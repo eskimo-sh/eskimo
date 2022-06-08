@@ -75,6 +75,33 @@ check_for_vagrant() {
     fi
 }
 
+restart_zeppelin_spark_executor() {
+
+    set +e
+    curl \
+        -b $SCRIPT_DIR/cookies \
+        -H 'Content-Type: application/json' \
+        -m 3600 \
+        -XPUT \
+        http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/interpreter/setting/restart/spark \
+        -d "$data" \
+        > eskimo-zeppelin-admin_call \
+        2> eskimo-zeppelin-call-error
+    if [[ $? != 0 ]]; then
+        echo "Couldn't sucessfully restart zeppelin spark interpreter"
+        exit 101
+    fi
+
+    if [[ `cat eskimo-zeppelin-admin_call | grep "\"status\":\"OK\""` == "" ]]; then
+        echo "Couldn't successfully check zeppelin spark interpreter restart"
+        exit 102
+    fi
+
+    rm -f eskimo-zeppelin-call-error
+    rm -f eskimo-zeppelin-admin_call
+
+}
+
 query_eskimo() {
     URL=$1
     data=$2
@@ -421,6 +448,7 @@ initial_setup_eskimo() {
         -XPOST http://$BOX_IP/login \
         -d 'eskimo-username=admin&eskimo-password=password' \
         >> /tmp/integration-test.log 2>&1
+
 
     # fetch status now and test it
     echo_date " - CALL Fetching status"
@@ -977,6 +1005,8 @@ run_zeppelin_data_load() {
             exit 41
         fi
     done
+
+    restart_zeppelin_spark_executor
 }
 
 create_kafka_topics() {
@@ -1069,6 +1099,8 @@ run_zeppelin_spark_kafka() {
     run_zeppelin_pararaph "/Spark Integration Kafka" 4
 
     run_zeppelin_pararaph "/Spark Integration Kafka" 6
+
+    restart_zeppelin_spark_executor
 }
 
 run_zeppelin_kafka_streams() {
@@ -1155,6 +1187,7 @@ run_zeppelin_kafka_streams() {
 
     rm -f streams-wordcount-output-results
 
+    restart_zeppelin_spark_executor
 }
 
 run_zeppelin_flink_kafka() {
@@ -1289,7 +1322,7 @@ do_cleanup() {
 
     #echo_date "   + Delete berka-trans"
     echo_date " - Delete berka index berka-trans"
-    vagrant ssh -c "curl -XDELETE http://localhost:9200/berka-trans" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "curl -XDELETE http://elasticsearch.default.svc.cluster.eskimo:9200/berka-trans" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
 }
 
@@ -1307,25 +1340,25 @@ test_web_apps() {
     fi
 
     echo_date "   + testing cerebro"
-    if [[ $(query_eskimo "cerebro/" | grep 'ng-app="cerebro"') == "" ]]; then
+    if [[ $(query_eskimo "cerebro/api/v1/namespaces/default/services/cerebro:31900/proxy/" | grep 'ng-app="cerebro"') == "" ]]; then
         echo_date "Couldn't reach Cerebro"
         exit 102
     fi
 
     echo_date "   + testing grafana (on system dashboard)"
-    if [[ $(query_eskimo "grafana/api/dashboards/db/eskimo-system-wide-monitoring" | grep meta) == "" ]]; then
+    if [[ $(query_eskimo "grafana/d/OMwJrHAWk/eskimo-system-wide-monitoring" | grep '<title>Grafana</title>') == "" ]]; then
         echo_date "Couldn't reach Grafana system dashboard"
         exit 103
     fi
 
-    echo_date "   + testing kubernetes application count"
-    kubernetes_apps=$(query_eskimo "kubernetes/v2/apps" | jq -r ' .apps | .[] | .id' 2> /dev/null)
-    if [[ $(echo "$kubernetes_apps" | wc -l) != $EXPECTED_NBR_APPS_kubernetes ]]; then
-        echo_date "Didn't find $EXPECTED_NBR_APPS_kubernetes apps in kubernetes"
-        echo_date "Found apps:"
-        echo "$kubernetes_apps"
-        exit 104
-    fi
+#    echo_date "   + testing kubernetes application count"
+#    kubernetes_apps=$(query_eskimo "kubernetes/v2/apps" | jq -r ' .apps | .[] | .id' 2> /dev/null)
+#    if [[ $(echo "$kubernetes_apps" | wc -l) != $EXPECTED_NBR_APPS_kubernetes ]]; then
+#        echo_date "Didn't find $EXPECTED_NBR_APPS_kubernetes apps in kubernetes"
+#        echo_date "Found apps:"
+#        echo "$kubernetes_apps"
+#        exit 104
+#    fi
 
     echo_date "   + testing spark history server"
     if [[ $(query_eskimo "spark-history-server/" | grep "Show incomplete applications") == "" ]]; then
@@ -1341,7 +1374,7 @@ test_web_apps() {
     #fi
 
     echo_date "   + testing kafka-manager"
-    if [[ $(query_eskimo "kafka-manager/" | grep "clusters/Eskimo") == "" ]]; then
+    if [[ $(query_eskimo "kafka-manager/api/v1/namespaces/default/services/kafka-manager:31220/proxy/" | grep "clusters/Eskimo") == "" ]]; then
         echo_date "Couldn't reach Kafka-Manager"
         exit 106
     fi
@@ -1380,7 +1413,7 @@ prepare_demo() {
     curl  \
             -b $SCRIPT_DIR/cookies \
             -m 3600 \
-            -H "kbn-version: 7.6.2" \
+            -H "kbn-version: 8.1.2" \
             -H "Content-Length: 0" \
             -H "Content-Type: application/json" \
             -H "Host: $BOX_IP" \
@@ -1390,7 +1423,10 @@ prepare_demo() {
             > kibana-flight-import \
             2> kibana-flight-import-error
 
-    if [[ `cat kibana-flight-import | grep "elasticsearchIndicesCreated"` == "" ]]; then
+# http://192.168.56.41/kibana/api/sample_data/flights
+#77b6aa8e83065cde78d90d2519f3f836ef59808a2391341f6b43708ea199437e
+
+    if [[ `cat kibana-flight-import | grep "\"kibanaSavedObjectsLoaded\":11"` == "" ]]; then
         echo "!! Couldn't import kibana flights object"
         exit 113
     fi
@@ -1402,7 +1438,7 @@ prepare_demo() {
     curl  \
             -b $SCRIPT_DIR/cookies \
             -m 3600 \
-            -H "kbn-version: 7.6.2" \
+            -H "kbn-version: 8.1.2" \
             -H "Content-Length: 0" \
             -H "Content-Type: application/json" \
             -H "Host: $BOX_IP" \
@@ -1412,7 +1448,7 @@ prepare_demo() {
             > kibana-logs-import \
             2> kibana-logs-import-error
 
-    if [[ `cat kibana-logs-import | grep "elasticsearchIndicesCreated"` == "" ]]; then
+    if [[ `cat kibana-logs-import | grep "\"kibanaSavedObjectsLoaded\":13"` == "" ]]; then
         echo "!! Couldn't import kibana logs object"
         exit 113
     fi
@@ -1424,7 +1460,7 @@ prepare_demo() {
     curl  \
             -b $SCRIPT_DIR/cookies \
             -m 3600 \
-            -H "kbn-version: 7.6.2" \
+            -H "kbn-version: 8.1.2" \
             -H "Content-Length: 0" \
             -H "Content-Type: application/json" \
             -H "Host: $BOX_IP" \
@@ -1434,7 +1470,7 @@ prepare_demo() {
             > kibana-ecommerce-import \
             2> kibana-ecommerce-import-error
 
-    if [[ `cat kibana-ecommerce-import | grep "elasticsearchIndicesCreated"` == "" ]]; then
+    if [[ `cat kibana-ecommerce-import | grep "\"kibanaSavedObjectsLoaded\":20"` == "" ]]; then
         echo "!! Couldn't import kibana ecommerce object"
         exit 113
     fi
@@ -1448,7 +1484,7 @@ prepare_demo() {
     curl  \
             -b $SCRIPT_DIR/cookies \
             -m 3600 \
-            -H "kbn-version: 7.6.2" \
+            -H "kbn-version: 8.1.2" \
             -H "Content-Length: 0" \
             -H "Content-Type: application/json" \
             -H "Host: $BOX_IP" \
@@ -1591,7 +1627,7 @@ check_for_virtualbox
 check_for_vagrant
 
 if [[ -z $DONT_REBUILD ]]; then
-    rebuild_eskimo
+   rebuild_eskimo
 fi
 
 if [[ -z $REBUILD_ONLY ]]; then
@@ -1627,6 +1663,7 @@ if [[ -z $REBUILD_ONLY ]]; then
     do_cleanup
 
 fi
+
 
 if [[ $DEMO == "demo" ]]; then
     prepare_demo
