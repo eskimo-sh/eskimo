@@ -422,9 +422,6 @@ initial_setup_eskimo() {
         -d 'eskimo-username=admin&eskimo-password=password' \
         >> /tmp/integration-test.log 2>&1
 
-# fixme remove me
-return
-
     # fetch status now and test it
     echo_date " - CALL Fetching status"
     status=$(curl -b $SCRIPT_DIR/cookies http://$BOX_IP/get-status 2> /dev/null)
@@ -1591,36 +1588,35 @@ check_for_virtualbox
 
 check_for_vagrant
 
-#
-#if [[ -z $DONT_REBUILD ]]; then
-#    rebuild_eskimo
-#fi
-#
-#if [[ -z $REBUILD_ONLY ]]; then
-#    build_box
-#fi
-#
-#install_eskimo
-#
+if [[ -z $DONT_REBUILD ]]; then
+    rebuild_eskimo
+fi
+
+if [[ -z $REBUILD_ONLY ]]; then
+    build_box
+fi
+
+install_eskimo
+
 initial_setup_eskimo
-#
-#if [[ -z $REBUILD_ONLY ]]; then
-#
-#    setup_eskimo
-#
-#    wait_all_services_up
-#
-#    run_zeppelin_data_load
-#
-#    create_kafka_topics
-#
-#    run_zeppelin_spark_kafka
-#
-#    run_zeppelin_flink_kafka
-#
-#    run_zeppelin_kafka_streams
-#
-#    run_zeppelin_other_notes
+
+if [[ -z $REBUILD_ONLY ]]; then
+
+    setup_eskimo
+
+    wait_all_services_up
+
+    run_zeppelin_data_load
+
+    create_kafka_topics
+
+    run_zeppelin_spark_kafka
+
+    run_zeppelin_flink_kafka
+
+    run_zeppelin_kafka_streams
+
+    run_zeppelin_other_notes
 
     test_web_apps
 
