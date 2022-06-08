@@ -55,8 +55,10 @@ fi
 # Find out which eskimo version we have in lib
 ESKIMO_WAR=`cd lib; ls -1 eskimo*war`
 
+# overriding serviceDefinitionFile in eskimo.properties
+export SERVICESDEFINITIONFILE=conf/services.json
+
 java \
     -Xmx1024m \
     -jar lib/$ESKIMO_WAR \
-    -DservicesDefinitionFile=conf/services.json \
     --spring.config.location=conf/eskimo.properties

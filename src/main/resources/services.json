@@ -446,7 +446,44 @@
           "type" : "PLAIN",
           "source" : "kubernetes-dashboard//",
           "target" : "kubernetes-dashboard/"
+        },
+        {
+          "__comment": "ALl of the following are to get rid of the limit of Kubernetes Dashboard to prevent HTTP access from non-localhost",
+          "type" : "PLAIN",
+          "source" : "isCurrentDomainSecure_(){return[\"localhost\",\"127.0.0.1\"].indexOf(location.hostname)>-1}",
+          "target" : "isCurrentDomainSecure_(){return true}"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "isCurrentProtocolSecure_(){return location.protocol.includes(\"https\")}",
+          "target" : "isCurrentProtocolSecure_(){return true}"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "isAuthenticationEnabled(S){return S.httpsMode}",
+          "target" : "isAuthenticationEnabled(S){return true}"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "isAuthEnabled(){return!!this.loginStatus&&this.loginStatus.httpsMode}",
+          "target" : "isAuthEnabled(){return true}"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "isLoginPageEnabled(){return\"true\"!==this.cookies_.get(this.config_.skipLoginPageCookieName)}",
+          "target" : "isLoginPageEnabled(){return true}"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "isLoginEnabled(){return this.isCurrentDomainSecure_()||this.isCurrentProtocolSecure_()}",
+          "target" : "isLoginEnabled(){return true}"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : ",S.secure&&(v+=\"secure;\"),S.sameSite||(S.sameSite=\"Lax\"),v+=\"sameSite=\"+S.sameSite+\";\"",
+          "target" : ""
         }
+
       ],
       "pageScripters" : [
         {

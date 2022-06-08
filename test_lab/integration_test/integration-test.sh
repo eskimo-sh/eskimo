@@ -962,10 +962,12 @@ run_zeppelin_data_load() {
     echo_date " - Waiting for kubernetes to unregister spark executor (not to compromise other tests)"
     for attempt in $(seq 1 60); do
         sleep 10
+        set +e
         spark_exec_status=$(vagrant ssh -c \
                 "sudo /usr/local/bin/kubectl get pod" \
                 $TARGET_MASTER_VM \
                 | grep -E 'zeppelin-spark|spark-integration' | grep Running )
+        set -e
         if [[ $spark_exec_status == "" ]]; then
             echo_date "   + No Zeppelin Spark executor found anymore, can continue ..."
             break

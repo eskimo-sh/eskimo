@@ -52,13 +52,15 @@ FOR /f "tokens=*" %%G IN ('dir /b %scriptpath%..\lib\eskimo*war') DO set WAR_FIL
 cd /D %drive%
 cd %scriptpath%..
 
-REM encoding UTF-8 is required to parse SSH command results properly.
 
+REM overriding serviceDefinitionFile in eskimo.properties
+SET SERVICESDEFINITIONFILE=conf\services.json
+
+REM encoding UTF-8 is required to parse SSH command results properly.
 %JAVA_HOME%\bin\java ^
     -Xms1024m ^
     -Xmx1024m ^
     -Dfile.encoding=UTF-8 ^
     -jar %scriptpath%..\lib\%WAR_FILE% ^
-    -DservicesDefinitionFile=%scriptpath%..\conf\services.json \
     --spring.config.location=%scriptpath%..\conf\eskimo.properties
 
