@@ -65,7 +65,7 @@ data:
             ttl 30
         }
         prometheus :9153
-        forward . /etc/k8s/resolv.conf
+        forward . /etc/k8s/shared/resolv.conf
         loop
         cache 30        
         reload
@@ -130,8 +130,8 @@ spec:
             - name: config-volume
               mountPath: /etc/coredns
               readOnly: true
-            - name: etc-k8s
-              mountPath: /etc/k8s
+            - name: etc-k8s-shared
+              mountPath: /etc/k8s/shared
               readOnly: true
           ports:
             - containerPort: 53
@@ -167,9 +167,9 @@ spec:
               scheme: HTTP
       dnsPolicy: Default
       volumes:
-        - name: etc-k8s
+        - name: etc-k8s-shared
           hostPath:
-            path: /etc/k8s
+            path: /etc/k8s/shared
         - name: config-volume
           configMap:
             name: coredns

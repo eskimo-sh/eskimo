@@ -39,4 +39,4 @@ set -e
 . /etc/eskimo_k8s_environment
 
 # Handling /var/lib/kubernetes/docker_registry
-/usr/local/sbin/gluster_mount.sh kubernetes_ssl /usr/local/etc/k8s/ssl kubernetes
+/usr/local/sbin/gluster_mount.sh kubernetes_shared /usr/local/etc/k8s/shared kubernetes

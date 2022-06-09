@@ -68,9 +68,14 @@ fi
 
 set -e
 
-if [[ ! -d /etc/k8s/ssl/ ]]; then
-    echo " - Creating folder /etc/k8s/ssl/"
-    sudo mkdir -p /etc/k8s/ssl/
+if [[ ! -d /etc/k8s/shared/ ]]; then
+    echo " - Creating folder /etc/k8s/shared/"
+    sudo mkdir -p /etc/k8s/shared/
+fi
+
+if [[ ! -d /etc/k8s/shared/ssl/ ]]; then
+    echo " - Creating folder /etc/k8s/shared/ssl/"
+    sudo mkdir -p /etc/k8s/shared/ssl/
 fi
 
 # attempt to recreate  / remount gluster shares
@@ -80,29 +85,29 @@ echo " - Creating / checking eskimo kubernetes base config"
 
 
 function delete_ssl_lock_file() {
-     rm -Rf /etc/k8s/ssl/ssl_management_lock
+     rm -Rf /etc/k8s/shared/ssl/ssl_management_lock
 }
 
 # From here we will be messing with gluster and hence we need to take a lock
 counter=0
-while [[ -f /etc/k8s/ssl/ssl_management_lock ]] ; do
-    echo "   + /etc/k8s/ssl/ssl_management_lock exist. waiting 2 secs ... "
+while [[ -f /etc/k8s/shared/ssl/ssl_management_lock ]] ; do
+    echo "   + /etc/k8s/shared/ssl/ssl_management_lock exist. waiting 2 secs ... "
     sleep 2
     let counter=counter+1
     if [[ $counter -ge 15 ]]; then
-        echo " !!! Couldn't get /etc/k8s/ssl/ssl_management_lock in 30 seconds. crashing !"
+        echo " !!! Couldn't get /etc/k8s/shared/ssl/ssl_management_lock in 30 seconds. crashing !"
         exit 150
     fi
 done
 
-touch /etc/k8s/ssl/ssl_management_lock
+touch /etc/k8s/shared/ssl/ssl_management_lock
 
 trap delete_ssl_lock_file 15
 trap delete_ssl_lock_file EXIT
 trap delete_ssl_lock_file ERR
 
 
-if [[ ! -f /etc/k8s/ssl/ca-config.json ]]; then
+if [[ ! -f /etc/k8s/shared/ssl/ca-config.json ]]; then
     echo "   + Create and install ca-config.json"
     cat > ca-config.json <<EOF
 {
@@ -150,12 +155,12 @@ if [[ ! -f /etc/k8s/ssl/ca-config.json ]]; then
 }
 EOF
 
-    sudo mv ca-config.json /etc/k8s/ssl/ca-config.json
-    sudo chown root /etc/k8s/ssl/ca-config.json
-    sudo chmod 755 /etc/k8s/ssl/ca-config.json
+    sudo mv ca-config.json /etc/k8s/shared/ssl/ca-config.json
+    sudo chown root /etc/k8s/shared/ssl/ca-config.json
+    sudo chmod 755 /etc/k8s/shared/ssl/ca-config.json
 fi
 
-if [[ ! -f /etc/k8s/ssl/ca-csr.json ]]; then
+if [[ ! -f /etc/k8s/shared/ssl/ca-csr.json ]]; then
     echo "   + Create and install ca-csr.json"
     cat > ca-csr.json <<EOF
 {
@@ -177,28 +182,28 @@ if [[ ! -f /etc/k8s/ssl/ca-csr.json ]]; then
 }
 EOF
 
-    sudo mv ca-csr.json /etc/k8s/ssl/ca-csr.json
-    sudo chown root /etc/k8s/ssl/ca-csr.json
-    sudo chmod 755 /etc/k8s/ssl/ca-csr.json
+    sudo mv ca-csr.json /etc/k8s/shared/ssl/ca-csr.json
+    sudo chown root /etc/k8s/shared/ssl/ca-csr.json
+    sudo chmod 755 /etc/k8s/shared/ssl/ca-csr.json
 fi
 
 
 # TODO re-generate cert with the following
 # echo "   + generate certificate ca.pen"
-# cfssl gencert -initca /etc/k8s/ssl/ca-csr.json | cfssljson -bare ca
+# cfssl gencert -initca /etc/k8s/shared/ssl/ca-csr.json | cfssljson -bare ca
 
-if [[ ! -f /etc/k8s/ssl/ca.pem ]]; then
+if [[ ! -f /etc/k8s/shared/ssl/ca.pem ]]; then
     # Generate certificates
     echo "   + Generate root certificates"
-    sudo /usr/local/bin/cfssl gencert -initca /etc/k8s/ssl/ca-csr.json | cfssljson -bare ca
+    sudo /usr/local/bin/cfssl gencert -initca /etc/k8s/shared/ssl/ca-csr.json | cfssljson -bare ca
 
     echo "   + Install root certificates"
-    sudo mv ca*.pem /etc/k8s/ssl/
-    sudo mv ca*csr* /etc/k8s/ssl/
+    sudo mv ca*.pem /etc/k8s/shared/ssl/
+    sudo mv ca*csr* /etc/k8s/shared/ssl/
 fi
 
 
-if [[ ! -f /etc/k8s/ssl/$USER-csr.json ]]; then
+if [[ ! -f /etc/k8s/shared/ssl/$USER-csr.json ]]; then
     echo "   + Create and install ${user}-csr.json"
     cat > $USER-csr.json <<EOF
 {
@@ -220,20 +225,20 @@ if [[ ! -f /etc/k8s/ssl/$USER-csr.json ]]; then
 }
 EOF
 
-    sudo mv $USER-csr.json /etc/k8s/ssl/$USER-csr.json
+    sudo mv $USER-csr.json /etc/k8s/shared/ssl/$USER-csr.json
 fi
 
-if [[ ! -f /etc/k8s/ssl/$USER.pem ]]; then
+if [[ ! -f /etc/k8s/shared/ssl/$USER.pem ]]; then
     # Generate certificates
     echo "   + Generate Admin certificates"
-    sudo /usr/local/bin/cfssl gencert -ca=/etc/k8s/ssl/ca.pem \
-      -ca-key=/etc/k8s/ssl/ca-key.pem \
-      -config=/etc/k8s/ssl/ca-config.json \
-      -profile=kubernetes /etc/k8s/ssl/`echo $USER`-csr.json | cfssljson -bare `echo $USER`
+    sudo /usr/local/bin/cfssl gencert -ca=/etc/k8s/shared/ssl/ca.pem \
+      -ca-key=/etc/k8s/shared/ssl/ca-key.pem \
+      -config=/etc/k8s/shared/ssl/ca-config.json \
+      -profile=kubernetes /etc/k8s/shared/ssl/`echo $USER`-csr.json | cfssljson -bare `echo $USER`
 
     echo "   + Install Admin certificates"
-    sudo mv `echo $USER`*.pem /etc/k8s/ssl/
-    sudo mv `echo $USER`*csr* /etc/k8s/ssl/
+    sudo mv `echo $USER`*.pem /etc/k8s/shared/ssl/
+    sudo mv `echo $USER`*csr* /etc/k8s/shared/ssl/
 fi
 
 if [[ ! -f /etc/k8s/serviceaccount-$USER.yaml  ]]; then

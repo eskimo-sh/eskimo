@@ -21,7 +21,7 @@ cd $tmp_dir
 
 echo "   + Configure the cluster and the certificates"
 kubectl config set-cluster eskimo \
-  --certificate-authority=/etc/k8s/ssl/ca.pem \
+  --certificate-authority=/etc/k8s/shared/ssl/ca.pem \
   --embed-certs=true \
   --server=$ESKIMO_KUBE_APISERVER \
   --kubeconfig=temp.kubeconfig
@@ -30,8 +30,8 @@ export ADMIN_USER=`cat /etc/eskimo_user`
 
 echo "   + Configure client side user and certificates"
 kubectl config set-credentials $ADMIN_USER \
-  --client-certificate=/etc/k8s/ssl/$ADMIN_USER.pem \
-  --client-key=/etc/k8s/ssl/$ADMIN_USER-key.pem \
+  --client-certificate=/etc/k8s/shared/ssl/$ADMIN_USER.pem \
+  --client-key=/etc/k8s/shared/ssl/$ADMIN_USER-key.pem \
   --token=$BOOTSTRAP_TOKEN \
   --kubeconfig=temp.kubeconfig
 

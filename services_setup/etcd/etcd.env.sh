@@ -120,17 +120,17 @@ echo "   + Using ESKIMO_ETCD_INITIAL_CLUSTER_STATE=$ESKIMO_ETCD_INITIAL_CLUSTER_
 #echo "   + Using ESKIMO_ETCD_CLIENT_CERT_AUTH=$ESKIMO_ETCD_CLIENT_CERT_AUTH"
 
 # Root ca file
-#export ESKIMO_ETCD_TRUSTED_CA_FILE="/etc/k8s/ssl/ca.pem"
+#export ESKIMO_ETCD_TRUSTED_CA_FILE="/etc/k8s/shared/ssl/ca.pem"
 #echo "   + Using ESKIMO_ETCD_TRUSTED_CA_FILE=$ESKIMO_ETCD_TRUSTED_CA_FILE"
 
 # Peer certificates
-#export #ESKIMO_ETCD_PEER_CERT_FILE="/etc/k8s/ssl/kubernetes.pem"
+#export #ESKIMO_ETCD_PEER_CERT_FILE="/etc/k8s/shared/ssl/kubernetes.pem"
 #echo "   + Using ESKIMO_ETCD_PEER_CERT_FILE=$ESKIMO_ETCD_PEER_CERT_FILE"
-#export ESKIMO_ETCD_PEER_KEY_FILE="/etc/k8s/ssl/kubernetes-key.pem"
+#export ESKIMO_ETCD_PEER_KEY_FILE="/etc/k8s/shared/ssl/kubernetes-key.pem"
 #echo "   + Using ESKIMO_ETCD_PEER_KEY_FILE=$ESKIMO_ETCD_PEER_KEY_FILE"
 #export ESKIMO_ETCD_PEER_CLIENT_CERT_AUTH="true"
 #echo "   + Using ESKIMO_ETCD_PEER_CLIENT_CERT_AUTH=$ESKIMO_ETCD_PEER_CLIENT_CERT_AUTH"
-#export ESKIMO_ETCD_PEER_TRUSTED_CA_FILE="/etc/k8s/ssl/ca.pem"
+#export ESKIMO_ETCD_PEER_TRUSTED_CA_FILE="/etc/k8s/shared/ssl/ca.pem"
 #echo "   + Using ESKIMO_ETCD_PEER_TRUSTED_CA_FILE=$ESKIMO_ETCD_PEER_TRUSTED_CA_FILE"
 
 export ESKIMO_ETCD_DATA_DIR="/var/lib/etcd"

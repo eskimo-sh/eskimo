@@ -58,15 +58,15 @@ cd $tmp_dir
 
 echo "   + Configure the cluster parameters"
 kubectl config set-cluster eskimo \
-  --certificate-authority=/etc/k8s/ssl/ca.pem \
+  --certificate-authority=/etc/k8s/shared/ssl/ca.pem \
   --embed-certs=true \
   --server=${ESKIMO_KUBE_APISERVER} \
   --kubeconfig=kuberouter.kubeconfig
 
 echo "   + Configure authentication parameters"
 kubectl config set-credentials kuberouter \
-  --client-certificate=/etc/k8s/ssl/kuberouter.pem \
-  --client-key=/etc/k8s/ssl/kuberouter-key.pem \
+  --client-certificate=/etc/k8s/shared/ssl/kuberouter.pem \
+  --client-key=/etc/k8s/shared/ssl/kuberouter-key.pem \
   --kubeconfig=kuberouter.kubeconfig
 # --token=${BOOTSTRAP_TOKEN} \
 

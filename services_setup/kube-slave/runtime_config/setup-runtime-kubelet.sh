@@ -65,7 +65,7 @@ cd $tmp_dir
 
 echo "   + Configure the cluster parameters"
 kubectl config set-cluster eskimo \
-  --certificate-authority=/etc/k8s/ssl/ca.pem \
+  --certificate-authority=/etc/k8s/shared/ssl/ca.pem \
   --embed-certs=true \
   --server=${ESKIMO_KUBE_APISERVER} \
   --kubeconfig=bootstrap.kubeconfig
@@ -73,8 +73,8 @@ kubectl config set-cluster eskimo \
 echo "   + Configure authentication parameters"
 kubectl config set-credentials kubelet-bootstrap \
   --token=${BOOTSTRAP_TOKEN} \
-  --client-certificate=/etc/k8s/ssl/kubernetes.pem \
-  --client-key=/etc/k8s/ssl/kubernetes-key.pem \
+  --client-certificate=/etc/k8s/shared/ssl/kubernetes.pem \
+  --client-key=/etc/k8s/shared/ssl/kubernetes-key.pem \
   --kubeconfig=bootstrap.kubeconfig
 
 echo "   + Configure the context"

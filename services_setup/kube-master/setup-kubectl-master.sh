@@ -112,23 +112,23 @@ cat > kubernetes-csr.json <<EOF
 }
 EOF
 
-sudo mv kubernetes-csr.json /etc/k8s/ssl/kubernetes-csr.json
-sudo chown kubernetes /etc/k8s/ssl/kubernetes-csr.json
-sudo chmod 755 /etc/k8s/ssl/kubernetes-csr.json
+sudo mv kubernetes-csr.json /etc/k8s/shared/ssl/kubernetes-csr.json
+sudo chown kubernetes /etc/k8s/shared/ssl/kubernetes-csr.json
+sudo chmod 755 /etc/k8s/shared/ssl/kubernetes-csr.json
 
 # Generate certificates
 echo "   + (Re-)Generate kubernetes certificates"
 
-sudo /usr/local/bin/cfssl gencert -ca=/etc/k8s/ssl/ca.pem \
-  -ca-key=/etc/k8s/ssl/ca-key.pem \
-  -config=/etc/k8s/ssl/ca-config.json \
-  -profile=kubernetes /etc/k8s/ssl/kubernetes-csr.json | cfssljson -bare kubernetes
+sudo /usr/local/bin/cfssl gencert -ca=/etc/k8s/shared/ssl/ca.pem \
+  -ca-key=/etc/k8s/shared/ssl/ca-key.pem \
+  -config=/etc/k8s/shared/ssl/ca-config.json \
+  -profile=kubernetes /etc/k8s/shared/ssl/kubernetes-csr.json | cfssljson -bare kubernetes
 
 echo "   + (Re-)Install kubernetes certificates"
-sudo mv kubernetes*.pem /etc/k8s/ssl/
-sudo chown kubernetes /etc/k8s/ssl/kubernetes*.pem
-sudo mv kubernetes*csr* /etc/k8s/ssl/
-sudo chown kubernetes /etc/k8s/ssl/kubernetes*csr*
+sudo mv kubernetes*.pem /etc/k8s/shared/ssl/
+sudo chown kubernetes /etc/k8s/shared/ssl/kubernetes*.pem
+sudo mv kubernetes*csr* /etc/k8s/shared/ssl/
+sudo chown kubernetes /etc/k8s/shared/ssl/kubernetes*csr*
 
 
 set +e

@@ -101,4 +101,4 @@ echo "   + Using ESKIMO_KUBE_TLS_CERT_FILE=$ESKIMO_KUBE_TLS_CERT_FILE"
 echo "   + Using ESKIMO_KUBE_TLS_PRIVATE_KEY=$ESKIMO_KUBE_TLS_PRIVATE_KEY"
 echo "   + Using ESKIMO_KUBE_CLIENT_CA_FILE=$ESKIMO_KUBE_CLIENT_CA_FILE"
 
-# --cert-dir=/etc/kubernetes/ssl
+# --cert-dir=/etc/k8s/shared/ssl

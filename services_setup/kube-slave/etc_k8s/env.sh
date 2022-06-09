@@ -101,11 +101,11 @@ export ESKIMO_KUBE_LOGTOSTDERR="true"
 export ESKIMO_ALLOW_PRIVILEGED="true"
 
 # The certificates used by API server
-export ESKIMO_KUBE_TLS_CERT_FILE=/etc/k8s/ssl/kubernetes.pem
+export ESKIMO_KUBE_TLS_CERT_FILE=/etc/k8s/shared/ssl/kubernetes.pem
 
-export ESKIMO_KUBE_TLS_PRIVATE_KEY=/etc/k8s/ssl/kubernetes-key.pem
+export ESKIMO_KUBE_TLS_PRIVATE_KEY=/etc/k8s/shared/ssl/kubernetes-key.pem
 
-export ESKIMO_KUBE_CLIENT_CA_FILE=/etc/k8s/ssl/ca.pem
+export ESKIMO_KUBE_CLIENT_CA_FILE=/etc/k8s/shared/ssl/ca.pem
 
 # How the controller-manager, scheduler, and proxy find the apiserver
 export ESKIMO_KUBE_MASTER="$ESKIMO_KUBE_APISERVER"

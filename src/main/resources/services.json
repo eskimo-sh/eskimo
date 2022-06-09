@@ -267,7 +267,7 @@
             "name": "target.volumes",
             "comment": "The volumes to be automagically managed by EGMI.",
             "defaultValue": "",
-            "value": "spark_eventlog,spark_data,flink_data,kafka_data,flink_completed_jobs,logstash_data,kubernetes_registry,kubernetes_ssl"
+            "value": "spark_eventlog,spark_data,flink_data,kafka_data,flink_completed_jobs,logstash_data,kubernetes_registry,kubernetes_shared"
           }
         ]
       }

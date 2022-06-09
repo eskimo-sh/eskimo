@@ -47,7 +47,7 @@ function delete_k8s_slave_lock_file() {
 # From here we will be messing with gluster and hence we need to take a lock
 counter=0
 while [[ -f /var/lib/kubernetes/k8s_slave_management_lock ]] ; do
-    echo "   + /etc/k8s/ssl/k8s_slave_management_lock exist. waiting 2 secs ... "
+    echo "   + /var/lib/kubernetes/k8s_slave_management_lock exist. waiting 2 secs ... "
     sleep 2
     let counter=counter+1
     if [[ $counter -ge 15 ]]; then

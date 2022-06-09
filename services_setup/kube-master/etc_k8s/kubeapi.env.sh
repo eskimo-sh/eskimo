@@ -67,13 +67,13 @@ export ESKIMO_KUBE_API_BIND_ADDRESS="0.0.0.0"
 echo "   + Using ESKIMO_KUBE_API_BIND_ADDRESS=$ESKIMO_KUBE_API_BIND_ADDRESS"
 
 # The certificates used by API server
-export ESKIMO_KUBE_TLS_CERT_FILE=/etc/k8s/ssl/kubernetes.pem
+export ESKIMO_KUBE_TLS_CERT_FILE=/etc/k8s/shared/ssl/kubernetes.pem
 echo "   + Using ESKIMO_KUBE_TLS_CERT_FILE=$ESKIMO_KUBE_TLS_CERT_FILE"
 
-export ESKIMO_KUBE_TLS_PRIVATE_KEY=/etc/k8s/ssl/kubernetes-key.pem
+export ESKIMO_KUBE_TLS_PRIVATE_KEY=/etc/k8s/shared/ssl/kubernetes-key.pem
 echo "   + Using ESKIMO_KUBE_TLS_PRIVATE_KEY=$ESKIMO_KUBE_TLS_PRIVATE_KEY"
 
-export ESKIMO_KUBE_CLIENT_CA_FILE=/etc/k8s/ssl/ca.pem
+export ESKIMO_KUBE_CLIENT_CA_FILE=/etc/k8s/shared/ssl/ca.pem
 echo "   + Using ESKIMO_KUBE_CLIENT_CA_FILE=$ESKIMO_KUBE_CLIENT_CA_FILE"
 
 # The Kubelet authorization configs
@@ -94,13 +94,13 @@ echo "   + Using ESKIMO_KUBE_ETCD_SERVER=$ESKIMO_KUBE_ETCD_SERVER"
 
 # The etcd SSL certificates
 # TODO not using etcs ssl for now
-#export ESKIMO_KUBE_ETCD_CAFILE=/etc/k8s/ssl/ca.pem
+#export ESKIMO_KUBE_ETCD_CAFILE=/etc/k8s/shared/ssl/ca.pem
 #echo "   + Using ESKIMO_KUBE_ETCD_CAFILE=$ESKIMO_KUBE_ETCD_CAFILE"
 #
-#export ESKIMO_KUBE_ETCD_CERTFILE=/etc/k8s/ssl/kubernetes.pem
+#export ESKIMO_KUBE_ETCD_CERTFILE=/etc/k8s/shared/ssl/kubernetes.pem
 #echo "   + Using ESKIMO_KUBE_ETCD_CERTFILE=$ESKIMO_KUBE_ETCD_CERTFILE"
 #
-#export ESKIMO_KUBE_ETCD_KEYFILE=/etc/k8s/ssl/kubernetes-key.pem
+#export ESKIMO_KUBE_ETCD_KEYFILE=/etc/k8s/shared/ssl/kubernetes-key.pem
 #echo "   + Using ESKIMO_KUBE_ETCD_KEYFILE=$ESKIMO_KUBE_ETCD_KEYFILE"
 
 # Address range to use for services
@@ -115,10 +115,10 @@ export ESKIMO_KUBE_ADMISSION_CONTROL="NamespaceExists,NamespaceLifecycle,LimitRa
 echo "   + Using ESKIMO_KUBE_ADMISSION_CONTROL=$ESKIMO_KUBE_ADMISSION_CONTROL"
 
 # ServiceAccount configs
-export ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE="/etc/k8s/ssl/kubernetes.pem"
+export ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE="/etc/k8s/shared/ssl/kubernetes.pem"
 echo "   + Using ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE=$ESKIMO_KUBE_SERVICE_ACCOUNT_KEYFILE"
 
-export ESKIMO_KUBE_SERVICE_ACCOUNT_SIGNING_KEYFILE="/etc/k8s/ssl/kubernetes-key.pem"
+export ESKIMO_KUBE_SERVICE_ACCOUNT_SIGNING_KEYFILE="/etc/k8s/shared/ssl/kubernetes-key.pem"
 echo "   + Using ESKIMO_KUBE_SERVICE_ACCOUNT_SIGNING_KEYFILE=$ESKIMO_KUBE_SERVICE_ACCOUNT_SIGNING_KEYFILE"
 
 export ESKIMO_KUBE_SERVUCE_ACCOUNT_ISSUER=api

@@ -42,7 +42,7 @@ export HOME=/root
 
 export RECREATE="no"
 for i in ${ALL_NODES_LIST_gluster//,/ }; do
-    if [[ `kubectl get endpoints | grep eskimo-glusterfs-cluster | grep $i` == "" ]]; then
+    if [[ `kubectl get endpoints eskimo-glusterfs-cluster -o json 2>/dev/null | grep $i` == "" ]]; then
         export RECREATE="yes"
         break
     fi

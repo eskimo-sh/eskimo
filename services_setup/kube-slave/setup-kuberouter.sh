@@ -79,7 +79,7 @@ fi
 
 set -e
 
-if [[ ! -f /etc/k8s/ssl/kuberouter-csr.json ]]; then
+if [[ ! -f /etc/k8s/shared/ssl/kuberouter-csr.json ]]; then
     echo "   + Create and install kuberouter-csr.json"
     cat > kuberouter-csr.json <<EOF
 {
@@ -101,27 +101,27 @@ if [[ ! -f /etc/k8s/ssl/kuberouter-csr.json ]]; then
 }
 EOF
 
-    sudo mv kuberouter-csr.json /etc/k8s/ssl/kuberouter-csr.json
-    sudo chown kubernetes /etc/k8s/ssl/kuberouter-csr.json
-    sudo chmod 755 /etc/k8s/ssl/kuberouter-csr.json
+    sudo mv kuberouter-csr.json /etc/k8s/shared/ssl/kuberouter-csr.json
+    sudo chown kubernetes /etc/k8s/shared/ssl/kuberouter-csr.json
+    sudo chmod 755 /etc/k8s/shared/ssl/kuberouter-csr.json
 fi
 
 
-if [[ ! -f /etc/k8s/ssl/kuberouter.pem ]]; then
+if [[ ! -f /etc/k8s/shared/ssl/kuberouter.pem ]]; then
 
     # Generate certificates
     echo "   + Generate kubernetes certificates"
 
-    sudo /usr/local/bin/cfssl gencert -ca=/etc/k8s/ssl/ca.pem \
-      -ca-key=/etc/k8s/ssl/ca-key.pem \
-      -config=/etc/k8s/ssl/ca-config.json \
-      -profile=kubernetes /etc/k8s/ssl/kuberouter-csr.json | cfssljson -bare kuberouter
+    sudo /usr/local/bin/cfssl gencert -ca=/etc/k8s/shared/ssl/ca.pem \
+      -ca-key=/etc/k8s/shared/ssl/ca-key.pem \
+      -config=/etc/k8s/shared/ssl/ca-config.json \
+      -profile=kubernetes /etc/k8s/shared/ssl/kuberouter-csr.json | cfssljson -bare kuberouter
 
     echo "   + Install kubernetes certificates"
-    sudo mv kuberouter*.pem /etc/k8s/ssl/
-    sudo chown kubernetes /etc/k8s/ssl/kuberouter*.pem
-    sudo mv kuberouter*csr* /etc/k8s/ssl/
-    sudo chown kubernetes /etc/k8s/ssl/kuberouter*csr*
+    sudo mv kuberouter*.pem /etc/k8s/shared/ssl/
+    sudo chown kubernetes /etc/k8s/shared/ssl/kuberouter*.pem
+    sudo mv kuberouter*csr* /etc/k8s/shared/ssl/
+    sudo chown kubernetes /etc/k8s/shared/ssl/kuberouter*csr*
 fi
 
 if [[ ! -f /etc/cni/net.d/10-kuberouter.conf ]]; then
