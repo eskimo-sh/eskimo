@@ -135,8 +135,8 @@ Use for instance the following commands on Linux:
 
 .Put maven and java in PATH on Linux
 ----
-export JAVA_HOME=/usr/local/lib/jdk-11
-export MAVEN_HOME=/usr/local/lib/apache-maven-3.5.3
+export JAVA_HOME=/usr/local/lib/jdk-11  ## (or wherever it's installed)
+export MAVEN_HOME=/usr/local/lib/apache-maven-3.5.3  ## (same)
 export PATH=$JAVA_HOME/bin:$MAVEN_HOME/bin:$PATH
 ----
 
@@ -146,8 +146,8 @@ And for instance the following commands on Windows
 
 .Put maven and java in PATH on Windows
 ----
-set JAVA_HOME=C:\programs\jdk-11
-set MAVEN_HOME=C:\programs\apache-maven-3.6.1
+set JAVA_HOME=C:\programs\jdk-11  :: (or wherever it's installed)
+set MAVEN_HOME=C:\programs\apache-maven-3.6.1  :: (same)
 set PATH=%MAVEN_HOME%\bin;%JAVA_HOME%\bin;%PATH%
 ----
 
