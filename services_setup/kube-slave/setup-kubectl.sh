@@ -70,16 +70,17 @@ set -e
 
 if [[ ! -d /etc/k8s/shared/ ]]; then
     echo " - Creating folder /etc/k8s/shared/"
-    sudo mkdir -p /etc/k8s/shared/
-fi
-
-if [[ ! -d /etc/k8s/shared/ssl/ ]]; then
-    echo " - Creating folder /etc/k8s/shared/ssl/"
-    sudo mkdir -p /etc/k8s/shared/ssl/
+    sudo mkdir -p /etc/k8s/shared
 fi
 
 # attempt to recreate  / remount gluster shares
 sudo /bin/bash /usr/local/sbin/setupK8sGlusterShares.sh
+
+# this needs to be done after gluster share
+if [[ ! -d /etc/k8s/shared/ssl/ ]]; then
+    echo " - Creating folder /etc/k8s/shared/ssl/"
+    sudo mkdir -p /etc/k8s/shared/ssl
+fi
 
 echo " - Creating / checking eskimo kubernetes base config"
 
