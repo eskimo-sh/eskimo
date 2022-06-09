@@ -529,7 +529,7 @@ setup_eskimo() {
            \"flink-runtime-taskmanager---memory---process---size:\": \"\",
            \"flink-runtime-parallelism---default\": \"\",
            \"flink-runtime-taskmanager---numberOfTaskSlots\": \"\",
-           \"gluster-target---volumes\": \"spark_eventlog,spark_data,flink_data,kafka_data,flink_completed_jobs,logstash_data,kubernetes_registry,kubernetes_ssl\",
+           \"gluster-target---volumes\": \"spark_eventlog,spark_data,flink_data,kafka_data,flink_completed_jobs,logstash_data,kubernetes_registry,kubernetes_shared\",
            \"grafana-admin_user\": \"\",
            \"grafana-admin_password\": \"\",
            \"kafka-Xms\": \"\",
@@ -591,10 +591,10 @@ setup_eskimo() {
         call_eskimo \
             "save-nodes-config" \
             '{
-        "node_id1":"192.168.10.51",
-        "node_id2":"192.168.10.52",
-        "node_id3":"192.168.10.53",
-        "node_id4":"192.168.10.54",
+        "node_id1":"192.168.56.51",
+        "node_id2":"192.168.56.52",
+        "node_id3":"192.168.56.53",
+        "node_id4":"192.168.56.54",
         "kube-master":"1",
         "zookeeper":"1",
         "etcd1":"on",
@@ -725,55 +725,55 @@ check_all_services_up() {
             fi
         done
     else
-        for i in "service_kubernetes_192-168-10-52" \
-            "service_mesos-agent_192-168-10-51" \
-            "service_mesos-agent_192-168-10-52" \
-            "service_mesos-agent_192-168-10-53" \
-            "service_mesos-agent_192-168-10-54" \
-            "service_prometheus_192-168-10-51" \
-            "service_prometheus_192-168-10-52" \
-            "service_prometheus_192-168-10-53" \
-            "service_prometheus_192-168-10-54" \
-            "service_flink-runtime_192-168-10-51" \
-            "service_flink-runtime_192-168-10-52" \
-            "service_flink-runtime_192-168-10-53" \
-            "service_flink-runtime_192-168-10-54" \
+        for i in "service_kubernetes_192-168-56-52" \
+            "service_mesos-agent_192-168-56-51" \
+            "service_mesos-agent_192-168-56-52" \
+            "service_mesos-agent_192-168-56-53" \
+            "service_mesos-agent_192-168-56-54" \
+            "service_prometheus_192-168-56-51" \
+            "service_prometheus_192-168-56-52" \
+            "service_prometheus_192-168-56-53" \
+            "service_prometheus_192-168-56-54" \
+            "service_flink-runtime_192-168-56-51" \
+            "service_flink-runtime_192-168-56-52" \
+            "service_flink-runtime_192-168-56-53" \
+            "service_flink-runtime_192-168-56-54" \
             "service_kibana_" \
-            "service_zookeeper_192-168-10-51" \
-            "service_spark-runtime_192-168-10-51" \
-            "service_spark-runtime_192-168-10-52" \
-            "service_spark-runtime_192-168-10-53" \
-            "service_spark-runtime_192-168-10-54" \
-            "service_mesos-master_192-168-10-51" \
+            "service_zookeeper_192-168-56-51" \
+            "service_spark-runtime_192-168-56-51" \
+            "service_spark-runtime_192-168-56-52" \
+            "service_spark-runtime_192-168-56-53" \
+            "service_spark-runtime_192-168-56-54" \
+            "service_mesos-master_192-168-56-51" \
             "service_zeppelin_" \
             "service_spark-history-server_" \
-            "service_elasticsearch_192-168-10-51" \
-            "service_elasticsearch_192-168-10-52" \
-            "service_elasticsearch_192-168-10-53" \
-            "service_elasticsearch_192-168-10-54" \
-            "service_logstash_192-168-10-51" \
-            "service_logstash_192-168-10-52" \
-            "service_logstash_192-168-10-53" \
-            "service_logstash_192-168-10-54" \
+            "service_elasticsearch_192-168-56-51" \
+            "service_elasticsearch_192-168-56-52" \
+            "service_elasticsearch_192-168-56-53" \
+            "service_elasticsearch_192-168-56-54" \
+            "service_logstash_192-168-56-51" \
+            "service_logstash_192-168-56-52" \
+            "service_logstash_192-168-56-53" \
+            "service_logstash_192-168-56-54" \
             "service_cerebro_" \
-            "service_kafka_192-168-10-51" \
-            "service_kafka_192-168-10-52" \
-            "service_kafka_192-168-10-53" \
-            "service_kafka_192-168-10-54" \
-            "service_ntp_192-168-10-51" \
-            "service_ntp_192-168-10-52" \
-            "service_ntp_192-168-10-53" \
-            "service_ntp_192-168-10-54" \
+            "service_kafka_192-168-56-51" \
+            "service_kafka_192-168-56-52" \
+            "service_kafka_192-168-56-53" \
+            "service_kafka_192-168-56-54" \
+            "service_ntp_192-168-56-51" \
+            "service_ntp_192-168-56-52" \
+            "service_ntp_192-168-56-53" \
+            "service_ntp_192-168-56-54" \
             "service_kafka-manager_" \
-            "service_gluster_192-168-10-51" \
-            "service_gluster_192-168-10-52" \
-            "service_gluster_192-168-10-53" \
-            "service_gluster_192-168-10-54" \
-            "node_alive_192-168-10-51" \
-            "node_alive_192-168-10-52" \
-            "node_alive_192-168-10-53" \
-            "node_alive_192-168-10-54" \
-            "service_flink-app-master_192-168-10-52" \
+            "service_gluster_192-168-56-51" \
+            "service_gluster_192-168-56-52" \
+            "service_gluster_192-168-56-53" \
+            "service_gluster_192-168-56-54" \
+            "node_alive_192-168-56-51" \
+            "node_alive_192-168-56-52" \
+            "node_alive_192-168-56-53" \
+            "node_alive_192-168-56-54" \
+            "service_flink-app-master_192-168-56-52" \
             "service_grafana_"; do
             if [[ $(echo $eskimo_status | jq -r ".nodeServicesStatus" | grep "$i" | cut -d ':' -f 2 | grep "OK") == "" ]]; then
                 echo "not found $i"
