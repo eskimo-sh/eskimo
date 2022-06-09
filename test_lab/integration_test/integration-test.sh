@@ -435,20 +435,21 @@ install_eskimo() {
     vagrant ssh -c "sudo systemctl daemon-reload" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 }
 
+login_eskimo() {
+      # login
+      echo_date " - CALL performing login"
+      curl \
+          -c $SCRIPT_DIR/cookies \
+          -H 'Content-Type: application/x-www-form-urlencoded' \
+          -XPOST http://$BOX_IP/login \
+          -d 'eskimo-username=admin&eskimo-password=password' \
+          >> /tmp/integration-test.log 2>&1
+}
+
 initial_setup_eskimo() {
 
     # Eskimo setup
     # ----------------------------------------------------------------------------------------------------------------------
-
-    # login
-    echo_date " - CALL performing login"
-    curl \
-        -c $SCRIPT_DIR/cookies \
-        -H 'Content-Type: application/x-www-form-urlencoded' \
-        -XPOST http://$BOX_IP/login \
-        -d 'eskimo-username=admin&eskimo-password=password' \
-        >> /tmp/integration-test.log 2>&1
-
 
     # fetch status now and test it
     echo_date " - CALL Fetching status"
@@ -485,13 +486,7 @@ setup_eskimo() {
     sleep 10
 
     # login again
-    echo_date " - CALL performing login"
-    curl \
-        -c $SCRIPT_DIR/cookies \
-        -H 'Content-Type: application/x-www-form-urlencoded' \
-        -XPOST http://$BOX_IP/login \
-        -d 'eskimo-username=admin&eskimo-password=password' \
-        >> /tmp/integration-test.log 2>&1
+    login_eskimo
 
 #    # fetch status now and test it
 #    echo_date " - CALL Fetching status"
@@ -1568,9 +1563,17 @@ prepare_demo() {
 usage() {
     echo "Usage:"
     echo "    -h  Display this help message."
-    echo "    -d  After the build, prepare the VM for DemoVM"
-    echo "    -r  Re-install eskimo on existing VM"
-    echo "    -f  Fast repackage"
+    echo "    -r  Rebuild eskimo (otherwise take latest build)"
+    echo "        -f  Fast repackage"
+    echo "    -b  Recreate box(es)"
+    echo "    -e  (Re-)install Eskimo on box"
+    echo "    -s  Setup Eskimo"
+    echo "    -l  Run Data load"
+    echo "    -z  Run Zeppelin notebooks test"
+    echo "    -t  Run other tests"
+    echo "    -c  Run cleanup"
+    echo "    -a  RUN ALL OF THE ABOVE"
+    echo "    -d  Prepare the VM for DemoVM"
     echo "    -m  Test on multiple nodes"
     echo "    -n  Don't rebuild the software (use last build)"
 }
@@ -1581,44 +1584,85 @@ export BOX_IP=192.168.56.41
 export DOCKER_LOCAL=192.168.56.41
 export TARGET_MASTER_VM="integration-test"
 
+if [[ "$*" == "" ]]; then
+    usage
+    exit 1
+fi
+
 sudo rm -Rf /tmp/integration-test.log
 
+export REBUILD_ESKIMO=""
+export RECREATE_BOX=""
+export INSTALL_ESKIMO=""
+export SETUP_ESKIMO=""
+export RUN_DATA_LOAD=""
+export RUN_NOTEBOOK_TESTS=""
+export RUN_OTHER_TESTS=""
+export RUN_CLEANUP=""
+
+
 # Parse options to the integration-test script
-while getopts ":hdrfmn" opt; do
+while getopts ":hrfbeslztcadm" opt; do
     case ${opt} in
         h)
             usage
             exit 0
             ;;
-        d)
-            export DEMO=demo
-            ;;
         r)
-            export REBUILD_ONLY=rebuild
+            export REBUILD_ESKIMO="do"
             ;;
         f)
             export FAST_REPACKAGE=fast
             ;;
-        n)
-            export DONT_REBUILD=dont
+        b)
+            export RECREATE_BOX="do"
             ;;
+        e)
+            export INSTALL_ESKIMO="do"
+            ;;
+        s)
+            export SETUP_ESKIMO="do"
+            ;;
+        l)
+            export RUN_DATA_LOAD="do"
+            ;;
+        z)
+            export RUN_NOTEBOOK_TESTS="do"
+            ;;
+        t)
+            export RUN_OTHER_TESTS="do"
+            ;;
+        c)
+            export RUN_CLEANUP="do"
+            ;;
+        a)  export REBUILD_ESKIMO="do"
+            export RECREATE_BOX="do"
+            export INSTALL_ESKIMO="do"
+            export SETUP_ESKIMO="do"
+            export RUN_DATA_LOAD="do"
+            export RUN_NOTEBOOK_TESTS="do"
+            export RUN_OTHER_TESTS="do"
+            export RUN_CLEANUP="do"
+            ;;
+        d)
+            export DEMO=demo
+            ;;
+
         m)
             export MULTIPLE_NODE=multiple
             export TARGET_MASTER_VM="integration-test1"
             export BOX_IP=192.168.56.51
             ;;
-        :)
-            break
-            ;;
         \?)
             echo "Invalid Option: -$OPTARG" 1>&2
+            usage
             exit 1
             ;;
     esac
 done
 
 if [[ ! -z $DEMO && ! -z $MULTIPLE_NODE ]]; then
-    echo "Demo and Multiple nodes are exckusive "
+    echo "Demo and Multiple nodes are exclusive "
     exit 70
 fi
 
@@ -1626,26 +1670,36 @@ check_for_virtualbox
 
 check_for_vagrant
 
-if [[ -z $DONT_REBUILD ]]; then
+if [[ "$REBUILD_ESKIMO" != "" ]]; then
    rebuild_eskimo
 fi
 
-if [[ -z $REBUILD_ONLY ]]; then
+if [[ "$RECREATE_BOX" != "" ]]; then
     build_box
 fi
 
-install_eskimo
+if [[ "$INSTALL_ESKIMO" != "" ]]; then
+    install_eskimo
+fi
 
-initial_setup_eskimo
+login_eskimo
 
-if [[ -z $REBUILD_ONLY ]]; then
+if [[ "$INSTALL_ESKIMO" != "" ]]; then
+    initial_setup_eskimo
+fi
 
+
+if [[ "$SETUP_ESKIMO" != "" ]]; then
     setup_eskimo
+fi
 
-    wait_all_services_up
+wait_all_services_up
 
+if [[ "$RUN_DATA_LOAD" != "" ]]; then
     run_zeppelin_data_load
+fi
 
+if [[ "$RUN_NOTEBOOK_TESTS" != "" ]]; then
     create_kafka_topics
 
     run_zeppelin_spark_kafka
@@ -1655,15 +1709,17 @@ if [[ -z $REBUILD_ONLY ]]; then
     run_zeppelin_kafka_streams
 
     run_zeppelin_other_notes
+fi
 
+if [[ "$RUN_OTHER_TESTS" != "" ]]; then
     test_web_apps
 
     test_doc
-
-    do_cleanup
-
 fi
 
+if [[ "$RUN_CLEANUP" != "" ]]; then
+    do_cleanup
+fi
 
 if [[ $DEMO == "demo" ]]; then
     prepare_demo
