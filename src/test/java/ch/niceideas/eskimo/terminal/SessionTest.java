@@ -32,7 +32,7 @@ public class SessionTest {
         assertTrue(dump.contains("hello world"));
         assertEquals("80x25", sizeSet.get());
         s.write("exit 3\n");
-        s.join(1000);
+        s.join(2000);
         assertFalse(s.isAlive());
         assertEquals(3, s.getChildProcess().exitValue());
     }
