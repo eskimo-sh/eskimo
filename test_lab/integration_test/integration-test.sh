@@ -71,7 +71,7 @@ check_for_vagrant() {
         echo_date "Found vagrant : "$(vagrant -v)
     else
         echo "Vagrant is not available on system"
-        echo_date 100
+        exit 100
     fi
 }
 
@@ -695,8 +695,6 @@ setup_eskimo() {
 check_all_services_up() {
     eskimo_status=$(query_eskimo "get-status")
     #echo $eskimo_status | jq -r " .nodeServicesStatus"
-
-    all_found=true
 
     if [[ -z $MULTIPLE_NODE ]]; then
         for i in "service_kubernetes_192-168-56-41" \
