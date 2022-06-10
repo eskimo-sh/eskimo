@@ -56,8 +56,8 @@ ExecStop=/bin/bash /usr/local/sbin/stop-kube-slave.sh
 LimitNOFILE=65536
 RestartSec=5
 Restart=always
-StartLimitBurst=3
-StartLimitInterval=120
+StartLimitBurst=5
+StartLimitInterval=300
 
 [Install]
 WantedBy=multi-user.target

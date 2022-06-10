@@ -97,17 +97,17 @@ export HOME=/root
 # Not recreating on slave
 if [[ `kubectl get serviceaccount | grep $ADMIN_USER` == "" ]]; then
     echo "   + Creating serviceaccount-$ADMIN_USER"
-    kubectl create -f /etc/k8s/serviceaccount-$ADMIN_USER.yaml
+    kubectl apply -f /etc/k8s/serviceaccount-$ADMIN_USER.yaml
 fi
 
 if [[ `kubectl get ClusterRoleBinding | grep default-$ADMIN_USER` == "" ]]; then
     echo "   + Creating ClusterRoleBinding default-$ADMIN_USER"
-    kubectl create -f /etc/k8s/clusterrolebinding-default-$ADMIN_USER.yaml
+    kubectl apply -f /etc/k8s/clusterrolebinding-default-$ADMIN_USER.yaml
 fi
 
 if [[ `kubectl get ClusterRoleBinding | grep kubernetes-dashboard-$ADMIN_USER` == "" ]]; then
     echo "   + Creating ClusterRoleBinding kubernetes-dashboard-$ADMIN_USER"
-    kubectl create -f /etc/k8s/clusterrolebinding-kubernetes-dashboard-$ADMIN_USER.yaml
+    kubectl apply -f /etc/k8s/clusterrolebinding-kubernetes-dashboard-$ADMIN_USER.yaml
 fi
 
 echo "   + Getting secret"

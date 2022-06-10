@@ -86,22 +86,22 @@ echo " - Creating / checking eskimo kubernetes base config"
 
 
 function delete_ssl_lock_file() {
-     rm -Rf /etc/k8s/shared/ssl/ssl_management_lock
+     rm -Rf /etc/k8s/shared/ssl_management_lock
 }
 
 # From here we will be messing with gluster and hence we need to take a lock
 counter=0
-while [[ -f /etc/k8s/shared/ssl/ssl_management_lock ]] ; do
-    echo "   + /etc/k8s/shared/ssl/ssl_management_lock exist. waiting 2 secs ... "
+while [[ -f /etc/k8s/shared/ssl_management_lock ]] ; do
+    echo "   + /etc/k8s/shared/ssl_management_lock exist. waiting 2 secs ... "
     sleep 2
     let counter=counter+1
     if [[ $counter -ge 15 ]]; then
-        echo " !!! Couldn't get /etc/k8s/shared/ssl/ssl_management_lock in 30 seconds. crashing !"
+        echo " !!! Couldn't get /etc/k8s/shared/ssl_management_lock in 30 seconds. crashing !"
         exit 150
     fi
 done
 
-touch /etc/k8s/shared/ssl/ssl_management_lock
+touch /etc/k8s/shared/ssl_management_lock
 
 trap delete_ssl_lock_file 15
 trap delete_ssl_lock_file EXIT

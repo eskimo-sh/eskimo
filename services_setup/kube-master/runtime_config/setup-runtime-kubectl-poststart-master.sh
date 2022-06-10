@@ -100,17 +100,26 @@ if [[ `kubectl get serviceaccount | grep $ADMIN_USER` != "" ]]; then
     sleep 3
 fi
 
-echo "   + (Re-)Creating serviceaccount-$ADMIN_USER"
-kubectl create -f /etc/k8s/serviceaccount-$ADMIN_USER.yaml
+# It might have been recreated by a slave startup in the meantime (sleep 3 above)
+if [[ `kubectl get serviceaccount | grep $ADMIN_USER` == "" ]]; then
+    # XXX I might still have a race condition here, like the serviceaccount being recreated in between the check on the
+    # previous line and the recreation on the following line by a kube-slave restarting at the same time. I am living
+    # with it for now.
+    # FIXME eventually solve this (take a lock in gluster share ? The problem is the cleaning up when platform restarts
+    # a potential solution to this would be to check othe creaton timestamp and ignore lock files older than a few dozen
+    # of minutes)
+    echo "   + (Re-)Creating serviceaccount-$ADMIN_USER"
+    kubectl apply -f /etc/k8s/serviceaccount-$ADMIN_USER.yaml
+fi
 
 if [[ `kubectl get ClusterRoleBinding | grep default-$ADMIN_USER` == "" ]]; then
     echo "   + Creating ClusterRoleBinding default-$ADMIN_USER"
-    kubectl create -f /etc/k8s/clusterrolebinding-default-$ADMIN_USER.yaml
+    kubectl apply -f /etc/k8s/clusterrolebinding-default-$ADMIN_USER.yaml
 fi
 
 if [[ `kubectl get ClusterRoleBinding | grep kubernetes-dashboard-$ADMIN_USER` == "" ]]; then
     echo "   + Creating ClusterRoleBinding kubernetes-dashboard-$ADMIN_USER"
-    kubectl create -f /etc/k8s/clusterrolebinding-kubernetes-dashboard-$ADMIN_USER.yaml
+    kubectl apply -f /etc/k8s/clusterrolebinding-kubernetes-dashboard-$ADMIN_USER.yaml
 fi
 
 echo "   + Getting secret"
