@@ -34,6 +34,7 @@ public class SessionTest {
         s.write("exit 3\n");
         s.join(2000);
         assertFalse(s.isAlive());
+        Thread.sleep(1000);
         assertEquals(3, s.getChildProcess().exitValue());
     }
 
