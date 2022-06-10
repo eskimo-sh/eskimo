@@ -68,16 +68,6 @@ export K8S_DASHBOARD_VERSION=2.5.1
 export K8S_DASHBOARD_METRICS_SCRAPER_VERSION=1.0.7
 export K8S_CLIENT_JAVA_VERSION=5.7.4
 
-# CAUTION : This version number needs to be aligned with the expected mesos version defined in
-# /services_setup/base-eskimo/install-mesos.sh
-export AMESOS_VERSION=1.11.0
-
-# fom binaries
-export MARATHON_VERSION_SHORT=1.10.17
-export MARATHON_VERSION=1.10.17-c427ce965
-# from sources
-export MARATHON_VERSION_SOURCES_GITHUB=1.10.17
-
 export DOCKER_REGISTRY_VERSION=2.7.1+ds2-7+b6_amd64
 export DOCKER_REGISTRY_VERSION_SHORT=2.7.1
 
@@ -101,7 +91,6 @@ export GRAFANA_VERSION=8.5.2
 export PROMETHEUS_VERSION=2.35.0
 export PROMETHEUS_NODE_EXPORTER_VERSION=1.0.1
 export PROMETHEUS_PUSHGATEWAY_VERSION=1.3.1
-export PROMETHEUS_MESOS_EXPORTER_VERSION=1.1.2
 
 # Zeppelin
 export ZEPPELIN_VERSION_FULL=0.10.1

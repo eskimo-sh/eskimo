@@ -108,10 +108,6 @@ fi
 
 #echo $DOCKER_VOLUMES_ARGS
 
-# Deprecated
-# Find of mesos for directory mount
-#export AMESOS_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep "mesos-*.*" | cut -d '-' -f 2`
-
 # Find external IP for libprocess (mesos) configuration
 . /etc/eskimo_topology.sh
 
@@ -130,9 +126,5 @@ fi
         -e NODE_NAME=$HOSTNAME \
         kubernetes.registry:5000/spark \
         /usr/local/bin/spark-sql "$@"
-
-# Deprecated
-#        -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ \
-#        -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/ \
 
 # -p 5000-5010:5000-5010 \
