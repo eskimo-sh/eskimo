@@ -50,6 +50,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
+import java.net.BindException;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -59,9 +60,6 @@ import java.util.stream.Collectors;
 public class ConnectionManagerService {
 
     private static final Logger logger = Logger.getLogger(ConnectionManagerService.class);
-
-    @Autowired
-    private SetupService setupService;
 
     @Autowired
     private ProxyManagerService proxyManagerService;
@@ -132,13 +130,10 @@ public class ConnectionManagerService {
         this.privateSShKeyContent = privateSShKeyContent;
         this.sshPort = sshPort;
     }
-    void setSetupService (SetupService setupService) {
-        this.setupService = setupService;
-    }
-    void setProxyManagerService (ProxyManagerService proxyManagerService) {
+    public void setProxyManagerService (ProxyManagerService proxyManagerService) {
         this.proxyManagerService = proxyManagerService;
     }
-    void setConfigurationService (ConfigurationService configurationService) {
+    public void setConfigurationService (ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
 
@@ -195,10 +190,10 @@ public class ConnectionManagerService {
         recreateTunnels(getConnectionInternal(host), host);
     }
 
-    public void dropTunnels (String host) {
+    public void dropTunnelsToBeClosed(String host) {
         SSHConnection connection = connectionMap.get(host);
         if (connection != null) {
-            dropTunnels(connection, host);
+            dropTunnelsToBeClosed(connection, host);
         }
     }
 
@@ -306,21 +301,21 @@ public class ConnectionManagerService {
     }
 
 
-    protected void dropTunnels(SSHConnection connection, String node) {
+    protected void dropTunnelsToBeClosed(SSHConnection connection, String node) {
 
         // Find out about declared forwarders to be handled (those that need to stay)
         List<ProxyTunnelConfig> keptTunnelConfigs = proxyManagerService.getTunnelConfigForHost(node);
 
         // close port forwarders that are not declared anymore
-        final List<LocalPortForwarderWrapper> previousForwarders = getForwarders(connection);
-        List<LocalPortForwarderWrapper> toBeClosed = previousForwarders.stream()
+        final List<LocalPortForwarderWrapper> currentForwarders = getForwarders(connection);
+        List<LocalPortForwarderWrapper> toBeClosed = currentForwarders.stream()
                 .filter(forwarder -> notIn (forwarder, keptTunnelConfigs))
                 .collect(Collectors.toList());
 
         try {
             for (LocalPortForwarderWrapper forwarder : toBeClosed) {
                 forwarder.close();
-                previousForwarders.remove(forwarder);
+                currentForwarders.remove(forwarder);
             }
         } catch (Exception e) {
             logger.warn(e.getMessage());
@@ -330,22 +325,31 @@ public class ConnectionManagerService {
 
     protected void recreateTunnels(SSHConnection connection, String node) throws ConnectionManagerException {
 
-        final List<LocalPortForwarderWrapper> previousForwarders = getForwarders(connection);
+        final List<LocalPortForwarderWrapper> currentForwarders = getForwarders(connection);
 
-        dropTunnels (connection, node);
+        dropTunnelsToBeClosed(connection, node);
 
         // Find out about declared forwarders to be handled
         List<ProxyTunnelConfig> tunnelConfigs = proxyManagerService.getTunnelConfigForHost(node);
 
         // recreate those that need to be recreated
         List<ProxyTunnelConfig> toBeCreated = tunnelConfigs.stream()
-                .filter(config -> notIn (config, previousForwarders))
+                .filter(config -> notIn (config, currentForwarders))
                 .collect(Collectors.toList());
 
         for (ProxyTunnelConfig config : toBeCreated) {
-            previousForwarders.add (new LocalPortForwarderWrapper(
-                    config.getServiceName(), connection, config.getLocalPort(), config.getNode(), config.getRemotePort()));
+            try {
+                currentForwarders.add(createPortForwarder(connection, config));
+            } catch (RemoveForwarderException e) {
+                logger.warn ("Not trying any further to recreate forwarder for "
+                        + config.getServiceName() + " - " + config.getNode() + " - " + config.getRemotePort());
+            }
         }
+    }
+
+    protected LocalPortForwarderWrapper createPortForwarder(SSHConnection connection, ProxyTunnelConfig config) throws ConnectionManagerException {
+        return new LocalPortForwarderWrapper(
+                config.getServiceName(), connection, config.getLocalPort(), config.getNode(), config.getRemotePort());
     }
 
     private List<LocalPortForwarderWrapper> getForwarders(SSHConnection connection) {
@@ -380,7 +384,7 @@ public class ConnectionManagerService {
         }
     }
 
-    private static class LocalPortForwarderWrapper {
+    public static class LocalPortForwarderWrapper {
 
         private final LocalPortForwarder forwarder;
 
@@ -395,8 +399,11 @@ public class ConnectionManagerService {
             this.targetHost = targetHost;
             this.targetPort = targetPort;
             try {
-                logger.info ("Creating tunnel for service " + serviceName + " - from " + localPort + " to " + targetHost + ":" + targetPort);
+                logger.info("Creating tunnel for service " + serviceName + " - from " + localPort + " to " + targetHost + ":" + targetPort);
                 this.forwarder = connection.createLocalPortForwarder(localPort, targetHost, targetPort);
+            } catch (BindException e) {
+                logger.error (e, e);
+                throw new RemoveForwarderException (e);
             } catch (IOException e) {
                 logger.error (e, e);
                 throw new ConnectionManagerException(e);
@@ -442,6 +449,12 @@ public class ConnectionManagerService {
         @Override
         public int hashCode() {
             return Objects.hash(targetHost, targetPort);
+        }
+    }
+
+    static class RemoveForwarderException extends ConnectionManagerException {
+        public RemoveForwarderException(Throwable cause) {
+            super(cause);
         }
     }
 }

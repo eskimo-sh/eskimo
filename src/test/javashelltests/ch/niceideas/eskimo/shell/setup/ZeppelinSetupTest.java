@@ -98,10 +98,6 @@ public class ZeppelinSetupTest extends AbstractSetupShellTest {
         try {
             String setupScript = FileUtils.readFile(new File("./services_setup/zeppelin/inContainerSetupZeppelin.sh"));
 
-            setupScript = setupScript.replace(". /run/zeppelin_mesos_environment", "");
-            setupScript = setupScript.replace("ln -s /usr/local/host_lib/mesos-$AMESOS_VERSION /usr/local/lib/mesos-$AMESOS_VERSION", "");
-            setupScript = setupScript.replace("ln -s /usr/local/lib/mesos-$AMESOS_VERSION /usr/local/lib/mesos", "");
-
             FileUtils.writeFile(new File(jailPath + "/inContainerSetupZeppelin.sh"), setupScript);
         } catch (FileException e) {
             throw new IOException(e);

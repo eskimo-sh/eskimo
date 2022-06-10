@@ -282,7 +282,12 @@ public class KubernetesService {
                 },
                 status -> status.removeInstallationFlag(operation.getService(), ServicesInstallStatusWrapper.KUBERNETES_NODE));
         if (nodeIp != null) {
-            proxyManagerService.removeServerForService(operation.getService(), nodeIp);
+            try {
+                proxyManagerService.removeServerForService(operation.getService(), nodeIp);
+            } catch (ConnectionManagerException e) {
+                logger.error (e, e);
+                logger.warn ("Couldn't remove server for service " + operation.getService() + " - " + nodeIp);
+            }
         } else {
             logger.warn ("No previous IP could be found for service " + operation.getService());
         }

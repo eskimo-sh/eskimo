@@ -199,6 +199,10 @@ public class ServicesDefinition implements InitializingBean {
                 if (uiWaitTime != null) {
                     uiConfig.setWaitTime(uiWaitTime);
                 }
+
+                Boolean kubeProxy = ((Boolean) servicesConfig.getValueForPath(serviceString+".ui.kubeProxy"));
+                uiConfig.setUsingKubeProxy (kubeProxy != null && kubeProxy);
+
                 uiConfig.setProxyTargetPort((Integer) servicesConfig.getValueForPath(serviceString+".ui.proxyTargetPort"));
                 uiConfig.setTitle((String) servicesConfig.getValueForPath(serviceString+".ui.title"));
 

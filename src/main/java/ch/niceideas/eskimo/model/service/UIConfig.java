@@ -53,6 +53,7 @@ public class UIConfig {
     @ToString.Exclude
     private final Service service;
 
+    private boolean usingKubeProxy = false;
     private String urlTemplate;
     private Integer proxyTargetPort;
     private int waitTime;

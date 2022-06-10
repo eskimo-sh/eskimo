@@ -726,7 +726,12 @@ public class SystemService {
                 logger.warn (SERVICE_PREFIX + savedService + " on " + nodeName + " has been removed from ServiceInstallationStatus!");
 
                 // unconfigure proxy if required
-                proxyManagerService.removeServerForService(savedService, nodeName.replace("-", "."));
+                try {
+                    proxyManagerService.removeServerForService(savedService, nodeName.replace("-", "."));
+                } catch (ConnectionManagerException e) {
+                    logger.error (e, e);
+                    logger.warn ("Couldn't remove server for service " + savedService + " - " + nodeName);
+                }
 
                 changes = true;
 

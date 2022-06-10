@@ -127,6 +127,7 @@ public abstract class AbstractSystemTest {
 
         proxyManagerService = createProxyManagerService();
         proxyManagerService.setServicesDefinition(servicesDefinition);
+        proxyManagerService.setConfigurationService(configurationService);
 
         proxyManagerService.setConnectionManagerService(new ConnectionManagerService() {
             @Override

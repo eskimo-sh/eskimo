@@ -35,16 +35,27 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
+import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.*;
+import com.trilead.ssh2.LocalPortForwarder;
+import org.apache.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ProxyManagerServiceTest {
+
+    private static final Logger logger = Logger.getLogger(ProxyManagerServiceTest.class);
 
     private ProxyManagerService pms;
     private ServicesDefinition sd;
@@ -96,7 +107,94 @@ public class ProxyManagerServiceTest {
     }
 
     @Test
-    public void testServerForServiceManagemement_Kubernetes() throws Exception {
+    public void testServerForServiceManagemement_reproduceFlinRuntimeProblem() throws Exception {
+
+        final List<String> openedForwarders = new ArrayList<>();
+        final List<String> closedForwarders = new ArrayList<>();
+
+        ConnectionManagerService cms = new ConnectionManagerService() {
+
+            @Override
+            protected LocalPortForwarderWrapper createPortForwarder(SSHConnection connection, ProxyTunnelConfig config) throws ConnectionManagerException {
+                openedForwarders.add (config.getLocalPort() + "/" + config.getNode() + "/" + config.getRemotePort());
+                return new LocalPortForwarderWrapper(
+                        config.getServiceName(), connection, config.getLocalPort(), config.getNode(), config.getRemotePort()) {
+                    @Override
+                    public void close() {
+                        closedForwarders.add (config.getLocalPort() + "/" + config.getNode() + "/" + config.getRemotePort());
+                    }
+                };
+            }
+            @Override
+            protected SSHConnection createConnectionInternal(String node, int operationTimeout){
+                return new SSHConnection(node, operationTimeout) {
+                    @Override
+                    public LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect){
+                        return null;
+                    }
+                };
+            }
+        };
+        pms.setConnectionManagerService(cms);
+        cms.setProxyManagerService(pms);
+
+
+        WebSocketProxyServer wsps = new WebSocketProxyServer(pms, sd) {
+        };
+        pms.setWebSocketProxyServer(wsps);
+
+        logger.info (" ---- flink-runtime detected on 192.168.10.12");
+        pms.updateServerForService ("flink-runtime", "192.168.10.12");
+
+        logger.info (" ---- flink-runtime removed from 192.168.10.12");
+        pms.removeServerForService("flink-runtime", "192.168.10.12");
+
+        logger.info (" ---- now flink-runtime detected on 192.168.10.13");
+        pms.updateServerForService ("flink-runtime", "192.168.10.13");
+
+        assertEquals(2, openedForwarders.size());
+        assertEquals(1, closedForwarders.size());
+
+        String firstForwarder = openedForwarders.get(0);
+        String secondForwarder = openedForwarders.get(1);
+
+        String closedForwarder = closedForwarders.get(0);
+
+        assertTrue(firstForwarder.endsWith("192.168.10.11/8001"));
+        assertTrue(secondForwarder.endsWith("192.168.10.11/8001"));
+
+        assertEquals(closedForwarder, firstForwarder);
+    }
+
+    @Test
+    public void testServerForServiceManagemement_Kubernetes_kbeProxy() throws Exception {
+
+        assertFalse(recreateTunnelsCalled.get());
+        assertFalse(removeForwardersCalled.get());
+
+        pms.updateServerForService("kubernetes-dashboard", "192.168.10.11");
+
+        assertTrue(recreateTunnelsCalled.get());
+        assertTrue(removeForwardersCalled.get());
+
+        recreateTunnelsCalled.set(false);
+        removeForwardersCalled.set(false);
+
+        pms.updateServerForService("kubernetes-dashboard", "192.168.10.11");
+
+        // should not have been recreated
+        assertFalse(recreateTunnelsCalled.get());
+        assertFalse(removeForwardersCalled.get());
+
+        pms.updateServerForService("kubernetes-dashboard", "192.168.10.13");
+
+        // since kub service are redirected to poxy on kube master, no tunnel recreation should occur when service moves
+        assertFalse(recreateTunnelsCalled.get());
+        assertFalse(removeForwardersCalled.get());
+    }
+
+    @Test
+    public void testServerForServiceManagemement_Kubernetes_noKubeProxy() throws Exception {
 
         assertFalse(recreateTunnelsCalled.get());
         assertFalse(removeForwardersCalled.get());
@@ -117,9 +215,8 @@ public class ProxyManagerServiceTest {
 
         pms.updateServerForService("kibana", "192.168.10.13");
 
-        // since kub service are redirected to poxy on kube master, no tunnel recreation should occur when service moves
-        assertFalse(recreateTunnelsCalled.get());
-        assertFalse(removeForwardersCalled.get());
+        assertTrue(recreateTunnelsCalled.get());
+        assertTrue(removeForwardersCalled.get());
     }
 
     @Test

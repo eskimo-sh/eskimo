@@ -75,7 +75,6 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         FileUtils.writeFile(new File(tempPath + "/config.json"), "{ \"ssh_username\" : \"test\" }");
 
         cm = new ConnectionManagerService(privateKeyRaw, getSShPort());
-        cm.setSetupService (setupService);
 
         pms = new ProxyManagerService();
         pms.setConnectionManagerService(cm);
@@ -135,12 +134,11 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
                 };
             }
             @Override
-            protected void dropTunnels(SSHConnection connection, String node)  {
-                super.dropTunnels(connection, node);
+            protected void dropTunnelsToBeClosed(SSHConnection connection, String node)  {
+                super.dropTunnelsToBeClosed(connection, node);
                 dropCalledFor.add(node);
             }
         };
-        cm.setSetupService (setupService);
 
         ProxyManagerService pms = new ProxyManagerService() {
             public List<ProxyTunnelConfig> getTunnelConfigForHost (String host) {
@@ -202,7 +200,7 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
                 };
             }
             @Override
-            protected void dropTunnels(SSHConnection connection, String node) {
+            protected void dropTunnelsToBeClosed(SSHConnection connection, String node) {
                 // NO-OP
             }
             @Override
@@ -210,7 +208,6 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
                 // NO-OP
             }
         };
-        cm.setSetupService (setupService);
 
         SSHConnection con1 = cm.getSharedConnection("localhost");
         SSHConnection con2 = cm.getSharedConnection("localhost");

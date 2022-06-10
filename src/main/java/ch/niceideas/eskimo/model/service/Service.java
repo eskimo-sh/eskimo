@@ -205,6 +205,10 @@ public class Service {
         return getUiConfig() != null && getUiConfig().getProxyTargetPort() != null;
     }
 
+    public boolean isUsingKubeProxy() {
+        return isProxied() && getUiConfig().isUsingKubeProxy();
+    }
+
     public boolean hasDependency(Service service) {
         return this.getDependencies().stream()
                 .anyMatch(dep -> dep.getMasterService().equals(service.getName()));

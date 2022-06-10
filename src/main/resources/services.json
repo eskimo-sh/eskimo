@@ -423,6 +423,7 @@
       }
     ],
     "ui": {
+      "kubeProxy": true,
       "__comment_urlTemplate": "Going through Kubectl proxy.",
       "urlTemplate": "kubernetes-dashboard/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/workloads?namespace=_all",
       "__comment_proxyTargetPort": "Kubectl proxy target port",
@@ -668,6 +669,7 @@
       "icon" : "images/kafka-manager-icon.png"
     },
     "ui": {
+      "kubeProxy": true,
       "__comment_urlTemplate": "Going through Kubectl proxy.",
       "urlTemplate": "kafka-manager/api/v1/namespaces/default/services/kafka-manager:31220/proxy/",
       "__comment_proxyTargetPort": "Kubectl proxy target port",
@@ -938,6 +940,7 @@
       "icon" : "images/flink-runtime-icon.png"
     },
     "ui": {
+      "kubeProxy": true,
       "__comment_urlTemplate": "Going through Kubectl proxy.",
       "urlTemplate": "flink-runtime/{NODE_ADDRESS}/api/v1/namespaces/default/services/flink-runtime-rest:8081/proxy/#/overview",
       "__comment_proxyTargetPort": "Kubectl proxy target port",
@@ -1166,6 +1169,7 @@
       "icon" : "images/cerebro-icon.png"
     },
     "ui": {
+      "kubeProxy": true,
       "__comment_urlTemplate": "Going through Kubectl proxy.",
       "urlTemplate": "cerebro/api/v1/namespaces/default/services/cerebro:31900/proxy/#/overview?host=http:%2F%2Felasticsearch.default.svc.cluster.eskimo:9200",
       "__comment_proxyTargetPort": "Kubectl proxy target port",
@@ -1437,6 +1441,7 @@
       "icon" : "images/zeppelin-icon.png"
     },
     "ui": {
+      "kubeProxy": true,
       "__comment_urlTemplate": "Going through Kubectl proxy.",
       "urlTemplate": "zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/",
       "__comment_proxyTargetPort": "Kubectl proxy target port",

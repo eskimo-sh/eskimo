@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
@@ -144,21 +145,7 @@ public class ProxyManagerService {
             // need to make a distinction between unique and multiple services here !!
             String serviceId = service.getServiceId(runtimeNode);
 
-            String effNode = runtimeNode;
-            if (service.isKubernetes()) {
-
-                // Kubernetes services are redirected to kubernetes master node
-                // - for services reached through the kubectl proxy, this is mandatory
-                // - for services using 'NodePort', since the port is made available on every node, this works as well
-                ServicesInstallStatusWrapper servicesInstallationStatus = null;
-                try {
-                    servicesInstallationStatus = configurationService.loadServicesInstallationStatus();
-                } catch (FileException | SetupException e) {
-                    logger.error(e, e);
-                    throw new ConnectionManagerException(e.getMessage(), e);
-                }
-                effNode = servicesInstallationStatus.getFirstNode(KubernetesService.KUBE_MASTER);
-            }
+            String effNode = getRuntimeNode(runtimeNode, service);
 
             ProxyTunnelConfig prevConfig = proxyTunnelConfigs.get(serviceId);
 
@@ -187,20 +174,43 @@ public class ProxyManagerService {
         }
     }
 
-    public void removeServerForService(String serviceName, String node) {
+    private String getRuntimeNode(String runtimeNodeName, Service service) throws ConnectionManagerException {
+        String effNode = runtimeNodeName;
+        if (service.isUsingKubeProxy()) {
+
+            // Kubernetes services are redirected to kubernetes master node if they are reached through the kubectl
+            // proxy, this is mandatory
+
+            ServicesInstallStatusWrapper servicesInstallationStatus = null;
+            try {
+                servicesInstallationStatus = configurationService.loadServicesInstallationStatus();
+            } catch (FileException | SetupException e) {
+                logger.error(e, e);
+                throw new ConnectionManagerException(e.getMessage(), e);
+            }
+            effNode = servicesInstallationStatus.getFirstNode(KubernetesService.KUBE_MASTER);
+            if (StringUtils.isBlank(effNode)) {
+                throw new ConnectionManagerException("Asked for kube master runtime node, but it couldn't be found in installation status");
+            }
+        }
+        return effNode;
+    }
+
+    public void removeServerForService(String serviceName, String runtimeNode) throws ConnectionManagerException {
 
         Service service = servicesDefinition.getService(serviceName);
-        String serviceId = service.getServiceId(node);
+        if (service != null && service.isProxied()) {
+            String serviceId = service.getServiceId(runtimeNode);
 
-        ProxyTunnelConfig prevConfig = proxyTunnelConfigs.get(serviceId);
+            ProxyTunnelConfig prevConfig = proxyTunnelConfigs.get(serviceId);
 
-        if (prevConfig != null) {
+            if (prevConfig != null) {
 
-            proxyTunnelConfigs.remove(serviceId);
-            connectionManagerService.dropTunnels (prevConfig.getNode());
-            webSocketProxyServer.removeForwardersForService(serviceId);
+                proxyTunnelConfigs.remove(serviceId);
+                connectionManagerService.dropTunnelsToBeClosed(prevConfig.getNode());
+                webSocketProxyServer.removeForwardersForService(serviceId);
+            }
         }
-
     }
 
     /** get a port number from 49152 to 65535 */

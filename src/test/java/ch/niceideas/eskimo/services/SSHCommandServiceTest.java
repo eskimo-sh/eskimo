@@ -79,7 +79,6 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
         FileUtils.writeFile(new File(tempPath + "/config.json"), "{ \"ssh_username\" : \"test\" }");
 
         cm = new ConnectionManagerService(privateKeyRaw, getSShPort());
-        cm.setSetupService (setupService);
 
         scs = new SSHCommandService();
 
