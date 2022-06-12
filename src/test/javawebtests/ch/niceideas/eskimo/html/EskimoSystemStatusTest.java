@@ -66,7 +66,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         loadScript(page, "eskimoUtils.js");
         loadScript(page, "eskimoSystemStatus.js");
 
-        js("STATUS_SERVICES = [\"ntp\",\"zookeeper\",\"gluster\",\"mesos-master\",\"mesos-agent\",\"kafka\",\"kafka-manager\",\"spark-history-server\",\"spark-runtime\",\"logstash\",\"cerebro\",\"elasticsearch\",\"kibana\",\"zeppelin\"];");
+        js("STATUS_SERVICES = [\"ntp\",\"zookeeper\",\"gluster\",\"mesos-master\",\"mesos-agent\",\"kafka\",\"kafka-manager\",\"spark-console\",\"spark-runtime\",\"logstash\",\"cerebro\",\"elasticsearch\",\"kibana\",\"zeppelin\"];");
 
         js("SERVICES_STATUS_CONFIG = " + jsonStatusConfig + ";");
 
@@ -408,7 +408,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
                 "192-168-10-11-192.168.10.11-gluster-true-false\n" +
                 "192-168-10-11-192.168.10.11-mesos-master-true-false\n" +
                 "192-168-10-11-192.168.10.11-kafka-manager-true-false\n" +
-                "192-168-10-11-192.168.10.11-spark-history-server-true-false\n" +
+                "192-168-10-11-192.168.10.11-spark-console-true-false\n" +
                 "192-168-10-11-192.168.10.11-cerebro-true-false\n" +
                 "192-168-10-11-192.168.10.11-kibana-true-false\n" +
                 "192-168-10-11-192.168.10.11-zeppelin-true-false\n", "window.serviceMenuServiceFoundHookCalls");

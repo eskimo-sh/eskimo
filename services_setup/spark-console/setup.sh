@@ -48,12 +48,12 @@ loadTopology
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
     echo " - No Self Node Number found in topology"
-    exit -1
+    exit 1
 fi
 
 if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit -2
+    exit 2
 fi
 
 # reinitializing log
@@ -74,7 +74,7 @@ echo " - Configuring host spark config part"
 . ./setupCommon.sh
 if [[ $? != 0 ]]; then
     echo "Common configuration part failed !"
-    exit -20
+    exit 20
 fi
 
 echo " - Building docker container for spark history server"
@@ -102,7 +102,7 @@ docker exec spark-console bash /scripts/inContainerSetupSparkCommon.sh $spark_us
 if [[ `tail -n 1 spark_console_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat spark_console_install_log
-    exit -100
+    exit 100
 fi
 
 echo " - Configuring spark-console container"
@@ -111,7 +111,7 @@ docker exec spark-console bash /scripts/inContainerSetupSparkHistoryServer.sh \
 if [[ `tail -n 1 spark_console_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat spark_console_install_log
-    exit -101
+    exit 101
 fi
 
 #echo " - TODO"

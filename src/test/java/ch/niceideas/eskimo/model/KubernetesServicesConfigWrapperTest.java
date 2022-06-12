@@ -29,13 +29,13 @@ public class KubernetesServicesConfigWrapperTest {
             "    \"spark-runtime_install\": \"on\",\n" +
             "    \"cerebro_ram\": \"800M\",\n" +
             "    \"kubernetes-dashboard_cpu\": \"0.1\",\n" +
-            "    \"spark-history-server_install\": \"on\",\n" +
-            "    \"spark-history-server_ram\": \"1G\",\n" +
+            "    \"spark-console_install\": \"on\",\n" +
+            "    \"spark-console_ram\": \"1G\",\n" +
             "    \"elasticsearch_ram\": \"1024M\",\n" +
             "    \"grafana_ram\": \"800M\",\n" +
             "    \"kubernetes-dashboard_ram\": \"1G\",\n" +
             "    \"cerebro_install\": \"on\",\n" +
-            "    \"spark-history-server_cpu\": \"0.1\",\n" +
+            "    \"spark-console_cpu\": \"0.1\",\n" +
             "    \"zeppelin_cpu\": \"0.4\",\n" +
             "    \"kibana_install\": \"on\",\n" +
             "    \"logstash_install\": \"on\",\n" +
@@ -47,7 +47,7 @@ public class KubernetesServicesConfigWrapperTest {
 
     @Test
     public void testGetEnabledServices() throws Exception {
-        assertEquals ("cerebro,elasticsearch,flink-runtime,grafana,kafka-manager,kafka,kibana,kubernetes-dashboard,logstash,spark-history-server,spark-runtime,zeppelin", String.join(",", kscw.getEnabledServices()));
+        assertEquals ("cerebro,elasticsearch,flink-runtime,grafana,kafka-manager,kafka,kibana,kubernetes-dashboard,logstash,spark-console,spark-runtime,zeppelin", String.join(",", kscw.getEnabledServices()));
     }
 
     @Test

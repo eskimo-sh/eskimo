@@ -57,7 +57,7 @@ public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
         js("eskimoKubernetesServicesConfig = {};");
 
         // leaving zeppelin out intentionally
-        js("eskimoKubernetesServicesConfig.getKubernetesServices = function() {return ['cerebro', 'kibana', 'kafka-manager', 'spark-history-server', 'grafana']};");
+        js("eskimoKubernetesServicesConfig.getKubernetesServices = function() {return ['cerebro', 'kibana', 'kafka-manager', 'spark-console', 'grafana']};");
 
         // instantiate test object
         js("eskimoKubernetesServicesSelection = new eskimo.KubernetesServicesSelection();");
@@ -105,7 +105,7 @@ public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
                 "\"grafana_reinstall\":\"on\"," +
                 "\"kafka-manager_reinstall\":\"on\"," +
                 "\"kibana_reinstall\":\"on\"," +
-                "\"spark-history-server_reinstall\":\"on\"}");
+                "\"spark-console_reinstall\":\"on\"}");
 
         JSONObject actualResult = new JSONObject((String)js("window.reinstallConfig").getJavaScriptResult());
         assertTrue(expectedResult.similar(actualResult));
@@ -119,7 +119,7 @@ public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
         assertTrue ((Boolean)js("$('#cerebro_reinstall').get(0).checked").getJavaScriptResult());
         assertTrue ((Boolean)js("$('#kibana_reinstall').get(0).checked").getJavaScriptResult());
         assertTrue ((Boolean)js("$('#kafka-manager_reinstall').get(0).checked").getJavaScriptResult());
-        assertTrue ((Boolean)js("$('#spark-history-server_reinstall').get(0).checked").getJavaScriptResult());
+        assertTrue ((Boolean)js("$('#spark-console_reinstall').get(0).checked").getJavaScriptResult());
         assertTrue ((Boolean)js("$('#grafana_reinstall').get(0).checked").getJavaScriptResult());
 
         assertFalse ((Boolean)js("$('#zeppelin_reinstall').get(0).checked").getJavaScriptResult());

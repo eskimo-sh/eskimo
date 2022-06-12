@@ -183,40 +183,4 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         assertEquals(1, dropCalledFor.size());
 
     }
-
-    @Test
-    public void testForceRecreateConnection() throws Exception {
-
-        ConnectionManagerService cm = new ConnectionManagerService(privateKeyRaw, getSShPort()) {
-            @Override
-            protected SSHConnection createConnectionInternal(String node, int operationTimeout) {
-                return new SSHConnection(node, getSShPort()) {
-                    public synchronized LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect) {
-                        return null;
-                    }
-                    public synchronized void sendIgnorePacket() {
-                        // NO-OP
-                    }
-                };
-            }
-            @Override
-            protected void dropTunnelsToBeClosed(SSHConnection connection, String node) {
-                // NO-OP
-            }
-            @Override
-            protected void recreateTunnels(SSHConnection connection, String node) {
-                // NO-OP
-            }
-        };
-
-        SSHConnection con1 = cm.getSharedConnection("localhost");
-        SSHConnection con2 = cm.getSharedConnection("localhost");
-
-        assertSame (con1, con2);
-
-        cm.forceRecreateConnection("localhost");
-
-        SSHConnection con3 = cm.getSharedConnection("localhost");
-        assertNotSame (con1, con3);
-    }
 }

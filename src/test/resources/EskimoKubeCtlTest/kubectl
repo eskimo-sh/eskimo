@@ -53,7 +53,7 @@ kibana-6d7656c9c5-tlmwp
 logstash-0
 logstash-1
 logstash-2
-spark-history-server-69bf57d949-sb2bh
+spark-console-69bf57d949-sb2bh
 zeppelin-9f6d88d6f-5pwcf
 coredns-5d8697db8f-vr459
 dashboard-metrics-scraper-78f56fbd8b-78bz2
@@ -81,7 +81,7 @@ kibana-6d7656c9c5-tlmwp                      192.168.56.31
 logstash-0                                   192.168.56.31
 logstash-1                                   192.168.56.32
 logstash-3                                   192.168.56.33
-spark-history-server-69bf57d949-sb2bh        192.168.56.31
+spark-console-69bf57d949-sb2bh        192.168.56.31
 zeppelin-9f6d88d6f-5pwcf                     192.168.56.31
 coredns-5d8697db8f-vr459                     192.168.56.31
 dashboard-metrics-scraper-78f56fbd8b-78bz2   192.168.56.31
@@ -109,7 +109,7 @@ kibana-6d7656c9c5-tlmwp                      default
 logstash-0                                   default
 logstash-1                                   default
 logstash-2                                   default
-spark-history-server-69bf57d949-sb2bh        default
+spark-console-69bf57d949-sb2bh        default
 zeppelin-9f6d88d6f-5pwcf                     default
 coredns-5d8697db8f-vr459                     kube-system
 dashboard-metrics-scraper-78f56fbd8b-78bz2   kubernetes-dashboard

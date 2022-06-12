@@ -191,7 +191,7 @@ public class ServicesProxyServletTest {
                 (proxy, method, methodArgs) -> {
                     switch (method.getName()) {
                         case "getRequestURI":
-                            return "/spark-history-server/history/spark-application-1653861510346/jobs/";
+                            return "/spark-console/history/spark-application-1653861510346/jobs/";
                         case "getPathInfo":
                             return "/history/spark-application-1653861510346/jobs/";
                         case "getRequestURL":
@@ -211,11 +211,11 @@ public class ServicesProxyServletTest {
                                     "Unsupported method: " + method.getName());
                     }
                 });
-        pms.updateServerForService("spark-history-server", "192.168.10.11");
+        pms.updateServerForService("spark-console", "192.168.10.11");
 
         http://localhost:9191/history/spark-application-1653861510346/jobs/
 
-        assertEquals("http://localhost:9191/spark-history-server/history/spark-application-1652639268719/jobs/",
+        assertEquals("http://localhost:9191/spark-console/history/spark-application-1652639268719/jobs/",
                 servlet.rewriteUrlFromResponse(request, "http://localhost:9191/history/spark-application-1652639268719/jobs/"));
     }
 
@@ -226,7 +226,7 @@ public class ServicesProxyServletTest {
 
         String toReplace  = "\n <a href='/toto.txt'>\na/a>";
         //String contextPath, String prefixPath
-        ReplacementContext ctx = new ReplacementContext("", "test/test", "");
+        ReplacementContext ctx = new ReplacementContext("", "test/test", "", "");
         String result = servlet.performReplacements(kafkaManagerService, "", ctx, toReplace );
         assertEquals("\n" +
                 " <a href='/test/test/toto.txt'>\n" +
@@ -269,7 +269,7 @@ public class ServicesProxyServletTest {
                 "    angular.module(\"zeppelinWebApp\").service(\"baseUrlSrv\", r)\n" +
                 "}";
 
-        ReplacementContext ctx = new ReplacementContext("", "test/test", "");
+        ReplacementContext ctx = new ReplacementContext("", "test/test", "", "");
         String result = servlet.performReplacements(zeppelinService, "controllers.js", ctx, toReplace );
 
         assertEquals("function(e, t, n) {\n" +

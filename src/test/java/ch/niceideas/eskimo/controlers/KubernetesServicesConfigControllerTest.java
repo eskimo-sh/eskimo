@@ -70,7 +70,7 @@ public class KubernetesServicesConfigControllerTest {
                 "    \"kafka-manager_install\": \"on\",\n" +
                 "    \"kibana_install\": \"on\",\n" +
                 "    \"logstash_install\": \"on\",\n" +
-                "    \"spark-history-server_install\": \"on\",\n" +
+                "    \"spark-console_install\": \"on\",\n" +
                 "    \"spark-runtime_install\": \"on\"\n" +
                 "}").similar(new JSONObject (mscc.loadKubernetesServicesConfig())));
 
@@ -254,7 +254,7 @@ public class KubernetesServicesConfigControllerTest {
                         "      \"kafka-manager\",\n" +
                         "      \"kibana\",\n" +
                         "      \"logstash\",\n" +
-                        "      \"spark-history-server\"\n" +
+                        "      \"spark-console\"\n" +
                         "    ],\n" +
                         "    \"restarts\": [],\n" +
                         "    \"installations\": [\"grafana\"],\n" +
@@ -269,7 +269,7 @@ public class KubernetesServicesConfigControllerTest {
                 "\"spark-runtime_install\":\"on\"," +
                 "\"grafana_install\":\"on\"," +
                 "\"zeppelin_install\":\"on\"," +
-                "\"spark-history-server\":\"on\"," +
+                "\"spark-console\":\"on\"," +
                 "\"kibana\":\"on\"}", session));
 
         assertEquals ("{\"status\": \"OK\"}", mscc.applyKubernetesServicesConfig(session));

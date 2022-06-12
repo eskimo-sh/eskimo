@@ -94,6 +94,13 @@ public class ProxyManagerService {
         this.configurationService = configurationService;
     }
 
+    private void __dumpProxyTunnelConfig() {
+        proxyTunnelConfigs.keySet().forEach(key -> {
+            logger.debug(" - " + key + " -> " + proxyTunnelConfigs.get(key));
+        });
+        logger.debug("");
+    }
+
     public HttpHost getServerHost(String serviceId) {
         ProxyTunnelConfig config =  proxyTunnelConfigs.get(serviceId);
         if (config == null) {
@@ -139,6 +146,7 @@ public class ProxyManagerService {
     }
 
     public void updateServerForService(String serviceName, String runtimeNode) throws ConnectionManagerException {
+
         Service service = servicesDefinition.getService(serviceName);
         if (service != null && service.isProxied()) {
 
@@ -150,6 +158,11 @@ public class ProxyManagerService {
             ProxyTunnelConfig prevConfig = proxyTunnelConfigs.get(serviceId);
 
             if (prevConfig == null || !prevConfig.getNode().equals(effNode)) {
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("------ BEFORE ---- updateServerForService (" + serviceName + "," + runtimeNode + ") ----------- ");
+                    __dumpProxyTunnelConfig();
+                }
 
                 // Handle host has changed !
                 ProxyTunnelConfig newConfig = new ProxyTunnelConfig(serviceName, generateLocalPort(), effNode, service.getUiConfig().getProxyTargetPort());
@@ -170,6 +183,11 @@ public class ProxyManagerService {
 
                 connectionManagerService.recreateTunnels (effNode);
                 webSocketProxyServer.removeForwardersForService(serviceId); // just remove them, they will be recreated automagically
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("------ AFTER ---- updateServerForService (" + serviceName + "," + runtimeNode + ") ----------- ");
+                    __dumpProxyTunnelConfig();
+                }
             }
         }
     }
@@ -198,6 +216,11 @@ public class ProxyManagerService {
 
     public void removeServerForService(String serviceName, String runtimeNode) throws ConnectionManagerException {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug("------ BEFORE ---- removeServerForService (" + serviceName + "," + runtimeNode + ") ----------- ");
+            __dumpProxyTunnelConfig();
+        }
+
         Service service = servicesDefinition.getService(serviceName);
         if (service != null && service.isProxied()) {
             String serviceId = service.getServiceId(runtimeNode);
@@ -210,6 +233,11 @@ public class ProxyManagerService {
                 connectionManagerService.dropTunnelsToBeClosed(prevConfig.getNode());
                 webSocketProxyServer.removeForwardersForService(serviceId);
             }
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("------ AFTER ---- removeServerForService (" + serviceName + "," + runtimeNode + ") ----------- ");
+            __dumpProxyTunnelConfig();
         }
     }
 

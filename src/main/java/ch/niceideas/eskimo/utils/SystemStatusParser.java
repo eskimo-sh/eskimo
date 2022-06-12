@@ -48,7 +48,7 @@ public class SystemStatusParser {
     /**
      * Debug with
      *
-     * sudo systemctl status --no-pager -al mesos-master zookeeper zeppelin ntp gluster mesos-agent logstash cerebro elasticsearch kafka-manager kafka spark-runtime kibana spark-history-server
+     * sudo systemctl status --no-pager -al mesos-master zookeeper zeppelin ntp gluster mesos-agent logstash cerebro elasticsearch kafka-manager kafka spark-runtime kibana spark-console
      *
      * systemctl status -a 2>/dev/null | grep ● -A 5 | grep ".service" -A 5  | grep "Active:" -A 5 | grep logstash -A 5
      *

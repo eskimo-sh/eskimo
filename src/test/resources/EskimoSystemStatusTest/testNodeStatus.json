@@ -23,7 +23,7 @@
     "service_ntp_192-168-10-13": "OK",
     "service_spark-runtime_192-168-10-11": "OK",
     "service_spark-runtime_192-168-10-13": "OK",
-    "service_spark-history-server_192-168-10-11": "OK",
+    "service_spark-console_192-168-10-11": "OK",
     "service_zeppelin_192-168-10-11": "OK",
     "service_zookeeper_192-168-10-11": "OK"
 }

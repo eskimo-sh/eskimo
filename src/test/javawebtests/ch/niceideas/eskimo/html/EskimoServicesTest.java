@@ -67,12 +67,12 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         js("eskimoServices.setEmptyFrameTarget (\""+testPage.getPath()+"/\");");
 
-        js("eskimoServices.setUiServices( [\"cerebro\", \"kibana\", \"spark-history-server\", \"zeppelin\"] );");
+        js("eskimoServices.setUiServices( [\"cerebro\", \"kibana\", \"spark-console\", \"zeppelin\"] );");
 
         js("var UI_SERVICES_CONFIG = {" +
                 "\"cerebro\" : {'urlTemplate': './cerebro/{NODE_ADDRESS}:9999/cerebro', 'title' : 'cerebro', 'waitTime': 10 }, " +
                 "\"kibana\" : {'urlTemplate': './kibana/{NODE_ADDRESS}:9999/kibana', 'title' : 'kibana', 'waitTime': 15 }, " +
-                "\"spark-history-server\" : {'urlTemplate': './spark-histo/{NODE_ADDRESS}:9999/spark-histo', 'title' : 'spark-histo', 'waitTime': 25 }, " +
+                "\"spark-console\" : {'urlTemplate': './spark-histo/{NODE_ADDRESS}:9999/spark-histo', 'title' : 'spark-histo', 'waitTime': 25 }, " +
                 "\"zeppelin\" : {'urlTemplate': './zeppelin/{NODE_ADDRESS}:9999/zeppelin', 'title' : 'zeppelin', 'waitTime': 30 }" +
                 "};");
 
@@ -225,7 +225,7 @@ public class EskimoServicesTest extends AbstractWebTest {
         // ensure values are found in node 1
         assertJavascriptEquals ("1.0", "$('#iframe-content-cerebro').length");
         assertJavascriptEquals ("1.0", "$('#iframe-content-kibana').length");
-        assertJavascriptEquals ("1.0", "$('#iframe-content-spark-history-server').length");
+        assertJavascriptEquals ("1.0", "$('#iframe-content-spark-console').length");
         assertJavascriptEquals ("1.0", "$('#iframe-content-zeppelin').length");
     }
 

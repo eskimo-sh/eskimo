@@ -26,7 +26,7 @@
   "prometheus3": "on",
   "spark-runtime2": "on",
   "spark-runtime3": "on",
-  "spark-history-server": "1",
+  "spark-console": "1",
   "zeppelin": "1",
   "zookeeper": "1"
 }

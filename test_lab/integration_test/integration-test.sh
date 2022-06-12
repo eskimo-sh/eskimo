@@ -675,9 +675,9 @@ setup_eskimo() {
           "logstash_install": "on",
           "logstash_cpu": "0.3",
           "logstash_ram": "1G",
-          "spark-history-server_install": "on",
-          "spark-history-server_cpu": "0.1",
-          "spark-history-server_ram": "1G",
+          "spark-console_install": "on",
+          "spark-console_cpu": "0.1",
+          "spark-console_ram": "1G",
           "spark-runtime_install": "on",
           "spark-runtime_cpu": "0.3",
           "spark-runtime_ram": "1.2G",
@@ -706,7 +706,7 @@ check_all_services_up() {
             "service_spark-runtime_192-168-56-41" \
             "service_mesos-master_192-168-56-41" \
             "service_zeppelin_192-168-56-41" \
-            "service_spark-history-server_192-168-56-41" \
+            "service_spark-console_192-168-56-41" \
             "service_elasticsearch_192-168-56-41" \
             "service_logstash_192-168-56-41" \
             "service_cerebro_192-168-56-41" \
@@ -744,7 +744,7 @@ check_all_services_up() {
             "service_spark-runtime_192-168-56-54" \
             "service_mesos-master_192-168-56-51" \
             "service_zeppelin_" \
-            "service_spark-history-server_" \
+            "service_spark-console_" \
             "service_elasticsearch_192-168-56-51" \
             "service_elasticsearch_192-168-56-52" \
             "service_elasticsearch_192-168-56-53" \
@@ -1353,9 +1353,9 @@ test_web_apps() {
 #        exit 104
 #    fi
 
-    echo_date "   + testing spark history server"
-    if [[ $(query_eskimo "spark-history-server/" | grep "Show incomplete applications") == "" ]]; then
-        echo_date "Couldn't reach Spark History Server"
+    echo_date "   + testing spark console"
+    if [[ $(query_eskimo "spark-console/" | grep "Show incomplete applications") == "" ]]; then
+        echo_date "Couldn't reach Spark Console"
         exit 105
     fi
 

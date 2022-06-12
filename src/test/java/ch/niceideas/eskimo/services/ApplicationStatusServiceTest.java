@@ -28,7 +28,7 @@ public class ApplicationStatusServiceTest extends AbstractSystemTest {
                         "{\"title\":\"Monitor Gluster volumes\",\"service\":\"gluster\"}," +
                         "{\"title\":\"Manage Kubernetes Cluster\",\"service\":\"kubernetes-dashboard\"}," +
                         "{\"title\":\"Manage your kafka topics\",\"service\":\"kafka-manager\"}," +
-                        "{\"title\":\"Monitor your Spark jobs\",\"service\":\"spark-history-server\"}," +
+                        "{\"title\":\"Monitor your Spark jobs\",\"service\":\"spark-console\"}," +
                         "{\"title\":\"Manage Flink Session\",\"service\":\"flink-runtime\"}," +
                         "{\"title\":\"Manage your data in Elasticsearch\",\"service\":\"cerebro\"}," +
                         "{\"title\":\"Visualize your data in Elasticsearch\",\"service\":\"kibana\"}," +

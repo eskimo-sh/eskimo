@@ -84,7 +84,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         assertFalse (def.getService("ntp").hasDependency(def.getService("zeppelin")));
         assertFalse (def.getService("gluster").hasDependency(def.getService("kube-master")));
-        assertFalse (def.getService("zookeeper").hasDependency(def.getService("spark-history-server")));
+        assertFalse (def.getService("zookeeper").hasDependency(def.getService("spark-console")));
         assertFalse (def.getService("zookeeper").hasDependency(def.getService("kafka")));
 
         assertTrue (def.getService("kafka").hasDependency(def.getService("zookeeper")));
@@ -155,7 +155,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                         "export ESKIMO_INSTALLED_gluster_1921681011=OK\n" +
                         "export ESKIMO_INSTALLED_gluster_1921681013=OK\n" +
                         "export ESKIMO_INSTALLED_kube_master_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_spark_history_server_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_spark_console_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_zeppelin_KUBERNETES_NODE=OK\n" +
                         "\n" +
                         "#Additional Environment\n" +
@@ -193,7 +193,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         }});
 
         KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>() {{
-            put("spark-history-server_install", "on");
+            put("spark-console_install", "on");
             put("cerebro_install", "on");
             put("kibana_install", "on");
             put("zeppelin_install", "on");
@@ -231,7 +231,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                         "export ESKIMO_INSTALLED_gluster_1921681011=OK\n" +
                         "export ESKIMO_INSTALLED_gluster_1921681013=OK\n" +
                         "export ESKIMO_INSTALLED_kube_master_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_spark_history_server_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_spark_console_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_zeppelin_KUBERNETES_NODE=OK\n" +
                         "\n" +
                         "#Additional Environment\n" +
@@ -288,7 +288,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "kafka",
                 "kafka-cli",
                 "kafka-manager",
-                "spark-history-server",
+                "spark-console",
                 "spark-runtime",
                 "spark-cli",
                 "flink-runtime",
@@ -331,7 +331,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "kibana",
                 "kubernetes-dashboard",
                 "logstash",
-                "spark-history-server",
+                "spark-console",
                 "spark-runtime",
                 "zeppelin"
         }, marathonServices);
@@ -349,7 +349,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "gluster",
                 "kubernetes-dashboard",
                 "kafka-manager",
-                "spark-history-server",
+                "spark-console",
                 "flink-runtime",
                 "cerebro",
                 "kibana",

@@ -234,7 +234,7 @@ public abstract class AbstractWebTest {
                 "    || serviceName == 'zookeeper' " +
                 "    || serviceName == 'grafana' " +
                 "    || serviceName == 'kafka-manager' " +
-                "    || serviceName == 'spark-history-server' " +
+                "    || serviceName == 'spark-console' " +
                 "    || serviceName == 'flink-app-master' " +
                 "    || serviceName == 'cerebro' " +
                 "    || serviceName == 'kibana' " +

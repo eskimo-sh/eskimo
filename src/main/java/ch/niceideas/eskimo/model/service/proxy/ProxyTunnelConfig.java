@@ -46,4 +46,9 @@ public class ProxyTunnelConfig {
     private final int localPort;
     private final String node;
     private final int remotePort;
+
+    @Override
+    public String toString() {
+        return serviceName + " - " + localPort + " -> " + node + ":" + remotePort;
+    }
 }

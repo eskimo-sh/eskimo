@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class KubeStatusParser {
 
-    final static Pattern POD_NAME_REXP = Pattern.compile("[a-zA-Z\\-]+(\\-[a-zA-Z0-9]+){1,2}");
+    final static Pattern POD_NAME_REXP = Pattern.compile("[a-zA-Z]+(-[a-zA-Z]+){0,1}(\\-[a-zA-Z0-9]+){1,2}");
 
     private final String allPodStatus;
     private final String allServicesStatus;

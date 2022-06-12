@@ -82,7 +82,7 @@ public class NodeRangeResolverTest {
                 put("mesos-master", "1");
                 put("spark-runtime1", "on");
                 put("spark-runtime2", "on");
-                put("spark-history-server", "1");
+                put("spark-console", "1");
                 put("zeppelin", "1");
                 put("zookeeper", "1");
             }});
@@ -118,7 +118,7 @@ public class NodeRangeResolverTest {
                 put("mesos-master", "1");
                 put("spark-runtime1", "on");
                 put("spark-runtime2", "on");
-                put("spark-history-server", "1");
+                put("spark-console", "1");
                 put("zeppelin", "1");
                 put("zookeeper", "1");
             }});
@@ -154,7 +154,7 @@ public class NodeRangeResolverTest {
                 put("mesos-master", "1");
                 put("spark-runtime1", "on");
                 put("spark-runtime2", "on");
-                put("spark-history-server", "1");
+                put("spark-console", "1");
                 put("zeppelin", "1");
                 put("zookeeper", "1");
             }});
@@ -215,7 +215,7 @@ public class NodeRangeResolverTest {
             put("mesos-master", "1");
             put("spark-runtime1", "on");
             put("spark-runtime2", "on");
-            put("spark-history-server", "1");
+            put("spark-console", "1");
             put("zeppelin", "1");
             put("zookeeper", "1");
         }});
@@ -264,7 +264,7 @@ public class NodeRangeResolverTest {
             put("spark-runtime2", "on");
             put("spark-runtime3", "on");
             put("spark-runtime4", "on");
-            put("spark-history-server", "1");
+            put("spark-console", "1");
             put("zeppelin", "1");
             put("zookeeper", "1");
         }});

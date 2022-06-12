@@ -10,7 +10,7 @@
       {"mesos-agent": "192.168.10.11"},
       {"logstash": "192.168.10.11"},
       {"kafka-manager": "192.168.10.11"},
-      {"spark-history-server": "192.168.10.11"},
+      {"spark-console": "192.168.10.11"},
       {"spark-runtime": "192.168.10.11"},
       {"flink-runtime": "192.168.10.11"}
     ],

@@ -216,7 +216,7 @@
     },
     {
       "settings": [],
-      "name": "spark-history-server"
+      "name": "spark-console"
     }
   ],
   "status": "OK"

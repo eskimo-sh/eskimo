@@ -173,7 +173,7 @@
         {
           "type" : "PLAIN",
           "source" : "this._websocket(this._url)",
-          "target" : "this._websocket(this._url.replace(\"ws://localhost:9191/grafana\", \"ws://localhost:9191/ws/grafana\"))"
+          "target" : "this._websocket(this._url.replace(\"{APP_ROOT}/grafana\", \"{APP_ROOT}/ws/grafana\"))"
         },
         {
           "type" : "PLAIN",
@@ -720,7 +720,7 @@
 
 
 
-  "spark-history-server" : {
+  "spark-console" : {
     "config": {
       "imageName" : "spark",
       "order": 12,
@@ -735,8 +735,8 @@
       "group" : "Spark",
       "name" : "Console",
       "memory": "small",
-      "logo" : "images/spark-history-server-logo.png",
-      "icon" : "images/spark-history-server-icon.png"
+      "logo" : "images/spark-console-logo.png",
+      "icon" : "images/spark-console-icon.png"
     },
     "ui": {
       "proxyTargetPort" : 31811,
@@ -747,8 +747,8 @@
       "applyStandardProxyReplacements": false,
       "urlRewriting" : [
         {
-          "startUrl" : "{APP_ROOT_URL}/history/",
-          "replacement" : "{APP_ROOT_URL}/spark-history-server/history/"
+          "startUrl" : "{FULL_SERVER_ROOT}/history/",
+          "replacement" : "{FULL_SERVER_ROOT}/spark-console/history/"
         }
       ]
     },
@@ -928,6 +928,7 @@
       "order": 15,
       "group" : "Flink",
       "name" : "Runtime",
+      "unique": true,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -942,20 +943,13 @@
     "ui": {
       "kubeProxy": true,
       "__comment_urlTemplate": "Going through Kubectl proxy.",
-      "urlTemplate": "flink-runtime/{NODE_ADDRESS}/api/v1/namespaces/default/services/flink-runtime-rest:8081/proxy/#/overview",
+      "urlTemplate": "flink-runtime/api/v1/namespaces/default/services/flink-runtime-rest:8081/proxy/#/overview",
       "__comment_proxyTargetPort": "Kubectl proxy target port",
       "proxyTargetPort" : 8001,
       "waitTime": 5000,
       "role" : "*",
       "title" : "Flink Dashboard",
       "statusPageLinktitle" : "Manage Flink Session"
-    },
-    "masterDetection": {
-      "strategy" : "LOG_FILE",
-      "logFile" : "/var/log/flink/flink-log-kubernetes-jobmanager.sh.log",
-      "grep": "Starting the resource manager.",
-      "timeStampExtractRexp" : "([0-9\\-]+ [0-9.:,]+).*",
-      "timeStampFormat" : "yyyy-MM-dd HH:mm:ss,SSS"
     },
     "dependencies": [
       {

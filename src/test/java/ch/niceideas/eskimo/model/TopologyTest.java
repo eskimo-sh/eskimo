@@ -278,7 +278,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export ESKIMO_INSTALLED_gluster_1921681011=OK\n" +
                 "export ESKIMO_INSTALLED_gluster_1921681013=OK\n" +
                 "export ESKIMO_INSTALLED_kube_master_1921681011=OK\n" +
-                "export ESKIMO_INSTALLED_spark_history_server_KUBERNETES_NODE=OK\n" +
+                "export ESKIMO_INSTALLED_spark_console_KUBERNETES_NODE=OK\n" +
                 "export ESKIMO_INSTALLED_zeppelin_KUBERNETES_NODE=OK\n", topology.getTopologyScript(StandardSetupHelpers.getStandard2NodesInstallStatus()));
     }
 
@@ -496,7 +496,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                         "export ESKIMO_INSTALLED_gluster_1921681011=OK\n" +
                         "export ESKIMO_INSTALLED_gluster_1921681013=OK\n" +
                         "export ESKIMO_INSTALLED_kube_master_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_spark_history_server_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_spark_console_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_zeppelin_KUBERNETES_NODE=OK\n" +
                         "\n" +
                         "#Additional Environment\n" +

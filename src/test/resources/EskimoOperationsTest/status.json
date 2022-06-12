@@ -2,7 +2,7 @@
   "installation_kafka-manager": "INIT",
   "installation_kibana": "INIT",
   "Installation_Topology-All-Nodes": "COMPLETE",
-  "installation_spark-history-server": "INIT",
+  "installation_spark-console": "INIT",
   "installation_cerebro": "RUNNING",
   "installation_zeppelin": "INIT",
   "installation_grafana": "INIT"

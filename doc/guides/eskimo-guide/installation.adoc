@@ -307,7 +307,7 @@ For the sake of information, the list of static ports used by the different serv
 * [prometheus] : 9090, 9091, 9093, 9094, 9100
 * [spark] : 7077, 8580, 8980, 8581, 8981, 2304, 18480, 7337, 7222, 8032, 7222
 * [flink] : 6121, 6122, 6123, 6130, 8081
-* [spark-history-server] : 18080, 31810
+* [spark-console] : 18080, 31810
 * [zeppelin] : 38080, 38081, 31008, 31009
 * [zookeeper] : 2181, 2888, 3888
 

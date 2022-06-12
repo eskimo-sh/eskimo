@@ -1,7 +1,7 @@
 {
   "kibana_install": "on",
   "zeppelin_install": "on",
-  "spark-history-server_install": "on",
+  "spark-console_install": "on",
   "cerebro_install": "on",
   "kafka-manager_install": "on"
 }

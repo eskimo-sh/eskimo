@@ -387,7 +387,7 @@ A service declaration in `services.json` for instance for `serviceX` would be de
 
         # [mandatory] the replacement for that pattern
         "replacement" : "{replacement}" ## e.g.
-                                   ## "{APP_ROOT_URL}/spark-history-server/history/"
+                                   ## "{APP_ROOT_URL}/spark-console/history/"
       }
     ]
 
@@ -841,13 +841,13 @@ URL needs to be replaced by the corresponding sub-path in the eskimo context.
 
 This is achieved using URL rewriting rules.
 
-.URL rewriting rule example for spark-history-server
+.URL rewriting rule example for spark-console
 ----
 
       "urlRewriting" : [
         {
           "startUrl" : "{APP_ROOT_URL}/history/",
-          "replacement" : "{APP_ROOT_URL}/spark-history-server/history/"
+          "replacement" : "{APP_ROOT_URL}/spark-console/history/"
         }
 ----
 

@@ -129,7 +129,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
         serviceInstallStatus.removeInstallationFlag("cerebro", "KUBERNETES_NODE");
         serviceInstallStatus.removeInstallationFlag("kafka-manager", "KUBERNETES_NODE");
         serviceInstallStatus.removeInstallationFlag("kibana", "KUBERNETES_NODE");
-        serviceInstallStatus.removeInstallationFlag("spark-history-server", "KUBERNETES_NODE");
+        serviceInstallStatus.removeInstallationFlag("spark-console", "KUBERNETES_NODE");
         serviceInstallStatus.removeInstallationFlag("zeppelin", "KUBERNETES_NODE");
         serviceInstallStatus.setValueForPath("grafana_installed_on_IP_KUBERNETES_NODE", "OK");
 
@@ -179,7 +179,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
         assertEquals(5, installList.size());
         assertEquals("" +
                 "cerebro-192.168.10.11," +
-                "spark-history-server-192.168.10.11," +
+                "spark-console-192.168.10.11," +
                 "kafka-manager-192.168.10.11," +
                 "kibana-192.168.10.11," +
                 "zeppelin-192.168.10.11", String.join(",", installList));
@@ -299,7 +299,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
         assertEquals(9, statusMap.size());
         assertEquals("OK", statusMap.get("service_cerebro_192-168-10-11"));
         assertEquals("KO", statusMap.get("service_kibana_192-168-10-11"));
-        assertEquals("NA", statusMap.get("service_spark-history-server_192-168-10-11"));
+        assertEquals("NA", statusMap.get("service_spark-console_192-168-10-11"));
     }
 
     @Test
@@ -341,7 +341,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
 
         assertEquals("KO", statusMap.get("service_cerebro_192-168-10-11"));
         assertEquals("KO", statusMap.get("service_kibana_192-168-10-11"));
-        assertEquals("KO", statusMap.get("service_spark-history-server_192-168-10-11"));
+        assertEquals("KO", statusMap.get("service_spark-console_192-168-10-11"));
         // This one is not referenced anymore in this case
         //assertEquals("KO", statusMap.get("service_grafana_192-168-10-13"));
         assertEquals("KO", statusMap.get("service_zeppelin_192-168-10-11"));
@@ -355,7 +355,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
 
         assertTrue (kubernetesService.shouldInstall(kubeServicesConfig, "cerebro"));
         assertTrue (kubernetesService.shouldInstall(kubeServicesConfig, "kibana"));
-        assertTrue (kubernetesService.shouldInstall(kubeServicesConfig, "spark-history-server"));
+        assertTrue (kubernetesService.shouldInstall(kubeServicesConfig, "spark-console"));
         assertFalse (kubernetesService.shouldInstall(kubeServicesConfig, "grafana"));
         assertTrue (kubernetesService.shouldInstall(kubeServicesConfig, "zeppelin"));
         assertTrue (kubernetesService.shouldInstall(kubeServicesConfig, "kafka-manager"));

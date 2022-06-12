@@ -222,8 +222,14 @@ public class ServicesProxyServlet extends ProxyServlet {
         return -1L;
     }
 
-    private String getAppRootUrl (HttpServletRequest servletRequest) {
+    private String getFullServerRoot (HttpServletRequest servletRequest) {
         return servletRequest.getScheme() + "://"
+                + servletRequest.getServerName() + ":" + servletRequest.getServerPort()
+                + (StringUtils.isNotBlank(servletRequest.getContextPath()) ? "/" + servletRequest.getContextPath() : "");
+    }
+
+    private String getAppRoot (HttpServletRequest servletRequest) {
+        return "//"
                 + servletRequest.getServerName() + ":" + servletRequest.getServerPort()
                 + (StringUtils.isNotBlank(servletRequest.getContextPath()) ? "/" + servletRequest.getContextPath() : "");
     }
@@ -241,8 +247,9 @@ public class ServicesProxyServlet extends ProxyServlet {
 
         String contextPathPrefix = getContextPath ();
         String prefixPath = getPrefixPath(servletRequest, contextPathPrefix);
-        String appRootUrl = getAppRootUrl (servletRequest);
-        ReplacementContext context = new ReplacementContext(contextPathPrefix, prefixPath, appRootUrl);
+        String fullServerRoot = getFullServerRoot (servletRequest);
+        String appRoot = getAppRoot (servletRequest);
+        ReplacementContext context = new ReplacementContext(contextPathPrefix, prefixPath, fullServerRoot, appRoot);
 
         boolean isText = false;
         if (entity != null && entity.getContentType() != null) {
@@ -352,8 +359,9 @@ public class ServicesProxyServlet extends ProxyServlet {
 
         String contextPathPrefix = getContextPath ();
         String prefixPath = getPrefixPath(servletRequest, contextPathPrefix);
-        String appRootUrl = getAppRootUrl (servletRequest);
-        ReplacementContext context = new ReplacementContext(contextPathPrefix, prefixPath, appRootUrl);
+        String fullServerRoot = getFullServerRoot (servletRequest);
+        String appRoot = getAppRoot (servletRequest);
+        ReplacementContext context = new ReplacementContext(contextPathPrefix, prefixPath, fullServerRoot, appRoot);
 
         String rewritten = Arrays.stream(servicesDefinition.listUIServices())
                 .map (servicesDefinition::getService)

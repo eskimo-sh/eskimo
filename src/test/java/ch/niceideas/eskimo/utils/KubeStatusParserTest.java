@@ -61,7 +61,9 @@ public class KubeStatusParserTest {
         assertTrue(KubeStatusParser.POD_NAME_REXP.matcher("elasticsearch-0").matches());
         assertTrue (KubeStatusParser.POD_NAME_REXP.matcher("kafka-2").matches());
         assertTrue (KubeStatusParser.POD_NAME_REXP.matcher("kubernetes-dashboard-7db6bbdf55-vhgcc").matches());
-        assertTrue (KubeStatusParser.POD_NAME_REXP.matcher("flink-5db698798f-nkj2p").matches());
+        assertTrue (KubeStatusParser.POD_NAME_REXP.matcher("flink-runtime-5db698798f-nkj2p").matches());
+
+        assertFalse (KubeStatusParser.POD_NAME_REXP.matcher("flink-runtime-taskmanager-1-1").matches());
         assertFalse (KubeStatusParser.POD_NAME_REXP.matcher("zeppelin-spark-e8ca018099847d6d-exec-20").matches());
     }
 

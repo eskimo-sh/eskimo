@@ -118,6 +118,16 @@ public class ConnectionManagerService {
         }, maximumConnectionAge, maximumConnectionAge);
     }
 
+    private void __dumpPortForwardersMap () {
+        portForwardersMap.keySet().forEach(sshConnection -> {
+           logger.debug(" - " + sshConnection.getHostname());
+           portForwardersMap.get(sshConnection).forEach(forwarder -> {
+               logger.debug("   + " + forwarder.toString());
+           });
+        });
+        logger.debug("");
+    }
+
     @PreDestroy
     public void destroy() {
         logger.info ("Cancelling connection closer scheduler");
@@ -151,39 +161,37 @@ public class ConnectionManagerService {
         return getConnectionInternal(node);
     }
 
-
-    public void forceRecreateConnection(String node) {
-
-        connectionMapLock.lock();
-
+    private void closeConnection (SSHConnection connection) {
         try {
+            logger.info ("Closing connection to " + connection.getHostname());
 
-            SSHConnection connection = connectionMap.get(node);
-
-            if (connection == null) {
-                throw new IllegalStateException();
+            for (LocalPortForwarderWrapper localPortForwarder : getForwarders(connection)) {
+                localPortForwarder.close();
             }
 
-            connectionsToCloseLazily.add (connection);
-
-            connectionMap.remove(node);
-            connectionAges.remove(node);
-
-            // tunnels should be closed immediately !
-            final List<LocalPortForwarderWrapper> previousForwarders = getForwarders(connection);
-            try {
-                for (LocalPortForwarderWrapper forwarder : previousForwarders) {
-                    forwarder.close();
-                }
-            } catch (Exception e) {
-                logger.warn(e.getMessage());
-                logger.debug(e, e);
-            }
-            portForwardersMap.remove(connection);
-
-        } finally  {
-            connectionMapLock.unlock();
+            connection.close();
+        } catch (Exception e) {
+            logger.debug (e, e);
         }
+    }
+
+    private void removeConnectionAndRegisterClose(String node, SSHConnection connection) {
+        connectionMap.remove(node);
+        connectionAges.remove(node);
+
+        // tunnels should be closed immediately !
+        final List<LocalPortForwarderWrapper> previousForwarders = getForwarders(connection);
+        try {
+            for (LocalPortForwarderWrapper forwarder : previousForwarders) {
+                forwarder.close();
+            }
+        } catch (Exception e) {
+            logger.warn(e.getMessage());
+            logger.debug(e, e);
+        }
+        portForwardersMap.remove(connection);
+
+        connectionsToCloseLazily.add (connection);
     }
 
     public void recreateTunnels(String host) throws ConnectionManagerException {
@@ -256,12 +264,6 @@ public class ConnectionManagerService {
 
     }
 
-    private void removeConnectionAndRegisterClose(String node, SSHConnection connection) {
-        connectionMap.remove(node);
-        connectionAges.remove(node);
-        connectionsToCloseLazily.add (connection);
-    }
-
     protected SSHConnection createConnectionInternal(String node, int operationTimeout) throws IOException, FileException, SetupException {
 
         logger.info ("Creating connection to " + node);
@@ -284,20 +286,6 @@ public class ConnectionManagerService {
             throw new IOException("Authentication failed");
         }
         return connection;
-    }
-
-    private void closeConnection (SSHConnection connection) {
-        try {
-            logger.info ("Closing connection to " + connection.getHostname());
-
-            for (LocalPortForwarderWrapper localPortForwarder : getForwarders(connection)) {
-                localPortForwarder.close();
-            }
-
-            connection.close();
-        } catch (Exception e) {
-            logger.debug (e, e);
-        }
     }
 
 
@@ -325,6 +313,11 @@ public class ConnectionManagerService {
 
     protected void recreateTunnels(SSHConnection connection, String node) throws ConnectionManagerException {
 
+        if (logger.isDebugEnabled()){
+            logger.debug("------ BEFORE ---- recreateTunnels (" + node + ") ----------- ");
+            __dumpPortForwardersMap();
+        }
+
         final List<LocalPortForwarderWrapper> currentForwarders = getForwarders(connection);
 
         dropTunnelsToBeClosed(connection, node);
@@ -344,6 +337,11 @@ public class ConnectionManagerService {
                 logger.warn ("Not trying any further to recreate forwarder for "
                         + config.getServiceName() + " - " + config.getNode() + " - " + config.getRemotePort());
             }
+        }
+
+        if (logger.isDebugEnabled()){
+            logger.debug("------ AFTER ---- recreateTunnels (" + node + ") ----------- ");
+            __dumpPortForwardersMap();
         }
     }
 
@@ -410,9 +408,14 @@ public class ConnectionManagerService {
             }
         }
 
+        @Override
+        public String toString() {
+            return serviceName + " - from " + localPort + " to " + targetHost + ":" + targetPort;
+        }
+
         public void close() {
             try {
-                logger.info ("CLOSING tunnel for service " + serviceName + " - from " + localPort + " to " + targetHost + ":" + targetPort);
+                logger.info ("CLOSING tunnel for service " + toString());
                 if (forwarder != null) {
                     forwarder.close();
                 }

@@ -272,7 +272,7 @@
     ],
     "group": "Elastic Stack"
   },
-  "spark-history-server": {
+  "spark-console": {
     "name": "Console",
     "unique": true,
     "commands": [

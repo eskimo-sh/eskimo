@@ -53,7 +53,7 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
         loadScript(page, "eskimoKubernetesServicesConfig.js");
 
         /*
-        js("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"cerebro\", \"kibana\", \"spark-history-server\", \"zeppelin\", \"kafka-manager\", \"flink-app-master\", \"grafana\"];");
+        js("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"cerebro\", \"kibana\", \"spark-console\", \"zeppelin\", \"kafka-manager\", \"flink-app-master\", \"grafana\"];");
         js("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-runtime\", \"gluster\", \"logstash\", \"flink-worker\", \"prometheus\"];");
         js("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         js("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
@@ -75,7 +75,7 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
                 "    \"grafana\",\n" +
                 "    \"kafka-manager\",\n" +
                 "    \"kibana\",\n" +
-                "    \"spark-history-server\",\n" +
+                "    \"spark-console\",\n" +
                 "    \"zeppelin\"\n" +
                 "  ]);");
 
@@ -84,7 +84,7 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
                 "    \"grafana\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
                 "    \"kafka-manager\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
                 "    \"kibana\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
-                "    \"spark-history-server\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
+                "    \"spark-console\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
                 "    \"zeppelin\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
                 "  });");
 
@@ -110,12 +110,12 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
                 "\"kafka-manager_ram\":\"1G\"," +
                 "\"cerebro_ram\":\"1G\"," +
                 "\"kafka-manager_install\":\"on\"," +
-                "\"spark-history-server_install\":\"on\"," +
-                "\"spark-history-server_ram\":\"1G\"," +
+                "\"spark-console_install\":\"on\"," +
+                "\"spark-console_ram\":\"1G\"," +
                 "\"kafka-manager_cpu\":\"1\"," +
                 "\"grafana_ram\":\"1G\"," +
                 "\"cerebro_install\":\"on\"," +
-                "\"spark-history-server_cpu\":\"1\"," +
+                "\"spark-console_cpu\":\"1\"," +
                 "\"zeppelin_cpu\":\"1\"," +
                 "\"kibana_cpu\":\"1\"," +
                 "\"zeppelin_install\":\"on\"," +
@@ -163,7 +163,7 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
                 "    \"zeppelin_install\": \"on\",\n" +
                 "    \"kafka-manager_install\": \"on\",\n" +
                 "    \"kibana_install\": \"on\",\n" +
-                "    \"spark-history-server_install\": \"on\",\n" +
+                "    \"spark-console_install\": \"on\",\n" +
                 "    \"grafana_install\": \"on\"\n" +
                 "})");
 
@@ -171,7 +171,7 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
         assertTrue((boolean)js("$('#zeppelin_install').is(':checked')").getJavaScriptResult());
         assertTrue((boolean)js("$('#kafka-manager_install').is(':checked')").getJavaScriptResult());
         assertTrue((boolean)js("$('#kibana_install').is(':checked')").getJavaScriptResult());
-        assertTrue((boolean)js("$('#spark-history-server_install').is(':checked')").getJavaScriptResult());
+        assertTrue((boolean)js("$('#spark-console_install').is(':checked')").getJavaScriptResult());
         assertTrue((boolean)js("$('#grafana_install').is(':checked')").getJavaScriptResult());
 
         // just test a few
@@ -199,7 +199,7 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
         assertEquals("on", js("$('#zeppelin_reinstall').val()").getJavaScriptResult());
         assertEquals("on", js("$('#kafka-manager_reinstall').val()").getJavaScriptResult());
         assertEquals("on", js("$('#kibana_reinstall').val()").getJavaScriptResult());
-        assertEquals("on", js("$('#spark-history-server_reinstall').val()").getJavaScriptResult());
+        assertEquals("on", js("$('#spark-console_reinstall').val()").getJavaScriptResult());
         assertEquals("on", js("$('#grafana_reinstall').val()").getJavaScriptResult());
 
     }
@@ -251,7 +251,7 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
                         "    \"zeppelin_install\": \"on\",\n" +
                         "    \"kafka-manager_install\": \"on\",\n" +
                         "    \"kibana_install\": \"on\",\n" +
-                        "    \"spark-history-server_install\": \"on\",\n" +
+                        "    \"spark-console_install\": \"on\",\n" +
                         "    \"grafana_install\": \"on\"\n" +
                         "} ); }");
 

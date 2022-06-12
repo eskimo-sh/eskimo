@@ -142,7 +142,7 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         assertEquals(6, oc.getRestarts().size());
 
         assertEquals (
-                        "etcd=192.168.10.11, kube-master=192.168.10.11, kube-slave=192.168.10.11, spark-history-server=(kubernetes), logstash=(kubernetes), zeppelin=(kubernetes)"
+                        "etcd=192.168.10.11, kube-master=192.168.10.11, kube-slave=192.168.10.11, spark-console=(kubernetes), logstash=(kubernetes), zeppelin=(kubernetes)"
                 , oc.getRestarts().stream()
                         .map(operationId -> operationId.getService()+"="+operationId.getNode())
                         .collect(Collectors.joining(", ")));
@@ -267,7 +267,7 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         System.err.println (oc2.toJSON());
 
         assertTrue (new JSONObject(
-                    "{\"restarts\":[{\"zookeeper\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"etcd\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.13\"},{\"kube-slave\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"cerebro\":\"(kubernetes)\"},{\"spark-history-server\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
+                    "{\"restarts\":[{\"zookeeper\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"etcd\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.13\"},{\"kube-slave\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"cerebro\":\"(kubernetes)\"},{\"spark-console\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
                             "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.13\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
                             "\"installations\":[]}")
                 .similar(oc2.toJSON()));
@@ -316,7 +316,7 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         System.err.println (oc2.toJSON());
 
         assertTrue (new JSONObject("{" +
-                "\"restarts\":[{\"etcd\":\"192.168.10.13\"},{\"kube-master\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.13\"},{\"kube-slave\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"cerebro\":\"(kubernetes)\"},{\"spark-history-server\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
+                "\"restarts\":[{\"etcd\":\"192.168.10.13\"},{\"kube-master\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.13\"},{\"kube-slave\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"cerebro\":\"(kubernetes)\"},{\"spark-console\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
                 "\"uninstallations\":[{\"kube-master\":\"192.168.10.13\"}]," +
                 "\"installations\":[]}")
                 .similar(oc2.toJSON()));
@@ -370,7 +370,7 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         System.err.println (oc2.toJSON());
 
         assertTrue (new JSONObject("{" +
-                "\"restarts\":[{\"kube-master\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"cerebro\":\"(kubernetes)\"},{\"spark-history-server\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
+                "\"restarts\":[{\"kube-master\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"cerebro\":\"(kubernetes)\"},{\"spark-console\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
                 "\"uninstallations\":[{\"kube-master\":\"192.168.10.13\"}]," +
                 "\"installations\":[]}")
                 .similar(oc2.toJSON()));

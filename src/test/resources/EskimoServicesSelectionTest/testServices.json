@@ -273,19 +273,19 @@
     "title": "Kubernetes Etcd",
     "mandatory": false
   },
-  "spark-history-server": {
+  "spark-console": {
     "kubernetes": true,
     "col": -1,
     "conditional": "NONE",
     "configOrder": 11,
     "unique": true,
-    "name": "spark-history-server",
-    "icon": "images/spark-history-server-icon.png",
+    "name": "spark-console",
+    "icon": "images/spark-console-icon.png",
     "kubeConfig": {"request": {
       "cpu": "0.3",
       "ram": "400M"
     }},
-    "logo": "images/spark-history-server-logo.png",
+    "logo": "images/spark-console-logo.png",
     "row": -1,
     "title": "Spark Console",
     "mandatory": false

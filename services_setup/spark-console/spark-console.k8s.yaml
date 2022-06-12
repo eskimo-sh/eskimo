@@ -118,8 +118,8 @@ spec:
             runAsGroup: 3302
           resources:
             requests:
-              cpu: "$ESKIMO_KUBE_REQUEST_spark_console_CPU"
-              memory: "$ESKIMO_KUBE_REQUEST_spark_console_RAM"
+              cpu: "$ESKIMO_KUBE_REQUEST_SPARK_CONSOLE_CPU"
+              memory: "$ESKIMO_KUBE_REQUEST_SPARK_CONSOLE_RAM"
       volumes:
         - name: var-log-spark
           hostPath:

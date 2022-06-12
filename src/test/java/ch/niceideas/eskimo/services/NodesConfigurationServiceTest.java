@@ -90,10 +90,7 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
     public void testInstallEskimoBaseSystem() throws Exception {
 
         nodesConfigurationService.setConnectionManagerService(new ConnectionManagerService() {
-            @Override
-            public void forceRecreateConnection(String node) {
-                // No-Op
-            }
+
             @Override
             public SSHConnection getPrivateConnection (String node) {
                 return null;
@@ -280,10 +277,7 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
         nodesConfigurationService.setSshCommandService(sshCommandService);
 
         nodesConfigurationService.setConnectionManagerService(new ConnectionManagerService() {
-            @Override
-            public void forceRecreateConnection(String node) {
-                // no Op
-            }
+
             @Override
             public SSHConnection getPrivateConnection (String node) {
                 return null;

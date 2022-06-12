@@ -5,7 +5,7 @@
   "kafka-manager": "1",
   "kibana": "1",
   "kube-master": "1",
-  "spark-history-server": "1",
+  "spark-console": "1",
   "zeppelin": "1",
   "zookeeper": "1",
   "elasticsearch1": "on",

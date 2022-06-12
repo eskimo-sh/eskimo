@@ -15,6 +15,6 @@
   "gluster_installed_on_IP_192-168-10-11": "OK",
   "gluster_installed_on_IP_192-168-10-13": "OK",
   "kube-master_installed_on_IP_192-168-10-11": "OK",
-  "spark-history-server_installed_on_IP_KUBERNETES_NODE": "OK",
+  "spark-console_installed_on_IP_KUBERNETES_NODE": "OK",
   "zeppelin_installed_on_IP_KUBERNETES_NODE": "OK"
 }

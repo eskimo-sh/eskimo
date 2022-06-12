@@ -142,7 +142,7 @@ public class NodesConfigControllerTest {
                 "      {\"kube-master\": \"192.168.10.11\"},\n" +
                 "      {\"kube-slave\": \"192.168.10.11\"},\n" +
                 "      {\"kube-slave\": \"192.168.10.13\"},\n" +
-                "      {\"spark-history-server\": \"(kubernetes)\"},\n" +
+                "      {\"spark-console\": \"(kubernetes)\"},\n" +
                 "      {\"logstash\": \"(kubernetes)\"},\n" +
                 "      {\"zeppelin\": \"(kubernetes)\"}\n" +
                 "    ],\n" +

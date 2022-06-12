@@ -75,11 +75,11 @@ public class ServicesSettingsServiceTest extends AbstractSystemTest {
         servicesDefinition = new ServicesDefinition() {
             @Override
             public String getAllServicesString() {
-                return "kafka zookeeper ntp mesos-master spark-runtime kibana cerebro zeppelin kafka-manager gluster spark-history-server prometheus grafana";
+                return "kafka zookeeper ntp mesos-master spark-runtime kibana cerebro zeppelin kafka-manager gluster spark-console prometheus grafana";
             }
             @Override
             public String[] listAllServices() {
-                return new String[] {"kafka",  "zookeeper", "ntp", "mesos-master", "spark-runtime", "kibana", "cerebro", "zeppelin", "kafka-manager", "gluster", "spark-history-server", "elasticsearch", "prometheus", "grafana"};
+                return new String[] {"kafka",  "zookeeper", "ntp", "mesos-master", "spark-runtime", "kibana", "cerebro", "zeppelin", "kafka-manager", "gluster", "spark-console", "elasticsearch", "prometheus", "grafana"};
             }
         };
         servicesDefinition.afterPropertiesSet();

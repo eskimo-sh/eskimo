@@ -79,7 +79,7 @@ public class StandardSetupHelpers {
             put("etcd_installed_on_IP_192-168-10-11", "OK");
             put("etcd_installed_on_IP_192-168-10-13", "OK");
             put("spark-runtime_installed_on_IP_KUBERNETES_NODE", "OK");
-            put("spark-history-server_installed_on_IP_KUBERNETES_NODE", "OK");
+            put("spark-console_installed_on_IP_KUBERNETES_NODE", "OK");
             put("zeppelin_installed_on_IP_KUBERNETES_NODE", "OK");
             put("zookeeper_installed_on_IP_192-168-10-13", "OK");
         }});
@@ -113,7 +113,7 @@ public class StandardSetupHelpers {
             put("service_etcd_192-168-10-13", "OK");
             put("service_spark-runtime_192-168-10-11", "OK");
             put("service_spark-runtime_192-168-10-13", "OK");
-            put("service_spark-history-server_192-168-10-13", "OK");
+            put("service_spark-console_192-168-10-13", "OK");
             put("service_zeppelin_192-168-10-13", "OK");
             put("service_zookeeper_192-168-10-13", "OK");
         }});
@@ -125,7 +125,7 @@ public class StandardSetupHelpers {
             put("kibana_install", "on");
             put("spark-runtime_install", "on");
             put("logstash_install", "on");
-            put("spark-history-server_install", "on");
+            put("spark-console_install", "on");
             put("kafka-manager_install", "on");
             put("kafka_install", "on");
             put("zeppelin_install", "on");

@@ -8,5 +8,5 @@ bash /tmp/elasticsearch/setup.sh 192.168.10.15
 bash /tmp/elasticsearch/setup.sh 192.168.10.13
 bash /tmp/spark-runtime/setup.sh 192.168.10.15
 bash /tmp/spark-runtime/setup.sh 192.168.10.13
-bash /tmp/spark-history-server/setup.sh 192.168.10.15
+bash /tmp/spark-console/setup.sh 192.168.10.15
 bash /tmp/zeppelin/setup.sh 192.168.10.15

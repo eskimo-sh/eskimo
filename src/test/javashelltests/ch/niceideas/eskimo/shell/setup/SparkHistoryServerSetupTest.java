@@ -77,7 +77,7 @@ public class SparkHistoryServerSetupTest extends AbstractSetupShellTest {
 
     @Override
     protected String getServiceName() {
-        return "spark-history-server";
+        return "spark-console";
     }
 
     @Override
@@ -91,7 +91,7 @@ public class SparkHistoryServerSetupTest extends AbstractSetupShellTest {
         copyFile(jailPath, "setupCommon.sh");
         copyFile(jailPath, "inContainerSetupSparkHistoryServer.sh");
         copyFile(jailPath, "inContainerSetupSparkCommon.sh");
-        copyFile(jailPath, "spark-history-server.k8s.yaml");
+        copyFile(jailPath, "spark-console.k8s.yaml");
         copyFile(jailPath, "inContainerStartService.sh");
         copyFile(jailPath, "inContainerInjectTopology.sh");
         copyFile(jailPath, "inContainerInjectTopologySparkHistory.sh");

@@ -20,8 +20,8 @@
     "label": "installation of kibana on marathon"
   },
   {
-    "operation": "installation_spark-history-server",
-    "label": "installation of spark-history-server on marathon"
+    "operation": "installation_spark-console",
+    "label": "installation of spark-console on marathon"
   },
   {
     "operation": "installation_zeppelin",

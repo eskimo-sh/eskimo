@@ -23,7 +23,7 @@
   "prometheus_installed_on_IP_192-168-10-14": "OK",
   "spark-runtime_installed_on_IP_192-168-10-13": "OK",
   "spark-runtime_installed_on_IP_192-168-10-14": "OK",
-  "spark-history-server_installed_on_IP_192-168-10-11": "OK",
+  "spark-console_installed_on_IP_192-168-10-11": "OK",
   "zeppelin_installed_on_IP_192-168-10-11": "OK",
   "zookeeper_installed_on_IP_192-168-10-11": "OK"
 }

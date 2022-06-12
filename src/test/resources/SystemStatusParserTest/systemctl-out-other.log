@@ -161,8 +161,8 @@
              │ └─637 /usr/sbin/rsyslogd -n
              ├─system-lvm2\x2dpvscan.slice
              │ └─lvm2-pvscan@8:1.service
-             ├─spark-history-server.service
-             │ └─13581 /usr/bin/docker run -i --name spark-history-server --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared eskimo:spark-histo
+             ├─spark-console.service
+             │ └─13581 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared eskimo:spark-histo
              ├─systemd-tmpfiles-setup-dev.service
              ├─atd.service
              │ └─638 /usr/sbin/atd -f
@@ -1972,21 +1972,21 @@ May 31 13:55:37 deb-node1 bash[1670]: starting org.apache.spark.deploy.mesos.Mes
 May 31 13:55:44 deb-node1 bash[1670]: failed to launch: nice -n 0 /usr/local/lib/spark/bin/spark-class org.apache.spark.deploy.mesos.MesosExternalShuffleService
 May 31 13:55:44 deb-node1 bash[1670]: full log in /usr/local/lib/spark-2.4.3/logs/spark--org.apache.spark.deploy.mesos.MesosExternalShuffleService-1-1798f7958aa7.out
 
-● spark-history-server.service - Spark History Server
-   Loaded: loaded (/lib/systemd/system/spark-history-server.service; enabled; vendor preset: enabled)
+● spark-console.service - Spark History Server
+   Loaded: loaded (/lib/systemd/system/spark-console.service; enabled; vendor preset: enabled)
    Active: active (running) since Sun 2019-06-02 10:13:32 UTC; 20min ago
   Process: 13580 ExecStartPre=/bin/chown spark /var/lib/spark/eventlog (code=exited, status=0/SUCCESS)
   Process: 13579 ExecStartPre=/bin/chown spark /var/lib/spark/data (code=exited, status=0/SUCCESS)
-  Process: 13570 ExecStartPre=/usr/bin/docker rm -f spark-history-server (code=exited, status=0/SUCCESS)
-  Process: 13549 ExecStartPre=/usr/bin/docker kill spark-history-server (code=exited, status=1/FAILURE)
+  Process: 13570 ExecStartPre=/usr/bin/docker rm -f spark-console (code=exited, status=0/SUCCESS)
+  Process: 13549 ExecStartPre=/usr/bin/docker kill spark-console (code=exited, status=1/FAILURE)
  Main PID: 13581 (docker)
     Tasks: 9 (limit: 4915)
-   CGroup: /system.slice/spark-history-server.service
-           └─13581 /usr/bin/docker run -i --name spark-history-server --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared eskimo:spark-history-s
+   CGroup: /system.slice/spark-console.service
+           └─13581 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared eskimo:spark-history-s
 
 Jun 02 10:13:32 deb-node1 systemd[1]: Starting Spark History Server...
-Jun 02 10:13:32 deb-node1 docker[13549]: Error response from daemon: Cannot kill container: spark-history-server: Container 2b74749e6792fd8b78ab7a1dc154c24548af52c0ea6a6de74827d1583fdd8491 is no
-Jun 02 10:13:32 deb-node1 docker[13570]: spark-history-server
+Jun 02 10:13:32 deb-node1 docker[13549]: Error response from daemon: Cannot kill container: spark-console: Container 2b74749e6792fd8b78ab7a1dc154c24548af52c0ea6a6de74827d1583fdd8491 is no
+Jun 02 10:13:32 deb-node1 docker[13570]: spark-console
 Jun 02 10:13:32 deb-node1 systemd[1]: Started Spark History Server.
 Jun 02 10:13:33 deb-node1 docker[13581]: starting org.apache.spark.deploy.history.HistoryServer, logging to /usr/local/lib/spark-2.4.3/logs/spark--org.apache.spark.deploy.history.HistoryServer-1
 
@@ -2575,8 +2575,8 @@ May 31 14:12:37 deb-node1 docker[5794]: Using config: /etc/zookeeper/conf/zoo.cf
            │ │ └─772 /usr/lib/snapd/snapd
            │ ├─spark-executor.service
            │ │ └─1670 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared -v /usr/local/
-           │ ├─spark-history-server.service
-           │ │ └─13581 /usr/bin/docker run -i --name spark-history-server --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared eskimo:spark-histo
+           │ ├─spark-console.service
+           │ │ └─13581 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared eskimo:spark-histo
            │ ├─ssh.service
            │ │ └─969 /usr/sbin/sshd -D
            │ ├─system-getty.slice
@@ -2765,8 +2765,8 @@ May 31 13:55:27 deb-node1 lvm[780]:   2 logical volume(s) in volume group "vagra
            │ └─772 /usr/lib/snapd/snapd
            ├─spark-executor.service
            │ └─1670 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared -v /usr/local/li
-           ├─spark-history-server.service
-           │ └─13581 /usr/bin/docker run -i --name spark-history-server --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared eskimo:spark-history
+           ├─spark-console.service
+           │ └─13581 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared eskimo:spark-history
            ├─ssh.service
            │ └─969 /usr/sbin/sshd -D
            ├─system-getty.slice

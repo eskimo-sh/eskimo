@@ -224,7 +224,7 @@ The user layer is intended for data / result visualizations and platform adminis
 
 * *Elastic Kibana*, *Grafana* and *Apache Zeppelin* for data and result visualizations
 ** Grafana is also used natively for platform monitoring concerns
-* *Cerebro*, The Spark History Server, The Flink Dashboard, the *Kafka Manager*, the *Mesos Console* and the *Marathon
+* *Cerebro*, The Spark Console (History Server), The Flink Dashboard, the *Kafka Manager*, the *Mesos Console* and the *Marathon
 Console* for platform administration.
 
 Each and every software components is executed with Docker and packaged as a docker container.

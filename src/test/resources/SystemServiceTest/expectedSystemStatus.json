@@ -20,7 +20,7 @@
     "service_kafka_192-168-10-11": "NA",
     "service_kube-slave_192-168-10-13": "NA",
     "service_kube-slave_192-168-10-11": "NA",
-    "service_spark-history-server_192-168-10-11": "NA",
+    "service_spark-console_192-168-10-11": "NA",
     "node_alive_192-168-10-11": "OK",
     "node_alive_192-168-10-13": "OK",
     "service_zookeeper_192-168-10-13": "NA"
