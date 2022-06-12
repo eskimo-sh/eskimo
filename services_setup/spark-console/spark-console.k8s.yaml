@@ -36,15 +36,15 @@ kind: Service
 apiVersion: v1
 metadata:
   labels:
-    k8s-app: spark-history-server
-  name: spark-history-server
+    k8s-app: spark-console
+  name: spark-console
   namespace: default
 spec:
   ports:
     - port: 31810
       targetPort: 18080
   selector:
-    k8s-app: spark-history-server
+    k8s-app: spark-console
 
 ---
 
@@ -52,8 +52,8 @@ kind: Service
 apiVersion: v1
 metadata:
   labels:
-    k8s-app: spark-history-server
-  name: spark-history-server-node
+    k8s-app: spark-console
+  name: spark-console-node
   namespace: default
 spec:
   type: NodePort
@@ -62,7 +62,7 @@ spec:
       targetPort: 18080
       nodePort: 31811
   selector:
-    k8s-app: spark-history-server
+    k8s-app: spark-console
     
 ---
 
@@ -70,27 +70,27 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   labels:
-    k8s-app: spark-history-server
-  name: spark-history-server
+    k8s-app: spark-console
+  name: spark-console
   namespace: default
 spec:
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      k8s-app: spark-history-server
+      k8s-app: spark-console
   template:
     metadata:
       labels:
-        k8s-app: spark-history-server
+        k8s-app: spark-console
     spec:
       #securityContext:
       #  seccompProfile:
       #    type: RuntimeDefault
       enableServiceLinks: false
       containers:
-        - name: spark-history-server
-          image: kubernetes.registry:5000/spark-history-server
+        - name: spark-console
+          image: kubernetes.registry:5000/spark-console
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 18080
@@ -118,8 +118,8 @@ spec:
             runAsGroup: 3302
           resources:
             requests:
-              cpu: "$ESKIMO_KUBE_REQUEST_SPARK_HISTORY_SERVER_CPU"
-              memory: "$ESKIMO_KUBE_REQUEST_SPARK_HISTORY_SERVER_RAM"
+              cpu: "$ESKIMO_KUBE_REQUEST_spark_console_CPU"
+              memory: "$ESKIMO_KUBE_REQUEST_spark_console_RAM"
       volumes:
         - name: var-log-spark
           hostPath:

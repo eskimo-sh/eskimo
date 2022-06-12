@@ -40,11 +40,11 @@ set -e
 #echo " - Injecting topology"
 #. /usr/local/sbin/inContainerInjectTopology.sh
 
-echo " - Injecting topology (Spark History)"
+echo " - Injecting topology (Spark Console)"
 . /usr/local/sbin/inContainerInjectTopologySparkHistory.sh
 
-echo " - Inject settings (spark-history-server)"
-/usr/local/sbin/settingsInjector.sh spark-history-server
+echo " - Inject settings (spark-console)"
+/usr/local/sbin/settingsInjector.sh spark-console
 
 echo " - Inject settings (spark-runtime)"
 /usr/local/sbin/settingsInjector.sh spark-runtime

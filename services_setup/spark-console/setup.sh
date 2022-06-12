@@ -57,7 +57,7 @@ if [[ $SELF_IP_ADDRESS == "" ]]; then
 fi
 
 # reinitializing log
-sudo rm -f spark_history_server_install_log
+sudo rm -f spark_console_install_log
 
 
 # build
@@ -78,7 +78,7 @@ if [[ $? != 0 ]]; then
 fi
 
 echo " - Building docker container for spark history server"
-build_container spark-history-server spark spark_history_server_install_log
+build_container spark-console spark spark_console_install_log
 
 # create and start container
 echo " - Running docker container to configure spark executor"
@@ -88,29 +88,29 @@ docker run \
         -d \
         -v /var/log/spark:/var/log/spark \
         -v /var/lib/spark:/var/lib/spark \
-        --name spark-history-server \
+        --name spark-console \
         -i \
-        -t eskimo:spark-history-server bash >> spark_history_server_install_log 2>&1
-fail_if_error $? "spark_history_server_install_log" -2
+        -t eskimo:spark-console bash >> spark_console_install_log 2>&1
+fail_if_error $? "spark_console_install_log" -2
 
 # connect to container
 #docker exec -it spark bash
 
-echo " - Configuring spark-history-server container (config script)"
-docker exec spark-history-server bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id \
-        | tee -a spark_history_server_install_log 2>&1
-if [[ `tail -n 1 spark_history_server_install_log` != " - In container config SUCCESS" ]]; then
+echo " - Configuring spark-console container (config script)"
+docker exec spark-console bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id \
+        | tee -a spark_console_install_log 2>&1
+if [[ `tail -n 1 spark_console_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat spark_history_server_install_log
+    cat spark_console_install_log
     exit -100
 fi
 
-echo " - Configuring spark-history-server container"
-docker exec spark-history-server bash /scripts/inContainerSetupSparkHistoryServer.sh \
-        | tee -a spark_history_server_install_log 2>&1
-if [[ `tail -n 1 spark_history_server_install_log` != " - In container config SUCCESS" ]]; then
+echo " - Configuring spark-console container"
+docker exec spark-console bash /scripts/inContainerSetupSparkHistoryServer.sh \
+        | tee -a spark_console_install_log 2>&1
+if [[ `tail -n 1 spark_console_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
-    cat spark_history_server_install_log
+    cat spark_console_install_log
     exit -101
 fi
 
@@ -119,23 +119,23 @@ fi
 
 
 echo " - Handling topology and setting injection"
-handle_topology_settings spark-history-server spark_history_server_install_log
+handle_topology_settings spark-console spark_console_install_log
 
-echo " - Copying Topology Injection Script (Spark History)"
-docker_cp_script inContainerInjectTopologySparkHistory.sh sbin spark-history-server spark_history_server_install_log
+echo " - Copying Topology Injection Script (Spark Console)"
+docker_cp_script inContainerInjectTopologySparkHistory.sh sbin spark-console spark_console_install_log
 
 echo " - Copying inContainerMountGluster.sh scriot"
-docker_cp_script inContainerMountGluster.sh sbin spark-history-server spark_history_server_install_log
+docker_cp_script inContainerMountGluster.sh sbin spark-console spark_console_install_log
 
-echo " - Copying glusterMountChecker.sh Script (Spark History)"
-docker_cp_script glusterMountChecker.sh sbin spark-history-server spark_history_server_install_log
+echo " - Copying glusterMountChecker.sh Script (Spark Console)"
+docker_cp_script glusterMountChecker.sh sbin spark-console spark_console_install_log
 
 echo " - Copying containerWatchDog.sh script to container"
-docker_cp_script containerWatchDog.sh sbin spark-history-server spark_history_server_install_log
+docker_cp_script containerWatchDog.sh sbin spark-console spark_console_install_log
 
 echo " - Committing changes to local template and exiting container spark"
-commit_container spark-history-server spark_history_server_install_log
+commit_container spark-console spark_console_install_log
 
 
 echo " - Starting marathon deployment"
-deploy_kubernetes spark-history-server spark_history_server_install_log
+deploy_kubernetes spark-console spark_console_install_log
