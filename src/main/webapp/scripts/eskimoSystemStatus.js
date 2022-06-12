@@ -596,13 +596,14 @@ eskimo.SystemStatus = function() {
                 || !that.eskimoServices.isServiceAvailable("grafana")
             ) {
 
-                $("#status-monitoring-no-dashboard").css("display", "inherit");
-                $("#status-monitoring-dashboard-frame").css("display", "none");
+                let noDashboardDiv = $("#status-monitoring-no-dashboard");
+                let monitoringDashboardFrame = $("#status-monitoring-dashboard-frame");
 
-                $("#status-monitoring-dashboard-frame").attr('src', "html/emptyPage.html");
+                noDashboardDiv.css("display", "inherit");
+                noDashboardDiv.html("(Grafana not available or no dashboard configured)");
 
-                $('#status-monitoring-no-dashboard').html("(Grafana not available or no dashboard configured)");
-
+                monitoringDashboardFrame.css("display", "none");
+                monitoringDashboardFrame.attr('src', "html/emptyPage.html");
             }
             // render iframe with refresh period (default 30s)
             else {

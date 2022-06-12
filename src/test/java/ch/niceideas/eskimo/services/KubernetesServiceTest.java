@@ -178,11 +178,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
 
         assertEquals(5, installList.size());
         assertEquals("" +
-                "cerebro-192.168.10.11," +
-                "spark-console-192.168.10.11," +
-                "kafka-manager-192.168.10.11," +
-                "kibana-192.168.10.11," +
-                "zeppelin-192.168.10.11", String.join(",", installList));
+                "spark-console-192.168.10.11,cerebro-192.168.10.11,kafka-manager-192.168.10.11,kibana-192.168.10.11,zeppelin-192.168.10.11", String.join(",", installList));
 
         assertEquals(5, uninstallList.size());
         assertEquals("" +

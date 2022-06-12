@@ -266,6 +266,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export ESKIMO_INSTALLED_logstash_KUBERNETES_NODE=OK\n" +
                 "export ESKIMO_INSTALLED_kube_slave_1921681011=OK\n" +
                 "export ESKIMO_INSTALLED_kibana_KUBERNETES_NODE=OK\n" +
+                "export ESKIMO_INSTALLED_spark_console_KUBERNETES_NODE=OK\n" +
                 "export ESKIMO_INSTALLED_elasticsearch_KUBERNETES_NODE=OK\n" +
                 "export ESKIMO_INSTALLED_ntp_1921681011=OK\n" +
                 "export ESKIMO_INSTALLED_cerebro_KUBERNETES_NODE=OK\n" +
@@ -278,7 +279,6 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export ESKIMO_INSTALLED_gluster_1921681011=OK\n" +
                 "export ESKIMO_INSTALLED_gluster_1921681013=OK\n" +
                 "export ESKIMO_INSTALLED_kube_master_1921681011=OK\n" +
-                "export ESKIMO_INSTALLED_spark_console_KUBERNETES_NODE=OK\n" +
                 "export ESKIMO_INSTALLED_zeppelin_KUBERNETES_NODE=OK\n", topology.getTopologyScript(StandardSetupHelpers.getStandard2NodesInstallStatus()));
     }
 
@@ -484,6 +484,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                         "export ESKIMO_INSTALLED_logstash_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_kube_slave_1921681011=OK\n" +
                         "export ESKIMO_INSTALLED_kibana_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_spark_console_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_elasticsearch_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_ntp_1921681011=OK\n" +
                         "export ESKIMO_INSTALLED_cerebro_KUBERNETES_NODE=OK\n" +
@@ -496,7 +497,6 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                         "export ESKIMO_INSTALLED_gluster_1921681011=OK\n" +
                         "export ESKIMO_INSTALLED_gluster_1921681013=OK\n" +
                         "export ESKIMO_INSTALLED_kube_master_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_spark_console_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_zeppelin_KUBERNETES_NODE=OK\n" +
                         "\n" +
                         "#Additional Environment\n" +

@@ -1,6 +1,10 @@
 {
   "result": "OK",
   "messages": {
+    "installation_spark-console_192-168-10-15": {
+      "lines": "",
+      "lastLine": 0
+    },
     "restart_kafka_kubernetes": {
       "lines": "",
       "lastLine": 0
@@ -42,10 +46,6 @@
       "lastLine": 0
     },
     "restart_kibana_kubernetes": {
-      "lines": "",
-      "lastLine": 0
-    },
-    "installation_spark-console_192-168-10-15": {
       "lines": "",
       "lastLine": 0
     },
@@ -96,6 +96,10 @@
       "label": "installation of kube-slave on 192.168.10.13"
     },
     {
+      "operation": "installation_spark-console_192-168-10-15",
+      "label": "installation of spark-console on 192.168.10.15"
+    },
+    {
       "operation": "installation_elasticsearch_192-168-10-15",
       "label": "installation of elasticsearch on 192.168.10.15"
     },
@@ -110,10 +114,6 @@
     {
       "operation": "installation_spark-runtime_192-168-10-13",
       "label": "installation of spark-runtime on 192.168.10.13"
-    },
-    {
-      "operation": "installation_spark-console_192-168-10-15",
-      "label": "installation of spark-console on 192.168.10.15"
     },
     {
       "operation": "installation_zeppelin_192-168-10-15",
@@ -145,6 +145,7 @@
     }
   ],
   "status": {
+    "installation_spark-console_192-168-10-15": "CANCELLED",
     "restart_kafka_kubernetes": "CANCELLED",
     "Check--Install_Base-System_192-168-10-13": "CANCELLED",
     "Check--Install_Base-System_192-168-10-15": "CANCELLED",
@@ -156,7 +157,6 @@
     "restart_cerebro_kubernetes": "CANCELLED",
     "installation_elasticsearch_192-168-10-13": "CANCELLED",
     "restart_kibana_kubernetes": "CANCELLED",
-    "installation_spark-console_192-168-10-15": "CANCELLED",
     "installation_elasticsearch_192-168-10-15": "CANCELLED",
     "restart_kafka-manager_kubernetes": "CANCELLED",
     "restart_logstash_kubernetes": "CANCELLED",

@@ -113,8 +113,8 @@ public class MasterServiceTest extends AbstractSystemTest {
         // this sets a default master
         ms.getMasterStatus();
 
-        assertEquals(2, ms.getServiceMasterNodes().size());
-        assertEquals(2, ms.getServiceMasterTimestamps().size());
+        assertEquals(1, ms.getServiceMasterNodes().size());
+        assertEquals(1, ms.getServiceMasterTimestamps().size());
 
         assertEquals("192.168.10.11", ms.getServiceMasterNodes().get("gluster"));
         assertNotNull(ms.getServiceMasterTimestamps().get("gluster"));

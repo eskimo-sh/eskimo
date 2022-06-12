@@ -67,18 +67,19 @@ Software.
             <AppenderRef ref="RollingFile" />
         </Root>
 
-        <Logger name="org" level="info"></Logger>
-        <Logger name="com" level="info"></Logger>
-        <Logger name="ch" level="info"></Logger>
-        <Logger name="org.apache.http.impl.execchain" level="warn"></Logger>
+        <Logger name="org" level="info"/>
+        <Logger name="com" level="info"/>
+        <Logger name="ch" level="info"/>
+        <Logger name="org.apache.http.impl.execchain" level="warn"/>
 
-        <Logger name="ch.niceideas.eskimo.proxy" level="debug"></Logger>
-        <Logger name="ch.niceideas.eskimo.services.ConnectionManagerService" level="debug"></Logger>
+        <!--
+        <Logger name="ch.niceideas.eskimo.proxy" level="debug" />
+        <Logger name="ch.niceideas.eskimo.services.ConnectionManagerService" level="debug" />
+        -->
 
-
-        <Logger name="ch.niceideas.eskimo.services" level="debug"></Logger>
-        <!--<Logger name="ch.niceideas.eskimo.services.ConnectionManagerService" level="info"></Logger>-->
-        <Logger name="org.apache.juli" level="fatal"></Logger>
+        <Logger name="ch.niceideas.eskimo.services" level="debug"/>
+        <Logger name="ch.niceideas.eskimo.services.ConnectionManagerService" level="info"/>
+        <Logger name="org.apache.juli" level="fatal"/>
     </Loggers>
 
 </Configuration>

@@ -48,10 +48,10 @@ Software.
             <AppenderRef ref="Console" />
         </Root>
 
-        <Logger name="org" level="info"></Logger>
-        <Logger name="com" level="info"></Logger>
-        <Logger name="ch" level="info"></Logger>
-        <Logger name="ch.niceideas.eskimo.services" level="debug"></Logger>
+        <Logger name="org" level="info"/>
+        <Logger name="com" level="info"/>
+        <Logger name="ch" level="info"/>
+        <Logger name="ch.niceideas.eskimo.services" level="debug"/>
     </Loggers>
 
 </Configuration>

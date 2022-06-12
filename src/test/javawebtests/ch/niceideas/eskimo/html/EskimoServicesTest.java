@@ -185,7 +185,7 @@ public class EskimoServicesTest extends AbstractWebTest {
         // make sure they're created
         assertJavascriptEquals ("1.0", "$('#folderMenuCerebro').length");
         assertJavascriptEquals ("1.0", "$('#folderMenuKibana').length");
-        assertJavascriptEquals ("1.0", "$('#folderMenuSparkHistoryServer').length");
+        assertJavascriptEquals ("1.0", "$('#folderMenuSparkConsole').length");
         assertJavascriptEquals ("1.0", "$('#folderMenuZeppelin').length");
 
         // test zeppelin menu entry

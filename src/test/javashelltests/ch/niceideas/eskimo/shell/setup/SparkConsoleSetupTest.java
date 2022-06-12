@@ -49,7 +49,7 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class SparkHistoryServerSetupTest extends AbstractSetupShellTest {
+public class SparkConsoleSetupTest extends AbstractSetupShellTest {
 
     protected static String jailPath = null;
 
