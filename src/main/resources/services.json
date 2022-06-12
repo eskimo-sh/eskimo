@@ -380,13 +380,6 @@
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": true
-      },
-      {
-        "masterElectionStrategy": "SAME_NODE",
-        "masterService": "etcd",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": false
       }
     ],
     "additionalEnvironment": [
