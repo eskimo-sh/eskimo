@@ -42,12 +42,12 @@ echo " - Loading Topology"
 export MASTER_IP_ADDRESS=$MASTER_NTP_1
 if [[ $MASTER_IP_ADDRESS == "" ]]; then
     echo " - No NTP master found in topology"
-    exit -1
+    exit 1
 fi
 
 if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit -2
+    exit 2
 fi
 
 export IS_MASTER="0"
@@ -64,6 +64,9 @@ if [[ $IS_MASTER == "1" ]]; then
     sudo sed -i s/"pool 1.debian.pool.ntp.org iburst"/"pool ntp2.hetzner.com iburst"/g /etc/ntp.conf
     sudo sed -i s/"pool 2.debian.pool.ntp.org iburst"/"pool ntp3.hetzner.net iburst"/g /etc/ntp.conf
     sudo sed -i s/"pool 3.debian.pool.ntp.org iburst"/""/g /etc/ntp.conf
+
+    sudo bash -c "echo -e \"\n\n#disable maximum offset of 1000 seconds\" >> /etc/ntp.conf"
+    sudo bash -c "echo \"tinker panic 0\" >> /etc/ntp.conf"
 
 else
 
