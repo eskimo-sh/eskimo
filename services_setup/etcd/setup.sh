@@ -60,6 +60,8 @@ fi
 # reinitializing log
 sudo rm -f etcd_install_log
 
+set -e
+
 echo " - Creating shared directory"
 if [[ ! -d /var/lib/etcd ]]; then
     sudo mkdir -p /var/lib/etcd
@@ -75,10 +77,6 @@ if [[ ! -d /var/log/etcd ]]; then
     sudo chmod -R 777 /var/log/etcd
     sudo chown -R kubernetes /var/log/etcd
 fi
-if [[ ! -d /etc/etcd ]]; then
-    sudo mkdir -p /etc/etcd
-    sudo chmod -R 777 /etc/etcd
-fi
 
 echo " - Linking /etc/etcd to /usr/local/lib/etcd/etc"
 if [[ ! -L /etc/etcd ]]; then
@@ -88,6 +86,8 @@ fi
 echo " - Installing etcd.env.sh"
 sudo cp etcd.env.sh /etc/etcd/
 sudo chmod 755 /etc/etcd/
+
+set +e
 
 echo " - Installing and checking systemd service file"
 install_and_check_service_file etcd etcd_install_log
