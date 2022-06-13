@@ -448,25 +448,27 @@ if [[ `docker network ls | grep docker-eskimo` == "" ]]; then
 fi
 
 
+# FIXME clean mu
+
 # kubelet works for now with cgroupfs, need to ensure docker is working with cgroupfs as well
-if [[ `grep cgroup /proc/mounts | grep cgroup2` != "" && `grep cgroup /proc/mounts | wc -l` -lt 4 ]]; then
+#if [[ `grep cgroup /proc/mounts | grep cgroup2` != "" && `grep cgroup /proc/mounts | wc -l` -lt 4 ]]; then
 
     # Docker is likely running on systemd cgroup driver or cgroup2, need to bring it back to cgroupfs (v1)
-    if [[ `grep native.cgroupdriver=cgroupfs /etc/docker/daemon.json` == "" ]]; then
+    if [[ `grep native.cgroupdriver=systemd /etc/docker/daemon.json` == "" ]]; then
 
         sudo sed -i -n '1h;1!H;${;g;s/'\
 '{\n'\
 '  "insecure-registries"'\
 '/'\
 '{\n'\
-'  "exec-opts": \["native.cgroupdriver=cgroupfs"\],\n'\
+'  "exec-opts": \["native.cgroupdriver=systemd"\],\n'\
 '  "insecure-registries"'\
 '/g;p;}' /etc/docker/daemon.json
 
 
         sudo systemctl restart docker containerd
     fi
-fi
+#fi
 
 
 echo " - Disabling IPv6"
@@ -541,10 +543,10 @@ function create_user_infrastructure() {
     USER_ID=$2
 
     echo " - Creating user $USER_NAME (if not exist)"
-    new_user_id=`id -u $USER_NAME 2>> /tmp/setup_log`
+    new_user_id=`id -u $USER_NAME 2> /dev/null`
     if [[ $new_user_id == "" ]]; then
         sudo useradd -m -u $USER_ID $USER_NAME
-        new_user_id=`id -u $USER_NAME 2>> /tmp/setup_log`
+        new_user_id=`id -u $USER_NAME 2> /dev/null`
         if [[ $new_user_id == "" ]]; then
             echo "Failed to add user $USER_NAME"
             exit 43
