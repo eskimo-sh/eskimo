@@ -61,6 +61,8 @@ if [[ $4 == "" ]]; then
 fi
 export OWNER_ID=$4
 
+export DEPENDENT_UNIT_DEFINITON=$5
+
 echo "-> gluster_mount_internal.sh"
 echo " - Proceeding with gluster mount with :"
 echo "   + volume           : $VOLUME"
@@ -68,6 +70,7 @@ echo "   + mount point      : $MOUNT_POINT"
 echo "   + mount point name : $MOUNT_POINT_NAME"
 echo "   + owner            : $OWNER"
 echo "   + owner UID        : $OWNER_ID"
+echo "   + Dep. unit def.   : $DEPENDENT_UNIT_DEFINITON"
 
 # Loading topology
 if [[ ! -f /etc/eskimo_topology.sh ]]; then
@@ -141,7 +144,11 @@ if [[ `grep $MOUNT_POINT /etc/fstab` == "" ]]; then
 
     echo " - Enabling gluster share $MOUNT_POINT"
     # XXX I change noauto to auto following issues after recover from suspend
-    bash -c "echo \"$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs auto,rw,_netdev,x-systemd.automount,x-systemd.requires=gluster.service,x-systemd.after=gluster.service 0 0\" >> /etc/fstab"
+    if [[ "$DEPENDENT_UNIT_DEFINITON" == "" ]]; then
+        bash -c "echo \"$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs auto,rw,_netdev,x-systemd.automount,x-systemd.requires=gluster.service,x-systemd.after=gluster.service,x-systemd.after=local-fs.target 0 0\" >> /etc/fstab"
+    else
+        bash -c "echo \"$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs noauto,rw,_netdev,$DEPENDENT_UNIT_DEFINITON,x-systemd.requires=gluster.service,x-systemd.after=gluster.service,x-systemd.after=local-fs.target 0 0\" >> /etc/fstab"
+    fi
 
     sleep 1
 
