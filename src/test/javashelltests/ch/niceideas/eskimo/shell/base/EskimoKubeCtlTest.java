@@ -174,7 +174,7 @@ public class EskimoKubeCtlTest {
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
 
         //System.err.println (result);
-        assertTrue (result.contains("delete -f -"));
+        //assertTrue (result.contains("delete -f -"));
         assertTrue (result.contains("apply -f -"));
     }
 
@@ -185,7 +185,7 @@ public class EskimoKubeCtlTest {
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
 
         //System.err.println (result);
-        assertTrue (result.contains("delete -f -"));
+        //assertTrue (result.contains("delete -f -"));
         assertTrue (result.contains("apply -f -"));
     }
 
