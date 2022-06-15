@@ -239,7 +239,7 @@ function show_log() {
 function uninstall_service() {
 
     if [[ "$1" == "" ]]; then
-        echo "restart_service takes service as first argument"
+        echo "uninstall_service takes service as first argument"
         exit 1
     fi
     SERVICE=$1
@@ -272,13 +272,18 @@ function restart_service() {
 
     SERVICE_FILE=/var/lib/eskimo/kube-services/$SERVICE.k8s.yaml
 
-    if [[ $TEST_MODE == "true" || -f $SERVICE_FILE ]]; then
-        echo "   + Deleting $SERVICE"
-        envsubst < $SERVICE_FILE | call-kubectl delete -f -
+# Trying for now not to delete and reapply, reapply only
+#    if [[ $TEST_MODE == "true" || -f $SERVICE_FILE ]]; then
+#        echo "   + Deleting $SERVICE"
+#        envsubst < $SERVICE_FILE | call-kubectl delete -f -
+
+#        if [[ $TEST_MODE != "true" ]]; then
+#            sleep 10
+#        fi
 
         echo "   + (Re-)applying $SERVICE"
         envsubst < $SERVICE_FILE | call-kubectl apply -f -
-    fi
+#    fi
 }
 
 
