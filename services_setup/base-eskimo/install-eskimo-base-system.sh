@@ -441,11 +441,11 @@ fi
 echo "  - Enabling docker"
 enable_docker
 
-echo " - Creating eskimo docker bridge interface"
-
-if [[ `docker network ls | grep docker-eskimo` == "" ]]; then
-    docker network create -d bridge --subnet 117.1.0.0/16 docker-eskimo
-fi
+#echo " - Creating eskimo docker bridge interface"
+#
+#if [[ `docker network ls | grep docker-eskimo` == "" ]]; then
+#    docker network create -d bridge --subnet 117.1.0.0/16 docker-eskimo
+#fi
 
 # Docker is likely running on systemd cgroup driver or cgroup2, need to bring it back to using systemd as cgroup driver
 if [[ `grep native.cgroupdriver=systemd /etc/docker/daemon.json` == "" ]]; then
