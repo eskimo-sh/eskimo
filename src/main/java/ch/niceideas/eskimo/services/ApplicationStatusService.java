@@ -151,8 +151,13 @@ public class ApplicationStatusService {
             systemStatus.setValueForPath("isSnapshot", isSnapshot(buildVersion));
 
             try {
-                JsonWrapper systemConfig = new JsonWrapper(configurationService.loadSetupConfig());
-                systemStatus.setValueForPath(SSH_USERNAME_FIELD, systemConfig.getValueForPath("ssh_username"));
+                String setupConfig = configurationService.loadSetupConfig();
+                if (StringUtils.isNotBlank(setupConfig)) {
+                    JsonWrapper systemConfig = new JsonWrapper(setupConfig);
+                    systemStatus.setValueForPath(SSH_USERNAME_FIELD, systemConfig.getValueForPath("ssh_username"));
+                } else {
+                    systemStatus.setValueForPath(SSH_USERNAME_FIELD, "(Setup incomplete)");
+                }
             } catch (FileException e) {
 
                 logger.error (e, e);
