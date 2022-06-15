@@ -577,6 +577,7 @@ create_user_infrastructure kubernetes 3307
 
 # removing all remaining locks
 rm -Rf /etc/k8s/k8s_poststart_management_lock
+rm -Rf /var/lib/gluster/volume_management_lock_*
 
 EOF
 
@@ -614,6 +615,6 @@ sudo systemctl start eskimo-startup-checks
 sudo systemctl enable eskimo-startup-checks
 set +e
 
-echo " - Creating /var/lib/eskimo/kube-services/"
-sudo mkdir -p /var/lib/eskimo/kube-services/
+echo " - Creating /var/lib/eskimo/"
+sudo mkdir -p /var/lib/eskimo/
 sudo chown -R $USER. /var/lib/eskimo/

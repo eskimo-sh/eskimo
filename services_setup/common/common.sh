@@ -520,7 +520,7 @@ function build_container() {
 
     if [[ ! -f ${SCRIPT_DIR}/docker_template_"$IMAGE".tar ]]; then
         echo "   + Decompressing archive"
-        gunzip ${SCRIPT_DIR}/docker_template_"$IMAGE".tar.gz  > $LOG_FILE 2>&1
+        gunzip ${SCRIPT_DIR}/docker_template_"$IMAGE".tar.gz > $LOG_FILE 2>&1
         fail_if_error $? "$LOG_FILE" 16
     fi
 

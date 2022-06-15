@@ -34,58 +34,24 @@
 # Software.
 #
 
-# Checking arguments
-if [[ $1 == "" ]]; then
-   echo "expected gluster volume name as first argument"
-   exit 1
-fi
-export VOLUME=$1
+# Sourcing kubernetes environment
+. /etc/k8s/env.sh
 
-if [[ $2 == "" ]]; then
-   echo "expected mount point as second argument"
-   exit 2
-fi
-export MOUNT_POINT=$2
+export HOME=/root
+
+
+export VOLUME=kubernetes_shared
+export MOUNT_POINT=/usr/local/etc/k8s/shared
+export OWNER=kubernetes
+
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# ALL OF WHAT FOLLOWS IS COPIED FROM gluster_mount_internal.sh from the eskimo gluster package
+# Don't do any modification here, make them in gluster_mount_internal.sh and then onl yreport them here
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 export MOUNT_POINT_NAME=`echo $MOUNT_POINT | tr -s '/' '-'`
 export MOUNT_POINT_NAME=${MOUNT_POINT_NAME#?};
-
-if [[ $3 == "" ]]; then
-   echo "expected mount point owner user as third argument"
-   exit 3
-fi
-export OWNER=$3
-
-
-export DEPENDENT_UNIT_DEFINITON=$5
-
-echo "-> gluster_mount_internal.sh"
-echo " - Proceeding with gluster mount with :"
-echo "   + volume           : $VOLUME"
-echo "   + mount point      : $MOUNT_POINT"
-echo "   + mount point name : $MOUNT_POINT_NAME"
-echo "   + owner            : $OWNER"
-echo "   + Dep. unit def.   : $DEPENDENT_UNIT_DEFINITON"
-
-# Loading topology
-if [[ ! -f /etc/eskimo_topology.sh ]]; then
-    echo "  - ERROR : no topology file defined !"
-    exit 5
-fi
-
-rm -Rf /tmp/gluster_mount_$VOLUME_log
-
-. /etc/eskimo_topology.sh
-
-# Defining topology variables
-if [[ $SELF_NODE_NUMBER == "" ]]; then
-    echo " - No Self Node Number found in topology"
-    exit 6
-fi
-
-if [[ $SELF_IP_ADDRESS == "" ]]; then
-    echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit 7
-fi
 
 set +e
 
@@ -115,7 +81,7 @@ fi
 
 # This is really just addressing the need to unmount the mount point before anything else is to be attempted
 # In case the underlying gluster transport is not connected and yet the mount point is still referenced as mounted
-echo " - Checking existing mount of $MOUNT_POINT"
+#echo " - Checking existing mount of $MOUNT_POINT"
 rm -Rf /tmp/gluster_error_$VOLUME
 ls -la $MOUNT_POINT >/dev/null 2>/tmp/gluster_error_$VOLUME
 if [[ $? != 0 ]]; then
@@ -130,26 +96,6 @@ if [[ $? != 0 ]]; then
             exit 9
         fi
     fi
-fi
-
-# The below is to define the systemd unit and the fstab entry to proceed with automatic mount of the gluster
-# share in the future
-if [[ `grep $MOUNT_POINT /etc/fstab` == "" ]]; then
-
-    echo " - Enabling gluster share $MOUNT_POINT"
-    # XXX I change noauto to auto following issues after recover from suspend
-    if [[ "$DEPENDENT_UNIT_DEFINITON" == "" ]]; then
-        bash -c "echo \"$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs auto,rw,_netdev,x-systemd.automount,x-systemd.requires=gluster.service,x-systemd.after=gluster.service,x-systemd.after=local-fs.target 0 0\" >> /etc/fstab"
-    else
-        bash -c "echo \"$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs noauto,rw,_netdev,$DEPENDENT_UNIT_DEFINITON,x-systemd.requires=gluster.service,x-systemd.after=gluster.service,x-systemd.after=local-fs.target 0 0\" >> /etc/fstab"
-    fi
-
-    sleep 1
-
-    echo " - reloading systemd daemon"
-    /bin/systemctl daemon-reload
-
-    sleep 2
 fi
 
 
@@ -170,17 +116,18 @@ if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
         cat /tmp/gluster_mount_$VOLUME_log
         exit 11
     fi
+
+
+    # give it a little time to actually connect the transport
+    sleep 4
+
+    if [[ `stat -c '%U' $MOUNT_POINT` != "$OWNER" ]]; then
+        echo " - Changing owner and rights of $MOUNT_POINT"
+        chown -R $OWNER $MOUNT_POINT
+    fi
+
+    chmod -R 777 $MOUNT_POINT
+
 fi
-
-
-# give it a little time to actually connect the transport
-sleep 4
-
-if [[ `stat -c '%U' $MOUNT_POINT` != "$OWNER" ]]; then
-    echo " - Changing owner and rights of $MOUNT_POINT"
-    chown -R $OWNER $MOUNT_POINT
-fi
-
-chmod -R 777 $MOUNT_POINT
 
 delete_gluster_lock_file

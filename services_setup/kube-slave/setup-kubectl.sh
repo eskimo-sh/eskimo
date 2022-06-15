@@ -76,17 +76,29 @@ fi
 # attempt to recreate  / remount gluster shares
 sudo /bin/bash /usr/local/sbin/setupK8sGlusterShares.sh
 
-# this needs to be done after gluster share
+# this needs to be done after gluster share above
 if [[ ! -d /etc/k8s/shared/ssl/ ]]; then
     echo " - Creating folder /etc/k8s/shared/ssl/"
     sudo mkdir -p /etc/k8s/shared/ssl
 fi
 
+if [[ ! -d /etc/k8s/shared/eskimo-services ]]; then
+    echo " - Creating folder /etc/k8s/shared/eskimo-services"
+    sudo mkdir -p /etc/k8s/shared/eskimo-services
+fi
+
+if [[ ! -L /var/lib/eskimo/kube-services ]]; then
+    echo " - Linking /etc/k8s/shared/eskimo-services to /var/lib/eskimo/kube-services"
+    sudo ln -s /etc/k8s/shared/eskimo-services /var/lib/eskimo/kube-services
+fi
+
+
+
 echo " - Creating / checking eskimo kubernetes base config"
 
 
 function delete_ssl_lock_file() {
-     rm -Rf /etc/k8s/shared/ssl_management_lock
+     sudo rm -Rf /etc/k8s/shared/ssl_management_lock
 }
 
 # From here we will be messing with gluster and hence we need to take a lock
@@ -101,7 +113,7 @@ while [[ -f /etc/k8s/shared/ssl_management_lock ]] ; do
     fi
 done
 
-touch /etc/k8s/shared/ssl_management_lock
+sudo touch /etc/k8s/shared/ssl_management_lock
 
 trap delete_ssl_lock_file 15
 trap delete_ssl_lock_file EXIT

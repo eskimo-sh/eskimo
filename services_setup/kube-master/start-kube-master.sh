@@ -270,7 +270,12 @@ while : ; do
 
     /etc/k8s/runtime_config/setup-and-check-runtime-kube-dns.sh MASTER
     if [[ $? != 0 ]]; then
-        exit 51
+        exit 52
+    fi
+
+    /etc/k8s/runtime_config/setup-and-check-runtime-kube-gluster-shares.sh
+    if [[ $? != 0 ]]; then
+        exit 52
     fi
 
 done

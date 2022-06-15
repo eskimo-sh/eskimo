@@ -119,6 +119,7 @@ echo "   + Starting Kubelet"
   --network-plugin=$ESKIMO_KUBELET_NETWORK_PLUGIN \
   --cni-conf-dir=$ESKIMO_KUBELET_CNI_CONF_DIR \
   --pod-infra-container-image $ESKIMO_KUBELET_POD_INFRA_CONTAINER_IMAGE \
+  --runtime-request-timeout $ESKIMO_KUBELET_RUNTIME_REQUEST_TIMEOUT \
   --kubeconfig=$ESKIMO_KUBELET_KUBECONFIG > /var/log/kubernetes/kubelet.log 2>&1' &
 kubelet_pid=$!
 
@@ -196,6 +197,12 @@ while : ; do
     if [[ $? != 0 ]]; then
         exit 51
     fi
+
+    /etc/k8s/runtime_config/setup-and-check-runtime-kube-gluster-shares.sh
+    if [[ $? != 0 ]]; then
+        exit 52
+    fi
+
 
 done
 

@@ -59,7 +59,7 @@ echo ""
 echo " - Proceeding with gluster mount of $SHARE_PATH"
 echo "--------------------------------------------------------------------------------"
 
-/usr/local/sbin/gluster_mount_internal.sh $SHARE_NAME $SHARE_PATH $SHARE_USER "$(/usr/bin/id -u $SHARE_USER)" "$DEPENDENT_UNIT_DEFINITON"
+/usr/local/sbin/gluster_mount_internal.sh $SHARE_NAME $SHARE_PATH $SHARE_USER "$DEPENDENT_UNIT_DEFINITON"
 if [[ $? != 0 ]]; then
     echo "Failed!"
     echo "--------------------------------------------------------------------------------"

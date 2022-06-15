@@ -171,7 +171,8 @@ Eskimo is exhaustively built on top of Docker.
 Only mesos agents need to be compiled and adapted to the host linux OS running your cluster nodes. +
 All the other components - from kafka to zeppelin through spark - run on docker
 
-Eskimo is successfully tested on Ubuntu, Debian, CentOS, Fedora and OpenSUSE nodes so far ... more are coming.
+Eskimo is successfully tested on Ubuntu, Debian, CentOS, Fedora and Red Hat Enterprise Linux nodes so far ... more are
+coming.
 
 a|image::pngs/enterprise_grade.png[80, 80] a| *Enterprise-grade requirements*
 

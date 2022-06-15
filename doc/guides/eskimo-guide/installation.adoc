@@ -124,9 +124,9 @@ Linux distributions successfully tested with Eskimo and officially supported are
 
 * Debian Stretch and greater
 * Ubuntu Xenial and greater
-* CentOS 7.x and 8.x
-* OpenSUSE 15.1 and greater
+* CentOS 7.x and 8.x, CentOS stream 8
 * RHEL 8.2 and greater
+* Fedora 35 or greater
 
 Other Debian-based or Red-Hat-based OSes could be supported as well but haven't been tested so far and may require the
 administrator to adapt the setup scripts located in `services_setup`.
@@ -140,8 +140,9 @@ The minimum hardware capacity requirements to run eskimo are as follows:
 In cases where the eskimo cluster runs on multiples nodes (two or more nodes), the minimum hardware capacity for
 each these nodes is as follows:
 
-* 20 GB HDD storage space for the system, additional storage space depending on the data to be manipulated and the
-replication factor.
+* 30 GB HDD storage space for the system
+** additional storage space depending on the data to be manipulated and the replication factor.
+** also at least 8Gb disk storage available on `/tmp` if it's a specific partition.
 * 4 CPUs (8 CPUs recommended)
 * 16 GB RAM (31 GB RAM recommended)
 
@@ -150,7 +151,9 @@ replication factor.
 In cases where Eskimo is deployed on a single node (such as the host node running Eskimo itself), the minimum hardware
 capacity for this node is as follows:
 
-* 30 GB HDD storage space for the system, additional storage space depending on the data to be manipulated.
+* 30 GB HDD storage space for the system
+** additional storage space depending on the data to be manipulated and the replication factor.
+** also at least 8Gb disk storage available on `/tmp` if it's a specific partition.
 * 8 CPUs (16 CPUs recommended)
 * 32 GB RAM (64 GB RAM recommended)
 
