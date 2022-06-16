@@ -75,6 +75,24 @@ check_for_vagrant() {
     fi
 }
 
+check_for_maven() {
+    if [ -x "$(command -v mvn)" ]; then
+        echo_date "Found mvn : "$(mvn -v)
+    else
+        echo "Maven is not available on system"
+        exit 101
+    fi
+}
+
+check_for_java() {
+    if [ -x "$(command -v java)" ]; then
+        echo_date "Found java : "$(java -version 2>&1)
+    else
+        echo "Java is not available on system"
+        exit 101
+    fi
+}
+
 restart_zeppelin_spark_executor() {
 
     set +e
@@ -1664,12 +1682,22 @@ if [[ ! -z $DEMO && ! -z $MULTIPLE_NODE ]]; then
     exit 70
 fi
 
-check_for_virtualbox
+if [[ "$REBUILD_ESKIMO" != "" ]]; then
 
-check_for_vagrant
+    check_for_maven
+
+    check_for_java
+fi
+
+if [[ "$RECREATE_BOX" != "" || "$INSTALL_ESKIMO" != "" || "$SETUP_ESKIMO" != "" || "$RUN_DATA_LOAD" != "" || "$RUN_NOTEBOOK_TESTS" != "" || "$RUN_OTHER_TESTS" != "" || "$RUN_CLEANUP" != "" || $DEMO == "demo" ]] ; then
+
+    check_for_virtualbox
+
+    check_for_vagrant
+fi
 
 if [[ "$REBUILD_ESKIMO" != "" ]]; then
-   rebuild_eskimo
+    rebuild_eskimo
 fi
 
 if [[ "$RECREATE_BOX" != "" ]]; then
