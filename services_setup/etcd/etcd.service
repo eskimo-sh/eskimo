@@ -57,21 +57,6 @@ ExecStart=/bin/bash -c ". /etc/etcd/etcd.env.sh && /usr/local/bin/etcd \
   --initial-cluster-state $ESKIMO_ETCD_INITIAL_CLUSTER_STATE \
   --data-dir $ESKIMO_ETCD_DATA_DIR"
 
-# Deprecated
-# required for flannel
-#  --enable-v2 \
-#  --experimental-enable-v2v3 $ESKIMO_FLANNEL_ETCD_PREFIX \
-
-# The day I enable HTTPS
-#  --cert-file $ESKIMO_ETCD_CERT_FILE \
-#  --key-file $ESKIMO_ETCD_KEY_FILE \
-#  --client-cert-auth=$ESKIMO_ETCD_CLIENT_CERT_AUTH \
-#  --trusted-ca-file $ESKIMO_ETCD_TRUSTED_CA_FILE \
-#  --peer-cert-file=$ESKIMO_ETCD_PEER_CERT_FILE \
-#  --peer-key-file=$ESKIMO_ETCD_PEER_KEY_FILE \
-#  --peer-client-cert-auth=$ESKIMO_ETCD_PEER_CLIENT_CERT_AUTH \
-#  --peer-trusted-ca-file=$ESKIMO_ETCD_PEER_TRUSTED_CA_FILE"
-
 RestartSec=5
 LimitNOFILE=65536
 Restart=always

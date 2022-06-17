@@ -99,7 +99,6 @@ function enable_docker() {
     fi
 
     echo "  - Registering kubernetes.registry as insecure registry"
-    # Deprecated, remove kubernetes.registry
     cat > /tmp/daemon.json <<- "EOF"
 {
   "insecure-registries" : ["kubernetes.registry:5000"]

@@ -112,9 +112,7 @@ sudo bash -c "echo -e \"\nexport SPARK_HOME=/usr/local/lib/spark/\" >> /etc/bash
 
 echo " - Creating spark environment file"
 sudo rm -Rf /usr/local/lib/spark/conf/spark-env.sh
-# Deprecated
-#sudo bash -c "echo -e \"\n#point to your libmesos.so if you use Mesos \"  >> /usr/local/lib/spark/conf/spark-env.sh"
-#sudo bash -c "echo -e \"export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/mesos/lib/libmesos.so\"  >> /usr/local/lib/spark/conf/spark-env.sh"
+
 sudo bash -c "echo -e \"\n#Important configuration directories \"  >> /usr/local/lib/spark/conf/spark-env.sh"
 sudo bash -c "echo -e \"export SPARK_CONF_DIR=/usr/local/lib/spark/conf\"  >> /usr/local/lib/spark/conf/spark-env.sh"
 sudo bash -c "echo -e \"export SPARK_LOG_DIR=/usr/local/lib/spark/logs\"  >> /usr/local/lib/spark/conf/spark-env.sh"
