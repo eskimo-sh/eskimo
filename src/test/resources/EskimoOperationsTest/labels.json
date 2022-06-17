@@ -1,30 +1,30 @@
 [
   {
     "operation": "Installation_Topology-All-Nodes",
-    "label": "Installation of Topology (All Nodes) on marathon"
+    "label": "Installation of Topology (All Nodes) on kubernetes"
   },
   {
     "operation": "installation_cerebro",
-    "label": "installation of cerebro on marathon"
+    "label": "installation of cerebro on kubernetes"
   },
   {
     "operation": "installation_grafana",
-    "label": "installation of grafana on marathon"
+    "label": "installation of grafana on kubernetes"
   },
   {
     "operation": "installation_kafka-manager",
-    "label": "installation of kafka-manager on marathon"
+    "label": "installation of kafka-manager on kubernetes"
   },
   {
     "operation": "installation_kibana",
-    "label": "installation of kibana on marathon"
+    "label": "installation of kibana on kubernetes"
   },
   {
     "operation": "installation_spark-console",
-    "label": "installation of spark-console on marathon"
+    "label": "installation of spark-console on kubernetes"
   },
   {
     "operation": "installation_zeppelin",
-    "label": "installation of zeppelin on marathon"
+    "label": "installation of zeppelin on kubernetes"
   }
 ]

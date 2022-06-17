@@ -59,8 +59,8 @@ public class NodesConfigController extends AbstractOperationController {
 
     private static final Logger logger = Logger.getLogger(NodesConfigController.class);
 
-    public static final String PENDING_OPERATIONS_STATUS_OVERRIDE = "PENDING_MARATHON_OPERATIONS_STATUS_OVERRIDE";
-    public static final String PENDING_OPERATIONS_COMMAND = "PENDING_MARATHON_OPERATIONS_COMMAND";
+    public static final String PENDING_OPERATIONS_STATUS_OVERRIDE = "PENDING_KUBERNETES_OPERATIONS_STATUS_OVERRIDE";
+    public static final String PENDING_OPERATIONS_COMMAND = "PENDING_KUBERNETES_OPERATIONS_COMMAND";
 
     @Autowired
     private SetupService setupService;

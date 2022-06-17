@@ -235,37 +235,36 @@ function install_docker_debian_based() {
     fi
 }
 
-function install_suse_mesos_dependencies() {
+function install_suse_eskimo_dependencies() {
 
-    echo "  - Installing other Mesos dependencies"
-    sudo zypper install -y ipset binutils zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-plain cyrus-sasl-crammd5 apr-devel subversion-devel apr-util-devel >> /tmp/setup_log 2>&1
+    echo "  - Installing other eskimo dependencies"
+    sudo zypper install -y ipset binutils >> /tmp/setup_log 2>&1
      if [[ $? != 0 ]]; then
-        echoerr "Unable to install mesos dependencies"
+        echoerr "Unable to install eskimo dependencies"
         cat /tmp/setup_log 1>&2
         exit 53
     fi
 
 }
 
-function install_redhat_mesos_dependencies() {
+function install_redhat_eskimo_dependencies() {
 
-    echo "  - Installing other Mesos dependencies"
-    sudo yum install -y ipset binutils zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-md5 apr-devel subversion-devel apr-util-devel >> /tmp/setup_log 2>&1
+    echo "  - Installing other eskimo dependencies"
+    sudo yum install -y ipset binutils >> /tmp/setup_log 2>&1
      if [[ $? != 0 ]]; then
-        echoerr "Unable to install mesos dependencies"
+        echoerr "Unable to install eskimo dependencies"
         cat /tmp/setup_log 1>&2
         exit 52
     fi
 
 }
 
-function install_debian_mesos_dependencies() {
+function install_debian_eskimo_dependencies() {
 
-    echo " - Installing other Mesos dependencies"
-    sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
-            ipset binutils libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev >> /tmp/setup_log 2>&1
+    echo " - Installing other eskimo dependencies"
+    sudo DEBIAN_FRONTEND=noninteractive apt-get -y install ipset binutils >> /tmp/setup_log 2>&1
     if [[ $? != 0 ]]; then
-        echoerr "Unable to install mesos dependencies"
+        echoerr "Unable to install eskimo dependencies"
         cat /tmp/setup_log 1>&2
         exit 51
     fi
@@ -380,11 +379,11 @@ fi
 
 echo "  - installing mesos dependencies"
 if [[ -f "/etc/debian_version" ]]; then
-    install_debian_mesos_dependencies
+    install_debian_eskimo_dependencies
 elif [[ -f "/etc/redhat-release" ]]; then
-    install_redhat_mesos_dependencies
+    install_redhat_eskimo_dependencies
 elif [[ -f "/etc/SUSE-brand" ]]; then
-    install_suse_mesos_dependencies
+    install_suse_eskimo_dependencies
 else
     echo " - !! ERROR : Could not find any brand marker file "
     echo "   + none of /etc/debian_version, /etc/redhat-release or /etc/SUSE-brand exist"
@@ -571,9 +570,7 @@ create_user_infrastructure grafana 3304
 
 create_user_infrastructure flink 3305
 
-create_user_infrastructure marathon 3306
-
-create_user_infrastructure kubernetes 3307
+create_user_infrastructure kubernetes 3306
 
 # removing all remaining locks
 rm -Rf /etc/k8s/k8s_poststart_management_lock

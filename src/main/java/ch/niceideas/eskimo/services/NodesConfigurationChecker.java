@@ -70,7 +70,7 @@ public class NodesConfigurationChecker {
         // foolproof bug check : make sure all ids are within node count
         checkIDSWithinNodeRanges(nodesConfig, nodeCount);
 
-        // foolproof bug check : make sure no marathon service can be selected here
+        // foolproof bug check : make sure no kubernetes service can be selected here
         checkNoKubernetesServicesSelected(nodesConfig);
 
         // enforce mandatory services
@@ -217,7 +217,7 @@ public class NodesConfigurationChecker {
 
     void checkNoKubernetesServicesSelected(NodesConfigWrapper nodesConfig) throws NodesConfigurationException {
 
-        // foolproof bug check : make sure no marathon service can be selected here
+        // foolproof bug check : make sure no kubernetes service can be selected here
         for (String key : nodesConfig.keySet()) {
 
             ParsedNodesConfigProperty property = NodesConfigWrapper.parseProperty(key);

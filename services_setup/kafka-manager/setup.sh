@@ -111,5 +111,5 @@ echo " - Committing changes to local template and exiting container kafka-manage
 commit_container kafka-manager kafka-manager_install_log
 
 
-echo " - Starting marathon deployment"
+echo " - Starting Kubernetes deployment"
 deploy_kubernetes kafka-manager kafka-manager_install_log

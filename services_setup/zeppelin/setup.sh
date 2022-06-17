@@ -232,7 +232,7 @@ echo " - Committing changes to local template and exiting container zeppelin"
 commit_container zeppelin zeppelin_install_log
 
 
-echo " - Starting marathon deployment"
+echo " - Starting Kubernetes deployment"
 deploy_kubernetes zeppelin zeppelin_install_log
 
 

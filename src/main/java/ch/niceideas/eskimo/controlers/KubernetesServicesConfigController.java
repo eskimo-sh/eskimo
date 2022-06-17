@@ -97,7 +97,7 @@ public class KubernetesServicesConfigController extends AbstractOperationControl
     void setConfigurationService (ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
-    void setMarathonServicesConfigChecker (KubernetesServicesConfigChecker kubernetesServicesConfigChecker) {
+    void setKubernetesServicesConfigChecker(KubernetesServicesConfigChecker kubernetesServicesConfigChecker) {
         this.kubernetesServicesConfigChecker = kubernetesServicesConfigChecker;
     }
 
@@ -226,7 +226,7 @@ public class KubernetesServicesConfigController extends AbstractOperationControl
 
         try {
 
-            JSONObject checkObject = checkOperations("Unfortunately, re-applying marathon configuration or changing marathon configuration is not possible in DEMO mode.");
+            JSONObject checkObject = checkOperations("Unfortunately, re-applying kubernetes configuration or changing kubernetes configuration is not possible in DEMO mode.");
             if (checkObject != null) {
                 return checkObject.toString(2);
             }
@@ -237,7 +237,7 @@ public class KubernetesServicesConfigController extends AbstractOperationControl
             ServicesInstallStatusWrapper newServicesInstallationStatus = (ServicesInstallStatusWrapper) session.getAttribute(PENDING_KUBERNETES_OPERATIONS_STATUS_OVERRIDE);
             session.removeAttribute(PENDING_KUBERNETES_OPERATIONS_STATUS_OVERRIDE);
 
-            // newNodesStatus is null in case of marathon services config update (as opposed to forced reinstall)
+            // newNodesStatus is null in case of kubernetes services config update (as opposed to forced reinstall)
             if (newServicesInstallationStatus != null) {
                 configurationService.saveServicesInstallationStatus(newServicesInstallationStatus);
             }
@@ -248,13 +248,13 @@ public class KubernetesServicesConfigController extends AbstractOperationControl
 
             return ReturnStatusHelper.createOKStatus();
 
-        } catch (/*MarathonException | */KubernetesException e) {
+        } catch (KubernetesException e) {
             logger.error(e, e);
             return ReturnStatusHelper.createEncodedErrorStatus(e);
 
         } catch (JSONException | SetupException | FileException e) {
             logger.error(e, e);
-            notificationService.addError("Marathon Services installation failed !");
+            notificationService.addError("Kubernetes Services installation failed !");
             return ReturnStatusHelper.createEncodedErrorStatus(e);
         }
     }

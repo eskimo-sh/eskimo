@@ -55,8 +55,6 @@ export CFSSL_VERSION=1.6.1
 # instead of taking the actual keys
 # export ETCD_VERSION=3.3.27
 export ETCD_VERSION=3.5.2
-# Deprecated
-#export FLANNEL_VERSION=0.17.0
 export K8S_ROUTER_VERSION=1.4.0
 export K8S_CNI_PLUGINS_VERSION=1.1.1
 export K8S_DASHBOARD_VERSION=2.5.1

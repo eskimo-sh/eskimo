@@ -68,7 +68,7 @@ public class ConfigurationServiceTest {
     }
 
     @Test
-    public void testLoadAndSaveMarathonServicesConfig() throws Exception {
+    public void testLoadAndSaveKubernetesServicesConfig() throws Exception {
 
         KubernetesServicesConfigWrapper ksc = configurationService.loadKubernetesServicesConfig();
         assertNull(ksc);

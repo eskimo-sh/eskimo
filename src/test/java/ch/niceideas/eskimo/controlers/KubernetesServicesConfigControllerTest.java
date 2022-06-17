@@ -45,7 +45,7 @@ public class KubernetesServicesConfigControllerTest {
     }
 
     @Test
-    public void testLoadMarathonServicesConfig() throws Exception {
+    public void testLoadKubernetesServicesConfig() throws Exception {
 
         mscc.setSetupService(new SetupService() {
             @Override
@@ -108,7 +108,7 @@ public class KubernetesServicesConfigControllerTest {
     }
 
     @Test
-    public void testReinstallMarathonServicesConfig() throws Exception {
+    public void testReinstallKubernetesServicesConfig() throws Exception {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
@@ -178,7 +178,7 @@ public class KubernetesServicesConfigControllerTest {
         mscc.setDemoMode(true);
 
         assertEquals ("{\n" +
-                "  \"messages\": \"Unfortunately, re-applying marathon configuration or changing marathon configuration is not possible in DEMO mode.\",\n" +
+                "  \"messages\": \"Unfortunately, re-applying kubernetes configuration or changing kubernetes configuration is not possible in DEMO mode.\",\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", mscc.applyKubernetesServicesConfig(session));
     }
@@ -236,7 +236,7 @@ public class KubernetesServicesConfigControllerTest {
             }
         });
 
-        mscc.setMarathonServicesConfigChecker(new KubernetesServicesConfigChecker() {
+        mscc.setKubernetesServicesConfigChecker(new KubernetesServicesConfigChecker() {
             @Override
             public void checkKubernetesServicesSetup(KubernetesServicesConfigWrapper kubeServicesConfig) throws KubernetesServicesConfigException {
                 // No Op

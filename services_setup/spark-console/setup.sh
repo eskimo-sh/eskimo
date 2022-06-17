@@ -137,5 +137,5 @@ echo " - Committing changes to local template and exiting container spark"
 commit_container spark-console spark_console_install_log
 
 
-echo " - Starting marathon deployment"
+echo " - Starting Kubernetes deployment"
 deploy_kubernetes spark-console spark_console_install_log

@@ -92,6 +92,6 @@ handle_topology_settings grafana grafana_install_log
 echo " - Committing changes to local template and exiting container grafana"
 commit_container grafana grafana_install_log
 
-echo " - Starting marathon deployment"
+echo " - Starting Kubernetes deployment"
 deploy_kubernetes grafana grafana_install_log
 

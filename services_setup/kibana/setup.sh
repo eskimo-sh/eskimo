@@ -102,5 +102,5 @@ echo " - Committing changes to local template and exiting container kibana"
 commit_container kibana /tmp/kibana_install_log
 
 
-echo " - Starting marathon deployment"
+echo " - Starting Kubernetes deployment"
 deploy_kubernetes kibana /tmp/kibana_install_log

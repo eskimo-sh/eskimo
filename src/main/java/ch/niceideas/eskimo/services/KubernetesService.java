@@ -359,7 +359,7 @@ public class KubernetesService {
                 String nodeIp = nodeNameAndStatus.getKey();
 
                 // if kubernetes is not answering, we assume service is still installed if it has been installed before
-                // we identify it on marathon node then.
+                // we identify it on kubernetes node then.
                 if (nodeIp != null && nodeIp.equals(KUBE_NA_FLAG)) {
                     if (StringUtils.isNotBlank(servicesInstallationStatus.getFirstNode(service))) {
                         nodeIp = kubeMasterNode;
@@ -376,7 +376,7 @@ public class KubernetesService {
                 // if there is any kind of problem, boild down to identify service on kube master
                 if (!installed || !running || servicesDefinition.getService(service).isRegistryOnly()) {
 
-                    // uninstalled services are identified on the marathon node
+                    // uninstalled services are identified on the kubernetes node
                     if (StringUtils.isBlank(nodeName)) {
                         if (StringUtils.isNotBlank(kubeMasterNode)) {
                             nodeName = kubeMasterNode.replace(".", "-");
@@ -447,8 +447,8 @@ public class KubernetesService {
                         if (command.getUninstallations().size() > 0) {
                             logger.warn("Uninstalled Kubernetes services will be flagged as uninstalled even though no operation can be performed in kubernetes.");
                             configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
-                                for (KubernetesOperationsCommand.KubernetesOperationId uninstalledMarathonService : command.getUninstallations()) {
-                                    servicesInstallationStatus.removeInstallationFlag(uninstalledMarathonService.getService(), ServicesInstallStatusWrapper.KUBERNETES_NODE);
+                                for (KubernetesOperationsCommand.KubernetesOperationId uninstalledKubeService : command.getUninstallations()) {
+                                    servicesInstallationStatus.removeInstallationFlag(uninstalledKubeService.getService(), ServicesInstallStatusWrapper.KUBERNETES_NODE);
                                 }
                             });
                         }

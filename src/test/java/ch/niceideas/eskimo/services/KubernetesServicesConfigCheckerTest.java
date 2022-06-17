@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class KubernetesServicesConfigCheckerTest {
 
-    private KubernetesServicesConfigChecker marathonConfigChecker = new KubernetesServicesConfigChecker();
+    private KubernetesServicesConfigChecker kubernetesConfigChecker = new KubernetesServicesConfigChecker();
     private ConfigurationService configurationService = new ConfigurationService();
     private SetupService setupService = new SetupService();
 
@@ -89,14 +89,14 @@ public class KubernetesServicesConfigCheckerTest {
 
         configurationService.setSetupService(setupService);
 
-        marathonConfigChecker.setServicesDefinition(def);
+        kubernetesConfigChecker.setServicesDefinition(def);
 
         setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
-        marathonConfigChecker.setConfigurationService(configurationService);
+        kubernetesConfigChecker.setConfigurationService(configurationService);
 
         ServicesDefinition servicesDefinition = new ServicesDefinition();
         servicesDefinition.afterPropertiesSet();
-        marathonConfigChecker.setServicesDefinition(servicesDefinition);
+        kubernetesConfigChecker.setServicesDefinition(servicesDefinition);
     }
 
     @Test
@@ -116,7 +116,7 @@ public class KubernetesServicesConfigCheckerTest {
                 put("cerebro_installed", "on");
             }});
 
-            marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
+            kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
         });
 
         assertEquals("Inconsistency found : Service cerebro expects a installaton of  elasticsearch. But it's not going to be installed", exception.getMessage());
@@ -139,7 +139,7 @@ public class KubernetesServicesConfigCheckerTest {
                 put("spark-runtime_install", "on");
             }});
 
-            marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
+            kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
         });
 
         assertEquals("Inconsistency found : Service spark-runtime expects 1 kube-master instance(s). But only 0 has been found !", exception.getMessage());
@@ -165,7 +165,7 @@ public class KubernetesServicesConfigCheckerTest {
                 put("zeppelin_installed", "on");
             }});
 
-            marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
+            kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
         });
 
         assertEquals("Inconsistency found : Service zeppelin expects 1 zookeeper instance(s). But only 0 has been found !", exception.getMessage());
@@ -189,7 +189,7 @@ public class KubernetesServicesConfigCheckerTest {
                 put("zookeeper_installed", "on");
             }});
 
-            marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
+            kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
         });
 
         assertEquals("Inconsistency found : service zookeeper is not a kubernetes service", exception.getMessage());
@@ -200,7 +200,7 @@ public class KubernetesServicesConfigCheckerTest {
 
         configurationService.saveNodesConfig(nodesConfig);
 
-        marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
+        kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
     }
 
     @Test
@@ -211,7 +211,7 @@ public class KubernetesServicesConfigCheckerTest {
         kubeServicesConfig.removeRootKey("cerebro_cpu");
 
         KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
-            marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
+            kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
         });
 
         assertEquals("Inconsistency found : Kubernetes Service cerebro is enabled but misses CPU request setting", exception.getMessage());
@@ -225,7 +225,7 @@ public class KubernetesServicesConfigCheckerTest {
         kubeServicesConfig.removeRootKey("cerebro_ram");
 
         KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
-            marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
+            kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
         });
 
         assertEquals("Inconsistency found : Kubernetes Service cerebro is enabled but misses RAM request setting", exception.getMessage());
@@ -239,7 +239,7 @@ public class KubernetesServicesConfigCheckerTest {
         kubeServicesConfig.setValueForPath("cerebro_cpu", "1l");
 
         KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
-            marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
+            kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
         });
 
         assertEquals("CPU definition for cerebro doesn't match expected REGEX - [0-9\\\\.]+[m]{0,1}", exception.getMessage());
@@ -253,7 +253,7 @@ public class KubernetesServicesConfigCheckerTest {
         kubeServicesConfig.setValueForPath("cerebro_ram", "100ui");
 
         KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
-            marathonConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
+            kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
         });
 
         assertEquals("RAM definition for cerebro doesn't match expected REGEX - [0-9\\.]+[EPTGMk]{0,1}", exception.getMessage());

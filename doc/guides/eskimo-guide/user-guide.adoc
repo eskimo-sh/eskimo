@@ -144,12 +144,17 @@ eskimo.demoMode=false
 ==== The DemoVM
 
 The Eskimo DemoVM downloadable from the eskimo web site. It is intended as a demonstration of the features of the eskimo
-platform and enables users to test eskimo's possibilities.
+platform and enables users to test eskimo's possibilities and feel it's administrator and user experience.
 
 The Eskimo DemoVM is provided with _Demo Mode_ enabled by default, with the limits explained above (some actions are
 blocked).
 
 In case a user wants to use the features that are disabled in _Demo Mode_, he needs to disable _Demo Mode_.
+
+*Note*: the "_host only_" interface IP address of the DemoVM needs to be `192.168.56.41`. Eskimo works by targettin cluster
+nodes using their IP addresses. In the case of the Demo VM, the targe cluster node is the very same VM itself. In this
+case, Eskimo is using the IP address of its own VM as installation target. So if the IP address of the DemoVM changes
+from `192.168.56.41` to anything else, Eskimo will interpret it as the target machine having disappeared.
 
 ==== Deactivating Demo Mode on the demo VM
 

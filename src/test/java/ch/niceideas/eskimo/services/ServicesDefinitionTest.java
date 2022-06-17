@@ -317,9 +317,9 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
     @Test
     public void testListKubernetesServices() throws Exception {
-        String[] marathonServices = def.listKubernetesServices();
+        String[] kubernetesServices = def.listKubernetesServices();
 
-        assertEquals(12, marathonServices.length);
+        assertEquals(12, kubernetesServices.length);
 
         assertArrayEquals(new String[] {
                 "cerebro",
@@ -334,7 +334,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "spark-console",
                 "spark-runtime",
                 "zeppelin"
-        }, marathonServices);
+        }, kubernetesServices);
     }
 
     @Test
