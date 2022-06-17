@@ -89,7 +89,7 @@ check_for_java() {
         echo_date "Found java : "$(java -version 2>&1)
     else
         echo "Java is not available on system"
-        exit 101
+        exit 102
     fi
 }
 
@@ -1022,18 +1022,23 @@ run_zeppelin_data_load() {
 
 create_kafka_topics() {
 
+    NBR_PARTITIONS=4
+    if [[ -z $MULTIPLE_NODE ]]; then
+        NBR_PARTITIONS=1
+    fi
+
     # creating required kafka topics
     # ----------------------------------------------------------------------------------------------------------------------
 
     echo_date " - Creating topic berka-payments"
     vagrant ssh -c \
-        "/usr/local/bin/kafka-topics.sh --create --replication-factor 1 --partitions 4 --zookeeper localhost:2181 --topic berka-payments" \
+        "/usr/local/bin/kafka-topics.sh --create --replication-factor 1 --partitions $NBR_PARTITIONS --zookeeper localhost:2181 --topic berka-payments" \
         $TARGET_MASTER_VM \
         >> /tmp/integration-test.log 2>&1
 
     echo_date " - Creating topic berka-payments-aggregate"
     vagrant ssh -c \
-        "/usr/local/bin/kafka-topics.sh --create --replication-factor 1 --partitions 4 --zookeeper localhost:2181 --topic berka-payments-aggregate" \
+        "/usr/local/bin/kafka-topics.sh --create --replication-factor 1 --partitions $NBR_PARTITIONS --zookeeper localhost:2181 --topic berka-payments-aggregate" \
         $TARGET_MASTER_VM \
         >> /tmp/integration-test.log 2>&1
 }
@@ -1244,7 +1249,7 @@ run_zeppelin_flink_kafka() {
 
         stop_zeppelin_pararaph "/Flink Integration Kafka" 7
 
-        rm -f kafka-berka-payments-aggregate-results
+        #rm -f kafka-berka-payments-aggregate-results
 
         exit 30
     fi
@@ -1535,7 +1540,7 @@ prepare_demo() {
     rm -f kibana-dashboards
 
     echo_date " - Find eskimo folder name (again)"
-    eskimo_folder=$(vagrant ssh -c "ls /usr/local/lib | grep eskimo" integration-test 2> /dev/null | sed -e 's/\r//g')
+    eskimo_folder=$(vagrant ssh -c "ls /usr/local/lib | grep eskimo-" integration-test 2> /dev/null | sed -e 's/(\r|\n)//g' | sed 's/\r//g')
     if [[ $eskimo_folder == "" ]]; then
         echo_date "Couldn't get eskimo folder name"
         exit 2
@@ -1591,7 +1596,6 @@ usage() {
     echo "    -a  RUN ALL OF THE ABOVE"
     echo "    -d  Prepare the VM for DemoVM"
     echo "    -m  Test on multiple nodes"
-    echo "    -n  Don't rebuild the software (use last build)"
 }
 
 export EXPECTED_NBR_APPS_kubernetes=6
