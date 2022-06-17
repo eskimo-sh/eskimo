@@ -79,9 +79,9 @@ public class EskimoOperationsTest extends AbstractWebTest {
                 + ");");
 
         assertJavascriptEquals(
-                "--&gt; Done : Installation of Topology (All Nodes) on kubernetes\n"
-                        + "-------------------------------------------------------------------------------\n"
-                        + "--&gt; Completed Successfuly.\n",
+                "--&gt; Done : Installation of Topology (All Nodes) on marathon\n" +
+                        "-------------------------------------------------------------------------------\n" +
+                        "--&gt; Completed Successfuly.\n",
                 "$('#operations-global-messages').html()");
     }
 
@@ -98,9 +98,9 @@ public class EskimoOperationsTest extends AbstractWebTest {
         js("eskimoOperations.showLogs('Installation_Topology-All-Nodes');");
 
         assertJavascriptEquals(
-                "--&gt; Done : Installation of Topology (All Nodes) on kubernetes\n"
-                    + "-------------------------------------------------------------------------------\n"
-                    + "--&gt; Completed Successfuly.\n",
+                "--&gt; Done : Installation of Topology (All Nodes) on marathon\n" +
+                        "-------------------------------------------------------------------------------\n" +
+                        "--&gt; Completed Successfuly.\n",
                 "$('#log-message-content').html()");
 
     }
