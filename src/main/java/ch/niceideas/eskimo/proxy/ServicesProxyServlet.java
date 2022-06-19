@@ -86,6 +86,10 @@ public class ServicesProxyServlet extends ProxyServlet {
         super.init();
         */
         doPreserveHost = true;
+        maxConnections = 50;
+        readTimeout = 30000;
+        connectTimeout = 10000;
+        connectionRequestTimeout = 20000;
     }
 
     private String getServiceName(HttpServletRequest servletRequest) {
