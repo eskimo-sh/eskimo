@@ -77,10 +77,6 @@ if [[ $? != 0 ]]; then
     exit 20
 fi
 
-echo " - Installing setupFlinkGlusterShares.sh to /usr/local/sbin"
-sudo cp setupFlinkGlusterShares.sh /usr/local/sbin/
-sudo chmod 755 /usr/local/sbin/setupFlinkGlusterShares.sh
-
 
 # flink common template part
 # ----------------------------------------------------------------------------------------------------------------------
@@ -130,6 +126,12 @@ docker_cp_script settingsInjector.sh sbin flink flink_install_log
 
 echo " - Copying inContainerMountGluster.sh script"
 docker_cp_script inContainerMountGluster.sh sbin flink flink_install_log
+
+echo " - Copying glusterMountChecker.sh Script"
+docker_cp_script glusterMountChecker.sh sbin flink flink_install_log
+
+echo " - Copying containerWatchDog.sh script to container"
+docker_cp_script containerWatchDog.sh sbin flink flink_install_log
 
 
 echo " - Committing changes to local template and exiting container flink"

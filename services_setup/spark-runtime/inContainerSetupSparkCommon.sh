@@ -69,6 +69,7 @@ sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/mkdir -p /var/lib/spark/tmp\" >
 sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/chown spark /var/lib/spark/tmp\" >> /etc/sudoers.d/spark"
 sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/chown -R spark /var/lib/spark\" >> /etc/sudoers.d/spark"
 sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/chown -R spark. /var/lib/spark\" >> /etc/sudoers.d/spark"
+sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/bash /usr/local/sbin/glusterMountChecker.sh\" >> /etc/sudoers.d/spark"
 
 echo " - Enabling spark user to use host_spark"
 sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/rm -Rf /var/lib/spark\" >> /etc/sudoers.d/spark"
@@ -79,6 +80,13 @@ echo " - Creating user spark home directory"
 mkdir -p /home/spark
 mkdir -p /home/spark/.kube
 chown -R spark /home/spark
+
+echo " - Creating gluster infrastructure directories"
+sudo mkdir -p /var/log/gluster/
+sudo mkdir -p /var/lib/gluster/
+
+sudo chmod -R 777 /var/log/gluster/
+sudo chmod -R 777 /var/lib/gluster/
 
 
 echo " - Simlinking spark binaries to /usr/local/bin"
@@ -228,6 +236,18 @@ spec:
 EOF
 sudo mv /tmp/spark-pod-template.yaml /usr/local/lib/spark/conf/
 chmod 755 /usr/local/lib/spark/conf/
+
+echo " - Creating glusterMountCheckerPeriodic.sh script"
+cat > /tmp/glusterMountCheckerPeriodic.sh <<- "EOF"
+#!/usr/bin/env bash
+while true; do
+     sleep 10
+     sudo /bin/bash /usr/local/sbin/glusterMountChecker.sh
+done
+EOF
+sudo /bin/chown root /tmp/glusterMountCheckerPeriodic.sh
+sudo /bin/mv /tmp/glusterMountCheckerPeriodic.sh /usr/local/sbin/glusterMountCheckerPeriodic.sh
+sudo /bin/chmod 755 /usr/local/sbin/glusterMountCheckerPeriodic.sh
 
 
 echo " - Enabling spark to change configuration at runtime"

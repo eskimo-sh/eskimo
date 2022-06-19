@@ -41,12 +41,6 @@ echo " - Setting key environment variables"
 export FLINK_HOME=/usr/local/lib/flink/
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
 
-# If this container gets called by the spark framework, the first argument is either 'driver' or 'executor'
-# in this case, shouldn't mess with IP addresses definition, e.g. spark.driver.host
-if [[ $1 == 'driver' || $1 == 'executor' ]]; then
-    export DONT_MANAGE_IPS_AND_HOSTS=1
-fi
-
 # Load eskimo topolgy
 if [[ -f /usr/local/sbin/inContainerInjectTopology.sh ]]; then
     # Injecting topoloy
@@ -55,6 +49,10 @@ fi
 
 echo " - Inject settings (flink-runtime)"
 /usr/local/sbin/settingsInjector.sh flink-runtime
+
+echo " - Start glusterMountCheckerPeriodic.sh script"
+/bin/bash /usr/local/sbin/glusterMountCheckerPeriodic.sh &
+export GLUSTER_MOUNT_CHECKER_PID=$!
 
 echo " - Changing current directory to /home/flink"
 cd /home/flink
@@ -65,4 +63,12 @@ export PATH=/usr/local/lib/flink/bin/:$PATH
 # Call flink provided entrypoint
 echo " - Executing : /usr/local/lib/flink/kubernetes/docker-entrypoint.sh" "$@"
 last_arg="${@: -1}"
-bash /usr/local/lib/flink/kubernetes/docker-entrypoint.sh "$@" | tee /var/log/flink/flink-log-`echo $last_arg | cut -d ' ' -f 1`.log
+bash /usr/local/lib/flink/kubernetes/docker-entrypoint.sh "$@" | tee /var/log/flink/flink-log-`echo $last_arg | cut -d ' ' -f 1`.log &
+export FLINK_PROCESS=$!
+
+
+echo " - Launching Watch Dog on glusterMountCheckerPeriodic remote server"
+/usr/local/sbin/containerWatchDog.sh $GLUSTER_MOUNT_CHECKER_PID $FLINK_PROCESS /var/log/flink/gluster-mount-checker-periodic-watchdog-$FLINK_PROCESS.log &
+
+echo " - Now waiting on main process to exit"
+wait $FLINK_PROCESS

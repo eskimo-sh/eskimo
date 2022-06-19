@@ -55,8 +55,7 @@ if [[ $3 == "" ]]; then
 fi
 export OWNER=$3
 
-
-export DEPENDENT_UNIT_DEFINITON=$5
+export DEPENDENT_UNIT_DEFINITON=$4
 
 echo "-> gluster_mount_internal.sh"
 echo " - Proceeding with gluster mount with :"

@@ -56,8 +56,19 @@ fi
 echo " - Inject settings (spark-runtime)"
 /usr/local/sbin/settingsInjector.sh spark-runtime
 
+echo " - Start glusterMountCheckerPeriodic.sh script"
+/bin/bash /usr/local/sbin/glusterMountCheckerPeriodic.sh &
+export GLUSTER_MOUNT_CHECKER_PID=$!
+
 echo " - Changing current directory to /home/spark"
 cd /home/spark
 
 # Call spark provided entrypoint
-bash /usr/local/lib/spark/kubernetes/dockerfiles/spark/entrypoint.sh "$@"
+bash /usr/local/lib/spark/kubernetes/dockerfiles/spark/entrypoint.sh "$@"  &
+export SPARK_PROCESS=$!
+
+echo " - Launching Watch Dog on glusterMountCheckerPeriodic remote server"
+/usr/local/sbin/containerWatchDog.sh $GLUSTER_MOUNT_CHECKER_PID $SPARK_PROCESS /var/log/flink/gluster-mount-checker-periodic-watchdog-$SPARK_PROCESS.log &
+
+echo " - Now waiting on main process to exit"
+wait $SPARK_PROCESS

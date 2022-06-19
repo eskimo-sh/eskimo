@@ -61,8 +61,9 @@ fi
 
 echo " - Enabling flink user to mount gluster shares (sudo)"
 sudo bash -c "echo \"flink  ALL = NOPASSWD: /bin/bash /usr/local/sbin/inContainerMountGluster.sh *\" >> /etc/sudoers.d/flink"
-sudo bash -c "echo \"link  ALL = NOPASSWD: /bin/chmod 777 /var/lib/flink/completed_jobs\" >> /etc/sudoers.d/flink"
+sudo bash -c "echo \"flink  ALL = NOPASSWD: /bin/chmod 777 /var/lib/flink/completed_jobs\" >> /etc/sudoers.d/flink"
 sudo bash -c "echo \"flink  ALL = NOPASSWD: /bin/chmod 777 /var/lib/flink/data\" >> /etc/sudoers.d/flink"
+sudo bash -c "echo \"flink  ALL = NOPASSWD: /bin/bash /usr/local/sbin/glusterMountChecker.sh\" >> /etc/sudoers.d/flink"
 
 echo " - Creating user flink home directory"
 mkdir -p /home/flink
@@ -72,6 +73,13 @@ chown flink /home/flink
 echo " - Presetting /usr/local/lib/flink/conf/ to flink"
 sudo chown -R flink. /usr/local/lib/flink/conf/
 sudo chmod -R 777 /usr/local/lib/flink/conf/
+
+echo " - Creating gluster infrastructure directories"
+sudo mkdir -p /var/log/gluster/
+sudo mkdir -p /var/lib/gluster/
+
+sudo chmod -R 777 /var/log/gluster/
+sudo chmod -R 777 /var/lib/gluster/
 
 
 echo " - Simlinking flink binaries to /usr/local/bin"
@@ -179,6 +187,19 @@ sudo bash -c "echo 'internal.cluster.execution-mode: NORMAL' >> /var/lib/flink/c
 
 cp /usr/local/lib/flink/conf/log4j-console.properties /var/lib/flink/config/
 cp /usr/local/lib/flink/conf/logback-console.xml /var/lib/flink/config/
+
+
+echo " - Creating glusterMountCheckerPeriodic.sh script"
+cat > /tmp/glusterMountCheckerPeriodic.sh <<- "EOF"
+#!/usr/bin/env bash
+while true; do
+     sleep 10
+     sudo /bin/bash /usr/local/sbin/glusterMountChecker.sh
+done
+EOF
+sudo /bin/chown root /tmp/glusterMountCheckerPeriodic.sh
+sudo /bin/mv /tmp/glusterMountCheckerPeriodic.sh /usr/local/sbin/glusterMountCheckerPeriodic.sh
+sudo /bin/chmod 755 /usr/local/sbin/glusterMountCheckerPeriodic.sh
 
 
 

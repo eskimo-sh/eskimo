@@ -45,8 +45,19 @@ echo " - Inject settings"
 echo " - Creating potentially missing /var/log/elasticsearch/logstash folder"
 mkdir -p /var/log/elasticsearch/logstash
 
+echo " - Start glusterMountCheckerPeriodic.sh script"
+/bin/bash /usr/local/sbin/glusterMountCheckerPeriodic.sh &
+export GLUSTER_MOUNT_CHECKER_PID=$!
+
 echo " - Mounting logstash gluster shares"
 sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh logstash_data /var/lib/elasticsearch/logstash/data elasticsearch
 
 echo " - Starting logstash remote server"
-/usr/local/sbin/logstash_remote.sh
+/usr/local/sbin/logstash_remote.sh &
+export LOGSTASH_SERVICE=$!
+
+echo " - Launching Watch Dog on glusterMountCheckerPeriodic remote server"
+/usr/local/sbin/containerWatchDog.sh $GLUSTER_MOUNT_CHECKER_PID $LOGSTASH_SERVICE /var/log/spark/gluster-mount-checker-periodic-watchdog.log &
+
+echo " - Now waiting on main process to exit"
+wait $LOGSTASH_SERVICE
