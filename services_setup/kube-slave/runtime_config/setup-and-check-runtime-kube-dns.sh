@@ -133,28 +133,6 @@ if [[ ! -f /etc/k8s/flag-dns-setup ]]; then
         fi
     fi
 
-    # If dnsmasq service is up and running and if 127.0.0.x is not in /etc/resolv.conf (make sure it is not commented out as well)
-    # => I need to adapt dnsmasq configuration from nameservre currently in /etc/resolv.conf and replace /etc/resolv.conf
-    if [[ `systemctl is-active dnsmasq` == "active" ]]; then
-
-        if [[ `grep -e "^nameserver" /etc/resolv.conf | grep -E "127.0.0|localhost"` == "" ]]; then
-
-            # replace name server by 127.0.0.1 and add former one to dnsmasq config
-            default_dns=` grep -e "^nameserver" /etc/resolv.conf | sed 's/  */ /g' | cut -d ' ' -f 2`
-            if [[ "$default_dns" == "" ]] ; then
-                echo "! couldn't extract default dns server !"
-
-            else
-                sudo bash -c "echo \"server=$default_dns\" > /etc/dnsmasq.d/default.conf"
-
-                sudo systemctl restart dnsmasq
-
-                # now replacing that dns server by 128.0.0.1 (dnsmasq server) in /etc&resolv.conf
-                sed -i  's/^nameserver \(.*\)/nameserver 127.0.0.1/g'  /etc/resolv.conf
-            fi
-        fi
-    fi
-
 
     touch /etc/k8s/flag-dns-setup
     rm -Rf /etc/k8s/k8s_dns_setup_management_lock
@@ -170,6 +148,32 @@ fi
 
 # Do it on master and on slave where master is not running only
 if [[ $MODE == "MASTER" || ( $MODE == "SLAVE" && "$MASTER_KUBE_MASTER_1" != "$SELF_IP_ADDRESS" ) ]]; then
+
+    # If dnsmasq service is up and running, then make sure it's used by /etc/resolv.conf
+    #   if 127.0.0.x is not in /etc/resolv.conf (make sure it is not commented out as well)
+    #   then I need to adapt dnsmasq configuration from nameservre currently in /etc/resolv.conf and replace
+    #   /etc/resolv.conf
+    if [[ `systemctl is-active dnsmasq` == "active" ]]; then
+
+        if [[ `grep -e "^nameserver" /etc/resolv.conf | grep -E "127.0.0|localhost"` == "" ]]; then
+
+            # replace name server by 127.0.0.1 and add former one to dnsmasq config
+            default_dns=` grep -e "^nameserver" /etc/resolv.conf | sed 's/  */ /g' | cut -d ' ' -f 2`
+            if [[ "$default_dns" == "" ]] ; then
+                echo "! couldn't extract default dns server !"
+
+            else
+                sudo bash -c "echo \"server=$default_dns\" > /etc/dnsmasq.d/default.conf"
+
+                sudo systemctl restart dnsmasq
+
+                sleep 1
+
+                # now replacing that dns server by 128.0.0.1 (dnsmasq server) in /etc&resolv.conf
+                sed -i  's/^nameserver \(.*\)/nameserver 127.0.0.1/g'  /etc/resolv.conf
+            fi
+        fi
+    fi
 
     # ensure DNS is still working alright
     #echo "   + Trying to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN" # this is filling up logs
