@@ -422,12 +422,7 @@ public class NodesConfigurationService {
         systemOperationService.applySystemOperation(operationId,
                 ml -> proceedWithServiceUninstallation(ml, operationId.getNode(), operationId.getService()),
                 status -> status.removeInstallationFlag(operationId.getService(), nodeName));
-        try {
-            proxyManagerService.removeServerForService(operationId.getService(), operationId.getNode());
-        } catch (ConnectionManagerException e) {
-            logger.error (e, e);
-            logger.warn ("Couldn't remove server for service " + operationId.getService() + " - " + operationId.getNode());
-        }
+        proxyManagerService.removeServerForService(operationId.getService(), operationId.getNode());
     }
 
     void uninstallServiceNoOp(ServiceOperationsCommand.ServiceOperationId operationId) throws SystemException {
@@ -435,12 +430,7 @@ public class NodesConfigurationService {
         systemOperationService.applySystemOperation(operationId,
                 builder -> {},
                 status -> status.removeInstallationFlag(operationId.getService(), nodeName));
-        try {
-            proxyManagerService.removeServerForService(operationId.getService(), operationId.getNode());
-        } catch (ConnectionManagerException e) {
-            logger.error (e, e);
-            logger.warn ("Couldn't remove server for service " + operationId.getService() + " - " + operationId.getNode());
-        }
+        proxyManagerService.removeServerForService(operationId.getService(), operationId.getNode());
     }
 
     void installService(ServiceOperationsCommand.ServiceOperationId operationId)

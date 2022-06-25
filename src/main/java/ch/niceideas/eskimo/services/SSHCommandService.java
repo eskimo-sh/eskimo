@@ -62,11 +62,6 @@ public class SSHCommandService {
     @Autowired
     private ConfigurationService configurationService;
 
-    @Value("${connectionManager.scriptOperationTimeout}")
-    private int scriptOperationTimeout = 1800000;
-
-    private int statusOperationTimeout = 30000;
-
     /** For tests */
     public void setConnectionManagerService(ConnectionManagerService connectionManagerService) {
         this.connectionManagerService = connectionManagerService;

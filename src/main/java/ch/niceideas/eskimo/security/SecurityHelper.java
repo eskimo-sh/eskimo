@@ -8,6 +8,10 @@ import java.util.stream.Collectors;
 
 public class SecurityHelper {
 
+    // to be used statically only
+    private SecurityHelper() {
+    }
+
     public static List<Role> getuserRoles() throws AuthorizationException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) {

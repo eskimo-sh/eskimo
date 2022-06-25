@@ -318,6 +318,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
             super (type, service, node);
         }
 
+        @Override
         public String getMessage() {
             return getOperation() + " of " + getService() + " on " + getNode();
         }

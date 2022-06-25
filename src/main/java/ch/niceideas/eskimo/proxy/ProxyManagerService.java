@@ -95,9 +95,7 @@ public class ProxyManagerService {
     }
 
     private void __dumpProxyTunnelConfig() {
-        proxyTunnelConfigs.keySet().forEach(key -> {
-            logger.debug(" - " + key + " -> " + proxyTunnelConfigs.get(key));
-        });
+        proxyTunnelConfigs.keySet().forEach(key -> logger.debug(" - " + key + " -> " + proxyTunnelConfigs.get(key)));
         logger.debug("");
     }
 
@@ -214,7 +212,7 @@ public class ProxyManagerService {
         return effNode;
     }
 
-    public void removeServerForService(String serviceName, String runtimeNode) throws ConnectionManagerException {
+    public void removeServerForService(String serviceName, String runtimeNode) {
 
         if (logger.isDebugEnabled()) {
             logger.debug("------ BEFORE ---- removeServerForService (" + serviceName + "," + runtimeNode + ") ----------- ");

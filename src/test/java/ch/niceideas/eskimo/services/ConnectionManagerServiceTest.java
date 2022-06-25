@@ -109,6 +109,16 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
     }
 
     @Test
+    public void testOldConnectionsGetsClosed() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testDumpPortForwardersMap() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
     public void testLocalPortForwarderWrapper() throws Exception {
 
         final List<ProxyTunnelConfig> forwarderConfig = new ArrayList<ProxyTunnelConfig>(){{

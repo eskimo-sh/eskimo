@@ -90,6 +90,11 @@ public class ProxyManagerServiceTest {
     }
 
     @Test
+    public void testDumpProxyTunnelConfig() {
+        fail ("To Be Implemented");
+    }
+
+    @Test
     public void testGetServerURI() throws Exception {
         pms.updateServerForService("zeppelin", "192.168.10.11");
 

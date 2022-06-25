@@ -121,9 +121,7 @@ public class ConnectionManagerService {
     private void __dumpPortForwardersMap () {
         portForwardersMap.keySet().forEach(sshConnection -> {
            logger.debug(" - " + sshConnection.getHostname());
-           portForwardersMap.get(sshConnection).forEach(forwarder -> {
-               logger.debug("   + " + forwarder.toString());
-           });
+           portForwardersMap.get(sshConnection).forEach(forwarder -> logger.debug("   + " + forwarder.toString()));
         });
         logger.debug("");
     }
