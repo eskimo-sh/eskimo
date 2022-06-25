@@ -73,10 +73,21 @@ public class ServicesProxyServlet extends ProxyServlet {
 
     private final String configuredContextPath;
 
-    public ServicesProxyServlet(ProxyManagerService proxyManagerService, ServicesDefinition servicesDefinition, String configuredContextPath) {
+    public ServicesProxyServlet(
+            ProxyManagerService proxyManagerService,
+            ServicesDefinition servicesDefinition,
+            String configuredContextPath,
+            int maxConnections,
+            int readTimeout,
+            int connectTimeout,
+            int connectionRequestTimeout) {
         this.configuredContextPath = configuredContextPath;
         this.proxyManagerService = proxyManagerService;
         this.servicesDefinition = servicesDefinition;
+        this.maxConnections = maxConnections;
+        this.readTimeout = readTimeout;
+        this.connectTimeout = connectTimeout;
+        this.connectionRequestTimeout = connectionRequestTimeout;
     }
 
     @Override
@@ -85,11 +96,8 @@ public class ServicesProxyServlet extends ProxyServlet {
         /*
         super.init();
         */
-        doPreserveHost = true;
-        maxConnections = 50;
-        readTimeout = 30000;
-        connectTimeout = 10000;
-        connectionRequestTimeout = 20000;
+        this.doPreserveHost = true;
+
     }
 
     private String getServiceName(HttpServletRequest servletRequest) {

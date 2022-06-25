@@ -40,15 +40,21 @@ import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import com.trilead.ssh2.LocalPortForwarder;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Appender;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.logging.log4j.core.config.Configurator.setLevel;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
@@ -109,13 +115,53 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
     }
 
     @Test
-    public void testOldConnectionsGetsClosed() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-    @Test
     public void testDumpPortForwardersMap() throws Exception {
-        fail ("To Be Implemented");
+
+        Logger testLogger = LogManager.getLogger(ConnectionManagerService.class.getName());
+        try {
+            setLevel(ConnectionManagerService.class.getName(), Level.DEBUG);
+
+            StringBuilder builder = new StringBuilder();
+
+            Appender testAppender = (Appender) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{Appender.class}, (proxy, method, args) -> {
+                if (method.getName().equals("isStarted")) {
+                    return true;
+                } else if (method.getName().equals("getName")) {
+                    return "test";
+                } else if (method.getName().equals("append")) {
+                    org.apache.logging.log4j.core.impl.Log4jLogEvent event = (org.apache.logging.log4j.core.impl.Log4jLogEvent) args[0];
+                    builder.append(event.getMessage().getFormattedMessage());
+                    builder.append("\n");
+                }
+                return null;
+            });
+
+            ((org.apache.logging.log4j.core.Logger) testLogger).addAppender(testAppender);
+
+            testLocalPortForwarderWrapper();
+
+            //System.err.println(builder.toString());
+
+            String result = builder.toString();
+
+            assertTrue(result.contains("------ BEFORE ---- recreateTunnels (localhost) ----------- "));
+
+            assertTrue(result.contains("------ AFTER ---- recreateTunnels (localhost) ----------- \n" +
+                    " - localhost\n" +
+                    "   + dummyService - from 6123 to localhost:123\n" +
+                    "   + dummyService - from 6124 to localhost:124\n" +
+                    "   + dummyService - from 6125 to localhost:125"));
+
+            assertTrue(result.contains("------ BEFORE ---- recreateTunnels (localhost) ----------- \n" +
+                    " - localhost\n" +
+                    "   + dummyService - from 6123 to localhost:123\n" +
+                    "   + dummyService - from 6124 to localhost:124\n" +
+                    "   + dummyService - from 6125 to localhost:125"));
+
+        } finally {
+
+            setLevel(ConnectionManagerService.class.getName(), Level.INFO);
+        }
     }
 
     @Test

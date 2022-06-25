@@ -310,25 +310,16 @@ public class KubernetesService {
         // 3.1 Node answers
         try {
 
+            KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
+
             String kubeMasterNode = servicesInstallationStatus.getFirstNode(KUBE_MASTER);
-
-            String ping = null;
-            if (!StringUtils.isBlank(kubeMasterNode)) {
-
-                // find out if SSH connection to host can succeed
-                try {
-                    ping = systemService.sendPing(kubeMasterNode);
-                } catch (SSHCommandException e) {
-                    logger.warn(e.getMessage());
-                    logger.debug(e, e);
-                }
+            if (StringUtils.isBlank(kubeMasterNode) && kubeServicesConfig.hasEnabledServices()) {
+                logger.warn("Kubernetes is not installed");
             }
 
-            // FIYME change politics, get kubectl status all at once and then below instead of calling for every service,
-            // get it from Kubectl result
+            // get kubectl status all at once and then below get it from Kubectl result
             KubeStatusParser parser = getKubeStatusParser();
 
-            KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
             for (String service : servicesDefinition.listKubernetesServices()) {
 
                 // should service be installed on kubernetes ?
@@ -357,7 +348,7 @@ public class KubernetesService {
                 String nodeName = nodeIp != null ? nodeIp.replace(".", "-") : null;
 
                 // if there is any kind of problem, boild down to identify service on kube master
-                if (!installed || !running || servicesDefinition.getService(service).isRegistryOnly()) {
+                if (!installed || !running || servicesDefinition.getService(service).isRegistryOnly() || parser == null) {
 
                     // uninstalled services are identified on the kubernetes node
                     if (StringUtils.isBlank(nodeName)) {

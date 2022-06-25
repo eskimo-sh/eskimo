@@ -371,7 +371,7 @@ public class SystemService {
                     kubernetesService.fetchKubernetesServicesStatus(statusMap, servicesInstallationStatus);
                 } catch (KubernetesException e) {
                     logger.debug(e, e);
-                    // workaround : flag all Kubeernetes services as KO on kube node
+                    // workaround : flag all Kubernetes services as KO on kube node
                     String kubeNode = servicesInstallationStatus.getFirstNode(KUBERNETES_SERVICE_NAME);
                     if (StringUtils.isNotBlank(kubeNode)) {
                         String kubeNodeName = kubeNode.replace(".", "-");

@@ -77,6 +77,18 @@ public class ProxyConfiguration implements WebSocketConfigurer {
     @Value("${server.servlet.context-path:#{null}}")
     private String configuredContextPath = "";
 
+    @Value ("${proxy.maxConnections:50}")
+    private int maxConnections;
+
+    @Value ("${proxy.readTimeout:30000}")
+    private int readTimeout;
+
+    @Value ("${proxy.connectTimeout:10000}")
+    private int connectTimeout;
+
+    @Value ("${proxy.connectionRequestTimeout:20000}")
+    private int connectionRequestTimeout;
+
     /**
      * This is to avoid following problem with REST requests passed by grafana
      *
@@ -107,7 +119,14 @@ public class ProxyConfiguration implements WebSocketConfigurer {
     public ServletRegistrationBean<ServicesProxyServlet> proxyServletRegistrationBean(){
 
         ServletRegistrationBean<ServicesProxyServlet> servletRegistrationBean = new ServletRegistrationBean<>(
-                new ServicesProxyServlet(proxyManagerService, servicesDefinition, configuredContextPath),
+                new ServicesProxyServlet(
+                        proxyManagerService,
+                        servicesDefinition,
+                        configuredContextPath,
+                        maxConnections,
+                        readTimeout,
+                        connectTimeout,
+                        connectionRequestTimeout),
                 Arrays.stream(servicesDefinition.listProxiedServices())
                         .map(serviceName -> servicesDefinition.getService(serviceName))
                         .map(service -> "/" + service.getName() + "/*")

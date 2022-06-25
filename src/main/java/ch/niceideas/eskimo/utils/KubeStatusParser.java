@@ -162,9 +162,9 @@ public class KubeStatusParser {
         }
 
         // 3. If no POD at all is running return notOK on kubeIp
-        if (!podNodesAndStatus.stream()
+        if (podNodesAndStatus.stream()
                 .map(Pair::getValue)
-                .anyMatch(status -> status.equalsIgnoreCase(KubernetesService.STATUS_RUNNING)
+                .noneMatch(status -> status.equalsIgnoreCase(KubernetesService.STATUS_RUNNING)
                         || status.equalsIgnoreCase(KubernetesService.STATUS_TERMINATING)
                         || status.equalsIgnoreCase(KubernetesService.STATUS_CONTAINER_CREATING))) {
             return new Pair<>(kubeIp, "notOK");

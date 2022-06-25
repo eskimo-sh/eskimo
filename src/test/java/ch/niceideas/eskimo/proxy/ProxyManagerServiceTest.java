@@ -34,34 +34,40 @@
 
 package ch.niceideas.eskimo.proxy;
 
-import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.*;
 import com.trilead.ssh2.LocalPortForwarder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static org.apache.logging.log4j.core.config.Configurator.setLevel;
+import static org.apache.logging.log4j.core.config.Configurator.setRootLevel;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ProxyManagerServiceTest {
 
-    private static final Logger logger = Logger.getLogger(ProxyManagerServiceTest.class);
+    private static final Logger logger = LogManager.getLogger(ProxyManagerServiceTest.class.getName());
 
     private ProxyManagerService pms;
     private ServicesDefinition sd;
 
-    private AtomicBoolean recreateTunnelsCalled = new AtomicBoolean(false);
-    private AtomicBoolean removeForwardersCalled = new AtomicBoolean(false);
+    private final AtomicBoolean recreateTunnelsCalled = new AtomicBoolean(false);
+    private final AtomicBoolean removeForwardersCalled = new AtomicBoolean(false);
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -90,8 +96,42 @@ public class ProxyManagerServiceTest {
     }
 
     @Test
-    public void testDumpProxyTunnelConfig() {
-        fail ("To Be Implemented");
+    public void testDumpProxyTunnelConfig() throws Exception {
+
+        Logger testLogger = LogManager.getLogger(ProxyManagerService.class.getName());
+        try {
+            setLevel(ProxyManagerService.class.getName(), Level.DEBUG);
+
+            StringBuilder builder = new StringBuilder();
+
+            Appender testAppender = (Appender) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{Appender.class}, (proxy, method, args) -> {
+                if (method.getName().equals("isStarted")) {
+                    return true;
+                } else if (method.getName().equals("getName")) {
+                    return "test";
+                } else if (method.getName().equals("append")) {
+                    org.apache.logging.log4j.core.impl.Log4jLogEvent event = (org.apache.logging.log4j.core.impl.Log4jLogEvent) args[0];
+                    builder.append(event.getMessage().getFormattedMessage());
+                    builder.append("\n");
+                }
+                return null;
+            });
+
+            ((org.apache.logging.log4j.core.Logger) testLogger).addAppender(testAppender);
+
+            pms.updateServerForService("gluster", "192.168.10.11");
+
+            String result = builder.toString();
+
+            logger.info(result);
+
+            assertTrue(result.contains("------ BEFORE ---- updateServerForService (gluster,192.168.10.11) ----------- "));
+            assertTrue(result.contains("Updating server config for service gluster. Will recreate tunnels to 192.168.10.11"));
+            assertTrue(result.contains("------ AFTER ---- updateServerForService (gluster,192.168.10.11) -----------"));
+            assertTrue(result.contains(" - gluster/192-168-10-11 -> gluster - "));
+        } finally {
+            setLevel(ProxyManagerService.class.getName(), Level.INFO);
+        }
     }
 
     @Test

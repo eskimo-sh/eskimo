@@ -71,7 +71,7 @@ public class ServicesProxyServletTest {
         pms = new ProxyManagerService();
         sd = new ServicesDefinition();
         sd.afterPropertiesSet();
-        servlet = new ServicesProxyServlet(pms, sd, "");
+        servlet = new ServicesProxyServlet(pms, sd, "", 50, 30000, 10000, 20000);
         pms.setServicesDefinition(sd);
 
         pms.setConfigurationService(new ConfigurationService() {
