@@ -90,7 +90,6 @@ docker run \
         -v $PWD:/scripts \
         -v $PWD/../common:/common \
         -d \
-        -v /var/log/spark:/var/log/spark \
         --name spark \
         -i \
         -t eskimo:spark bash >> spark_executor_install_log 2>&1
@@ -130,6 +129,12 @@ docker_cp_script settingsInjector.sh sbin spark spark_executor_install_log
 
 echo " - Copying inContainerMountGluster.sh script"
 docker_cp_script inContainerMountGluster.sh sbin spark spark_executor_install_log
+
+echo " - Copying glusterMountChecker.sh Script"
+docker_cp_script glusterMountChecker.sh sbin spark spark_executor_install_log
+
+echo " - Copying containerWatchDog.sh script to container"
+docker_cp_script containerWatchDog.sh sbin spark spark_executor_install_log
 
 echo " - Committing changes to local template and exiting container spark"
 commit_container spark spark_executor_install_log

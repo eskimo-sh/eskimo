@@ -107,8 +107,11 @@ for i in `ls -1 /usr/local/lib/spark/sbin/stop*`; do
 done
 
 echo " - Simlinking spark logs to /var/log/"
+sudo mkdir -p /var/log/spark
 sudo rm -Rf /usr/local/lib/spark/logs
 sudo ln -s /var/log/spark /usr/local/lib/spark/logs
+sudo chown -R spark /var/log/spark
+sudo chmod -R 777 /var/log/spark
 
 echo " - Defining SPARK_HOME variable"
 # etc profile

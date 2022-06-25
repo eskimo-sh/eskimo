@@ -78,16 +78,16 @@ public class ProxyConfiguration implements WebSocketConfigurer {
     private String configuredContextPath = "";
 
     @Value ("${proxy.maxConnections:50}")
-    private int maxConnections;
+    private int maxConnections = 50;
 
     @Value ("${proxy.readTimeout:30000}")
-    private int readTimeout;
+    private int readTimeout = 30000;
 
     @Value ("${proxy.connectTimeout:10000}")
-    private int connectTimeout;
+    private int connectTimeout = 10000;
 
     @Value ("${proxy.connectionRequestTimeout:20000}")
-    private int connectionRequestTimeout;
+    private int connectionRequestTimeout = 20000;
 
     /**
      * This is to avoid following problem with REST requests passed by grafana

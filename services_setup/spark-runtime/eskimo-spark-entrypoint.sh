@@ -68,7 +68,7 @@ bash /usr/local/lib/spark/kubernetes/dockerfiles/spark/entrypoint.sh "$@"  &
 export SPARK_PROCESS=$!
 
 echo " - Launching Watch Dog on glusterMountCheckerPeriodic remote server"
-/usr/local/sbin/containerWatchDog.sh $GLUSTER_MOUNT_CHECKER_PID $SPARK_PROCESS /var/log/flink/gluster-mount-checker-periodic-watchdog-$SPARK_PROCESS.log &
+/usr/local/sbin/containerWatchDog.sh $GLUSTER_MOUNT_CHECKER_PID $SPARK_PROCESS /var/log/spark/gluster-mount-checker-periodic-watchdog-$SPARK_PROCESS.log &
 
 echo " - Now waiting on main process to exit"
 wait $SPARK_PROCESS
