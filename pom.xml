@@ -40,9 +40,9 @@ Software.
     <artifactId>eskimo-ce</artifactId>
     <packaging>war</packaging>
     <name>Eskimo CE</name>
+    <version>0.4-SNAPSHOT</version>
     <description>Eskimo Platform Console - Community Edition</description>
     <url>https://www.eskimo.sh</url>
-    <version>0.4-SNAPSHOT</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -69,7 +69,7 @@ Software.
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20201115</version>
+            <version>20200518</version>
         </dependency>
 
         <!-- Web -->
@@ -301,6 +301,7 @@ Software.
                     <source>11</source>
                     <target>11</target>
                     <release>11</release>
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
 
