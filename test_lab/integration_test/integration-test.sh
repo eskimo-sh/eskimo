@@ -1302,6 +1302,11 @@ run_zeppelin_other_notes() {
 
     wait_for_executor_unregistered
 
+    load_kibana_flight_data
+
+    echo_date " - ZEPPELIN running Elasticsearch Demo"
+    run_all_zeppelin_pararaphs "/ElasticSearch Demo (Queries)"
+
 }
 
 do_cleanup() {
@@ -1420,10 +1425,7 @@ test_doc(){
     return
 }
 
-prepare_demo() {
-
-    # [Optionally] Prepare demo
-    # ----------------------------------------------------------------------------------------------------------------------
+load_kibana_flight_data() {
 
     echo_date " - Loading Kibana flights sample data"
     curl  \
@@ -1449,6 +1451,12 @@ prepare_demo() {
 
     rm -f kibana-flight-import
     rm -f kibana-flight-import-error
+}
+
+prepare_demo() {
+
+    # [Optionally] Prepare demo
+    # ----------------------------------------------------------------------------------------------------------------------
 
     echo_date " - Loading Kibana Logs sample data"
     curl  \

@@ -317,6 +317,11 @@ public class SystemService {
 
     public void updateStatus() {
 
+        if (statusUpdateLock.isLocked()) {
+            logger.warn ("!!! NOT UPDATING STATUS SINCE STATUS UPDATED IS RUNNING ALREADY !!!");
+            return;
+        }
+
         try {
             statusUpdateLock.lock();
 
