@@ -392,8 +392,8 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         assertEquals(6, zookeeperDep.length, String.join(",", zookeeperDep));
         assertArrayEquals(new String[] {
                 "zookeeper",
-                "flink-runtime",
                 "gluster",
+                "flink-runtime",
                 "kafka",
                 "kafka-manager",
                 "zeppelin"

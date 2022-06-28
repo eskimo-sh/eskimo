@@ -52,11 +52,11 @@ public class SetupCommandTest extends AbstractServicesDefinitionTest {
                 "    \"cerebro\",\n" +
                 "    \"grafana\",\n" +
                 "    \"spark\",\n" +
-                "    \"flink\",\n" +
                 "    \"kafka\",\n" +
                 "    \"kafka-manager\",\n" +
                 "    \"kibana\",\n" +
                 "    \"logstash\",\n" +
+                "    \"flink\",\n" +
                 "    \"zeppelin\"\n" +
                 "  ],\n" +
                 "  \"buildKube\": [\"kube\"],\n" +
@@ -92,25 +92,7 @@ public class SetupCommandTest extends AbstractServicesDefinitionTest {
 
         List<SetupCommand.SetupOperationId> opInOrder = setupCommand.getAllOperationsInOrder(null);
 
-        assertEquals ("" +
-                        "Build_base-eskimo," +
-                        "Build_ntp," +
-                        "Build_prometheus," +
-                        "Build_zookeeper," +
-                        "Build_gluster," +
-                        "Build_kube-master," +
-                        "Build_kubernetes-dashboard," +
-                        "Build_elasticsearch," +
-                        "Build_cerebro," +
-                        "Build_grafana," +
-                        "Build_spark," +
-                        "Build_flink," +
-                        "Build_kafka," +
-                        "Build_kafka-manager," +
-                        "Build_kibana," +
-                        "Build_logstash," +
-                        "Build_zeppelin," +
-                        "Build_kube",
+        assertEquals ("Build_base-eskimo,Build_ntp,Build_prometheus,Build_zookeeper,Build_gluster,Build_kube-master,Build_kubernetes-dashboard,Build_elasticsearch,Build_cerebro,Build_grafana,Build_spark,Build_kafka,Build_kafka-manager,Build_kibana,Build_logstash,Build_flink,Build_zeppelin,Build_kube",
                 opInOrder.stream().map(SetupCommand.SetupOperationId::toString).collect(Collectors.joining(",")));
     }
 

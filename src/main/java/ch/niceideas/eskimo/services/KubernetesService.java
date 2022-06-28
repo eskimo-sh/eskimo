@@ -212,15 +212,20 @@ public class KubernetesService {
 
     protected String restartServiceInternal(Service service, String node) throws KubernetesException, SSHCommandException {
         if (service.isKubernetes()) {
-            try {
-                String kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(KUBE_MASTER);
-                if (StringUtils.isBlank(kubeMasterNode)) {
-                    throw new KubernetesException(KUBE_MASTER_NOT_INSTALLED);
+            if (!service.isRegistryOnly()) {
+                try {
+                    String kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(KUBE_MASTER);
+                    if (StringUtils.isBlank(kubeMasterNode)) {
+                        throw new KubernetesException(KUBE_MASTER_NOT_INSTALLED);
+                    }
+                    return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl restart " + service.getName() + " " + kubeMasterNode);
+                } catch (FileException | SetupException e) {
+                    logger.error(e, e);
+                    throw new KubernetesException(e);
                 }
-                return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl restart " + service.getName() + " " + kubeMasterNode);
-            } catch (FileException | SetupException e) {
-                logger.error (e, e);
-                throw new KubernetesException(e);
+            } else {
+                logger.info ("No restarting " + service.getName() + " since it's a registry only service");
+                return "";
             }
         } else {
             throw new UnsupportedOperationException("Restarting service for " + service.getName()
