@@ -268,6 +268,18 @@
             "comment": "The volumes to be automagically managed by EGMI.",
             "defaultValue": "",
             "value": "spark_eventlog,spark_data,flink_data,kafka_data,flink_completed_jobs,logstash_data,kubernetes_registry,kubernetes_shared"
+          },
+          {
+            "name": "target.volumes.performance.off",
+            "comment": "Volumes for which the performance setting sneeds to be turned off\n.",
+            "defaultValue": "",
+            "value": "kafka_data"
+          },
+          {
+            "name": "config.performance.off",
+            "comment": "Performance settings to turn off for volumes defined in 'target.volumes.performance.off'",
+            "defaultValue": "",
+            "value": "performance.quick-read,performance.io-cache,performance.write-behind,performance.stat-prefetch,performance.read-ahead,performance.readdir-ahead,performance.open-behind"
           }
         ]
       }
@@ -958,6 +970,13 @@
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": false
+      },
+      {
+        "masterElectionStrategy": "RANDOM",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": false,
+        "restart": true
       }
     ],
     "editableSettings": [
