@@ -1409,7 +1409,7 @@
         "properties": [
           {
             "name": "max-old-space-size",
-            "comment": "Maximum Old Space Size of the nodejs runtime for Kibana",
+            "comment": "Maximum Old Space Size of the nodejs runtime for Kibana. <b>Expressed in MB</b>",
             "defaultValue": "[ESKIMO_DEFAULT]"
           }
         ]

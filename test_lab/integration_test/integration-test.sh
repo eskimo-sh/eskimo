@@ -342,7 +342,7 @@ __dp_build_box() {
     vagrant up $1 >> /tmp/integration-test.log 2>&1
 
     echo_date "   + Updating the appliance"
-    vagrant ssh -c "sudo yum update -y" $1 >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "sudo bash -c 'if [[ -f \"/etc/debian_version\" ]]; then apt-get -y update && apt-get -y upgrade ; else yum update -y; fi'" $1 >> /tmp/integration-test.log 2>&1
 
     if [[ $2 == "MASTER" ]]; then
 
@@ -537,13 +537,13 @@ setup_eskimo() {
         '{"cerebro-Xms":"",
          "cerebro-Xmx":"800m",
          "elasticsearch-Xms":"800m",
-         "elasticsearch-Xmx":"1024m",
+         "elasticsearch-Xmx":"800m",
          "elasticsearch-action---destructive_requires_name":"",
          "elasticsearch-index---refresh_interval":"",
          "elasticsearch-index---number_of_replicas":"",
          "elasticsearch-index---number_of_shards":"",
          "flink-runtime-jobmanager---memory---process---size":"1100m",
-         "flink-runtime-taskmanager---memory---process---size:":"1200m",
+         "flink-runtime-taskmanager---memory---process---size:":"1100m",
          "flink-runtime-parallelism---default":"",
          "flink-runtime-taskmanager---numberOfTaskSlots":"",
          "gluster-target---volumes":"spark_eventlog,spark_data,flink_data,kafka_data,flink_completed_jobs,logstash_data,kubernetes_registry,kubernetes_shared",
@@ -552,7 +552,7 @@ setup_eskimo() {
          "grafana-admin_user":"",
          "grafana-admin_password":"",
          "kafka-Xms":"800m",
-         "kafka-Xmx":"1024m",
+         "kafka-Xmx":"800m",
          "kafka-num---network---threads":"",
          "kafka-num---io---threads":"",
          "kafka-socket---send---buffer---bytes":"",
@@ -560,9 +560,9 @@ setup_eskimo() {
          "kafka-socket---request---max---bytes":"",
          "kafka-num---partitions":"",
          "kafka-log---retention---hours":"",
-         "kibana-max-old-space-size":"800m",
-         "logstash-Xms":"850m",
-         "logstash-Xmx":"950m",
+         "kibana-max-old-space-size":"1024",
+         "logstash-Xms":"800m",
+         "logstash-Xmx":"800m",
          "spark-runtime-spark---driver---memory":"1100m",
          "spark-runtime-spark---rpc---numRetries":"",
          "spark-runtime-spark---rpc---retry---wait":"",
@@ -1304,8 +1304,9 @@ run_zeppelin_other_notes() {
 
     load_kibana_flight_data
 
-    echo_date " - ZEPPELIN running Elasticsearch Demo"
-    run_all_zeppelin_pararaphs "/ElasticSearch Demo (Queries)"
+    # TODO XXX re-enable ElasticSearch demo samle notebook execution once Zeppelin ES interpreter is fixed
+    #echo_date " - ZEPPELIN running Elasticsearch Demo"
+    #run_all_zeppelin_pararaphs "/ElasticSearch Demo (Queries)"
 
 }
 
