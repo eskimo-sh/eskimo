@@ -75,8 +75,9 @@ second time will force refresh the service iframe*.
 
 NTP - Network Time Protocol - is used within Eskimo to synchronize all node clocks on the eskimo cluster.
 
-Eskimo typically elects an NTP master synchronizing over internet (if available) and all other NTP instances are
-considered slaves and synchronize to this NTP master.
+Eskimo elects one of the NTP node as master. +
+The master synchronizes its time from internet servers (if available) and all other NTP nodes are
+considered slaves and synchronize their time from this NTP master.
 
 NTP on Eskimo is installed as a native SystemD / docker unit on hosts and doesn't run on Kubernetes.
 
@@ -84,7 +85,7 @@ NTP on Eskimo is installed as a native SystemD / docker unit on hosts and doesn'
 
 image::pngs/zookeeper-logo.png[50, 50, align="center"]
 
-Zookeeper is a distributed configuration and election tool used to synchronize kafka and mesos nodes and processes.
+Zookeeper is a distributed configuration and election tool used to synchronize kafka and EGMI nodes and processes.
 
 It is an effort to develop and maintain an open-source server which enables highly reliable distributed coordination.
 
@@ -94,7 +95,7 @@ distributed applications
 
 https://zookeeper.apache.org/
 
-Zookeeper is used by kafka to register topics, mesos for master election, gluster, etc.
+Zookeeper on Eskimo is installed as a native SystemD / docker unit on hosts and doesn't run on Kubernetes.
 
 ==== Zookeeper specificities within Eskimo
 
@@ -105,23 +106,25 @@ running the zookeeper container as `/usr/local/bin/zookeeperCli.sh`
 
 image::pngs/gluster-logo.png[50, 50, align="center"]
 
-Gluster is a free and open source software scalable network filesystem.
+Gluster is a free and open source software scalable network filesystem. +
+It's a scalable network filesystem suitable for data-intensive tasks such as cloud storage and media streaming.
+GlusterFS is free and open source software and can utilize common off-the-shelf hardware.
 
-GlusterFS is a scalable network filesystem suitable for data-intensive tasks such as cloud storage and media streaming. GlusterFS is free and open source software and can utilize common off-the-shelf hardware.
-
-GlusterFS is the common distributed filesystem used within eskimo. It is used to store business data and to
-synchronize eskimo cluster nodes.
+GlusterFS is the common distributed filesystem used within eskimo. It is used to store business data and share data and
+configuration among eskimo cluster nodes.
 
 https://www.gluster.org/
 
+GlusterFS on Eskimo is installed as a native SystemD / docker unit on hosts and doesn't run on Kubernetes. It is used
+by Kubernetes itself to store its shared configuration.
+
 ==== Gluster Infrastructure
 
-Eskimo approaches gluster shares management in a specific way. +
-Gluster runs from within a docker container and is isolated from the host operating system.
+Eskimo approaches gluster shares management in a specific way.
 
-
-Eskimo then leverages on EGMI - https://github.com/eskimo-sh/egmi - Eskimo Gluster Management Interface - to managed and
-operate the gluster cluster.
+First Gluster runs from within a docker container and is isolated from the host operating system. +
+Then Eskimo then leverages on EGMI - https://github.com/eskimo-sh/egmi - Eskimo Gluster Management Interface - to manage
+and operate the gluster cluster.
 
 The architecture can be depicted as follows:
 
@@ -135,30 +138,28 @@ Please refer to the EGMI page on github linked above for further description of 
 of the configuration file (part) `egmi.properties` in the Eskimo services configuration file `services.json`. Refer to
 the services development guide for a presentation of that file.
 
-==== Gluster shares management
+==== Gluster mounts management
 
 Gluster shares are mounted at runtime using standard mount command (fuse filesystem).
 
 However eskimo provides _Toolbox script_ that takes care of all the burden of managing shared folders with gluster.
 
-This _Toolbox script_ is the available at : `/usr/local/sbin/gluster_mount.sh`. +
+This _Toolbox script_ is the available on cluster nodes at: `/usr/local/sbin/gluster_mount.sh`. +
 This script is called as follows:
 
 .calling /usr/local/sbin/gluster_mount.sh
 ----
-/usr/local/sbin/gluster_mount.sh VOLUME_NAME MOUNT_POINT
+/usr/local/sbin/gluster_mount.sh VOLUME_NAME MOUNT_POINT OWNER_USER_ID
 ----
 
 where:
 
 * `VOLUME_NAME` is the name of the volume to be created in the gluster cluster
 * `MOUNT_POINT` is the folder where to mount that volume on the local filesystem.
+* `OWNER_USER_ID` the user to which the mount points should belong
 
-The beauty of this script is that it takes care of everything:
-
-* Registering the local node with the gluster cluster if not already done
-* Creating the volume in gluster if not already done
-* Registering the mount point in `/etc/fstab` and systemd for automatic remount
+The beauty of this script is that it takes care of everything, from manioulating /etc/fstab to configuring SystemD
+automount properly, etc.
 
 This script is related to the mount part (the client part) on hosts OSes running on the Eskimo cluster.
 A similar script is provided to run from within container to mount gluster shares from within containers
@@ -169,9 +170,8 @@ EGMI takes care of the GlusterFS backend management part.
 
 Some notes regarding gluster usage within Eskimo:
 
-* Eskimo's pre-packaged services leverage on gluster for their data share need between marathon services and services
-running natively on node hosts and controlled by systemd. Gluster provides the abstraction of location of the filesystem
-for services deployed on the cluster by Marathon.
+* Eskimo's pre-packaged services leverage on gluster for their data share need between services running on different
+cluster nodes. Gluster provides the abstraction of location of the filesystem for services.
 * Gluster mounts with fuse are pretty weak and not very tolerant to network issues. For this reason a watchdog runs
 periodically that fixes gluster mounts that might have been disconnected following a network cut or another network
 problem
@@ -181,14 +181,45 @@ problem
 
 image::pngs/kubernetes-logo.png[50, 50, align="center"]
 
-TODO Kube specificities (kube router, etcd, etc.)
+Kubernetes is an open-source container orchestration system for automating software deployment, scaling, and management.
 
-TODO Kubernetes Dashboard and other pre-packages images (dns, pause)
+Eskimo leverages on Kubernetes to distribute services and management consoles on the Cluster nodes. Aside of some
+services required for Kubernetes itself - such as GlusterFS, Zookeeper (used by EGMI actually) and ntp - all Eskimo
+services are now distributed by and operated on Kubernetes.
 
-TODO Gluster shares for Kubernetes
+Kubernetes requires etcd to store and manage its configuration and Eskimo takes care of deploying etcd. +
+Eskimo also takes care of each and every bits and bytes of configuration related to Kubernetes. Kubernetes is exposed to
+administrators but they are not forced to be aware of it. Eskimo automates each and every tak related to Kubernetes such
+as deploying services and PODs, configuring endpoints, creating SSL certificates, etc.
+Eskimo also created roles and users required to operate Kubernetes and sets up host level DNS configuration to enable
+host-native services to call Kubernetes services by their name.
 
-TODO URL
+Eskimo separates Kubernetes components in two families :
 
+* The *Kube Master* which packages
+** The `kube-apiserver`
+** The `kube-controller-manager`
+** The `kube-scheduler`
+** A Kube proxy process
+* The *Kube Slave* which packages
+** The `kubelet`
+** The `kube-router`
+
+https://kubernetes.io/
+
+==== Kubernetes specificities within Eskimo
+
+The Kube Master takes care of deploying the *CoreDNS* POD and package.
+
+The *Kube Router* is used for networking, firewalling and proxying on eskimo cluster nodes.
+
+Both the Kube Master packages and the Kube Slave package takes care of mounting the gluster volume used to store
+the Kubernetes configuration to make it available to both master and slave processes.
+
+All kubernetes system Docker images such as CoreDNS, Pause, etc. are packaged by Eskimo and deployed automatically.
+
+Last but not least, Eskimo defines required endpoints automatically to make gluster available as a volume provider to
+kubernetes services.
 
 
 === Elastic Logstash
@@ -206,11 +237,15 @@ https://www.elastic.co/products/logstash
 
 ==== Logstash specificities within Eskimo
 
-With Eskimo, logstash runs in a docker container ans as such it is pretty isolated from the host Operating System but
-also from other containers. +
-This can be a problem whenever one wants to call logstash form the host machine or even worst, from another container.
+Whenever logstash is distributed as a docker container, and yet to be used from other containers, such as Zeppelin,
+these containers can hardly (there are ways, but they are cumbersome) instantiate logstash processes. This is solved
+within Eskimo by leveryging on a command server and an _always on_ container with the logstash software.
 
-Eskimo provides two key features to circumvent this problem:
+THis command server is deployed as a Kubernetes StatefulSet in such a way that Kubernetes schedules this container on
+every Eskimo cluster node. +
+The command server in these containers takes care of invoking logstash processes with the arguments passed to its API.
+
+This works as follows:
 
 1. First, the folder `/var/lib/logstash/data` is shared between the host, the zeppelin container and the logstash
 containers. As such, `/var/lib/logstash/data` can be used to pass data to logstash. +
@@ -219,25 +254,31 @@ In a cluster environment, `/var/lib/logstash/data` is shared among cluster nodes
 2. Eskimo provides a command `/usr/local/bin/logstash-cli` that acts as a command line client to the logstash server
 container. +
 Whenever one calls `logstash-cli`, this client command invokes logstash in the logstash container (potentially remotely
-on another node) and passes the arguments is has been given to the logstash instance.
+on another node through kubernetes) and passes the arguments is has been given to the logstash instance.
 
 `logstash-cli` supports all logstash arguments which are passed through to the invoked logstash instance within the
 logstash container. +
-In addition, it supports two non standard arguments that are specific to eskimo:
+In addition, it supports two non-standard arguments that are specific to eskimo:
 
-* `-target_host XXX.XXX.XXX.XXX` which is used to identify the cluster node on which to invoke logstash. Within the
-Zeppelin container, this can safely be set to `localhost` since there is mandatorily a logstash container available on
-the node(s) running Zeppelin.
 * `-std_in /path/to/file` which is used to pass the given file as STDIN to the invoked logstash instance. This is
 unfortunately required since piping the STDIN of the logstash-cli command to the remote logstash instance is not
 supported yet.
 
-==== Gluster shares for Spark
+==== logstash-cli package
 
-Nodes where logstash is installedautomatically have the following gluster share created and mounted:
+A specific package called logstash cli packages the `logstash-cli` command presented above and makes it available on
+nodes where it is installed.
+
+In addition to the command server / `logstash-cli` couple, a `logstash` command wrapper is provided that invokes
+logstash in an ad'hoc container created on the fly.
+
+==== Gluster shares for Logstash
+
+Nodes where logstash is installed automatically have the following gluster share created and mounted:
 
 * `/var/lib/elasticsearch/logstash/data` which can be used to pass data to logstash instances or retrieve data from
 logstash instances.
+
 
 === ElasticSearch
 
@@ -253,6 +294,9 @@ you want. Start simple with one question and see where it takes you.
 
 https://www.elastic.co/products/elasticsearch
 
+ElasticSearch is deployed as a Kubernetes StatefulSet in such a way that Kubernetes schedules an ElasticSearch instance
+on every Eskimo cluster node.
+
 === Cerebro
 
 image::pngs/cerebro-logo.png[50, 50, align="center"]
@@ -263,6 +307,9 @@ tool.
 Monitoring the nodes here includes all indexes, all the data nodes, index size, total index size, etc
 
 https://github.com/lmenezes/cerebro
+
+Cerebro is deployed in Kubernetes as a _deployment_, ensuring it's availability on another node when the former node
+running it goes down.
 
 === Elastic Kibana
 
@@ -275,6 +322,9 @@ Kibana gives you the freedom to select the way you give shape to your data. And 
 you’re looking for. With its interactive visualizations, start with one question and see where it leads you.
 
 https://www.elastic.co/products/kibana
+
+Kibana is deployed in Kubernetes as a _deployment_, ensuring it's availability on another node when the former node
+running it goes down.
 
 ==== Kibana specificities within Eskimo
 
@@ -290,6 +340,7 @@ such as obviously visualizations, saved searches, index patterns, etc. need to b
 In addition to the Kibana native samples distributed along Kibana, Eskimo provisions a sample Dashboard for Berka
 transactions used in Zeppelin sample notes.
 
+
 === Apache Kafka
 
 image::pngs/kafka-logo.png[50, 50, align="center"]
@@ -301,6 +352,10 @@ wicked fast, and runs in production in thousands of companies.
 
 https://kafka.apache.org/
 
+Kafka is deployed as a Kubernetes StatefulSet in such a way that Kubernetes schedules an Kafka instance
+on every Eskimo cluster node.
+
+
 === Kafka Manager
 
 image::pngs/kafka-logo.png[50, 50, align="center"]
@@ -311,6 +366,9 @@ KafkaManager enables to manage multiples clusters, nodes, create and delete topi
 generate partition assignments, monitor statistics, etc.
 
 https://github.com/lmenezes/cerebro
+
+Kafka Manager is deployed in Kubernetes as a _deployment_, ensuring it's availability on another node when the former
+node running it goes down.
 
 
 === Apache Spark
@@ -456,12 +514,12 @@ be used to program Spark batch jobs, Spark Streaming jobs, Flink jobs, etc.
 
 The different sample note packages with Eskimo and available from within Zeppelin are described hereafter.
 
-===== ElasticSearch Demo (Queries)
-
-This is a very simple demo note showing how to submit queries to ElasticSearch from a Zeppelin note.
-
-It uses the elasticsearch interpreter from Zeppelin. +
-One needs to have loaded the "Sample flight data" from within Kibana in prior to execute the queries from this notebook.
+//===== ElasticSearch Demo (Queries)
+//
+//This is a very simple demo note showing how to submit queries to ElasticSearch from a Zeppelin note.
+//
+//It uses the elasticsearch interpreter from Zeppelin. +
+//One needs to have loaded the "Sample flight data" from within Kibana in prior to execute the queries from this notebook.
 
 ===== Logstash Demo
 
@@ -622,15 +680,15 @@ WARNING: The default _username_ / _password_ can onyl be changed *before* Grafan
 Eskimo is able to provision Grafana dashboards automatically at installation time.
 
 * dashboards and all references objects exports need to be put under `services_setup/grafana/provisioning/dashboards`
-such as e.g. `services_setup/grafana/provisioning/dashboards/mesos-monitoring.json` along with a `yml` file describing the
-dashboard (look at examples)
+such as e.g. `services_setup/grafana/provisioning/dashboards/system-monitoring.json` along with a `yaml` file describing
+the dashboard (look at examples)
 
 
 ==== Pre-packaged Grafana Dashboards
 
 Eskimo CE provides two pre-packaged Grafana dashboards :
 
-* *Eskimo System Wide Monitoring* : This is the global cluster sttaus monitoring dashboard. This dashboard is the one
+* *Eskimo System Wide Monitoring* : This is the global cluster status monitoring dashboard. This dashboard is the one
 used on the Eskimo Status Page.
 * *Eskimo Nodes System Monitoring* : This s a complete monitoring dashboard showing all individual eskimo cluster nodes
 metrics. It is intended for fine-grained monitoring and debugging purpose.

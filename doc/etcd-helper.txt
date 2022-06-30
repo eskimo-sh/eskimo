@@ -2,3 +2,9 @@
 
 # Get top-level keys and values
 /usr/local/bin/etcdctl get / --prefix
+
+# remove node
+etcdctl member remove 7a6ff46678be7f4c
+
+# add node
+etcdctl member add node1 --peer-urls=http://192.168.56.21:2380
