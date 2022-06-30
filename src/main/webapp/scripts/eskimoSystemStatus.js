@@ -1138,7 +1138,7 @@ eskimo.SystemStatus = function() {
             type: "GET",
             dataType: "json",
             url: "get-status",
-            timeout: 1000 * 10, // 10 secs
+            timeout: 1000 * 35, // 35 secs
             success: function (data, status, jqXHR) {
 
                 disconnectedFlag = false;
