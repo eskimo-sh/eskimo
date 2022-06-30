@@ -5,30 +5,32 @@ In the current version, eskimo provides pre-packaged docker images as well as se
 pre-packaged software components.
 
 Eskimo takes care of everything regarding the building of the docker images for these software components as well
-their setup, installation and operation on the eskimo cluster nodes. +
-Supported packaged services are defined at three different leveks in order to be operable by Eskimo:
+their setup, installation and operation on the eskimo cluster nodes.
+
+This chapter gives some additional information related to these software components operated by eskimo, presents some
+design decisions regarding their operation as well as implementation detaild of the Eskimo *pre-packaged software
+components*.
+
+=== Eskimo services operation principles
+
+Supported packaged services are defined at different levels in order to be operable by Eskimo:
 
 1. They must be defined and configured in the configuration file `services.json`
 2. They must have a `setup.sh` script in their `services_setup` folder.
-3. They must have a docker image available containing the _ready-to-run_ vanilla software.
+3. (Optionally) they should have a docker image available containing the _ready-to-run_ vanilla software (if it's a
+docker service)
+4. (Optionally) they should have a SystemD unit file for Eskimo to be able to manage the service through Systemd (for
+non-kubernetes services)
+5. (Optionally) they should have a Kubernetes deployment descriptor for Eskimo to be able to manage the service through
+Kubernetes (for kubernetes services)
 
 This is detailed in the
 https://www.eskimo.sh/doc/service-dev-guide.html#services_installation_framework[Service Installation Framework Guide].
 
-
-
-This chapter gives some additional information related to these software components as well as present some design
-decisions regarding their operation.
-
-=== Operation principles
-
-We won't go into all details of each and every of the list of software components packaged within eskimo.
-
-We are just describing hereunder, in a raw fashion, some important specificities for some of them.
-
 ==== Systemd unit configuration files
 
-Eskimo uses SystemD to manage and operate services. Services themselves are implemented as docker containers.
+Some services leverages on SystemD to be managed and operated by Eskimo. Services themselves are implemented as docker
+containers.
 
 This is how docker operations are mapped to systemctl commands :
 
@@ -38,6 +40,13 @@ This is how docker operations are mapped to systemctl commands :
 Since every restart of a service creates actually a new docker container, containers are inheritently not stateful and
 freshly restarted every time. +
 This is why the persistent data is stored under sub-folders of `/var/lib` which is mounted to the docker container.
+
+==== Kubernetes Deployment descriptos
+
+But most services are Kubernetes services instead of native SystemD services.
+
+They canbe managed using the Kubernetes Dashboard - which is prepackaged with Eskimo - or with the help of the
+`kubectl` command.
 
 ==== Commands wrappers for kafka, logstash, spark and flink
 
@@ -69,6 +78,8 @@ NTP - Network Time Protocol - is used within Eskimo to synchronize all node cloc
 Eskimo typically elects an NTP master synchronizing over internet (if available) and all other NTP instances are
 considered slaves and synchronize to this NTP master.
 
+NTP on Eskimo is installed as a native SystemD / docker unit on hosts and doesn't run on Kubernetes.
+
 === Zookeeper
 
 image::pngs/zookeeper-logo.png[50, 50, align="center"]
@@ -90,7 +101,7 @@ Zookeeper is used by kafka to register topics, mesos for master election, gluste
 The script `zkCli.sh` enabling an administrator to browse, query and manipulate zookeeper is available on the host
 running the zookeeper container as `/usr/local/bin/zookeeperCli.sh`
 
-=== glusterFS
+=== GlusterFS
 
 image::pngs/gluster-logo.png[50, 50, align="center"]
 
@@ -152,7 +163,7 @@ The beauty of this script is that it takes care of everything:
 This script is related to the mount part (the client part) on hosts OSes running on the Eskimo cluster.
 A similar script is provided to run from within container to mount gluster shares from within containers
 (as required for instance for marathon operated services) : `inContainerMountGluster.sh`. +
-EGMI takes care of the server part.
+EGMI takes care of the GlusterFS backend management part.
 
 ==== Gluster specificities within Eskimo
 
@@ -164,6 +175,20 @@ for services deployed on the cluster by Marathon.
 * Gluster mounts with fuse are pretty weak and not very tolerant to network issues. For this reason a watchdog runs
 periodically that fixes gluster mounts that might have been disconnected following a network cut or another network
 problem
+
+
+=== Kubernetes
+
+image::pngs/kubernetes-logo.png[50, 50, align="center"]
+
+TODO Kube specificities (kube router, etcd, etc.)
+
+TODO Kubernetes Dashboard and other pre-packages images (dns, pause)
+
+TODO Gluster shares for Kubernetes
+
+TODO URL
+
 
 
 === Elastic Logstash
@@ -287,36 +312,6 @@ generate partition assignments, monitor statistics, etc.
 
 https://github.com/lmenezes/cerebro
 
-=== Apache Mesos
-
-image::pngs/mesos-master-logo.png[50, 50, align="center"]
-
-Apache Mesos abstracts CPU, memory, storage, and other compute resources away from machines (physical or virtual),
-enabling fault-tolerant and elastic distributed systems to easily be built and run effectively.
-
-Mesos is a distributed system kernel. Mesos is built using the same principles as the Linux kernel, only at a
-different level of abstraction. +
-The Mesos kernel runs on every machine and provides applications (e.g., Hadoop, Spark, Kafka, Flink) with
-API’s for resource management and scheduling across entire datacenter and cloud environments.
-
-http://mesos.apache.org/
-
-==== mesos-cli
-
-Eskimo provides a specific command line tool for manipulating mesos frameworks: `/usr/local/bin/mesos-cli.sh` installed
-on all nodes of the eskimo cluster. +
-This tool can be used to list running frameworks, force kill them in a reliable way, etc.
-
-=== Mesosphere Marathon
-
-image::pngs/marathon-logo.png[80, 80, align="center"]
-
-Marathon is a production-grade container orchestration platform for Apache Mesos.
-
-Eskimo leverages on Marathon to distribute services, consoles and Web Applications accross Eskimo cluster nodes. Eskimo
-provides virtual routing to the runtime node running services and wraps the HTTP traffic through SSH tunnels.
-
-https://mesosphere.github.io/marathon/
 
 === Apache Spark
 

@@ -193,10 +193,7 @@ apt-get -yq update
 apt-get -yq install docker-ce docker-ce-cli containerd.io
 
 # other dependencies
-apt-get -y install libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev
-
-# other dependencies
-apt-get -yq install net-tools attr
+apt-get -y install ipset binutils net-tools attr
 
 # glusterfs client
 apt-get -y install glusterfs-client
@@ -224,10 +221,7 @@ yum-config-manager --add-repo https://download.docker.com/linux/$LINUX_DISTRIBUT
 yum install -y docker-ce docker-ce-cli containerd.io
 
 # other dependencies
-yum install -y zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-md5 apr-devel subversion-devel apr-util-devel
-
-# other dependencies
-yum install -y net-tools anacron
+yum install -y ipset binutils net-tools anacron
 
 # glusterfs client
 yum -y install glusterfs glusterfs-fuse
@@ -244,17 +238,14 @@ sudo zypper --non-interactive refresh | echo 'a'
 sudo zypper install -y docker
 
 # other dependencies
-sudo zypper install -y zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel cyrus-sasl-plain cyrus-sasl-crammd5 apr-devel subversion-devel apr-util-devel
-
-# other dependencies
-sudo zypper install -y net-tools cron
+sudo zypper install -y ipset binutils net-tools cron
 
 # glusterfs client
 sudo zypper install -y glusterfs
 ----
 
 *Again, if eskimo cluster nodes have no internet access in your setup, you need to install all the corresponding
-packages* (this listed above and their transitive dependencies) *before you can use these machines as
+packages* (those listed above and their transitive dependencies) *before you can use these machines as
 eskimo cluster nodes.*
 
 ===== Eskimo system user
@@ -264,9 +255,8 @@ That user can be any user but it has to be configured in Eskimo - see <<user_con
 access to every single node to be operated by eskimo using SSH Public Key Authentication -
 see <<ssh_key_authentication>>.
 
-*In addition, that user needs to have sudo access without requiring to enter a password!*
-
-The ability for the configured user is absolutely key.
+*In addition, that user needs to have sudo access (wildcard) without requiring to enter a password!*
+This `sudo` ability for the configured user is absolutely key.
 
 On most systems, this means:
 
@@ -278,11 +268,12 @@ On most systems, this means:
 
 ===== Protecting eskimo nodes with a firewall
 
-The different sevices operated by Eskimo require different set of ports to communicate with each others.
+The different sevices operated by Eskimo require different set of ports to communicate with each others. As such,
+internal cluster communications - all IP addresses used by the cluster nodes - have to be whitelisted in the firewall.
 
-In case a firewall (firewalld or simple iptables configuration) is installed on eskimo cluster nodes, then
-the following port numbers need to be explicitly open (for both UDP and TCP) on every single node in the cluster for
-eskimo access:
+The cluster nodes can protect from external access - IP addresses not belonging to the eskimo cluster nodes - by
+blocking pretty much every port except port 22, which is the single port used by eskimo to reach eskimo cluster
+services.
 
 *IN ADDITION TO THE STATIC PORTS LISTED BELOW, A WHOLE SET OF PORT RANGES ARE USED BY THE KUBERBNETES INFRASTRUCTURE,
 ELASTICSEARCH, SPARK EXECUTORS AND FLINK WORKERS TO COMMUNICATE WITH EACH OTHER. THESE DYNAMIC PORTS ARE CREATED ON THE
@@ -292,7 +283,13 @@ FLY AND HAVING THEM CLOSED BY THE FIREWALL WOULD SIMPLY PREVENT THEM FROM WORKIN
 firewall is filtering out the internal eskimo cluster nodes IP addresses from the exclusion rules. +
 Every eskimo node should have wide access to every other node in the eskimo cluster. Period.*
 
-However, it is important to filter out every single access attempt originating from outside the Eskimo cluster. The
+Specifically on RHEL, firewalld in its default configuration (coming out of the box) is preventing eskimo services from
+reaching each others and compromises Eskimo's behaviour. It needs to be properly configured and white list all
+communications (all ports) in between Eskimo cluster nodes. Or just disable firewalld for a non-production critical
+deployment (`sudo disable firewalld` and `sudo stop firewalld`).
+
+On the opposite side, as far as external eskimo clustet communications are concerned,
+it is important to filter out every single access attempt originating from outside the Eskimo cluster. The
 only open port for requests outside of the eskimo cluster should be the port 22 used by SSH since all accesses from the
 Eskimo console to the nodes from the Eskimo cluster happens through SSH tunnels.
 
@@ -362,7 +359,8 @@ file. See <<user_file>>
 [[user_file]]
 === Access eskimo
 
-With eskimo properly started using the scripts in `bin` discussed above, one can reach eskimo using http://machine_ip:9191. +
+With eskimo properly started using the scripts in `bin` discussed above, one can reach eskimo using
+http://machine_ip:9191. +
 The default port number is 9191. This can be changed in configuration file `eskimo.properties`.
 
 *The default login / password credentials are _admin_ / _password_.*
@@ -545,7 +543,6 @@ usermod -a -G docker $USER
 
 # (system or at least shell / process restart required after this)
 ----
-
 
 
 ==== Checking for updates
