@@ -113,7 +113,7 @@ available from within Eskimo.
 They are disposed in the menu under "_Eskimo Services_".
 
 The pre-packaged web consoles with Eskimo are Zeppelin, EGMI, Kibana, Grafana, Cerebro, Spark History Server,
-Flink App Manager, Kafka Manager, the Mesos Console and the Marathon Console.
+Flink App Manager, Kafka Manager and the Kubernetes Dashboard.
 
 
 ==== Demo Mode
@@ -126,7 +126,7 @@ In Demo Mode, following actions are blocked:
 
 * Reinstalling a service
 * Changing or re-applying nodes configuration
-* Changing or re-applying marathon configuration
+* Changing or re-applying kubernetes configuration
 * Changing or re-applying setup configuration
 
 Demo Mode is activated by changing the property `eskimo.demoMode` to `true` in the confguration file `eskimo.properties`:
@@ -136,7 +136,7 @@ Demo Mode is activated by changing the property `eskimo.demoMode` to `true` in t
 # Whether to put eskimo in Demo Mode (true, false)
 # The eskimo demo mode is used for the DemoVM. In demo mode, following restrictions apply:
 # - Cannot change nodes config
-# - Cannot change marathon config
+# - Cannot change kubernetes config
 # - Cannot re-install a service
 eskimo.demoMode=false
 ----

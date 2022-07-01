@@ -163,7 +163,7 @@ automount properly, etc.
 
 This script is related to the mount part (the client part) on hosts OSes running on the Eskimo cluster.
 A similar script is provided to run from within container to mount gluster shares from within containers
-(as required for instance for marathon operated services) : `inContainerMountGluster.sh`. +
+(as required for instance for kubernetes operated services) : `inContainerMountGluster.sh`. +
 EGMI takes care of the GlusterFS backend management part.
 
 ==== Gluster specificities within Eskimo
@@ -394,17 +394,14 @@ executors as well
 * `/var/lib/spark/eventlog` where the spark executors and the spark driver store their logs and used by the spark
 history server to monitor spark jobs.
 
-==== Other spark specificities within Eskimo
+==== Other Spark specificities within Eskimo
 
-When running on Apache Mesos, Spark needs a special process to be up and running to orchestrate the shuffle stage in
-between executor processes on the various nodes. With Dynamic allocation, Spark needs to understand the executor
-topology operated by Mesos. +
-A special process needs to be up and running on every node where spark executors can be run for this very need, the
-_Mesos Shuffle Service_.
+The spark runtime is a _registry only_ service. As long as no start job is running, there is no spark POD running in
+kubernetes. The spark driver takes care of instantiating spark executor as Kubernetes POD. The Spark driver itself can
+run within Kubernetes as a POD or outside Kubernetes as a standalone process.
 
-Within Eskimo, this _Mesos Shuffle Service_ is identified as the `spark-executor` service which serves two intents:
-operating the _Mesos Shuffle Service_ and setting up host-level requirements to optimize spark executors execution from
-Mesis on every node of the Eskimo cluster.
+The _Spark History Server_ on the other hand, leveraging on the same container image as spark runtime PODs, is always up
+and running as a Kubernetes POD.
 
 === Apache Flink
 
@@ -431,6 +428,10 @@ gluster shares created and mounted:
 * `/var/lib/flink/data flink` used to store data to be shared amoung flink workers.
 * `/var/lib/flink/completed_jobs` where flink completed jobs are stored.
 
+==== Other Flink specificities within Eskimo
+
+A Flink POD is always running, it's the Job Manager service which is constantly up and running and takes care of
+instantiating Task Manager PODs.
 
 === Apache zeppelin
 
@@ -476,13 +477,6 @@ An additional share exist in order to be able to share data to the zeppelin dock
 ** `/var/lib/zeppelin/data` used to share data between hosts and the zeppelin container (also automatically shared by
 gluster when deploying in cluster mode).
 
-==== A note on memory.
-
-In the zeppelin _services installation framework_ root folder the zeppelin marathon configuration file
-`zeppelin.marathon.json` defines the memory available for zeppelin as 4.5 GB (`"mem": 4500`). +
-While this is fine for a single user usage, it's far from sufficient for a multi-user production environment.
-This should be increased to a minimal additional 2Gb for every user intending to use Zeppelin concurrently.
-
 ==== _Shared_ or _Per Note_ interpreters
 
 Zeppelin's interpreters - such as the Spark interpreter wrapping the spark submit process or the ElasticSearch
@@ -498,9 +492,7 @@ For this reason, *in a production multi-user environment, it's important to make
 `per_note`* thus enabling a much better isolation between users. +
 In this case, it's also very important to significantly increase the amount of memory available to the zeppelin
 container to something with minimum 2Gb per user using Zeppelin concurrently with a 2Gb base (e.g. 2 users would
-mean 2 Gb Base + 2 x 2 Gb for each user, hence 6Gb RAM in total to give to Zeppelin). The available memory for Zeppelin
-is defined in the _zeppelin service marathon configuration file_ named `zeppelin.marathon.json` located in the zeppelin
-sub -folder of the `services_setup` folder.
+mean 2 Gb Base + 2 x 2 Gb for each user, hence 6Gb RAM in total to give to Zeppelin).
 
 *Eskimo Enterprise Edition* is required if one wishes to separate Zeppelin's interpreters *per user*.
 

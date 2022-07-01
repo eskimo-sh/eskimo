@@ -2,26 +2,28 @@
 [[chap-cluster-setup]]
 == Setting up the eskimo cluster
 
-Right after the initial setup presented in the previous chapter. The administrator can start setting up and installing
-the Eskimo Big Data Analytics cluster.
+Right after the initial setup (menu entry "*Setup*") presented in the previous chapter. The administrator can start
+setting up and installing the Eskimo Big Data Analytics cluster.
 
 The process is the following:
 
-1. *Service settings configuration*. Fine tune the settings for the services one is about to install on the Eskimo cluster
-2. *Nodes and native services layout configuration* : Declare the IP addresses of the nodes to me installed and operated
-by eskimo and select the native services that should run on these nodes
-3. *Marathon services selection* : Declare which of the marathon services you want to deploy on the cluster
+1. *Service settings configuration*. Fine tune the settings for the services about to be installed on the Eskimo cluster
+2. *Nodes and native services layout configuration* : Declare the IP addresses of the Eskimo cluster nodes nodes to
+be installed and operated by eskimo and select the native services (as opposed to Kubernetes) that should run on these
+nodes
+3. *Marathon services selection* : Pick up the Kubernetes services to be deployed on the cluster
 
 === Services settings configuration
 
 The most essential settings for all eskimo pre-packaged services are set automatically in such a way that the nominal
 analytics use cases of an eskimo cluster work out of the box.
 
-But for many specific use cases, the default values for these settings as handled by Eskimo are not sufficient. +
+Huewver, for many specific use cases, the default values for these settings as handled by Eskimo are not sufficient. +
 For this reason, Eskimo CE embeds a settings editor enabling administrators to fine tune runtime settings for eskimo
 embedded services.
 
-The settings editor is available from the menu under "Configured Services":
+The service settings editor is available from the menu under "Configured Services", third menu entry under
+"*Platform Administration*".
 
 image::pngs/eskimo-settings.png[800, 800, align="center"]
 
@@ -31,15 +33,18 @@ The default values enforced by eskimo right after installation are indicated.
 
 === Nodes and native services layout configuration
 
-The fourth menu entry under "*Platform Administration*" is the most important part of the Eskimo Administration console:
-it provides the system administrators / Eskimo Users with the way to deploy the eskimo managed native services on the
-eskimo cluster nodes.
+The fourth menu entry under "*Platform Administration*" is leads to an essential part of the Eskimo Administration
+console: it provides the system administrators / Eskimo Users with the way to deploy the eskimo managed native services
+on the eskimo cluster nodes.
 
-Eskimo native services are docker containers managed (started / stopped / monitored / etc.) by systemd.
-Native services are operated by SystemD directly on the nodes, while marathon services are operated through Mesos /
-Marathon.
+Eskimo native services are docker containers managed (started / stopped / monitored / etc.) by SystemD.
+Native services are operated by SystemD directly on the nodes, while Kubernetes services are operated, well, through
+kubernetes.
 
-Setting up a native services on the eskimo cluster usually boils down to these 2 phases :
+Kubernetes itself is not a docker service but installed natively on nodes in this phase of the installation process as
+well.
+
+Setting up a native services on the eskimo cluster usually boils down to these 2 steps:
 
 * Adding nodes to the eskimo cluster - using the _Add Node_ button or ranges of nodes using the _Add Range_ button.
 * Selecting the services that should be deployed and operated and the configured nodes
@@ -48,7 +53,7 @@ Below is an example of a tiny cluster with three nodes setup:
 
 image::pngs/eskimo-nodes-config.png[800, 800, align="center"]
 
-As a sidenote, whenever nodes share the same configuration, they can be defined as a _range of IP addresses_ instead
+Whenever nodes share the same configuration, they can be defined as a _range of IP addresses_ instead
 of defining each and every one of them, thus simplifying the configuration as explained in the next section.
 
 ==== Adding nodes to the eskimo cluster
@@ -69,25 +74,25 @@ node in a range is not answering. +
 holes in your range of IPs.* This is fairly important if you want Eskimo to be able to
 successfully manage your cluster.
 
-WARNING: In its current version (0.3 at the time of writing this document), eskimo *requires at all cost* nodes to be
-defined using IP addresses and in no way are hostnames or DNS names supported. In this version of eskimo, only IP
+WARNING: In its current version (0.4 at the time of writing this document), eskimo *requires at all cost nodes to be
+defined using IP addresses* and in no way are hostnames or DNS names supported. In this version of eskimo, only IP
 addresses are supported, period. +
-Unfortunately with big data technologies and especially spark and mesos, supporting DNS or hostnames is significantly
-more complicated than direct IP addresses resolutions. +
-We are working on this and the next version of eskimo will support working with hostnames instead of IP addresses. But
-for the time being, administrators need to configure eskimo using IP addresses and only IP addresses.
+Unfortunately with big data technologies and especially spark and kubernetes, supporting DNS or hostnames is
+significantly more complicated than direct IP addresses lookup. +
+We are working on this and in a further version of eskimo will support working with hostnames instead of IP addresses.
+But for the time being, administrators need to configure eskimo using IP addresses and only IP addresses.
 
 ==== Deploying services
 
-With all nodes from the cluster to be managed by eskimo properly identified either as single node or as part of a range
-of nodes, services can be configured and deployed.
+With all nodes from the cluster to be managed by eskimo properly identified (either as single node or as part of a
+range) of nodes, services can be configured and deployed.
 
 image::pngs/multiple-services.png[600, 600, align="center"]
 
 ==== Master services
 
 Some services are considered *master services* and are identified on the _services selection_ window as unique services
-(understand services that can be deployed only once, e.g. Kibana, Zeppelin, Mesos-Master, etc.) and configured using
+(understand services that can be deployed only once, e.g. Zookeeper, the Kube Master, etc.) and configured using
 a radio button
 
 These "_Master services_" - considered unique - can only be configured in single node configuration and only once for
@@ -96,7 +101,7 @@ the whole cluster:
 ==== Slave services
 
 Some other services are considered *slave services* and can be deployed at will, on one single or all nodes of the
-cluster (understand services that can be deployed multiple times, e.g. elasticsearch, kafka, mesos-agent, etc.) and
+cluster (understand services that can be deployed multiple times, e.g. NTP, GlusterFS, Kube Slave, etc.) and
 configured using a checkbox on the _services selection_ window.
 
 These "_Slave Services_" - considered multiple - can be configured at will.
@@ -115,7 +120,7 @@ nodes, slave services can be removed from nodes or added at will after the initi
 Eskimo takes care of everything !*
 
 As a sidenote, _Eskimo Community Edition_ doesn't support high availability for master services, one needs to acquire
-_Eskimo Enterprise Edition_ for high availability.
+_Eskimo Enterprise Edition_ for full high availability anf failover support.
 
 *Applying configuration* is also useful when a service is reporting an error for instance such as needed restart or
 being reported as vanished. +
@@ -135,17 +140,17 @@ latest service docker image available. +
 Dependent services will be properly restarted.
 
 
-=== Marathon Services Selection
+=== Kubernetes Services Selection
 
-The last step in the Eskimo cluster installation consists in deploying marathon services.
+The last step in the Eskimo cluster installation consists in deploying kubernetes services.
 
-This is performed by the fifth menu entry under "*Platform Administration*" called "*Config. Marathon Services*".
+This is performed by the fifth menu entry under "*Platform Administration*" called "*Config. Kubernetes Services*".
 
 The process is actually very simple and one just needs to select the services to be installed and operated automatically
-by marathon.
+by Kubernetes, along with the CPU and RAM resource rewuest to be passed to Kubernetes.
 
-image::pngs/eskimo-marathon-setup.png[800, 800, align="center"]
+image::pngs/eskimo-kubernetes-config.png[800, 800, align="center"]
 
-Just as for native node host services, Eskimo provides a possibility to force the reinstallation of marathon services. +
-Just click on the "Force Reinstall" button and choose which services should be re-installed on marathon.
+Just as for native node host services, Eskimo provides a possibility to force the reinstallation of Kubernetes services. +
+Just click on the "Force Reinstall" button and choose which services should be re-installed on kubernetes.
 
