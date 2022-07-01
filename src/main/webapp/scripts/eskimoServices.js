@@ -350,6 +350,7 @@ eskimo.Services = function () {
             setTimeout (function (effUIConfig) {
                 $.ajax({
                     type: "GET",
+                    timeout: 1000 * 10, // 10 secs. We don't want this call to hang !
                     url: effUIConfig.targetUrl,
                     success: function (data, status, jqXHR) {
 

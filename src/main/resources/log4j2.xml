@@ -80,6 +80,8 @@ Software.
         <Logger name="ch.niceideas.eskimo.services" level="debug"/>
         <Logger name="ch.niceideas.eskimo.services.ConnectionManagerService" level="info"/>
         <Logger name="org.apache.juli" level="fatal"/>
+
+        <!--Logger name="org.apache.http.impl.conn.PoolingHttpClientConnectionManager" level="debug"-->
     </Loggers>
 
 </Configuration>

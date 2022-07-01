@@ -77,7 +77,7 @@ public class ConnectionManagerService {
     private int sshKeyExchangeTimeout = 20000;
 
     @Value("${connectionManager.maximumConnectionAge}")
-    private int maximumConnectionAge = 3600000;
+    private int maximumConnectionAge = 600000;
 
     @Value("${connectionManager.sshOperationTimeout}")
     private int sshOperationTimeout = 120000;
