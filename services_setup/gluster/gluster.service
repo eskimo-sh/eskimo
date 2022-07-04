@@ -50,7 +50,7 @@ ExecStartPre=/bin/rm -f /var/run/gluster/gluster.pid
 
 ExecStart=/bin/bash -c "/usr/local/sbin/startGlusterServiceContainer.sh"
 
-ExecStartPost=/bin/sleep 10
+ExecStartPost=/bin/sleep 15
 
 ExecStop=/usr/bin/docker exec -t gluster /usr/local/sbin/inContainerStopService.sh
 

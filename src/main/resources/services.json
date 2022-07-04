@@ -280,6 +280,12 @@
             "comment": "Performance settings to turn off for volumes defined in 'target.volumes.performance.off'",
             "defaultValue": "",
             "value": "performance.quick-read,performance.io-cache,performance.write-behind,performance.stat-prefetch,performance.read-ahead,performance.readdir-ahead,performance.open-behind"
+          },
+          {
+            "name": "system.statusUpdatePeriodSeconds",
+            "comment": "The orchestration loop delay in seconds. EGMI runs its checks and updates its status every X seconds.",
+            "defaultValue": "30",
+            "value": "20"
           }
         ]
       }

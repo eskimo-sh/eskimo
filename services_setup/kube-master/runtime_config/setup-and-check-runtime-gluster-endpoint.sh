@@ -40,32 +40,32 @@
 
 export HOME=/root
 
-export RECREATE="no"
+export FORCE_RECREATE="no"
+# shellcheck disable=SC2154
 for i in ${ALL_NODES_LIST_gluster//,/ }; do
     if [[ `kubectl get endpoints eskimo-glusterfs-cluster -o json 2>/dev/null | grep $i` == "" ]]; then
-        export RECREATE="yes"
+        export FORCE_RECREATE="yes"
         break
     fi
 done
 
-if [[ "$RECREATE" == "yes" ]]; then
+# recreate file as temporary file first
 
-    echo " - Recreating eskimo-glusterfs-cluster.yaml"
-
-    export GLUSTER_YAML_FILE="apiVersion: v1
+export GLUSTER_YAML_FILE="apiVersion: v1
 kind: Endpoints
 metadata:
   name: eskimo-glusterfs-cluster
 subsets:"
-    for i in ${ALL_NODES_LIST_gluster//,/ }; do
-        export GLUSTER_YAML_FILE="$GLUSTER_YAML_FILE
+
+for i in ${ALL_NODES_LIST_gluster//,/ }; do
+    export GLUSTER_YAML_FILE="$GLUSTER_YAML_FILE
 - addresses:
   - ip: $i
   ports:
   - port: 1"
-    done
+done
 
-    export GLUSTER_YAML_FILE="$GLUSTER_YAML_FILE
+export GLUSTER_YAML_FILE="$GLUSTER_YAML_FILE
 
 ---
 
@@ -78,7 +78,15 @@ spec:
   - port: 1"
 
 
-    echo "$GLUSTER_YAML_FILE" > /var/lib/eskimo/kube-services/eskimo-glusterfs-cluster.yaml
+echo "$GLUSTER_YAML_FILE" > /tmp/CANDIDATE-eskimo-glusterfs-cluster.yaml
+
+# recreate and reapply either the first time or if there are differences
+if [[ ( ! -f /var/lib/eskimo/kube-services/eskimo-glusterfs-cluster.yaml) || \
+      `diff /tmp/CANDIDATE-eskimo-glusterfs-cluster.yaml /var/lib/eskimo/kube-services/eskimo-glusterfs-cluster.yaml` != "" || \
+      "$FORCE_RECREATE" == "yes" ]]; then
+
+    echo " - Recreating eskimo-glusterfs-cluster.yaml"
+    mv /tmp/CANDIDATE-eskimo-glusterfs-cluster.yaml /var/lib/eskimo/kube-services/eskimo-glusterfs-cluster.yaml
 
     echo " - Applying eskimo-glusterfs-cluster.yaml"
     /usr/local/bin/kubectl apply -f /var/lib/eskimo/kube-services/eskimo-glusterfs-cluster.yaml
