@@ -51,6 +51,8 @@ include::architecture.adoc[]
 
 include::services.adoc[]
 
+include::limitations.adoc[]
+
 
 
 [appendix]
