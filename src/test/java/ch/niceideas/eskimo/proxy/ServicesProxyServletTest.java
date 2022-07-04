@@ -285,7 +285,7 @@ public class ServicesProxyServletTest {
                 "        ,\n" +
                 "        this.getWebsocketUrl = function() {\n" +
                 "            var t = \"https:\" === location.protocol ? \"wss:\" : \"ws:\";\n" +
-                "            return t + \"//\" + location.hostname + \":\" + this.getPort() + \"/ws\" + e(location.pathname) + \"/ws\"\n" +
+                "            return t + \"//\" + location.hostname + \":\" + this.getPort() + \"/ws\" + e(location.pathname).replace(\"\" != \"\" ? \"\" : \"dummy_not_matching_anything\", \"\") + \"/ws\"\n" +
                 "        }\n" +
                 "        ,\n" +
                 "        this.getBase = function() {\n" +

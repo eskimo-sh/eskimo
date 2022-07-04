@@ -1480,7 +1480,7 @@
         {
           "type" : "PLAIN",
           "source" : "return t+\"//\"+location.hostname+\":\"+this.getPort()+e(location.pathname)+\"/ws",
-          "target" : "return t + \"//\" + location.hostname + \":\" + this.getPort() + \"/{CONTEXT_PATH}ws\" + e(location.pathname).replace(\"{CONTEXT_PATH}\", \"\") + \"/ws"
+          "target" : "return t + \"//\" + location.hostname + \":\" + this.getPort() + \"/{CONTEXT_PATH}ws\" + e(location.pathname).replace(\"{CONTEXT_PATH}\" != \"\" ? \"{CONTEXT_PATH}\" : \"dummy_not_matching_anything\", \"\") + \"/ws"
         },
         {
           "type" : "PLAIN",

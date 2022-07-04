@@ -45,8 +45,10 @@ This is why the persistent data is stored under sub-folders of `/var/lib` which 
 
 But most services are Kubernetes services instead of native SystemD services.
 
-They canbe managed using the Kubernetes Dashboard - which is prepackaged with Eskimo - or with the help of the
+They can be managed using the Kubernetes Dashboard - which is prepackaged with Eskimo - or with the help of the
 `kubectl` command.
+
+Eskimi provided services have descriptors placed in `/var/lib/eskimo/kube-services/` by eskimo.
 
 ==== Commands wrappers for kafka, logstash, spark and flink
 
