@@ -226,7 +226,7 @@ public class ServicesProxyServletTest {
 
         String toReplace  = "\n <a href='/toto.txt'>\na/a>";
         //String contextPath, String prefixPath
-        ReplacementContext ctx = new ReplacementContext("", "test/test", "", "");
+        ReplacementContext ctx = new ReplacementContext("", "test/test", "", "", "", "");
         String result = servlet.performReplacements(kafkaManagerService, "", ctx, toReplace );
         assertEquals("\n" +
                 " <a href='/test/test/toto.txt'>\n" +
@@ -269,7 +269,7 @@ public class ServicesProxyServletTest {
                 "    angular.module(\"zeppelinWebApp\").service(\"baseUrlSrv\", r)\n" +
                 "}";
 
-        ReplacementContext ctx = new ReplacementContext("", "test/test", "", "");
+        ReplacementContext ctx = new ReplacementContext("", "test/test", "", "", "", "");
         String result = servlet.performReplacements(zeppelinService, "controllers.js", ctx, toReplace );
 
         assertEquals("function(e, t, n) {\n" +

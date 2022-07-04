@@ -106,7 +106,7 @@ if [[ `tail -n 1 spark_console_install_log` != " - In container config SUCCESS" 
 fi
 
 echo " - Configuring spark-console container"
-docker exec spark-console bash /scripts/inContainerSetupSparkHistoryServer.sh \
+docker exec spark-console bash /scripts/inContainerSetupSparkHistoryServer.sh  \
         | tee -a spark_console_install_log 2>&1
 if [[ `tail -n 1 spark_console_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"

@@ -45,6 +45,7 @@ if [[ $ZOOKEEPER_IP_ADDRESS == "" ]]; then
     exit 3
 fi
 
+bash -c "echo -e \"spark.ui.proxyBase=$CONTEXT_PATH/spark-console\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 # silent
 #echo " - Adapting configuration files and scripts"

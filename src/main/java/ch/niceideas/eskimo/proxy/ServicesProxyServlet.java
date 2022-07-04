@@ -237,13 +237,13 @@ public class ServicesProxyServlet extends ProxyServlet {
     private String getFullServerRoot (HttpServletRequest servletRequest) {
         return servletRequest.getScheme() + "://"
                 + servletRequest.getServerName() + ":" + servletRequest.getServerPort()
-                + (StringUtils.isNotBlank(servletRequest.getContextPath()) ? "/" + servletRequest.getContextPath() : "");
+                + (StringUtils.isNotBlank(servletRequest.getContextPath()) ? servletRequest.getContextPath() : "");
     }
 
     private String getAppRoot (HttpServletRequest servletRequest) {
         return "//"
                 + servletRequest.getServerName() + ":" + servletRequest.getServerPort()
-                + (StringUtils.isNotBlank(servletRequest.getContextPath()) ? "/" + servletRequest.getContextPath() : "");
+                + (StringUtils.isNotBlank(servletRequest.getContextPath()) ? servletRequest.getContextPath() : "");
     }
 
     /** Copy response body data (the entity) from the proxy to the servlet client. */
@@ -261,7 +261,12 @@ public class ServicesProxyServlet extends ProxyServlet {
         String prefixPath = getPrefixPath(servletRequest, contextPathPrefix);
         String fullServerRoot = getFullServerRoot (servletRequest);
         String appRoot = getAppRoot (servletRequest);
-        ReplacementContext context = new ReplacementContext(contextPathPrefix, prefixPath, fullServerRoot, appRoot);
+        ReplacementContext context = new ReplacementContext(contextPathPrefix, prefixPath,
+                fullServerRoot,
+                servletRequest.getScheme() + "://"
+                        + servletRequest.getServerName() + ":" + servletRequest.getServerPort(),
+                appRoot,
+                "//" + servletRequest.getServerName() + ":" + servletRequest.getServerPort());
 
         boolean isText = false;
         if (entity != null && entity.getContentType() != null) {
@@ -373,7 +378,12 @@ public class ServicesProxyServlet extends ProxyServlet {
         String prefixPath = getPrefixPath(servletRequest, contextPathPrefix);
         String fullServerRoot = getFullServerRoot (servletRequest);
         String appRoot = getAppRoot (servletRequest);
-        ReplacementContext context = new ReplacementContext(contextPathPrefix, prefixPath, fullServerRoot, appRoot);
+        ReplacementContext context = new ReplacementContext(contextPathPrefix, prefixPath,
+                fullServerRoot,
+                servletRequest.getScheme() + "://"
+                        + servletRequest.getServerName() + ":" + servletRequest.getServerPort(),
+                appRoot,
+                "//" + servletRequest.getServerName() + ":" + servletRequest.getServerPort());
 
         String rewritten = Arrays.stream(servicesDefinition.listUIServices())
                 .map (servicesDefinition::getService)

@@ -39,7 +39,6 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
-
 echo " - Creating start-spark-console-wrapper.sh wrapper (changing name to start-history-server-wrapper.sh)"
 sudo cp $SCRIPT_DIR/start-spark-console-wrapper.sh /usr/local/lib/spark/sbin/start-history-server-wrapper.sh
 sudo chmod 755 /usr/local/lib/spark/sbin/start-history-server-wrapper.sh
@@ -60,8 +59,6 @@ sudo bash -c "echo -e \"spark.history.fs.logDirectory=file:///var/lib/spark/even
 
 sudo bash -c "echo -e \"\n#The period at which to check for new or updated logs in the log directory.\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.history.fs.update.interval=5s\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-
-sudo bash -c "echo -e \"spark.ui.proxyBase=/spark-console\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 
 # Caution : the in container setup script must mandatorily finish with this log"

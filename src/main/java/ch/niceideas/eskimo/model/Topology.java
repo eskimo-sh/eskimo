@@ -63,6 +63,15 @@ public class Topology {
 
     private final Map<String, String> definedMasters = new HashMap<>();
     private final Map<String, Map<String, String>> additionalEnvironment = new HashMap<>();
+    private final String contextPath;
+
+    Topology() {
+        this.contextPath = null;
+    }
+
+    public Topology(String contextPath) {
+        this.contextPath = contextPath;
+    }
 
     public static ParsedNodesConfigProperty parseKeyToServiceConfig (String key, NodesConfigWrapper nodesConfig)
             throws NodesConfigurationException {
@@ -96,7 +105,7 @@ public class Topology {
             ServicesDefinition servicesDefinition, String contextPath, String currentNode)
             throws ServiceDefinitionException, NodesConfigurationException {
 
-        Topology topology = new Topology();
+        Topology topology = new Topology(contextPath);
 
         try {
             // Define master for standard services
@@ -543,6 +552,10 @@ public class Topology {
         appendExport(sb, "SELF_NODE_NUMBER", ""+nodeNbr);
 
         appendExport(sb, "ESKIMO_NODE_COUNT", ""+nodesConfig.getNodeAddresses().size());
+
+        if (StringUtils.isNotBlank(contextPath)) {
+            appendExport(sb, "CONTEXT_PATH", ""+contextPath);
+        }
 
         List<String> allNodeList = new ArrayList<>(nodesConfig.getNodeAddresses());
         Collections.sort(allNodeList); // THis is absolutely key, the order needs to be predictable
