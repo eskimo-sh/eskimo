@@ -75,12 +75,21 @@ check_for_vagrant() {
     fi
 }
 
+check_for_docker() {
+    if [ -x "$(command -v docker)" ]; then
+        echo_date "Found docker : "$(docker -v)
+    else
+        echo "Docker is not available on system"
+        exit 101
+    fi
+}
+
 check_for_maven() {
     if [ -x "$(command -v mvn)" ]; then
         echo_date "Found mvn : "$(mvn -v)
     else
         echo "Maven is not available on system"
-        exit 101
+        exit 102
     fi
 }
 
@@ -89,7 +98,7 @@ check_for_java() {
         echo_date "Found java : "$(java -version 2>&1)
     else
         echo "Java is not available on system"
-        exit 102
+        exit 103
     fi
 }
 
@@ -302,6 +311,11 @@ wait_for_executor_unregistered() {
 
 __tmp_saved_dir=$(pwd)
 
+__dump_error() {
+  __returned_to_saved_dir
+  cat /tmp/integration-test.log
+}
+
 __returned_to_saved_dir() {
     cd $__tmp_saved_dir
 }
@@ -309,13 +323,22 @@ __returned_to_saved_dir() {
 # BUSINESS FUNCTIONS
 # ======================================================================================================================
 
+rebuild_packages() {
+
+    echo_date " - Rebuilding packages"
+
+    cd $SCRIPT_DIR/../../packages_dev
+
+    bash build.sh all_images
+
+    bash build.sh kube
+
+    __returned_to_saved_dir
+}
+
 rebuild_eskimo() {
 
     echo_date " - Rebuilding eskimo"
-
-    trap __returned_to_saved_dir 15
-    trap __returned_to_saved_dir EXIT
-    trap __returned_to_saved_dir ERR
 
     cd $SCRIPT_DIR/../..
 
@@ -1593,6 +1616,8 @@ prepare_demo() {
 usage() {
     echo "Usage:"
     echo "    -h  Display this help message."
+    echo "    -p  Rebuild eskimo service packages"
+    echo "        -n  Skip packages rebuild (useful when used with -a)"
     echo "    -r  Rebuild eskimo (otherwise take latest build)"
     echo "        -f  Fast repackage"
     echo "    -b  Recreate box(es)"
@@ -1628,14 +1653,22 @@ export RUN_DATA_LOAD=""
 export RUN_NOTEBOOK_TESTS=""
 export RUN_OTHER_TESTS=""
 export RUN_CLEANUP=""
+export REBUILD_PACKAGES=""
+export SKIP_PACKAGES=""
 
 
 # Parse options to the integration-test script
-while getopts ":hrfbeslztcadm" opt; do
+while getopts ":hpnrfbeslztcadm" opt; do
     case ${opt} in
         h)
             usage
             exit 0
+            ;;
+        p)
+            export REBUILD_PACKAGES="do"
+            ;;
+        n)
+            export SKIP_PACKAGES="skip"
             ;;
         r)
             export REBUILD_ESKIMO="do"
@@ -1664,7 +1697,8 @@ while getopts ":hrfbeslztcadm" opt; do
         c)
             export RUN_CLEANUP="do"
             ;;
-        a)  export REBUILD_ESKIMO="do"
+        a)  export REBUILD_PACKAGES="do"
+            export REBUILD_ESKIMO="do"
             export RECREATE_BOX="do"
             export INSTALL_ESKIMO="do"
             export SETUP_ESKIMO="do"
@@ -1690,9 +1724,18 @@ while getopts ":hrfbeslztcadm" opt; do
     esac
 done
 
+trap __dump_error 15
+trap __dump_error EXIT
+trap __dump_error ERR
+
 if [[ ! -z $DEMO && ! -z $MULTIPLE_NODE ]]; then
     echo "Demo and Multiple nodes are exclusive "
     exit 70
+fi
+
+if [[ "$REBUILD_PACKAGES" != "" ]]; then
+
+    check_for_docker
 fi
 
 if [[ "$REBUILD_ESKIMO" != "" ]]; then
@@ -1707,6 +1750,10 @@ if [[ "$RECREATE_BOX" != "" || "$INSTALL_ESKIMO" != "" || "$SETUP_ESKIMO" != "" 
     check_for_virtualbox
 
     check_for_vagrant
+fi
+
+if [[ "$REBUILD_PACKAGES" != "" && $SKIP_PACKAGES != "skip" ]]; then
+    rebuild_packages
 fi
 
 if [[ "$REBUILD_ESKIMO" != "" ]]; then
