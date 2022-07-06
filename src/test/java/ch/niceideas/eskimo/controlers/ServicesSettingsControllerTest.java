@@ -53,7 +53,9 @@ public class ServicesSettingsControllerTest {
 
         String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesConfigControllerTest/expectedResult.json"), StandardCharsets.UTF_8);
         assertTrue(StringUtils.isNotBlank(expectedResult));
-        assertEquals (expectedResult, scc.loadServicesSettings());
+        assertEquals (
+                expectedResult.replace("\r", "").trim(),
+                scc.loadServicesSettings().replace("\r", "").trim());
 
         scc.setConfigurationService(new ConfigurationService() {
             @Override

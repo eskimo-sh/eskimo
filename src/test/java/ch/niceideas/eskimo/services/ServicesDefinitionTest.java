@@ -485,7 +485,9 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         String expectedServicesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/expectedServicesConfig.json"), StandardCharsets.UTF_8);
 
-        assertEquals(expectedServicesConfig, conf.toJSON().toString(2));
+        assertEquals(
+                expectedServicesConfig.replace("\r", "").trim(),
+                conf.toJSON().toString(2).replace("\r", "").trim());
         //assertTrue (new JsonWrapper(expectedServicesConfig).getJSONObject().similar(conf.toJSON()));
     }
 

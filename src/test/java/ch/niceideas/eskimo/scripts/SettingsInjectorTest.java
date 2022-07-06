@@ -141,7 +141,9 @@ public class SettingsInjectorTest {
 
     @AfterEach
     public void tearDown() throws Exception {
-        new File (tempFolder).delete();
+        if (tempFolder != null) {
+            new File(tempFolder).delete();
+        }
     }
 
     @Test

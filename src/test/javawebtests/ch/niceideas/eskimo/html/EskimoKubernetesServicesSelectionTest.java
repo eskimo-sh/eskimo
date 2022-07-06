@@ -69,7 +69,7 @@ public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
 
         String htmlForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoKubernetesServicesSelectionTest/form.html"), StandardCharsets.UTF_8);
 
-        js("INNER_FORM = '" + htmlForm.replace("\n", " ") + "';");
+        js("INNER_FORM = '" + htmlForm.replace("\n", " ").replace("\r", "") + "';");
 
         js("$('#kubernetes-services-selection-body').html(INNER_FORM);");
     }
