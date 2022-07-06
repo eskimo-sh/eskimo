@@ -39,6 +39,8 @@ import ch.niceideas.common.utils.StreamUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+
 public class EskimoSettingsOperationsCommandTest extends AbstractWebTest {
 
     @BeforeEach
@@ -62,11 +64,11 @@ public class EskimoSettingsOperationsCommandTest extends AbstractWebTest {
     @Test
     public void testShowCommand() throws Exception {
 
-        String command = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSettingsOperationsCommandTest/command.json"));
+        String command = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSettingsOperationsCommandTest/command.json"), StandardCharsets.UTF_8);
 
         js("eskimoSettingsOperationsCommand.showCommand("+command+".command)");
 
-        String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSettingsOperationsCommandTest/expectedResult.html"));
+        String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSettingsOperationsCommandTest/expectedResult.html"), StandardCharsets.UTF_8);
 
         assertJavascriptEquals(expectedResult.replace("\n", "").replace("  ", ""), "$('#settings-operations-command-body').html()");
     }

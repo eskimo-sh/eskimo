@@ -42,6 +42,8 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class EskimoOperationsTest extends AbstractWebTest {
@@ -75,7 +77,7 @@ public class EskimoOperationsTest extends AbstractWebTest {
     @Test
     public void testUpdateGlobalMessages() throws Exception {
         js("eskimoOperations.updateGlobalMessages("
-                + new JSONObject(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsTest/globalMessages.json"))).toString()
+                + new JSONObject(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsTest/globalMessages.json"), StandardCharsets.UTF_8))
                 + ");");
 
         assertJavascriptEquals(
@@ -90,9 +92,9 @@ public class EskimoOperationsTest extends AbstractWebTest {
         testRenderLabels();
 
         js("eskimoOperations.updateMessages("
-                + new JSONArray(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsTest/labels.json"))).toString()
+                + new JSONArray(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsTest/labels.json"), StandardCharsets.UTF_8))
                 + ", "
-                + new JSONObject(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsTest/messages.json"))).toString()
+                + new JSONObject(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsTest/messages.json"), StandardCharsets.UTF_8))
                 + ");");
 
         js("eskimoOperations.showLogs('Installation_Topology-All-Nodes');");
@@ -110,9 +112,9 @@ public class EskimoOperationsTest extends AbstractWebTest {
         testRenderLabels();
 
         js("eskimoOperations.renderStatus("
-                + new JSONArray(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsTest/labels.json"))).toString()
+                + new JSONArray(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsTest/labels.json"), StandardCharsets.UTF_8))
                 + ", "
-                + new JSONObject(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsTest/status.json"))).toString()
+                + new JSONObject(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsTest/status.json"), StandardCharsets.UTF_8))
                 + ");");
 
         assertJavascriptEquals("100% (Complete)", "$('#Installation_Topology-All-Nodes-progress').html()");
@@ -122,7 +124,7 @@ public class EskimoOperationsTest extends AbstractWebTest {
     public void testRenderLabels() throws Exception {
 
         js("eskimoOperations.renderLabels("
-                + new JSONArray(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsTest/labels.json"))).toString()
+                + new JSONArray(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsTest/labels.json"), StandardCharsets.UTF_8))
                 + ");");
 
         assertJavascriptEquals(

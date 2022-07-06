@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class ServicesSettingsControllerTest {
             @Override
             public ServicesSettingsWrapper loadServicesSettings() throws FileException, SetupException {
                 try {
-                    String jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"));
+                    String jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
                     return new ServicesSettingsWrapper(jsonConfig);
                 } catch (IOException e) {
                     throw new SetupException(e);
@@ -50,7 +51,7 @@ public class ServicesSettingsControllerTest {
             }
         });
 
-        String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesConfigControllerTest/expectedResult.json"));
+        String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesConfigControllerTest/expectedResult.json"), StandardCharsets.UTF_8);
         assertTrue(StringUtils.isNotBlank(expectedResult));
         assertEquals (expectedResult, scc.loadServicesSettings());
 
@@ -133,7 +134,7 @@ public class ServicesSettingsControllerTest {
                     List<String> restartedServices) throws FileException, SetupException {
                 String jsonConfig = null;
                 try {
-                    jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"));
+                    jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
                 } catch (IOException e) {
                     fail (e.getMessage());
                 }

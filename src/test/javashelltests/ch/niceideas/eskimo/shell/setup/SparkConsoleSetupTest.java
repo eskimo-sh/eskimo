@@ -45,6 +45,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -120,7 +121,7 @@ public class SparkConsoleSetupTest extends AbstractSetupShellTest {
     public void testConfigurationFileUpdate() throws Exception {
         assertTestConfFileUpdate();
 
-        String sudohLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_sudo"));
+        String sudohLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_sudo"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(sudohLogs)) {
 
             System.err.println (sudohLogs);

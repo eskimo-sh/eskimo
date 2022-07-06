@@ -56,6 +56,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.SocketException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -257,6 +260,18 @@ public class ServicesProxyServlet extends ProxyServlet {
 
         HttpEntity entity = proxyResponse.getEntity();
 
+        Charset encoding = null;
+        try {
+            if (entity != null && entity.getContentEncoding() != null) {
+                encoding = Charset.forName(entity.getContentEncoding().getValue());
+            } else {
+                encoding = StandardCharsets.UTF_8;
+            }
+        } catch (UnsupportedCharsetException e) {
+            logger.warn (e.getMessage());
+            encoding = StandardCharsets.UTF_8;
+        }
+
         String contextPathPrefix = getContextPath ();
         String prefixPath = getPrefixPath(servletRequest, contextPathPrefix);
         String fullServerRoot = getFullServerRoot (servletRequest);
@@ -283,11 +298,11 @@ public class ServicesProxyServlet extends ProxyServlet {
 
         } else {
 
-            String inputString = StreamUtils.getAsString(entity.getContent());
+            String inputString = StreamUtils.getAsString(entity.getContent(), encoding);
 
             String resultString = performReplacements(service, servletRequest.getRequestURI(), context, inputString);
 
-            byte[] result = resultString.getBytes();
+            byte[] result = resultString.getBytes(encoding);
 
             // overwrite content length header
             servletResponse.setIntHeader(HttpHeaders.CONTENT_LENGTH, result.length);

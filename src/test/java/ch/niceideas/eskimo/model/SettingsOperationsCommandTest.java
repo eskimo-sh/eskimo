@@ -7,6 +7,8 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SettingsOperationsCommandTest extends AbstractServicesDefinitionTest {
@@ -29,10 +31,10 @@ public class SettingsOperationsCommandTest extends AbstractServicesDefinitionTes
         configurationService.setSetupService(setupService);
         configurationService.setServicesDefinition (def);
 
-        jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"));
-        testForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testForm.json"));
+        jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
+        testForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testForm.json"), StandardCharsets.UTF_8);
 
-        expectedJson = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SettingsOperationsCommandTest/expected.json"));
+        expectedJson = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SettingsOperationsCommandTest/expected.json"), StandardCharsets.UTF_8);
 
         scs = new ServicesSettingsService();
 

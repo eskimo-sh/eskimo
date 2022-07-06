@@ -39,6 +39,8 @@ import ch.niceideas.common.utils.StreamUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+
 public class EskimoServicesSettingsTest extends AbstractWebTest {
 
     private String jsonConfig = null;
@@ -59,7 +61,7 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
 
         waitForElementIdInDOM("reset-services-settings-btn");
 
-        jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"));
+        jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
 
         js("var TEST_SERVICE_SETTINGS = " + jsonConfig + ";");
 

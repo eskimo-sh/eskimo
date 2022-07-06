@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.*;
@@ -42,10 +43,12 @@ import ch.niceideas.eskimo.model.service.EditableSettings;
 import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.model.service.Service;
 import jdk.javadoc.doclet.StandardDoclet;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -64,9 +67,9 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        jsonNodesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testConfig.json"));
-        jsonKubernetesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testKubernetesConfig.json"));
-        jsonMinimalConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testMinimalConfig.json"));
+        jsonNodesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testConfig.json"), StandardCharsets.UTF_8);
+        jsonKubernetesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testKubernetesConfig.json"), StandardCharsets.UTF_8);
+        jsonMinimalConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testMinimalConfig.json"), StandardCharsets.UTF_8);
     }
 
     @Test
@@ -480,9 +483,10 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         assertEquals("When shuffle tracking is enabled, controls the timeout for executors that are holding shuffle data - should be consistent with spark.dynamicAllocation.cachedExecutorIdleTimeout.", lastProp.getComment());
         assertEquals("300s", lastProp.getDefaultValue());
 
-        String expectedServicesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/expectedServicesConfig.json"));
+        String expectedServicesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/expectedServicesConfig.json"), StandardCharsets.UTF_8);
 
         assertEquals(expectedServicesConfig, conf.toJSON().toString(2));
+        //assertTrue (new JsonWrapper(expectedServicesConfig).getJSONObject().similar(conf.toJSON()));
     }
 
     @Test

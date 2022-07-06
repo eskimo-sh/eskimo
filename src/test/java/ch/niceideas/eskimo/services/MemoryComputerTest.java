@@ -41,6 +41,7 @@ import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -58,8 +59,8 @@ public class MemoryComputerTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        nodesConfigString =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testConfig.json"));
-        kubeServicesConfigString =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testKubernetesConfig.json"));
+        nodesConfigString =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testConfig.json"), StandardCharsets.UTF_8);
+        kubeServicesConfigString =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testKubernetesConfig.json"), StandardCharsets.UTF_8);
 
         servicesDefinition = new ServicesDefinition();
         servicesDefinition.afterPropertiesSet();

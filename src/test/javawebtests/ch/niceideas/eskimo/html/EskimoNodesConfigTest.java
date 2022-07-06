@@ -42,6 +42,8 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -52,7 +54,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
+        jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"), StandardCharsets.UTF_8);
 
         loadScript(page, "eskimoUtils.js");
         loadScript(page, "eskimoNodesConfigurationChecker.js");

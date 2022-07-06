@@ -43,6 +43,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlTableDataCell;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
@@ -58,10 +59,10 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        jsonFullStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testFullStatus.json"));
-        jsonNodesStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testNodeStatus.json"));
-        jsonStatusConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testStatusConfig.json"));
-        jsonMastersStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testMastersStatus.json"));
+        jsonFullStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testFullStatus.json"), StandardCharsets.UTF_8);
+        jsonNodesStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testNodeStatus.json"), StandardCharsets.UTF_8);
+        jsonStatusConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testStatusConfig.json"), StandardCharsets.UTF_8);
+        jsonMastersStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testMastersStatus.json"), StandardCharsets.UTF_8);
 
         loadScript(page, "eskimoUtils.js");
         loadScript(page, "eskimoSystemStatus.js");
@@ -323,7 +324,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     @Test
     public void testHandleSystemStatus() throws Exception {
 
-        String jsonFullStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testFullStatus.json"));
+        String jsonFullStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testFullStatus.json"), StandardCharsets.UTF_8);
 
         js("var jsonFullStatus = " + jsonFullStatus);
 
@@ -371,7 +372,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         assertJavascriptEquals("Following services are reporting problems : <span style=\"color: darkred;\">mesos-agent</span>",
                 "$('#system-information-services-status').html()");
 
-        String expectedHtmlInformation = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/expectedHtmlInformation.html"));
+        String expectedHtmlInformation = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/expectedHtmlInformation.html"), StandardCharsets.UTF_8);
         assertJavascriptEquals(expectedHtmlInformation.replace("\n", "").replace("  ", ""), "$('#system-information-actions').html()");
     }
 

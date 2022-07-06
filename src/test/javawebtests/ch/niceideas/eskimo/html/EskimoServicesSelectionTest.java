@@ -39,6 +39,7 @@ import ch.niceideas.common.utils.StreamUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
@@ -50,7 +51,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
+        jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"), StandardCharsets.UTF_8);
 
         loadScript(page, "bootstrap.js");
 
@@ -69,7 +70,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         js("eskimoServicesSelection.setServicesSettingsForTest(SERVICES_CONFIGURATION);");
 
-        jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"));
+        jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"), StandardCharsets.UTF_8);
 
         js("SERVICES_CONFIGURATION = " + jsonServices + ";");
         //js("eskimoNodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");

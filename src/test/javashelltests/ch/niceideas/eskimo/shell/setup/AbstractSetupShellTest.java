@@ -48,6 +48,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -118,7 +119,7 @@ public abstract class AbstractSetupShellTest {
                         nodesConfig, kubeServicesConfig, StandardSetupHelpers.getStandard2NodesInstallStatus(), new MemoryModel(new HashMap<>()), 1));
         ProcessHelper.exec(new String[]{"chmod", "755", jailPath + "/eskimo-topology.sh"}, true);
 
-        String testFileConf = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getCamelCaseServiceName()+"SetupShellTest/testFile.conf"));
+        String testFileConf = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getCamelCaseServiceName()+"SetupShellTest/testFile.conf"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(testFileConf)) {
             copyResource("testFile.conf", jailPath, testFileConf);
         }
@@ -276,7 +277,7 @@ public abstract class AbstractSetupShellTest {
     }
 
     private static File createResourceFile(String resourceFile, String targetDir) throws IOException, FileException {
-        String resourceString = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("AbstractSetupShellTest/" + resourceFile));
+        String resourceString = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("AbstractSetupShellTest/" + resourceFile), StandardCharsets.UTF_8);
 
         return copyResource(resourceFile, targetDir, resourceString);
     }
@@ -293,7 +294,7 @@ public abstract class AbstractSetupShellTest {
     }
 
     protected final void assertKubernetesCommands() throws IOException {
-        String kubeCtlLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_kubectl"));
+        String kubeCtlLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_kubectl"), StandardCharsets.UTF_8);
         System.err.println (kubeCtlLogs);
 
         if (StringUtils.isNotBlank(kubeCtlLogs)) {
@@ -311,7 +312,7 @@ public abstract class AbstractSetupShellTest {
     protected final void assertSystemDInstallation() throws IOException {
         //System.err.println (setupLogs);
 
-        String sudoLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_sudo"));
+        String sudoLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_sudo"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(sudoLogs)) {
 
             //System.err.println(sudoLogs);
@@ -340,7 +341,7 @@ public abstract class AbstractSetupShellTest {
             fail ("Expected to find sudo logs in .log_sudo");
         }
 
-        String systemctlLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_systemctl"));
+        String systemctlLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_systemctl"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(systemctlLogs)) {
 
             //System.err.println(systemctlLogs);
@@ -354,7 +355,7 @@ public abstract class AbstractSetupShellTest {
 
     protected final void assertSystemDServiceDockerCommands() throws IOException {
         //System.err.println(setupLogs);
-        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"));
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(dockerLogs)) {
 
             //System.err.println (dockerLogs);
@@ -391,7 +392,7 @@ public abstract class AbstractSetupShellTest {
 
     protected final void assertKubernetesServiceDockerCommands(String currentFolder, String imageName, boolean simplified) throws IOException {
         //System.err.println(setupLogs);
-        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(currentFolder + "/.log_docker"));
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(currentFolder + "/.log_docker"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(dockerLogs)) {
 
             System.err.println (dockerLogs);
@@ -436,7 +437,7 @@ public abstract class AbstractSetupShellTest {
     }
 
     protected final void assertTestConfFileUpdate() throws Exception {
-        String testFileConfResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getCamelCaseServiceName()+"SetupShellTest/testFile.conf.result"));
+        String testFileConfResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getCamelCaseServiceName()+"SetupShellTest/testFile.conf.result"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(testFileConfResult)) {
 
             File updatedTestConfFilePath = new File (getJailPath() + "/testFile.conf");

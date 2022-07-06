@@ -44,6 +44,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -203,10 +204,10 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
     @Test
     public void testApplyNodesConfig() throws Exception {
 
-        ServicesInstallStatusWrapper servicesInstallStatus = new ServicesInstallStatusWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/serviceInstallStatus.json"), "UTF-8"));
+        ServicesInstallStatusWrapper servicesInstallStatus = new ServicesInstallStatusWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/serviceInstallStatus.json"), StandardCharsets.UTF_8));
         configurationService.saveServicesInstallationStatus(servicesInstallStatus);
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper (StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/rawNodesConfig.json"), "UTF-8"));
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper (StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/rawNodesConfig.json"), StandardCharsets.UTF_8));
         configurationService.saveNodesConfig(nodesConfig);
 
         configurationService.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
@@ -290,20 +291,20 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
 
         nodesConfigurationService.applyNodesConfig(command);
 
-        String expectedCommandStart = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedCommandsStart.txt"), "UTF-8");
+        String expectedCommandStart = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedCommandsStart.txt"), StandardCharsets.UTF_8);
         expectedCommandStart = expectedCommandStart.replace("{UUID}", testRunUUID);
 
-        String expectedCommandEnd = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedCommandsEnd.txt"), "UTF-8");
+        String expectedCommandEnd = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedCommandsEnd.txt"), StandardCharsets.UTF_8);
         expectedCommandEnd = expectedCommandEnd.replace("{UUID}", testRunUUID);
 
         String commandString = testSSHCommandScript.toString();
 
         for (String commandStart : expectedCommandStart.split("\n")) {
-            assertTrue (commandString.contains(commandStart), commandStart + "\nis contained in \n" + commandString);
+            assertTrue (commandString.contains(commandStart.replace("\r", "")), commandStart + "\nis contained in \n" + commandString);
         }
 
         for (String commandEnd : expectedCommandEnd.split("\n")) {
-            assertTrue (commandString.contains(commandEnd), commandEnd + "\nis contained in \n" + commandString);
+            assertTrue (commandString.contains(commandEnd.replace("\r", "")), commandEnd + "\nis contained in \n" + commandString);
         }
     }
 

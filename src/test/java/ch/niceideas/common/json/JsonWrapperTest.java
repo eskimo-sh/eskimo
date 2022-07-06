@@ -40,6 +40,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -55,15 +56,15 @@ public class JsonWrapperTest {
     @BeforeEach
     public void setUp() throws Exception {
         InputStream sourceJSONStream = ResourceUtils.getResourceAsStream("JsonWrapperTest/in.json");
-        sourceJSONInput = StreamUtils.getAsString(sourceJSONStream);
+        sourceJSONInput = StreamUtils.getAsString(sourceJSONStream, StandardCharsets.UTF_8);
         sourceJSONStream.close();
 
         sourceJSONStream = ResourceUtils.getResourceAsStream("JsonWrapperTest/out.json");
-        sourceJSONOutput = StreamUtils.getAsString(sourceJSONStream);
+        sourceJSONOutput = StreamUtils.getAsString(sourceJSONStream, StandardCharsets.UTF_8);
         sourceJSONStream.close();
 
         InputStream sourceJSONSearchYahootream = ResourceUtils.getResourceAsStream("JsonWrapperTest/yahooSearchIBMJson.json");
-        sourceJSONSearchYahoo = StreamUtils.getAsString(sourceJSONSearchYahootream);
+        sourceJSONSearchYahoo = StreamUtils.getAsString(sourceJSONSearchYahootream, StandardCharsets.UTF_8);
         sourceJSONSearchYahootream.close();
     }
 

@@ -45,6 +45,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -113,10 +114,10 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
     @Test
     public void testGetOperationsMonitoringStatus() throws Exception {
 
-        ServicesInstallStatusWrapper servicesInstallStatus = new ServicesInstallStatusWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/serviceInstallStatus.json"), "UTF-8"));
+        ServicesInstallStatusWrapper servicesInstallStatus = new ServicesInstallStatusWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/serviceInstallStatus.json"), StandardCharsets.UTF_8));
         configurationService.saveServicesInstallationStatus(servicesInstallStatus);
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper (StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/rawNodesConfig.json"), "UTF-8"));
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper (StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/rawNodesConfig.json"), StandardCharsets.UTF_8));
         configurationService.saveNodesConfig(nodesConfig);
 
         configurationService.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
@@ -205,7 +206,7 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
         //System.err.println (operationsMonitoringStatus.getFormattedValue());
 
         OperationsMonitoringStatusWrapper expectedStatus = new OperationsMonitoringStatusWrapper (
-                StreamUtils.getAsString(ResourceUtils.getResourceAsStream("OperationsMonitoringServiceTest/expected-status.json"), "UTF-8"));
+                StreamUtils.getAsString(ResourceUtils.getResourceAsStream("OperationsMonitoringServiceTest/expected-status.json"), StandardCharsets.UTF_8));
 
         //assertEquals (expectedStatus.getFormattedValue(), operationsMonitoringStatus.getFormattedValue());
         assertTrue (expectedStatus.getJSONObject().similar(operationsMonitoringStatus.getJSONObject()));
@@ -217,10 +218,10 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
         final Object monitor = new Object();
         final AtomicInteger waitCount = new AtomicInteger();
 
-        ServicesInstallStatusWrapper servicesInstallStatus = new ServicesInstallStatusWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/serviceInstallStatus.json"), "UTF-8"));
+        ServicesInstallStatusWrapper servicesInstallStatus = new ServicesInstallStatusWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/serviceInstallStatus.json"), StandardCharsets.UTF_8));
         configurationService.saveServicesInstallationStatus(servicesInstallStatus);
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper (StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/rawNodesConfig.json"), "UTF-8"));
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper (StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/rawNodesConfig.json"), StandardCharsets.UTF_8));
         configurationService.saveNodesConfig(nodesConfig);
 
         configurationService.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
@@ -333,7 +334,7 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
         //System.err.println (operationsMonitoringStatus.getFormattedValue());
 
         OperationsMonitoringStatusWrapper expectedStatus = new OperationsMonitoringStatusWrapper (
-                StreamUtils.getAsString(ResourceUtils.getResourceAsStream("OperationsMonitoringServiceTest/expected-status-interrupted.json"), "UTF-8"));
+                StreamUtils.getAsString(ResourceUtils.getResourceAsStream("OperationsMonitoringServiceTest/expected-status-interrupted.json"), StandardCharsets.UTF_8));
 
         //assertEquals (expectedStatus.getFormattedValue(), operationsMonitoringStatus.getFormattedValue());
         assertTrue (expectedStatus.getJSONObject().similar(operationsMonitoringStatus.getJSONObject()));

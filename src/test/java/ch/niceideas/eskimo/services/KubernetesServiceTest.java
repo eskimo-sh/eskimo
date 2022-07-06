@@ -44,6 +44,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -138,7 +139,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
                 systemService,
                 StandardSetupHelpers.getStandardKubernetesConfig(),
                 serviceInstallStatus,
-                new KubernetesServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("KubernetesServiceTest/kubernetes-services-config.json"), "UTF-8"))
+                new KubernetesServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("KubernetesServiceTest/kubernetes-services-config.json"), StandardCharsets.UTF_8))
         );
 
         final List<String> installList = new LinkedList<>();
@@ -202,7 +203,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
         ServicesInstallStatusWrapper serviceInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         serviceInstallStatus.setValueForPath("grafana_installed_on_IP_KUBERNETES_NODE", "OK");
 
-        KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("KubernetesServiceTest/kubernetes-services-config.json"), "UTF-8"));
+        KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("KubernetesServiceTest/kubernetes-services-config.json"), StandardCharsets.UTF_8));
         kubeServicesConfig.setValueForPath("cerebro_install", "off");
 
         KubernetesOperationsCommand command = KubernetesOperationsCommand.create (
@@ -242,7 +243,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
                 systemService,
                 StandardSetupHelpers.getStandardKubernetesConfig(),
                 serviceInstallStatus,
-                new KubernetesServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("KubernetesServiceTest/kubernetes-services-config.json"), "UTF-8"))
+                new KubernetesServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("KubernetesServiceTest/kubernetes-services-config.json"), StandardCharsets.UTF_8))
         );
 
         operationsMonitoringService.operationsStarted(command);

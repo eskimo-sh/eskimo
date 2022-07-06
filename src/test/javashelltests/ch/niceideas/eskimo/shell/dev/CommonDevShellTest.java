@@ -41,6 +41,7 @@ import org.junit.Assume;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -107,7 +108,7 @@ public class CommonDevShellTest {
         // no error reported
         assertEquals ("", result);
 
-        String wgetLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_wget"));
+        String wgetLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_wget"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(wgetLogs)) {
 
             //System.err.println (wgetLogs);
@@ -127,7 +128,7 @@ public class CommonDevShellTest {
         // no error reported
         assertEquals ("Found docker : \n", result);
 
-        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"));
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(dockerLogs)) {
 
             //System.err.println (dockerLogs);
@@ -158,7 +159,7 @@ public class CommonDevShellTest {
                 result.replaceAll("/[^\\n]+\\n", "") // remove error
         );
 
-        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"));
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(dockerLogs)) {
 
             //System.err.println (dockerLogs);
@@ -191,7 +192,7 @@ public class CommonDevShellTest {
                 result.replaceAll("ls[^\\n]+\\n", "") // remove error
         );
 
-        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"));
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"), StandardCharsets.UTF_8);
         System.err.println (dockerLogs);
         if (StringUtils.isNotBlank(dockerLogs)) {
 

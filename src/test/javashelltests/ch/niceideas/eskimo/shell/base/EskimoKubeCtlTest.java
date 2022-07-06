@@ -44,6 +44,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -67,7 +68,7 @@ public class EskimoKubeCtlTest {
 
         ProcessHelper.exec(new String[]{"bash", "-c", "chmod 777 " + jailPath + "/eskimo-kubectl"}, true);
 
-        String kubectlMockCommandContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoKubeCtlTest/kubectl"), "UTF-8");
+        String kubectlMockCommandContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoKubeCtlTest/kubectl"), StandardCharsets.UTF_8);
         FileUtils.writeFile(new File (jailPath + "/kubectl"), kubectlMockCommandContent);
 
         ProcessHelper.exec(new String[]{"bash", "-c", "chmod 777 " + jailPath + "/kubectl"}, true);

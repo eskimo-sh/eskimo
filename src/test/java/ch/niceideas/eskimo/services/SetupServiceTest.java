@@ -47,6 +47,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.junit.Assume.assumeTrue;
@@ -74,8 +75,8 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         sd.afterPropertiesSet();
 
-        setupConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/setupConfig.json"));
-        packagesVersionFile = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/eskimo_packages_versions.json"));
+        setupConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/setupConfig.json"), StandardCharsets.UTF_8);
+        packagesVersionFile = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/eskimo_packages_versions.json"), StandardCharsets.UTF_8);
         FileUtils.delete(new File ("/tmp/setupConfigTest"));
 
         tempConfigStoragePath = File.createTempFile("test_setup_service", "folder");

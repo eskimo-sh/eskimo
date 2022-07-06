@@ -40,6 +40,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
@@ -66,7 +67,7 @@ public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
 
         waitForElementIdInDOM("kubernetes-services-selection-body");
 
-        String htmlForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoKubernetesServicesSelectionTest/form.html"));
+        String htmlForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoKubernetesServicesSelectionTest/form.html"), StandardCharsets.UTF_8);
 
         js("INNER_FORM = '" + htmlForm.replace("\n", " ") + "';");
 

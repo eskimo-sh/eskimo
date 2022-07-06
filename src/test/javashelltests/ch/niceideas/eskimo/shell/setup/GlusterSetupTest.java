@@ -45,6 +45,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -108,7 +109,7 @@ public class GlusterSetupTest extends AbstractSetupShellTest {
     @Test
     public void testConfigurationFileUpdate() throws Exception {
 
-        String sudoLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_sudo"));
+        String sudoLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_sudo"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(sudoLogs)) {
 
             System.err.println (sudoLogs);

@@ -100,8 +100,8 @@ public abstract class AbstractBaseSSHTest {
 
         sshPort = ProxyManagerService.generateLocalPort();
 
-        privateKeyRaw = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("AbstractBaseSSHTest/id_rsa"));
-        publicKeyRaw = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("AbstractBaseSSHTest/id_rsa.pub"));
+        privateKeyRaw = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("AbstractBaseSSHTest/id_rsa"), StandardCharsets.UTF_8);
+        publicKeyRaw = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("AbstractBaseSSHTest/id_rsa.pub"), StandardCharsets.UTF_8);
 
         sshd = SshServer.setUpDefaultServer();
         sshd.setPort(sshPort);

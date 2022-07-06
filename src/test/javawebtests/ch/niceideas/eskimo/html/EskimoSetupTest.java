@@ -40,6 +40,8 @@ import ch.niceideas.common.utils.StreamUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+
 public class EskimoSetupTest extends AbstractWebTest {
 
     @BeforeEach
@@ -93,7 +95,7 @@ public class EskimoSetupTest extends AbstractWebTest {
     @Test
     public void testSaveSetupShowsCommand() throws Exception {
 
-        String setup = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSetupTest/setup.json"));
+        String setup = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSetupTest/setup.json"), StandardCharsets.UTF_8);
 
         js("$.ajax = function (callback) { callback.success ( { command: { test: \"test\" }} ); }");
 
@@ -108,7 +110,7 @@ public class EskimoSetupTest extends AbstractWebTest {
     public void testDisableDownloadInSnapshot_EnableInRelease() throws Exception {
 
         // build
-        String setupBuild =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/setupConfig.json"));
+        String setupBuild =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/setupConfig.json"), StandardCharsets.UTF_8);
 
         js("eskimoSetup.handleSetup("+setupBuild+")");
 
@@ -144,7 +146,7 @@ public class EskimoSetupTest extends AbstractWebTest {
     @Test
     public void testHandleSetup() throws Exception {
 
-        String setupConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/setupConfig.json"));
+        String setupConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/setupConfig.json"), StandardCharsets.UTF_8);
 
         js("eskimoSetup.handleSetup("+setupConfig+")");
 

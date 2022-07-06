@@ -39,6 +39,8 @@ import ch.niceideas.common.utils.StreamUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -49,7 +51,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        dirContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoFileManagersTest/dirContentTest.json"));
+        dirContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoFileManagersTest/dirContentTest.json"), StandardCharsets.UTF_8);
 
         loadScript (page, "eskimoFileManagers.js");
 
@@ -155,7 +157,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         js("eskimoFileManagers.listFolder('192.168.10.11', '192-168-10-11', '/', "+dirContent+");");
 
-        String htmlContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoFileManagersTest/expectedContent.rawhtml"));
+        String htmlContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoFileManagersTest/expectedContent.rawhtml"), StandardCharsets.UTF_8);
 
         assertJavascriptEquals(htmlContent, "$('#file-manager-folder-content-192-168-10-11').html()");
     }

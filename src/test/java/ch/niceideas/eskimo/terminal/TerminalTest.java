@@ -4,6 +4,7 @@ import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,7 +13,7 @@ public class TerminalTest {
 
     @Test
     public void testNominal() throws Exception {
-        String emptyScreen = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("TerminalTest/emptyScreen.html"));
+        String emptyScreen = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("TerminalTest/emptyScreen.html"), StandardCharsets.UTF_8);
         Terminal term = new Terminal(80, 24);
         ScreenImage si = term.dumpHtml(false, 0);
         assertEquals(emptyScreen, si.screen);
@@ -261,7 +262,7 @@ public class TerminalTest {
 
         term.write("\u001B[?2K");
 
-        String emptyScreen = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("TerminalTest/emptyScreen.html"));
+        String emptyScreen = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("TerminalTest/emptyScreen.html"), StandardCharsets.UTF_8);
         si = term.dumpHtml(false, 0);
         assertEquals(emptyScreen, si.screen);
     }

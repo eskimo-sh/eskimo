@@ -39,6 +39,8 @@ import ch.niceideas.common.utils.StreamUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EskimoUtilsTest extends AbstractWebTest {
@@ -67,7 +69,7 @@ public class EskimoUtilsTest extends AbstractWebTest {
     @Test
     public void testSerializeObject() throws Exception {
 
-        String testForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoUtilsTest/testForm.html"));
+        String testForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoUtilsTest/testForm.html"), StandardCharsets.UTF_8);
         js("$('#main-content').html('"+testForm.replace("\n", "")+"')");
 
         String serializedForm = js("JSON.stringify($('form#testForm').serializeObject())").getJavaScriptResult().toString();

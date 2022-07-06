@@ -44,6 +44,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -133,7 +134,7 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
         systemService.updateStatus();
         SystemStatusWrapper systemStatus = systemService.getStatus();
 
-        String expectedStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedSystemStatus.json"), "UTF-8");
+        String expectedStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedSystemStatus.json"), StandardCharsets.UTF_8);
 
         //assertEquals(expectedStatus, systemStatus.getFormattedValue());
         //System.err.println (systemStatus.getJSONObject());

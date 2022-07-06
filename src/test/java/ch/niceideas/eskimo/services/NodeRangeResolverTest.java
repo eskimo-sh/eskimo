@@ -42,6 +42,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.util.comparator.Comparators;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 
@@ -276,7 +277,7 @@ public class NodeRangeResolverTest {
     public void testMultipleRanges() throws Exception {
 
         InputStream servicesConfigStream = ResourceUtils.getResourceAsStream("NodeRangeResolverTest/multiple-ranges-nodes-config.json");
-        NodesConfigWrapper newConfig = new NodesConfigWrapper(StreamUtils.getAsString(servicesConfigStream));
+        NodesConfigWrapper newConfig = new NodesConfigWrapper(StreamUtils.getAsString(servicesConfigStream, StandardCharsets.UTF_8));
 
         NodesConfigWrapper resolvedConfig = nrr.resolveRanges(newConfig);
 

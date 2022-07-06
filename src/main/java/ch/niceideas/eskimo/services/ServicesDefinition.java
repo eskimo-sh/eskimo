@@ -54,6 +54,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
@@ -101,7 +102,7 @@ public class ServicesDefinition implements InitializingBean {
         if (is == null) {
             throw new ServiceDefinitionException("File " + servicesDefinitionFile + " couldn't be loaded");
         }
-        String servicesAsString =  StreamUtils.getAsString(is);
+        String servicesAsString =  StreamUtils.getAsString(is, StandardCharsets.UTF_8);
         if (StringUtils.isBlank(servicesAsString)) {
             throw new ServiceDefinitionException("File " + servicesDefinitionFile + " is empty.");
         }

@@ -45,6 +45,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -111,7 +112,7 @@ public class ZookeeperSetupTest extends AbstractSetupShellTest {
     public void testConfigurationFileUpdate() throws Exception {
         assertTestConfFileUpdate();
 
-        String bashLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_bash"));
+        String bashLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_bash"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(bashLogs)) {
 
             //System.err.println (bashLogs);

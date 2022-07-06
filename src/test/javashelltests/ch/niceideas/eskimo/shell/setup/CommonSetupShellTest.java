@@ -40,6 +40,7 @@ import org.junit.Assume;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -103,7 +104,7 @@ public class CommonSetupShellTest {
         // no error reported
         assertEquals (" - Copying /bin/bash Script to cerebro\n", result);
 
-        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"));
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(dockerLogs)) {
 
             //System.err.println (dockerLogs);
@@ -130,7 +131,7 @@ public class CommonSetupShellTest {
                 " - Copying Service Start Script\n" +
                 " - Copying settingsInjector.sh Script\n", result);
 
-        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"));
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(dockerLogs)) {
 
             //System.err.println (dockerLogs);
@@ -171,7 +172,7 @@ public class CommonSetupShellTest {
                 " - Removing any previously deployed cerebro service from kubernetes\n" +
                 " - Deploying cerebro service in kubernetes\n", result);
 
-        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"));
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(dockerLogs)) {
 
             //System.err.println (dockerLogs);
@@ -189,7 +190,7 @@ public class CommonSetupShellTest {
             fail ("No docker manipulations found");
         }
 
-        String kubeCtlLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_kubectl"));
+        String kubeCtlLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_kubectl"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(kubeCtlLogs)) {
 
             int indexOfDelete = kubeCtlLogs.indexOf("delete -f cerebro.k8s.yaml");
@@ -218,7 +219,7 @@ public class CommonSetupShellTest {
                 " - Testing systemd startup - Make sure service is really running\n" +
                 " - Enabling cerebro on startup\n", result);
 
-        String sudoLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_sudo"));
+        String sudoLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_sudo"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(sudoLogs)) {
 
             //System.err.println (sudoLogs);
@@ -261,7 +262,7 @@ public class CommonSetupShellTest {
         // no error reported
         assertEquals (" - Commiting the changes to the local template\n", result);
 
-        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"));
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(dockerLogs)) {
 
             //System.err.println (dockerLogs);
@@ -294,7 +295,7 @@ public class CommonSetupShellTest {
                 " - Killing any previous containers\n" +
                 " - Building docker container from image eskimo:cerebro\n", result);
 
-        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"));
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(dockerLogs)) {
 
             //System.err.println (dockerLogs);

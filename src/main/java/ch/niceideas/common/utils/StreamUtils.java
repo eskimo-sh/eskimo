@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Various utility methods aimed at helping with stream handling.
@@ -133,7 +134,7 @@ public abstract class StreamUtils {
      * @param encoding the stream encoding
      * @return the input stream as a string
      */
-    public static String getAsString(InputStream input, String encoding) throws IOException {
+    public static String getAsString(InputStream input, Charset encoding) throws IOException {
 
         if (input == null) {
             return "";
@@ -156,7 +157,7 @@ public abstract class StreamUtils {
      * @return the input stream as a string
      */
     public static String getAsString(InputStream input) throws IOException {
-        return getAsString(input, Charset.defaultCharset().name());
+        return getAsString(input, Charset.defaultCharset());
     }
 
     /**

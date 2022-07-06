@@ -45,6 +45,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -95,7 +96,7 @@ public class KubeSlaveSetupTest extends AbstractSetupShellTest {
     @Test
     public void testSystemDInstallation() throws Exception {
 
-        String sudoLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_sudo"));
+        String sudoLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_sudo"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(sudoLogs)) {
 
             System.err.println(sudoLogs);
@@ -122,7 +123,7 @@ public class KubeSlaveSetupTest extends AbstractSetupShellTest {
             fail ("Expected to find sudo logs in .log_sudo");
         }
 
-        String systemctlLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_systemctl"));
+        String systemctlLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_systemctl"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(systemctlLogs)) {
 
             //System.err.println(systemctlLogs);
