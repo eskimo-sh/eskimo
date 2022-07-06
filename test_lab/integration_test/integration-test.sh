@@ -686,46 +686,92 @@ setup_eskimo() {
     # ----------------------------------------------------------------------------------------------------------------------
 
     echo_date " - CALL saving kubernetes config"
-    call_eskimo \
-        "save-kubernetes-services-config" \
-        '{
-          "cerebro_install": "on",
-          "cerebro_cpu": "0.2",
-          "cerebro_ram": "800M",
-          "elasticsearch_install": "on",
-          "elasticsearch_cpu": "0.3",
-          "elasticsearch_ram": "1024M",
-          "flink-runtime_install": "on",
-          "flink-runtime_cpu": "0.3",
-          "flink-runtime_ram": "1.2G",
-          "grafana_install": "on",
-          "grafana_cpu": "0.2",
-          "grafana_ram": "800M",
-          "kafka_install": "on",
-          "kafka_cpu": "0.2",
-          "kafka_ram": "1G",
-          "kafka-manager_install": "on",
-          "kafka-manager_cpu": "0.1",
-          "kafka-manager_ram": "1G",
-          "kibana_install": "on",
-          "kibana_cpu": "0.2",
-          "kibana_ram": "1024M",
-          "kubernetes-dashboard_install": "on",
-          "kubernetes-dashboard_cpu": "0.1",
-          "kubernetes-dashboard_ram": "1G",
-          "logstash_install": "on",
-          "logstash_cpu": "0.3",
-          "logstash_ram": "1G",
-          "spark-console_install": "on",
-          "spark-console_cpu": "0.1",
-          "spark-console_ram": "1G",
-          "spark-runtime_install": "on",
-          "spark-runtime_cpu": "0.3",
-          "spark-runtime_ram": "1.2G",
-          "zeppelin_install": "on",
-          "zeppelin_cpu": "0.3",
-          "zeppelin_ram": "3G"
-        }'
+    if [[ -z $MULTIPLE_NODE ]]; then
+
+        call_eskimo \
+            "save-kubernetes-services-config" \
+            '{
+              "cerebro_install": "on",
+              "cerebro_cpu": "0.1",
+              "cerebro_ram": "800M",
+              "elasticsearch_install": "on",
+              "elasticsearch_cpu": "0.2",
+              "elasticsearch_ram": "1024M",
+              "flink-runtime_install": "on",
+              "flink-runtime_cpu": "0.2",
+              "flink-runtime_ram": "1.2G",
+              "grafana_install": "on",
+              "grafana_cpu": "0.1",
+              "grafana_ram": "800M",
+              "kafka_install": "on",
+              "kafka_cpu": "0.1",
+              "kafka_ram": "1G",
+              "kafka-manager_install": "on",
+              "kafka-manager_cpu": "0.1",
+              "kafka-manager_ram": "1G",
+              "kibana_install": "on",
+              "kibana_cpu": "0.1",
+              "kibana_ram": "1024M",
+              "kubernetes-dashboard_install": "on",
+              "kubernetes-dashboard_cpu": "0.1",
+              "kubernetes-dashboard_ram": "1G",
+              "logstash_install": "on",
+              "logstash_cpu": "0.2",
+              "logstash_ram": "1G",
+              "spark-console_install": "on",
+              "spark-console_cpu": "0.1",
+              "spark-console_ram": "1G",
+              "spark-runtime_install": "on",
+              "spark-runtime_cpu": "0.2",
+              "spark-runtime_ram": "1.2G",
+              "zeppelin_install": "on",
+              "zeppelin_cpu": "0.1",
+              "zeppelin_ram": "3G"
+            }'
+
+    else
+
+        call_eskimo \
+            "save-kubernetes-services-config" \
+            '{
+              "cerebro_install": "on",
+              "cerebro_cpu": "0.2",
+              "cerebro_ram": "800M",
+              "elasticsearch_install": "on",
+              "elasticsearch_cpu": "0.3",
+              "elasticsearch_ram": "1024M",
+              "flink-runtime_install": "on",
+              "flink-runtime_cpu": "0.3",
+              "flink-runtime_ram": "1.2G",
+              "grafana_install": "on",
+              "grafana_cpu": "0.2",
+              "grafana_ram": "800M",
+              "kafka_install": "on",
+              "kafka_cpu": "0.2",
+              "kafka_ram": "1G",
+              "kafka-manager_install": "on",
+              "kafka-manager_cpu": "0.1",
+              "kafka-manager_ram": "1G",
+              "kibana_install": "on",
+              "kibana_cpu": "0.2",
+              "kibana_ram": "1024M",
+              "kubernetes-dashboard_install": "on",
+              "kubernetes-dashboard_cpu": "0.1",
+              "kubernetes-dashboard_ram": "1G",
+              "logstash_install": "on",
+              "logstash_cpu": "0.3",
+              "logstash_ram": "1G",
+              "spark-console_install": "on",
+              "spark-console_cpu": "0.1",
+              "spark-console_ram": "1G",
+              "spark-runtime_install": "on",
+              "spark-runtime_cpu": "0.3",
+              "spark-runtime_ram": "1.2G",
+              "zeppelin_install": "on",
+              "zeppelin_cpu": "0.3",
+              "zeppelin_ram": "3G"
+            }'
+    fi
 
     # Now need to apply command
     echo_date " - CALL applying kubernetes config"
@@ -1810,6 +1856,9 @@ fi
 if [[ $DEMO == "demo" ]]; then
     prepare_demo
 fi
+
+# clean log file if we went this far without a problem (since it will be dumped on the console)
+echo "" > /tmp/integration-test.log
 
 
 
