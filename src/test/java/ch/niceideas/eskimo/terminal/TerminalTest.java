@@ -16,7 +16,7 @@ public class TerminalTest {
         String emptyScreen = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("TerminalTest/emptyScreen.html"), StandardCharsets.UTF_8);
         Terminal term = new Terminal(80, 24);
         ScreenImage si = term.dumpHtml(false, 0);
-        assertEquals(emptyScreen, si.screen);
+        assertEquals(emptyScreen.replace("\r", ""), si.screen);
     }
 
     @Test
@@ -264,7 +264,7 @@ public class TerminalTest {
 
         String emptyScreen = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("TerminalTest/emptyScreen.html"), StandardCharsets.UTF_8);
         si = term.dumpHtml(false, 0);
-        assertEquals(emptyScreen, si.screen);
+        assertEquals(emptyScreen.replace("\r", ""), si.screen);
     }
 
     @Test

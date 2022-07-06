@@ -373,7 +373,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
                 "$('#system-information-services-status').html()");
 
         String expectedHtmlInformation = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/expectedHtmlInformation.html"), StandardCharsets.UTF_8);
-        assertJavascriptEquals(expectedHtmlInformation.replace("\n", "").replace("  ", ""), "$('#system-information-actions').html()");
+        assertJavascriptEquals(expectedHtmlInformation.replace("\n", "").replace("\r", "").replace("  ", ""), "$('#system-information-actions').html()");
     }
 
     @Test

@@ -68,7 +68,7 @@ public class EskimoOperationsCommandTest extends AbstractWebTest {
 
         String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsCommandTest/expectedResult.html"), StandardCharsets.UTF_8);
 
-        assertJavascriptEquals(expectedResult.replace("\n", "").replace("  ", ""), "$('#operations-command-body').html()");
+        assertJavascriptEquals(expectedResult.replace("\n", "").replace("\r", "").replace("  ", ""), "$('#operations-command-body').html()");
     }
 
     @Test
