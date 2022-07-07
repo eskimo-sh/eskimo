@@ -40,7 +40,7 @@ Software.
     <artifactId>eskimo-ce</artifactId>
     <packaging>war</packaging>
     <name>Eskimo CE</name>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.5-SNAPSHOT</version>
     <description>Eskimo Platform Console - Community Edition</description>
     <url>https://www.eskimo.sh</url>
 
