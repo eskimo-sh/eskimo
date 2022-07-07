@@ -293,7 +293,7 @@ possibility to build images locally is available.
 Whenever building images locally, the majority of the failures from from references versions of software components not
 avaiilable anymore. For instance, when the Apache flink team releases a new minor version, they most of the time remove
 the previous minor from the download site. +
-Whe nsuch think happen the building of the corresponding local image will fail in Eskimo. +
+When such think happen the building of the corresponding local image will fail in Eskimo. +
 The only solution to this is to update the target version in the file `packages_dev/common/common.sh`.
 
 == Eskimo source distribution layout
