@@ -318,7 +318,7 @@ public class KubernetesService {
             KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
 
             String kubeMasterNode = servicesInstallationStatus.getFirstNode(KUBE_MASTER);
-            if (StringUtils.isBlank(kubeMasterNode) && kubeServicesConfig.hasEnabledServices()) {
+            if (kubeServicesConfig == null || StringUtils.isBlank(kubeMasterNode) && kubeServicesConfig.hasEnabledServices()) {
                 logger.warn("Kubernetes is not installed");
             }
 
