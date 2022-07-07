@@ -1,18 +1,10 @@
 {
-    "kube-master": {
-        "software": "2.7.1",
-        "distribution": "1"
-    },
     "zookeeper": {
         "software": "debian_10_buster",
         "distribution": "1"
     },
     "base-eskimo": {
         "software": "0.4",
-        "distribution": "1"
-    },
-    "kube": {
-        "software": "1.23.5",
         "distribution": "1"
     },
     "zeppelin": {
@@ -27,8 +19,12 @@
         "software": "debian_10_buster",
         "distribution": "1"
     },
+    "kubernetes-dashboard": {
+        "software": "2.5.1",
+        "distribution": "1"
+    },
     "flink": {
-        "software": "1.14.4",
+        "software": "1.14.5",
         "distribution": "1"
     },
     "logstash": {
@@ -37,6 +33,10 @@
     },
     "cerebro": {
         "software": "0.9.3",
+        "distribution": "1"
+    },
+    "kube-master": {
+        "software": "2.7.1",
         "distribution": "1"
     },
     "elasticsearch": {
@@ -60,15 +60,15 @@
         "distribution": "1"
     },
     "prometheus": {
-        "software": "2.24.0",
+        "software": "2.35.0",
         "distribution": "1"
     },
     "kibana": {
         "software": "8.1.2",
         "distribution": "1"
     },
-    "kubernetes-dashboard": {
-        "software": "2.5.1",
+    "kube": {
+        "software": "1.23.5",
         "distribution": "1"
     }
 }

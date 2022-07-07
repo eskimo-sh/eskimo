@@ -282,7 +282,7 @@ supported yet.
 
 ==== logstash-cli package
 
-A specific package called logstash cli packages the `logstash-cli` command presented above and makes it available on
+A specific package called _logstash-cli_ packages the `logstash-cli` command presented above and makes it available on
 nodes where it is installed.
 
 In addition to the command server / `logstash-cli` couple, a `logstash` command wrapper is provided that invokes
@@ -312,6 +312,11 @@ https://www.elastic.co/products/elasticsearch
 
 ElasticSearch is deployed as a Kubernetes StatefulSet in such a way that Kubernetes schedules an ElasticSearch instance
 on every Eskimo cluster node.
+
+Elasticsearch instances are available using the DNS hostname `elasticsearch.default.svc.cluster.eskimo` both within
+containers (PODs) running through Kubernetes and within containers running natively on nodes. +
+Individual ES instances have specific names but the hostname above enables to reach anyone of them in a random fashion
+(high availability),
 
 === Cerebro
 
@@ -371,6 +376,16 @@ https://kafka.apache.org/
 Kafka is deployed as a Kubernetes StatefulSet in such a way that Kubernetes schedules an Kafka instance
 on every Eskimo cluster node.
 
+Kafka instances are available using the DNS hostname `kafka.default.svc.cluster.eskimo` both within
+containers (PODs) running through Kubernetes and within containers running natively on nodes. +
+Individual Kafka instances have specific names but the hostname above enables to reach anyone of them in a random
+fashion (high availability),
+
+==== kafka-cli package
+
+A specific package called _kafka-cli_ installs wrappers on the usual kafka command line programs usually bundled with
+kafka distributions. It is intended to be installed on nodes where operators, administrators or developers will
+interact with kafka.
 
 === Kafka Manager
 
@@ -399,6 +414,12 @@ set of higher-level tools including Spark SQL for SQL and structured data proces
 GraphX for graph processing, and Spark Streaming.
 
 https://spark.apache.org/
+
+==== spark-cli package
+
+A specific package called _spark-cli_ installs wrappers on the usual spark command line programs usually bundled with
+Spark distributions. It is intended to be installed on nodes where operators, administrators or developers will
+interact with spark.
 
 ==== Gluster shares for Spark
 
@@ -435,6 +456,12 @@ never-ending) flow of data records, and a transformation is an operation that ta
 produces one or more output streams as a result.
 
 https://flink.apache.org
+
+==== flink-cli package
+
+A specific package called _flink-cli_ installs wrappers on the usual flink command line programs usually bundled with
+Flink distributions. It is intended to be installed on nodes where operators, administrators or developers will
+interact with flink.
 
 ==== Gluster shares for Flink
 

@@ -66,12 +66,13 @@ your Big Data Cluster
 Eskimo is as well:
 
 * a collection of ready to use docker containers packaging fine-tuned and highly customized plug and play services with
-  all the _nuts and bolds_ required to make them work well together.
+  all the _nuts and bolts_ required to make them work well together.
 * a framework for developing, building and deploying Big Data and NoSQL services based on _Kubernetes_, _Docker_ and
 _SystemD_.
 
-Eskimo Packages all the components above and takes care of all the nuts and bolts required to make them work together
-smoothly and without the user or administrator needing to take care of anything, Big Data the _Plug & Play_ way.
+Eskimo Packages all the components above and takes care of all the configuration and tuning required to make them work
+together smoothly and without the user or administrator needing to take care of anything, Big Data the _Plug & Play_
+way.
 
 image::doc/guides/eskimo-guide/pngs/eskimo_platform.png[800, 800, align="center"]
 
@@ -100,10 +101,10 @@ Minimum requirements are as follows:
 * JDK 11 or greater
 * Apache maven 3.5 or greater.
 
-Every other dependency will be downloaded during the maven build process.
+Every other dependency will be downloaded during the maven build process (except `trilead-ssh2`, see <<trilead-ssh2>> below).
 
-Theoretically, Eskimo can be built on any Operating System providing a command line and supporting Java 11+ (Note :
-previous versions of JDK down to 8 may be supported without any guarantee) and Maven 3+. +
+Theoretically, Eskimo can be built on any Operating System providing a command line and supporting Java 11+
+(Note : previous versions of JDK down to 8 may be supported without any guarantee) and Maven 3+. +
 *However, the eskimo source tree makes an extensive use of symbolic links wich - unfortunately - are not supported on
 Microsoft Windows*. +
 For this reason, building eskimo on windows is absolutely possible but it is highly discouraged to develop eskimo on
@@ -151,7 +152,7 @@ set MAVEN_HOME=C:\programs\apache-maven-3.6.1  :: (same)
 set PATH=%MAVEN_HOME%\bin;%JAVA_HOME%\bin;%PATH%
 ----
 
-
+[[trilead-ssh2]]
 ==== Install maven dependency trilead-ssh2
 
 
@@ -281,6 +282,20 @@ it is created by eskimo (with the default credentials above) at the path pointed
 If you experience the error above or something alike, change that propery to point to a location where the first
 version of the file can successfully be created.
 
+=== Building packages / docker images locally
+
+With _released versions_ of Eskimo, operators / administrators have the choice to either build packages / docker images
+locally - which boils down to creating container images where the target software (e.g. spark, flink, gluster, etc.) is
+downloaded from internet and installed - or download pre-built images from www.eskimo.sh. +
+Whereas on development - SNAPSHOT - versions of Eskimo downloading pre-built images is not possible, only the
+possibility to build images locally is available.
+
+Whenever building images locally, the majority of the failures from from references versions of software components not
+avaiilable anymore. For instance, when the Apache flink team releases a new minor version, they most of the time remove
+the previous minor from the download site. +
+Whe nsuch think happen the building of the corresponding local image will fail in Eskimo. +
+The only solution to this is to update the target version in the file `packages_dev/common/common.sh`.
+
 == Eskimo source distribution layout
 
 The directory structure of the eskimo source distribution is as follows:
@@ -334,6 +349,57 @@ $ cd ./test_lab/vagrant/
 $ vagrant up deb-node1 --provider=libvirt
 ----
 
+
+=== Integration tests
+
+A script `integration-test.sh` is provided in `test_lab/integration_test` that is instrumental in building and testing
+eskimo in depth. +
+It enables to test rebuilding a full fledged Eskimo environment from scratch on a test platform of _one single_ of
+_multiple_ node(s) (VMs) and test all its features (run all the zeppelin sample notebooks, ensure proper deployment of
+all services, etc.). +
+A specific command line flag in this script even enables to build a full Demo VM from scratch (See user guide on Demo
+VM).
+
+It's usage is at follows:
+
+.integration-test.sh
+----
+badtrash@badbook:/work/eskimo/test_lab/integration_test$ ./integration-test.sh
+Usage:
+    -h  Display this help message.
+    -p  Rebuild eskimo service packages
+        -n  Skip packages rebuild (useful when used with -a)
+    -r  Rebuild eskimo (otherwise take latest build)
+        -f  Fast repackage
+    -b  Recreate box(es)
+    -e  (Re-)install Eskimo on box
+    -s  Setup Eskimo
+    -l  Run Data load
+    -z  Run Zeppelin notebooks test
+    -t  Run other tests
+    -c  Run cleanup
+    -a  RUN ALL OF THE ABOVE
+    -d  Prepare the VM for DemoVM
+    -m  Test on multiple nodes
+----
+
+For instance, the DemoVM is built using the following call:
+
+.DemoVM building with integration-test.sh
+----
+badtrash@badbook:/work/eskimo/test_lab/integration_test$ ./integration-test.sh -ad
+----
+
+Multiple dependencies are required on the machine where this `integration-test.sh `script is intended to run:
+
+* Vagrant 2.2+
+* VirtualBox 6+
+* Apache Maven 3+
+* Java 11+
+* Docker 20+
+
+All of these needs to be available in the PATH. (Lower versions of these software components might work as well but
+without any guarantee).
 
 == Further information
 

@@ -144,7 +144,7 @@ each these nodes is as follows:
 ** additional storage space depending on the data to be manipulated and the replication factor.
 ** also at least 8Gb disk storage available on `/tmp` if it's a specific partition.
 * 4 CPUs (8 CPUs recommended)
-* 16 GB RAM (31 GB RAM recommended)
+* 16 GB RAM (32 GB RAM recommended)
 
 *Single Machine Eskimo deployment, minimum requirement for the single node*
 
@@ -162,12 +162,13 @@ capacity for this node is as follows:
 ==== Required packages installation and Internet access on cluster nodes
 
 Eskimo performs some initial setup operations on every node of the cluster it needs to operate. Some of these
-operations require Internet access to download dependencies (either RPM or DEB packages).
+operations would require Internet access to download dependencies (either RPM or DEB packages) if these are not properly
+installed in advance by administrators.
 
-In case it is not possible to give access to internet to the nodes in the cluster you wish to operate using eskimo, you
-will find below the `yum` and `apt` commands used during nodes setup. +
-*You can reproduce these commands on your environment to find out about the packages that need to be installed in prior
-to have eskimo operating your cluster nodes:*
+In case it is not possible to give access to internet to the nodes in the cluster one wishes to operate using eskimo,
+one will find below the `yum` and `apt` commands used during nodes setup. +
+*In case internet access from cluster node is not possible, one can reproduce these commands on your environment to
+find out about the packages that need to be installed in prior to have eskimo operating your cluster nodes:*
 
 Following commands are executed on a debian-based node:
 
@@ -247,6 +248,9 @@ sudo zypper install -y glusterfs
 *Again, if eskimo cluster nodes have no internet access in your setup, you need to install all the corresponding
 packages* (those listed above and their transitive dependencies) *before you can use these machines as
 eskimo cluster nodes.*
+
+After this initial setup is performed (called Eskimo base installation and done by the script
+`install-eskimo-base-system.sh`), eskimo operates entirely without any need to access internet.
 
 ===== Eskimo system user
 
