@@ -36,33 +36,53 @@
 
 echoerr() { echo "$@" 1>&2; }
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-. $SCRIPT_DIR/common.sh "$@"
 
-# CHange current folder to script dir (important !)
-cd $SCRIPT_DIR || exit 199
+function delete_kube_housekeeping_lock_file() {
+     rm -Rf /var/lib/kubernetes/kube_houskeeping_lock
+}
 
-# Loading topology
-if [[ ! -f /etc/k8s/env.sh ]]; then
-    echo "Could not find /etc/k8s/env.sh"
-    exit 1
+# From here we will be messing with kubernetes and hence we need to take a lock
+if [[ -f /var/lib/kubernetes/kube_houskeeping_lock ]] ; then
+    echo `date +"%Y-%m-%d %H:%M:%S"`" - kube-housekeeping.sh is in execution already. Skipping ..."
+    exit 0
 fi
 
+trap delete_kube_housekeeping_lock_file 15
+trap delete_kube_housekeeping_lock_file EXIT
+trap delete_kube_housekeeping_lock_file ERR
+
+mkdir -p /var/lib/kubernetes/
+touch /var/lib/kubernetes/kube_houskeeping_lock
+
+
+echo "   + Sourcing kubernetes environment"
 . /etc/k8s/env.sh
 
-sudo rm -Rf /tmp/kubectrl_setup
-mkdir /tmp/kubectrl_setup
-cd /tmp/kubectrl_setup
+export HOME=/root
 
-# Defining topology variables
-if [[ $SELF_NODE_NUMBER == "" ]]; then
-    echo " - No Self Node Number found in topology"
-    exit 1
-fi
+export PATH=/usr/local/bin:$PATH
 
-if [[ $SELF_IP_ADDRESS == "" ]]; then
-    echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit 2
-fi
 
-rm -Rf /tmp/kubectrl_setup
+echo `date +"%Y-%m-%d %H:%M:%S"`"   + Searching for failed PODs" \
+      >> /var/log/kubernetes/kube-houskeeping.log
+
+for failedPod in `kubectl get pods --all-namespaces --field-selector 'status.phase=Failed' -o name`; do
+
+      echo `date +"%Y-%m-%d %H:%M:%S"`"Found failed POD $failedPod" \
+            >> /var/log/kubernetes/kube-houskeeping.log
+
+      echo `date +"%Y-%m-%d %H:%M:%S"`"------------- POD $failedPod details are as follows : ---------------"  \
+            >> /var/log/kubernetes/kube-houskeeping.log
+
+      kubectl get $failedPod -o json \
+            >> /var/log/kubernetes/kube-houskeeping.log
+
+      echo `date +"%Y-%m-%d %H:%M:%S"`"Now deleting POD $failedPod" \
+            >> /var/log/kubernetes/kube-houskeeping.log
+
+      kubectl delete $failedPod \
+            >> /var/log/kubernetes/kube-houskeeping.log
+
+done
+
+delete_kube_housekeeping_lock_file
