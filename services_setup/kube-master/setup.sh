@@ -121,12 +121,6 @@ fail_if_error $? /dev/null 304
 bash ./setup-kubeapi.sh
 fail_if_error $? /dev/null 305
 
-bash ./setup-kubectrl.sh
-fail_if_error $? /dev/null 306
-
-bash ./setup-kubesched.sh
-fail_if_error $? /dev/null 307
-
 bash ./setup-kube-services.sh
 fail_if_error $? /dev/null 308
 
@@ -137,6 +131,18 @@ sudo chmod 755 /usr/local/sbin/start-kube-master.sh
 
 sudo cp stop-kube-master.sh /usr/local/sbin/
 sudo chmod 755 /usr/local/sbin/stop-kube-master.sh
+
+echo " - Copying kube-housekeeping.sh to /usr/local/sbin"
+sudo cp kube-housekeeping.sh /usr/local/sbin/
+sudo chmod 755 /usr/local/sbin/kube-housekeeping.sh
+
+if [[ `sudo crontab -u root -l 2>/dev/null | grep kube-housekeeping.sh` == "" ]]; then
+    echo " - Scheduling periodic execution of kube-housekeeping.sh using crontab"
+    sudo rm -f /tmp/crontab
+    sudo bash -c "crontab -u root -l >> /tmp/crontab 2>/dev/null"
+    sudo bash -c "echo \"* * * * * /bin/bash /usr/local/sbin/kube-housekeeping.sh\" >> /tmp/crontab"
+    sudo crontab -u root /tmp/crontab
+fi
 
 echo " - Installing and checking systemd service file"
 install_and_check_service_file kube-master k8s-master_install_log
