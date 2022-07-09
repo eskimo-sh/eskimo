@@ -570,7 +570,9 @@ public class SetupService {
                         String softwareVersion = (String) packagesVersion.getValueForPath(packageName + ".software");
                         String distributionVersion = (String) packagesVersion.getValueForPath(packageName + ".distribution");
 
-                        downloadPackage(DOCKER_TEMPLATE_PREFIX + packageName + "_" + softwareVersion + "_" + distributionVersion + TAR_GZ_EXTENSION);
+                        downloadPackage(
+                                packageName + "_" + softwareVersion + "_" + distributionVersion,
+                                DOCKER_TEMPLATE_PREFIX + packageName + "_" + softwareVersion + "_" + distributionVersion + TAR_GZ_EXTENSION);
                     }
                 }
             }
@@ -599,7 +601,9 @@ public class SetupService {
                         String softwareVersion = (String) packagesVersion.getValueForPath(kubePackageName + ".software");
                         String distributionVersion = (String) packagesVersion.getValueForPath(kubePackageName + ".distribution");
 
-                        downloadPackage(KUBE_PREFIX + kubePackageName + "_" + softwareVersion + "_" + distributionVersion + TAR_GZ_EXTENSION);
+                        downloadPackage(
+                                kubePackageName + "_" + softwareVersion + "_" + distributionVersion,
+                                KUBE_PREFIX + kubePackageName + "_" + softwareVersion + "_" + distributionVersion + TAR_GZ_EXTENSION);
                     }
 
                 } else {
@@ -632,7 +636,7 @@ public class SetupService {
 
                         if (compareVersion (new Pair<> (newSoftwareVersion, newDistributionVersion),
                                 lastVersionValues) > 0) {
-                            downloadPackage(DOCKER_TEMPLATE_PREFIX + imageName + "_" + newSoftwareVersion + "_" + newDistributionVersion + TAR_GZ_EXTENSION);
+                            downloadPackage(imageName, DOCKER_TEMPLATE_PREFIX + imageName + "_" + newSoftwareVersion + "_" + newDistributionVersion + TAR_GZ_EXTENSION);
                         }
                     }
                 }
@@ -704,11 +708,11 @@ public class SetupService {
         return 0;
     }
 
-    protected void downloadPackage(String fileName) throws SetupException {
+    protected void downloadPackage(String packageIdentifier, String fileName) throws SetupException {
         if (!operationsMonitoringService.isInterrupted()) {
             try {
                 systemOperationService.applySystemOperation(
-                        new SetupCommand.SetupOperationId(SetupCommand.TYPE_DOWNLOAD, fileName),
+                        new SetupCommand.SetupOperationId(SetupCommand.TYPE_DOWNLOAD, packageIdentifier),
                         ml -> {
 
                             File targetFile = new File(packageDistributionPath + "/" + fileName);
