@@ -76,6 +76,7 @@ public class SSHConnection {
         return readTimeout;
     }
 
+    @Deprecated
     public boolean authenticateWithDSA(String user, String pem, String password) throws IOException {
         return under.authenticateWithDSA(user, pem, password);
     }
@@ -240,6 +241,7 @@ public class SSHConnection {
         under.setSecureRandom(rnd);
     }
 
+    @Deprecated
     public void enableDebugging(boolean enable, DebugLogger logger) {
         under.enableDebugging(enable, logger);
     }
