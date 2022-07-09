@@ -324,10 +324,10 @@ public class SetupServiceTest extends AbstractSystemTest {
         SetupCommand setupCommand = SetupCommand.create(setupConfigJson, setupService, servicesDefinition);
         operationsMonitoringService.operationsStarted(setupCommand);
 
-        setupService.downloadPackage("cerebro_0.8.4_1");
+        setupService.downloadPackage("cerebro_0.8.4_1", "cerebro_0.8.4_1.tgz");
 
         assertEquals (1, packageDevPathTest.listFiles().length);
-        assertEquals("cerebro_0.8.4_1", packageDevPathTest.listFiles()[0].getName());
+        assertEquals("cerebro_0.8.4_1.tgz", packageDevPathTest.listFiles()[0].getName());
         assertEquals("TEST DOWNLOADED CONTENT", FileUtils.readFile(packageDevPathTest.listFiles()[0]));
 
         FileUtils.delete(packageDevPathTest);
@@ -468,7 +468,7 @@ public class SetupServiceTest extends AbstractSystemTest {
                 builtPackageList.add (image);
             }
             @Override
-            protected void downloadPackage(String fileName) throws SetupException {
+            protected void downloadPackage(String packageName, String fileName) throws SetupException {
                 downloadPackageList.add (fileName);
             }
             @Override
@@ -531,7 +531,7 @@ public class SetupServiceTest extends AbstractSystemTest {
                 builtPackageList.add (image);
             }
             @Override
-            protected void downloadPackage(String fileName) throws SetupException {
+            protected void downloadPackage(String packageName, String fileName) throws SetupException {
                 downloadPackageList.add (fileName);
             }
             @Override
@@ -594,7 +594,7 @@ public class SetupServiceTest extends AbstractSystemTest {
                 builtPackageList.add (image);
             }
             @Override
-            protected void downloadPackage(String fileName) {
+            protected void downloadPackage(String packageName, String fileName) {
                 downloadPackageList.add (fileName);
             }
             @Override
@@ -639,7 +639,7 @@ public class SetupServiceTest extends AbstractSystemTest {
                 builtPackageList.add (image);
             }
             @Override
-            protected void downloadPackage(String fileName) {
+            protected void downloadPackage(String packageName, String fileName) {
                 downloadPackageList.add (fileName);
             }
             @Override
@@ -682,7 +682,7 @@ public class SetupServiceTest extends AbstractSystemTest {
                 builtPackageList.add (image);
             }
             @Override
-            protected void downloadPackage(String fileName) {
+            protected void downloadPackage(String packageName, String fileName) {
                 downloadPackageList.add (fileName);
             }
             @Override

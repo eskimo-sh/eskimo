@@ -184,7 +184,7 @@ public class OperationsMonitoringService implements OperationsContext {
                 throw new IllegalStateException("Need to start an Operations group first.");
             }
             MessagingManager msgMgr = operationLogs.computeIfAbsent(operation, (op) -> {
-                throw new IllegalStateException();
+                throw new IllegalStateException("No operation " + operation + " is know.");
             });
             msgMgr.addLines(message);
         }
@@ -196,7 +196,7 @@ public class OperationsMonitoringService implements OperationsContext {
                 throw new IllegalStateException("Need to start an Operations group first.");
             }
             MessagingManager msgMgr = operationLogs.computeIfAbsent(operation, (op) -> {
-                throw new IllegalStateException();
+                throw new IllegalStateException("No operation " + operation + " is know.");
             });
             msgMgr.addLines(messages);
         }
