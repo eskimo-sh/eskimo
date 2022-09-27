@@ -236,7 +236,7 @@ if [[ $MODE == "MASTER" || ( $MODE == "SLAVE" && "$MASTER_KUBE_MASTER_1" != "$SE
 
                         sleep 2
 
-                        echo "   + Trying AGAIN to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN to see if the resolbetrick on external interface worked"
+                        echo "   + Trying AGAIN to ping kubernetes.default.svc.$CLUSTER_DNS_DOMAIN to see if the resolvetrick on external interface worked"
                         /bin/ping -c 1 -W 5 -w 10 kubernetes.default.svc.$CLUSTER_DNS_DOMAIN > /var/log/kubernetes/start_k8s_master.log 2>&1
                         if [[ $? != 0 ]]; then
 

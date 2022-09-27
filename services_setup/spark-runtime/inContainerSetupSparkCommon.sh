@@ -257,7 +257,11 @@ echo " - Enabling spark to change configuration at runtime"
 chown -R spark. "/usr/local/lib/spark/conf/"
 
 echo " - Copying log4j.properties from template"
-sudo cp /usr/local/lib/spark/conf/log4j.properties.template /usr/local/lib/spark/conf/log4j.properties
+if [[ -f /usr/local/lib/spark/conf/log4j2.properties.template ]]; then
+    sudo cp /usr/local/lib/spark/conf/log4j2.properties.template /usr/local/lib/spark/conf/log4j2.properties
+else
+    sudo cp /usr/local/lib/spark/conf/log4j.properties.template /usr/local/lib/spark/conf/log4j.properties
+fi
 
 
 # Caution : the in container setup script must mandatorily finish with this log"

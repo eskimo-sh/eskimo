@@ -94,17 +94,17 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
         assertEquals("192.168.10.13", group1.get(1).getNode());
 
         List<ServiceOperationsCommand.ServiceOperationId> group2 = orderedRestart.get(1);
-        assertEquals(1, group2.size());
-        assertEquals("kube-master", group2.get(0).getService());
+        assertEquals(2, group2.size());
+        assertEquals("kube-slave", group2.get(0).getService());
         assertEquals("192.168.10.11", group2.get(0).getNode());
 
-        List<ServiceOperationsCommand.ServiceOperationId> group3 = orderedRestart.get(2);
-        assertEquals(2, group3.size());
-        assertEquals("kube-slave", group3.get(0).getService());
-        assertEquals("192.168.10.11", group3.get(0).getNode());
+        assertEquals("kube-slave", group2.get(1).getService());
+        assertEquals("192.168.10.13", group2.get(1).getNode());
 
-        assertEquals("kube-slave", group3.get(1).getService());
-        assertEquals("192.168.10.13", group3.get(1).getNode());
+        List<ServiceOperationsCommand.ServiceOperationId> group3 = orderedRestart.get(2);
+        assertEquals(1, group3.size());
+        assertEquals("kube-master", group3.get(0).getService());
+        assertEquals("192.168.10.11", group3.get(0).getNode());
 
         List<ServiceOperationsCommand.ServiceOperationId> group4 = orderedRestart.get(3);
         assertEquals(1, group4.size());
@@ -136,16 +136,16 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
         assertEquals("192.168.10.11", group1.get(1).getNode());
 
         List<ServiceOperationsCommand.ServiceOperationId> group4 = orderedInstall.get(4);
-        assertEquals(1, group4.size());
-        assertEquals("kube-master", group4.get(0).getService());
+        assertEquals(2, group4.size());
+        assertEquals("kube-slave", group4.get(0).getService());
         assertEquals("192.168.10.11", group4.get(0).getNode());
+        assertEquals("kube-slave", group4.get(1).getService());
+        assertEquals("192.168.10.13", group4.get(1).getNode());
 
         List<ServiceOperationsCommand.ServiceOperationId> group5 = orderedInstall.get(5);
-        assertEquals(2, group5.size());
-        assertEquals("kube-slave", group5.get(0).getService());
+        assertEquals(1, group5.size());
+        assertEquals("kube-master", group5.get(0).getService());
         assertEquals("192.168.10.11", group5.get(0).getNode());
-        assertEquals("kube-slave", group5.get(1).getService());
-        assertEquals("192.168.10.13", group5.get(1).getNode());
 
 
     }
