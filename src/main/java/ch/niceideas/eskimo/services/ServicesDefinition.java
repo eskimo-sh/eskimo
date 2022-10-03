@@ -327,6 +327,9 @@ public class ServicesDefinition implements InitializingBean {
                     Boolean depRestart = depObj.has("restart") ? depObj.getBoolean("restart") : null;
                     dependency.setRestart(depRestart == null || depRestart);
 
+                    Boolean dependentInstalledFirst = depObj.has("dependentInstalledFirst") ? depObj.getBoolean("dependentInstalledFirst") : null;
+                    dependency.setDependentInstalledFirst(dependentInstalledFirst != null && dependentInstalledFirst); // false by default
+
                     String conditionalDependency = depObj.has("conditional") ? depObj.getString("conditional") : null;
                     if (StringUtils.isNotBlank(conditionalDependency)) {
                         dependency.setConditional (conditionalDependency);
@@ -739,12 +742,12 @@ public class ServicesDefinition implements InitializingBean {
 
         // need to browse dependencies
         for (Dependency dep : one.getDependencies()) {
-            if (dep.getMasterService().equals(other.getName())) {
+            if (dep.getMasterService().equals(other.getName()) && !dep.isDependentInstalledFirst()) {
                 return 1;
             }
         }
         for (Dependency dep : other.getDependencies()) {
-            if (dep.getMasterService().equals(one.getName())) {
+            if (dep.getMasterService().equals(one.getName()) && !dep.isDependentInstalledFirst()) {
                 return -1;
             }
         }

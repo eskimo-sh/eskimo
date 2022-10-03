@@ -237,6 +237,16 @@ All kubernetes system Docker images such as CoreDNS, Pause, etc. are packaged by
 Last but not least, Eskimo defines required endpoints automatically to make gluster available as a volume provider to
 kubernetes services.
 
+===== kube-slave required on kube-master node
+
+The kube-slave service (eskimo specifics) takes care of setting up virtual networking and Name resolution (DNS) on host
+machines.
+For the time being (Eskimo V0.4.x) it is required to install the kube-slave service on the node running the kuber-master
+to setup virtual networking properly on that node as well.
+
+Should one not want to run any kubernetes service or PODs on the kube-master node, one should declare PODs or
+deployments with the constraint on `node-role.kubernetes.io/master` as `NoSchedule`.
+
 
 === Elastic Logstash
 

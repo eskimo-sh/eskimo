@@ -79,7 +79,7 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
                 new String[] {"kube-master", "kube-slave", "gluster", "cerebro", "kibana"},
                 StandardSetupHelpers.getStandard2NodesInstallStatus(),
                 StandardSetupHelpers.getStandard2NodesSetup()
-            );
+        );
 
         List<List<ServiceOperationsCommand.ServiceOperationId>> orderedRestart = restartCommand.getRestartsInOrder(
                 sis, StandardSetupHelpers.getStandard2NodesSetup()

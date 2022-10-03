@@ -313,7 +313,7 @@ __tmp_saved_dir=$(pwd)
 
 __dump_error() {
   __returned_to_saved_dir
-  cat /tmp/integration-test.log
+  echo "(Do 'cat /tmp/integration-test.log' to know more if script finishes in error)"
 }
 
 __returned_to_saved_dir() {
@@ -365,7 +365,7 @@ __dp_build_box() {
     vagrant up $1 >> /tmp/integration-test.log 2>&1
 
     echo_date "   + Updating the appliance"
-    vagrant ssh -c "sudo bash -c 'if [[ -f \"/etc/debian_version\" ]]; then apt-get -y update && apt-get -y upgrade ; else yum update -y; fi'" $1 >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "sudo bash -c 'if [[ -f \"/etc/debian_version\" ]]; then export DEBIAN_FRONTEND=noninteractive; apt-get -y update && apt-mark hold grub-pc && apt-get -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" dist-upgrade ; else yum update -y; fi'" $1 >> /tmp/integration-test.log 2>&1
 
     if [[ $2 == "MASTER" ]]; then
 

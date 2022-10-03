@@ -246,8 +246,8 @@ public class ServicesProxyServlet extends ProxyServlet {
         return servletRequest.getScheme() + "://"
                 + servletRequest.getServerName()
                 + (servletRequest.getServerPort() == 80 ?
-                "" :
-                ":" + servletRequest.getServerPort());
+                    "" :
+                    ":" + servletRequest.getServerPort());
     }
 
     private String getAppRoot (HttpServletRequest servletRequest) {
@@ -259,8 +259,8 @@ public class ServicesProxyServlet extends ProxyServlet {
         return "//"
                 + servletRequest.getServerName()
                 + (servletRequest.getServerPort() == 80 ?
-                "" :
-                ":" + servletRequest.getServerPort());
+                    "" :
+                    ":" + servletRequest.getServerPort());
     }
 
     /** Copy response body data (the entity) from the proxy to the servlet client. */
