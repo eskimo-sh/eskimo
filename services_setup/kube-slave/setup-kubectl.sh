@@ -107,8 +107,8 @@ while [[ -f /etc/k8s/shared/ssl_management_lock ]] ; do
     echo "   + /etc/k8s/shared/ssl_management_lock exist. waiting 2 secs ... "
     sleep 2
     let counter=counter+1
-    if [[ $counter -ge 15 ]]; then
-        echo " !!! Couldn't get /etc/k8s/shared/ssl_management_lock in 30 seconds. crashing !"
+    if [[ $counter -ge 30 ]]; then
+        echo " !!! Couldn't get /etc/k8s/shared/ssl_management_lock in 60 seconds. crashing !"
         exit 150
     fi
 done
@@ -118,6 +118,7 @@ sudo touch /etc/k8s/shared/ssl_management_lock
 trap delete_ssl_lock_file 15
 trap delete_ssl_lock_file EXIT
 trap delete_ssl_lock_file ERR
+
 
 
 if [[ ! -f /etc/k8s/shared/ssl/ca-config.json ]]; then
@@ -308,6 +309,71 @@ EOF
 
     sudo mv clusterrolebinding-default-$USER.yaml /etc/k8s/clusterrolebinding-default-$USER.yaml
 fi
+
+
+if [[ ! -f /etc/k8s/shared/ssl//etc/k8s/shared/ssl/kubernetes-csr.json ]]; then
+    echo "   + Create and install kubernetes-csr.json"
+    cat > kubernetes-csr.json <<EOF
+{
+  "CN": "kubernetes",
+  "hosts": [
+    "127.0.0.1",
+    "${MASTER_KUBE_MASTER_1}",
+    "${MASTER_URL}",
+    "${CLUSTER_KUBERNETES_SVC_IP}",
+    "kubernetes",
+    "kubernetes.default",
+    "kubernetes.default.svc",
+    "kubernetes.default.svc.cluster",
+    "kubernetes.default.svc.cluster.local",
+    "eskimo",
+    "eskimo.default",
+    "eskimo.default.svc",
+    "eskimo.default.svc.cluster",
+    "eskimo.default.svc.cluster.local",
+    "eskimo.eskimo",
+    "eskimo.eskimo.svc",
+    "eskimo.eskimo.svc.cluster",
+    "eskimo.eskimo.svc.cluster.local"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+   "names": [
+      {
+        "C": "SH",
+        "ST": "Eskimo",
+        "L": "Eskimo",
+        "O": "system:masters",
+        "OU": "System"
+      }
+    ]
+}
+EOF
+
+    sudo mv kubernetes-csr.json /etc/k8s/shared/ssl/kubernetes-csr.json
+    sudo chown kubernetes /etc/k8s/shared/ssl/kubernetes-csr.json
+    sudo chmod 755 /etc/k8s/shared/ssl/kubernetes-csr.json
+fi
+
+if [[ ! -f /etc/k8s/shared/ssl//etc/k8s/shared/ssl/kubernetes.pem ]]; then
+    # Generate certificates
+    echo "   + (Re-)Generate kubernetes certificates"
+
+    sudo /usr/local/bin/cfssl gencert -ca=/etc/k8s/shared/ssl/ca.pem \
+      -ca-key=/etc/k8s/shared/ssl/ca-key.pem \
+      -config=/etc/k8s/shared/ssl/ca-config.json \
+      -profile=kubernetes /etc/k8s/shared/ssl/kubernetes-csr.json | cfssljson -bare kubernetes
+
+    echo "   + (Re-)Install kubernetes certificates"
+    sudo mv kubernetes*.pem /etc/k8s/shared/ssl/
+    sudo chown kubernetes /etc/k8s/shared/ssl/kubernetes*.pem
+    sudo mv kubernetes*csr* /etc/k8s/shared/ssl/
+    sudo chown kubernetes /etc/k8s/shared/ssl/kubernetes*csr*
+fi
+
+
 
 delete_ssl_lock_file
 

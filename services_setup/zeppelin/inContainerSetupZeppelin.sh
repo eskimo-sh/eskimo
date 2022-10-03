@@ -166,6 +166,14 @@ sudo sed -i -n '1h;1!H;${;g;s/'\
 '          \"value\": \"python3.7\",'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
+sudo sed -i -n '1h;1!H;${;g;s/'\
+'          \"name\": \"zeppelin.spark.enableSupportedVersionCheck\",\n'\
+'          \"value\": true,'\
+'/'\
+'          \"name\": \"zeppelin.spark.enableSupportedVersionCheck\",\n'\
+'          \"value\": false,'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
 
 echo " - Configuring ElasticSearch interpreter"
 

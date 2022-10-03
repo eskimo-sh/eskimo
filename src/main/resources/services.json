@@ -384,7 +384,8 @@
         "masterService": "kube-slave",
         "numberOfMasters": 1,
         "mandatory": true,
-        "restart": false
+        "restart": false,
+        "dependentInstalledFirst": true
       }
     ]
   },

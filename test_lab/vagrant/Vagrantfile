@@ -71,7 +71,7 @@ nodes = [
   { :hostname => 'integration-test1', :box => 'sorabt/centos-stream-8',  :ip => '192.168.56.51', :ram => 7500, :cpu => 2 },
   { :hostname => 'integration-test2', :box => 'fedora/35-cloud-base',  :ip => '192.168.56.52', :ram => 7500, :cpu => 2 },
   { :hostname => 'integration-test3', :box => 'ubuntu/xenial64',  :ip => '192.168.56.53', :ram => 7500, :cpu => 2 },
-  { :hostname => 'integration-test4', :box => 'bento/debian-11',  :ip => '192.168.56.54', :ram => 7500, :cpu => 2 },
+  { :hostname => 'integration-test4', :box => 'bento/debian-11.4',  :ip => '192.168.56.54', :ram => 7500, :cpu => 2 },
   { :hostname => 'small-node1', :box => 'sorabt/centos-stream-8',  :ip => '192.168.56.71', :ram => 7000, :cpu => 2 },
   { :hostname => 'small-node2', :box => 'sorabt/centos-stream-8',  :ip => '192.168.56.72', :ram => 7000, :cpu => 2 },
   { :hostname => 'small-node3', :box => 'sorabt/centos-stream-8',  :ip => '192.168.56.73', :ram => 7000, :cpu => 2 },

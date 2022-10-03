@@ -112,9 +112,6 @@ fail_if_error $? /dev/null 301
 bash ./setup-kubectl.sh
 fail_if_error $? /dev/null 302
 
-bash ./setup-kubectl-master.sh
-fail_if_error $? /dev/null 303
-
 bash /etc/k8s/runtime_config/setup-runtime-kubectl.sh
 fail_if_error $? /dev/null 304
 

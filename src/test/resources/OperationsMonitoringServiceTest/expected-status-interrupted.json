@@ -84,16 +84,16 @@
       "label": "Check / Install of Base System on 192.168.10.15"
     },
     {
+      "operation": "installation_kube-master_192-168-10-15",
+      "label": "installation of kube-master on 192.168.10.15"
+    },
+    {
       "operation": "installation_kube-slave_192-168-10-15",
       "label": "installation of kube-slave on 192.168.10.15"
     },
     {
       "operation": "installation_kube-slave_192-168-10-13",
       "label": "installation of kube-slave on 192.168.10.13"
-    },
-    {
-      "operation": "installation_kube-master_192-168-10-15",
-      "label": "installation of kube-master on 192.168.10.15"
     },
     {
       "operation": "installation_spark-console_192-168-10-15",

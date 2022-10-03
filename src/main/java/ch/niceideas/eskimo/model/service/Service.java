@@ -143,7 +143,11 @@ public class Service {
 
     public int getRelevantDependenciesCount() {
         return (int) dependencies.stream()
-                .filter(dep -> !dep.getMasterService().equals(getName()) && !dep.getMasterService().equals(NodesConfigWrapper.NODE_ID_FIELD))
+                .filter(dep ->
+                           !dep.getMasterService().equals(getName())
+                        && !dep.getMasterService().equals(NodesConfigWrapper.NODE_ID_FIELD)
+                        && !dep.isDependentInstalledFirst()
+                )
                 .count();
     }
 

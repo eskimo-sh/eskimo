@@ -85,7 +85,7 @@ public class ServicesInstallationSorter {
             operationForService.add(operation);
         }
 
-        // 2. Order by depencencies
+        // 2. Order by dependencies
         List<Service> services = groupedOperations.keySet().stream()
                 .sorted((one, other) -> servicesDefinition.compareServices(one, other))
                 .map(service -> servicesDefinition.getService(service))
