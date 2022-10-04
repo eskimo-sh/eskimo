@@ -492,29 +492,30 @@ Software.
                     <plugin>
                         <groupId>org.asciidoctor</groupId>
                         <artifactId>asciidoctor-maven-plugin</artifactId>
-                        <version>2.1.0</version>
+                        <version>2.2.2</version>
                         <dependencies>
                             <dependency>
                                 <groupId>org.asciidoctor</groupId>
                                 <artifactId>asciidoctorj-pdf</artifactId>
-                                <version>1.5.4</version>
+                                <version>2.3.0</version>
                             </dependency>
                             <!-- Comment this section to use the default jruby artifact provided by the plugin -->
-                            <dependency>
+                            <!--<dependency>
                                 <groupId>org.jruby</groupId>
                                 <artifactId>jruby-complete</artifactId>
-                                <version>9.2.17.0</version>
+                                <version>9.3.8.0</version>
                             </dependency>
+                            -->
                             <!-- Comment this section to use the default AsciidoctorJ artifact provided by the plugin -->
                             <dependency>
                                 <groupId>org.asciidoctor</groupId>
                                 <artifactId>asciidoctorj</artifactId>
-                                <version>2.4.3</version>
+                                <version>2.5.6</version>
                             </dependency>
                             <dependency>
                                 <groupId>org.asciidoctor</groupId>
                                 <artifactId>asciidoctorj-diagram</artifactId>
-                                <version>2.1.2</version>
+                                <version>2.2.3</version>
                             </dependency>
                         </dependencies>
                         <configuration>
@@ -543,12 +544,14 @@ Software.
                                     <sourceDirectory>doc/guides/service-dev-guide</sourceDirectory>
                                     <backend>pdf</backend>
                                     <doctype>book</doctype>
-                                    <sourceHighlighter>rouge</sourceHighlighter>
-                                    <imagesDir>.</imagesDir>
                                     <preserveDirectories>true</preserveDirectories>
                                     <attributes>
+                                        <source-highlighter>rouge</source-highlighter>
+                                        <imagesdir>.</imagesdir>
                                         <pdf-stylesdir>${project.basedir}/doc/theme</pdf-stylesdir>
                                         <pdf-style>eskimo</pdf-style>
+                                        <pdf-themesdir>${project.basedir}/doc/theme</pdf-themesdir>
+                                        <pdf-theme>eskimo</pdf-theme>
                                         <pdf-fontsdir>${project.basedir}/doc/fonts</pdf-fontsdir>
                                         <icons>font</icons>
                                         <sectnums>true</sectnums>
@@ -573,12 +576,14 @@ Software.
                                     <sourceDirectory>doc/guides/eskimo-guide</sourceDirectory>
                                     <backend>pdf</backend>
                                     <doctype>book</doctype>
-                                    <sourceHighlighter>rouge</sourceHighlighter>
-                                    <imagesDir>.</imagesDir>
                                     <preserveDirectories>true</preserveDirectories>
                                     <attributes>
+                                        <source-highlighter>rouge</source-highlighter>
+                                        <imagesdir>.</imagesdir>
                                         <pdf-stylesdir>${project.basedir}/doc/theme</pdf-stylesdir>
                                         <pdf-style>eskimo</pdf-style>
+                                        <pdf-themesdir>${project.basedir}/doc/theme</pdf-themesdir>
+                                        <pdf-theme>eskimo</pdf-theme>
                                         <pdf-fontsdir>${project.basedir}/doc/fonts</pdf-fontsdir>
                                         <icons>font</icons>
                                         <sectnums>true</sectnums>
@@ -600,11 +605,11 @@ Software.
                                 </goals>
                                 <configuration>
                                     <backend>html5</backend>
-                                    <sourceHighlighter>coderay</sourceHighlighter>
                                     <sourceDocumentName>eskimo-guide.adoc</sourceDocumentName>
                                     <sourceDirectory>doc/guides/eskimo-guide</sourceDirectory>
-                                    <imagesDir>./</imagesDir>
                                     <attributes>
+                                        <source-highlighter>rouge</source-highlighter>
+                                        <imagesdir>.</imagesdir>
                                         <stylesheet>../../theme/eskimo.css</stylesheet>
                                         <sectnums>true</sectnums>
                                         <toc>left</toc>
@@ -627,11 +632,11 @@ Software.
                                 </goals>
                                 <configuration>
                                     <backend>html5</backend>
-                                    <sourceHighlighter>coderay</sourceHighlighter>
                                     <sourceDocumentName>service-dev-guide.adoc</sourceDocumentName>
                                     <sourceDirectory>doc/guides/service-dev-guide</sourceDirectory>
-                                    <imagesDir>./</imagesDir>
                                     <attributes>
+                                        <source-highlighter>rouge</source-highlighter>
+                                        <imagesdir>.</imagesdir>
                                         <stylesheet>../../theme/eskimo.css</stylesheet>
                                         <sectnums>true</sectnums>
                                         <toc>left</toc>

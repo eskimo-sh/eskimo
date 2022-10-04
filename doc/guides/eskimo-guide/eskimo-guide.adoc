@@ -34,8 +34,8 @@ Software.
 
 :sectnums:
 :toc:
-:authors: eskimo.sh / https://www.eskimo.sh / 2019-2022
-:copyright: eskimo.sh / https://www.eskimo.sh / 2019-2022
+:authors: eskimo.sh - https://www.eskimo.sh - 2019-2022
+:copyright: eskimo.sh - https://www.eskimo.sh - 2019-2022
 
 = Eskimo User and Administration Guide
 
@@ -59,8 +59,8 @@ include::limitations.adoc[]
 == Copyright and License
 
 
-Eskimo is Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved. +
-Author : eskimo.sh / https://www.eskimo.sh
+Eskimo is Copyright 2019 - 2022 eskimo.sh - https://www.eskimo.sh - All rights reserved. +
+Author : eskimo.sh - https://www.eskimo.sh
 
 Eskimo is available under a dual licensing model : commercial and GNU AGPL. +
 If you did not acquire a commercial licence for Eskimo, you can still use it and consider it free software under the

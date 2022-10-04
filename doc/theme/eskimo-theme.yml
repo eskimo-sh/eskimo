@@ -38,58 +38,75 @@ font:
       normal: DINPro-Regular.ttf
       bold: DINPro-Bold.ttf
       italic: DINPro-Italic.ttf
-      bold_italic: DINPro-Bold.ttf
+      bold-italic: DINPro-Bold-Italic.ttf
+      bold_italic: DINPro-Bold-Italic.ttf
   fallbacks:
     [DINPro]
-title_page:
+
+base:
+  font-family: DINPro
+  font-color: #333333
+  font-size: 11
+  line-height-length: 14
+  line-height: $base-line-height-length / $base-font-size
+
+code:
+  font-size: 9
+
+vertical-rhythm: $base-line-height-length
+
+heading:
+  font-color: #698fa4
+  h1:
+    font-size: 17
+  h2:
+    font-size: 15
+  h3:
+    font-size: 14
+  font-style: bold
+  line-height: 1.2
+  margin-bottom: $vertical-rhythm
+
+title-page:
   align: center
   logo:
       top: 0%
   title:
     top: 55%
-    font_size: $heading_h1_font_size
-    font_style: bold
-    font_color: 698fa4
-    line_height: 0.9
+    font-size: $heading-h1-font-size
+    font-style: bold
+    font-color: 698fa4
+    line-height: 0.9
   subtitle:
-    font_size: $heading_h3_font_size
-    font_style: bold
-    line_height: 1
+    font-size: $heading-h3-font-size
+    font-style: bold
+    line-height: 1
   authors:
-    margin_top: $base_font_size * 1.25
-    font_size: $base_font_size * 1.5
-    font_color: 181818
+    margin-top: $base-font-size * 1.25
+    font-size: $base-font-size * 1.5
+    font-color: 181818
   revision:
-    margin_top: $base_font_size * 1.25
+    margin-top: $base-font-size * 1.25
 
 page:
   layout: portrait
   margin: [0.5in, 0.75in, 0.5in, 0.75in]
   size: A4
-base:
-  font-family: DINPro
-  font_color: #333333
-  line_height_length: 14
-  line_height: $base_line_height_length / $base_font_size
-vertical_rhythm: $base_line_height_length
-heading:
-  font_color: #698fa4
-  font_size: 17
-  font_style: bold
-  line_height: 1.2
-  margin_bottom: $vertical_rhythm
+
 link:
-  font_color: #009900
-outline_list:
-  indent: $base_font_size * 1.5
+  font-color: #009900
+
+outline-list:
+  indent: $base-font-size * 1.5
+
 header:
   height: 0.75in
-  line_height: 1
-  recto_content:
+  line-height: 1
+  recto-content:
     center: '{document-title}'
-  verso_content:
+  verso-content:
     center: '{document-title}'
-     #image_vertical_align: <alignment> or <number>
+     #image-vertical-align: <alignment> or <number>
       # additional attributes for content:
       # * {page-count}
       # * {page-number}
@@ -98,16 +115,19 @@ header:
       # * {chapter-title}
       # * {section-title}
       # * {section-or-chapter-title}
+
 footer:
   height: 0.75in
-  line_height: 1
-  recto_content:
+  line-height: 1
+  recto-content:
     right: '{chapter-title} | *{page-number}*'
-  verso_content:
+  verso-content:
     left: '*{page-number}* | {chapter-title}'
+
 image:
   align: center
+
 caption:
   align: center
-  font_color: #FF0000
-  font_size: 10
+  font-color: #FF0000
+  font-size: 10
