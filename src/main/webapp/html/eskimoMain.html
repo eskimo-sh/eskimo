@@ -32,170 +32,341 @@ The above copyright notice and this licensing notice shall be included in all co
 Software.
 -->
 
-<header id="hoe-header" hoe-color-type="logo-bg8" hoe-lpanel-effect="shrink">
 
-    <div class="hoe-left-header">
-        <a href="#" style="margin-right: 10px; padding-left: 7px;">
-            <img class="img-circle" alt="eskimo icon" src="images/eskimo-icon.png" style="width: 30px;">
-        </a>
-        <a href="#"> <span id="eskimoTitle">Eskimo Console</span></a>
-        <div class="eskimo-version" id="eskimo-version">
-            (version)
+<!-- ========== Topbar Start ========== -->
+<div class="navbar-custom topnav-navbar">
+
+    <div class="container-fluid detached-nav">
+
+        <!-- Topbar Logo -->
+        <div class="logo-topbar">
+            <!-- Logo light -->
+            <a href="index.html" class="logo-light">
+                <span class="logo-lg">
+                    <img src="images/eskimo-icon.png" alt="logo" height="22">
+                </span>
+                <span class="logo-sm">
+                    <img src="images/eskimo-icon.png" alt="small logo" height="22">
+                </span>
+            </a>
+
+            <!-- Logo Dark -->
+            <a href="index.html" class="logo-dark">
+                <span class="logo-lg">
+                    <img src="images/eskimo-icon-black.png" alt="dark logo" height="22">
+                </span>
+                <span class="logo-sm">
+                    <img src="images/eskimo-icon-black.png" alt="small logo" height="22">
+                </span>
+            </a>
         </div>
-    </div>
 
-    <div class="hoe-right-header" hoe-color-type="header-bg8" hoe-position-type="relative" >
-        <span class="hoe-sidebar-toggle"><a href="#"></a></span>
+        <!-- Sidebar Menu Toggle Button -->
+        <button class="button-toggle-menu">
+            <i class="mdi mdi-menu"></i>
+        </button>
 
-        <ul class="left-navbar">
+        <!-- Horizontal Menu Toggle Button -->
+        <button class="navbar-toggle" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
+            <div class="lines">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </button>
 
-            <li class="dropdown hoe-rheader-submenu message-notification left-min-30">
-                <span class="dashboardTitle"><strong>Platform Administration and Operation</strong></span><span id="dashboardTitle" class="dashboardTitle"></span>
-            </li>
+        <ul class="list-unstyled topbar-menu float-end mb-0">
 
-            <li style="padding-left: 5px;" class="dropdown hoe-rheader-submenu message-notification left-min-30">
-                <a href="#" id="main-show-notifications-link" class="dropdown-toggle icon-circle" data-toggle="dropdown"
-                   title="Show Notifications">
-                    <span class="fa fa-bell-o"></span>
-                    <span id="new-notifications-count" class="badge badge-success"></span>
+
+            <li class="dropdown notification-list">
+                <a class="nav-link dropdown-toggle arrow-none" data-bs-toggle="dropdown" href="index.html#"
+                   role="button" aria-haspopup="false" aria-expanded="false">
+                    <i class="ri-notification-3-line noti-icon"></i>
+                    <span class="noti-icon-badge"></span>
                 </a>
-                <ul id="notifications-container" class="dropdown-menu ">
-                    <li class="hoe-submenu-label">
-                        <h3><span id="notifications-count" class="bold">0</span> Notification(s)
-                            <a href="#" id="main-clear-notifications-link"><span style="color: #333333;">Clear</span></a>
-                        </h3>
-                    </li>
-                </ul>
+                <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated dropdown-lg py-0">
+                    <div class="p-2 border-top-0 border-start-0 border-end-0 border-dashed border">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 class="m-0 font-16 fw-semibold"> Notification</h6>
+                            </div>
+                            <div class="col-auto">
+                                <a href="javascript: void(0);" class="text-dark text-decoration-underline">
+                                    <small>Clear All</small>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="notifications-container" class="px-3" style="max-height: 300px;" data-simplebar>
+
+                        <h5 class="text-muted font-13 fw-normal mt-2">Today</h5>
+                        <!-- item
+
+                        <a href="javascript:void(0);" class="dropdown-item p-0 notify-item card unread-noti shadow-none mb-2">
+                            <div class="card-body">
+                                <span class="float-end noti-close-btn text-muted"><i class="mdi mdi-close"></i></span>
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <div class="notify-icon bg-primary">
+                                            <i class="mdi mdi-comment-account-outline"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1 text-truncate ms-2">
+                                        <h5 class="noti-item-title fw-semibold font-14">Datacorp <small class="fw-normal text-muted ms-1">1 min ago</small></h5>
+                                        <small class="noti-item-subtitle text-muted">Caleb Flakelar commented on Admin</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        -->
+
+                        <!-- item
+                        <a href="javascript:void(0);" class="dropdown-item p-0 notify-item card read-noti shadow-none mb-2">
+                            <div class="card-body">
+                                <span class="float-end noti-close-btn text-muted"><i class="mdi mdi-close"></i></span>
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <div class="notify-icon bg-info">
+                                            <i class="mdi mdi-account-plus"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1 text-truncate ms-2">
+                                        <h5 class="noti-item-title fw-semibold font-14">Admin <small class="fw-normal text-muted ms-1">1 hours ago</small></h5>
+                                        <small class="noti-item-subtitle text-muted">New user registered</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        -->
+
+
+                    </div>
+
+                </div>
             </li>
 
-        </ul>
-
-        <ul class="right-navbar">
-            <li class="dropdown hoe-rheader-submenu hidden-xs">
-                <a href="docs/eskimo-guide.html" id="main-show-user-guide"
+            <li class="dropdown notification-list d-none d-sm-inline-block">
+                <a class="nav-link dropdown-toggle arrow-none" data-bs-toggle="dropdown" href="docs/eskimo-guide.html"
+                   id="main-show-user-guide"
                    target="_blank" class="icon-circle"
-                   title="Show User Guide">
+                   title="Show User Guide"
+                   role="button" aria-haspopup="false" aria-expanded="false">
                     <span class="fa fa-file-o"></span>
                 </a>
             </li>
-            <li class="dropdown hoe-rheader-submenu hidden-xs">
-                <a href="docs/service-dev-guide.html" id="main-show-service-guide"
+
+            <li class="dropdown notification-list d-none d-sm-inline-block">
+                <a class="nav-link dropdown-toggle arrow-none" data-bs-toggle="dropdown"
+                   href="docs/service-dev-guide.html" id="main-show-service-guide"
                    target="_blank" class="icon-circle"
-                    title="Show Service Development Guide">
+                   title="Show Service Development Guide"
+                   role="button" aria-haspopup="false" aria-expanded="false">
                     <span class="fa fa-file-o"></span>
                 </a>
             </li>
-            <li class="dropdown hoe-rheader-submenu hidden-xs">
-                <a href="#" id="main-show-about-link" class="icon-circle"
-                   title="Show Eskimo About Information">
+            <li class="dropdown notification-list d-none d-sm-inline-block">
+                <a class="nav-link dropdown-toggle arrow-none" data-bs-toggle="dropdown" href="#"
+                   id="main-show-about-link" class="icon-circle"
+                   title="Show Eskimo About Information"
+                   role="button" aria-haspopup="false" aria-expanded="false">
                     <span class="top-menu-small fa fa-question"></span>
                 </a>
             </li>
+
+            <li class="notification-list d-none d-md-inline-block">
+                <a class="nav-link" href="index.html" data-toggle="fullscreen">
+                    <i class="ri-fullscreen-line noti-icon"></i>
+                </a>
+            </li>
+
+            <li class="dropdown notification-list">
+                <a class="nav-link dropdown-toggle nav-user arrow-none me-0" data-bs-toggle="dropdown"
+                   href="index.html#" role="button" aria-haspopup="false"
+                   aria-expanded="false">
+                                <span class="account-user-avatar">
+                                    <img src="assets/images/users/avatar-1.jpg" alt="user-image" class="rounded-circle">
+                                </span>
+                    <span>
+                                    <span class="account-user-name">Dominic Keller</span>
+                                    <span class="account-position">Founder</span>
+                                </span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated topbar-dropdown-menu profile-dropdown">
+                    <!-- item-->
+                    <div class=" dropdown-header noti-title">
+                        <h6 class="text-overflow m-0">Welcome !</h6>
+                    </div>
+
+                    <!-- item-->
+                    <a href="javascript:void(0);" class="dropdown-item notify-item">
+                        <i class="mdi mdi-account-circle me-1"></i>
+                        <span>My Account</span>
+                    </a>
+
+                    <!-- item-->
+                    <a href="javascript:void(0);" class="dropdown-item notify-item">
+                        <i class="mdi mdi-logout me-1"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </li>
         </ul>
 
-    </div>
-</header>
-<div id="hoeapp-container" hoe-color-type="lpanel-bg8" hoe-lpanel-effect="shrink">
-    <aside id="hoe-left-panel" hoe-position-type="absolute">
-        <div class="left-panel-container">
-            <div id="menu-scroll-up" class="menu-scroll-button" style="display: none;">
-                <span class="fa fa-arrow-up">
-                </span>
-            </div>
-            <div id="menu-container" class="left-panel-menu-container">
-                <ul class="nav panel-list" id="mainFolderMenu">
-                    <li id="mainFolderMenuAnchor" class="nav-level">Eskimo Services</li>
 
-                    <li class="folder-menu-items disabled" id="folderMenuConsoles" data-menu-role="ADMIN">
-                        <a id="main-menu-show-consoles-link" href="#">
-                            <span class="fa fa-terminal"></span>
-                            <span class="menu-text">SSH Terminals</span>
-                        </a>
-                    </li>
-                    <li class="folder-menu-items disabled" id="folderMenuFileManagers">
-                        <a id="main-menu-show-file-managers-link" href="#">
-                            <span class="fa fa-folder"></span>
-                            <span class="menu-text">SFTP File Manager</span>
-                        </a>
-                    </li>
-                </ul>
-                <ul class="nav panel-list">
-                    <li id="adminTitle" class="nav-level" style="border-top: 2px solid #677889;">Platform Administration</li>
-                    <li class="config-menu-items disabled">
-                        <a id="main-menu-show-status-link" href="#">
-                            <span class="fa fa-server"></span>
-                            <span class="menu-text">Status</span>
-                        </a>
-                    </li>
-                    <li class="config-menu-items disabled" id="menu-configure-setup" data-menu-role="ADMIN">
-                        <a id="main-menu-show-setup-link" href="#">
-                            <span class="fa fa-check-square"></span>
-                            <span class="menu-text">Setup</span>
-                        </a>
-                    </li>
-                    <li class="config-menu-items disabled" data-menu-role="ADMIN">
-                        <a id="main-menu-show-services-settings-link" href="#">
-                            <span class="fa fa-cog"></span>
-                            <span class="menu-text">Configure Services</span>
-                        </a>
-                    </li>
-                    <li class="config-menu-items disabled" data-menu-role="ADMIN">
-                        <a id="main-menu-show-nodes-config-link" href="#">
-                            <span class="fa fa-cog"></span>
-                            <span class="menu-text">Configure Eskimo Nodes</span>
-                        </a>
-                    </li>
-                    <li id="menu-kubernetes-configuration" class="config-menu-items disabled menu-hidden" style="display: none; visibility: hidden;" data-menu-role="ADMIN">
-                        <a id="main-menu-show-kubernetes-config-link" href="#">
-                            <span class="fa fa-cog"></span>
-                            <span class="menu-text">Config. Kubernetes Services</span>
-                        </a>
-                    </li>
-                    <li class="config-menu-items disabled"  id="menu-operations">
-                        <a id="main-menu-show-operations-link" href="#">
-                            <span class="fa fa-envelope"></span>
-                            <span class="menu-text">Operations Monitoring</span>
-                        </a>
-                    </li>
-                    <li class="config-menu-items menu-static">
-                        <a id="main-menu-logout-link" href="#">
-                            <span class="fa fa-sign-out"></span>
-                            <span class="menu-text">Logout</span>
-                        </a>
-                    </li>
-                </ul>
+    </div>
+</div>
+<!-- ========== Topbar End ========== -->
+
+
+<!-- ========== Left Sidebar Start ========== -->
+<div class="leftside-menu">
+
+    <!-- Logo Light -->
+    <a href="index.html" class="logo logo-light">
+        <span class="logo-lg">
+            <img src="images/eskimo-icon.png" alt="logo" height="22">
+            <span id="eskimoTitle" class="logo-title">Eskimo Console</span>
+            <div class="eskimo-version" id="eskimo-version">
+                (version)
             </div>
-            <div id="menu-scroll-down" class="menu-scroll-button" style="display: none;">
-                <span class="fa fa-arrow-down">
-                </span>
+        </span>
+        <span class="logo-sm">
+            <img src="images/eskimo-icon.png" alt="small logo" height="22">
+        </span>
+    </a>
+
+    <!-- Logo Dark -->
+    <a href="index.html" class="logo logo-dark">
+        <span class="logo-lg">
+            <img src="images/eskimo-icon-black.png" alt="dark logo" height="22">
+            <span id="eskimoTitle" class="logo-title">Eskimo Console</span>
+            <div class="eskimo-version" id="eskimo-version">
+                (version)
             </div>
+        </span>
+        <span class="logo-sm">
+            <img src="images/eskimo-icon-black.png" alt="small logo" height="22">
+        </span>
+    </a>
+
+    <!-- Sidebar Hover Menu Toggle Button -->
+    <button type="button" class="btn button-sm-hover p-0" data-bs-toggle="tooltip" data-bs-placement="right"
+            title="Show Full Sidebar">
+        <i class="ri-checkbox-blank-circle-line align-middle"></i>
+    </button>
+
+    <!-- Sidebar -left -->
+    <div class="h-100" id="leftside-menu-container" data-simplebar>
+        <!-- Leftbar User -->
+        <div class="leftbar-user">
+            <a href="pages-profile.html">
+                <img src="assets/images/users/avatar-1.jpg" alt="user-image" height="42"
+                     class="rounded-circle shadow-sm">
+                <span class="leftbar-user-name">Dominic Keller</span>
+            </a>
         </div>
-    </aside>
-    <section id="main-content">
+
+        <!--- Sidemenu -->
+        <ul class="side-nav">
+
+            <li id="mainFolderMenuAnchor" class="side-nav-title side-nav-item">Eskimo Services</li>
+
+            <li class="side-nav-item" id="folderMenuConsoles" data-menu-role="ADMIN">
+                <a id="main-menu-show-consoles-link" href="#" class="side-nav-link">
+                    <i class="fa fa-terminal"></i>
+                    <span class="menu-text">SSH Terminals</span>
+                </a>
+            </li>
+
+            <li class="side-nav-item" id="folderMenuFileManagers">
+                <a id="main-menu-show-file-managers-link" href="#" class="side-nav-link">
+                    <i class="fa fa-folder"></i>
+                    <span class="menu-text">SFTP File Manager</span>
+                </a>
+            </li>
+
+            <li id="adminTitle" class="side-nav-title side-nav-item">Platform Administration</li>
+
+            <li class="side-nav-item disabled">
+                <a id="main-menu-show-status-link" href="#" class="side-nav-link">
+                    <i class="fa fa-server"></i>
+                    <span class="menu-text">Status</span>
+                </a>
+            </li>
+            <li class="side-nav-item disabled" id="menu-configure-setup" data-menu-role="ADMIN">
+                <a id="main-menu-show-setup-link" href="#" class="side-nav-link">
+                    <i class="fa fa-check-square"></i>
+                    <span class="menu-text">Setup</span>
+                </a>
+            </li>
+            <li class="side-nav-item disabled" data-menu-role="ADMIN">
+                <a id="main-menu-show-services-settings-link" href="#" class="side-nav-link">
+                    <i class="fa fa-cog"></i>
+                    <span class="menu-text">Configure Services</span>
+                </a>
+            </li>
+            <li class="side-nav-item disabled" data-menu-role="ADMIN">
+                <a id="main-menu-show-nodes-config-link" href="#" class="side-nav-link">
+                    <i class="fa fa-cog"></i>
+                    <span class="menu-text">Setup Eskimo Nodes</span>
+                </a>
+            </li>
+            <li id="menu-kubernetes-configuration" class="side-nav-item disabled visually-hidden"
+                style="display: none; visibility: hidden;" data-menu-role="ADMIN">
+                <a id="main-menu-show-kubernetes-config-link" href="#" class="side-nav-link">
+                    <span class="fa fa-cog"></span>
+                    <span class="menu-text">Setup Kube Services</span>
+                </a>
+            </li>
+            <li class="side-nav-item disabled" id="menu-operations">
+                <a id="main-menu-show-operations-link" href="#" class="side-nav-link">
+                    <i class="fa fa-envelope"></i>
+                    <span class="menu-text">Operations Monitoring</span>
+                </a>
+            </li>
+            <li class="side-nav-item menu-static">
+                <a id="main-menu-logout-link" href="#" class="side-nav-link">
+                    <i class="fa fa-sign-out"></i>
+                    <span class="menu-text">Logout</span>
+                </a>
+            </li>
+
+        </ul>
+        <!--- End Sidemenu -->
+
+        <div class="clearfix"></div>
+    </div>
+</div>
+<!-- ========== Left Sidebar End ========== -->
+
+
+<div class="content-page">
+    <div class="content" id="main-content">
 
         <!-- eskimoNodeStatus.html -->
-        <div class="inner-content" id="inner-content-status" style="visibility: hidden;"> </div>
+        <div class="container-fluid" id="inner-content-status" style="visibility: hidden;"></div>
 
         <!-- eskimoConsoles.html -->
-        <div class="inner-content" id="inner-content-consoles" style="visibility: hidden;"></div>
+        <div class="container-fluid" id="inner-content-consoles" style="visibility: hidden;"></div>
 
         <!-- eskimoOperations.html -->
-        <div class="inner-content" id="inner-content-operations" style="visibility: hidden;"> </div>
+        <div class="container-fluid" id="inner-content-operations" style="visibility: hidden;"></div>
 
         <!-- eskimoSetup.html -->
-        <div class="inner-content" id="inner-content-setup" style="visibility: hidden;"></div>
+        <div class="container-fluid" id="inner-content-setup" style="visibility: hidden;"></div>
 
         <!-- eskimoNodesConfig.html -->
-        <div class="inner-content" id="inner-content-nodes" style="visibility: hidden;"></div>
+        <div class="container-fluid" id="inner-content-nodes" style="visibility: hidden;"></div>
 
         <!-- eskimoServicesSettings.html -->
-        <div class="inner-content" id="inner-content-services-settings" style="visibility: hidden;"></div>
+        <div class="container-fluid" id="inner-content-services-settings" style="visibility: hidden;"></div>
 
         <!-- eskimoKubernetesServicesConfig.html -->
-        <div class="inner-content" id="inner-content-kubernetes-services-config" style="visibility: hidden;"></div>
+        <div class="container-fluid" id="inner-content-kubernetes-services-config" style="visibility: hidden;"></div>
 
         <!-- eskimoFileManagers.html -->
-        <div class="inner-content" id="inner-content-file-managers" style="visibility: hidden;"></div>
+        <div class="container-fluid" id="inner-content-file-managers" style="visibility: hidden;"></div>
 
         <!-- progress bar -->
         <div class="inner-content-show" id="inner-content-progress"
@@ -203,12 +374,14 @@ Software.
             <div class="inner-content-inner " style="top: 50%;width: 100%; height: 50px;">
 
                 <div class="progress progress-striped active" style="margin-bottom: 0px;">
-                    <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                    <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0"
+                         aria-valuemax="100" style="width: 100%">
                         Operations Executing on Eskimo
                     </div>
                 </div>
                 <div class="pending-link-operations">
-                    <a id="link-to-operations" href="javascript:eskimoMain.getOperations().showOperations();">Show Pending Operations</a></div>
+                    <a id="link-to-operations" href="javascript:eskimoMain.getOperations().showOperations();">Show
+                        Pending Operations</a></div>
 
             </div>
 
@@ -238,6 +411,5 @@ Software.
         <!-- modal dialog for about box -->
         <div id="about-modal-wrapper"></div>
 
-    </section>
-
+    </div>
 </div>

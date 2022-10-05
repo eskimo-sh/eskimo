@@ -498,9 +498,9 @@ eskimo.Services = function () {
             if (eskimoMain.hasRole(uiConfig.role)) {
 
                 let menuEntry = '' +
-                    '<li class="folder-menu-items disabled" id="folderMenu' + getUcfirst(getCamelCase(service)) + '">\n' +
-                    '    <a id="services-menu_' + service + '" href="#">\n' +
-                    '        <img src="' + that.eskimoNodesConfig.getServiceIconPath(service) + '"></img>\n' +
+                    '<li class="side-nav-item disabled" id="folderMenu' + getUcfirst(getCamelCase(service)) + '">\n' +
+                    '    <a id="services-menu_' + service + '" href="#" class="side-nav-link">\n' +
+                    '        <i><img src="' + that.eskimoNodesConfig.getServiceIconPath(service) + '"></img></i>\n' +
                     '        <span class="menu-text">' + uiConfig.title + '</span>\n' +
                     '    </a>\n' +
                     '</li>';

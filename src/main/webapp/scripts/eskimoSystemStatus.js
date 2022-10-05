@@ -108,21 +108,21 @@ eskimo.SystemStatus = function() {
                 loadUIStatusServicesConfig();
 
                 $('#show-all-nodes-btn').click($.proxy (function () {
-                    $(".filter-btn").attr("class", "btn btn-default filter-btn");
+                    $(".filter-btn").attr("class", "btn btn-secondary ms-2 filter-btn");
                     setNodeFilter (null);
                     showStatus(true);
                 }, this));
 
                 $('#show-master-services-btn').click($.proxy (function () {
-                    $(".filter-btn").attr("class", "btn btn-default filter-btn");
-                    $("#show-master-services-btn").attr("class", "btn filter-btn btn-success");
+                    $(".filter-btn").attr("class", "btn btn-secondary ms-2 filter-btn");
+                    $("#show-master-services-btn").attr("class", "btn filter-btn btn-success ms-2");
                     setNodeFilter ("master");
                     showStatus(true);
                 }, this));
 
                 $('#show-issues-btn').click($.proxy (function () {
-                    $(".filter-btn").attr("class", "btn btn-default filter-btn");
-                    $("#show-issues-btn").attr("class", "btn filter-btn btn-success");
+                    $(".filter-btn").attr("class", "btn btn-secondary ms-2 filter-btn");
+                    $("#show-issues-btn").attr("class", "btn filter-btn btn-success ms-2");
                     setNodeFilter ("issues");
                     showStatus(true);
                 }, this));

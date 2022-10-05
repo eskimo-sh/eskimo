@@ -238,7 +238,8 @@ eskimo.Main = function() {
                 that.doInitializeInternal();
 
                 // This has to remain last
-                initHoe();
+                // FIXME theme
+                //initHoe();
             });
         });
     };
@@ -290,10 +291,10 @@ eskimo.Main = function() {
 
         $(".folder-menu-items, .config-menu-items").each(function() {
             let menuRole = $(this).attr("data-menu-role");
-            //console.log (this.id, menuRole, that.hasRole(menuRole), $(this).hasClass("menu-hidden"));
+            //console.log (this.id, menuRole, that.hasRole(menuRole), $(this).hasClass("visually-hidden"));
             if (menuRole != null && menuRole != "") {
-                if (!that.hasRole(menuRole) && !$(this).hasClass("menu-hidden")) {
-                    $(this).addClass ("menu-hidden");
+                if (!that.hasRole(menuRole) && !$(this).hasClass("visually-hidden")) {
+                    $(this).addClass ("visually-hidden");
                     $(this).css ("display", "none");
                 }
             }
@@ -379,21 +380,21 @@ eskimo.Main = function() {
 
             if (menuRole == null || menuRole == "" || that.hasRole(menuRole)) {
 
-                if (menuKubernetesConfig.hasClass("menu-hidden")) {
+                if (menuKubernetesConfig.hasClass("visually-hidden")) {
 
                     menuKubernetesConfig.css("visibility", "visible");
                     menuKubernetesConfig.css("display", "inherit");
-                    menuKubernetesConfig.removeClass("menu-hidden")
+                    menuKubernetesConfig.removeClass("visually-hidden")
 
                     // perhaps need to resize the menu ?
                     this.menuResize();
                 }
             }
         } else {
-            if (!menuKubernetesConfig.hasClass("menu-hidden")) {
+            if (!menuKubernetesConfig.hasClass("visually-hidden")) {
                 menuKubernetesConfig.css("visibility", "hidden");
                 menuKubernetesConfig.css("display", "none");
-                menuKubernetesConfig.addClass("menu-hidden")
+                menuKubernetesConfig.addClass("visually-hidden")
             }
         }
     };
@@ -488,7 +489,7 @@ eskimo.Main = function() {
         setupDone = true;
 
         $(".config-menu-items").each(function() {
-            if (!$(this).hasClass("menu-hidden") && !($(this).hasClass("menu-static"))) {
+            if (!$(this).hasClass("visually-hidden") && !($(this).hasClass("menu-static"))) {
                 $(this).attr("class", "config-menu-items");
             }
         });
@@ -501,7 +502,7 @@ eskimo.Main = function() {
         serviceMenuClear();
 
         $(".config-menu-items").each(function() {
-            if (!$(this).hasClass("menu-hidden") && !($(this).hasClass("menu-static"))) {
+            if (!$(this).hasClass("visually-hidden") && !($(this).hasClass("menu-static"))) {
                 $(this).attr("class", "config-menu-items disabled");
             }
         });
@@ -608,7 +609,7 @@ eskimo.Main = function() {
 
         // reset visibility state
         $("#menu-container > * > li").each(function(nbr, node) {
-            if (!$(node).hasClass("menu-hidden")) {
+            if (!$(node).hasClass("visually-hidden")) {
                 $(node).css("display", "");
             }
         });
@@ -634,7 +635,7 @@ eskimo.Main = function() {
             // and deincrement menuHidingPos
             $("#menu-container > * > li").each(function(nbr, node) {
                 if (nbr == menuHidingPos) {
-                    if (!$(node).hasClass ("menu-hidden")) {
+                    if (!$(node).hasClass ("visually-hidden")) {
                         $(node).css("display", "");
                     }
                 }
