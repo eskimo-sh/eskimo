@@ -1,5 +1,6 @@
 @charset "UTF-8";
 :root{
+    --ct-compact-menu-height-min: 1700px;
     --ct-box-shadow:0px 0px 35px 0px rgba(154, 161, 171, 0.15);
     --ct-box-shadow-sm:0 .125rem .25rem rgba(0, 0, 0, 0.075);
     --ct-box-shadow-lg:0 0 45px 0 rgba(0, 0, 0, 0.12);
@@ -12538,10 +12539,10 @@ html[data-sidenav-size=compact]:not(.authentication-bg) .side-nav .side-nav-fort
     text-align:center
 }
 html[data-sidenav-size=condensed]:not(.authentication-bg){
-    min-height:1700px
+    min-height:var(--ct-compact-menu-height-min)
 }
 html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper{
-    min-height:1700px
+    min-height:var(--ct-compact-menu-height-min)
 }
 html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .leftside-menu{
     position:absolute;
@@ -12814,7 +12815,7 @@ html[data-layout-mode=detached]:not([data-layout=topnav]) .leftbar-user{
     background:url(../images/waves.png) no-repeat
 }
 html[data-layout-mode=detached]:not([data-layout=topnav])[data-sidenav-size=condensed] .content-page{
-    min-height:1700px
+    min-height:var(--ct-compact-menu-height-min)
 }
 html[data-layout-mode=detached]:not([data-layout=topnav])[data-sidenav-size=full] .leftside-menu{
     margin-top:calc(24px * .5)!important;

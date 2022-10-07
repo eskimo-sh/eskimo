@@ -268,7 +268,7 @@ Software.
         </div>
 
         <!--- Sidemenu -->
-        <ul class="side-nav">
+        <ul class="side-nav" id="menu-side-nav">
 
             <li id="mainFolderMenuAnchor" class="side-nav-title side-nav-item">Eskimo Services</li>
 
@@ -315,7 +315,7 @@ Software.
             <li id="menu-kubernetes-configuration" class="side-nav-item disabled visually-hidden"
                 style="display: none; visibility: hidden;" data-menu-role="ADMIN">
                 <a id="main-menu-show-kubernetes-config-link" href="#" class="side-nav-link">
-                    <span class="fa fa-cog"></span>
+                    <i class="fa fa-cog"></i>
                     <span class="menu-text">Setup Kube Services</span>
                 </a>
             </li>
@@ -341,36 +341,36 @@ Software.
 <!-- ========== Left Sidebar End ========== -->
 
 
-<div class="content-page">
+<div class="content-page" data-simplebar>
     <div class="content" id="main-content">
 
         <!-- eskimoNodeStatus.html -->
-        <div class="container-fluid" id="inner-content-status" style="visibility: hidden;"></div>
+        <div class="container-fluid inner-content" id="inner-content-status" style="visibility: hidden; display: none;"></div>
 
         <!-- eskimoConsoles.html -->
-        <div class="container-fluid" id="inner-content-consoles" style="visibility: hidden;"></div>
+        <div class="container-fluid inner-content" id="inner-content-consoles" style="visibility: hidden; display: none;"></div>
 
         <!-- eskimoOperations.html -->
-        <div class="container-fluid" id="inner-content-operations" style="visibility: hidden;"></div>
+        <div class="container-fluid inner-content" id="inner-content-operations" style="visibility: hidden; display: none;"></div>
 
         <!-- eskimoSetup.html -->
-        <div class="container-fluid" id="inner-content-setup" style="visibility: hidden;"></div>
+        <div class="container-fluid inner-content" id="inner-content-setup" style="visibility: hidden; display: none;"></div>
 
         <!-- eskimoNodesConfig.html -->
-        <div class="container-fluid" id="inner-content-nodes" style="visibility: hidden;"></div>
+        <div class="container-fluid inner-content" id="inner-content-nodes" style="visibility: hidden; display: none;"></div>
 
         <!-- eskimoServicesSettings.html -->
-        <div class="container-fluid" id="inner-content-services-settings" style="visibility: hidden;"></div>
+        <div class="container-fluid inner-content" id="inner-content-services-settings" style="visibility: hidden; display: none;"></div>
 
         <!-- eskimoKubernetesServicesConfig.html -->
-        <div class="container-fluid" id="inner-content-kubernetes-services-config" style="visibility: hidden;"></div>
+        <div class="container-fluid inner-content" id="inner-content-kubernetes-services-config" style="visibility: hidden; display: none;"></div>
 
         <!-- eskimoFileManagers.html -->
-        <div class="container-fluid" id="inner-content-file-managers" style="visibility: hidden;"></div>
+        <div class="container-fluid inner-content" id="inner-content-file-managers" style="visibility: hidden; display: none;"></div>
 
         <!-- progress bar -->
         <div class="inner-content-show" id="inner-content-progress"
-             style="z-index: 10; height: 100%; background: white; opacity: 0.4; display: none; visibility: hidden;">
+             style="z-index: 10; height: 100%; background: white; opacity: 0.4; display: none; visibility: hidden; display: none;">
             <div class="inner-content-inner " style="top: 50%;width: 100%; height: 50px;">
 
                 <div class="progress progress-striped active" style="margin-bottom: 0px;">

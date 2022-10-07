@@ -201,10 +201,6 @@ eskimo.Main = function() {
 
         $(window).resize (this.windowResize);
 
-        // menu scrolling
-        $("#menu-scroll-up").click(menuUp);
-        $("#menu-scroll-down").click(menuDown);
-        $('#hoe-left-panel').on('mousewheel', menuMouseWheel);
 
         // notifications
         $("#main-show-notifications-link").click(eskimoNotifications.notificationsShown);
@@ -236,6 +232,8 @@ eskimo.Main = function() {
             $("#hoeapp-wrapper").load("html/eskimoMain.html", function (responseTxt, statusTxt, jqXHR) {
 
                 that.doInitializeInternal();
+
+                new ThemeCustomizer().init();
 
                 // This has to remain last
                 // FIXME theme
@@ -289,7 +287,7 @@ eskimo.Main = function() {
 
     function disableAdminMenu () {
 
-        $(".folder-menu-items, .config-menu-items").each(function() {
+        $(".side-nav-item").each(function() {
             let menuRole = $(this).attr("data-menu-role");
             //console.log (this.id, menuRole, that.hasRole(menuRole), $(this).hasClass("visually-hidden"));
             if (menuRole != null && menuRole != "") {
@@ -367,8 +365,10 @@ eskimo.Main = function() {
         } else {
 
             $(".inner-content").css("visibility", "hidden");
+            $(".inner-content").css("display", "none");
 
             $("#inner-content-" + content).css("visibility", "visible");
+            $("#inner-content-" + content).css("display", "block");
         }
     };
 
@@ -426,7 +426,7 @@ eskimo.Main = function() {
 
                 let service = getHyphenSeparated(menuService);
 
-                $(this).attr("class", "folder-menu-items disabled");
+                $(this).attr("class", "side-nav-item folder-menu-items disabled");
 
                 that.getServices().handleServiceHiding(service);
             });
@@ -444,10 +444,10 @@ eskimo.Main = function() {
                 let serviceUp = that.getSystemStatus().serviceIsUp(nodeServicesStatus, service);
 
                 if (!serviceUp || !that.getServices().isServiceAvailable(service)) {
-                    $(this).attr("class", "folder-menu-items disabled");
+                    $(this).attr("class", "side-nav-item folder-menu-items disabled");
                     that.getServices().handleServiceHiding(service);
                 } else {
-                    $(this).attr("class", "folder-menu-items");
+                    $(this).attr("class", "side-nav-item folder-menu-items");
                 }
             });
         }
@@ -488,9 +488,12 @@ eskimo.Main = function() {
     this.handleSetupCompleted = function () {
         setupDone = true;
 
-        $(".config-menu-items").each(function() {
-            if (!$(this).hasClass("visually-hidden") && !($(this).hasClass("menu-static"))) {
-                $(this).attr("class", "config-menu-items");
+        $(".side-nav-item").each(function() {
+            if (!$(this).hasClass("visually-hidden")
+                && !($(this).hasClass("menu-static"))
+                && !($(this).hasClass("side-nav-title"))
+                && !($(this).hasClass("folder-menu-items"))) {
+                $(this).attr("class", "side-nav-item");
             }
         });
     };
@@ -501,14 +504,17 @@ eskimo.Main = function() {
 
         serviceMenuClear();
 
-        $(".config-menu-items").each(function() {
-            if (!$(this).hasClass("visually-hidden") && !($(this).hasClass("menu-static"))) {
-                $(this).attr("class", "config-menu-items disabled");
+        $(".side-nav-item").each(function() {
+            if (!$(this).hasClass("visually-hidden")
+                && !($(this).hasClass("menu-static"))
+                && !($(this).hasClass("side-nav-title"))
+                && !($(this).hasClass("folder-menu-items"))) {
+                $(this).attr("class", "side-nav-item disabled");
             }
         });
 
-        $("#menu-configure-setup").attr("class", "config-menu-items");
-        $("#menu-operations").attr("class", "config-menu-items");
+        $("#menu-configure-setup").attr("class", "side-nav-item");
+        $("#menu-operations").attr("class", "side-nav-item");
     };
 
     this.showSetupNotDone = function (message) {
@@ -588,96 +594,15 @@ eskimo.Main = function() {
         that.menuResize();
     };
 
+    // FIXME theme remove
     this.menuResize = function() {
         // alert (window.innerHeight + " - " + window.innerWidth);
 
-        let actualMenuHeight = $("#menu-container").height();
-        let menuContainerHeight = $("#hoe-left-panel").height();
+        var r = document.querySelector(':root');
+        r.style.setProperty('--ct-compact-menu-height-min', ($("#menu-side-nav").height() + 90) + 'px');
 
-        //console.log (menuContainerHeight + " -  " + actualMenuHeight);
-
-        if (menuContainerHeight - 80 < actualMenuHeight) {
-            $("#menu-scroll-up").css ("display", "inherit");
-            $("#menu-scroll-down").css ("display", "inherit");
-            $("#menu-container").css ("top", "25px");
-            that.menuUp();
-        } else {
-            $("#menu-scroll-up").css ("display", "none");
-            $("#menu-scroll-down").css ("display", "none");
-            $("#menu-container").css ("top", "0px");
-        }
-
-        // reset visibility state
-        $("#menu-container > * > li").each(function(nbr, node) {
-            if (!$(node).hasClass("visually-hidden")) {
-                $(node).css("display", "");
-            }
-        });
-        menuHidingPos = 0;
     };
 
-    function menuMouseWheel (event) {
-        if (event.deltaY > 0) {
-            menuUp();
-        } else if (event.deltaY < 0) {
-            menuDown();
-        }
-        event.preventDefault();
-    }
-
-    function menuUp(e) {
-
-        if (menuHidingPos > 0) {
-
-            menuHidingPos--;
-
-            // browse both menu and unhide last hidden element
-            // and deincrement menuHidingPos
-            $("#menu-container > * > li").each(function(nbr, node) {
-                if (nbr == menuHidingPos) {
-                    if (!$(node).hasClass ("visually-hidden")) {
-                        $(node).css("display", "");
-                    }
-                }
-            });
-        }
-
-        if (e != null) {
-            e.preventDefault();
-        }
-        return false;
-    }
-    this.menuUp = menuUp;
-
-    function menuDown (e) {
-
-        let menuContainerHeight = $("#hoe-left-panel").height();
-        let actualMenuHeight = $("#menu-container").height();
-
-        //console.log(menuContainerHeight, actualMenuHeight, menuHidingPos);
-
-        // IF AND ONLY IF size is not sufficient for current menu site, THEN
-        if (menuContainerHeight - 80 < actualMenuHeight) {
-
-            console.log ("OK");
-
-            // hide first non-hidden li element from both menu
-            // and increment menuHidingPos
-            $("#menu-container > * > li").each(function(nbr, node) {
-                if (nbr == menuHidingPos) {
-                    $(node).css("display", "none");
-                }
-            });
-
-            menuHidingPos++;
-        }
-
-        if (e != null) {
-            e.preventDefault();
-        }
-        return false;
-    }
-    this.menuDown = menuDown;
 
     this.initialize();
 };

@@ -498,7 +498,7 @@ eskimo.Services = function () {
             if (eskimoMain.hasRole(uiConfig.role)) {
 
                 let menuEntry = '' +
-                    '<li class="side-nav-item disabled" id="folderMenu' + getUcfirst(getCamelCase(service)) + '">\n' +
+                    '<li class="side-nav-item folder-menu-items disabled" id="folderMenu' + getUcfirst(getCamelCase(service)) + '">\n' +
                     '    <a id="services-menu_' + service + '" href="#" class="side-nav-link">\n' +
                     '        <i><img src="' + that.eskimoNodesConfig.getServiceIconPath(service) + '"></img></i>\n' +
                     '        <span class="menu-text">' + uiConfig.title + '</span>\n' +
@@ -528,7 +528,7 @@ eskimo.Services = function () {
             serviceInitialized[service] = false;
 
             let iframeWrapperString = '' +
-                '<div class="inner-content inner-content-frame-container" id="inner-content-' + service + '" style="visibility: hidden;">\n' +
+                '<div class="inner-content inner-content-frame-container" id="inner-content-' + service + '" style="visibility: hidden; display: none;">\n' +
                 '    <div id="' + service + '-management"\n' +
                 '         class="panel theme-panel inner-content-inner inner-content-inner-frame" >\n' +
                 '        <div class="service-container" id="' + service + '-container" >\n' +

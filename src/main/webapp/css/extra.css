@@ -494,16 +494,13 @@ table.system-information tr td.info-label {
     overflow-y: auto;
 }
 .inner-content {
-    /* No padding bottom */
-    padding: 20px 20px 0px 20px;
-    position: absolute;
-    top: 0px;
-    bottom: 0px;
+    /*
     width: 100%;
     height: 100%;
     overflow-y: auto;
     display: flex;
     flex-flow: column;
+    */
 }
 .inner-content-frozen {
     overflow-y: hidden;
@@ -716,4 +713,8 @@ td.operation-title{
 html[data-sidenav-size=condensed] .content-page {
     height: 100%;
     overflow: visible;
+}
+
+.content-page {
+    padding-bottom: 0px;
 }
