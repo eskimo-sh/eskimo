@@ -439,7 +439,7 @@ eskimo.Services = function () {
         /*
         // menu
         let serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(service)));
-        serviceMenu.attr("class", "folder-menu-items disabled");
+        serviceMenu.attr("class", "side-nav-item folder-menu-items disabled");
         */
 
         // iframe

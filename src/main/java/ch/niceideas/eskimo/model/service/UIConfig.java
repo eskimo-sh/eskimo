@@ -61,7 +61,6 @@ public class UIConfig {
     private String requiredRole;
 
     private boolean applyStandardProxyReplacements = true;
-    private String statusPageLinkTitle;
 
     private final List<ProxyReplacement> proxyReplacements = new ArrayList<>();
     private final List<UrlRewriting> urlRewritings = new ArrayList<>();

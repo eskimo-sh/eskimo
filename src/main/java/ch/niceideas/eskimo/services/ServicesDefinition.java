@@ -217,10 +217,6 @@ public class ServicesDefinition implements InitializingBean {
                     uiConfig.setApplyStandardProxyReplacements((Boolean)servicesConfig.getValueForPath(serviceString+".ui.applyStandardProxyReplacements"));
                 }
 
-                if (servicesConfig.hasPath(serviceString+".ui.statusPageLinktitle")) {
-                    uiConfig.setStatusPageLinkTitle((String)servicesConfig.getValueForPath(serviceString+".ui.statusPageLinktitle"));
-                }
-
                 service.setUiConfig(uiConfig);
 
                 if (servicesConfig.hasPath(serviceString+".ui.pageScripters")) {
@@ -677,14 +673,6 @@ public class ServicesDefinition implements InitializingBean {
                 .sorted(Comparator.comparingInt(Service::getConfigOrder))
                 .map(Service::getName)
                 .toArray(String[]::new);
-    }
-
-    public UIConfig[] listLinkServices() {
-        return services.values().stream()
-                .filter(Service::isLink)
-                .sorted(Comparator.comparingInt(Service::getConfigOrder))
-                .map(Service::getUiConfig)
-                .toArray(UIConfig[]::new);
     }
 
     public String[] listUIServices() {

@@ -147,22 +147,22 @@ Software.
             </li>
 
             <li class="dropdown notification-list d-none d-sm-inline-block">
-                <a class="nav-link dropdown-toggle arrow-none" data-bs-toggle="dropdown" href="docs/eskimo-guide.html"
+                <a class="nav-link" href="docs/eskimo-guide.html"
                    id="main-show-user-guide"
                    target="_blank" class="icon-circle"
                    title="Show User Guide"
                    role="button" aria-haspopup="false" aria-expanded="false">
-                    <span class="fa fa-file-o"></span>
+                    <i class="menu-icon fa fa-file-o"></i>
                 </a>
             </li>
 
             <li class="dropdown notification-list d-none d-sm-inline-block">
-                <a class="nav-link dropdown-toggle arrow-none" data-bs-toggle="dropdown"
+                <a class="nav-link "
                    href="docs/service-dev-guide.html" id="main-show-service-guide"
                    target="_blank" class="icon-circle"
                    title="Show Service Development Guide"
                    role="button" aria-haspopup="false" aria-expanded="false">
-                    <span class="fa fa-file-o"></span>
+                    <i class="menu-icon fa fa-file-o"></i>
                 </a>
             </li>
             <li class="dropdown notification-list d-none d-sm-inline-block">
@@ -170,7 +170,7 @@ Software.
                    id="main-show-about-link" class="icon-circle"
                    title="Show Eskimo About Information"
                    role="button" aria-haspopup="false" aria-expanded="false">
-                    <span class="top-menu-small fa fa-question"></span>
+                    <i class="menu-icon top-menu-small fa fa-question"></i>
                 </a>
             </li>
 
@@ -184,13 +184,13 @@ Software.
                 <a class="nav-link dropdown-toggle nav-user arrow-none me-0" data-bs-toggle="dropdown"
                    href="index.html#" role="button" aria-haspopup="false"
                    aria-expanded="false">
-                                <span class="account-user-avatar">
-                                    <img src="assets/images/users/avatar-1.jpg" alt="user-image" class="rounded-circle">
-                                </span>
+                    <span class="account-user-avatar">
+                        <img src="images/user.png" alt="user-image" class="rounded-circle">
+                    </span>
                     <span>
-                                    <span class="account-user-name">Dominic Keller</span>
-                                    <span class="account-position">Founder</span>
-                                </span>
+                        <span class="account-user-name" id="account-user-name">(User)</span>
+                        <span class="account-position" id="account-position">(Role)</span>
+                    </span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated topbar-dropdown-menu profile-dropdown">
                     <!-- item-->
@@ -205,7 +205,7 @@ Software.
                     </a>
 
                     <!-- item-->
-                    <a href="javascript:void(0);" class="dropdown-item notify-item">
+                    <a href="javascript:void(0);" id="user-logout" class="dropdown-item notify-item">
                         <i class="mdi mdi-logout me-1"></i>
                         <span>Logout</span>
                     </a>
@@ -240,8 +240,8 @@ Software.
     <a href="index.html" class="logo logo-dark">
         <span class="logo-lg">
             <img src="images/eskimo-icon-black.png" alt="dark logo" height="22">
-            <span id="eskimoTitle" class="logo-title">Eskimo Console</span>
-            <div class="eskimo-version" id="eskimo-version">
+            <span id="eskimoTitle-dark" class="logo-title">Eskimo Console</span>
+            <div class="eskimo-version" id="eskimo-version-dark">
                 (version)
             </div>
         </span>
@@ -263,7 +263,7 @@ Software.
             <a href="pages-profile.html">
                 <img src="assets/images/users/avatar-1.jpg" alt="user-image" height="42"
                      class="rounded-circle shadow-sm">
-                <span class="leftbar-user-name">Dominic Keller</span>
+                <span class="leftbar-user-name">(User)</span>
             </a>
         </div>
 
@@ -323,12 +323,6 @@ Software.
                 <a id="main-menu-show-operations-link" href="#" class="side-nav-link">
                     <i class="fa fa-envelope"></i>
                     <span class="menu-text">Operations Monitoring</span>
-                </a>
-            </li>
-            <li class="side-nav-item menu-static">
-                <a id="main-menu-logout-link" href="#" class="side-nav-link">
-                    <i class="fa fa-sign-out"></i>
-                    <span class="menu-text">Logout</span>
                 </a>
             </li>
 

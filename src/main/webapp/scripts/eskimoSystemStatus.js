@@ -35,7 +35,10 @@ Software.
 if (typeof eskimo === "undefined" || eskimo == null) {
     window.eskimo = {}
 }
+
 eskimo.SystemStatus = function() {
+
+    const STATUS_REFRESH_PERIOD_MS = 10000;
 
     // will be injected eventually from constructorObject
     this.eskimoNotifications = null;
@@ -50,8 +53,6 @@ eskimo.SystemStatus = function() {
     const that = this;
 
     let initialized = false;
-
-    const STATUS_UPDATE_INTERVAL = 4000;
 
     // initialized by backend
     let STATUS_SERVICES = [];
@@ -612,7 +613,7 @@ eskimo.SystemStatus = function() {
 
                 setTimeout(function () {
                     that.displayMonitoringDashboard(monitoringDashboardId, refreshPeriod);
-                }, blocking ? 0 : 5000);
+                }, blocking ? 0 : STATUS_REFRESH_PERIOD_MS);
             }
         }
 
@@ -625,6 +626,13 @@ eskimo.SystemStatus = function() {
         $("#system-information-timestamp").html(systemStatus.buildTimestamp);
 
         $("#system-information-user").html(systemStatus.sshUsername);
+
+        $("#logged-user").html(systemStatus.username);
+        $("#account-user-name").html(systemStatus.username);
+
+        $("#logged-role").html(systemStatus.roles);
+        $("#account-position").html(systemStatus.roles);
+
 
         $("#system-information-start-timestamp").html (systemStatus.startTimestamp);
 
@@ -680,35 +688,6 @@ eskimo.SystemStatus = function() {
                 "</span>");
         }
 
-        // C. System Information Actions
-
-        let systemInformationActions = '';
-
-        if (systemStatus.links && systemStatus.links.length && systemStatus.links.length > 0) {
-            for (let i = 0; i < systemStatus.links.length; i++) {
-
-                let link = systemStatus.links[i];
-
-                if (that.eskimoServices.isServiceAvailable(link.service)
-                    && this.serviceIsUp (nodeServicesStatus, link.service)) {
-                    systemInformationActions += '' +
-                        '<a href="javascript:eskimoMain.getServices().showServiceIFrame(\''+link.service+'\');">' +
-                        '<table class=".status-monitoring-action-table">' +
-                        '<tr>' +
-                        '<td>' +
-                        '<img class="control-logo-logo" src="images/'+link.service+'-logo.png"/>' +
-                        '</td><td>&nbsp;' +
-                        link.title +
-                        '</td>' +
-                        '</tr>' +
-                        '</table>' +
-                        '</a>';
-                }
-            }
-        }
-
-        $("#system-information-actions").html(systemInformationActions);
-
         // D. General configuration
 
         that.eskimoMain.handleKubernetesSubsystem (systemStatus.enableKubernetes);
@@ -729,7 +708,7 @@ eskimo.SystemStatus = function() {
             return false;
         })
 
-        setTimeout (that.monitoringDashboardFrameTamper, 10000);
+        setTimeout (that.monitoringDashboardFrameTamper, STATUS_REFRESH_PERIOD_MS);
     };
 
     this.callServiceMenuHooks  = function (serviceStatus, nodeName, node, service, blocking) {
@@ -768,8 +747,8 @@ eskimo.SystemStatus = function() {
             if (nodeAlive == 'OK') {
 
                 // Show SFTP and Terminal Menu entries
-                $("#folderMenuConsoles").attr("class", "folder-menu-items");
-                $("#folderMenuFileManagers").attr("class", "folder-menu-items");
+                $("#folderMenuConsoles").attr("class", "side-nav-item folder-menu-items");
+                $("#folderMenuFileManagers").attr("class", "side-nav-item folder-menu-items");
 
                 availableNodes.push({"nbr": nbr, "nodeName": nodeName, "nodeAddress": node});
             }
@@ -1192,7 +1171,7 @@ eskimo.SystemStatus = function() {
                 }
 
                 // reschedule updateStatus
-                statusUpdateTimeoutHandler = setTimeout(updateStatus, STATUS_UPDATE_INTERVAL);
+                statusUpdateTimeoutHandler = setTimeout(updateStatus, STATUS_REFRESH_PERIOD_MS);
                 inUpdateStatus = false;
             },
 
@@ -1218,7 +1197,7 @@ eskimo.SystemStatus = function() {
                 disconnectedFlag = true;
 
                 // reschedule updateStatus
-                statusUpdateTimeoutHandler = setTimeout(updateStatus, STATUS_UPDATE_INTERVAL);
+                statusUpdateTimeoutHandler = setTimeout(updateStatus, STATUS_REFRESH_PERIOD_MS);
                 inUpdateStatus = false;
             }
         });

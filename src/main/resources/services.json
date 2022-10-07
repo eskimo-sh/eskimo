@@ -151,7 +151,6 @@
       "waitTime": 5000,
       "title" : "Grafana Monitoring",
       "role" : "*",
-      "statusPageLinktitle" : "Access all monitoring dashboards in Grafana",
       "proxyReplacements" : [
         {
           "type" : "PLAIN",
@@ -244,7 +243,6 @@
       "waitTime": 10000,
       "role" : "ADMIN",
       "title": "Gluster Dashboard",
-      "statusPageLinktitle": "Monitor Gluster volumes"
     },
     "masterDetection": {
       "strategy" : "LOG_FILE",
@@ -460,7 +458,6 @@
       "waitTime": 5000,
       "role" : "ADMIN",
       "title" : "Kubernetes Dashboard",
-      "statusPageLinktitle" : "Manage Kubernetes Cluster",
       "proxyReplacements" : [
         {
           "type" : "PLAIN",
@@ -706,7 +703,6 @@
       "waitTime": 6000,
       "role" : "ADMIN",
       "title" : "Kafka manager",
-      "statusPageLinktitle" : "Manage your kafka topics",
       "proxyReplacements" : [
         {
           "type" : "PLAIN",
@@ -772,7 +768,6 @@
       "waitTime": 5000,
       "role" : "*",
       "title" : "Spark Console",
-      "statusPageLinktitle" : "Monitor your Spark jobs",
       "applyStandardProxyReplacements": false,
       "urlRewriting" : [
         {
@@ -982,7 +977,6 @@
       "waitTime": 5000,
       "role" : "*",
       "title" : "Flink Dashboard",
-      "statusPageLinktitle" : "Manage Flink Session"
     },
     "dependencies": [
       {
@@ -1211,7 +1205,6 @@
       "waitTime": 5000,
       "role" : "*",
       "title" : "Cerebro",
-      "statusPageLinktitle" : "Manage your data in Elasticsearch"
     },
     "dependencies": [
       {
@@ -1387,7 +1380,6 @@
       "role" : "*",
       "title" : "Kibana",
       "applyStandardProxyReplacements": false,
-      "statusPageLinktitle" : "Visualize your data in Elasticsearch",
       "proxyReplacements" : [
         {
           "type" : "PLAIN",
@@ -1483,7 +1475,6 @@
       "waitTime": 8000,
       "role" : "*",
       "title" : "Zeppelin",
-      "statusPageLinktitle" : "Use Zeppelin for your Data Science projects",
       "proxyReplacements" : [
         {
           "type" : "PLAIN",

@@ -218,7 +218,7 @@ eskimo.Main = function() {
         $("#main-menu-show-nodes-config-link").click(eskimoNodesConfig.showNodesConfig);
         $("#main-menu-show-kubernetes-config-link").click(eskimoKubernetesServicesConfig.showKubernetesServicesConfig);
         $("#main-menu-show-operations-link").click(eskimoOperations.showOperations);
-        $("#main-menu-logout-link").click(function() {
+        $("#user-logout").click(function() {
             window.location = "logout";
         });
 

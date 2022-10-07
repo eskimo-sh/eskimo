@@ -718,3 +718,15 @@ html[data-sidenav-size=condensed] .content-page {
 .content-page {
     padding-bottom: 0px;
 }
+
+table.node-status-table tbody,
+.table.table-bordered table.node-status-table  tbody{
+    border: 0px none;
+}
+
+
+.menu-icon {
+    font-size: 20px;
+    vertical-align: middle;
+    line-height: 70px;
+}

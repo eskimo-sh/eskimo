@@ -45,6 +45,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
@@ -182,18 +185,15 @@ public class ApplicationStatusService {
 
             systemStatus.setValueForPath("startTimestamp", df.format(startDate));
 
-            // 1. Get link status
-            UIConfig[] linkServices = servicesDefinition.listLinkServices();
-            JSONArray linkArray = new JSONArray(new ArrayList<JSONObject>(){{
-                for (UIConfig config : linkServices) {
-                    add(new JSONObject(new HashMap<String, String>(){{
-                        put ("service", config.getServiceName());
-                        put ("title", config.getStatusPageLinkTitle());
-                    }}));
-                }
-            }});
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-            systemStatus.getJSONObject().put("links", linkArray);
+            systemStatus.setValueForPath("username", auth.getName());
+
+            Collection<SimpleGrantedAuthority> authorities = (Collection<SimpleGrantedAuthority>) auth.getAuthorities();
+            StringBuilder sb = new StringBuilder();
+            authorities.forEach( authority -> sb.append(authority.getAuthority()));
+
+            systemStatus.setValueForPath("roles", sb.toString());
 
             lastStatus.set (systemStatus);
 
