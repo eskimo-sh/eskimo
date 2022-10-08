@@ -594,11 +594,6 @@ class ThemeCustomizer {
                     self.html.classList.toggle('sidebar-enable');
                 }
 
-                // Todo: old implementation
-
-
-                eskimoMain.menuResize();
-
             });
         }
 

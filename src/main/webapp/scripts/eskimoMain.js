@@ -356,6 +356,14 @@ eskimo.Main = function() {
 
     this.showOnlyContent = function (content, isServiceIFrame) {
 
+        $("#main-content").scrollTop();
+
+        if (isServiceIFrame) {
+            $('#main-content').addClass("overflow-hidden");
+        } else {
+            $('#main-content').removeClass("overflow-hidden");
+        }
+
         // if service iframe is already shown, clicking a second time on the link refreshed the iframe
 
         if (isServiceIFrame && $("#inner-content-" + content).css("visibility") == "visible") {
@@ -385,9 +393,6 @@ eskimo.Main = function() {
                     menuKubernetesConfig.css("visibility", "visible");
                     menuKubernetesConfig.css("display", "inherit");
                     menuKubernetesConfig.removeClass("visually-hidden")
-
-                    // perhaps need to resize the menu ?
-                    this.menuResize();
                 }
             }
         } else {
@@ -590,17 +595,6 @@ eskimo.Main = function() {
         var headerHeight = $("#hoe-header").height();;
 
         $(".inner-content").css("height", (viewPortHeight - headerHeight) + "px");
-
-        that.menuResize();
-    };
-
-    // FIXME theme remove
-    this.menuResize = function() {
-        // alert (window.innerHeight + " - " + window.innerWidth);
-
-        var r = document.querySelector(':root');
-        r.style.setProperty('--ct-compact-menu-height-min', ($("#menu-side-nav").height() + 90) + 'px');
-
     };
 
 

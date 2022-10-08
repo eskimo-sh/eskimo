@@ -62,8 +62,10 @@ Software.
     <!-- Bootstrap -->
     <link href="css/font-awesome.min.css" rel="stylesheet">
 
-    <link href="css/app-saas.css" rel="stylesheet">
+    <link href="css/eskimo-theme.css" rel="stylesheet">
+    <link href="css/bootstrap-5.2.0.css" rel="stylesheet">
     <link href="css/ajaxterm.css" rel="stylesheet">
+    <link href="css/extra.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]
@@ -73,7 +75,9 @@ Software.
 
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="scripts/vendor.js"></script>
+    <script src="scripts/jquery-3.6.0.js"></script>
+    <script src="scripts/bootstrap-5.2.0.js"></script>
+
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="scripts/eskimoUtils.js"></script>
 
@@ -116,13 +120,13 @@ Software.
 <body theme-bg="bg1">
 <main class="login-form">
     <div class="container">
-        <div class="row text-center vertical-center">
+        <div class="row text-center justify-content-sm-center vertical-center">
             <div class="col-md-8 col-xs-10 col-sm-10 col-lg-6 col-md-offset-2 col-xs-offset-1 col-sm-offset-1 col-lg-offset-3">
-                <div id="panel-login" class="panel panel-default">
-                    <div class="eskimo-panel-heading panel-heading">Eskimo Login</div>
-                    <div id="panel-login-body" class="panel-body">
+                <div id="panel-login" class="card ">
+                    <div class="eskimo-panel-heading card-header">Eskimo Login</div>
+                    <div id="panel-login-body" class="card-body">
                         <form id="loginForm" action="/login" method="POST">
-                            <div class="form-group row">
+                            <div class="input-group mb-2 row">
                                 <label for="eskimo-username"
                                        class="col-md-4 col-form-label text-md-right">Username</label>
                                 <div class="col-md-6">
@@ -131,16 +135,16 @@ Software.
                                 </div>
                             </div>
 
-                            <div class="form-group row">
+                            <div class="input-group mb-2 row">
                                 <label for="eskimo-password" class="col-md-4 col-form-label text-md-right">Password</label>
                                 <div class="col-md-6">
                                     <input type="password" id="eskimo-password" class="form-control" name="eskimo-password" required>
                                 </div>
                             </div>
 
-                            <div class="row">
+                            <div class="row justify-content-sm-center">
                                 <div class="col-md-6 col-md-offset-3">
-                                    <button type="submit" class="btn btn-primary">
+                                    <button type="submit" class="btn btn-info">
                                         Login
                                     </button>
                                 </div>
@@ -152,7 +156,7 @@ Software.
                             </div>
                         </div>
                     </div>
-                    <div id="login-demo-footer" class="eskimo-panel-footer panel-footer" style="display: none;">
+                    <div id="login-demo-footer" class="eskimo-panel-footer card-footer" style="display: none;">
                         (Use <strong>admin</strong> / <strong>password</strong> on Demo VM)
                     </div>
                 </div>
