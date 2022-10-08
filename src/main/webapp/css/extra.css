@@ -724,9 +724,27 @@ table.node-status-table tbody,
     border: 0px none;
 }
 
-
 .menu-icon {
     font-size: 20px;
     vertical-align: middle;
     line-height: 70px;
 }
+
+.content-page {
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+}
+
+.inner-content-frame-container,
+.inner-content-inner-frame{
+    height: calc(100vh - 77px);
+}
+
+/*
+html[data-sidenav-size=condensed]:not(.authentication-bg) .inner-content-frame-container,
+html[data-sidenav-size=condensed]:not(.authentication-bg) .inner-content-inner-frame
+{
+    min-height:var(--ct-compact-menu-height-min)
+}
+*/

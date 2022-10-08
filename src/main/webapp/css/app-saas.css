@@ -478,6 +478,8 @@ html[data-sidenav-color=light]{
     --ct-menu-item-hover:#727cf5;
     --ct-menu-item-active:#727cf5
 }
+
+
 /*! * Bootstrap v5.2.0 (https://getbootstrap.com/) * Copyright 2011-2022 The Bootstrap Authors * Copyright 2011-2022 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) */
 :root{
     --ct-blue:#2c8ef8;
@@ -541,8 +543,8 @@ html[data-sidenav-color=light]{
     --ct-border-radius-xl:1rem;
     --ct-border-radius-2xl:2rem;
     --ct-border-radius-pill:50rem;
-    --ct-link-color:#727cf5;
-    --ct-link-hover-color:#6169d0;
+    --ct-link-color:#333333;
+    --ct-link-hover-color:#616980;
     --ct-code-color:#39afd1;
     --ct-highlight-bg:var(--ct-mark-bg)
 }
@@ -12352,7 +12354,7 @@ textarea.form-control-lg{
     width:100%
 }
 .content-page{
-    margin-left:260px;
+    margin-left:259px;
     overflow:hidden;
     min-height:100vh;
     padding:70px 12px 65px
@@ -12538,12 +12540,15 @@ html[data-sidenav-size=compact]:not(.authentication-bg) .side-nav .side-nav-fort
     padding:8px 10px;
     text-align:center
 }
+/*
 html[data-sidenav-size=condensed]:not(.authentication-bg){
     min-height:var(--ct-compact-menu-height-min)
 }
 html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper{
     min-height:var(--ct-compact-menu-height-min)
 }
+
+ */
 html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .leftside-menu{
     position:absolute;
     width:70px;
@@ -12551,7 +12556,28 @@ html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .leftside-men
     z-index:5;
     padding-top:70px
 }
-html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .leftside-menu .simplebar-content-wrapper,html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .leftside-menu .simplebar-mask{
+
+/* JKE changes on simplebar
+
+html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .leftside-menu .simplebar-content-wrapper,
+html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .leftside-menu .simplebar-mask{
+    overflow-x:visible!important
+}
+html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .leftside-menu .simplebar-horizontal ,
+html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .leftside-menu .simplebar-horizontal .simplebar-scrollbar{
+    display:none!important
+}
+html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .leftside-menu .simplebar-offset{
+    bottom:0!important
+}
+html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .leftside-menu .simplebar-content{
+    overflow-x: visible;
+}
+*/
+
+/* former version */
+html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .leftside-menu .simplebar-content-wrapper,
+html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .leftside-menu .simplebar-mask{
     overflow:visible!important
 }
 html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .leftside-menu .simplebar-scrollbar{
@@ -12560,6 +12586,7 @@ html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .leftside-men
 html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .leftside-menu .simplebar-offset{
     bottom:0!important
 }
+
 html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .leftside-menu .logo{
     width:70px;
     z-index:1;
@@ -12569,9 +12596,10 @@ html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .button-sm-ho
     display:none
 }
 html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .content-page{
-    margin-left:70px
+    margin-left:69px
 }
-html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .footer,html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .navbar-custom{
+html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .footer,
+html[data-sidenav-size=condensed]:not(.authentication-bg) .wrapper .navbar-custom{
     left:70px
 }
 html[data-sidenav-size=condensed]:not(.authentication-bg) .side-nav .badge,html[data-sidenav-size=condensed]:not(.authentication-bg) .side-nav .side-nav-title{
@@ -12814,9 +12842,11 @@ html[data-layout-mode=detached]:not([data-layout=topnav]) .leftside-menu{
 html[data-layout-mode=detached]:not([data-layout=topnav]) .leftbar-user{
     background:url(../images/waves.png) no-repeat
 }
+/*
 html[data-layout-mode=detached]:not([data-layout=topnav])[data-sidenav-size=condensed] .content-page{
     min-height:var(--ct-compact-menu-height-min)
 }
+*/
 html[data-layout-mode=detached]:not([data-layout=topnav])[data-sidenav-size=full] .leftside-menu{
     margin-top:calc(24px * .5)!important;
     bottom:calc(24px * .5)!important;
@@ -13027,7 +13057,7 @@ html[data-sidenav-color=dark][data-sidenav-size=condensed] .side-nav .side-nav-i
     box-shadow:var(--ct-box-shadow);
     min-height:70px;
     position:fixed;
-    left:260px;
+    left:259px;
     top:0;
     right:0;
     z-index:1000

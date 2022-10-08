@@ -571,18 +571,31 @@ class ThemeCustomizer {
                 var configSize = self.config.sidenav.size;
                 var size = self.html.getAttribute('data-sidenav-size', configSize);
 
+                console.log (configSize + " - " + size);
+
                 if (size !== 'full') {
+                    /*
                     if (size === 'condensed') {
                         self.changeLeftbarSize(configSize == 'condensed' ? 'default' : configSize, false);
                     } else {
                         self.changeLeftbarSize('condensed', false);
                     }
+                    */
+                    self.changeLeftbarSize('full', false);
+                    self.html.classList.remove('sidebar-enable');
                 } else {
-                    self.showBackdrop();
+
+                    if (window.innerWidth <= 1140) {
+                        self.showBackdrop();
+                    } else {
+                        self.changeLeftbarSize('default', false);
+                    }
+
+                    self.html.classList.toggle('sidebar-enable');
                 }
 
                 // Todo: old implementation
-                self.html.classList.toggle('sidebar-enable');
+
 
                 eskimoMain.menuResize();
 
@@ -607,7 +620,11 @@ class ThemeCustomizer {
     }
 
     showBackdrop() {
+        if (document.getElementById("sidebar-backdrop")) {
+            return;
+        }
         const backdrop = document.createElement('div');
+        backdrop.id = "sidebar-backdrop"
         backdrop.classList = 'offcanvas-backdrop fade show';
         document.body.appendChild(backdrop);
         document.body.style.overflow = "hidden";
@@ -633,9 +650,16 @@ class ThemeCustomizer {
     _adjustLayout() {
         var self = this;
 
-        if (window.innerWidth <= 750) {
+        if (window.innerWidth <= 1140) {
             self.changeLeftbarSize('full', false);
+
+            if (self.html.classList.contains('sidebar-enable')) {
+                self.showBackdrop();
+            }
+
+
         }
+        /*
         else if (window.innerWidth >= 750 && window.innerWidth <= 1140) {
             if (self.config.sidenav.size !== 'full') {
                 if (self.config.sidenav.size === 'sm-hover') {
@@ -648,7 +672,9 @@ class ThemeCustomizer {
                 self.changeLayoutMode('fluid', false)
             }
 
-        } else {
+        }
+        */
+        else {
             self.changeLeftbarSize(self.config.sidenav.size);
             self.changeLayoutMode(self.config.layout.mode);
         }

@@ -532,7 +532,7 @@ eskimo.Services = function () {
                 '    <div id="' + service + '-management"\n' +
                 '         class="panel theme-panel inner-content-inner inner-content-inner-frame" >\n' +
                 '        <div class="service-container" id="' + service + '-container" >\n' +
-                '          <iframe class="inner-content-iframe" id="iframe-content-' + service + '" src="' + EMPTY_FRAMETARGET + '">\n' +
+                '          <iframe scrolling="no" class="inner-content-iframe" id="iframe-content-' + service + '" src="' + EMPTY_FRAMETARGET + '">\n' +
                 '          </iframe>\n' +
                 '        </div>\n' +
                 '    </div>\n' +
