@@ -702,6 +702,7 @@ td.operation-title{
 
 .card {
     width: 100%;
+    border: 1px solid #ddd;
 }
 
 .logo-title {
@@ -760,4 +761,13 @@ html[data-sidenav-size=condensed]:not(.authentication-bg) .inner-content-inner-f
 
 #login-demo-footer {
     background-color: #f5f5f5;
+}
+
+.card-header, .card-title {
+    margin-top: 0;
+    /* margin: 10px; */
+    padding: 4px 10px 2px 23px;
+    background-color: #f5f5f5;
+    border-color: #ddd;
+    border-bottom: 1px solid #e3e3e3;
 }

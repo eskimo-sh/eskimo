@@ -221,8 +221,8 @@
 }
 html[data-sidenav-color=dark]{
     --ct-bg-leftbar:#313a46;
-    --ct-dark-menu-item:#8391a2;
-    --ct-dark-menu-item-hover:#bccee4;
+    --ct-dark-menu-item:#93a1b2;
+    --ct-dark-menu-item-hover:#ccdef4;
     --ct-dark-menu-item-active:#fff
 }
 html[data-sidenav-color=default]{

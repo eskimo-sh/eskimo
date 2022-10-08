@@ -552,7 +552,7 @@ eskimo.NodesConfig = function() {
         multipleServicesDiv = multipleServicesDiv + "</div>";
 
         let newIn = ' '+
-            '<div id="field'+ next +'" class="form-group col-md-12 node-config-element" >'+
+            '<div id="field'+ next +'" class="input-group col-md-12 node-config-element" >'+
             '    <div class="col-md-12 node-config-element-wrapper"> '+
             '        <label class="col-md-3 control-label" id="label'+next+'">'+getNodeTitle(isRange)+' <div class="server-title-text">' + next + '</div></label> '+
             '        <div class="col-md-6"> '+
