@@ -98,9 +98,11 @@
     --ct-table-caption-color:var(--ct-text-muted)
 }
 :root .daterangepicker,:root .dropdown-menu,:root .ql-toolbar,:root .select2-dropdown,:root .tt-menu{
+    --ct-dropdown-padding-x: 0.25rem;
+    --ct-dropdown-padding-y: 0.25rem;
     --ct-dropdown-color:#6c757d;
     --ct-dropdown-bg:#fff;
-    --ct-dropdown-border-color:#e7ebf0;
+    --ct-dropdown-border-color:#c7cbe0;
     --ct-dropdown-divider-bg:#e7ebf0;
     --ct-dropdown-box-shadow:var(--ct-box-shadow);
     --ct-dropdown-link-color:#6c757d;

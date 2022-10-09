@@ -46,14 +46,6 @@ body.empty-page-white {
     background-color: white;
 }
 
-.eskimo-panel-heading {
-    background: #384b5f;
-    color: #FFFFFF;
-    font-weight: bold;
-    padding-top: 10px;
-    padding-bottom: 10px;
-}
-
 .vertical-center {
     min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
     min-height: 100vh; /* These two lines are counted as one :-)       */
@@ -770,4 +762,12 @@ html[data-sidenav-size=condensed]:not(.authentication-bg) .inner-content-inner-f
     background-color: #f5f5f5;
     border-color: #ddd;
     border-bottom: 1px solid #e3e3e3;
+}
+
+.eskimo-panel-heading {
+    background: #384b5f;
+    color: #FFFFFF;
+    font-weight: bold;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }

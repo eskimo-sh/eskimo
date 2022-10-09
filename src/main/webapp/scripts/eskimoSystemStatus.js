@@ -83,9 +83,9 @@ eskimo.SystemStatus = function() {
                 '    <li><a id="start" tabindex="-1" href="#" title="Start Service"><i class="fa fa-play"></i> Start Service</a></li>\n' +
                 '    <li><a id="stop" tabindex="-1" href="#" title="Stop Service"><i class="fa fa-stop"></i> Stop Service</a></li>\n' +
                 '    <li><a id="restart" tabindex="-1" href="#" title="Restart Service"><i class="fa fa-refresh"></i> Restart Service</a></li>\n' +
-                '    <li class="divider"></li>' +
+                '    <li class="dropdown-divider"></li>' +
                 '    <li><a id="reinstall" tabindex="-1" href="#" title="Reinstall Service"><i class="fa fa-undo"></i> Reinstall Service</a></li>\n' +
-                '    <li class="divider"></li>'
+                '    <li class="dropdown-divider"></li>'
                 : '') +
             '    <li><a id="show_journal" tabindex="-1" href="#" title="Show Journal"><i class="fa fa-file"></i> Show Journal</a></li>\n';
 
@@ -152,15 +152,14 @@ eskimo.SystemStatus = function() {
                     let nodeMenu = $("#nodeContextMenu");
                     nodeMenu.html($("#nodeContextMenuTemplate").html());
 
-
                     //open menu
                     let $menu = nodeMenu
                         .data("invokedOn", target)
                         .show()
                         .css({
                             position: "absolute",
-                            left: getMenuPosition(settings, e.clientX, 'width', 'scrollLeft', "#nodeContextMenu") - $("#inner-content-status").offset().left,
-                            top: getMenuPosition(settings, e.clientY, 'height', 'scrollTop', "#nodeContextMenu") - $("#inner-content-status").offset().top
+                            left: getMenuPosition(settings, e.clientX, 'width', 'scrollLeft', "#nodeContextMenu"),
+                            top: getMenuPosition(settings, e.clientY, 'height', 'scrollTop', "#nodeContextMenu")
                         })
                         .off('click')
                         .on('click', 'a', function (evt) {
@@ -202,7 +201,7 @@ eskimo.SystemStatus = function() {
 
                     if (additionalCommands) {
                         if (additionalCommands.length > 0) {
-                            additionalCommandsHTML += '<li class="divider"></li>';
+                            additionalCommandsHTML += '<li class="dropdown-divider"></li>';
                         }
 
                         for (let i = 0; i < additionalCommands.length; i++) {
@@ -229,8 +228,8 @@ eskimo.SystemStatus = function() {
                         .show()
                         .css({
                             position: "absolute",
-                            left: getMenuPosition(settings, e.clientX, 'width', 'scrollLeft', "#serviceContextMenu") - $("#inner-content-status").offset().left,
-                            top: getMenuPosition(settings, e.clientY, 'height', 'scrollTop', "#serviceContextMenu") - $("#inner-content-status").offset().top
+                            left: getMenuPosition(settings, e.clientX, 'width', 'scrollLeft', "#serviceContextMenu"),
+                            top: getMenuPosition(settings, e.clientY, 'height', 'scrollTop', "#serviceContextMenu")
                         })
                         .off('click')
                         .on('click', 'a', function (evt) {
@@ -258,8 +257,8 @@ eskimo.SystemStatus = function() {
     };
 
     function getMenuPosition(settings, mouse, direction, scrollDir, menu) {
-        let win = $("#inner-content-status")[direction](),
-            scroll = $("#inner-content-status")[scrollDir](),
+        let win = $("#main-content")[direction](),
+            scroll = $("#main-content")[scrollDir](),
             menuTarget = $(menu)[direction](),
             position = mouse + scroll;
 
