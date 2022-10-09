@@ -187,7 +187,7 @@ eskimo.ServicesSettings = function () {
             if (serviceEditableSettingsArray.length > 0) {
 
                 servicesSettingsContent = servicesSettingsContent +
-                    '<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse-'+serviceName+'" aria-expanded="false" aria-controls="collapse1">'+
+                    '<a class="collapsed" data-bs-toggle="collapse" data-parent="#accordion" href="#collapse-'+serviceName+'" aria-expanded="false" aria-controls="collapse1">'+
                     '<div class="panel-heading" role="tab" id="heading-panel-'+serviceName+'"><table><tr>'+
                     '<td><img class="nodes-config-logo" src="' + that.eskimoNodesConfig.getServiceLogoPath(serviceName) + '" /></td>'+
                     '<td><h5>' +

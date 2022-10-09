@@ -189,9 +189,9 @@ eskimo.FileManagers = function() {
         // select active file-manager
         $("#file-managers-tab-list").find("li").each(function() {
             if (this.id == "file-manager_"+nodeName) {
-                $(this).attr("class", "active");
+                $(this).attr("class", "nav-item active");
             } else {
-                $(this).attr("class", "");
+                $(this).attr("class", "nav-item ");
             }
         });
 
@@ -683,8 +683,8 @@ eskimo.FileManagers = function() {
         if (!fileManagerFound) {
 
             // Add tab entry
-            fileManagersTabList.append($('<li id="file-manager_' + nodeName + '">'+
-                '<a id="select_file_manager_' + nodeName  + '" href="#">' + node + '</a></li>'));
+            fileManagersTabList.append($('<li id="file-manager_' + nodeName + '" class="nav-item">'+
+                '<a class="nav-link" id="select_file_manager_' + nodeName  + '" href="#">' + node + '</a></li>'));
 
             let fileManagerContent = '<div class="col-md-12 file-manager-view" id="file-managers-file-manager-' + nodeName + '">\n' +
                 '    <div id="file-manager-actions-' + nodeName + '">\n' +

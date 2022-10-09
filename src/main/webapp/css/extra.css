@@ -771,3 +771,10 @@ html[data-sidenav-size=condensed]:not(.authentication-bg) .inner-content-inner-f
     padding-top: 10px;
     padding-bottom: 10px;
 }
+
+.nav-tabs .nav-item.show .nav-link,
+.nav-tabs .nav-item.active .nav-link {
+    color: var(--ct-nav-tabs-link-active-color);
+    background-color: var(--ct-nav-tabs-link-active-bg);
+    border-color: var(--ct-nav-tabs-link-active-border-color);
+}

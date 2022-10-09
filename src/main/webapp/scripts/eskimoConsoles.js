@@ -166,9 +166,9 @@ eskimo.Consoles = function() {
         // select active console
         $("#consoles-tab-list").find("li").each(function() {
             if (this.id == "console_" + nodeName) {
-                $(this).attr("class", "active");
+                $(this).attr("class", "nav-item active");
             } else {
-                $(this).attr("class", "");
+                $(this).attr("class", "nav-item");
             }
         });
 
@@ -209,7 +209,7 @@ eskimo.Consoles = function() {
         var prev = null;
         var target = null;
         $("#consoles-tab-list").find("li").each(function() {
-            if ($(this).attr("class") == "active") {
+            if ($(this).hasClass("active")) {
                 if (prev != null) {
                     target = prev;
                 }
@@ -230,7 +230,7 @@ eskimo.Consoles = function() {
             if (first == null) {
                 first = this;
             }
-            if ($(this).attr("class") == "active") {
+            if ($(this).hasClass("active")) {
                 takeNext = true
             } else {
                 if (takeNext) {
@@ -330,8 +330,8 @@ eskimo.Consoles = function() {
 
             // Add tab entry
             consoleTabList.append($(''+
-                '<li id="console_' + nodeName + '">'+
-                '<a id="select_console_' + nodeName + '" href="#">' + node +
+                '<li id="console_' + nodeName + '" class="nav-item">'+
+                '<a class="nav-link" id="select_console_' + nodeName + '" href="#">' + node +
                 '</a></li>'));
 
             var consoleContent = '<div class="col-md-12 ajaxterminal" id="consoles-console-' + nodeName + '">\n' +
