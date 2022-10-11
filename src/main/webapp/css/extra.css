@@ -145,6 +145,7 @@ But it breaks  the menu entry title overlay
     border: 1px solid #BBBBBB;
     padding-top: 10px;
     border-radius: 10px;
+    margin-bottom: 10px;
 }
 .node-config-element-wrapper {
     padding-bottom: 5px;
@@ -254,6 +255,11 @@ li.disabled a .menu-text {
 #kubernetes-services-table-head > tr > td {
     padding: 2px 5px 2px 5px;
     text-align: center;
+    vertical-align: middle;
+}
+
+#kubernetes-services-table-body > tr > td {
+    padding: 2px 5px 2px 5px;
     vertical-align: middle;
 }
 
@@ -504,10 +510,9 @@ table.system-information tr td.info-label {
     position: relative;
     width: 100%;
     display: block;
-    flex-grow: 1;
     padding-bottom: 10px;
     overflow: visible;
-    height: 100%;
+    /*height: 100%;*/
 }
 #pending-message-panel {
     height: 100%
@@ -777,4 +782,13 @@ html[data-sidenav-size=condensed]:not(.authentication-bg) .inner-content-inner-f
     color: var(--ct-nav-tabs-link-active-color);
     background-color: var(--ct-nav-tabs-link-active-bg);
     border-color: var(--ct-nav-tabs-link-active-border-color);
+}
+
+.panel {
+    margin-bottom: 20px;
+    background-color: #fff;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
+    box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
 }

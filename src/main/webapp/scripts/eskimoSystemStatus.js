@@ -866,7 +866,7 @@ eskimo.SystemStatus = function() {
     this.generateTableHeader = function() {
 
         let tableHeaderHtml = ''+
-            '<tr id="header_1" class="status-node-table-header">\n'+
+            '<tr id="header_1" class="status-node-table-header table-secondary">\n'+
             '<td class="status-node-cell" rowspan="2">Status</td>\n' +
             '<td class="status-node-cell" rowspan="2">No</td>\n' +
             '<td class="status-node-cell" rowspan="2">Node</td>\n';
@@ -911,7 +911,7 @@ eskimo.SystemStatus = function() {
 
         tableHeaderHtml +=
                 '</tr>\n' +
-                '<tr id="header_2" class="status-node-table-header">\n';
+                '<tr id="header_2" class="status-node-table-header table-secondary">\n';
 
         // Phase 2 : render second row
         for (let i = 0; i < STATUS_SERVICES.length; i++) {

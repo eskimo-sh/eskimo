@@ -41,81 +41,91 @@ Software.
                 <div class="col-md-12">
                     <h3> Eskimo Setup</h3>
 
+                    <div class="col-md-12 col-sd-12">
+                        <div class="card">
+                            <div class="card-header" role="tab">
+                                Base setup
+                            </div>
+                            <div class="card-body">
 
-                    <div class="col-md-12 col-sd-12">
-                        <label class="col-md-3 control-label" id="label_storage">Configuration Storage Path</label>
-                        <div class="col-md-6">
-                            <input id="setup_storage" name="setup_storage" type="text"
-                                   placeholder="Path where configuration will be stored, e.g. /var/lib/eskimo/data" class="form-control input-md">
-                        </div>
-                        <div class="col-md-3"></div>
-                        <br>
-                    </div>
-                    <div class="col-md-12 col-sd-12">
-                        <div class="col-md-3"></div>
-                        <label class="col-md-6 control-label" id="label_storage_explain">(This path
-                            should be writable by the system user running Eskimo on the local
-                            machine)</label>
-                        <div class="col-md-3"></div>
-                        <br><br>
-                    </div>
+                                <div class="row">
+                                    <label class="col-md-3 control-label" id="label_storage">Configuration Storage
+                                        Path</label>
+                                    <div class="col-md-6">
+                                        <input id="setup_storage" name="setup_storage" type="text"
+                                               placeholder="Path where configuration will be stored, e.g. /var/lib/eskimo/data"
+                                               class="form-control input-md">
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                    <br>
+                                    <div class="col-md-3"></div>
+                                    <label class="col-md-6 control-label" id="label_storage_explain">(This path
+                                        should be writable by the system user running Eskimo on the local
+                                        machine)</label>
+                                    <div class="col-md-3"></div>
+                                    <br><br>
+                                </div>
 
-                    <div class="col-md-12 col-sd-12">
-                        <label class="col-md-3 control-label" id="label_username">SSH username</label>
-                        <div class="col-md-6">
-                            <input id="ssh_username" name="ssh_username" type="text"
-                                   placeholder="SSH username, e.g. eskimo" class="form-control input-md">
-                        </div>
-                        <div class="col-md-3"></div>
-                        <br>
-                    </div>
-                    <div class="col-md-12 col-sd-12">
-                        <div class="col-md-3"></div>
-                        <label class="col-md-6 control-label" id="label_username_explain">(The System user to be used when connecting to nodes using SSH)</label>
-                        <div class="col-md-3"></div>
-                        <br><br>
-                    </div>
+                                <div class="row">
+                                    <label class="col-md-3 control-label" id="label_username">SSH username</label>
+                                    <div class="col-md-6">
+                                        <input id="ssh_username" name="ssh_username" type="text"
+                                               placeholder="SSH username, e.g. eskimo" class="form-control input-md">
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                    <br>
+                                    <div class="col-md-3"></div>
+                                    <label class="col-md-6 control-label" id="label_username_explain">(The System user
+                                        to be used when connecting to nodes using SSH)</label>
+                                    <div class="col-md-3"></div>
+                                    <br><br>
+                                </div>
 
 
-                    <div class="col-md-12 col-sd-12">
-                        <label class="col-md-3 control-label" id="label_ssh_key">Select SSH Private Key</label>
-                        <div class="col-md-6">
-                            <div class="input-group">
-                								<span class="input-group-btn">
-                    								<span class="btn btn-primary btn-file">
-                        								Browse&hellip; <input type="file" id="btn-file-ssh-key" single>
-                    								</span>
-                							    </span>
-                                <input type="text" class="form-control" name="filename-ssh-key"
-                                       id="filename-ssh-key" readonly>
-                                <input type="hidden" name="content-ssh-key" id="content-ssh-key">
+                                <div class="row">
+                                    <label class="col-md-3 control-label" id="label_ssh_key">Select SSH Private
+                                        Key</label>
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                                            <span class="input-group-btn">
+                                                                <span class="btn btn-info btn-file">
+                                                                    Browse&hellip; <input type="file"
+                                                                                          id="btn-file-ssh-key" single>
+                                                                </span>
+                                                            </span>
+                                            <input type="text" class="form-control" name="filename-ssh-key"
+                                                   id="filename-ssh-key" readonly>
+                                            <input type="hidden" name="content-ssh-key" id="content-ssh-key">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                    <br>
+                                    <div class="col-md-3"></div>
+                                    <label class="col-md-6 control-label" id="label_ssh_key_explain">(Pick up
+                                        the SSH private key to use to reach the cluster hosts)</label>
+                                    <div class="col-md-3"></div>
+                                    <br><br>
+                                </div>
+
                             </div>
                         </div>
-                        <div class="col-md-3"></div>
-                        <br>
-                    </div>
-                    <div class="col-md-12 col-sd-12">
-                        <div class="col-md-3"></div>
-                        <label class="col-md-6 control-label" id="label_ssh_key_explain">(Pick up
-                            the SSH private key to use to reach the cluster hosts)</label>
-                        <div class="col-md-3"></div>
-                        <br><br>
                     </div>
 
                     <div class="col-md-12 col-sd-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="heading-panel-kubepackages">
+                        <div class="card">
+                            <div class="card-header" role="tab" id="heading-panel-kubepackages">
                                 Kubernetes origin
                             </div>
-                            <div class="panel-body">
-                                <div class="col-md-12 col-sd-12">
+                            <div class="card-body">
+                                <div class="row">
 
-                                    <div class="col-lg-3 col-lg-offset-3 col-md-4 col-md-offset-2 col-sm-6 col-sm-offset-0">
+                                    <div class="col-md-4 offset-md-2 col-sm-6 col-sm-offset-0">
                                         <div class="radio">
                                             <label class="control-label">Download Kubernetes </label>
-                                            <label class="radio-inline"  id="setup-kube-origin-download-label">
-                                                <input  type="radio"
-                                                        class="input-md" name="setup-kube-origin" id="setup-kube-origin-download" value="download">
+                                            <label class="radio-inline" id="setup-kube-origin-download-label">
+                                                <input type="radio"
+                                                       class="input-md" name="setup-kube-origin"
+                                                       id="setup-kube-origin-download" value="download">
                                             </label>
                                         </div>
                                     </div>
@@ -123,19 +133,21 @@ Software.
                                         <div class="radio">
                                             <label class="control-label">Build Kubernetes locally</label>
                                             <label class="radio-inline">
-                                                <input  type="radio"
-                                                        class="input-md" name="setup-kube-origin" id="setup-kube-origin-build" value="build">
+                                                <input type="radio"
+                                                       class="input-md" name="setup-kube-origin"
+                                                       id="setup-kube-origin-build" value="build">
                                             </label>
                                         </div>
                                     </div>
-                                </div>
+                                    <br>
 
-                                <div class="col-md-12 col-sd-12">
-                                    <label class="col-lg-3 col-lg-offset-3 col-md-4 col-md-offset-2 col-sm-6 col-sm-offset-0 control-label" id="download-kube-explain">
+                                    <label class="col-md-4 offset-md-2 col-sm-6 col-sm-offset-0 control-label"
+                                           id="download-kube-explain">
                                         Download Kubernetes from niceideas.ch <br>
                                         - internet access required<br>
-                                        <span id="download-kube-explain-disabled" style="color: red;">(Disabled on development version)</span> </label>
-                                    <label class="col-lg-3 col-md-4 col-sm-6 control-label" id="build-kube-explain">
+                                        <span id="download-kube-explain-disabled" style="color: red;">(Disabled on development version)</span>
+                                    </label>
+                                    <label class="col-md-4 col-sm-6 control-label" id="build-kube-explain">
                                         Build Kubernetes locally on eskimo backend<br>
                                         - <strong>only on Linux</strong> <br>
                                         - internet access required <br>
@@ -147,70 +159,70 @@ Software.
 
 
                     </div>
-                    <div class="col-sd-12 col-md-12">
-
-                    </div>
 
                     <div class="col-md-12 col-sd-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="heading-panel-packages">
+                        <div class="card">
+                            <div class="card-header" role="tab" id="heading-panel-packages">
                                 Services Docker Images origin
                             </div>
-                            <div class="panel-body">
-                                <div class="col-md-12 col-sd-12">
+                            <div class="card-body">
+                                <div class="row">
 
-                                    <div class="col-lg-3 col-lg-offset-3 col-md-4 col-md-offset-2 col-sm-6 col-sm-offset-0">
+                                    <div class="col-md-4 offset-md-2 col-sm-6 col-sm-offset-0">
 
 
                                         <div class="radio">
                                             <label class="control-label">Download Packages </label>
                                             <label class="radio-inline" id="setup-services-origin-download-label">
-                                                <input  type="radio"
-                                                        class="input-md" name="setup-services-origin" id="setup-services-origin-download" value="download">
+                                                <input type="radio"
+                                                       class="input-md" name="setup-services-origin"
+                                                       id="setup-services-origin-download" value="download">
                                             </label>
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-3 col-md-4 col-sm-6">
+                                    <div class="col-md-4 col-sm-6">
                                         <div class="radio">
                                             <label class="control-label">Build packages locally</label>
                                             <label class="radio-inline">
-                                                <input  type="radio"
-                                                        class="input-md" name="setup-services-origin" id="setup-services-origin-build" value="build">
+                                                <input type="radio"
+                                                       class="input-md" name="setup-services-origin"
+                                                       id="setup-services-origin-build" value="build">
                                             </label>
                                         </div>
                                     </div>
 
-                                </div>
-
-                                <div class="col-md-12 col-sd-12">
-                                    <label class="col-lg-3 col-lg-offset-3 col-md-4 col-md-offset-2 col-sm-6 col-sm-offset-0 control-label" id="download-services-explain">
-                            Download docker packages from niceideas.ch <br>
-                            - internet access required<br>
-                                        <span id="download-services-explain-disabled" style="color: red;">(Disabled on development version)</span> </label>
-                                    <label class="col-lg-3 col-md-4 col-sm-6 control-label" id="build-services-explain">
-                            Build docker packages locally on eskimo backend <br>
-                            - <strong>only on Linux</strong> <br>
-                            - internet access required <br>
-                            - docker required </label>
+                                    <label class="col-md-4 offset-md-2 col-sm-6 col-sm-offset-0 control-label"
+                                           id="download-services-explain">
+                                        Download docker packages from niceideas.ch <br>
+                                        - internet access required<br>
+                                        <span id="download-services-explain-disabled" style="color: red;">(Disabled on development version)</span>
+                                    </label>
+                                    <label class="col-md-4 col-sm-6 control-label" id="build-services-explain">
+                                        Build docker packages locally on eskimo backend <br>
+                                        - <strong>only on Linux</strong> <br>
+                                        - internet access required <br>
+                                        - docker required </label>
                                 </div>
                             </div>
                         </div>
 
 
                     </div>
-                    <div class="col-md-12 col-sd-12 btn-toolbar" id="save-setup">
-                        <div class="btn-group">
-                            <button id="save-setup-btn" name="save-setup-btn" class="btn btn-primary">
-                                Save and Apply Setup
-                            </button>
+                    <div class="row">
+                        <div class="col-md-12 col-sd-12 btn-toolbar" id="save-setup">
+                            <div class="btn-group">
+                                <button id="save-setup-btn" name="save-setup-btn" class="btn btn-info ms-2 ">
+                                    Save and Apply Setup
+                                </button>
+                            </div>
+                            <div class="btn-group">
+                                <button id="reset-setup-btn" name="reset-setup-btn" class="btn btn-secondary ms-2 ">
+                                    Reset
+                                </button>
+                            </div>
+                            <br><br>
                         </div>
-                        <div class="btn-group">
-                            <button id="reset-setup-btn" name="reset-setup-btn" class="btn btn-default">
-                                Reset
-                            </button>
-                        </div>
-                        <br><br>
                     </div>
 
                 </div>

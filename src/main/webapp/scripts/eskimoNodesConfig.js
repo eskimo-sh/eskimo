@@ -552,8 +552,8 @@ eskimo.NodesConfig = function() {
         multipleServicesDiv = multipleServicesDiv + "</div>";
 
         let newIn = ' '+
-            '<div id="field'+ next +'" class="input-group col-md-12 node-config-element" >'+
-            '    <div class="col-md-12 node-config-element-wrapper"> '+
+            '<div id="field'+ next +'" class="input-group row col-md-12 node-config-element" >'+
+            '    <div class="row node-config-element-wrapper"> '+
             '        <label class="col-md-3 control-label" id="label'+next+'">'+getNodeTitle(isRange)+' <div class="server-title-text">' + next + '</div></label> '+
             '        <div class="col-md-6"> '+
             '            <input id="'+NODE_ID_FIELD + next+'" name="'+NODE_ID_FIELD+next+'" type="text" placeholder="'+
@@ -562,14 +562,14 @@ eskimo.NodesConfig = function() {
             '        </div>'+
             '        <div class="btn-toolbar col-md-3">'+
             '            <div class="btn-group">'+
-            '                <button data-is-range="' + isRange + '" id="configure' + next + '" class="btn btn-primary">Configure</button>'+
+            '                <button data-is-range="' + isRange + '" id="configure' + next + '" class="btn btn-info ms-2">Configure</button>'+
             '            </div>'+
             '            <div class="btn-group">'+
-            '                <button id="remove' + next + '" class="btn btn-danger remove-me" >Remove</button>'+
+            '                <button id="remove' + next + '" class="btn btn-danger ms-2 remove-me" >Remove</button>'+
             '            </div>'+
             '        </div>'+
             '    </div><br>'+
-            '    <div class="col-md-12"> '+
+            '    <div class="row"> '+
             '        <div class="col-md-1"></div> '+
             '        <label class="col-md-2">Installed Services:</label> '+
              uniqueServicesDiv+

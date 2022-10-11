@@ -178,7 +178,7 @@ eskimo.ServicesSettings = function () {
 
     function layoutServicesSettings() {
 
-        let servicesSettingsContent = '<div class="panel panel-default">';
+        let servicesSettingsContent = '<div class="card">';
 
         for (let i = 0; i < SERVICES_SETTINGS.length; i++) {
             let serviceEditableSettings = SERVICES_SETTINGS[i];
@@ -188,15 +188,15 @@ eskimo.ServicesSettings = function () {
 
                 servicesSettingsContent = servicesSettingsContent +
                     '<a class="collapsed" data-bs-toggle="collapse" data-parent="#accordion" href="#collapse-'+serviceName+'" aria-expanded="false" aria-controls="collapse1">'+
-                    '<div class="panel-heading" role="tab" id="heading-panel-'+serviceName+'"><table><tr>'+
+                    '<div class="card-header" role="tab" id="heading-panel-'+serviceName+'"><table><tr>'+
                     '<td><img class="nodes-config-logo" src="' + that.eskimoNodesConfig.getServiceLogoPath(serviceName) + '" /></td>'+
                     '<td><h5>' +
                     serviceName +
                     '</h5></td>' +
                     '</tr></table></div>'+
                     '</a>'+
-                    '<div id="collapse-'+serviceName+'" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-panel-'+serviceName+'">'+
-                    '<div class="panel-body">';
+                    '<div id="collapse-'+serviceName+'" class="collapse" role="tabpanel" aria-labelledby="heading-panel-'+serviceName+'">'+
+                    '<div class="card-body">';
 
                 for (let j = 0; j < serviceEditableSettingsArray.length; j++) {
 
