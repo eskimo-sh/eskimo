@@ -543,6 +543,7 @@ table.system-information tr td.info-label {
     padding: 0;
     margin: 0;
     border: 0 none;
+    height: 100%;
 }
 .service-container {
     position: relative;
