@@ -43,7 +43,7 @@ Software.
     <div class="col-xs-12 file-managers-header">
         <div class="col-md-12" id="file-managers-action">
             <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Open SFTP File Manager <span class="caret"></span>
                 </button>
                 <ul id="file-managers-action-open-file-manager" class="dropdown-menu">
@@ -60,13 +60,13 @@ Software.
     </div>
 
     <div id="file-viewer-modal" class="modal fade" tabindex="-1" role="dialog">
-        <div id="file-viewer-modal-dialog" class="modal-dialog file-viewer-modal-dialog">
+        <div id="file-viewer-modal-dialog" class="modal-dialog modal-full-width file-viewer-modal-dialog">
 
             <!-- Modal content-->
             <div class="modal-content file-viewer-modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" id="file-manager-viewer-header-close">&times;</button>
                     <h4 class="modal-title" id="file-viewer-title">Viewing File : </h4>
+                    <button type="button" class="btn-close" id="file-manager-viewer-header-close"></button>
                 </div>
                 <div id="file-viewer-body" class="modal-body file-viewer-body">
                     <div class="col-md-12 file-content" id="file-content">
@@ -74,7 +74,7 @@ Software.
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" id="file-manager-viewer-button-close">Close</button>
+                    <button type="button" class="btn btn-secondary" id="file-manager-viewer-button-close">Close</button>
                 </div>
             </div>
         </div>
@@ -86,8 +86,8 @@ Software.
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" id="file-manager-input-header-close">&times;</button>
                     <h4 class="modal-title" id="filename-input-title">Enter file name </h4>
+                    <button type="button" class="btn-close" id="file-manager-input-header-close"></button>
                 </div>
                 <div class="modal-body">
                 <div class="col-md-12 col-sd-12">
@@ -104,8 +104,8 @@ Software.
                 </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" id="file-manager-input-button-cancel">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="file-manager-input-button-validate">OK</button>
+                    <button type="button" class="btn btn-secondary" id="file-manager-input-button-cancel">Cancel</button>
+                    <button type="button" class="btn btn-info" id="file-manager-input-button-validate">OK</button>
                 </div>
             </div>
         </div>

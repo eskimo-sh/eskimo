@@ -266,7 +266,7 @@ eskimo.FileManagers = function() {
         // Create folder content list
         let folderContentHeader = ''+
             '        <div class="table-responsive">\n' +
-            '            <table class="table table-hover">\n' +
+            '            <table class="file-manager-files-table table table-hover">\n' +
             '                <tbody>\n';
 
         let sortedFilesArray = [];
@@ -358,7 +358,7 @@ eskimo.FileManagers = function() {
 
                                 $("#file-viewer-title").html("Viewing File : " + data.fileName);
 
-                                $('#file-viewer-modal').modal();
+                                $('#file-viewer-modal').modal("show");
 
                                 /*
                                 $('#file-viewer-modal-dialog').keypress(function(ev) {
@@ -690,7 +690,7 @@ eskimo.FileManagers = function() {
                 '    <div id="file-manager-actions-' + nodeName + '">\n' +
                 '        <nav id="file-manager-folder-menu-' + nodeName + '" class="btn-toolbar file-manager-folder-menu">\n' +
                 '            <div class="btn-group">'+
-                '                <button id="file-manager-close-' + nodeName + '" name="file-manager-close-' + nodeName + '" class="btn btn-primary">Close</button>\n' +
+                '                <button id="file-manager-close-' + nodeName + '" name="file-manager-close-' + nodeName + '" class="btn btn-secondary">Close</button>\n' +
                 '            </div>' +
                 '            <div class="btn-group">' +
                 '                <button type="button" id="show_root_' + nodeName + '" class="btn btn-default"><i class="fa fa-home"></i> Root</button>\n' +

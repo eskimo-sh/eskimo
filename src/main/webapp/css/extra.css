@@ -249,15 +249,21 @@ li.disabled a .menu-text {
 .operations-cell,
 .status-node-cell-empty,
 .status-node-cell-intro,
-#kubernetes-services-table-head > tr > td {
+#kubernetes-services-table-head > tr > td,
+#kubernetes-services-selection-table-head > tr > td {
     padding: 2px 5px 2px 5px;
     text-align: center;
     vertical-align: middle;
 }
 
-#kubernetes-services-table-body > tr > td {
+#kubernetes-services-table-body > tr > td,
+#kubernetes-services-selection-table-body > tr > td {
     padding: 2px 5px 2px 5px;
     vertical-align: middle;
+}
+
+.file-manager-files-table > tbody > tr > td {
+    padding: 2px 5px 2px 5px;
 }
 
 .table > thead > tr > td.status-node-cell,
@@ -619,7 +625,6 @@ td.operation-title{
 }
 
 .file-viewer-modal-dialog {
-    width: 90%;
     height: 90%;
 }
 

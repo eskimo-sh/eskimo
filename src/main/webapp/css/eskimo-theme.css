@@ -130,7 +130,7 @@
     --ct-nav-tabs-border-color:#dee2e6;
     --ct-nav-tabs-link-hover-border-color:#eef2f7 #eef2f7 var(--ct-nav-tabs-border-color);
     --ct-nav-tabs-link-active-color:#565e64;
-    --ct-nav-tabs-link-active-bg:#fff;
+    --ct-nav-tabs-link-active-bg:#eee;
     --ct-nav-tabs-link-active-border-color:#dee2e6 #dee2e6 var(--ct-nav-tabs-link-active-bg)
 }
 :root .navbar{
