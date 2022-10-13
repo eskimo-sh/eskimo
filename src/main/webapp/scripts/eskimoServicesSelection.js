@@ -319,7 +319,7 @@ eskimo.ServicesSelection = function() {
                 continue; // done
             }
 
-            let rowHTML =  '<div class="col-md-12"> ';
+            let rowHTML =  '<div class="col-md-12 row"> ';
             for (let col = 1; col <= 3; col++) {
 
                 let serviceConfig = getService (row, col);
@@ -327,7 +327,7 @@ eskimo.ServicesSelection = function() {
 
                     if (serviceConfig.unique) {
                         rowHTML +=
-                            '<div class="radio col-md-4 text-right no-padding">' +
+                            '<div class="radio col-md-4 service-selection no-padding">' +
                             '    <label id="'+serviceConfig.name + '-label" class="control-label">'+serviceConfig.title+'</label>'+
                             '    <label id="'+serviceConfig.name + '-icon" class="control-logo"><img class="control-logo-logo" src="' + serviceConfig.logo+'"/></label>'+
                             '    <label class="radio-inline">' +
@@ -337,7 +337,7 @@ eskimo.ServicesSelection = function() {
                             '</div>';
                     } else {
                         rowHTML +=
-                            '<div class="checkbox col-md-4 text-right no-padding">' +
+                            '<div class="checkbox col-md-4 service-selection no-padding">' +
                             '    <label id="'+serviceConfig.name + '-label" class="control-label">'+serviceConfig.title+'</label>' +
                             '    <label id="'+serviceConfig.name + '-icon" class="control-logo"><img class="control-logo-logo" src="' + serviceConfig.logo+'"/></label>'+
                             '    <label class="checkbox-inline">' +
@@ -352,7 +352,7 @@ eskimo.ServicesSelection = function() {
                 }
             }
 
-            rowHTML += '</div><br>';
+            rowHTML += '</div>';
             newIn += rowHTML;
         }
 

@@ -145,7 +145,8 @@ But it breaks  the menu entry title overlay
     border: 1px solid #BBBBBB;
     padding-top: 10px;
     border-radius: 10px;
-    margin-bottom: 10px;
+    margin: 10px;
+    width: calc(100% - 20px);
 }
 .node-config-element-wrapper {
     padding-bottom: 5px;
@@ -205,10 +206,6 @@ But it breaks  the menu entry title overlay
 }
 #operations-command-body {
     max-height: 700px;
-}
-
-#about-modal-dialog {
-    width: 800px;
 }
 
 #services-selection-modal-dialog {
@@ -616,7 +613,11 @@ td.operation-title{
     text-align: left;
 }
 
-.operations-log-modal-dialog,
+
+.operations-log-modal-dialog {
+    height: 90%;
+}
+
 .file-viewer-modal-dialog {
     width: 90%;
     height: 90%;
@@ -792,4 +793,8 @@ html[data-sidenav-size=condensed]:not(.authentication-bg) .inner-content-inner-f
     border-radius: 4px;
     -webkit-box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
     box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
+}
+
+.service-selection {
+    text-align: right;
 }
