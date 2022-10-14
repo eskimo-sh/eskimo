@@ -533,7 +533,7 @@ eskimo.NodesConfig = function() {
 
             let uniqueService = UNIQUE_SERVICES[i];
 
-            uniqueServicesDiv +='  <input  type="radio" class="input-md" name="' + uniqueService + '" id="' + uniqueService + next + '" value="'+next+'"></input>';
+            uniqueServicesDiv +='  <input  type="radio" class="form-check-input" name="' + uniqueService + '" id="' + uniqueService + next + '" value="'+next+'"></input>';
         }
 
         uniqueServicesDiv += "</div>";
@@ -546,7 +546,7 @@ eskimo.NodesConfig = function() {
 
             let multipleService = MULTIPLE_SERVICES[i];
 
-            multipleServicesDiv +=' <input  type="checkbox" class="input-md" name="' + multipleService + next + '" id="' + multipleService + next + '" ></input>'
+            multipleServicesDiv +=' <input  type="checkbox" class="form-check-input" name="' + multipleService + next + '" id="' + multipleService + next + '" ></input>'
         }
 
         multipleServicesDiv = multipleServicesDiv + "</div>";
@@ -558,7 +558,7 @@ eskimo.NodesConfig = function() {
             '        <div class="col-md-6"> '+
             '            <input id="'+NODE_ID_FIELD + next+'" name="'+NODE_ID_FIELD+next+'" type="text" placeholder="'+
                                 (isRange ? 'IP addresses range, e.g 192.168.1.10-192.168.1.25' : 'IP address, e.g. 192.168.10.10')+
-            '                   " class="form-control input-md"> '+
+            '                   " class="form-control"> '+
             '        </div>'+
             '        <div class="btn-toolbar col-md-3">'+
             '            <div class="btn-group">'+

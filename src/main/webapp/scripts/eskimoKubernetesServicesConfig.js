@@ -161,10 +161,10 @@ eskimo.KubernetesServicesConfig = function() {
     this.onKubernetesServiceSelected = function (serviceName, kubernetesConfig) {
 
         $('#' + serviceName + '_cpu_setting').html(
-            '    <input style="width: 80px;" type="text" class="input-md" pattern="[0-9\\.]+[m]{0,1}" name="' + serviceName +'_cpu" id="' + serviceName +'_cpu"></input>');
+            '    <input style="width: 80px;" type="text" class="form-control" pattern="[0-9\\.]+[m]{0,1}" name="' + serviceName +'_cpu" id="' + serviceName +'_cpu"></input>');
 
         $('#' + serviceName + '_ram_setting').html(
-            '    <input style="width: 80px;" type="text" class="input-md" pattern="[0-9\\.]+[EPTGMk]{0,1}" name="' + serviceName +'_ram" id="' + serviceName +'_ram"></input>');
+            '    <input style="width: 80px;" type="text" class="form-control" pattern="[0-9\\.]+[EPTGMk]{0,1}" name="' + serviceName +'_ram" id="' + serviceName +'_ram"></input>');
 
         let cpuSet = false;
         let ramSet = false;
@@ -233,7 +233,7 @@ eskimo.KubernetesServicesConfig = function() {
                 KUBERNETES_SERVICES[i]+
                 '</td>'+
                 '<td style="text-align: center;">' +
-                '    <input  type="checkbox" class="input-md" name="' + KUBERNETES_SERVICES[i] + INSTALL_FLAG + '" id="'+KUBERNETES_SERVICES[i] + INSTALL_FLAG + '"></input>' +
+                '    <input  type="checkbox" class="form-check-input" name="' + KUBERNETES_SERVICES[i] + INSTALL_FLAG + '" id="'+KUBERNETES_SERVICES[i] + INSTALL_FLAG + '"></input>' +
                 '</td>' +
                 '<td id="' + KUBERNETES_SERVICES[i] + '_cpu_setting" style="text-align: center;">' +
                 '</td>' +

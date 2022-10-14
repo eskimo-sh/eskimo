@@ -25,7 +25,7 @@
         const offcanvasList = [...offcanvasElementList].map(offcanvasEl => new bootstrap.Offcanvas(offcanvasEl))
 
         //Toasts
-        var toastPlacement = document.getElementById("toastPlacement");
+        let toastPlacement = document.getElementById("toastPlacement");
         if (toastPlacement) {
             document.getElementById("selectToastPlacement").addEventListener("change", function () {
                 if (!toastPlacement.dataset.originalClass) {
@@ -35,8 +35,8 @@
             });
         }
 
-        var toastElList = [].slice.call(document.querySelectorAll('.toast'))
-        var toastList = toastElList.map(function (toastEl) {
+        let toastElList = [].slice.call(document.querySelectorAll('.toast'))
+        let toastList = toastElList.map(function (toastEl) {
             return new bootstrap.Toast(toastEl)
         })
 
@@ -70,16 +70,16 @@
     // Portlet Widget (Card Reload, Collapse, and Delete)
     function initPortletCard() {
 
-        var portletIdentifier = ".card"
-        var portletCloser = '.card a[data-bs-toggle="remove"]'
-        var portletRefresher = '.card a[data-bs-toggle="reload"]'
+        let portletIdentifier = ".card"
+        let portletCloser = '.card a[data-bs-toggle="remove"]'
+        let portletRefresher = '.card a[data-bs-toggle="reload"]'
         let self = this
 
         // Panel closest
         $(document).on("click", portletCloser, function (ev) {
             ev.preventDefault();
-            var $portlet = $(this).closest(portletIdentifier);
-            var $portlet_parent = $portlet.parent();
+            let $portlet = $(this).closest(portletIdentifier);
+            let $portlet_parent = $portlet.parent();
             $portlet.remove();
             if ($portlet_parent.children().length == 0) {
                 $portlet_parent.remove();
@@ -89,10 +89,10 @@
         // Panel Reload
         $(document).on("click", portletRefresher, function (ev) {
             ev.preventDefault();
-            var $portlet = $(this).closest(portletIdentifier);
+            let $portlet = $(this).closest(portletIdentifier);
             // This is just a simulation, nothing is going to be reloaded
             $portlet.append('<div class="card-disabled"><div class="card-portlets-loader"></div></div>');
-            var $pd = $portlet.find('.card-disabled');
+            let $pd = $portlet.find('.card-disabled');
             setTimeout(function () {
                 $pd.fadeOut('fast', function () {
                     $pd.remove();
@@ -104,8 +104,8 @@
     //  Multi Dropdown
     function initMultiDropdown() {
         $('.dropdown-menu a.dropdown-toggle').on('click', function () {
-            var dropdown = $(this).next('.dropdown-menu');
-            var otherDropdown = $(this).parent().parent().find('.dropdown-menu').not(dropdown);
+            let dropdown = $(this).next('.dropdown-menu');
+            let otherDropdown = $(this).parent().parent().find('.dropdown-menu').not(dropdown);
             otherDropdown.removeClass('show')
             otherDropdown.parent().find('.dropdown-toggle').removeClass('show')
             return false;
@@ -114,11 +114,11 @@
 
     // Left Sidebar Menu (Vertical Menu)
     function initLeftSidebar() {
-        var self = this;
+        const self = this;
 
         if ($(".side-nav").length) {
-            var navCollapse = $('.side-nav li .collapse');
-            var navToggle = $(".side-nav li [data-bs-toggle='collapse']");
+            let navCollapse = $('.side-nav li .collapse');
+            let navToggle = $(".side-nav li [data-bs-toggle='collapse']");
             navToggle.on('click', function (e) {
                 return false;
             });
@@ -126,14 +126,14 @@
             // open one menu at a time only
             navCollapse.on({
                 'show.bs.collapse': function (event) {
-                    var parent = $(event.target).parents('.collapse.show');
+                    let parent = $(event.target).parents('.collapse.show');
                     $('.side-nav .collapse.show').not(event.target).not(parent).collapse('hide');
                 }
             });
 
             // activate the menu in left side bar (Vertical Menu) based on url
             $(".side-nav a").each(function () {
-                var pageUrl = window.location.href.split(/[?#]/)[0];
+                let pageUrl = window.location.href.split(/[?#]/)[0];
                 if (this.href == pageUrl) {
                     $(this).addClass("active");
                     $(this).parent().addClass("menuitem-active");
@@ -145,20 +145,20 @@
 
                     $(this).parent().parent().parent().parent().parent().parent().parent().addClass("menuitem-active");
 
-                    var secondLevelParent = $(this).parent().parent().parent().parent().parent().parent().parent().parent().parent();
+                    let secondLevelParent = $(this).parent().parent().parent().parent().parent().parent().parent().parent().parent();
                     if (secondLevelParent.attr('id') !== 'wrapper') secondLevelParent.addClass("show");
 
-                    var upperLevelParent = $(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().parent();
+                    let upperLevelParent = $(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().parent();
                     if (!upperLevelParent.is('body')) upperLevelParent.addClass("menuitem-active");
                 }
             });
 
 
             setTimeout(function () {
-                var activatedItem = document.querySelector('li.menuitem-active .active');
+                let activatedItem = document.querySelector('li.menuitem-active .active');
                 if (activatedItem != null) {
-                    var simplebarContent = document.querySelector('.leftside-menu .simplebar-content-wrapper');
-                    var offset = activatedItem.offsetTop - 300;
+                    let simplebarContent = document.querySelector('.leftside-menu .simplebar-content-wrapper');
+                    let offset = activatedItem.offsetTop - 300;
                     if (simplebarContent && offset > 100) {
                         scrollTo(simplebarContent, offset, 600);
                     }
@@ -173,10 +173,10 @@
                 return -c / 2 * (t * (t - 2) - 1) + b;
             }
             function scrollTo(element, to, duration) {
-                var start = element.scrollTop, change = to - start, currentTime = 0, increment = 20;
-                var animateScroll = function () {
+                let start = element.scrollTop, change = to - start, currentTime = 0, increment = 20;
+                let animateScroll = function () {
                     currentTime += increment;
-                    var val = easeInOutQuad(currentTime, start, change, duration);
+                    let val = easeInOutQuad(currentTime, start, change, duration);
                     element.scrollTop = val;
                     if (currentTime < duration) {
                         setTimeout(animateScroll, increment);
@@ -191,7 +191,7 @@
     function initTopbarMenu() {
         if ($('.topnav-menu').length) {
             $('.topnav-menu li a').each(function () {
-                var pageUrl = window.location.href.split(/[?#]/)[0];
+                let pageUrl = window.location.href.split(/[?#]/)[0];
                 if (this.href == pageUrl) {
                     $(this).addClass('active');
                     $(this).parent().parent().addClass('active'); // add active to li of the current link
@@ -211,7 +211,7 @@
     // Topbar Search Form
     function initSearch() {
         // Serach Toggle
-        var navDropdowns = $('.navbar-custom .dropdown:not(.app-search)');
+        let navDropdowns = $('.navbar-custom .dropdown:not(.app-search)');
 
         // hide on other click
         $(document).on('click', function (e) {
@@ -239,8 +239,8 @@
 
     // Topbar Fullscreen Button
     function initfullScreenListener() {
-        var self = this;
-        var fullScreenBtn = document.querySelector('[data-toggle="fullscreen"]');
+        const self = this;
+        let fullScreenBtn = document.querySelector('[data-toggle="fullscreen"]');
 
         if (fullScreenBtn) {
             fullScreenBtn.addEventListener('click', function (e) {
@@ -309,8 +309,8 @@
         // Input Mask
         if (jQuery().mask) {
             $('[data-toggle="input-mask"]').each(function (idx, obj) {
-                var maskFormat = $(obj).data("maskFormat");
-                var reverse = $(obj).data("reverse");
+                let maskFormat = $(obj).data("maskFormat");
+                let reverse = $(obj).data("reverse");
                 if (reverse != null)
                     $(obj).mask(maskFormat, { 'reverse': reverse });
                 else
@@ -321,9 +321,9 @@
         // Date-Range-Picker
         if (jQuery().daterangepicker) {
             //date pickers ranges only
-            var start = moment().subtract(29, 'days');
-            var end = moment();
-            var defaultRangeOptions = {
+            let start = moment().subtract(29, 'days');
+            let end = moment();
+            let defaultRangeOptions = {
                 startDate: start,
                 endDate: end,
                 ranges: {
@@ -337,8 +337,8 @@
             };
 
             $('[data-toggle="date-picker-range"]').each(function (idx, obj) {
-                var objOptions = $.extend({}, defaultRangeOptions, $(obj).data());
-                var target = objOptions["targetDisplay"];
+                let objOptions = $.extend({}, defaultRangeOptions, $(obj).data());
+                let target = objOptions["targetDisplay"];
                 //rendering
                 $(obj).daterangepicker(objOptions, function (start, end) {
                     if (target)
@@ -347,7 +347,7 @@
             });
 
             // Datetime and date range picker
-            var defaultOptions = {
+            let defaultOptions = {
                 "cancelClass": "btn-light",
                 "applyButtonClasses": "btn-success"
             };
@@ -360,7 +360,7 @@
 
         // Bootstrap Timepicker
         if (jQuery().timepicker) {
-            var defaultOptions = {
+            let defaultOptions = {
                 "showSeconds": true,
                 "icons": {
                     "up": "mdi mdi-chevron-up",
@@ -369,26 +369,26 @@
             };
 
             $('[data-toggle="timepicker"]').each(function (idx, obj) {
-                var objOptions = $.extend({}, defaultOptions, $(obj).data());
+                let objOptions = $.extend({}, defaultOptions, $(obj).data());
                 $(obj).timepicker(objOptions);
             });
         }
 
         // Bootstrap Touchspin
         if (jQuery().TouchSpin) {
-            var defaultOptions = {
+            let defaultOptions = {
 
             };
 
             $('[data-toggle="touchspin"]').each(function (idx, obj) {
-                var objOptions = $.extend({}, defaultOptions, $(obj).data());
+                let objOptions = $.extend({}, defaultOptions, $(obj).data());
                 $(obj).TouchSpin(objOptions);
             });
         }
 
         // Bootstrap Maxlength
         if (jQuery().maxlength) {
-            var defaultOptions = {
+            let defaultOptions = {
                 warningClass: "badge bg-success",
                 limitReachedClass: "badge bg-danger",
                 separator: ' out of ',
@@ -398,7 +398,7 @@
             };
 
             $('[data-toggle="maxlength"]').each(function (idx, obj) {
-                var objOptions = $.extend({}, defaultOptions, $(obj).data());
+                let objOptions = $.extend({}, defaultOptions, $(obj).data());
                 $(obj).maxlength(objOptions);
             });
         }

@@ -332,7 +332,7 @@ eskimo.ServicesSelection = function() {
                             '    <label id="'+serviceConfig.name + '-icon" class="control-logo"><img class="control-logo-logo" src="' + serviceConfig.logo+'"/></label>'+
                             '    <label class="radio-inline">' +
                             '        <input  type="radio" ' +
-                            '                class="input-md service-selection-radio-choice" name="'+serviceConfig.name +'-choice" id="'+serviceConfig.name +'-choice" value="choice"></input>' +
+                            '                class="form-check-input service-selection-radio-choice" name="'+serviceConfig.name +'-choice" id="'+serviceConfig.name +'-choice" value="choice"></input>' +
                             '    </label>' +
                             '</div>';
                     } else {
@@ -341,7 +341,7 @@ eskimo.ServicesSelection = function() {
                             '    <label id="'+serviceConfig.name + '-label" class="control-label">'+serviceConfig.title+'</label>' +
                             '    <label id="'+serviceConfig.name + '-icon" class="control-logo"><img class="control-logo-logo" src="' + serviceConfig.logo+'"/></label>'+
                             '    <label class="checkbox-inline">' +
-                            '        <input  type="checkbox" class="input-md" name="'+serviceConfig.name +'-choice" id="'+serviceConfig.name +'-choice"></input>' +
+                            '        <input  type="checkbox" class="form-check-input" name="'+serviceConfig.name +'-choice" id="'+serviceConfig.name +'-choice"></input>' +
                             '    </label>' +
                             '</div>';
                     }

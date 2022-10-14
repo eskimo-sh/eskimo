@@ -228,7 +228,7 @@ eskimo.ServicesSettings = function () {
                             '     </div>'+
                             '     <div class="col-lg-8 col-md-10 col-sm-12" style="margin-bottom: 5px;">\n' +
                             '         <input id="' + inputName + '" name="' + inputName + '" type="text"\n' +
-                            '                placeholder="' + property.defaultValue + '" class="form-control input-md"' +
+                            '                placeholder="' + property.defaultValue + '" class="form-control"' +
                             '                value="' + (property.value != null ? property.value : '') + '"'+
                             '         >\n' +
                             '     </div>\n' +
