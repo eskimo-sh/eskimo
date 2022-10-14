@@ -193,25 +193,28 @@ eskimo.Operations = function() {
 
                 progress.html("Error!");
                 progress.css("width", "100%");
-                progress.addClass("progress-bar-danger");
-                progress.removeClass("progress-bar-info");
-                wrapper.removeClass("progress-striped");
+                progress.addClass("bg-danger");
+                progress.removeClass("bg-info");
+                progress.removeClass("progress-bar-striped");
+                progress.removeClass("progress-bar-animated");
 
             } else if (opStatus == "CANCELLED") {
 
                 progress.html("Cancelled!");
                 progress.css("width", "100%");
-                progress.addClass("progress-bar-warning");
-                progress.removeClass("progress-bar-info");
-                wrapper.removeClass("progress-striped");
+                progress.addClass("bg-warning");
+                progress.removeClass("bg-info");
+                progress.removeClass("progress-bar-striped");
+                progress.removeClass("progress-bar-animated");
 
             } else if (opStatus == "COMPLETE") {
 
                 progress.html("100% (Complete)");
                 progress.css("width", "100%");
-                progress.addClass("progress-bar-success");
-                progress.removeClass("progress-bar-info");
-                wrapper.removeClass("progress-striped");
+                progress.addClass("bg-success");
+                progress.removeClass("bg-info");
+                progress.removeClass("progress-bar-striped");
+                progress.removeClass("progress-bar-animated");
             }
         }
     }
@@ -249,13 +252,13 @@ eskimo.Operations = function() {
                     + "<tr id=\"" + operation + "\">\n" +
                     "      <td class=\"operation-title\">" + label + "</td>\n" +
                     "      <td class=\"operations-cell\">\n" +
-                    "          <div id=\"" + operation + "-progress-wrapper\" class=\"progress progress-striped active progress-operation-wrapper\">\n" +
-                    "              <div id=\"" + operation + "-progress\" class=\"progress-bar progress-bar-info\" role=\"progressbar\" aria-valuenow=\"0\" aria-valuemin=\"0\" aria-valuemax=\"100\" >\n" +
+                    "          <div id=\"" + operation + "-progress-wrapper\" class=\"progress active progress-operation-wrapper\">\n" +
+                    "              <div id=\"" + operation + "-progress\" class=\"progress-bar progress-bar-striped progress-bar-animated bg-info\" role=\"progressbar\" aria-valuenow=\"0\" aria-valuemin=\"0\" aria-valuemax=\"100\" >\n" +
                     "              </div>\n" +
                     "          </div>\n" +
                     "      </td>\n" +
                     "      <td class=\"operations-cell\">\n" +
-                    "          <a onclick=\"javascript:eskimoMain.getOperations().showLogs('" + operation + "');\">Logs</a>\n" +
+                    "          <a onclick=\"javascript:eskimoMain.getOperations().showLogs('" + operation + "');\">View</a>\n" +
                     "      </td>\n" +
                     "      </tr>";
 
