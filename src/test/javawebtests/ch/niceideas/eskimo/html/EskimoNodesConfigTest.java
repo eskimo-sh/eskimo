@@ -56,14 +56,14 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"), StandardCharsets.UTF_8);
 
-        loadScript(page, "eskimoUtils.js");
-        loadScript(page, "eskimoNodesConfigurationChecker.js");
-        loadScript(page, "eskimoNodesConfig.js");
+        loadScript("eskimoUtils.js");
+        loadScript("eskimoNodesConfigurationChecker.js");
+        loadScript("eskimoNodesConfig.js");
 
-        js("UNIQUE_SERVICES = [\"zookeeper\", \"kube-master\", ];");
-        js("MULTIPLE_SERVICES = [\"ntp\", \"prometheus\", \"etcd\", \"kube-slave\", \"gluster\" ];");
-        js("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
-        js("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
+        js("window.UNIQUE_SERVICES = [\"zookeeper\", \"kube-master\", ];");
+        js("window.MULTIPLE_SERVICES = [\"ntp\", \"prometheus\", \"etcd\", \"kube-slave\", \"gluster\" ];");
+        js("window.MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
+        js("window.CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
         // instantiate test object
         js("eskimoNodesConfig = new eskimo.NodesConfig()");
@@ -75,7 +75,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         waitForElementIdInDOM("reset-nodes-config");
 
-        js("SERVICES_CONFIGURATION = " + jsonServices + ";");
+        js("window.SERVICES_CONFIGURATION = " + jsonServices + ";");
 
         js("eskimoNodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
 
@@ -125,13 +125,13 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     public void testSaveNodesButton() throws Exception {
         testRenderNodesConfig();
 
-        js("function checkNodesSetup(nodeSetup) {" +
+        js("wndow.checkNodesSetup = function (nodeSetup) {" +
                 "    window.nodeSetup = nodeSetup" +
                 "}");
 
-        page.getElementById("save-nodes-btn").click();
+        getElementById("save-nodes-btn").click();
 
-        //System.err.println(js("JSON.stringify (window.nodeSetup)").getJavaScriptResult());
+        //System.err.println(js("JSON.stringify (window.nodeSetup)"));
 
         JSONObject expectedResult = new JSONObject("{" +
                 "\"kube-master\":\"1\"," +
@@ -147,7 +147,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
                 "\"node_id2\":\"192.168.10.13\"," +
                 "\"gluster2\":\"on\"}");
 
-        JSONObject actualResult = new JSONObject((String)js("JSON.stringify (window.nodeSetup)").getJavaScriptResult());
+        JSONObject actualResult = new JSONObject((String)js("return JSON.stringify (window.nodeSetup)"));
 
         System.err.println (actualResult);
         assertTrue(expectedResult.similar(actualResult));
@@ -163,9 +163,9 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
                 "    object.success ({clear: \"missing\"});" +
                 "}");
 
-        page.getElementById("reset-nodes-config").click();
+        getElementById("reset-nodes-config").click();
 
-        assertTrue(page.getElementById("nodes-placeholder").getTextContent().contains("(No nodes / services configured yet)"));
+        assertTrue(getElementById("nodes-placeholder").getText().contains("(No nodes / services configured yet)"));
 
         // test clear = setup
         js("$.ajax = function (object) {" +
@@ -174,9 +174,9 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         js("eskimoMain.handleSetupNotCompleted = function () { window.handleSetupNotCompletedCalled = true; }");
 
-        page.getElementById("reset-nodes-config").click();
+        getElementById("reset-nodes-config").click();
 
-        assertTrue((boolean)js("window.handleSetupNotCompletedCalled").getJavaScriptResult());
+        assertTrue((boolean)js("return window.handleSetupNotCompletedCalled"));
 
         // test OK
         js("$.ajax = function (object) {" +
@@ -185,7 +185,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         js("eskimoNodesConfig.renderNodesConfig = function (config) { window.nodesConfig = config; }");
 
-        page.getElementById("reset-nodes-config").click();
+        getElementById("reset-nodes-config").click();
 
         assertJavascriptEquals("{\"result\":\"OK\"}", "JSON.stringify (window.nodesConfig)");
     }
@@ -239,21 +239,21 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         js("eskimoNodesConfig.addNode()");
 
-        assertTrue(page.getElementById("label1").getTextContent().contains("Node no  1"));
+        assertTrue(getElementById("label1").getText().contains("Node no  1"));
 
-        assertNotNull (page.getElementById("node_id1"));
+        assertNotNull (getElementById("node_id1"));
         assertTagName ("node_id1", "input");
 
-        assertNotNull (page.getElementById("zookeeper1"));
+        assertNotNull (getElementById("zookeeper1"));
         assertTagName ("zookeeper1", "input");
 
-        assertNotNull (page.getElementById("gluster1"));
+        assertNotNull (getElementById("gluster1"));
         assertTagName ("gluster1", "input");
 
-        assertNotNull (page.getElementById("kube-master1"));
+        assertNotNull (getElementById("kube-master1"));
         assertTagName ("kube-master1", "input");
 
-        assertNotNull (page.getElementById("etcd1"));
+        assertNotNull (getElementById("etcd1"));
         assertTagName ("etcd1", "input");
 
         assertJavascriptEquals ("1.0", "eskimoNodesConfig.getNodesCount()");

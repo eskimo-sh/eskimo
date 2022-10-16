@@ -34,28 +34,21 @@
 
 package ch.niceideas.eskimo.html;
 
-import com.gargoylesoftware.htmlunit.AjaxController;
-import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
-import com.gargoylesoftware.htmlunit.WebRequest;
-import com.gargoylesoftware.htmlunit.html.HtmlDivision;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EskimoAjaxtermTest extends AbstractWebTest {
 
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript (page, "ajaxterm.js");
+        loadScript ("ajaxterm.js");
 
-        js("$('#main-content').html('<div id=\"test-term\"></div>')");
+        js("$('#main-content').html('<div id=\"test-term\" contenteditable=\"true\">&nbsp;</div>')");
 
         js("" +
                 "var t = new ajaxterm.Terminal(\"test-term\", {\n" +
@@ -115,7 +108,9 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
                 "    };" +
                 "}");
 
-        ((HtmlDivision)page.getElementById("test-term")).type("a");
+        //Thread.sleep(100000);
+
+        getElementById("test-term").sendKeys("a");
 
         //Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
         Thread.sleep (2000);
@@ -132,7 +127,7 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
         // active wait
         boolean found = false;
         for (int i = 0; i < 100; i++) { // 10 seconds
-            String sentData = js("window.ajtData").getJavaScriptResult().toString();
+            String sentData = js("return window.ajtData").toString();
             Thread.sleep(100);
             if (sentData.endsWith("k=A&t=0")) {
                 found = true;
@@ -150,7 +145,7 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
         // active wait
         boolean found = false;
         for (int i = 0; i < 100; i++) { // 10 seconds
-            String sentData = js("window.ajtData").getJavaScriptResult().toString();
+            String sentData = js("return window.ajtData").toString();
             Thread.sleep(100);
             if (sentData.endsWith("k=%1B%5B%5BA&t=0")) {
                 found = true;
@@ -167,7 +162,7 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
         // active wait
         boolean found = false;
         for (int i = 0; i < 100; i++) { // 10 seconds
-            String sentData = js("window.ajtData").getJavaScriptResult().toString();
+            String sentData = js("return window.ajtData").toString();
             Thread.sleep(100);
             if (sentData.endsWith("k=%7F&t=0")) {
                 found = true;

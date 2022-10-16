@@ -32,48 +32,49 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.html;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+package ch.niceideas.eskimo.html.infra;
 
-public class EskimoAboutTest extends AbstractWebTest {
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
 
-    @BeforeEach
-    public void setUp() throws Exception {
+public class UsualServer implements TestResourcesServer {
 
-        loadScript("bootstrap-5.2.0.js");
+    private String className = null;
 
-        loadScript("eskimoAbout.js");
+    private Server jetty = null;
 
-        js("eskimoAbout = new eskimo.About();");
-        js("eskimoAbout.initialize()");
+    public void startServer(String className) throws Exception {
+        this.className = className;
 
-        waitForElementIdInDOM("about-modal-body");
+        jetty = new Server(9001);
+
+        ResourceHandler resource_handler = new ResourceHandler();
+        resource_handler.setDirectoriesListed(true);
+        resource_handler.setWelcomeFiles(new String[] {
+                "index.html"
+        });
+
+        resource_handler.setResourceBase(".");
+
+        HandlerList handlers = new HandlerList();
+        handlers.setHandlers(new Handler[] {
+                resource_handler,
+                new DefaultHandler()
+        });
+        jetty.setHandler(handlers);
+
+        jetty.start();
     }
 
-    @Test
-    public void testNominal() throws Exception {
-
-        js("eskimoAbout.showAbout()");
-
-        assertCssValue("#about-modal", "display", "block");
-        assertCssValue("#about-modal", "visibility", "visible");
-
-        js("eskimoAbout.cancelAbout()");
-
-        /* FIXME WTF ?!?
-        await().atMost(20, TimeUnit.SECONDS).until(() ->
-                   js("$('#about-modal').css('display')") != null
-                && js("$('#about-modal').css('display')").getJavaScriptResult() != null
-                && js("$('#about-modal').css('display')").getJavaScriptResult().toString() != null
-                && js("$('#about-modal').css('display')").getJavaScriptResult().toString().equals ("none"));
-        */
-        Thread.sleep(2000);
-
-        //assertCssValue("#about-modal", "visibility", "hidden");
-        assertCssValue("#about-modal", "display", "none");
+    public void stopServer() throws Exception {
+        jetty.stop();
     }
 
+    public void postTestMethodHook(JsRunner runner) throws Exception {
+        // nothing to do
+    }
 }
-

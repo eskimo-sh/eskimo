@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.html;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Dimension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -45,9 +46,9 @@ public class EskimoMainTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript(page, "hoe.js");
-        loadScript(page, "eskimoMain.js");
-        loadScript(page, "eskimoUtils.js");
+        loadScript("app.js");
+        loadScript("eskimoMain.js");
+        loadScript("eskimoUtils.js");
 
         js("window.eskimoFlavour = \"CE\";");
 
@@ -138,39 +139,40 @@ public class EskimoMainTest extends AbstractWebTest {
 
         js("eskimoMain.showProgressbar()");
 
-        assertEquals("visible", js("$('.inner-content-show').css('visibility')").getJavaScriptResult());
+        assertEquals("visible", js("return $('.inner-content-show').css('visibility')"));
 
         js("eskimoMain.hideProgressbar()");
 
-        assertEquals("hidden", js("$('.inner-content-show').css('visibility')").getJavaScriptResult());
+        assertEquals("hidden", js("return $('.inner-content-show').css('visibility')"));
     }
 
     @Test
     public void testStartStopOperationInprogress() throws Exception {
 
-        assertEquals(false, js("eskimoMain.isOperationInProgress()").getJavaScriptResult());
+        assertEquals(false, js("return eskimoMain.isOperationInProgress()"));
 
         js("eskimoMain.startOperationInProgress();");
 
-        assertEquals(true, js("eskimoMain.isOperationInProgress()").getJavaScriptResult());
+        assertEquals(true, js("return eskimoMain.isOperationInProgress()"));
 
         js("eskimoMain.scheduleStopOperationInProgress();");
 
-        assertEquals(false, js("eskimoMain.isOperationInProgress()").getJavaScriptResult());
+        assertEquals(false, js("return eskimoMain.isOperationInProgress()"));
     }
 
     @Test
     public void testHandleSetupCompletedAndNotCompleted() throws Exception {
 
-        page.getElementById("hoe-left-panel").remove(); // the test stuff messes with the page loading below (twice in dom)
+        js("document.getElementById('hoe-left-panel').remove(); ");
+        // the test stuff messes with the page loading below (twice in dom)
         js("$('#hoeapp-wrapper').load('html/eskimoMain.html');");
 
         waitForElementIdInDOM("menu-container");
 
         js("eskimoMain.handleSetupCompleted()");
 
-        js("var allDisabled = true;");
-        js("var allEnabled = true;");
+        js("window.allDisabled = true;");
+        js("window.allEnabled = true;");
 
         js("" +
                 " $('.config-menu-items').each(function() {\n" +
@@ -202,7 +204,8 @@ public class EskimoMainTest extends AbstractWebTest {
     @Test
     public void testMenuHidingNonAdmin() throws Exception {
 
-        page.getElementById("hoe-left-panel").remove(); // the test stuff messes with the page loading below (twice in dom)
+        js("document.getElementById('hoe-left-panel').remove(); ");
+        // the test stuff messes with the page loading below (twice in dom)
         js("$('#hoeapp-wrapper').load('html/eskimoMain.html');");
 
         waitForElementIdInDOM("menu-container");
@@ -223,8 +226,7 @@ public class EskimoMainTest extends AbstractWebTest {
 
         assertJavascriptEquals("desktop", "$('#hoeapp-wrapper').attr ('hoe-device-type')");
 
-        page.getEnclosingWindow().setInnerHeight(600);
-        page.getEnclosingWindow().setInnerWidth(600);
+        driver.manage().window().setSize(new Dimension(600, 600));
 
         js("window.dispatchEvent(new Event('resize'));");
 

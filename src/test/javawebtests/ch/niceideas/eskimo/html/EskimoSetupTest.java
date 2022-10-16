@@ -47,10 +47,10 @@ public class EskimoSetupTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript(page, "eskimoUtils.js");
-        loadScript(page, "eskimoSetup.js");
+        loadScript("eskimoUtils.js");
+        loadScript("eskimoSetup.js");
 
-        js("function errorHandler() {};");
+        js("window.errorHandler = function () {};");
 
         String currentDir = System.getProperty("user.dir");
         System.out.println("Current dir using System:" +currentDir);

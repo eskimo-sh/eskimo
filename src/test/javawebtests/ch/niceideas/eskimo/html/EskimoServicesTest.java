@@ -51,10 +51,10 @@ public class EskimoServicesTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript(page, "eskimoUtils.js");
-        loadScript(page, "eskimoServices.js");
+        loadScript("eskimoUtils.js");
+        loadScript("eskimoServices.js");
 
-        js("function errorHandler() {};");
+        js("window.errorHandler = function() {};");
 
         // instantiate test object
         js("eskimoServices = new eskimo.Services()");
@@ -69,7 +69,7 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         js("eskimoServices.setUiServices( [\"cerebro\", \"kibana\", \"spark-console\", \"zeppelin\"] );");
 
-        js("var UI_SERVICES_CONFIG = {" +
+        js("window.UI_SERVICES_CONFIG = {" +
                 "\"cerebro\" : {'urlTemplate': './cerebro/{NODE_ADDRESS}:9999/cerebro', 'title' : 'cerebro', 'waitTime': 10 }, " +
                 "\"kibana\" : {'urlTemplate': './kibana/{NODE_ADDRESS}:9999/kibana', 'title' : 'kibana', 'waitTime': 15 }, " +
                 "\"spark-console\" : {'urlTemplate': './spark-histo/{NODE_ADDRESS}:9999/spark-histo', 'title' : 'spark-histo', 'waitTime': 25 }, " +
@@ -172,7 +172,7 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         js("eskimoServices.periodicRetryServices();");
 
-        await().atMost(10, TimeUnit.SECONDS).until(() -> ((Double)js("eskimoServices.getUIConfigsToRetryForTests().length").getJavaScriptResult()) == 0.0);
+        await().atMost(10, TimeUnit.SECONDS).until(() -> ((Double)js("eskimoServices.getUIConfigsToRetryForTests().length")) == 0.0);
         assertJavascriptEquals("0.0", "eskimoServices.getUIConfigsToRetryForTests().length");
     }
 
@@ -232,13 +232,13 @@ public class EskimoServicesTest extends AbstractWebTest {
     @Test
     public void testBuildUrl() throws Exception {
 
-        js("uiConfig = {'urlTemplate': './test/{NODE_ADDRESS}:9999/test'}"); // proxyContext
+        js("window.uiConfig = {'urlTemplate': './test/{NODE_ADDRESS}:9999/test'}"); // proxyContext
         assertJavascriptEquals("./test/192-168-10-11:9999/test", "eskimoServices.buildUrl(uiConfig, '192.168.10.11')");
 
-        js("uiConfig = {'proxyContext': '/test', 'unique': true}"); //
+        js("window.uiConfig = {'proxyContext': '/test', 'unique': true}"); //
         assertJavascriptEquals("/test", "eskimoServices.buildUrl(uiConfig, '192.168.10.11')");
 
-        js("uiConfig = {'proxyContext': '/test'}"); //
+        js("window.uiConfig = {'proxyContext': '/test'}"); //
         assertJavascriptEquals("/test/192-168-10-11", "eskimoServices.buildUrl(uiConfig, '192.168.10.11')");
     }
 
@@ -262,14 +262,14 @@ public class EskimoServicesTest extends AbstractWebTest {
         assertJavascriptEquals("true", "UI_SERVICES_CONFIG['cerebro'].refreshWaiting");
 
 
-        js("UI_SERVICES_CONFIG['cerebro'].refreshWaiting = false;");
+        js("window.UI_SERVICES_CONFIG['cerebro'].refreshWaiting = false;");
         js("eskimoServices.handleServiceDisplay('cerebro', UI_SERVICES_CONFIG['cerebro'], '192.168.10.11', true);");
 
         assertJavascriptEquals("0.0", "UI_SERVICES_CONFIG['cerebro'].targetWaitTime");
 
         js("eskimoServices.handleServiceIsUp(UI_SERVICES_CONFIG['cerebro'])");
 
-        await().atMost(5, TimeUnit.SECONDS).until(() -> js("UI_SERVICES_CONFIG['cerebro'].refreshWaiting").getJavaScriptResult().toString().equals ("false"));
+        await().atMost(5, TimeUnit.SECONDS).until(() -> js("return UI_SERVICES_CONFIG['cerebro'].refreshWaiting").toString().equals ("false"));
 
         assertJavascriptEquals("false", "UI_SERVICES_CONFIG['cerebro'].refreshWaiting");
         assertJavascriptEquals("./cerebro/192-168-10-11:9999/cerebro", "UI_SERVICES_CONFIG['cerebro'].actualUrl");
@@ -282,7 +282,7 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         js("eskimoServices.handleServiceHiding('cerebro', UI_SERVICES_CONFIG['cerebro'])");
 
-        assertJavascriptNull("UI_SERVICES_CONFIG['cerebro'].actualUrl");
+        assertJavascriptNull("return UI_SERVICES_CONFIG['cerebro'].actualUrl");
     }
 
     @Test
@@ -306,7 +306,7 @@ public class EskimoServicesTest extends AbstractWebTest {
                         "\"targetWaitTime\":15," +
                         "\"refreshWaiting\":true}]")
                 .similar(
-                new JSONArray((String)js("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult())));
+                new JSONArray((String)js("return JSON.stringify (window.uiConfigsToRetry)"))));
     }
 
     @Test
@@ -318,12 +318,12 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         js("eskimoServices.periodicRetryServices()");
 
-        System.err.println(js("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult());
+        System.err.println(js("return JSON.stringify (window.uiConfigsToRetry)"));
 
         assertTrue (
                 new JSONArray("[]")
                         .similar(
-                                new JSONArray((String)js("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult())));
+                                new JSONArray((String)js("return JSON.stringify (window.uiConfigsToRetry)"))));
     }
 
     @Test
@@ -335,12 +335,12 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         js("eskimoServices.periodicRetryServices()");
 
-        System.err.println(js("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult());
+        System.err.println(js("return JSON.stringify (window.uiConfigsToRetry)"));
 
         assertTrue (
                 new JSONArray("[]")
                         .similar(
-                                new JSONArray((String)js("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult())));
+                                new JSONArray((String)js("return JSON.stringify (window.uiConfigsToRetry)"))));
 
     }
 
@@ -354,7 +354,7 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         js("eskimoServices.periodicRetryServices()");
 
-        System.err.println(js("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult());
+        System.err.println(js("return JSON.stringify (window.uiConfigsToRetry)"));
 
         assertTrue (
                 new JSONArray("[{" +
@@ -367,6 +367,6 @@ public class EskimoServicesTest extends AbstractWebTest {
                         "\"refreshWaiting\":true," +
                         "\"actualUrl\":null}]")
                         .similar(
-                                new JSONArray((String)js("JSON.stringify (window.uiConfigsToRetry)").getJavaScriptResult())));
+                                new JSONArray((String)js("return JSON.stringify (window.uiConfigsToRetry)"))));
     }
 }

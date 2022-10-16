@@ -35,24 +35,27 @@
 package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.eskimo.html.infra.TestResourcesServer;
 import ch.niceideas.eskimo.utils.GenerateLCOV;
-import com.gargoylesoftware.htmlunit.AjaxController;
-import com.gargoylesoftware.htmlunit.ScriptResult;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import jscover.Main;
 import jscover.report.FileData;
 import jscover.report.JSONDataMerger;
 import org.apache.log4j.Logger;
-import org.junit.Assert;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CapabilityType;
 
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
@@ -65,58 +68,61 @@ public abstract class AbstractWebTest {
 
     private static final Logger logger = Logger.getLogger(AbstractWebTest.class);
 
-    //public static final int MAX_WAIT_TIME_SECS = 50;
+    private static File jsCoverageFlagFile = new File("target/jsCoverageFlag");
 
     private static final int INCREMENTAL_WAIT_MS = 500;
     private static final int MAX_WAIT_RETRIES = 50;
 
-    private static Thread server;
-    private static Main main = null;
-
-    private static File jsCoverageFlagFile = new File("target/jsCoverageFlag");
-
-    private static String jsCoverReportDir = "target/jscov-report";
-    private static String[] jsCoverArgs = new String[]{
-            "-ws",
-            "--document-root=src/main/webapp",
-            "--port=9001",
-            //"--no-branch",
-            //"--no-function",
-            //"--no-instrument=example/lib",
-            "--log=INFO",
-            "--report-dir=" + jsCoverReportDir
-    };
-
     private static String className = null;
-    private static List<String> coverages = new ArrayList<>();
 
-    private static JSONDataMerger jsonDataMerger = new JSONDataMerger();
+    private static TestResourcesServer server;
 
-    protected WebClient webClient;
-    protected HtmlPage page;
+    protected WebDriver driver;
 
-    ScriptResult js (String jsCode) {
-        return page.executeJavaScript (jsCode);
+    Object js (String jsCode) {
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+        Object result = js.executeScript (jsCode);
+
+        try {
+
+            //Switch to alert
+            Alert alert = driver.switchTo().alert();
+
+            //Capture text on alert window
+            String alertMessage = alert.getText();
+            logger.info ("DRIVER ALERT : " + alertMessage);
+
+            //Close alert window
+            alert.accept();
+
+        } catch (NoAlertPresentException e) {
+            // ignore
+        } catch (UnhandledAlertException e) {
+            logger.error (e.getMessage());
+        }
+
+        return result;
+
+    }
+
+    WebElement getElementById (String elementId) {
+        try {
+            return driver.findElement(By.id(elementId));
+        } catch (org.openqa.selenium.NoSuchElementException e) {
+            logger.debug (e.getMessage());
+            return null;
+        }
     }
 
     @BeforeAll
-    public static void setUpOnce() {
-        if (isCoverageRun()) {
-            main = new Main();
-            server = new Thread(() -> main.runMain(jsCoverArgs));
-            server.start();
-        }
+    public static void setUpOnce() throws Exception {
+        server = TestResourcesServer.getServer(isCoverageRun());
+        server.startServer(className);
     }
 
     @AfterAll
     public static void tearDownOnce() throws Exception {
-        if (isCoverageRun()) {
-            main.stop();
-
-            File targetFile = new File(jsCoverReportDir + "/" + className, "jscoverage.json");
-            targetFile.getParentFile().mkdirs();
-            FileUtils.writeFile(targetFile, mergeJSON());
-        }
+        server.stopServer();
     }
 
     @BeforeEach
@@ -127,35 +133,7 @@ public abstract class AbstractWebTest {
 
     @AfterEach
     public void tearDown() throws Exception {
-        if (isCoverageRun()) {
-            js("window.jscoverFinished = false;");
-            js("jscoverage_report('', function(){window.jscoverFinished=true;});");
-
-            // FIXME I have failing tests with Awaitility !?!
-            /*
-            await().atMost(MAX_WAIT_TIME_SECS * (isCoverageRun() ? 2 : 1)  , TimeUnit.SECONDS).until(
-                    () -> (Boolean) js("window.jscoverFinished").getJavaScriptResult());
-
-            */
-
-            int attempt = 0;
-            while ((!((Boolean) (js("window.jscoverFinished").getJavaScriptResult())).booleanValue()) && attempt < 10) {
-                logger.debug("Waiting for coverage report to be written ...");
-                Thread.sleep(500);
-                attempt++;
-            }
-
-            String json = (String) (js("jscoverage_serializeCoverageToJSON();")).getJavaScriptResult();
-            coverages.add(json);
-        }
-    }
-
-    private static String mergeJSON() {
-        SortedMap<String, FileData> total = new TreeMap<>();
-        for (String json : coverages) {
-            total = jsonDataMerger.mergeJSONCoverageMaps(total, jsonDataMerger.jsonToMap(json));
-        }
-        return GenerateLCOV.toJSON(total);
+        server.postTestMethodHook(this::js);
     }
 
     protected static boolean isCoverageRun() {
@@ -163,69 +141,69 @@ public abstract class AbstractWebTest {
         return jsCoverageFlagFile.exists();
     }
 
-    protected final void loadScript (HtmlPage page, String script) {
-        if (isCoverageRun()) {
-            js("loadScript('http://localhost:9001/scripts/"+script+"')");
-        } else {
-            js("loadScript('../../src/main/webapp/scripts/"+script+"')");
-        }
+    protected final void loadScript (String script) {
+        js("loadScript('http://localhost:9001/src/main/webapp/scripts/"+script+"')");
     }
 
     @BeforeEach
     public void init() throws Exception {
-        webClient = new WebClient();
 
-        webClient.setAlertHandler((page, s) -> logger.info(s));
+        ChromeOptions co = new ChromeOptions();
+        co.setCapability(CapabilityType.UNHANDLED_PROMPT_BEHAVIOUR, "ignore");
 
-        webClient.setAjaxController(new AjaxController() {
+        co.addArguments("--no-sandbox");
+        co.addArguments("--headless");
+        co.addArguments("disable-gpu");
 
-        });
+        driver = WebDriverManager.chromedriver()
+                .capabilities(co)
+                .create();
 
-        URL testPage = ResourceUtils.getURL("classpath:GenericTestPage.html");
-        page = webClient.getPage(testPage);
-        assertEquals("Generic Test Page", page.getTitleText());
+        driver.get("http://localhost:9001/src/test/resources/GenericTestPage.html");
+
+        assertEquals("Generic Test Page", driver.getTitle());
 
         // create common mocks
         // create mock functions
-        js("var eskimoServices = {};");
+        js("window.eskimoServices = {};");
         js("eskimoServices.serviceMenuServiceFoundHook = function (){};");
         js("eskimoServices.getServiceIcon = function (service) { return service + '-icon.png'; };");
         js("eskimoServices.isServiceAvailable = function (){ return true; };");
 
-        js("var eskimoConsoles = {}");
+        js("window.eskimoConsoles = {}");
         js("eskimoConsoles.setAvailableNodes = function () {};");
 
-        js("var eskimoServicesSelection = {" +
+        js("window.eskimoServicesSelection = {" +
                 "}");
 
-        js("var eskimoOperationsCommand = {" +
+        js("window.eskimoOperationsCommand = {" +
                 "showCommand : function() {}" +
                 "}");
 
-        js("var eskimoMessaging = {}");
+        js("window.eskimoMessaging = {}");
         js("eskimoMessaging.isOperationInProgress = function() { return false; };");
         js("eskimoMessaging.setOperationInProgress = function() {};");
         js("eskimoMessaging.showMessages = function() {};");
 
-        js("var eskimoOperations = {}");
+        js("window.eskimoOperations = {}");
         js("eskimoOperations.isOperationInProgress = function() { return false; };");
         js("eskimoOperations.setOperationInProgress = function() {};");
         js("eskimoOperations.showOperations = function() {};");
 
-        js("var eskimoNotifications = {}");
+        js("window.eskimoNotifications = {}");
         js("eskimoNotifications.fetchNotifications = function() {};");
 
-        js("var eskimoSetup = {}");
+        js("window.eskimoSetup = {}");
         js("eskimoSetup.setSnapshot = function () {};");
 
-        js("var eskimoSetupCommand = {}");
+        js("window.eskimoSetupCommand = {}");
 
-        js("var eskimoFileManagers = {};");
+        js("window.eskimoFileManagers = {};");
         js("eskimoFileManagers.setAvailableNodes = function() {};");
 
-        js("var eskimoServicesSettings = {};");
+        js("window.eskimoServicesSettings = {};");
 
-        js("var eskimoNodesConfig = {};");
+        js("window.eskimoNodesConfig = {};");
         js("eskimoNodesConfig.getServiceLogoPath = function (serviceName){ return serviceName + '-logo.png'; };");
         js("eskimoNodesConfig.getServiceIconPath = function (serviceName){ return serviceName + '-icon.png'; };");
         js("eskimoNodesConfig.getServicesDependencies = function () { return {}; };");
@@ -241,20 +219,20 @@ public abstract class AbstractWebTest {
                 "    || serviceName == 'zeppelin' ); " +
                 "};");
 
-        js("var eskimoSystemStatus = {};");
+        js("window.eskimoSystemStatus = {};");
         js("eskimoSystemStatus.showStatus = function () {};");
 
-        js("var eskimoKubernetesServicesSelection = {" +
+        js("window.eskimoKubernetesServicesSelection = {" +
                 "showKubernetesServiceSelection: function () {}" +
                 "};");
 
-        js("var eskimoKubernetesOperationsCommand = {" +
+        js("window.eskimoKubernetesOperationsCommand = {" +
                 "showCommand : function() {}" +
                 "};");
 
-        js("var eskimoSettingsOperationsCommand = {}");
+        js("window.eskimoSettingsOperationsCommand = {}");
 
-        js("var eskimoMain = {};");
+        js("window.eskimoMain = {};");
         js("eskimoMain.handleSetupCompleted = function (){};");
         js("eskimoMain.getServices = function (){ return eskimoServices; };");
         js("eskimoMain.getMessaging = function (){ return eskimoMessaging; };");
@@ -290,11 +268,11 @@ public abstract class AbstractWebTest {
         // 3 attempts
         for (int i = 0; i < 3 ; i++) {
             logger.info ("Loading jquery : attempt " + i);
-            loadScript(page, "jquery-3.3.1.js");
+            loadScript("jquery-3.6.0.js");
 
             waitForDefinition("window.$");
 
-            if (!js("typeof window.$").getJavaScriptResult().toString().equals ("undefined")) {
+            if (!js("return typeof window.$").toString().equals ("undefined")) {
                 break;
             }
         }
@@ -303,33 +281,34 @@ public abstract class AbstractWebTest {
 
         // override jquery load
         js("$.fn._internalLoad = $.fn.load;");
-        js("$.fn.load = function (resource, callback) { return this._internalLoad ('../../src/main/webapp/'+resource, callback); };");
+        js("$.fn.load = function (resource, callback) { return this._internalLoad ('../../../src/main/webapp/'+resource, callback); };");
+        //js("$.fn.load = function (resource, callback) { return this._internalLoad ('file://" + System.getProperty("user.dir") + "/src/main/webapp/'+resource, callback); };");
 
     }
 
     @AfterEach
     public void close() {
-        webClient.close();
+        driver.close();
     }
 
     protected void assertAttrValue(String selector, String attribute, String value) {
-        assertEquals (value, js("$('"+selector+"').attr('"+attribute+"')").getJavaScriptResult());
+        assertEquals (value, js("return $('"+selector+"').attr('"+attribute+"')"));
     }
 
     protected void assertCssValue(String selector, String attribute, String value) {
-        assertEquals (value, js("$('"+selector+"').css('"+attribute+"')").getJavaScriptResult());
+        assertEquals (value, js("return $('"+selector+"').css('"+attribute+"')"));
     }
 
     protected void assertJavascriptEquals(String value, String javascript) {
-        assertEquals (value, js(javascript).getJavaScriptResult().toString());
+        assertEquals (value, js("return " + javascript).toString());
     }
 
     protected void assertJavascriptNull(String javascript) {
-        assertNull (js(javascript).getJavaScriptResult());
+        assertNull (js("return " + javascript));
     }
 
     protected void assertTagName(String elementId, String tagName) {
-        assertEquals (tagName, page.getElementById(elementId).getTagName());
+        assertEquals (tagName, getElementById(elementId).getTagName());
     }
 
     protected void waitForElementIdInDOM(String elementId) throws InterruptedException {
@@ -341,7 +320,7 @@ public abstract class AbstractWebTest {
         */
 
         int attempt = 0;
-        while (page.getElementById(elementId) == null && attempt < MAX_WAIT_RETRIES) {
+        while (getElementById(elementId) == null && attempt < MAX_WAIT_RETRIES) {
 
             /*
             if (attempt > 20) {
@@ -364,7 +343,7 @@ public abstract class AbstractWebTest {
         */
 
         int attempt = 0;
-        while (js("typeof " + varName).getJavaScriptResult().toString().equals ("undefined") && attempt < MAX_WAIT_RETRIES) {
+        while (js("return typeof " + varName).toString().equals ("undefined") && attempt < MAX_WAIT_RETRIES) {
             Thread.sleep(INCREMENTAL_WAIT_MS);
             attempt++;
         }

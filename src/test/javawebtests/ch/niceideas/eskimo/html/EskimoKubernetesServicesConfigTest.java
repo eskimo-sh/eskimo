@@ -48,9 +48,9 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript(page, "eskimoUtils.js");
-        loadScript(page, "eskimoKubernetesServicesConfigChecker.js");
-        loadScript(page, "eskimoKubernetesServicesConfig.js");
+        loadScript("eskimoUtils.js");
+        loadScript("eskimoKubernetesServicesConfigChecker.js");
+        loadScript("eskimoKubernetesServicesConfig.js");
 
         /*
         js("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"cerebro\", \"kibana\", \"spark-console\", \"zeppelin\", \"kafka-manager\", \"flink-app-master\", \"grafana\"];");
@@ -97,12 +97,12 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
 
         testRenderKubernetesConfig();
 
-        js("function checkKubernetesSetup (kubernetesConfig) {" +
+        js("window.checkKubernetesSetup = function (kubernetesConfig) {" +
                 "    console.log (kubernetesConfig);" +
                 "    window.savedKubernetesConfig = JSON.stringify (kubernetesConfig);" +
                 "};");
 
-        page.getElementById("save-kubernetes-servicesbtn").click();
+        getElementById("save-kubernetes-servicesbtn").click();
 
         JSONObject expectedConfig = new JSONObject("" +
                 "{\"zeppelin_ram\":\"1G\"," +
@@ -124,7 +124,7 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
                 "\"cerebro_cpu\":\"1\"," +
                 "\"grafana_cpu\":\"1\"}");
 
-        JSONObject actualConfig = new JSONObject((String)js("window.savedKubernetesConfig").getJavaScriptResult());
+        JSONObject actualConfig = new JSONObject((String)js("window.savedKubernetesConfig"));
         assertTrue(expectedConfig.similar(actualConfig));
     }
 
@@ -135,24 +135,24 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
 
         js("eskimoKubernetesServicesConfig.selectAll()");
 
-        assertEquals (false, js("$('#kibana_install').get(0).checked").getJavaScriptResult());
-        assertEquals (false, js("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
-        assertEquals (false, js("$('#grafana_install').get(0).checked").getJavaScriptResult());
-        assertEquals (false, js("$('#cerebro_install').get(0).checked").getJavaScriptResult());
+        assertEquals (false, js("return $('#kibana_install').get(0).checked"));
+        assertEquals (false, js("return $('#zeppelin_install').get(0).checked"));
+        assertEquals (false, js("return $('#grafana_install').get(0).checked"));
+        assertEquals (false, js("return $('#cerebro_install').get(0).checked"));
 
         js("eskimoKubernetesServicesConfig.selectAll()");
 
-        assertEquals (true, js("$('#kibana_install').get(0).checked").getJavaScriptResult());
-        assertEquals (true, js("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
-        assertEquals (true, js("$('#grafana_install').get(0).checked").getJavaScriptResult());
-        assertEquals (true, js("$('#cerebro_install').get(0).checked").getJavaScriptResult());
+        assertEquals (true, js("return $('#kibana_install').get(0).checked"));
+        assertEquals (true, js("return $('#zeppelin_install').get(0).checked"));
+        assertEquals (true, js("return $('#grafana_install').get(0).checked"));
+        assertEquals (true, js("return $('#cerebro_install').get(0).checked"));
 
         js("eskimoKubernetesServicesConfig.selectAll()");
 
-        assertEquals (false, js("$('#kibana_install').get(0).checked").getJavaScriptResult());
-        assertEquals (false, js("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
-        assertEquals (false, js("$('#grafana_install').get(0).checked").getJavaScriptResult());
-        assertEquals (false, js("$('#cerebro_install').get(0).checked").getJavaScriptResult());
+        assertEquals (false, js("return $('#kibana_install').get(0).checked"));
+        assertEquals (false, js("return $('#zeppelin_install').get(0).checked"));
+        assertEquals (false, js("return $('#grafana_install').get(0).checked"));
+        assertEquals (false, js("return $('#cerebro_install').get(0).checked"));
 
     }
 
@@ -167,22 +167,22 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
                 "    \"grafana_install\": \"on\"\n" +
                 "})");
 
-        assertTrue((boolean)js("$('#cerebro_install').is(':checked')").getJavaScriptResult());
-        assertTrue((boolean)js("$('#zeppelin_install').is(':checked')").getJavaScriptResult());
-        assertTrue((boolean)js("$('#kafka-manager_install').is(':checked')").getJavaScriptResult());
-        assertTrue((boolean)js("$('#kibana_install').is(':checked')").getJavaScriptResult());
-        assertTrue((boolean)js("$('#spark-console_install').is(':checked')").getJavaScriptResult());
-        assertTrue((boolean)js("$('#grafana_install').is(':checked')").getJavaScriptResult());
+        assertTrue((boolean)js("return $('#cerebro_install').is(':checked')"));
+        assertTrue((boolean)js("return $('#zeppelin_install').is(':checked')"));
+        assertTrue((boolean)js("return $('#kafka-manager_install').is(':checked')"));
+        assertTrue((boolean)js("return $('#kibana_install').is(':checked')"));
+        assertTrue((boolean)js("return $('#spark-console_install').is(':checked')"));
+        assertTrue((boolean)js("return $('#grafana_install').is(':checked')"));
 
         // just test a few
-        assertEquals("1", js("$('#cerebro_cpu').val()").getJavaScriptResult());
-        assertEquals("1G", js("$('#cerebro_ram').val()").getJavaScriptResult());
+        assertEquals("1", js("return $('#cerebro_cpu').val()"));
+        assertEquals("1G", js("return $('#cerebro_ram').val()"));
 
-        assertEquals("1", js("$('#kafka-manager_cpu').val()").getJavaScriptResult());
-        assertEquals("1G", js("$('#kafka-manager_ram').val()").getJavaScriptResult());
+        assertEquals("1", js("return $('#kafka-manager_cpu').val()"));
+        assertEquals("1G", js("return $('#kafka-manager_ram').val()"));
 
-        assertEquals("1", js("$('#grafana_cpu').val()").getJavaScriptResult());
-        assertEquals("1G", js("$('#grafana_ram').val()").getJavaScriptResult());
+        assertEquals("1", js("return $('#grafana_cpu').val()"));
+        assertEquals("1G", js("return $('#grafana_ram').val()"));
     }
 
     @Test
@@ -195,12 +195,12 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
         js("eskimoKubernetesServicesConfig.showReinstallSelection()");
 
         // on means nothing, it doesn't mean checkbox is checked, but it enables to validate the rendering is OK
-        assertEquals("on", js("$('#cerebro_reinstall').val()").getJavaScriptResult());
-        assertEquals("on", js("$('#zeppelin_reinstall').val()").getJavaScriptResult());
-        assertEquals("on", js("$('#kafka-manager_reinstall').val()").getJavaScriptResult());
-        assertEquals("on", js("$('#kibana_reinstall').val()").getJavaScriptResult());
-        assertEquals("on", js("$('#spark-console_reinstall').val()").getJavaScriptResult());
-        assertEquals("on", js("$('#grafana_reinstall').val()").getJavaScriptResult());
+        assertEquals("on", js("return $('#cerebro_reinstall').val()"));
+        assertEquals("on", js("return $('#zeppelin_reinstall').val()"));
+        assertEquals("on", js("return $('#kafka-manager_reinstall').val()"));
+        assertEquals("on", js("return $('#kibana_reinstall').val()"));
+        assertEquals("on", js("return $('#spark-console_reinstall').val()"));
+        assertEquals("on", js("return $('#grafana_reinstall').val()"));
 
     }
 
@@ -240,10 +240,10 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
 
         js("eskimoKubernetesServicesConfig.showKubernetesServicesConfig()");
 
-        assertEquals (false, js("$('#kibana_install').get(0).checked").getJavaScriptResult());
-        assertEquals (false, js("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
-        assertEquals (false, js("$('#grafana_install').get(0).checked").getJavaScriptResult());
-        assertEquals (false, js("$('#cerebro_install').get(0).checked").getJavaScriptResult());
+        assertEquals (false, js("return $('#kibana_install').get(0).checked"));
+        assertEquals (false, js("return $('#zeppelin_install').get(0).checked"));
+        assertEquals (false, js("return $('#grafana_install').get(0).checked"));
+        assertEquals (false, js("return $('#cerebro_install').get(0).checked"));
 
         // 5. all good, all services selected
         js("$.ajax = function(object) { object.success( {\n" +
@@ -257,10 +257,10 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
 
         js("eskimoKubernetesServicesConfig.showKubernetesServicesConfig()");
 
-        assertEquals (true, js("$('#kibana_install').get(0).checked").getJavaScriptResult());
-        assertEquals (true, js("$('#zeppelin_install').get(0).checked").getJavaScriptResult());
-        assertEquals (true, js("$('#grafana_install').get(0).checked").getJavaScriptResult());
-        assertEquals (true, js("$('#cerebro_install').get(0).checked").getJavaScriptResult());
+        assertEquals (true, js("return $('#kibana_install').get(0).checked"));
+        assertEquals (true, js("return $('#zeppelin_install').get(0).checked"));
+        assertEquals (true, js("return $('#grafana_install').get(0).checked"));
+        assertEquals (true, js("return $('#cerebro_install').get(0).checked"));
     }
 
     @Test

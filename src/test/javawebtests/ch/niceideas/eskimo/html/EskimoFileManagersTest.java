@@ -38,6 +38,7 @@ import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 
 import java.nio.charset.StandardCharsets;
 
@@ -53,11 +54,11 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         dirContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoFileManagersTest/dirContentTest.json"), StandardCharsets.UTF_8);
 
-        loadScript (page, "eskimoFileManagers.js");
+        loadScript ("eskimoFileManagers.js");
 
         js("function errorHandler() {};");
 
-        js("var dirContent = " + dirContent + "");
+        js("window.dirContent = " + dirContent + "");
 
         // instantiate test object
         js("eskimoFileManagers = new eskimo.FileManagers()");
@@ -198,7 +199,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         waitForElementIdInDOM("file-manager-close-192-168-10-11");
 
-        page.getElementById("file-manager-close-192-168-10-11").click();
+        getElementById("file-manager-close-192-168-10-11").click();
 
         assertJavascriptEquals("1.0", "eskimoFileManagers.getOpenedFileManagers().length");
         assertJavascriptEquals("192-168-10-13", "eskimoFileManagers.getOpenedFileManagers()[0].nodeName");
@@ -208,11 +209,11 @@ public class EskimoFileManagersTest extends AbstractWebTest {
     public void testShowFileManagers() {
         js("eskimoFileManagers.showFileManagers()");
 
-        assertNotNull (page.getElementById("file_manager_open_192-168-10-11"));
-        assertEquals ("192.168.10.11", page.getElementById("file_manager_open_192-168-10-11").getTextContent().trim());
+        assertNotNull (getElementById("file_manager_open_192-168-10-11"));
+        assertEquals ("192.168.10.11", getElementById("file_manager_open_192-168-10-11").getText().trim());
 
-        assertNotNull (page.getElementById("file_manager_open_192-168-10-13"));
-        assertEquals ("192.168.10.13", page.getElementById("file_manager_open_192-168-10-13").getTextContent().trim());
+        assertNotNull (getElementById("file_manager_open_192-168-10-13"));
+        assertEquals ("192.168.10.13", getElementById("file_manager_open_192-168-10-13").getText().trim());
     }
 
     @Test
@@ -220,14 +221,14 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         testShowFileManagers();
 
-        page.getElementById("file_manager_open_192-168-10-13").click();
+        getElementById("file_manager_open_192-168-10-13").click();
 
         //System.err.println (page.asXml());
 
         assertCssValue ("#file-managers-file-manager-192-168-10-13", "visibility", "inherit");
         assertCssValue ("#file-managers-file-manager-192-168-10-13", "display", "inherit");
 
-        page.getElementById("file_manager_open_192-168-10-11").click();
+        getElementById("file_manager_open_192-168-10-11").click();
 
         assertCssValue ("#file-managers-file-manager-192-168-10-11", "visibility", "inherit");
         assertCssValue ("#file-managers-file-manager-192-168-10-11", "display", "inherit");

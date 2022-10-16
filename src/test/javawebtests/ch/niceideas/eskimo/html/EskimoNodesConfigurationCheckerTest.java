@@ -38,7 +38,6 @@ import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.controlers.ServicesController;
 import ch.niceideas.eskimo.services.ServicesDefinition;
-import com.gargoylesoftware.htmlunit.ScriptException;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,7 +60,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"), StandardCharsets.UTF_8);
 
-        loadScript(page, "eskimoNodesConfigurationChecker.js");
+        loadScript("eskimoNodesConfigurationChecker.js");
 
         ServicesController sc = new ServicesController();
 
@@ -72,16 +71,16 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         String servicesDependencies = sc.getServicesDependencies();
 
-        js("var SERVICES_DEPENDENCIES_WRAPPER = " + servicesDependencies + ";");
+        js("window.SERVICES_DEPENDENCIES_WRAPPER = " + servicesDependencies + ";");
 
-        js("var UNIQUE_SERVICES = [\"zookeeper\", \"kube-master\" ];");
-        js("var MULTIPLE_SERVICES = [\"kube-slave\", \"prometheus\", \"gluster\", \"logstash\", \"etcd\"];");
-        js("var MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
-        js("var CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
+        js("window.UNIQUE_SERVICES = [\"zookeeper\", \"kube-master\" ];");
+        js("window.MULTIPLE_SERVICES = [\"kube-slave\", \"prometheus\", \"gluster\", \"logstash\", \"etcd\"];");
+        js("window.MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
+        js("window.CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
-        js("var SERVICES_CONFIGURATION = " + jsonServices + ";");
+        js("window.SERVICES_CONFIGURATION = " + jsonServices + ";");
 
-        js("function callCheckNodeSetup(config) {\n" +
+        js("window.callCheckNodeSetup = function (config) {\n" +
                 "   return checkNodesSetup(config, UNIQUE_SERVICES, MANDATORY_SERVICES, SERVICES_CONFIGURATION, SERVICES_DEPENDENCIES_WRAPPER.servicesDependencies);\n" +
                 "}");
 
@@ -108,7 +107,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     @Test
     public void testNotAnIpAddress() throws Exception {
 
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
+        Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "blabla");
                 put("ntp1", "on");
@@ -188,7 +187,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     @Test
     public void testUniqueServiceOnRange() throws Exception {
 
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
+        Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("node_id2", "192.168.10.12-192.160.10.15");
@@ -218,7 +217,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     @Test
     public void testMissingGluster() throws Exception {
 
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
+        Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("node_id2", "192.168.10.12");
@@ -242,7 +241,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     @Test
     public void testNoIPConfigured() throws Exception {
 
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
+        Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "");
             }});
@@ -257,7 +256,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
     @Test
     public void testKeyGreaterThanNodeNumber() throws Exception {
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
+        Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id2", "192.168.10.11");
             }});
@@ -289,7 +288,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     @Test
     public void testNoGlusterOnSingleNode() throws Exception {
 
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
+        Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("ntp1", "on");
@@ -311,7 +310,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     @Test
     public void testKubeSlaveButNoKubeMaster() throws Exception {
 
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
+        Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("kube-slave1", "on");
@@ -333,7 +332,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     @Test
     public void testGlusterButNoZookeeper() throws Exception {
 
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
+        Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("kube-slave1", "on");
@@ -355,7 +354,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     @Test
     public void testNoKubernetesServiceCanBeSelected() throws Exception {
 
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
+        Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("node_id2", "192.168.10.12");

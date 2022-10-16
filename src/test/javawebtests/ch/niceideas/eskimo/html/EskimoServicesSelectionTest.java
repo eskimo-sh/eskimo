@@ -53,10 +53,10 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"), StandardCharsets.UTF_8);
 
-        loadScript(page, "bootstrap.js");
+        loadScript("bootstrap-5.2.0.js");
 
-        loadScript(page, "eskimoUtils.js");
-        loadScript(page, "eskimoServicesSelection.js");
+        loadScript("eskimoUtils.js");
+        loadScript("eskimoServicesSelection.js");
 
         // instantiate test object
         js("eskimoServicesSelection = new eskimo.ServicesSelection();");
@@ -66,19 +66,19 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         waitForElementIdInDOM("services-selection-button-select-all");
 
-        js("SERVICES_CONFIGURATION = " + jsonServices + ";");
+        js("window.SERVICES_CONFIGURATION = " + jsonServices + ";");
 
         js("eskimoServicesSelection.setServicesSettingsForTest(SERVICES_CONFIGURATION);");
 
         jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"), StandardCharsets.UTF_8);
 
-        js("SERVICES_CONFIGURATION = " + jsonServices + ";");
+        js("window.SERVICES_CONFIGURATION = " + jsonServices + ";");
         //js("eskimoNodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
 
-        js("UNIQUE_SERVICES = [\"zookeeper\", \"kube-master\"];");
-        js("MULTIPLE_SERVICES = [\"ntp\", \"etcd\", \"kube-slave\", \"gluster\", \"prometheus\"];");
-        js("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
-        js("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
+        js("window.UNIQUE_SERVICES = [\"zookeeper\", \"kube-master\"];");
+        js("window.MULTIPLE_SERVICES = [\"ntp\", \"etcd\", \"kube-slave\", \"gluster\", \"prometheus\"];");
+        js("window.MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
+        js("window.CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
         js("eskimoNodesConfig.getConfiguredServices = function() {\n"+
                 "    return CONFIGURED_SERVICES;\n"+
@@ -105,13 +105,13 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
     @Test
     public void testServicesSelectionRadioMouseDown() throws Exception {
-        page.getElementById("zookeeper-choice").click();
+        getElementById("zookeeper-choice").click();
 
         assertJavascriptEquals("true", "$('#zookeeper-choice').get(0).checked");
 
-        page.getElementById("zookeeper-choice").click();
+        getElementById("zookeeper-choice").click();
 
-        await().atMost(10, TimeUnit.SECONDS).until(() -> js("$('#zookeeper-choice').get(0).checked").getJavaScriptResult().toString().equals ("false"));
+        await().atMost(10, TimeUnit.SECONDS).until(() -> js("return $('#zookeeper-choice').get(0).checked").toString().equals ("false"));
 
         assertJavascriptEquals("false", "$('#zookeeper-choice').get(0).checked");
     }
@@ -119,7 +119,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
     @Test
     public void testNominal() throws Exception {
 
-        js("var result = null;");
+        js("window.result = null;");
 
         js("eskimoServicesSelection.getCurrentNodesConfig = function() {" +
                 "return {\n" +
@@ -146,7 +146,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
     @Test
     public void testSelectAll() throws Exception {
 
-        js("var result = null;");
+        js("window.result = null;");
 
         js("eskimoNodesConfig.getNodesCount = function() { return 2; }");
 

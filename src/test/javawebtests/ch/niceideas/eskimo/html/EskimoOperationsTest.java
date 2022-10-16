@@ -34,7 +34,6 @@
 
 package ch.niceideas.eskimo.html;
 
-import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import org.json.JSONArray;
@@ -44,17 +43,15 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 public class EskimoOperationsTest extends AbstractWebTest {
 
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript(page, "bootstrap.js");
-        loadScript(page, "eskimoOperations.js");
+        loadScript("bootstrap-5.2.0.js");
+        loadScript("eskimoOperations.js");
 
-        js("function errorHandler() {};");
+        js("window.errorHandler = function () {};");
 
         // instantiate test object
         js("eskimoOperations = new eskimo.Operations()");
@@ -69,7 +66,7 @@ public class EskimoOperationsTest extends AbstractWebTest {
 
         js("$.ajax = function(obj) { window.objUrl = obj.url }");
 
-        page.getElementById("interupt-operations-btn").click();
+        getElementById("interupt-operations-btn").click();
 
         assertJavascriptEquals("interupt-processing", "window.objUrl ");
     }

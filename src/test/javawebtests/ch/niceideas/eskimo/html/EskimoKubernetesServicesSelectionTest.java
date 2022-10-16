@@ -51,9 +51,9 @@ public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript(page, "bootstrap.js");
-        loadScript(page, "eskimoUtils.js");
-        loadScript(page, "eskimoKubernetesServicesSelection.js");
+        loadScript("bootstrap-5.2.0.js");
+        loadScript("eskimoUtils.js");
+        loadScript("eskimoKubernetesServicesSelection.js");
 
         js("eskimoKubernetesServicesConfig = {};");
 
@@ -69,7 +69,7 @@ public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
 
         String htmlForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoKubernetesServicesSelectionTest/form.html"), StandardCharsets.UTF_8);
 
-        js("INNER_FORM = '" + htmlForm.replace("\n", " ").replace("\r", "") + "';");
+        js("window.INNER_FORM = '" + htmlForm.replace("\n", " ").replace("\r", "") + "';");
 
         js("$('#kubernetes-services-selection-body').html(INNER_FORM);");
     }
@@ -78,11 +78,11 @@ public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
     public void testNominal() throws Exception {
 
         // this is just to ensure everything has been properly loaded by setup
-        assertNotNull (page.getElementById("select-all-kubernetes-services-button"));
+        assertNotNull (getElementById("select-all-kubernetes-services-button"));
 
         js("eskimoKubernetesServicesSelection.showKubernetesServiceSelection()");
 
-        await().atMost(1, TimeUnit.SECONDS).until(() -> js("$('#kubernetes-services-selection-modal').css('display')").getJavaScriptResult().toString().equals ("block"));
+        await().atMost(1, TimeUnit.SECONDS).until(() -> js("return $('#kubernetes-services-selection-modal').css('display')").toString().equals ("block"));
 
         assertCssValue("#kubernetes-services-selection-modal", "display", "block");
         assertCssValue("#kubernetes-services-selection-modal", "visibility", "visible");
@@ -99,7 +99,7 @@ public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
 
         testSelectAll();
 
-        page.getElementById("kubernetes-services-select-button-validate").click();
+        getElementById("kubernetes-services-select-button-validate").click();
 
         JSONObject expectedResult = new JSONObject("{" +
                 "\"cerebro_reinstall\":\"on\"," +
@@ -108,7 +108,7 @@ public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
                 "\"kibana_reinstall\":\"on\"," +
                 "\"spark-console_reinstall\":\"on\"}");
 
-        JSONObject actualResult = new JSONObject((String)js("window.reinstallConfig").getJavaScriptResult());
+        JSONObject actualResult = new JSONObject((String)js("return window.reinstallConfig"));
         assertTrue(expectedResult.similar(actualResult));
     }
 
@@ -117,12 +117,12 @@ public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
 
         js("eskimoKubernetesServicesSelection.kubernetesServicesSelectionSelectAll();");
 
-        assertTrue ((Boolean)js("$('#cerebro_reinstall').get(0).checked").getJavaScriptResult());
-        assertTrue ((Boolean)js("$('#kibana_reinstall').get(0).checked").getJavaScriptResult());
-        assertTrue ((Boolean)js("$('#kafka-manager_reinstall').get(0).checked").getJavaScriptResult());
-        assertTrue ((Boolean)js("$('#spark-console_reinstall').get(0).checked").getJavaScriptResult());
-        assertTrue ((Boolean)js("$('#grafana_reinstall').get(0).checked").getJavaScriptResult());
+        assertTrue ((Boolean)js("return ('#cerebro_reinstall').get(0).checked"));
+        assertTrue ((Boolean)js("return $('#kibana_reinstall').get(0).checked"));
+        assertTrue ((Boolean)js("return $('#kafka-manager_reinstall').get(0).checked"));
+        assertTrue ((Boolean)js("return $('#spark-console_reinstall').get(0).checked"));
+        assertTrue ((Boolean)js("return $('#grafana_reinstall').get(0).checked"));
 
-        assertFalse ((Boolean)js("$('#zeppelin_reinstall').get(0).checked").getJavaScriptResult());
+        assertFalse ((Boolean)js("return $('#zeppelin_reinstall').get(0).checked"));
     }
 }

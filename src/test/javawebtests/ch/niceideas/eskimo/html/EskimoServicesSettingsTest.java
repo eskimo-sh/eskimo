@@ -48,8 +48,8 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript(page, "eskimoUtils.js");
-        loadScript(page, "eskimoServicesSettings.js");
+        loadScript("eskimoUtils.js");
+        loadScript("eskimoServicesSettings.js");
 
         // instantiate test object
         js("eskimoServicesSettings = new eskimo.ServicesSettings()");
@@ -63,7 +63,7 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
 
         jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
 
-        js("var TEST_SERVICE_SETTINGS = " + jsonConfig + ";");
+        js("window.TEST_SERVICE_SETTINGS = " + jsonConfig + ";");
 
         js("eskimoServicesSettings.setServicesSettingsForTest(TEST_SERVICE_SETTINGS.settings)");
 
@@ -82,7 +82,7 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
 
         js("eskimoSettingsOperationsCommand.showCommand = function () {window.showCommandCalled = true;  }");
 
-        page.getElementById("save-services-settings-btn").click();
+        getElementById("save-services-settings-btn").click();
 
         assertJavascriptEquals("true", "window.showCommandCalled");
     }

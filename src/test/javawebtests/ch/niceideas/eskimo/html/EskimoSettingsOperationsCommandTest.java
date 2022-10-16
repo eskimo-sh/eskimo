@@ -46,9 +46,9 @@ public class EskimoSettingsOperationsCommandTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript(page, "bootstrap.js");
+        loadScript("bootstrap-5.2.0.js");
 
-        loadScript(page, "eskimoSettingsOperationsCommand.js");
+        loadScript("eskimoSettingsOperationsCommand.js");
 
         // instantiate test object
         js("eskimoSettingsOperationsCommand = new eskimo.SettingsOperationsCommand();");
@@ -84,7 +84,7 @@ public class EskimoSettingsOperationsCommandTest extends AbstractWebTest {
 
         testShowCommand();
 
-        page.getElementById("settings-operations-command-button-validate").click();
+        getElementById("settings-operations-command-button-validate").click();
 
         assertJavascriptEquals("true", "window.stopOperationInProgressResult");
     }

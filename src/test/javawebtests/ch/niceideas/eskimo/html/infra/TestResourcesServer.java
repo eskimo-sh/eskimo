@@ -32,48 +32,26 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.html;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+package ch.niceideas.eskimo.html.infra;
 
-public class EskimoAboutTest extends AbstractWebTest {
+public interface TestResourcesServer {
 
-    @BeforeEach
-    public void setUp() throws Exception {
-
-        loadScript("bootstrap-5.2.0.js");
-
-        loadScript("eskimoAbout.js");
-
-        js("eskimoAbout = new eskimo.About();");
-        js("eskimoAbout.initialize()");
-
-        waitForElementIdInDOM("about-modal-body");
+    interface JsRunner {
+        Object js (String jsCode);
     }
 
-    @Test
-    public void testNominal() throws Exception {
-
-        js("eskimoAbout.showAbout()");
-
-        assertCssValue("#about-modal", "display", "block");
-        assertCssValue("#about-modal", "visibility", "visible");
-
-        js("eskimoAbout.cancelAbout()");
-
-        /* FIXME WTF ?!?
-        await().atMost(20, TimeUnit.SECONDS).until(() ->
-                   js("$('#about-modal').css('display')") != null
-                && js("$('#about-modal').css('display')").getJavaScriptResult() != null
-                && js("$('#about-modal').css('display')").getJavaScriptResult().toString() != null
-                && js("$('#about-modal').css('display')").getJavaScriptResult().toString().equals ("none"));
-        */
-        Thread.sleep(2000);
-
-        //assertCssValue("#about-modal", "visibility", "hidden");
-        assertCssValue("#about-modal", "display", "none");
+    static TestResourcesServer getServer(boolean coverage) {
+        if (coverage) {
+            return new CoverageServer();
+        }  else {
+            return new UsualServer();
+        }
     }
 
+    public void startServer(String className) throws Exception;
+
+    void stopServer() throws Exception;
+
+    void postTestMethodHook(JsRunner runner) throws Exception;
 }
-

@@ -36,9 +36,7 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.eskimo.controlers.ServicesController;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
-import ch.niceideas.eskimo.services.KubernetesService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
-import com.gargoylesoftware.htmlunit.ScriptException;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -103,8 +101,8 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript(page, "eskimoNodesConfigurationChecker.js");
-        loadScript(page, "eskimoKubernetesServicesConfigChecker.js");
+        loadScript("eskimoNodesConfigurationChecker.js");
+        loadScript("eskimoKubernetesServicesConfigChecker.js");
 
         ServicesController sc = new ServicesController();
 
@@ -116,11 +114,11 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
         String servicesDependencies = sc.getServicesDependencies();
         String kubernetesServiceConfig = sc.getKubernetesServices();
 
-        js("var SERVICES_DEPENDENCIES_WRAPPER = " + servicesDependencies + ";");
+        js("window.SERVICES_DEPENDENCIES_WRAPPER = " + servicesDependencies + ";");
 
-        js("var KUBERNETES_SERVICES_CONFIG = " + kubernetesServiceConfig + ";");
+        js("window.KUBERNETES_SERVICES_CONFIG = " + kubernetesServiceConfig + ";");
 
-        js("function callCheckKubernetesSetup(nodesConfig, kubernetesConfig) {\n" +
+        js("window.callCheckKubernetesSetup(nodesConfig, kubernetesConfig) = function {\n" +
                 "   return doCheckKubernetesSetup(nodesConfig, kubernetesConfig, SERVICES_DEPENDENCIES_WRAPPER.servicesDependencies, KUBERNETES_SERVICES_CONFIG.kubernetesServicesConfigurations);\n" +
                 "}");
     }
@@ -143,7 +141,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
 
         kubernetesConfig.removeRootKey("flink-runtime_install");
 
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
+        Exception exception = assertThrows(Exception.class, () -> {
                 js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")");
         });
         logger.debug (exception.getMessage());
@@ -156,7 +154,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
         kubernetesConfig.removeRootKey("flink-runtime_install");
         kubernetesConfig.removeRootKey("flink-runtime_cpu");
 
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
+        Exception exception = assertThrows(Exception.class, () -> {
             js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")");
         });
         logger.debug (exception.getMessage());
@@ -168,7 +166,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
 
         kubernetesConfig.setValueForPath("flink-runtime_cpu", "0.5z");
 
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
+        Exception exception = assertThrows(Exception.class, () -> {
             js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")");
         });
         logger.debug (exception.getMessage());
@@ -180,7 +178,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
 
         kubernetesConfig.setValueForPath("flink-runtime_ram", "500Gb");
 
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
+        Exception exception = assertThrows(Exception.class, () -> {
             js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")");
         });
         logger.debug (exception.getMessage());
@@ -219,7 +217,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
     @Test
     public void testOneCerebroButNoES() throws Exception {
 
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
+        Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("node_id1", "192.168.10.11");
                 put("kubernetes", "1");
@@ -241,7 +239,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
     @Test
     public void testSparkButNoKube() throws Exception {
 
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
+        Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("node_id1", "192.168.10.11");
                 put("ntp1", "on");
@@ -261,7 +259,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
     @Test
     public void testZeppelinButNoZookeeper() throws Exception {
 
-        ScriptException exception = assertThrows(ScriptException.class, () -> {
+        Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
                 put("node_id1", "192.168.10.11");
                 put("ntp1", "on");
