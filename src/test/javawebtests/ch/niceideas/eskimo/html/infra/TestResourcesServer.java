@@ -49,7 +49,7 @@ public interface TestResourcesServer {
         }
     }
 
-    public void startServer(String className) throws Exception;
+    void startServer(String className) throws Exception;
 
     void stopServer() throws Exception;
 

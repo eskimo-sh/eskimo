@@ -84,7 +84,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
                 "}");
 
         js("eskimoFileManagers.connectFileManager = function (nodeAddress, nodeName) {" +
-                "    alert (\"calledFor : \" + nodeAddress);\n" +
+                "    console.log (\"calledFor : \" + nodeAddress);\n" +
                 "    eskimoFileManagers.getOpenedFileManagers().push({\"nodeName\" : nodeName, \"nodeAddress\": nodeAddress, \"current\": \"/\"});" +
                 "    eskimoFileManagers.listFolder (nodeAddress, nodeName, '/', dirContent);\n" +
                 "}");
@@ -98,7 +98,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         js("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
 
-        assertJavascriptEquals("1.0", "eskimoFileManagers.getOpenedFileManagers().length");
+        assertJavascriptEquals("1", "eskimoFileManagers.getOpenedFileManagers().length");
         assertJavascriptEquals("192-168-10-11", "eskimoFileManagers.getOpenedFileManagers()[0].nodeName");
 
         // if this is set then we want as far as listFolder function
@@ -201,7 +201,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         getElementById("file-manager-close-192-168-10-11").click();
 
-        assertJavascriptEquals("1.0", "eskimoFileManagers.getOpenedFileManagers().length");
+        assertJavascriptEquals("1", "eskimoFileManagers.getOpenedFileManagers().length");
         assertJavascriptEquals("192-168-10-13", "eskimoFileManagers.getOpenedFileManagers()[0].nodeName");
     }
 
@@ -225,13 +225,13 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         //System.err.println (page.asXml());
 
-        assertCssValue ("#file-managers-file-manager-192-168-10-13", "visibility", "inherit");
-        assertCssValue ("#file-managers-file-manager-192-168-10-13", "display", "inherit");
+        assertCssValue ("#file-managers-file-manager-192-168-10-13", "visibility", "visible");
+        assertCssValue ("#file-managers-file-manager-192-168-10-13", "display", "block");
 
         getElementById("file_manager_open_192-168-10-11").click();
 
-        assertCssValue ("#file-managers-file-manager-192-168-10-11", "visibility", "inherit");
-        assertCssValue ("#file-managers-file-manager-192-168-10-11", "display", "inherit");
+        assertCssValue ("#file-managers-file-manager-192-168-10-11", "visibility", "visible");
+        assertCssValue ("#file-managers-file-manager-192-168-10-11", "display", "block");
 
         assertCssValue ("#file-managers-file-manager-192-168-10-13", "visibility", "hidden");
         assertCssValue ("#file-managers-file-manager-192-168-10-13", "display", "none");

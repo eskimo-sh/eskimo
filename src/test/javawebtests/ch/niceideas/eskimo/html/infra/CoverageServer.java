@@ -36,7 +36,6 @@
 package ch.niceideas.eskimo.html.infra;
 
 import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.eskimo.html.AbstractWebTest;
 import ch.niceideas.eskimo.utils.GenerateLCOV;
 import jscover.Main;
 import jscover.report.FileData;

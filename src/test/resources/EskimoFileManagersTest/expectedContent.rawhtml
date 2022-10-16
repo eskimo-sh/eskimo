@@ -1,5 +1,5 @@
         <div class="table-responsive">
-            <table class="table table-hover">
+            <table class="file-manager-files-table table table-hover">
                 <tbody>
                 <tr>
                     <td>                        <a href="javascript:eskimoMain.getFileManagers().openFolder('192.168.10.11', '192-168-10-11', '/', '.');">.                        </a>                    </td>
