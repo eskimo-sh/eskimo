@@ -118,7 +118,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
 
         js("window.KUBERNETES_SERVICES_CONFIG = " + kubernetesServiceConfig + ";");
 
-        js("window.callCheckKubernetesSetup(nodesConfig, kubernetesConfig) = function {\n" +
+        js("window.callCheckKubernetesSetup = function (nodesConfig, kubernetesConfig) {\n" +
                 "   return doCheckKubernetesSetup(nodesConfig, kubernetesConfig, SERVICES_DEPENDENCIES_WRAPPER.servicesDependencies, KUBERNETES_SERVICES_CONFIG.kubernetesServicesConfigurations);\n" +
                 "}");
     }
@@ -145,7 +145,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
                 js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")");
         });
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Found a CPU definition for flink-runtime_cpu. But corresponding service installation is not enabled"));
+        assertTrue(exception.getMessage().contains("Inconsistency found : Found a CPU definition for flink-runtime_cpu. But corresponding service installation is not enabled"));
     }
 
     @Test
@@ -158,7 +158,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
             js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")");
         });
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Found a RAM definition for flink-runtime_ram. But corresponding service installation is not enabled"));
+        assertTrue(exception.getMessage().contains("Inconsistency found : Found a RAM definition for flink-runtime_ram. But corresponding service installation is not enabled"));
     }
 
     @Test
@@ -170,7 +170,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
             js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")");
         });
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("CPU definition for flink-runtime_cpu doesn't match expected REGEX - [0-9\\\\.]+[m]{0,1}"));
+        assertTrue(exception.getMessage().contains("CPU definition for flink-runtime_cpu doesn't match expected REGEX - [0-9\\\\.]+[m]{0,1}"));
     }
 
     @Test
@@ -182,7 +182,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
             js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")");
         });
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("RAM definition for flink-runtime_ram doesn't match expected REGEX - [0-9\\.]+[EPTGMk]{0,1}"));
+        assertTrue(exception.getMessage().contains("RAM definition for flink-runtime_ram doesn't match expected REGEX - [0-9\\.]+[EPTGMk]{0,1}"));
     }
 
     @Test
@@ -233,7 +233,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service cerebro expects a installaton of  elasticsearch. But it's not going to be installed"));
+        assertTrue(exception.getMessage().contains("Inconsistency found : Service cerebro expects a installaton of  elasticsearch. But it's not going to be installed"));
     }
 
     @Test
@@ -253,7 +253,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service spark-runtime expects 1 kube-master instance(s). But only 0 has been found !"));
+        assertTrue(exception.getMessage().contains("Inconsistency found : Service spark-runtime expects 1 kube-master instance(s). But only 0 has been found !"));
     }
 
     @Test
@@ -277,7 +277,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service zeppelin expects 1 zookeeper instance(s). But only 0 has been found !"));
+        assertTrue(exception.getMessage().contains("Inconsistency found : Service zeppelin expects 1 zookeeper instance(s). But only 0 has been found !"));
     }
 
 }

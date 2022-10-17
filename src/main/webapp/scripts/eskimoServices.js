@@ -66,10 +66,7 @@ eskimo.Services = function () {
     };
 
     function loadUIServicesConfig() {
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxGet({
             url: "get-ui-services-config",
             success: function (data, status, jqXHR) {
 
@@ -87,10 +84,7 @@ eskimo.Services = function () {
     }
 
     function loadUIServices() {
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxGet({
             url: "list-ui-services",
             success: function (data, status, jqXHR) {
 

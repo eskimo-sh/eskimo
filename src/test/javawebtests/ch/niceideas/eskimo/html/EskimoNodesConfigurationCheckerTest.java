@@ -118,7 +118,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Node 1 has IP configured as blabla which is not an IP address or a range."));
+        assertTrue(exception.getMessage().contains("Node 1 has IP configured as blabla which is not an IP address or a range."));
     }
 
     @Test
@@ -211,7 +211,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Node 2 is a range an declares service zookeeper which is a unique service, hence forbidden on a range."));
+        assertTrue(exception.getMessage().contains("Node 2 is a range an declares service zookeeper which is a unique service, hence forbidden on a range."));
     }
 
     @Test
@@ -235,7 +235,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : service gluster is mandatory on all nodes but some nodes are lacking i"));
+        assertTrue(exception.getMessage().contains("Inconsistency found : service gluster is mandatory on all nodes but some nodes are lacking i"));
     }
 
     @Test
@@ -250,7 +250,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Node 1 has no IP configured."));
+        assertTrue(exception.getMessage().contains("Node 1 has no IP configured."));
 
     }
 
@@ -265,7 +265,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : got key node_id2 which is greater than node number 1"));
+        assertTrue(exception.getMessage().contains("Inconsistency found : got key node_id2 which is greater than node number 1"));
     }
 
     @Test
@@ -304,7 +304,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         logger.debug (exception.getMessage());
 
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : service gluster is mandatory on all nodes but some nodes are lacking it."));
+        assertTrue(exception.getMessage().contains("Inconsistency found : service gluster is mandatory on all nodes but some nodes are lacking it."));
     }
 
     @Test
@@ -326,7 +326,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service kube-slave expects 1 kube-master instance(s). But only 0 has been found !"));
+        assertTrue(exception.getMessage().contains("Inconsistency found : Service kube-slave expects 1 kube-master instance(s). But only 0 has been found !"));
     }
 
     @Test
@@ -348,7 +348,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : Service gluster expects 1 zookeeper instance(s). But only 0 has been found !"));
+        assertTrue(exception.getMessage().contains("Inconsistency found : Service gluster expects 1 zookeeper instance(s). But only 0 has been found !"));
     }
 
     @Test
@@ -377,7 +377,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
         });
 
         logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().startsWith("Inconsistency found : service cerebro is either undefined or a kubernetes service which should not be selectable here."));
+        assertTrue(exception.getMessage().contains("Inconsistency found : service cerebro is either undefined or a kubernetes service which should not be selectable here."));
     }
 
 

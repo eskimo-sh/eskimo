@@ -69,10 +69,7 @@ eskimo.Operations = function() {
 
                 $("#interupt-operations-btn").click(function(e) {
                     $("#operations-title").html("<h3>Operations pending .... <strong>(Interrupting ...)</strong></h3>");
-                    $.ajax({
-                        type: "GET",
-                        dataType: "json",
-                        contentType: "application/json; charset=utf-8",
+                    $.ajaxGet({
                         url: "interupt-processing",
                         success: function (data, status, jqXHR2) {
                         },
@@ -269,10 +266,7 @@ eskimo.Operations = function() {
     this.renderLabels = renderLabels;
 
     function fetchOperationStatus(callback) {
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxGet({
             url: "fetch-operations-status?last-lines="  + JSON.stringify(getLastLines()),
             success: function (data, status, jqXHR) {
 

@@ -270,10 +270,7 @@ eskimo.SystemStatus = function() {
     }
 
     function loadUIStatusServicesConfig() {
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxGet({
             url: "get-ui-services-status-config",
             success: function (data, status, jqXHR) {
 
@@ -292,10 +289,7 @@ eskimo.SystemStatus = function() {
     }
 
     function loadListServices () {
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxGet({
             url: "list-services",
             success: function (data, status, jqXHR) {
 
@@ -405,11 +399,8 @@ eskimo.SystemStatus = function() {
         that.eskimoMain.startOperationInProgress();
 
         // 1 hour timeout
-        $.ajax({
-            type: "GET",
-            dataType: "json",
+        $.ajaxGet({
             timeout: 1000 * 3600,
-            contentType: "application/json; charset=utf-8",
             url: (custom ?
                 "service-custom-action?action=" + action + "&service=" + service + "&nodeAddress=" + node :
                 action + "?service=" + service + "&nodeAddress=" + node),
@@ -1079,9 +1070,7 @@ eskimo.SystemStatus = function() {
     };
 
     this.fetchOperationResult = function() {
-        $.ajax({
-            type: "GET",
-            dataType: "json",
+        $.ajaxGet({
             url: "get-last-operation-result",
             success: function (data, status, jqXHR) {
 
@@ -1112,9 +1101,7 @@ eskimo.SystemStatus = function() {
             that.eskimoMain.showProgressbar();
         }
 
-        $.ajax({
-            type: "GET",
-            dataType: "json",
+        $.ajaxGet({
             url: "get-status",
             timeout: 1000 * 35, // 35 secs
             success: function (data, status, jqXHR) {

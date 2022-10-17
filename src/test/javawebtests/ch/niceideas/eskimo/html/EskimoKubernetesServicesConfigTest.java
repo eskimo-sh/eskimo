@@ -61,32 +61,39 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
         */
 
         // instantiate test object
-        js("eskimoKubernetesServicesConfig = new eskimo.KubernetesServicesConfig();");
+        js("window.eskimoKubernetesServicesConfig = new eskimo.KubernetesServicesConfig();");
         js("eskimoKubernetesServicesConfig.eskimoMain = eskimoMain;");
         js("eskimoKubernetesServicesConfig.eskimoKubernetesServicesSelection = eskimoKubernetesServicesSelection");
         js("eskimoKubernetesServicesConfig.eskimoKubernetesOperationsCommand = eskimoKubernetesOperationsCommand");
         js("eskimoKubernetesServicesConfig.eskimoNodesConfig = eskimoNodesConfig");
-        js("eskimoKubernetesServicesConfig.initialize();");
 
-        waitForElementIdInDOM("reset-kubernetes-servicesconfig");
-
-        js("eskimoKubernetesServicesConfig.setKubernetesServicesForTest([\n" +
+        js("window.KUBERNETES_SERVICES = [\n" +
                 "    \"cerebro\",\n" +
                 "    \"grafana\",\n" +
                 "    \"kafka-manager\",\n" +
                 "    \"kibana\",\n" +
                 "    \"spark-console\",\n" +
                 "    \"zeppelin\"\n" +
-                "  ]);");
+                "  ];");
 
-        js("eskimoKubernetesServicesConfig.setKubernetesServicesConfigForTest({\n" +
+        js("window.KUBERNETES_SERVICES_CONFIG = {\n" +
                 "    \"cerebro\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
                 "    \"grafana\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
                 "    \"kafka-manager\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
                 "    \"kibana\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
                 "    \"spark-console\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
                 "    \"zeppelin\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
-                "  });");
+                "  };");
+
+        js("$.ajaxGet = function(callback) { console.log(callback); }");
+
+        js("eskimoKubernetesServicesConfig.initialize();");
+
+        waitForElementIdInDOM("reset-kubernetes-servicesconfig");
+
+        js("eskimoKubernetesServicesConfig.setKubernetesServicesForTest(KUBERNETES_SERVICES);");
+
+        js("eskimoKubernetesServicesConfig.setKubernetesServicesConfigForTest(KUBERNETES_SERVICES_CONFIG);");
 
         js("$('#inner-content-kubernetes-services-config').css('display', 'inherit')");
         js("$('#inner-content-kubernetes-services-config').css('visibility', 'visible')");
@@ -124,7 +131,7 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
                 "\"cerebro_cpu\":\"1\"," +
                 "\"grafana_cpu\":\"1\"}");
 
-        JSONObject actualConfig = new JSONObject((String)js("window.savedKubernetesConfig"));
+        JSONObject actualConfig = new JSONObject((String)js("return window.savedKubernetesConfig"));
         assertTrue(expectedConfig.similar(actualConfig));
     }
 

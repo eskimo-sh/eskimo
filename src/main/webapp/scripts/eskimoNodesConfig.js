@@ -120,10 +120,7 @@ eskimo.NodesConfig = function() {
     };
 
     function loadServiceDependencies() {
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxGet({
             url: "get-services-dependencies",
             success: function (data, status, jqXHR) {
 
@@ -140,10 +137,7 @@ eskimo.NodesConfig = function() {
     }
 
     function loadConfigServices() {
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxGet({
             url: "list-config-services",
             success: function (data, status, jqXHR) {
 
@@ -316,9 +310,7 @@ eskimo.NodesConfig = function() {
             that.eskimoMain.showProgressbar();
         }
 
-        $.ajax({
-            type: "GET",
-            dataType: "json",
+        $.ajaxGet({
             url: "load-nodes-config",
             success: function (data, status, jqXHR) {
 
@@ -611,11 +603,8 @@ eskimo.NodesConfig = function() {
         that.eskimoMain.showProgressbar();
 
         // 1 hour timeout
-        $.ajax({
-            type: "POST",
-            dataType: "json",
+        $.ajaxPost({
             timeout: 1000 * 120,
-            contentType: "application/json; charset=utf-8",
             url: reinstall ? "reinstall-nodes-config" : "save-nodes-config",
             data: JSON.stringify(model),
             success: function (data, status, jqXHR) {

@@ -270,9 +270,7 @@ eskimo.Consoles = function() {
             alert("Console " + terminalToClose + " not found");
         } else {
             //console.log(openedConsole.terminal);
-            $.ajax({
-                type: "GET",
-                dataType: "json",
+            $.ajaxGet({
                 url: "terminal-remove?session=" + openedConsole.terminal.getSessionId(),
                 success: function (data, status, jqXHR) {
                     //console.log(data);

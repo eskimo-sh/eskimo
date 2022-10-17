@@ -75,10 +75,7 @@ eskimo.ServicesSettings = function () {
     };
 
     function loadServicesSettings() {
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxGet({
             url: "load-services-settings",
             success: function (data, status, jqXHR) {
 
@@ -105,10 +102,7 @@ eskimo.ServicesSettings = function () {
 
         that.eskimoMain.showProgressbar();
 
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxPost({
             timeout: 1000 * 7200,
             url: "save-services-settings",
             data: JSON.stringify(servicesConfigForm),

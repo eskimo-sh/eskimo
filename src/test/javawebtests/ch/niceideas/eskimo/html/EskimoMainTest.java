@@ -176,10 +176,10 @@ public class EskimoMainTest extends AbstractWebTest {
 
         js("" +
                 " $('.config-menu-items').each(function() {\n" +
-                "     if ($(this).attr('class') == 'config-menu-items') {\n" +
+                "     if ($(this).attr('class') == 'side-nav-item ') {\n" +
                 "         allDisabled=false;\n" +
                 "     }\n" +
-                "     if ($(this).attr('class') == 'config-menu-items disabled') {\n" +
+                "     if ($(this).attr('class') == 'side-nav-item  disabled') {\n" +
                 "         allEnabled=false;\n" +
                 "     }\n" +
                 "});");
@@ -193,7 +193,7 @@ public class EskimoMainTest extends AbstractWebTest {
 
         js("" +
                 " $('.config-menu-items').each(function() {\n" +
-                "     if ($(this).attr('class') == 'config-menu-items disabled') {\n" +
+                "     if ($(this).attr('class') == 'side-nav-item  disabled') {\n" +
                 "         allEnabled=false;\n" +
                 "     }\n" +
                 "});");
@@ -220,21 +220,6 @@ public class EskimoMainTest extends AbstractWebTest {
     }
 
     @Test
-    public void testInitHoe() throws Exception {
-
-        js("initHoe();");
-
-        assertJavascriptEquals("desktop", "$('#hoeapp-wrapper').attr ('hoe-device-type')");
-
-        driver.manage().window().setSize(new Dimension(600, 600));
-
-        js("window.dispatchEvent(new Event('resize'));");
-
-        assertJavascriptEquals("phone", "$('#hoeapp-wrapper').attr ('hoe-device-type')");
-
-    }
-
-    @Test
     public void testFetchContext() throws Exception {
 
         js("$.ajax = function (callback) { callback.success ( {\n" +
@@ -248,49 +233,4 @@ public class EskimoMainTest extends AbstractWebTest {
         assertJavascriptEquals("0.4-SNAPSHOT", "$('#eskimo-version').html()");
     }
 
-    @Test
-    public void testMenuUpAndDownServicesSettingsWrapper() throws Exception {
-
-        StringBuilder menuB = new StringBuilder();
-        for (int i = 0; i < 40; i++) {
-            menuB.append ("          <li id=\"" + (char) ('A' + i) + "\" class=\"config-menu-items\">" + (char) ('A' + i) + "</li>");
-        }
-
-        js("$('#mainFolderMenu').html('" +
-                "<li id=\"title\" class=\"nav-level\">title</li>" +
-                menuB +
-                "')");
-
-        assertJavascriptEquals("list-item", "$('#title').css('display')");
-
-        js("eskimoMain.menuDown()");
-
-        assertJavascriptEquals("none", "$('#title').css('display')");
-        assertJavascriptEquals("list-item", "$('#A').css('display')");
-
-        js("eskimoMain.menuDown()");
-        js("eskimoMain.menuDown()");
-
-        assertJavascriptEquals("none", "$('#title').css('display')");
-        assertJavascriptEquals("none", "$('#A').css('display')");
-        assertJavascriptEquals("none", "$('#B').css('display')");
-        assertJavascriptEquals("list-item", "$('#C').css('display')");
-
-        js("eskimoMain.menuUp()");
-        js("eskimoMain.menuUp()");
-
-        assertJavascriptEquals("none", "$('#title').css('display')");
-        assertJavascriptEquals("list-item", "$('#A').css('display')");
-
-        js("eskimoMain.menuUp()");
-
-        assertJavascriptEquals("list-item", "$('#title').css('display')");
-    }
-
-    /*
-    @Test
-    public void testHandleKubernetesSubsystem() throws Exception {
-        fail("To Be Implemented");
-    }
-    */
 }

@@ -49,10 +49,7 @@ eskimo.Notifications = function() {
 
     // get last line of notifications
     function loadLastLine() {
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxGet({
             url: "get-lastline-notification",
             success: function (data, status, jqXHR) {
                 if (data && data.status) {
@@ -66,10 +63,7 @@ eskimo.Notifications = function() {
     }
 
     function fetchNotifications() {
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxGet({
             url: "fetch-notifications?last_line=" + lastLineNotifications,
             success: function (data, status, jqXHR) {
 
@@ -121,10 +115,7 @@ eskimo.Notifications = function() {
 
     function clearNotifications() {
 
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxGet({
             url: "clear-notifications",
             success: function (data, status, jqXHR) {
                 lastLineNotifications = 0;

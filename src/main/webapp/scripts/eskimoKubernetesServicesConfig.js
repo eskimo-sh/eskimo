@@ -107,10 +107,7 @@ eskimo.KubernetesServicesConfig = function() {
     };
 
     function loadKubernetesServices() {
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxGet({
             url: "get-kubernetes-services",
             success: function (data, status, jqXHR) {
 
@@ -306,9 +303,7 @@ eskimo.KubernetesServicesConfig = function() {
             that.eskimoMain.showProgressbar();
         }
 
-        $.ajax({
-            type: "GET",
-            dataType: "json",
+        $.ajaxGet({
             url: "load-kubernetes-services-config",
             success: function (data, status, jqXHR) {
 
@@ -362,11 +357,8 @@ eskimo.KubernetesServicesConfig = function() {
         that.eskimoMain.showProgressbar();
 
         // 1 hour timeout
-        $.ajax({
-            type: "POST",
-            dataType: "json",
+        $.ajaxPost({
             timeout: 1000 * 120,
-            contentType: "application/json; charset=utf-8",
             url: reinstall ? "reinstall-kubernetes-services-config" : "save-kubernetes-services-config",
             data: JSON.stringify(model),
             success: function (data, status, jqXHR) {

@@ -108,3 +108,77 @@ function isFunction(functionToCheck) {
     }
     return {}.toString.call(functionToCheck) === '[object Function]';
 }
+
+$.ajaxDelete = function (reqObject) {
+    $._ajaxSendContent ("DELETE", reqObject);
+};
+
+$.ajaxPost = function (reqObject) {
+    $._ajaxSendContent ("POST", reqObject);
+};
+
+$.ajaxPut = function (reqObject) {
+    $._ajaxSendContent ("PUT", reqObject);
+};
+
+$._ajaxSendContent = function(verb, reqObject) {
+
+    let success = function (data, status, jqXHR) {
+        if (!data || data.error) {
+            console.error(data.error);
+            alert(data.error);
+        }
+    };
+    if (typeof reqObject.success !== 'undefined') {
+        success = reqObject.success;
+    }
+
+    let error = function (jqXHR, status) {
+        errorHandler(jqXHR, status);
+    };
+    if (typeof reqObject.error !== 'undefined') {
+        error = reqObject.error;
+    }
+
+    $.ajax({
+        type: verb,
+        dataType: (typeof reqObject.dataType === 'undefined' ? "json" : reqObject.dataType),
+        contentType: (typeof reqObject.contentType === 'undefined' ? "application/json; charset=utf-8" : reqObject.contentType),
+        timeout: (typeof reqObject.timeout === 'undefined' ? 1000 * 20 : reqObject.timeout),
+        url: reqObject.url,
+        data: reqObject.data,
+        success: success,
+        error: error
+    });
+};
+
+$.ajaxGet = function(reqObject) {
+
+    let success = function (data, status, jqXHR) {
+        if (!data || data.error) {
+            console.error(data.error);
+            alert(data.error);
+        }
+    };
+    if (typeof reqObject.success !== 'undefined') {
+        success = reqObject.success;
+    }
+
+    let error = function (jqXHR, status) {
+        errorHandler(jqXHR, status);
+    };
+    if (typeof reqObject.error !== 'undefined') {
+        error = reqObject.error;
+    }
+
+    $.ajax({
+        type: "GET",
+        dataType: (typeof reqObject.dataType === 'undefined' ? "json" : reqObject.dataType),
+        contentType: (typeof reqObject.contentType === 'undefined' ? "application/json; charset=utf-8" : reqObject.contentType),
+        timeout: (typeof reqObject.timeout === 'undefined' ? 1000 * 10 : reqObject.timeout),
+        url: reqObject.url,
+        context: (typeof reqObject.context === 'undefined' ? this : reqObject.context),
+        success: success,
+        error: error
+    });
+};

@@ -330,10 +330,7 @@ eskimo.FileManagers = function() {
 
     this.openFile = function (node, nodeName, currentFolder, file) {
 
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxGet({
             url: "file-manager-open-file?nodeAddress=" + node + "&folder=" + currentFolder + "&file=" + file,
             success: function (data, status, jqXHR) {
 
@@ -391,11 +388,8 @@ eskimo.FileManagers = function() {
 
     this.deletePath = function (node, nodeName, currentFolder, file) {
         if (confirm("Are you sure you want to delete file " + file + "?")) {
-            $.ajax({
-                type: "GET",
-                dataType: "json",
+            $.ajaxGet({
                 context: this,
-                contentType: "application/json; charset=utf-8",
                 url: "file-manager-delete?nodeAddress=" + node + "&folder=" + currentFolder + "&file=" + file,
                 success: function (data, status, jqXHR) {
 
@@ -479,10 +473,7 @@ eskimo.FileManagers = function() {
         let currentFolder = $('#filename-input-currentfolder').val();
         let newFileName = $("#filename-input-input").val();
 
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxGet({
             url: "file-manager-create-file?nodeAddress=" + nodeAddress + "&folder=" + currentFolder + "&fileName=" + newFileName,
             success: function (data, status, jqXHR) {
 
@@ -510,10 +501,7 @@ eskimo.FileManagers = function() {
 
     this.openFolder = function (node, nodeName, currentFolder, subFolder) {
         console.log ("Opening folder for " + nodeName + " - " + currentFolder + "/" + subFolder);
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxGet({
             url: "file-manager-navigate?nodeAddress=" + node + "&folder=" + currentFolder + "&subFolder=" + subFolder ,
             success: function (data, status, jqXHR) {
 
@@ -599,11 +587,8 @@ eskimo.FileManagers = function() {
     }
 
     this.connectFileManager = function (node, nodeName) {
-        $.ajax({
-            type: "GET",
-            dataType: "json",
+        $.ajaxGet({
             context: this,
-            contentType: "application/json; charset=utf-8",
             url: "file-manager-connect?nodeAddress=" +node ,
             success: function (data, status, jqXHR) {
 
@@ -648,9 +633,7 @@ eskimo.FileManagers = function() {
         if (openedFileManager == null) {
             alert("File Manager " + terminalToClose + " not found");
         } else {
-            $.ajax({
-                type: "GET",
-                dataType: "json",
+            $.ajaxGet({
                 url: "file-manager-remove?nodeAddress=" + openedFileManager.nodeAddress,
                 success: function (data, status, jqXHR) {
                     console.log(data);

@@ -83,6 +83,12 @@ public abstract class AbstractWebTest {
         JavascriptExecutor js = (JavascriptExecutor)driver;
         Object result = js.executeScript (jsCode);
 
+        closeAlertIfAny();
+
+        return result;
+    }
+
+    void closeAlertIfAny() {
         try {
 
             //Switch to alert
@@ -100,9 +106,6 @@ public abstract class AbstractWebTest {
         } catch (UnhandledAlertException e) {
             logger.error (e.getMessage());
         }
-
-        return result;
-
     }
 
     WebElement getElementById (String elementId) {
@@ -152,7 +155,7 @@ public abstract class AbstractWebTest {
         co.setCapability(CapabilityType.UNHANDLED_PROMPT_BEHAVIOUR, "ignore");
 
         co.addArguments("--no-sandbox");
-        co.addArguments("--headless");
+        //co.addArguments("--headless");
         co.addArguments("disable-gpu");
 
         driver = WebDriverManager.chromedriver()

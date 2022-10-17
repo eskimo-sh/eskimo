@@ -182,9 +182,7 @@ eskimo.Setup = function() {
     this.handleSetup = handleSetup;
 
     function loadSetup(initializationTime) {
-        $.ajax({
-            type: "GET",
-            dataType: "json",
+        $.ajaxGet({
             url: "load-setup",
             success: function (data, status, jqXHR) {
                 handleSetup(data, initializationTime);
@@ -227,10 +225,7 @@ eskimo.Setup = function() {
     this.showSetupMessage = showSetupMessage;
 
     function doSaveSetup (setupConfig) {
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxPost({
             timeout: 1000 * 120,
             url: "save-setup",
             data: JSON.stringify(setupConfig),

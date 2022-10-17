@@ -117,7 +117,7 @@ public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
 
         js("eskimoKubernetesServicesSelection.kubernetesServicesSelectionSelectAll();");
 
-        assertTrue ((Boolean)js("return ('#cerebro_reinstall').get(0).checked"));
+        assertTrue ((Boolean)js("return $('#cerebro_reinstall').get(0).checked"));
         assertTrue ((Boolean)js("return $('#kibana_reinstall').get(0).checked"));
         assertTrue ((Boolean)js("return $('#kafka-manager_reinstall').get(0).checked"));
         assertTrue ((Boolean)js("return $('#spark-console_reinstall').get(0).checked"));

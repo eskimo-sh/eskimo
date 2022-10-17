@@ -243,10 +243,7 @@ eskimo.Main = function() {
     };
 
     function fetchContext  () {
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxGet({
             url: "context",
             success: function (data, status, jqXHR) {
 

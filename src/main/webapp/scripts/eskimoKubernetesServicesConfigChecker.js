@@ -38,9 +38,7 @@ let ramCheckRE = /^[0-9\\.]+[EPTGMk]{0,1}$/g;
 
 function checkKubernetesSetup (kubernetesSetupConfig, servicesDependencies, kubernetesServices, successCallback) {
 
-    $.ajax({
-        type: "GET",
-        dataType: "json",
+    $.ajaxGet({
         url: "load-nodes-config",
         success: function (data, status, jqXHR) {
 

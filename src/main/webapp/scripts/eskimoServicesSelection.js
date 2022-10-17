@@ -73,10 +73,7 @@ eskimo.ServicesSelection = function() {
     };
 
     function loadServicesConfig() {
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+        $.ajaxGet({
             url: "get-services-config",
             success: function (data, status, jqXHR2) {
 

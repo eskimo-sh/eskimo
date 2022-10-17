@@ -163,11 +163,8 @@ eskimo.SetupCommand = function() {
             that.eskimoMain.startOperationInProgress();
 
             // 5 hours timeout
-            $.ajax({
-                type: "POST",
-                dataType: "json",
+            $.ajaxPost({
                 timeout: 1000 * 3600 * 5,
-                contentType: "application/json; charset=utf-8",
                 url: "apply-setup",
                 success: function (data, status, jqXHR) {
 
