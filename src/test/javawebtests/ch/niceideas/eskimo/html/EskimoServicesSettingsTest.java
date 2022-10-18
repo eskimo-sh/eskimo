@@ -74,9 +74,11 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
     @Test
     public void testSaveServicesSettingsWithButton() throws Exception {
 
+        js("$.ajaxGet = function(callback) { console.log(callback); }");
+
         js("eskimoServicesSettings.showServicesSettings();");
 
-        js("$.ajax = function(object) {" +
+        js("$.ajaxPost = function(object) {" +
                 "    object.success({status: \"OK\", command: true})" +
                 "}");
 
@@ -112,8 +114,8 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
 
         js("eskimoServicesSettings.showServicesSettingsMessage ('test');");
 
-        assertCssValue("#services-settings-warning", "display", "inherit");
-        assertCssValue("#services-settings-warning", "visibility", "inherit");
+        assertCssValue("#services-settings-warning", "display", "block");
+        assertCssValue("#services-settings-warning", "visibility", "visible");
 
         assertAttrValue("#services-settings-warning-message", "class", "alert alert-danger");
 

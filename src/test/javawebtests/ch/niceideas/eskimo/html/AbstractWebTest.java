@@ -34,19 +34,9 @@
 
 package ch.niceideas.eskimo.html;
 
-import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.eskimo.html.infra.TestResourcesServer;
-import ch.niceideas.eskimo.utils.GenerateLCOV;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import jscover.Main;
-import jscover.report.FileData;
-import jscover.report.JSONDataMerger;
 import org.apache.log4j.Logger;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -56,10 +46,6 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -78,44 +64,6 @@ public abstract class AbstractWebTest {
     private static TestResourcesServer server;
 
     protected WebDriver driver;
-
-    Object js (String jsCode) {
-        JavascriptExecutor js = (JavascriptExecutor)driver;
-        Object result = js.executeScript (jsCode);
-
-        closeAlertIfAny();
-
-        return result;
-    }
-
-    void closeAlertIfAny() {
-        try {
-
-            //Switch to alert
-            Alert alert = driver.switchTo().alert();
-
-            //Capture text on alert window
-            String alertMessage = alert.getText();
-            logger.info ("DRIVER ALERT : " + alertMessage);
-
-            //Close alert window
-            alert.accept();
-
-        } catch (NoAlertPresentException e) {
-            // ignore
-        } catch (UnhandledAlertException e) {
-            logger.error (e.getMessage());
-        }
-    }
-
-    WebElement getElementById (String elementId) {
-        try {
-            return driver.findElement(By.id(elementId));
-        } catch (org.openqa.selenium.NoSuchElementException e) {
-            logger.debug (e.getMessage());
-            return null;
-        }
-    }
 
     @BeforeAll
     public static void setUpOnce() throws Exception {
@@ -139,15 +87,6 @@ public abstract class AbstractWebTest {
         server.postTestMethodHook(this::js);
     }
 
-    protected static boolean isCoverageRun() {
-        //return true;
-        return jsCoverageFlagFile.exists();
-    }
-
-    protected final void loadScript (String script) {
-        js("loadScript('http://localhost:9001/src/main/webapp/scripts/"+script+"')");
-    }
-
     @BeforeEach
     public void init() throws Exception {
 
@@ -155,7 +94,8 @@ public abstract class AbstractWebTest {
         co.setCapability(CapabilityType.UNHANDLED_PROMPT_BEHAVIOUR, "ignore");
 
         co.addArguments("--no-sandbox");
-        //co.addArguments("--headless");
+        co.addArguments("window-size=1900,1024");
+        co.addArguments("--headless");
         co.addArguments("disable-gpu");
 
         driver = WebDriverManager.chromedriver()
@@ -286,12 +226,73 @@ public abstract class AbstractWebTest {
         js("$.fn._internalLoad = $.fn.load;");
         js("$.fn.load = function (resource, callback) { return this._internalLoad ('../../../src/main/webapp/'+resource, callback); };");
         //js("$.fn.load = function (resource, callback) { return this._internalLoad ('file://" + System.getProperty("user.dir") + "/src/main/webapp/'+resource, callback); };");
-
     }
 
     @AfterEach
     public void close() {
         driver.close();
+    }
+
+
+    Object js (String jsCode) {
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+        Object result = js.executeScript (jsCode);
+
+        closeAlertIfAny();
+
+        return result;
+    }
+
+    void closeAlertIfAny() {
+        try {
+
+            //Switch to alert
+            Alert alert = driver.switchTo().alert();
+
+            //Capture text on alert window
+            String alertMessage = alert.getText();
+            logger.info ("DRIVER ALERT : " + alertMessage);
+
+            //Close alert window
+            alert.accept();
+
+        } catch (NoAlertPresentException e) {
+            // ignore
+        } catch (UnhandledAlertException e) {
+            logger.error (e.getMessage());
+        }
+    }
+
+    WebElement getElementBy (By by) {
+        try {
+            return driver.findElement(by);
+        } catch (org.openqa.selenium.NoSuchElementException e) {
+            logger.debug (e.getMessage());
+            return null;
+        }
+    }
+
+    WebElement getElementById (String elementId) {
+        try {
+            return driver.findElement(By.id(elementId));
+        } catch (org.openqa.selenium.NoSuchElementException e) {
+            logger.debug (e.getMessage());
+            return null;
+        }
+    }
+
+    protected static boolean isCoverageRun() {
+        //return true;
+        return jsCoverageFlagFile.exists();
+    }
+
+    protected final void loadScript (String script) {
+        js("loadScript('http://localhost:9001/src/main/webapp/scripts/"+script+"')");
+        try {
+            waitForElementInDOM(By.cssSelector("script[src=\"http://localhost:9001/src/main/webapp/scripts/" + script + "\"]"));
+        } catch (InterruptedException e) {
+            logger.debug(e, e);
+        }
     }
 
     protected void assertAttrValue(String selector, String attribute, String value) {
@@ -312,6 +313,29 @@ public abstract class AbstractWebTest {
 
     protected void assertTagName(String elementId, String tagName) {
         assertEquals (tagName, getElementById(elementId).getTagName());
+    }
+
+    protected void waitForElementInDOM(By by) throws InterruptedException{
+
+        // FIXME I have failing tests with Awaitility !?!
+        /*
+        await().atMost(MAX_WAIT_TIME_SECS * (isCoverageRun() ? 2 : 1) , TimeUnit.SECONDS).until(
+                () -> page.getElementById(elementId) != null);
+        */
+
+        int attempt = 0;
+        while (getElementBy(by) == null && attempt < MAX_WAIT_RETRIES) {
+
+            /*
+            if (attempt > 20) {
+                System.err.println (page.asXml());
+                System.exit(-1);
+            }
+            */
+
+            Thread.sleep(INCREMENTAL_WAIT_MS);
+            attempt++;
+        }
     }
 
     protected void waitForElementIdInDOM(String elementId) throws InterruptedException {

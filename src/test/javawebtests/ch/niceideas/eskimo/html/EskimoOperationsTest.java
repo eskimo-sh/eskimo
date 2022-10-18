@@ -64,7 +64,7 @@ public class EskimoOperationsTest extends AbstractWebTest {
     @Test
     public void testInteruptOperations() throws Exception {
 
-        js("$.ajax = function(obj) { window.objUrl = obj.url }");
+        js("$.ajaxGet = function(obj) { window.objUrl = obj.url }");
 
         getElementById("interupt-operations-btn").click();
 
@@ -125,12 +125,12 @@ public class EskimoOperationsTest extends AbstractWebTest {
                 + ");");
 
         assertJavascriptEquals(
-                "<div id=\"Installation_Topology-All-Nodes-progress\" class=\"progress-bar progress-bar-info\" role=\"progressbar\" aria-valuenow=\"0\" aria-valuemin=\"0\" aria-valuemax=\"100\">\n"
-                        + "              </div>",
+                "<div id=\"Installation_Topology-All-Nodes-progress\" class=\"progress-bar progress-bar-striped progress-bar-animated bg-info\" role=\"progressbar\" aria-valuenow=\"0\" aria-valuemin=\"0\" aria-valuemax=\"100\">\n" +
+                        "              </div>",
                 "$('#Installation_Topology-All-Nodes-progress-wrapper').html().trim()");
 
         assertJavascriptEquals(
-                "7.0",
+                "7",
                 "$('.progress-operation-wrapper').length");
     }
 

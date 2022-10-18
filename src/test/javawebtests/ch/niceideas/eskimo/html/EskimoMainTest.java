@@ -104,6 +104,9 @@ public class EskimoMainTest extends AbstractWebTest {
         // Don0t let jquery load real eskimoMain
         js("$.fn.ready = function () {};");
 
+        js("$.ajaxGetSaved = $.ajaxGet");
+        js("$.ajaxGet = function(callback) { console.log(callback); }");
+
         // instantiate test object
         js("eskimoMain = new eskimo.Main();");
         js("eskimoMain.doInitializeInternal();");
@@ -163,11 +166,13 @@ public class EskimoMainTest extends AbstractWebTest {
     @Test
     public void testHandleSetupCompletedAndNotCompleted() throws Exception {
 
+        //Thread.sleep(100000);
+
         js("document.getElementById('hoe-left-panel').remove(); ");
         // the test stuff messes with the page loading below (twice in dom)
         js("$('#hoeapp-wrapper').load('html/eskimoMain.html');");
 
-        waitForElementIdInDOM("menu-container");
+        waitForElementIdInDOM("leftside-menu-container");
 
         js("eskimoMain.handleSetupCompleted()");
 
@@ -175,14 +180,16 @@ public class EskimoMainTest extends AbstractWebTest {
         js("window.allEnabled = true;");
 
         js("" +
-                " $('.config-menu-items').each(function() {\n" +
-                "     if ($(this).attr('class') == 'side-nav-item ') {\n" +
+                " $('.side-nav-item').each(function() {\n" +
+                "     if ($(this).attr('class') == 'side-nav-item') {\n" +
                 "         allDisabled=false;\n" +
                 "     }\n" +
-                "     if ($(this).attr('class') == 'side-nav-item  disabled') {\n" +
+                "     if ($(this).attr('class') == 'side-nav-item disabled') {\n" +
                 "         allEnabled=false;\n" +
                 "     }\n" +
                 "});");
+
+        //Thread.sleep(100000);
 
         assertJavascriptEquals("false", "allDisabled");
         assertJavascriptEquals("true", "allEnabled");
@@ -192,8 +199,8 @@ public class EskimoMainTest extends AbstractWebTest {
         js("allEnabled = true;");
 
         js("" +
-                " $('.config-menu-items').each(function() {\n" +
-                "     if ($(this).attr('class') == 'side-nav-item  disabled') {\n" +
+                " $('.side-nav-item').each(function() {\n" +
+                "     if ($(this).attr('class') == 'side-nav-item disabled') {\n" +
                 "         allEnabled=false;\n" +
                 "     }\n" +
                 "});");
@@ -208,7 +215,7 @@ public class EskimoMainTest extends AbstractWebTest {
         // the test stuff messes with the page loading below (twice in dom)
         js("$('#hoeapp-wrapper').load('html/eskimoMain.html');");
 
-        waitForElementIdInDOM("menu-container");
+        waitForElementIdInDOM("leftside-menu-container");
 
         assertJavascriptEquals("list-item", "$('#folderMenuConsoles').css('display')");
         assertJavascriptEquals("list-item", "$('#menu-configure-setup').css('display')");
@@ -221,6 +228,8 @@ public class EskimoMainTest extends AbstractWebTest {
 
     @Test
     public void testFetchContext() throws Exception {
+
+        js("$.ajaxGet = $.ajaxGetSaved");
 
         js("$.ajax = function (callback) { callback.success ( {\n" +
                 "    \"version\": \"0.4-SNAPSHOT\",\n" +

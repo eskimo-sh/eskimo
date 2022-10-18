@@ -62,6 +62,9 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
         js("eskimoServicesSelection = new eskimo.ServicesSelection();");
         js("eskimoServicesSelection.eskimoMain = eskimoMain");
         js("eskimoServicesSelection.eskimoNodesConfig = eskimoNodesConfig");
+
+        js("$.ajaxGet = function(callback) { console.log(callback); }");
+
         js("eskimoServicesSelection.initialize()");
 
         waitForElementIdInDOM("services-selection-button-select-all");
@@ -98,9 +101,9 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
     @Test
     public void testInitModalServicesConfig() throws Exception {
 
-        assertJavascriptEquals("1.0", "$('#etcd-choice').length");
-        assertJavascriptEquals("1.0", "$('#kube-master-choice').length");
-        assertJavascriptEquals("1.0", "$('#zookeeper-choice').length");
+        assertJavascriptEquals("1", "$('#etcd-choice').length");
+        assertJavascriptEquals("1", "$('#kube-master-choice').length");
+        assertJavascriptEquals("1", "$('#zookeeper-choice').length");
     }
 
     @Test

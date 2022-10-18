@@ -164,7 +164,7 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         js("alert (JSON.stringify (eskimoServices.getUIConfigsToRetryForTests()));");
 
-        assertJavascriptEquals("2.0", "eskimoServices.getUIConfigsToRetryForTests().length");
+        assertJavascriptEquals("2", "eskimoServices.getUIConfigsToRetryForTests().length");
         assertJavascriptEquals("cerebro", "eskimoServices.getUIConfigsToRetryForTests()[0].title");
         assertJavascriptEquals("kibana", "eskimoServices.getUIConfigsToRetryForTests()[1].title");
 
@@ -172,8 +172,8 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         js("eskimoServices.periodicRetryServices();");
 
-        await().atMost(10, TimeUnit.SECONDS).until(() -> ((Double)js("eskimoServices.getUIConfigsToRetryForTests().length")) == 0.0);
-        assertJavascriptEquals("0.0", "eskimoServices.getUIConfigsToRetryForTests().length");
+        await().atMost(10, TimeUnit.SECONDS).until(() -> ((Long)js("return eskimoServices.getUIConfigsToRetryForTests().length")) == 0);
+        assertJavascriptEquals("0", "eskimoServices.getUIConfigsToRetryForTests().length");
     }
 
     @Test
@@ -183,13 +183,13 @@ public class EskimoServicesTest extends AbstractWebTest {
         js("eskimoServices.createServicesMenu()");
 
         // make sure they're created
-        assertJavascriptEquals ("1.0", "$('#folderMenuCerebro').length");
-        assertJavascriptEquals ("1.0", "$('#folderMenuKibana').length");
-        assertJavascriptEquals ("1.0", "$('#folderMenuSparkConsole').length");
-        assertJavascriptEquals ("1.0", "$('#folderMenuZeppelin').length");
+        assertJavascriptEquals ("1", "$('#folderMenuCerebro').length");
+        assertJavascriptEquals ("1", "$('#folderMenuKibana').length");
+        assertJavascriptEquals ("1", "$('#folderMenuSparkConsole').length");
+        assertJavascriptEquals ("1", "$('#folderMenuZeppelin').length");
 
         // test zeppelin menu entry
-        assertJavascriptEquals ("zeppelin-icon.png", "$('#folderMenuZeppelin').find('a > img').attr('src')");
+        assertJavascriptEquals ("zeppelin-icon.png", "$('#folderMenuZeppelin').find('a > i > img').attr('src')");
         assertJavascriptEquals ("zeppelin", "$('#folderMenuZeppelin').find('a > span').html()");
     }
 
@@ -223,10 +223,10 @@ public class EskimoServicesTest extends AbstractWebTest {
         // make sure they are created
 
         // ensure values are found in node 1
-        assertJavascriptEquals ("1.0", "$('#iframe-content-cerebro').length");
-        assertJavascriptEquals ("1.0", "$('#iframe-content-kibana').length");
-        assertJavascriptEquals ("1.0", "$('#iframe-content-spark-console').length");
-        assertJavascriptEquals ("1.0", "$('#iframe-content-zeppelin').length");
+        assertJavascriptEquals ("1", "$('#iframe-content-cerebro').length");
+        assertJavascriptEquals ("1", "$('#iframe-content-kibana').length");
+        assertJavascriptEquals ("1", "$('#iframe-content-spark-console').length");
+        assertJavascriptEquals ("1", "$('#iframe-content-zeppelin').length");
     }
 
     @Test
@@ -258,14 +258,14 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         assertJavascriptEquals("./cerebro/192-168-10-11:9999/cerebro", "UI_SERVICES_CONFIG['cerebro'].targetUrl");
         assertJavascriptEquals("cerebro", "UI_SERVICES_CONFIG['cerebro'].service");
-        assertJavascriptEquals("10.0", "UI_SERVICES_CONFIG['cerebro'].targetWaitTime");
+        assertJavascriptEquals("10", "UI_SERVICES_CONFIG['cerebro'].targetWaitTime");
         assertJavascriptEquals("true", "UI_SERVICES_CONFIG['cerebro'].refreshWaiting");
 
 
         js("window.UI_SERVICES_CONFIG['cerebro'].refreshWaiting = false;");
         js("eskimoServices.handleServiceDisplay('cerebro', UI_SERVICES_CONFIG['cerebro'], '192.168.10.11', true);");
 
-        assertJavascriptEquals("0.0", "UI_SERVICES_CONFIG['cerebro'].targetWaitTime");
+        assertJavascriptEquals("0", "UI_SERVICES_CONFIG['cerebro'].targetWaitTime");
 
         js("eskimoServices.handleServiceIsUp(UI_SERVICES_CONFIG['cerebro'])");
 
@@ -282,7 +282,7 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         js("eskimoServices.handleServiceHiding('cerebro', UI_SERVICES_CONFIG['cerebro'])");
 
-        assertJavascriptNull("return UI_SERVICES_CONFIG['cerebro'].actualUrl");
+        assertJavascriptNull("UI_SERVICES_CONFIG['cerebro'].actualUrl");
     }
 
     @Test

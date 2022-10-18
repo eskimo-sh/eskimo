@@ -71,6 +71,10 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         js("eskimoNodesConfig.eskimoServicesSelection =  eskimoServicesSelection");
         js("eskimoNodesConfig.eskimoServices = eskimoServices");
         js("eskimoNodesConfig.eskimoOperationsCommand = eskimoOperationsCommand");
+
+        js("$.ajaxGet = function(callback) { console.log(callback); }");
+        js("$.ajaxPost = function(callback) { console.log(callback); }");
+
         js("eskimoNodesConfig.initialize()");
 
         waitForElementIdInDOM("reset-nodes-config");
@@ -106,26 +110,26 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         js("eskimoNodesConfig.renderNodesConfig("+nodesConfig.getFormattedValue()+");");
 
         // test a few nodes
-        assertJavascriptEquals("1.0", "$('#ntp1:checked').length");
-        assertJavascriptEquals("1.0", "$('#etcd1:checked').length");
-        assertJavascriptEquals("1.0", "$('#kube-slave1:checked').length");
+        assertJavascriptEquals("1", "$('#ntp1:checked').length");
+        assertJavascriptEquals("1", "$('#etcd1:checked').length");
+        assertJavascriptEquals("1", "$('#kube-slave1:checked').length");
 
-        assertJavascriptEquals("1.0", "$('#ntp2:checked').length");
-        assertJavascriptEquals("1.0", "$('#etcd2:checked').length");
-        assertJavascriptEquals("1.0", "$('#kube-slave2:checked').length");
+        assertJavascriptEquals("1", "$('#ntp2:checked').length");
+        assertJavascriptEquals("1", "$('#etcd2:checked').length");
+        assertJavascriptEquals("1", "$('#kube-slave2:checked').length");
 
-        assertJavascriptEquals("0.0", "$('#zookeeper1:checked').length");
-        assertJavascriptEquals("1.0", "$('#zookeeper2:checked').length");
+        assertJavascriptEquals("0", "$('#zookeeper1:checked').length");
+        assertJavascriptEquals("1", "$('#zookeeper2:checked').length");
 
-        assertJavascriptEquals("1.0", "$('#kube-master1:checked').length");
-        assertJavascriptEquals("0.0", "$('#kube-master2:checked').length");
+        assertJavascriptEquals("1", "$('#kube-master1:checked').length");
+        assertJavascriptEquals("0", "$('#kube-master2:checked').length");
     }
 
     @Test
     public void testSaveNodesButton() throws Exception {
         testRenderNodesConfig();
 
-        js("wndow.checkNodesSetup = function (nodeSetup) {" +
+        js("window.checkNodesSetup = function (nodeSetup) {" +
                 "    window.nodeSetup = nodeSetup" +
                 "}");
 
@@ -159,7 +163,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         js("eskimoMain.isSetupDone = function () { return true; }");
 
         // test clear = missing
-        js("$.ajax = function (object) {" +
+        js("$.ajaxGet = function (object) {" +
                 "    object.success ({clear: \"missing\"});" +
                 "}");
 
@@ -168,7 +172,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         assertTrue(getElementById("nodes-placeholder").getText().contains("(No nodes / services configured yet)"));
 
         // test clear = setup
-        js("$.ajax = function (object) {" +
+        js("$.ajaxGet = function (object) {" +
                 "    object.success ({clear: \"setup\"});" +
                 "}");
 
@@ -179,7 +183,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         assertTrue((boolean)js("return window.handleSetupNotCompletedCalled"));
 
         // test OK
-        js("$.ajax = function (object) {" +
+        js("$.ajaxGet = function (object) {" +
                 "    object.success ({result: \"OK\"});" +
                 "}");
 
@@ -206,9 +210,9 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
                 "\"prometheus2\": \"on\",\n" +
                 "}, 2)");
 
-        assertJavascriptEquals("1.0", "$('#prometheus2:checked').length");
+        assertJavascriptEquals("1", "$('#prometheus2:checked').length");
 
-        assertJavascriptEquals("1.0", "$('#ntp2:checked').length");
+        assertJavascriptEquals("1", "$('#ntp2:checked').length");
     }
 
 
@@ -239,7 +243,8 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         js("eskimoNodesConfig.addNode()");
 
-        assertTrue(getElementById("label1").getText().contains("Node no  1"));
+        assertTrue(getElementById("label1").getText().contains(" Node no \n" +
+                "1"));
 
         assertNotNull (getElementById("node_id1"));
         assertTagName ("node_id1", "input");
@@ -256,7 +261,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         assertNotNull (getElementById("etcd1"));
         assertTagName ("etcd1", "input");
 
-        assertJavascriptEquals ("1.0", "eskimoNodesConfig.getNodesCount()");
+        assertJavascriptEquals ("1", "eskimoNodesConfig.getNodesCount()");
 
     }
 }

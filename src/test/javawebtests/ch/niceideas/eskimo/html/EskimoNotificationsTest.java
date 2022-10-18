@@ -45,6 +45,7 @@ public class EskimoNotificationsTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
+        loadScript("eskimoUtils.js");
         loadScript("eskimoNotifications.js");
 
         js("window.errorHandler = function () {};");
@@ -63,7 +64,7 @@ public class EskimoNotificationsTest extends AbstractWebTest {
 
         assertJavascriptEquals("1", "$('#new-notifications-count').html()");
 
-        String notificationsHTML = js("$('#notifications-container').html()").toString();
+        String notificationsHTML = js("return $('#notifications-container').html()").toString();
         //System.err.println (notificationsHTML);
         assertTrue (notificationsHTML.startsWith ("" +
                 "<li class=\"hoe-submenu-label\">\n" +
@@ -84,13 +85,13 @@ public class EskimoNotificationsTest extends AbstractWebTest {
 
         testAddNotifications();
 
-        js("$.ajax = function(object) {" +
+        js("$.ajaxGet = function(object) {" +
                 "    object.success();" +
                 "}");
 
         getElementById("notifications-clear").click();
 
-        String notificationsHTML = js("$('#notifications-container').html()").toString();
+        String notificationsHTML = js("return $('#notifications-container').html()").toString();
 
         assertEquals("<li class=\"hoe-submenu-label\">\n" +
                 "    <h3><span id=\"notifications-count\" class=\"bold\">0    </span> Notification(s)     <a id=\"notifications-clear\" href=\"#\">        <span class=\"notifications-clear-link\">Clear</span>    </a></h3>\n" +

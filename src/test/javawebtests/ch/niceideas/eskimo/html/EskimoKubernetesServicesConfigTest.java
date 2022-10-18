@@ -225,14 +225,14 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
         js("eskimoMain.isSetupDone = function () { return true; }");
         js("eskimoMain.isOperationInProgress = function () { return true; }");
         js("eskimoMain.showProgressbar = function () { window.showProgressBarCalled = true; }");
-        js("$.ajax = function() {}");
+        js("$.ajaxGet = function() {}");
 
         js("eskimoKubernetesServicesConfig.showKubernetesServicesConfig()");
         assertJavascriptEquals("true", "window.showProgressBarCalled");
 
         // 3. data clear, setup
         js("eskimoMain.isOperationInProgress = function () { return false; }");
-        js("$.ajax = function(object) { object.success( { 'clear': 'setup'}); }");
+        js("$.ajaxGet = function(object) { object.success( { 'clear': 'setup'}); }");
         js("eskimoMain.handleSetupNotCompleted = function () { window.handleSetupNotCompletedCalled = true; }");
 
         js("eskimoKubernetesServicesConfig.showKubernetesServicesConfig()");
@@ -243,7 +243,7 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
         js("window.showProgressBarCalled = false;");
         js("window.setupNotDoneCalled = false;");
 
-        js("$.ajax = function(object) { object.success( { 'clear': 'missing'}); }");
+        js("$.ajaxGet = function(object) { object.success( { 'clear': 'missing'}); }");
 
         js("eskimoKubernetesServicesConfig.showKubernetesServicesConfig()");
 
@@ -253,7 +253,7 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
         assertEquals (false, js("return $('#cerebro_install').get(0).checked"));
 
         // 5. all good, all services selected
-        js("$.ajax = function(object) { object.success( {\n" +
+        js("$.ajaxGet = function(object) { object.success( {\n" +
                 "    \"cerebro_install\": \"on\",\n" +
                         "    \"zeppelin_install\": \"on\",\n" +
                         "    \"kafka-manager_install\": \"on\",\n" +

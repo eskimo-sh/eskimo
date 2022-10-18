@@ -61,7 +61,7 @@ eskimo.ServicesSettings = function () {
                 });
 
                 $("#reset-services-settings-btn").click(function (e) {
-                    showServicesConfig();
+                    showServicesSettings();
 
                     e.preventDefault();
                     return false;
@@ -153,7 +153,7 @@ eskimo.ServicesSettings = function () {
     }
     this.showServicesSettingsMessage = showServicesSettingsMessage;
 
-    function showServicesConfig () {
+    function showServicesSettings () {
 
         if (!that.eskimoMain.isSetupDone()) {
             that.eskimoMain.showSetupNotDone("Cannot configure nodes as long as initial setup is not completed");
@@ -168,7 +168,7 @@ eskimo.ServicesSettings = function () {
 
         that.eskimoMain.showOnlyContent("services-settings");
     }
-    this.showServicesSettings = showServicesConfig;
+    this.showServicesSettings = showServicesSettings;
 
     function layoutServicesSettings() {
 

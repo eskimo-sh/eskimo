@@ -74,7 +74,7 @@ public class EskimoSetupTest extends AbstractWebTest {
         //System.out.println (page.asXml());
 
         // should have displayed the error
-        assertCssValue ("#setup-warning", "display", "inherit");
+        assertCssValue ("#setup-warning", "display", "block");
         assertJavascriptEquals ("Configuration Storage path should be set", "$('#setup-warning-message').html()");
 
         js("$('#setup_storage').val('/tmp/test')");
@@ -131,8 +131,8 @@ public class EskimoSetupTest extends AbstractWebTest {
 
         js("eskimoSetup.showSetupMessage ('test');");
 
-        assertCssValue("#setup-warning", "display", "inherit");
-        assertCssValue("#setup-warning", "visibility", "inherit");
+        assertCssValue("#setup-warning", "display", "block");
+        assertCssValue("#setup-warning", "visibility", "visible");
 
         assertAttrValue("#setup-warning-message", "class", "alert alert-danger");
 

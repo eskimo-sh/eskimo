@@ -72,7 +72,7 @@ public class EskimoUtilsTest extends AbstractWebTest {
         String testForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoUtilsTest/testForm.html"), StandardCharsets.UTF_8);
         js("$('#main-content').html('"+testForm.replace("\n", "").replace("\r", "")+"')");
 
-        String serializedForm = js("JSON.stringify($('form#testForm').serializeObject())").toString();
+        String serializedForm = js("return JSON.stringify($('form#testForm').serializeObject())").toString();
         assertEquals("{\"text1\":\"test1\",\"text2\":\"test2\",\"hidden1\":\"testHidden1\"}", serializedForm);
     }
 

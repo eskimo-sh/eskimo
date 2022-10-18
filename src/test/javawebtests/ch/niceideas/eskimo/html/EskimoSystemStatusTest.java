@@ -78,6 +78,9 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         js("eskimoSystemStatus.eskimoSetup = eskimoSetup");
         js("eskimoSystemStatus.eskimoServices = eskimoServices");
         js("eskimoSystemStatus.eskimoMain = eskimoMain");
+
+        js("$.ajaxGet = function(callback) { console.log(callback); }");
+
         js("eskimoSystemStatus.initialize()");
 
         waitForElementIdInDOM("service-status-warning");
@@ -97,8 +100,8 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         js("eskimoSystemStatus.renderNodesStatusEmpty()");
 
-        assertCssValue("#status-node-container-empty", "visibility", "inherit");
-        assertCssValue("#status-node-container-empty", "display", "inherit");
+        assertCssValue("#status-node-container-empty", "visibility", "visible");
+        assertCssValue("#status-node-container-empty", "display", "block");
     }
 
     @Test
@@ -139,7 +142,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         js("eskimoSystemStatus.showGrafanaDashboard()");
 
-        assertCssValue("#status-monitoring-grafana", "display", "inherit");
+        assertCssValue("#status-monitoring-grafana", "display", "block");
         assertJavascriptEquals("col-xs-12 col-sm-12 col-md-4", "$('#status-monitoring-info-container').attr('class')");
 
         js("eskimoSystemStatus.hideGrafanaDashboard()");
@@ -168,14 +171,12 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         driver.findElement(By.cssSelector("#status-node-table-body td.status-node-cell")).click();
 
-        assertJavascriptEquals("" +
-                        "    <li><a id=\"start\" tabindex=\"-1\" href=\"#\" title=\"Start Service\"><i class=\"fa fa-play\"></i> Start Service</a></li>\n" +
+        assertJavascriptEquals("    <li><a id=\"start\" tabindex=\"-1\" href=\"#\" title=\"Start Service\"><i class=\"fa fa-play\"></i> Start Service</a></li>\n" +
                         "    <li><a id=\"stop\" tabindex=\"-1\" href=\"#\" title=\"Stop Service\"><i class=\"fa fa-stop\"></i> Stop Service</a></li>\n" +
                         "    <li><a id=\"restart\" tabindex=\"-1\" href=\"#\" title=\"Restart Service\"><i class=\"fa fa-refresh\"></i> Restart Service</a></li>\n" +
-                        "    <li class=\"divider\"></li>    <li><a id=\"reinstall\" tabindex=\"-1\" href=\"#\" title=\"Reinstall Service\"><i class=\"fa fa-undo\"></i> Reinstall Service</a></li>\n" +
-                        "    <li class=\"divider\"></li>    <li><a id=\"show_journal\" tabindex=\"-1\" href=\"#\" title=\"Show Journal\"><i class=\"fa fa-file\"></i> Show Journal</a></li>\n" +
-                        "<li class=\"divider\"></li><li><a id=\"show_log\" tabindex=\"-1\" href=\"#\" title=\"Show Logs\"><i class=\"fa fa-file\"></i> Show Logs</a></li>\n" +
-                        "",
+                        "    <li class=\"dropdown-divider\"></li>    <li><a id=\"reinstall\" tabindex=\"-1\" href=\"#\" title=\"Reinstall Service\"><i class=\"fa fa-undo\"></i> Reinstall Service</a></li>\n" +
+                        "    <li class=\"dropdown-divider\"></li>    <li><a id=\"show_journal\" tabindex=\"-1\" href=\"#\" title=\"Show Journal\"><i class=\"fa fa-file\"></i> Show Journal</a></li>\n" +
+                        "<li class=\"dropdown-divider\"></li><li><a id=\"show_log\" tabindex=\"-1\" href=\"#\" title=\"Show Logs\"><i class=\"fa fa-file\"></i> Show Logs</a></li>\n",
                 "$('#serviceContextMenu').html()");
 
         assertCssValue("#serviceContextMenu", "position", "absolute");
@@ -332,7 +333,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         js("eskimoSystemStatus.handleSystemStatus (jsonFullStatus.nodeServicesStatus, jsonFullStatus.systemStatus, true)");
 
-        assertCssValue("#status-monitoring-no-dashboard", "display", "inherit");
+        assertCssValue("#status-monitoring-no-dashboard", "display", "block");
         assertCssValue("#status-monitoring-dashboard-frame", "display", "none");
 
         assertAttrValue("#status-monitoring-dashboard-frame", "src", "html/emptyPage.html");
@@ -362,7 +363,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         js("eskimoSystemStatus.handleSystemStatus (jsonFullStatus.nodeServicesStatus, jsonFullStatus.systemStatus, true)");
 
-        await().atMost(15, TimeUnit.SECONDS).until(() -> js("$('#system-information-nodes-status').html()").toString()
+        await().atMost(15, TimeUnit.SECONDS).until(() -> js("return $('#system-information-nodes-status').html()").toString()
                 .equals("Following nodes are reporting problems : <span style=\"color: darkred;\">192.168.10.13</span>"));
 
         assertJavascriptEquals("Following nodes are reporting problems : <span style=\"color: darkred;\">192.168.10.13</span>",
@@ -370,9 +371,6 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         assertJavascriptEquals("Following services are reporting problems : <span style=\"color: darkred;\">mesos-agent</span>",
                 "$('#system-information-services-status').html()");
-
-        String expectedHtmlInformation = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/expectedHtmlInformation.html"), StandardCharsets.UTF_8);
-        assertJavascriptEquals(expectedHtmlInformation.replace("\n", "").replace("\r", "").replace("  ", ""), "$('#system-information-actions').html()");
     }
 
     @Test
@@ -380,8 +378,8 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         js("eskimoSystemStatus.showStatusMessage ('test');");
 
-        assertCssValue("#service-status-warning", "display", "inherit");
-        assertCssValue("#service-status-warning", "visibility", "inherit");
+        assertCssValue("#service-status-warning", "display", "block");
+        assertCssValue("#service-status-warning", "visibility", "visible");
 
         assertAttrValue("#service-status-warning-message", "class", "alert alert-warning");
 
@@ -417,13 +415,11 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     @Test
     public void testInitializeStatusTableMenusAdmin() {
         js("eskimoSystemStatus.initializeStatusTableMenus()");
-        assertJavascriptEquals("" +
-                        "    <li><a id=\"start\" tabindex=\"-1\" href=\"#\" title=\"Start Service\"><i class=\"fa fa-play\"></i> Start Service</a></li>\n" +
+        assertJavascriptEquals("    <li><a id=\"start\" tabindex=\"-1\" href=\"#\" title=\"Start Service\"><i class=\"fa fa-play\"></i> Start Service</a></li>\n" +
                         "    <li><a id=\"stop\" tabindex=\"-1\" href=\"#\" title=\"Stop Service\"><i class=\"fa fa-stop\"></i> Stop Service</a></li>\n" +
                         "    <li><a id=\"restart\" tabindex=\"-1\" href=\"#\" title=\"Restart Service\"><i class=\"fa fa-refresh\"></i> Restart Service</a></li>\n" +
-                        "    <li class=\"divider\"></li>    <li><a id=\"reinstall\" tabindex=\"-1\" href=\"#\" title=\"Reinstall Service\"><i class=\"fa fa-undo\"></i> Reinstall Service</a></li>\n" +
-                        "    <li class=\"divider\"></li>    <li><a id=\"show_journal\" tabindex=\"-1\" href=\"#\" title=\"Show Journal\"><i class=\"fa fa-file\"></i> Show Journal</a></li>\n" +
-                        "",
+                        "    <li class=\"dropdown-divider\"></li>    <li><a id=\"reinstall\" tabindex=\"-1\" href=\"#\" title=\"Reinstall Service\"><i class=\"fa fa-undo\"></i> Reinstall Service</a></li>\n" +
+                        "    <li class=\"dropdown-divider\"></li>    <li><a id=\"show_journal\" tabindex=\"-1\" href=\"#\" title=\"Show Journal\"><i class=\"fa fa-file\"></i> Show Journal</a></li>\n",
                 "$('#serviceContextMenuTemplate').html()");
     }
 

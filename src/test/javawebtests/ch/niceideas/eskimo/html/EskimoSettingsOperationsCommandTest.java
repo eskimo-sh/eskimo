@@ -76,7 +76,7 @@ public class EskimoSettingsOperationsCommandTest extends AbstractWebTest {
     @Test
     public void testSubmit() throws Exception {
 
-        js("$.ajax = function(callback) { callback.success ({}); }");
+        js("$.ajaxPost = function(callback) { callback.success ({}); }");
 
         js("eskimoMain.scheduleStopOperationInProgress = function (result) { window.stopOperationInProgressResult = result; }");
 

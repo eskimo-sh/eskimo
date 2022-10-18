@@ -74,11 +74,14 @@ public class EskimoOperationsCommandTest extends AbstractWebTest {
     @Test
     public void testSubmit() throws Exception {
 
-        js("$.ajax = function(callback) { callback.success ({}); }");
+        js("$.ajaxPost = function(callback) { callback.success ({}); }");
 
         js("eskimoMain.scheduleStopOperationInProgress = function (result) { window.stopOperationInProgressResult = result; }");
 
         testShowCommand();
+
+        // TODO replace this by waitForElementCss ("operations-command-button-validate", "display", "block")
+        //Thread.sleep(2000);
 
         getElementById("operations-command-button-validate").click();
 
