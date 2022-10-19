@@ -39,11 +39,18 @@ eskimo.Notifications = function() {
 
     const that = this;
 
+    const MAX_NOTIFICATION_DISPLAY = 6;
+
     let lastLineNotifications = 0;
     let notifications = [];
     let newNotificationsCount = 0;
 
     this.initialize = function () {
+
+        $("#notifications-clear").click(function () {
+            clearNotifications();
+        });
+
         loadLastLine();
     };
 
@@ -135,19 +142,16 @@ eskimo.Notifications = function() {
 
     function renderNotifications() {
 
-        let notificationHTML = '' +
-            '<li class="hoe-submenu-label">\n' +
-            '    <h3><span id="notifications-count" class="bold">' +
-            notifications.length +
-            '    </span> Notification(s) ' +
-            '    <a id="notifications-clear" href="#">' +
-            '        <span class="notifications-clear-link">Clear</span>' +
-            '    </a></h3>\n' +
-            '</li>';
+        let notificationHTML = '';
 
         let start = 0;
-        if (notifications.length > 10) {
-            start = notifications.length - 10;
+
+        if (notifications.length <= 0) {
+            notificationHTML = notificationHTML +
+                '<h5 class="text-muted font-13 fw-normal mt-2">(Empty)</h5>';
+
+        } else if (notifications.length > MAX_NOTIFICATION_DISPLAY) {
+            start = notifications.length - MAX_NOTIFICATION_DISPLAY;
             notificationHTML = notificationHTML + '' +
                 '<li>\n' +
                 '    <a href="#" class="clearfix">\n' +
@@ -156,73 +160,91 @@ eskimo.Notifications = function() {
                 '</li>';
         }
 
-
         for (let i = start; i < notifications.length; i++) {
 
             let notification = notifications[i];
 
+            notificationHTML = notificationHTML +
+                '<a href="javascript:void(0);" class="dropdown-item p-0 notify-item card unread-noti shadow-none mb-2">\n' +
+                '    <div class="card-body">\n' +
+                '        <div class="d-flex align-items-center">\n' +
+                '            <div class="flex-shrink-0">\n';
+
             if (notification.type == "error" || notification.type == "Error") {
 
                 notificationHTML = notificationHTML +
-                    '<li>\n' +
-                    '    <a href="#" class="clearfix">\n' +
-                    '        <i class="fa fa-exclamation-triangle red-text"></i>\n' +
-                    '        <span class="notification-title">Error - received from backend</span>\n' +
-                    '        <span class="notification-ago">' + notification.tstamp + '</span>\n' +
-                    '        <p class="notification-message">' + notification.message + '</p>\n' +
-                    '    </a>\n' +
-                    '</li>';
+                    '                <div class="notify-icon bg-danger">\n' +
+                    '                    <i class="fa fa-exclamation-triangle"></i>\n' +
+                    '                </div>\n';
 
             } else if (notification.type == "doing" || notification.type == "Doing") {
 
                 notificationHTML = notificationHTML +
-                    '<li>\n' +
-                    '    <a href="#" class="clearfix">\n' +
-                    '        <i class="fa fa-exchange green-text"></i>\n' +
-                    '        <span class="notification-title">In progress...</span>\n' +
-                    '        <span class="notification-ago">' + notification.tstamp + '</span>\n' +
-                    '        <p class="notification-message">' + notification.message + '</p>\n' +
-                    '        <p class="notification-message">\n' +
-                    '            <div class="progress">\n' +
-                    '                <div class="progress-bar progress-bar-striped active" role="progressbar"\n' +
-                    '                     aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:60%;"> 60%\n' +
-                    '                </div>\n' +
-                    '            </div>\n' +
-                    '        </p>\n' +
-                    '    </a>\n' +
-                    '</li>';
+                    '                <div class="notify-icon bg-info">\n' +
+                '                    <i class="fa fa-exchange"></i>\n' +
+                '                </div>\n';
 
             } else if (notification.type == "info" || notification.type == "Info") {
 
                 notificationHTML = notificationHTML +
-                    '<li>\n' +
-                    '    <a href="#" class="clearfix">\n' +
-                    '        <i class="fa fa-cogs green-text"></i>\n' +
-                    '        <span class="notification-title">Information</span>\n' +
-                    '        <span class="notification-ago">' + notification.tstamp + '</span>\n' +
-                    '        <p class="notification-message">' + notification.message + '</p>\n' +
-                    '    </a>\n' +
-                    '</li>';
+                    '                <div class="notify-icon bg-primary">\n' +
+                '                    <i class="fa fa-cogs"></i>\n' +
+                '                </div>\n';
 
             } else {
 
                 notificationHTML = notificationHTML +
-                    '<li>\n' +
-                    '    <a href="#" class="clearfix">\n' +
-                    '        <i class="fa fa-exchange green-text"></i>\n' +
-                    '        <span class="notification-title">Message</span>\n' +
-                    '        <span class="notification-ago">' + notification.tstamp + '</span>\n' +
-                    '        <p class="notification-message">' + notification.message + '</p>\n' +
-                    '    </a>\n' +
-                    '</li>';
+                    '                <div class="notify-icon bg-primary">\n' +
+                '                    <i class="fa fa-exchange"></i>\n' +
+                '                </div>\n';
+
             }
+
+            notificationHTML = notificationHTML +
+                '            </div>\n' +
+                '            <div class="flex-grow-1 text-truncate ms-2">\n';
+
+
+            if (notification.type == "error" || notification.type == "Error") {
+
+                notificationHTML = notificationHTML +
+                    '                <h5 class="noti-item-title fw-semibold font-14">Error <small class="fw-normal text-muted ms-1">' + notification.tstamp + '</small></h5>\n' +
+                    '                <small class="noti-item-subtitle text-muted">' + notification.message + '</small>\n';
+
+            } else if (notification.type == "doing" || notification.type == "Doing") {
+
+                notificationHTML = notificationHTML +
+                    '                <h5 class="noti-item-title fw-semibold font-14">In progress... <small class="fw-normal text-muted ms-1">' + notification.tstamp + '</small></h5>\n' +
+                    '                <small class="noti-item-subtitle text-muted">' + notification.message +
+                    '                    <div class="progress">\n' +
+                    '                        <div class="progress-bar progress-bar-striped active" role="progressbar"\n' +
+                    '                             aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:60%;"> 60%\n' +
+                    '                        </div>\n' +
+                    '                    </div>\n' +
+                    '                </small>\n';
+
+            } else if (notification.type == "info" || notification.type == "Info") {
+
+                notificationHTML = notificationHTML +
+                    '                <h5 class="noti-item-title fw-semibold font-14">Information <small class="fw-normal text-muted ms-1">' + notification.tstamp + '</small></h5>\n' +
+                    '                <small class="noti-item-subtitle text-muted">' + notification.message + '</small>\n';
+
+            } else {
+
+                notificationHTML = notificationHTML +
+                    '                <h5 class="noti-item-title fw-semibold font-14">Message <small class="fw-normal text-muted ms-1">' + notification.tstamp + '</small></h5>\n' +
+                    '                <small class="noti-item-subtitle text-muted">' + notification.message + '</small>\n';
+
+            }
+
+            notificationHTML = notificationHTML +
+                '            </div>\n' +
+                '        </div>\n' +
+                '    </div>\n' +
+                '</a>'
         }
 
         $("#notifications-container").html(notificationHTML);
-
-        $("#notifications-clear").click(function () {
-            clearNotifications();
-        });
 
     }
 

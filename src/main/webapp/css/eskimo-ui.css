@@ -807,3 +807,14 @@ html[data-sidenav-size=condensed]:not(.authentication-bg) .inner-content-inner-f
 .service-selection {
     text-align: right;
 }
+
+#notifications-container .card {
+    border: 0px none;
+}
+
+.notification-list .notify-item .card-body .noti-item-subtitle,
+.notification-list .notify-item .card-body .noti-item-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+}
