@@ -63,34 +63,21 @@ public abstract class AbstractWebTest {
 
     private static TestResourcesServer server;
 
-    protected WebDriver driver;
+    protected static WebDriver driver;
 
     @BeforeAll
     public static void setUpOnce() throws Exception {
         server = TestResourcesServer.getServer(isCoverageRun());
         server.startServer(className);
-    }
 
-    @AfterAll
-    public static void tearDownOnce() throws Exception {
-        server.stopServer();
-    }
-
-    @BeforeEach
-    public void setUpClassName() {
-        Class<?> clazz = this.getClass(); //if you want to get Class object
-        className = clazz.getCanonicalName(); //you want to get only class name
-    }
-
-    @AfterEach
-    public void tearDown() throws Exception {
-        server.postTestMethodHook(this::js);
-    }
-
-    @BeforeEach
-    public void init() throws Exception {
+        /*
+        WebDriverManager.chromedriver()
+                .clearDriverCache()
+                .clearResolutionCache();
+        */
 
         ChromeOptions co = new ChromeOptions();
+
         co.setCapability(CapabilityType.UNHANDLED_PROMPT_BEHAVIOUR, "ignore");
 
         co.addArguments("--no-sandbox");
@@ -102,8 +89,27 @@ public abstract class AbstractWebTest {
         driver = WebDriverManager.chromedriver()
                 .capabilities(co)
                 .create();
+    }
+
+    @AfterAll
+    public static void tearDownOnce() throws Exception {
+        server.stopServer();
+
+        if (driver != null) {
+            driver.quit();
+        }
+
+        Thread.sleep(1000); // give some time to selenium driver to really shutdown before running next test
+    }
+
+    @BeforeEach
+    public void init() throws Exception {
+
+        Class<?> clazz = this.getClass(); //if you want to get Class object
+        className = clazz.getCanonicalName(); //you want to get only class name
 
         driver.get("http://localhost:9001/src/test/resources/GenericTestPage.html");
+        driver.navigate().refresh();
 
         assertEquals("Generic Test Page", driver.getTitle());
 
@@ -112,10 +118,16 @@ public abstract class AbstractWebTest {
     }
 
     @AfterEach
-    public void close() {
+    public void tearDown() throws Exception {
+        server.postTestMethodHook(this::js);
+
+        /*
         if (driver != null) {
             driver.close();
         }
+        */
+
+        //Thread.sleep (200);
     }
 
     private void initDriver() throws InterruptedException {
