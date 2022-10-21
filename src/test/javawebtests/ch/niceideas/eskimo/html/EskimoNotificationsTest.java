@@ -64,20 +64,13 @@ public class EskimoNotificationsTest extends AbstractWebTest {
 
         assertJavascriptEquals("1", "$('#new-notifications-count').html()");
 
-        String notificationsHTML = js("return $('#notifications-container').html()").toString();
+        // debugging
+        //String notificationsHTML = js("return $('#notifications-container').html()").toString();
         //System.err.println (notificationsHTML);
-        assertTrue (notificationsHTML.startsWith ("" +
-                "<li class=\"hoe-submenu-label\">\n" +
-                "    <h3><span id=\"notifications-count\" class=\"bold\">1    </span> Notification(s)     <a id=\"notifications-clear\" href=\"#\">        <span class=\"notifications-clear-link\">Clear</span>    </a></h3>\n" +
-                "</li><li>\n" +
-                "    <a href=\"#\" class=\"clearfix\">\n" +
-                "        <i class=\"fa fa-cogs green-text\"></i>\n" +
-                "        <span class=\"notification-title\">Information</span>\n"));
 
-        assertTrue (notificationsHTML.endsWith("" +
-                "        <p class=\"notification-message\">Installation of Topology and settings on 192.168.10.11 succeeded</p>\n" +
-                "    </a>\n" +
-                "</li>"));
+        assertJavascriptEquals("1", "$('#notifications-container .card-body .d-flex .flex-grow-1 .noti-item-title').length");
+        assertJavascriptEquals("Installation of Topology and settings on 192.168.10.11 succeeded",
+                "$('#notifications-container .card-body .d-flex .flex-grow-1 .noti-item-subtitle').text()");
     }
 
     @Test
@@ -89,14 +82,13 @@ public class EskimoNotificationsTest extends AbstractWebTest {
                 "    object.success();" +
                 "}");
 
-        getElementById("notifications-clear").click();
+        js("eskimoNotifications.clearNotifications()");
 
-        String notificationsHTML = js("return $('#notifications-container').html()").toString();
+        // debugging
+        //String notificationsHTML = js("return $('#notifications-container').html()").toString();
+        //System.err.println (notificationsHTML);
 
-        assertEquals("<li class=\"hoe-submenu-label\">\n" +
-                "    <h3><span id=\"notifications-count\" class=\"bold\">0    </span> Notification(s)     <a id=\"notifications-clear\" href=\"#\">        <span class=\"notifications-clear-link\">Clear</span>    </a></h3>\n" +
-                "</li>", notificationsHTML);
-
+        assertJavascriptEquals("0", "$('#notifications-container .card-body .d-flex .flex-grow-1 .noti-item-title').length");
     }
 
 }

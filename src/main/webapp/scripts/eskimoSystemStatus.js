@@ -533,7 +533,6 @@ eskimo.SystemStatus = function() {
         statusMonitoringInfo.css("height", "220px");
 
         $("#status-monitoring-info-panel").attr("class", "col-md-6");
-        $("#status-monitoring-info-actions").attr("class", "col-md-6");
 
         $("#status-monitoring-info-container").attr("class", "col-xs-12 col-sm-12 col-md-12");
 
@@ -550,7 +549,6 @@ eskimo.SystemStatus = function() {
         statusMonitoringInfo.css("height", "413px");
 
         $("#status-monitoring-info-panel").attr("class", "col-md-12");
-        $("#status-monitoring-info-actions").attr("class", "col-md-12");
 
         $("#status-monitoring-info-container").attr("class", "col-xs-12 col-sm-12 col-md-4");
 

@@ -217,7 +217,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     @Test
     public void testShowStatus() throws Exception {
 
-        js("$.ajax = function (options) {" +
+        js("$.ajaxGet = function (options) {" +
                 "    options.success(" + jsonFullStatus + ")" +
                 "}");
 
@@ -230,12 +230,6 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         assertNotNull (tableString);
 
         assertTrue (tableString.contains("192.168.10.11"));
-
-        String infoActionsString = js("return $('#status-monitoring-info-actions').html()").toString();
-
-        assertNotNull (infoActionsString);
-
-        assertTrue (infoActionsString.contains(" Use Zeppelin for your Data Science projects"));
     }
 
     @Test
@@ -276,13 +270,12 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
                 "}");
 
         // HTMLUnit cannot load grafana
-        Exception exception = assertThrows(Exception.class,
-                () -> js("eskimoSystemStatus.displayMonitoringDashboard('abcd', '50');"));
-        assertTrue(exception.getMessage().endsWith("grafana/d/abcd/monitoring?orgId=1&&kiosk&refresh=50"));
+        js("eskimoSystemStatus.displayMonitoringDashboard('abcd', '50');");
+        assertJavascriptEquals("grafana/d/abcd/monitoring?orgId=1&&kiosk&refresh=50", "$('#status-monitoring-dashboard-frame').attr('src')");
 
         await().atMost(15, TimeUnit.SECONDS).until(() -> js("return $('#status-monitoring-no-dashboard').css('display')").toString().equals("none"));
 
-        assertCssValue("#status-monitoring-dashboard-frame", "display", "inherit");
+        assertCssValue("#status-monitoring-dashboard-frame", "display", "block");
         assertCssValue("#status-monitoring-no-dashboard", "display", "none");
     }
 

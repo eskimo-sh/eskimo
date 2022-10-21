@@ -94,9 +94,10 @@ public abstract class AbstractWebTest {
         co.setCapability(CapabilityType.UNHANDLED_PROMPT_BEHAVIOUR, "ignore");
 
         co.addArguments("--no-sandbox");
-        co.addArguments("window-size=1900,1024");
+        co.addArguments("--window-position=0,0");
+        co.addArguments("--window-size=1900,1024");
         co.addArguments("--headless");
-        co.addArguments("disable-gpu");
+        co.addArguments("--disable-gpu");
 
         driver = WebDriverManager.chromedriver()
                 .capabilities(co)
@@ -107,6 +108,17 @@ public abstract class AbstractWebTest {
         assertEquals("Generic Test Page", driver.getTitle());
 
         // create common mocks
+        initDriver();
+    }
+
+    @AfterEach
+    public void close() {
+        if (driver != null) {
+            driver.close();
+        }
+    }
+
+    private void initDriver() throws InterruptedException {
         // create mock functions
         js("window.eskimoServices = {};");
         js("eskimoServices.serviceMenuServiceFoundHook = function (){};");
@@ -227,12 +239,6 @@ public abstract class AbstractWebTest {
         js("$.fn.load = function (resource, callback) { return this._internalLoad ('../../../src/main/webapp/'+resource, callback); };");
         //js("$.fn.load = function (resource, callback) { return this._internalLoad ('file://" + System.getProperty("user.dir") + "/src/main/webapp/'+resource, callback); };");
     }
-
-    @AfterEach
-    public void close() {
-        driver.close();
-    }
-
 
     Object js (String jsCode) {
         JavascriptExecutor js = (JavascriptExecutor)driver;

@@ -129,6 +129,10 @@ public class EskimoSetupTest extends AbstractWebTest {
     @Test
     public void testShowSetupMessage() throws Exception {
 
+        js("$.ajaxGet = function(callback) { console.log(callback); }");
+
+        js("eskimoSetup.showSetup()");
+
         js("eskimoSetup.showSetupMessage ('test');");
 
         assertCssValue("#setup-warning", "display", "block");

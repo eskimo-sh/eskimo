@@ -2,6 +2,11 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -10,6 +15,14 @@ public class ApplicationStatusServiceTest extends AbstractSystemTest {
 
     @Test
     public void testUpdateAndGetStatus() {
+
+        UsernamePasswordAuthenticationToken principal =
+                new UsernamePasswordAuthenticationToken ("user1", "test", new ArrayList<SimpleGrantedAuthority>(){{
+                    add(new SimpleGrantedAuthority("admin"));
+                    add(new SimpleGrantedAuthority("user"));
+                }});
+
+        SecurityContextHolder.getContext().setAuthentication(principal);
 
         applicationStatusService.updateStatus();
 
@@ -23,19 +36,10 @@ public class ApplicationStatusServiceTest extends AbstractSystemTest {
         assertEquals("(Setup incomplete)", appStatus.getValueForPathAsString("sshUsername"));
         assertEquals("true", appStatus.getValueForPathAsString("enableKubernetes"));
 
-        assertEquals("[" +
-                        "{\"title\":\"Access all monitoring dashboards in Grafana\",\"service\":\"grafana\"}," +
-                        "{\"title\":\"Monitor Gluster volumes\",\"service\":\"gluster\"}," +
-                        "{\"title\":\"Manage Kubernetes Cluster\",\"service\":\"kubernetes-dashboard\"}," +
-                        "{\"title\":\"Manage your kafka topics\",\"service\":\"kafka-manager\"}," +
-                        "{\"title\":\"Monitor your Spark jobs\",\"service\":\"spark-console\"}," +
-                        "{\"title\":\"Manage Flink Session\",\"service\":\"flink-runtime\"}," +
-                        "{\"title\":\"Manage your data in Elasticsearch\",\"service\":\"cerebro\"}," +
-                        "{\"title\":\"Visualize your data in Elasticsearch\",\"service\":\"kibana\"}," +
-                        "{\"title\":\"Use Zeppelin for your Data Science projects\",\"service\":\"zeppelin\"}]",
-                appStatus.getValueForPathAsString("links"));
+        assertEquals("true", appStatus.getValueForPathAsString("enableKubernetes"));
 
-        assertEquals("true", appStatus.getValueForPathAsString("isSnapshot"));
+        assertEquals("user1", appStatus.getValueForPathAsString("username"));
+        assertEquals("admin,user", appStatus.getValueForPathAsString("roles"));
     }
 
 }
