@@ -308,6 +308,7 @@ public abstract class AbstractWebTest {
         js("loadScript('http://localhost:9001/src/main/webapp/scripts/"+script+"')");
         try {
             waitForElementInDOM(By.cssSelector("script[src=\"http://localhost:9001/src/main/webapp/scripts/" + script + "\"]"));
+            Thread.sleep(20);
         } catch (InterruptedException e) {
             logger.debug(e, e);
         }

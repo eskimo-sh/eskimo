@@ -61,7 +61,7 @@ public class CoverageServer implements TestResourcesServer {
             "--port=9001",
             //"--no-branch",
             //"--no-function",
-            //"--no-instrument=example/lib",
+            "--no-instrument=src/main/webapp/scripts/bootstrap-5.2.0.js",
             "--log=INFO",
             "--report-dir=" + jsCoverReportDir
     };
@@ -102,13 +102,13 @@ public class CoverageServer implements TestResourcesServer {
             */
 
         int attempt = 0;
-        while ((!(Boolean) (runner.js("window.jscoverFinished"))) && attempt < 10) {
+        while ((!(Boolean) (runner.js("return window.jscoverFinished"))) && attempt < 10) {
             logger.debug("Waiting for coverage report to be written ...");
             Thread.sleep(500);
             attempt++;
         }
 
-        String json = (String) (runner.js("jscoverage_serializeCoverageToJSON();"));
+        String json = (String) (runner.js("return jscoverage_serializeCoverageToJSON();"));
         coverages.add(json);
     }
 
