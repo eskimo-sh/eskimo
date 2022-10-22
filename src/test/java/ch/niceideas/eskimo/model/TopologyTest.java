@@ -39,6 +39,7 @@ import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
 import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;

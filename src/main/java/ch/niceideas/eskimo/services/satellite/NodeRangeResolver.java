@@ -32,11 +32,12 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.services;
+package ch.niceideas.eskimo.services.satellite;
 
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper.ParsedNodesConfigProperty;
 import ch.niceideas.eskimo.model.Topology;
+import ch.niceideas.eskimo.services.NodesConfigurationException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;

@@ -39,7 +39,7 @@ public class ServicesSettingsControllerTest {
     @Test
     public void testLoadServicesConfig() throws Exception {
 
-        scc.setConfigurationService(new ConfigurationService() {
+        scc.setConfigurationService(new ConfigurationServiceImpl() {
             @Override
             public ServicesSettingsWrapper loadServicesSettings() throws FileException, SetupException {
                 try {
@@ -57,7 +57,7 @@ public class ServicesSettingsControllerTest {
                 expectedResult.replace("\r", "").trim(),
                 scc.loadServicesSettings().replace("\r", "").trim());
 
-        scc.setConfigurationService(new ConfigurationService() {
+        scc.setConfigurationService(new ConfigurationServiceImpl() {
             @Override
             public ServicesSettingsWrapper loadServicesSettings() throws FileException, SetupException {
                 throw new SetupException("Test Error");

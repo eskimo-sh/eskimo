@@ -35,16 +35,14 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.ResourceUtils;
-import ch.niceideas.common.utils.SerializablePair;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
 import org.json.JSONObject;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -428,9 +426,9 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
             public ServicesInstallationSorter getServicesInstallationSorter() {
                 ServicesInstallationSorter sis = new ServicesInstallationSorter();
                 sis.setServicesDefinition(def);
-                ConfigurationService cs = new ConfigurationService();
+                ConfigurationServiceImpl cs = new ConfigurationServiceImpl();
                 sis.setConfigurationService(cs);
-                cs.setSetupService(new SetupService() {
+                cs.setSetupService(new SetupServiceImpl() {
                     public String getConfigStoragePath() {
                         return "/tmp";
                     }

@@ -65,10 +65,10 @@ public class SystemServiceTest extends AbstractSystemTest {
     }
 
     @Override
-    protected SystemService createSystemService() {
-        SystemService ss = new SystemService(false) {
+    protected SystemServiceImpl createSystemService() {
+        SystemServiceImpl ss = new SystemServiceImpl(false) {
             @Override
-            protected File createTempFile(String serviceOrFlag, String node, String extension) throws IOException {
+            public File createTempFile(String serviceOrFlag, String node, String extension) throws IOException {
                 File retFile = new File ("/tmp/" + serviceOrFlag + "-" + testRunUUID + "-" + node + extension);
                 retFile.createNewFile();
                 return retFile;
@@ -79,8 +79,8 @@ public class SystemServiceTest extends AbstractSystemTest {
     }
 
     @Override
-    protected SetupService createSetupService() {
-        return new SetupService() {
+    protected SetupServiceImpl createSetupService() {
+        return new SetupServiceImpl() {
             @Override
             public String findLastPackageFile(String prefix, String packageName) {
                 return prefix+"_"+packageName+"_dummy_1.dummy";

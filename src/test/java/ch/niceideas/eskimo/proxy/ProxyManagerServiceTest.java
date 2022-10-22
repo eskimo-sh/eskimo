@@ -81,7 +81,7 @@ public class ProxyManagerServiceTest {
                 recreateTunnelsCalled.set(true);
             }
         });
-        pms.setConfigurationService(new ConfigurationService() {
+        pms.setConfigurationService(new ConfigurationServiceImpl() {
             @Override
             public ServicesInstallStatusWrapper loadServicesInstallationStatus() {
                 return StandardSetupHelpers.getStandard2NodesInstallStatus();

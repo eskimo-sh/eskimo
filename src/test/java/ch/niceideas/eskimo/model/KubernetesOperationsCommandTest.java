@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionTest {
 
-    private SystemService systemService = new SystemService() {
+    private SystemService systemService = new SystemServiceImpl() {
 
     };
 
@@ -78,7 +78,7 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
 
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
 
-        SystemService ss = new SystemService() {
+        SystemService ss = new SystemServiceImpl() {
             @Override
             public SystemStatusWrapper getStatus() {
                 return StandardSetupHelpers.getStandard2NodesSystemStatus();
@@ -104,7 +104,7 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
         kubeServicesConfig.getJSONObject().remove("kafka-manager_install");
 
-        SystemService ss = new SystemService() {
+        SystemService ss = new SystemServiceImpl() {
             @Override
             public SystemStatusWrapper getStatus() throws StatusExceptionWrapperException {
                 return StandardSetupHelpers.getStandard2NodesSystemStatus();
@@ -150,7 +150,7 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
         kubeServicesConfig.getJSONObject().remove("kafka-manager_install");
         kubeServicesConfig.getJSONObject().remove("zeppelin_install");
 
-        SystemService ss = new SystemService() {
+        SystemService ss = new SystemServiceImpl() {
             @Override
             public SystemStatusWrapper getStatus() {
                 return StandardSetupHelpers.getStandard2NodesSystemStatus();
@@ -184,7 +184,7 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
         kubeServicesConfig.setValueForPath("kafka_cpu", "1");
         kubeServicesConfig.setValueForPath("zeppelin_ram", "3000m");
 
-        SystemService ss = new SystemService() {
+        SystemService ss = new SystemServiceImpl() {
             @Override
             public SystemStatusWrapper getStatus() {
                 return StandardSetupHelpers.getStandard2NodesSystemStatus();

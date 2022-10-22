@@ -86,7 +86,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         tempPackagesDistribPath.delete();
     }
 
-    SetupService createSetupService(SetupService setupService) throws IOException {
+    SetupServiceImpl createSetupService(SetupServiceImpl setupService) throws IOException {
 
         File storagePathConfDir = File.createTempFile("eskimo_storage", "");
         storagePathConfDir.delete();
@@ -146,7 +146,7 @@ public class SetupServiceTest extends AbstractSystemTest {
     @Test
     public void testSaveAndPrepareSetup_build() throws Exception {
 
-        SetupService setupService = createSetupService(new SetupService());
+        SetupServiceImpl setupService = createSetupService(new SetupServiceImpl());
         setupService.setApplicationStatusService(applicationStatusService);
 
         SetupCommand command = setupService.saveAndPrepareSetup(setupConfig);
@@ -174,7 +174,7 @@ public class SetupServiceTest extends AbstractSystemTest {
     @Test
     public void testSaveAndPrepareSetup_download() throws Exception {
 
-        SetupService setupService = createSetupService(new SetupService() {
+        SetupServiceImpl setupService = createSetupService(new SetupServiceImpl() {
             @Override
             protected JsonWrapper loadRemotePackagesVersionFile() {
                 return new JsonWrapper(packagesVersionFile);
@@ -223,7 +223,7 @@ public class SetupServiceTest extends AbstractSystemTest {
     @Test
     public void testEnsureSetupCompleted() throws Exception {
 
-        SetupService setupService = createSetupService(new SetupService());
+        SetupServiceImpl setupService = createSetupService(new SetupServiceImpl());
         setupService.setApplicationStatusService(applicationStatusService);
 
         setupService.saveAndPrepareSetup(setupConfig);
@@ -294,7 +294,7 @@ public class SetupServiceTest extends AbstractSystemTest {
     @Test
     public void testDownloadPackage() throws Exception {
 
-        SetupService setupService = createSetupService(new SetupService() {
+        SetupServiceImpl setupService = createSetupService(new SetupServiceImpl() {
             @Override
             protected JsonWrapper loadRemotePackagesVersionFile() throws SetupException {
                 return new JsonWrapper(packagesVersionFile);
@@ -388,7 +388,7 @@ public class SetupServiceTest extends AbstractSystemTest {
     @Test
     public void testPrepareSetup() throws Exception {
 
-        SetupService setupService = createSetupService(new SetupService() {
+        SetupServiceImpl setupService = createSetupService(new SetupServiceImpl() {
             @Override
             protected JsonWrapper loadRemotePackagesVersionFile() throws SetupException {
                 return new JsonWrapper(packagesVersionFile);
@@ -462,7 +462,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         final List<String> builtPackageList = new ArrayList<>();
         final List<String> downloadPackageList = new ArrayList<>();
 
-        SetupService setupService = createSetupService(new SetupService() {
+        SetupServiceImpl setupService = createSetupService(new SetupServiceImpl() {
             @Override
             protected void buildPackage(String image) throws SetupException {
                 builtPackageList.add (image);
@@ -525,7 +525,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         final List<String> builtPackageList = new ArrayList<>();
         final List<String> downloadPackageList = new ArrayList<>();
 
-        SetupService setupService = createSetupService(new SetupService() {
+        SetupServiceImpl setupService = createSetupService(new SetupServiceImpl() {
             @Override
             protected void buildPackage(String image) throws SetupException {
                 builtPackageList.add (image);
@@ -588,7 +588,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         final List<String> builtPackageList = new ArrayList<>();
         final List<String> downloadPackageList = new ArrayList<>();
 
-        SetupService setupService = createSetupService(new SetupService() {
+        SetupServiceImpl setupService = createSetupService(new SetupServiceImpl() {
             @Override
             protected void buildPackage(String image) {
                 builtPackageList.add (image);
@@ -633,7 +633,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         final List<String> builtPackageList = new ArrayList<>();
         final List<String> downloadPackageList = new ArrayList<>();
 
-        SetupService setupService = createSetupService(new SetupService() {
+        SetupServiceImpl setupService = createSetupService(new SetupServiceImpl() {
             @Override
             protected void buildPackage(String image) {
                 builtPackageList.add (image);
@@ -676,7 +676,7 @@ public class SetupServiceTest extends AbstractSystemTest {
         final List<String> builtPackageList = new ArrayList<>();
         final List<String> downloadPackageList = new ArrayList<>();
 
-        SetupService setupService = createSetupService(new SetupService() {
+        SetupServiceImpl setupService = createSetupService(new SetupServiceImpl() {
             @Override
             protected void buildPackage(String image) {
                 builtPackageList.add (image);

@@ -122,14 +122,32 @@ public class StandardSetupHelpers {
     public static KubernetesServicesConfigWrapper getStandardKubernetesConfig() {
         return new KubernetesServicesConfigWrapper(new HashMap<>() {{
             put("cerebro_install", "on");
+            put("cerebro_cpu", "1");
+            put("cerebro_ram", "800M");
             put("kibana_install", "on");
+            put("kibana_cpu", "1");
+            put("kibana_ram", "800M");
             put("spark-runtime_install", "on");
+            put("spark-runtime_cpu", "1");
+            put("spark-runtime_ram", "800M");
             put("logstash_install", "on");
+            put("logstash_cpu", "1");
+            put("logstash_ram", "800M");
             put("spark-console_install", "on");
+            put("spark-console_cpu", "1");
+            put("spark-console_ram", "800M");
             put("kafka-manager_install", "on");
+            put("kafka-manager_cpu", "1");
+            put("kafka-manager_ram", "800M");
             put("kafka_install", "on");
+            put("kafka_cpu", "1");
+            put("kafka_ram", "800M");
             put("zeppelin_install", "on");
+            put("zeppelin_cpu", "1");
+            put("zeppelin_ram", "800M");
             put("elasticsearch_install", "on");
+            put("elasticsearch_cpu", "1");
+            put("elasticsearch_ram", "800M");
         }});
     }
 }

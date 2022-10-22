@@ -62,8 +62,8 @@ public class MasterServiceTest extends AbstractSystemTest {
     }
 
     @Override
-    protected ConfigurationService createConfigurationService() {
-        return new ConfigurationService() {
+    protected ConfigurationServiceImpl createConfigurationService() {
+        return new ConfigurationServiceImpl() {
             @Override
             public NodesConfigWrapper loadNodesConfig() {
                 return StandardSetupHelpers.getStandard2NodesSetup();
@@ -80,8 +80,8 @@ public class MasterServiceTest extends AbstractSystemTest {
     }
 
     @Override
-    protected SystemService createSystemService() {
-        return new SystemService(false) {
+    protected SystemServiceImpl createSystemService() {
+        return new SystemServiceImpl(false) {
             @Override
             public SystemStatusWrapper getStatus() {
                 return StandardSetupHelpers.getStandard2NodesSystemStatus();

@@ -6,6 +6,7 @@ import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,7 +62,7 @@ public class SystemAdminControllerTest {
 
     @Test
     public void testShowJournal() {
-        sac.setSystemService(new SystemService(false) {
+        sac.setSystemService(new SystemServiceImpl(false) {
             @Override
             public void showJournal(Service service, String node) {
                 // No Op
@@ -75,7 +76,7 @@ public class SystemAdminControllerTest {
 
     @Test
     public void testStartService() {
-        sac.setSystemService(new SystemService(false) {
+        sac.setSystemService(new SystemServiceImpl(false) {
             @Override
             public void startService(Service service, String node) {
                 // No Op
@@ -86,7 +87,7 @@ public class SystemAdminControllerTest {
                 "  \"status\": \"OK\"\n" +
                 "}", sac.startService("zookeeper", "192.168.10.11"));
 
-        sac.setSystemService(new SystemService(false) {
+        sac.setSystemService(new SystemServiceImpl(false) {
             @Override
             public void startService(Service service, String node) throws SystemException {
                 throw new SystemException("Test Error");
@@ -101,7 +102,7 @@ public class SystemAdminControllerTest {
 
     @Test
     public void testStopService() {
-        sac.setSystemService(new SystemService(false) {
+        sac.setSystemService(new SystemServiceImpl(false) {
             @Override
             public void stopService(Service service, String node) {
                 // No Op
@@ -115,7 +116,7 @@ public class SystemAdminControllerTest {
 
     @Test
     public void testRestartService() {
-        sac.setSystemService(new SystemService(false) {
+        sac.setSystemService(new SystemServiceImpl(false) {
             @Override
             public void restartService(Service service, String node) {
                 // No Op
@@ -129,7 +130,7 @@ public class SystemAdminControllerTest {
 
     @Test
     public void testServiceActionCustom() {
-        sac.setSystemService(new SystemService(false) {
+        sac.setSystemService(new SystemServiceImpl(false) {
             @Override
             public void callCommand(String commandId, String serviceName, String node) {
                 // No Op
@@ -173,7 +174,7 @@ public class SystemAdminControllerTest {
 
         AtomicBoolean called = new AtomicBoolean(false);
 
-        sac.setSystemService(new SystemService(false) {
+        sac.setSystemService(new SystemServiceImpl(false) {
 
             @Override
             public void delegateApplyNodesConfig(ServiceOperationsCommand command)  {
@@ -182,7 +183,7 @@ public class SystemAdminControllerTest {
 
         });
 
-        sac.setConfigurationService(new ConfigurationService() {
+        sac.setConfigurationService(new ConfigurationServiceImpl() {
             @Override
             public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
                 ServicesInstallStatusWrapper retWrapper = StandardSetupHelpers.getStandard2NodesInstallStatus();

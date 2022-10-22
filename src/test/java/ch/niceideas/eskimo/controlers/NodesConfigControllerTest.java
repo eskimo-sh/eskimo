@@ -4,6 +4,7 @@ import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ public class NodesConfigControllerTest {
             }
         });
 
-        ncc.setConfigurationService(new ConfigurationService() {
+        ncc.setConfigurationService(new ConfigurationServiceImpl() {
             @Override
             public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) {
                 // No Op
@@ -54,7 +55,7 @@ public class NodesConfigControllerTest {
     @Test
     public void testLoadNodesConfig() throws Exception {
 
-        ncc.setSetupService(new SetupService() {
+        ncc.setSetupService(new SetupServiceImpl() {
             @Override
             public void ensureSetupCompleted() throws SetupException {
                 // No-Op
@@ -78,7 +79,7 @@ public class NodesConfigControllerTest {
                 "    \"gluster2\": \"on\"\n" +
                 "}").similar(new JSONObject (ncc.loadNodesConfig())));
 
-        ncc.setSetupService(new SetupService() {
+        ncc.setSetupService(new SetupServiceImpl() {
             @Override
             public void ensureSetupCompleted() throws SetupException {
                 throw new SetupException("Test Error");
@@ -91,14 +92,14 @@ public class NodesConfigControllerTest {
                 "  \"status\": \"OK\"\n" +
                 "}", ncc.loadNodesConfig());
 
-        ncc.setSetupService(new SetupService() {
+        ncc.setSetupService(new SetupServiceImpl() {
             @Override
             public void ensureSetupCompleted() throws SetupException {
                 // No-Op
             }
         });
 
-        ncc.setConfigurationService(new ConfigurationService() {
+        ncc.setConfigurationService(new ConfigurationServiceImpl() {
             @Override
             public NodesConfigWrapper loadNodesConfig() throws SystemException, SetupException {
                 throw new SystemException("Test Error");

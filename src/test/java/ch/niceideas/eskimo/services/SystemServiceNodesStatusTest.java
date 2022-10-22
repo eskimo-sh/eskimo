@@ -61,10 +61,10 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
     }
 
     @Override
-    protected SystemService createSystemService() {
-        SystemService ss = new SystemService(false) {
+    protected SystemServiceImpl createSystemService() {
+        SystemServiceImpl ss = new SystemServiceImpl(false) {
             @Override
-            protected File createTempFile(String serviceOrFlag, String node, String extension) throws IOException {
+            public File createTempFile(String serviceOrFlag, String node, String extension) throws IOException {
                 File retFile = new File ("/tmp/"+serviceOrFlag+"-"+testRunUUID+"-"+ node +extension);
                 retFile.createNewFile();
                 return retFile;
@@ -75,8 +75,8 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
     }
 
     @Override
-    protected ConfigurationService createConfigurationService() {
-        return new ConfigurationService() {
+    protected ConfigurationServiceImpl createConfigurationService() {
+        return new ConfigurationServiceImpl() {
             @Override
             public NodesConfigWrapper loadNodesConfig() {
                 return StandardSetupHelpers.getStandard2NodesSetup();

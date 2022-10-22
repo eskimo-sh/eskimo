@@ -21,7 +21,7 @@ public class ConfigurationServiceTest {
 
     private File tmpFile = null;
 
-    private ConfigurationService configurationService = null;
+    private ConfigurationServiceImpl configurationService = null;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -33,12 +33,12 @@ public class ConfigurationServiceTest {
             logger.error (e, e);
             throw new SetupException(e);
         }
-        configurationService = new ConfigurationService();
+        configurationService = new ConfigurationServiceImpl();
 
         ServicesDefinition sd = new ServicesDefinition();
         sd.afterPropertiesSet();
 
-        SetupService setupService = new SetupService() {
+        SetupServiceImpl setupService = new SetupServiceImpl() {
             @Override
             public String getConfigStoragePath() {
                 return tmpFile.getAbsolutePath();

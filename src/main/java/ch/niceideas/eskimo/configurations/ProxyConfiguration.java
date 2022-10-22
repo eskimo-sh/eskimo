@@ -47,6 +47,7 @@ import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -109,6 +110,7 @@ public class ProxyConfiguration implements WebSocketConfigurer {
      * </code>
      */
     @Bean
+    @Profile("!no-web-stack")
     public ConfigurableServletWebServerFactory webServerFactory() {
         TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
         factory.addConnectorCustomizers(connector -> connector.setProperty("relaxedQueryChars", "|{}[]"));
@@ -116,6 +118,7 @@ public class ProxyConfiguration implements WebSocketConfigurer {
     }
 
     @Bean
+    @Profile("!no-web-stack")
     public ServletRegistrationBean<ServicesProxyServlet> proxyServletRegistrationBean(){
 
         ServletRegistrationBean<ServicesProxyServlet> servletRegistrationBean = new ServletRegistrationBean<>(
@@ -139,6 +142,7 @@ public class ProxyConfiguration implements WebSocketConfigurer {
     }
 
     @Bean
+    @Profile("!no-web-stack")
     public ServletRegistrationBean<WebCommandServlet> commandServletRegistrationBean(){
 
         ServletRegistrationBean<WebCommandServlet> servletRegistrationBean = new ServletRegistrationBean<>(
@@ -151,6 +155,7 @@ public class ProxyConfiguration implements WebSocketConfigurer {
     }
 
     @Bean
+    @Profile("!no-web-stack")
     public ServletListenerRegistrationBean<ProxyServlet.ProxySessionListener> sessionListenerWithMetrics() {
         ServletListenerRegistrationBean<ProxyServlet.ProxySessionListener> listenerRegBean =
                 new ServletListenerRegistrationBean<>();
@@ -160,6 +165,7 @@ public class ProxyConfiguration implements WebSocketConfigurer {
     }
 
     @Override
+    @Profile("!no-web-stack")
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         String[] allWsUrls = Arrays.stream(servicesDefinition.listProxiedServices())
                 .map(serviceName -> servicesDefinition.getService(serviceName))
@@ -169,6 +175,7 @@ public class ProxyConfiguration implements WebSocketConfigurer {
     }
 
     @Bean
+    @Profile("!no-web-stack")
     public ServletServerContainerFactoryBean createServletServerContainerFactoryBean() {
         ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
         container.setMaxTextMessageBufferSize(WebSocketProxyForwarder.MESSAGE_SIZE_LIMIT);

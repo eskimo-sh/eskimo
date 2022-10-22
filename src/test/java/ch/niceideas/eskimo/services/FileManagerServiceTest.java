@@ -75,24 +75,24 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
     private ProxyManagerService pms = null;
 
-    private FileManagerService sc = null;
+    private FileManagerServiceImpl sc = null;
 
     private SSHCommandService scs = null;
 
-    private SetupService setupService = null;
+    private SetupServiceImpl setupService = null;
 
-    private ConfigurationService cs = null;
+    private ConfigurationServiceImpl cs = null;
 
     @BeforeEach
     public void setUp() throws Exception {
-        setupService = new SetupService();
+        setupService = new SetupServiceImpl();
         String tempPath = SystemServiceTest.createTempStoragePath();
         setupService.setConfigStoragePathInternal(tempPath);
         FileUtils.writeFile(new File(tempPath + "/config.json"), "{ \"ssh_username\" : \"test\" }");
 
         cm = new ConnectionManagerService(privateKeyRaw, getSShPort());
 
-        sc = new FileManagerService();
+        sc = new FileManagerServiceImpl();
 
         scs = new SSHCommandService();
         scs.setConnectionManagerService(cm);
@@ -105,7 +105,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
         cm.setProxyManagerService(pms);
         pms.setConnectionManagerService(cm);
 
-        cs = new ConfigurationService();
+        cs = new ConfigurationServiceImpl();
         cs.setSetupService(setupService);
 
         cm.setConfigurationService(cs);
@@ -206,7 +206,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
                     return null;
                 });
 
-        sc.downloadFile("localhost", tempFile.getParent(), tempFile.getName(), new FileManagerService.HttpServletResponseAdapter(){
+        sc.downloadFile("localhost", tempFile.getParent(), tempFile.getName(), new FileManagerServiceImpl.HttpServletResponseAdapter(){
 
             @Override
             public void setContentType(String type) {
@@ -226,7 +226,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
     }
 
     void getTestClient(String mimeType) throws IOException, ConnectionManagerException {
-        sc = new FileManagerService() {
+        sc = new FileManagerServiceImpl() {
             @Override
             SFTPv3Client getClient(@RequestParam("address") String node) throws ConnectionManagerException, IOException {
                 return new SFTPv3Client(cm.getSharedConnection("localhost").getUnder());

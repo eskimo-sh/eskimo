@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.services.FileManagerService;
+import ch.niceideas.eskimo.services.FileManagerServiceImpl;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -60,11 +61,6 @@ public class FileManagerController {
 
     @Autowired
     private FileManagerService fileManagerService;
-
-    /* For tests */
-    void setFileManagerService(FileManagerService fileManagerService) {
-        this.fileManagerService = fileManagerService;
-    }
 
     @GetMapping("/file-manager-remove")
     @ResponseBody
@@ -150,7 +146,7 @@ public class FileManagerController {
             @RequestParam("file") String file,
             HttpServletResponse response) {
         response.setHeader("Content-Disposition", "attachment");
-        fileManagerService.downloadFile (node, folder, file, new FileManagerService.HttpServletResponseAdapter() {
+        fileManagerService.downloadFile (node, folder, file, new FileManagerServiceImpl.HttpServletResponseAdapter() {
 
             @Override
             public void setContentType(String type) {
@@ -166,7 +162,7 @@ public class FileManagerController {
             response.flushBuffer();
         } catch (IOException ex) {
             logger.error("Download error. Filename was " + file, ex);
-            throw new FileManagerService.FileDownloadException("Download error. Filename was " + file, ex);
+            throw new FileManagerServiceImpl.FileDownloadException("Download error. Filename was " + file, ex);
         }
     }
 

@@ -35,7 +35,7 @@ public class WebCommandServletTest {
             }
         };
 
-        ConfigurationService cs = new ConfigurationService() {
+        ConfigurationService cs = new ConfigurationServiceImpl() {
 
             @Override
             public ServicesInstallStatusWrapper loadServicesInstallationStatus() {

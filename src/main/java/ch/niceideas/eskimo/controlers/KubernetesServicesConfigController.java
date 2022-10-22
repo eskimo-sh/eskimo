@@ -83,24 +83,6 @@ public class KubernetesServicesConfigController extends AbstractOperationControl
     @Value("${eskimo.enableKubernetesSubsystem}")
     private String enableKubernetes = "true";
 
-
-    /* For tests */
-    void setKubernetesService(KubernetesService kubernetesService) {
-        this.kubernetesService = kubernetesService;
-    }
-    void setServicesDefinition (ServicesDefinition servicesDefinition) {
-        this.servicesDefinition = servicesDefinition;
-    }
-    void setSetupService(SetupService setupService) {
-        this.setupService = setupService;
-    }
-    void setConfigurationService (ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-    void setKubernetesServicesConfigChecker(KubernetesServicesConfigChecker kubernetesServicesConfigChecker) {
-        this.kubernetesServicesConfigChecker = kubernetesServicesConfigChecker;
-    }
-
     @GetMapping("/load-kubernetes-services-config")
     @ResponseBody
     public String loadKubernetesServicesConfig() {

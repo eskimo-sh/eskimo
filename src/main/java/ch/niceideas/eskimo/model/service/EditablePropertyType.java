@@ -1,4 +1,4 @@
-package ch.niceideas.eskimo.services;
+package ch.niceideas.eskimo.model.service;
 
 public enum EditablePropertyType {
 

@@ -39,6 +39,7 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.services.SetupService;
+import ch.niceideas.eskimo.services.SetupServiceImpl;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -71,7 +72,7 @@ public class PackageVersionGenerator {
             System.exit(-3);
         }
 
-        SetupService setupService = new SetupService();
+        SetupService setupService = new SetupServiceImpl();
 
         Map<String, Pair<String, String>> packages = new HashMap<>();
 

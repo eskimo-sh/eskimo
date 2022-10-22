@@ -41,7 +41,9 @@ import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
-import com.trilead.ssh2.Connection;
+import ch.niceideas.eskimo.services.satellite.MemoryComputer;
+import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
+import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -49,15 +51,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Set;
 
 public abstract class AbstractSystemTest {
 
     private static final Logger logger = Logger.getLogger(AbstractSystemTest.class);
 
-    protected SetupService setupService;
+    protected SetupServiceImpl setupService;
 
-    protected SystemService systemService = null;
+    protected SystemServiceImpl systemService = null;
 
     protected NotificationService notificationService = null;
 
@@ -75,9 +76,9 @@ public abstract class AbstractSystemTest {
 
     protected MemoryComputer memoryComputer = null;
 
-    protected ConfigurationService configurationService = null;
+    protected ConfigurationServiceImpl configurationService = null;
 
-    protected KubernetesService kubernetesService = null;
+    protected KubernetesServiceImpl kubernetesService = null;
 
     protected SSHCommandService sshCommandService = null;
 
@@ -307,12 +308,12 @@ public abstract class AbstractSystemTest {
         return new ProxyManagerService();
     }
 
-    protected ConfigurationService createConfigurationService() {
-        return new ConfigurationService();
+    protected ConfigurationServiceImpl createConfigurationService() {
+        return new ConfigurationServiceImpl();
     }
 
-    protected SetupService createSetupService() {
-        return new SetupService(){
+    protected SetupServiceImpl createSetupService() {
+        return new SetupServiceImpl(){
 
             @Override
             protected void dowloadFile(MessageLogger ml, File destinationFile, URL downloadUrl, String message) throws IOException {
@@ -327,16 +328,16 @@ public abstract class AbstractSystemTest {
         };
     }
 
-    protected SystemService createSystemService() {
-        return new SystemService(false);
+    protected SystemServiceImpl createSystemService() {
+        return new SystemServiceImpl(false);
     }
 
     protected NodesConfigurationService createNodesConfigurationService () {
         return new NodesConfigurationService();
     }
 
-    protected KubernetesService createKubernetesService() {
-        return new KubernetesService() {
+    protected KubernetesServiceImpl createKubernetesService() {
+        return new KubernetesServiceImpl() {
             /* FIXME override kubectl command calling */
         };
     }

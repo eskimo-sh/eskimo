@@ -100,12 +100,12 @@ public abstract class AbstractSetupShellTest {
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
 
         ServicesDefinition def = new ServicesDefinition();
-        SetupService setupService = new SetupService();
+        SetupServiceImpl setupService = new SetupServiceImpl();
         setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
         def.setSetupService(setupService);
         def.afterPropertiesSet();
 
-        ConfigurationService configurationService = new ConfigurationService() {
+        ConfigurationService configurationService = new ConfigurationServiceImpl() {
             @Override
             public ServicesInstallStatusWrapper loadServicesInstallationStatus() {
                 return StandardSetupHelpers.getStandard2NodesInstallStatus();

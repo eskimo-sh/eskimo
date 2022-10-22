@@ -48,8 +48,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class KubernetesServicesConfigCheckerTest {
 
     private KubernetesServicesConfigChecker kubernetesConfigChecker = new KubernetesServicesConfigChecker();
-    private ConfigurationService configurationService = new ConfigurationService();
-    private SetupService setupService = new SetupService();
+    private ConfigurationServiceImpl configurationService = new ConfigurationServiceImpl();
+    private SetupServiceImpl setupService = new SetupServiceImpl();
 
     NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
         put("node_id1", "192.168.10.11");
@@ -82,7 +82,7 @@ public class KubernetesServicesConfigCheckerTest {
         ServicesDefinition def = new ServicesDefinition();
         def.afterPropertiesSet();
 
-        setupService = new SetupService();
+        setupService = new SetupServiceImpl();
         configurationService.setSetupService(setupService);
 
         setupService.setConfigurationService (configurationService);

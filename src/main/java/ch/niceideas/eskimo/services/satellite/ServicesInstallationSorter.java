@@ -32,12 +32,13 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.services;
+package ch.niceideas.eskimo.services.satellite;
 
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.Dependency;
 import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
 import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;

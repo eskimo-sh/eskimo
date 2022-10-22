@@ -86,10 +86,10 @@ public class KubernetesServiceTest extends AbstractSystemTest {
     }
 
     @Override
-    protected SystemService createSystemService() {
-        return new SystemService(false) {
+    protected SystemServiceImpl createSystemService() {
+        return new SystemServiceImpl(false) {
             @Override
-            String sendPing(String node) throws SSHCommandException {
+            public String sendPing(String node) throws SSHCommandException {
                 super.sendPing(node);
                 return "OK";
             }
@@ -97,8 +97,8 @@ public class KubernetesServiceTest extends AbstractSystemTest {
     }
 
     @Override
-    protected SetupService createSetupService() {
-        return new SetupService() {
+    protected SetupServiceImpl createSetupService() {
+        return new SetupServiceImpl() {
             @Override
             public String findLastPackageFile(String prefix, String packageName) {
                 return prefix+"_"+packageName+"_dummy_1.dummy";
@@ -106,7 +106,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
         };
     }
 
-    private KubernetesService resetupKubernetesService(KubernetesService kubernetesService) {
+    private KubernetesServiceImpl resetupKubernetesService(KubernetesServiceImpl kubernetesService) {
         kubernetesService.setServicesDefinition(servicesDefinition);
         kubernetesService.setConfigurationService (configurationService);
         kubernetesService.setSystemService(systemService);
@@ -144,7 +144,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
 
         final List<String> installList = new LinkedList<>();
         final List<String> uninstallList = new LinkedList<>();
-        KubernetesService kubernetesService = resetupKubernetesService(new KubernetesService() {
+        KubernetesServiceImpl kubernetesService = resetupKubernetesService(new KubernetesServiceImpl() {
 
             @Override
             void installService(KubernetesOperationsCommand.KubernetesOperationId operationId, String kubernetesNode) {
@@ -196,7 +196,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
 
         final List<String> kubernetesApiCalls = new ArrayList<>();
 
-        KubernetesService kubernetesService = resetupKubernetesService(new KubernetesService() {
+        KubernetesServiceImpl kubernetesService = resetupKubernetesService(new KubernetesServiceImpl() {
 
         });
 
@@ -230,7 +230,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
 
         final List<String> kubernetesApiCalls = new ArrayList<>();
 
-        KubernetesService kubernetesService = resetupKubernetesService(new KubernetesService() {
+        KubernetesServiceImpl kubernetesService = resetupKubernetesService(new KubernetesServiceImpl() {
 
         });
 
@@ -265,7 +265,7 @@ public class KubernetesServiceTest extends AbstractSystemTest {
     @Test
     public void testFetchKubernetesServicesStatusNominal () throws Exception {
 
-        KubernetesService kubernetesService = resetupKubernetesService(new KubernetesService() {
+        KubernetesServiceImpl kubernetesService = resetupKubernetesService(new KubernetesServiceImpl() {
             @Override
             protected KubeStatusParser getKubeStatusParser() throws KubernetesException {
                 String allPodStatus = "" +
@@ -302,13 +302,13 @@ public class KubernetesServiceTest extends AbstractSystemTest {
     @Test
     public void testFetchKubernetesServicesStatusKubernetesNodeDown () throws Exception {
 
-        KubernetesService kubernetesService = resetupKubernetesService(new KubernetesService() {
+        KubernetesServiceImpl kubernetesService = resetupKubernetesService(new KubernetesServiceImpl() {
 
         });
 
-        systemService = new SystemService(false) {
+        systemService = new SystemServiceImpl(false) {
             @Override
-            String sendPing(String node) throws SSHCommandException {
+            public String sendPing(String node) throws SSHCommandException {
                 super.sendPing(node);
                 throw new SSHCommandException("Node dead");
             }

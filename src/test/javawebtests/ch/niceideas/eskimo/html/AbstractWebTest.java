@@ -44,6 +44,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 
@@ -89,6 +91,8 @@ public abstract class AbstractWebTest {
         driver = WebDriverManager.chromedriver()
                 .capabilities(co)
                 .create();
+
+        driver.get("http://localhost:9001/src/test/resources/GenericTestPage.html");
     }
 
     @AfterAll
@@ -108,8 +112,15 @@ public abstract class AbstractWebTest {
         Class<?> clazz = this.getClass(); //if you want to get Class object
         className = clazz.getCanonicalName(); //you want to get only class name
 
-        driver.get("http://localhost:9001/src/test/resources/GenericTestPage.html");
         driver.navigate().refresh();
+
+        // wait for page to load
+        Wait<WebDriver> wait = new WebDriverWait(driver, 100);
+        wait.until(innerDriver -> {
+            return String
+                    .valueOf(((JavascriptExecutor) innerDriver).executeScript("return document.readyState"))
+                    .equals("complete");
+        });
 
         assertEquals("Generic Test Page", driver.getTitle());
 

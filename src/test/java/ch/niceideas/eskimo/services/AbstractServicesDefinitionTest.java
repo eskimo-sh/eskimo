@@ -39,11 +39,12 @@ import ch.niceideas.eskimo.model.service.Dependency;
 import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
 import ch.niceideas.eskimo.model.service.MemoryConsumptionSize;
 import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import org.junit.jupiter.api.BeforeEach;
 
 public abstract class AbstractServicesDefinitionTest {
 
-    protected SetupService setupService = new SetupService();
+    protected SetupServiceImpl setupService = new SetupServiceImpl();
 
     protected ServicesDefinition def;
 

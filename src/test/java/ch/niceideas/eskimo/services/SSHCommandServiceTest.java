@@ -66,14 +66,14 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
 
     private SSHCommandService scs = null;
 
-    private SetupService setupService = null;
+    private SetupServiceImpl setupService = null;
 
-    private ConfigurationService cs = null;
+    private ConfigurationServiceImpl cs = null;
 
     @BeforeEach
     public void setUp() throws Exception {
 
-        setupService = new SetupService();
+        setupService = new SetupServiceImpl();
         String tempPath = SystemServiceTest.createTempStoragePath();
         setupService.setConfigStoragePathInternal(tempPath);
         FileUtils.writeFile(new File(tempPath + "/config.json"), "{ \"ssh_username\" : \"test\" }");
@@ -89,7 +89,7 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
         cm.setProxyManagerService(pms);
         pms.setConnectionManagerService(cm);
 
-        cs = new ConfigurationService();
+        cs = new ConfigurationServiceImpl();
         cs.setSetupService(setupService);
 
         cm.setConfigurationService(cs);

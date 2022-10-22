@@ -38,7 +38,7 @@ public class SetupConfigControllerTest {
     @Test
     public void testLoadSetupConfig() {
 
-        scc.setSetupService(new SetupService() {
+        scc.setSetupService(new SetupServiceImpl() {
             @Override
             public void ensureSetupCompleted() throws SetupException {
                 // No Op
@@ -46,7 +46,7 @@ public class SetupConfigControllerTest {
         });
 
 
-        scc.setConfigurationService(new ConfigurationService() {
+        scc.setConfigurationService(new ConfigurationServiceImpl() {
             @Override
             public String loadSetupConfig() throws FileException, SetupException {
                 throw new SetupException ("Application is not initialized properly. Missing file 'config.conf' system configuration");
@@ -61,7 +61,7 @@ public class SetupConfigControllerTest {
                 "  \"status\": \"OK\"\n" +
                 "}", scc.loadSetupConfig());
 
-        scc.setConfigurationService(new ConfigurationService() {
+        scc.setConfigurationService(new ConfigurationServiceImpl() {
             @Override
             public String loadSetupConfig() throws FileException, SetupException {
                 return "{\"config\": \"dummy\"}";
@@ -75,14 +75,14 @@ public class SetupConfigControllerTest {
                 "    \"version\": \"DEV-SNAPSHOT\"\n" +
                 "}", scc.loadSetupConfig());
 
-        scc.setSetupService(new SetupService() {
+        scc.setSetupService(new SetupServiceImpl() {
             @Override
             public void ensureSetupCompleted() throws SetupException {
                 throw new SetupException("No loaded");
             }
         });
 
-        scc.setConfigurationService(new ConfigurationService() {
+        scc.setConfigurationService(new ConfigurationServiceImpl() {
             @Override
             public String loadSetupConfig() throws FileException, SetupException {
                 return "{\"config\": \"dummy\"}";
@@ -98,7 +98,7 @@ public class SetupConfigControllerTest {
                 "    \"version\": \"DEV-SNAPSHOT\"\n" +
                 "}", scc.loadSetupConfig());
 
-        scc.setConfigurationService(new ConfigurationService() {
+        scc.setConfigurationService(new ConfigurationServiceImpl() {
             @Override
             public String loadSetupConfig() throws FileException, SetupException {
                 throw new SetupException("Setup error");
@@ -113,14 +113,14 @@ public class SetupConfigControllerTest {
                 "  \"status\": \"OK\"\n" +
                 "}", scc.loadSetupConfig());
 
-        scc.setSetupService(new SetupService() {
+        scc.setSetupService(new SetupServiceImpl() {
             @Override
             public void ensureSetupCompleted() throws SetupException {
                 // No Op
             }
         });
 
-        scc.setConfigurationService(new ConfigurationService() {
+        scc.setConfigurationService(new ConfigurationServiceImpl() {
             @Override
             public String loadSetupConfig() throws FileException, SetupException {
                 return "{\"config\": \"dummy\"}";
@@ -184,7 +184,7 @@ public class SetupConfigControllerTest {
 
         HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
 
-        scc.setSetupService(new SetupService() {
+        scc.setSetupService(new SetupServiceImpl() {
             @Override
             public SetupCommand saveAndPrepareSetup(String configAsString) throws SetupException {
                 JsonWrapper setupConfigJSON = new JsonWrapper(configAsString);

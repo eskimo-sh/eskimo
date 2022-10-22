@@ -74,7 +74,7 @@ public class ServicesProxyServletTest {
         servlet = new ServicesProxyServlet(pms, sd, "", 50, 30000, 10000, 20000);
         pms.setServicesDefinition(sd);
 
-        pms.setConfigurationService(new ConfigurationService() {
+        pms.setConfigurationService(new ConfigurationServiceImpl() {
             public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
                 return StandardSetupHelpers.getStandard2NodesInstallStatus();
             }

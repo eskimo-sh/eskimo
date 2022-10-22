@@ -32,11 +32,13 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.services;
+package ch.niceideas.eskimo.services.satellite;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.services.NodesConfigurationException;
+import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.comparator.Comparators;

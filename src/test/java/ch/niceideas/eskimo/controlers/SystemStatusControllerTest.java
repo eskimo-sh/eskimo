@@ -57,14 +57,14 @@ public class SystemStatusControllerTest {
     @Test
     public void testGetStatus() {
 
-        ssc.setSetupService(new SetupService() {
+        ssc.setSetupService(new SetupServiceImpl() {
             @Override
             public void ensureSetupCompleted() throws SetupException {
                 // No Op
             }
         });
 
-        ssc.setSystemService(new SystemService(false) {
+        ssc.setSystemService(new SystemServiceImpl(false) {
             @Override
             public SystemStatusWrapper getStatus() {
                 return new SystemStatusWrapper("{\"status\":\"OK\"}");
@@ -92,7 +92,7 @@ public class SystemStatusControllerTest {
                 "  \"status\": \"OK\"\n" +
                 "}", ssc.getStatus());
 
-        ssc.setSystemService(new SystemService(false) {
+        ssc.setSystemService(new SystemServiceImpl(false) {
             @Override
             public SystemStatusWrapper getStatus()  {
                 return new SystemStatusWrapper("{}");

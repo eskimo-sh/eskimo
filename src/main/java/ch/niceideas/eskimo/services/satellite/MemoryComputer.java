@@ -32,12 +32,16 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.services;
+package ch.niceideas.eskimo.services.satellite;
 
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.services.SSHCommandException;
+import ch.niceideas.eskimo.services.SSHCommandService;
+import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.services.SystemException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -63,17 +67,9 @@ public class MemoryComputer {
 
     @Autowired
     private ServicesDefinition servicesDefinition;
-    /** For tests only */
-    void setServicesDefinition(ServicesDefinition servicesDefinition) {
-        this.servicesDefinition = servicesDefinition;
-    }
 
     @Autowired
     private SSHCommandService sshCommandService;
-    /** For tests only*/
-    void setSshCommandService(SSHCommandService sshCommandService) {
-        this.sshCommandService = sshCommandService;
-    }
 
     @Value("${system.parallelismInstallThreadCount}")
     private int parallelismInstallThreadCount = 10;
@@ -84,6 +80,14 @@ public class MemoryComputer {
     @Value("${system.reservedMemoryOnNodes}")
     private long reservedMemoryMb = 1000;
 
+    /** For tests only */
+    public void setServicesDefinition(ServicesDefinition servicesDefinition) {
+        this.servicesDefinition = servicesDefinition;
+    }
+    /** For tests only*/
+    public void setSshCommandService(SSHCommandService sshCommandService) {
+        this.sshCommandService = sshCommandService;
+    }
 
 
     public MemoryModel buildMemoryModel (NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, Set<String> deadIps) throws SystemException {

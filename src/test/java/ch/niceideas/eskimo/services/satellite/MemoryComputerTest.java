@@ -32,12 +32,17 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.services;
+package ch.niceideas.eskimo.services.satellite;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.services.SSHCommandException;
+import ch.niceideas.eskimo.services.SSHCommandService;
+import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.services.StandardSetupHelpers;
+import ch.niceideas.eskimo.services.satellite.MemoryComputer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

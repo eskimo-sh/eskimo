@@ -54,211 +54,33 @@ import java.io.File;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-@Component
-@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-public class ConfigurationService {
 
-    private static final Logger logger = Logger.getLogger(ConfigurationService.class);
+public interface ConfigurationService {
 
-    public static final String SERVICE_INSTALLATION_STATUS_PATH = "/service-install-status.json";
-    public static final String SERVICES_SETTINGS_JSON_PATH = "/services-settings.json";
-    public static final String KUBERNETES_SERVICES_CONFIG_JSON = "/kubernetes-services-config.json";
-    public static final String CONFIG_JSON = "/config.json";
+    void saveServicesSettings(ServicesSettingsWrapper settings) throws FileException, SetupException;
 
-    private final ReentrantLock statusFileLock = new ReentrantLock();
-    private final ReentrantLock nodesConfigFileLock = new ReentrantLock();
-    private final ReentrantLock kubernetesServicesFileLock = new ReentrantLock();
-    private final ReentrantLock servicesConfigFileLock = new ReentrantLock();
+    ServicesSettingsWrapper loadServicesSettings() throws FileException, SetupException;
 
-    @Autowired
-    private SetupService setupService;
+    ServicesSettingsWrapper loadServicesConfigNoLock() throws FileException, SetupException;
 
-    @Autowired
-    private ServicesDefinition servicesDefinition;
+    void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) throws FileException, SetupException;
 
-    /* For tests */
-    public void setSetupService(SetupService setupService) {
-        this.setupService = setupService;
-    }
-    public void setServicesDefinition(ServicesDefinition servicesDefinition) {
-        this.servicesDefinition = servicesDefinition;
-    }
+    void updateAndSaveServicesInstallationStatus(SystemService.StatusUpdater statusUpdater) throws FileException, SetupException;
 
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public void saveServicesSettings(ServicesSettingsWrapper settings) throws FileException, SetupException {
-        servicesConfigFileLock.lock();
-        try {
-            String configStoragePath = setupService.getConfigStoragePath();
-            FileUtils.writeFile(new File(configStoragePath + SERVICES_SETTINGS_JSON_PATH), settings.getFormattedValue());
-        } finally {
-            servicesConfigFileLock.unlock();
-        }
-    }
+    ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException;
 
-    public ServicesSettingsWrapper loadServicesSettings() throws FileException, SetupException {
-        servicesConfigFileLock.lock();
-        try {
-            String configStoragePath = setupService.getConfigStoragePath();
-            File statusFile = new File(configStoragePath + SERVICES_SETTINGS_JSON_PATH);
-            if (!statusFile.exists()) {
-                return ServicesSettingsWrapper.initEmpty(servicesDefinition);
-            }
+    void saveNodesConfig(NodesConfigWrapper nodesConfig) throws FileException, SetupException;
 
-            return new ServicesSettingsWrapper(statusFile);
-        } finally {
-            servicesConfigFileLock.unlock();
-        }
-    }
+    NodesConfigWrapper loadNodesConfig() throws SystemException, SetupException;
 
-    public ServicesSettingsWrapper loadServicesConfigNoLock() throws FileException, SetupException {
-        String configStoragePath = setupService.getConfigStoragePath();
-        File statusFile = new File(configStoragePath + SERVICES_SETTINGS_JSON_PATH);
-        if (!statusFile.exists()) {
-            return ServicesSettingsWrapper.initEmpty(servicesDefinition);
-        }
+    JsonWrapper createSetupConfigAndSaveStoragePath(String configAsString) throws SetupException, FileException;
 
-        return new ServicesSettingsWrapper(statusFile);
-    }
+    void saveSetupConfig(String configAsString) throws SetupException, FileException;
 
+    String loadSetupConfig() throws FileException, SetupException;
 
-    void updateAndSaveServicesInstallationStatus(SystemService.StatusUpdater statusUpdater) throws FileException, SetupException {
-        statusFileLock.lock();
-        try {
-            ServicesInstallStatusWrapper status = loadServicesInstallationStatus();
-            statusUpdater.updateStatus(status);
-            saveServicesInstallationStatus(status);
-        } finally {
-            statusFileLock.unlock();
-        }
-    }
+    KubernetesServicesConfigWrapper loadKubernetesServicesConfig() throws SystemException;
 
-    public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) throws FileException, SetupException {
-        statusFileLock.lock();
-        try {
-            String configStoragePath = setupService.getConfigStoragePath();
-            FileUtils.writeFile(new File(configStoragePath + SERVICE_INSTALLATION_STATUS_PATH), status.getFormattedValue());
-        } finally {
-            statusFileLock.unlock();
-        }
-    }
-
-    public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
-        statusFileLock.lock();
-        try {
-            String configStoragePath = setupService.getConfigStoragePath();
-            File statusFile = new File(configStoragePath + SERVICE_INSTALLATION_STATUS_PATH);
-            if (!statusFile.exists()) {
-                return ServicesInstallStatusWrapper.empty();
-            }
-
-            return new ServicesInstallStatusWrapper(statusFile);
-        } finally {
-            statusFileLock.unlock();
-        }
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public void saveNodesConfig(NodesConfigWrapper nodesConfig) throws FileException, SetupException {
-        nodesConfigFileLock.lock();
-        try {
-            String configStoragePath = setupService.getConfigStoragePath();
-            FileUtils.writeFile(new File(configStoragePath + "/nodes-config.json"), nodesConfig.getFormattedValue());
-        } finally {
-            nodesConfigFileLock.unlock();
-        }
-    }
-
-    public NodesConfigWrapper loadNodesConfig() throws SystemException, SetupException {
-        nodesConfigFileLock.lock();
-        try {
-            String configStoragePath = setupService.getConfigStoragePath();
-            File nodesConfigFile = new File(configStoragePath + "/nodes-config.json");
-            if (!nodesConfigFile.exists()) {
-                return null;
-            }
-
-            return new NodesConfigWrapper(FileUtils.readFile(nodesConfigFile));
-        } catch (JSONException | FileException e) {
-            logger.error (e, e);
-            throw new SystemException(e);
-        } finally {
-            nodesConfigFileLock.unlock();
-        }
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public JsonWrapper createSetupConfigAndSaveStoragePath(String configAsString) throws SetupException, FileException {
-        JsonWrapper setupConfigJSON = new JsonWrapper(configAsString);
-
-        // First thing first : save storage path
-        String configStoragePath = (String) setupConfigJSON.getValueForPath("setup_storage");
-        if (StringUtils.isBlank(configStoragePath)) {
-            throw new SetupException ("config Storage path cannot be empty.");
-        }
-
-        File entryFile = new File(setupService.getStoragePathConfDir() + "/storagePath.conf");
-        FileUtils.writeFile(entryFile, configStoragePath);
-
-        File storagePath = new File(configStoragePath);
-        if (!storagePath.exists()) {
-
-            if (!storagePath.mkdirs()) {
-                logger.debug ("mkdirs " + storagePath + " failed. Will crash on next line.");
-            }
-
-            if (!storagePath.exists()) {
-                throw new SetupException("Path \"" + configStoragePath + "\" doesn't exist and couldn't be created.");
-            }
-        }
-        if (!storagePath.canWrite()) {
-            String username = System.getProperty("user.name");
-            throw new SetupException("User " + username + " cannot write in path " + storagePath + " doesn't exist.");
-        }
-        return setupConfigJSON;
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public void saveSetupConfig(String configAsString) throws SetupException, FileException {
-        File configFile = new File(setupService.getConfigStoragePath() + CONFIG_JSON);
-        FileUtils.writeFile(configFile, configAsString);
-    }
-
-    public String loadSetupConfig() throws FileException, SetupException {
-        File configFile = new File(setupService.getConfigStoragePath() + CONFIG_JSON);
-        if (!configFile.exists()) {
-            throw new SetupException ("Application is not initialized properly. Missing file 'config.conf' system configuration");
-        }
-
-        return FileUtils.readFile(configFile);
-    }
-
-    public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() throws SystemException  {
-        kubernetesServicesFileLock.lock();
-        try {
-            String configStoragePath = setupService.getConfigStoragePath();
-            File kubernetesServicesConfigFile = new File(configStoragePath + KUBERNETES_SERVICES_CONFIG_JSON);
-            if (!kubernetesServicesConfigFile.exists()) {
-                return null;
-            }
-
-            return new KubernetesServicesConfigWrapper(FileUtils.readFile(kubernetesServicesConfigFile));
-        } catch (JSONException | FileException | SetupException e) {
-            logger.error (e, e);
-            throw new SystemException(e);
-        } finally {
-            kubernetesServicesFileLock.unlock();
-        }
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public void saveKubernetesServicesConfig(KubernetesServicesConfigWrapper kubeServicesConfig) throws FileException, SetupException {
-        kubernetesServicesFileLock.lock();
-        try {
-            String configStoragePath = setupService.getConfigStoragePath();
-            FileUtils.writeFile(new File(configStoragePath + KUBERNETES_SERVICES_CONFIG_JSON), kubeServicesConfig.getFormattedValue());
-        } finally {
-            kubernetesServicesFileLock.unlock();
-        }
-    }
+    void saveKubernetesServicesConfig(KubernetesServicesConfigWrapper kubeServicesConfig) throws FileException, SetupException;
 
 }

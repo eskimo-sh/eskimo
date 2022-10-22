@@ -1,110 +1,126 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
+import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
+import ch.niceideas.eskimo.test.services.SystemServiceTestImpl;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-cluster", "no-web-stack"})
 public class KubernetesServicesConfigControllerTest {
 
-    private KubernetesServicesConfigController mscc = new KubernetesServicesConfigController();
+    @Autowired
+    private KubernetesServicesConfigController kscc;
+
+    @Autowired
+    private SystemServiceTestImpl systemSeviceTest;
+
+    @Autowired
+    private SetupServiceTestImpl setupServiceTest;
+
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
+
+    @Autowired
+    private OperationsMonitoringService operationsMonitoringService;
 
     @BeforeEach
     public void testSetup() {
-        mscc.setNotificationService(new NotificationService());
 
-        mscc.setSystemService(new SystemService() {
-            @Override
-            public SystemStatusWrapper getStatus() {
-                return SystemStatusWrapper.empty();
-            }
-        });
+        systemSeviceTest.setReturnEmptySystemStatus(true);
 
-        mscc.setConfigurationService(new ConfigurationService() {
-            @Override
-            public void saveKubernetesServicesConfig(KubernetesServicesConfigWrapper kubeServicesConfig) {
-                // No-Op
-            }
-        });
+        if (operationsMonitoringService.isProcessingPending()) {
+            operationsMonitoringService.operationsFinished(true);
+        }
 
-        mscc.setOperationsMonitoringService(new OperationsMonitoringService() {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
-            }
-        });
+        SecurityContextHelper.loginAdmin();
+
+        configurationServiceTest.reset();
+
+        kscc.setDemoMode(false);
     }
 
     @Test
     public void testLoadKubernetesServicesConfig() throws Exception {
 
-        mscc.setSetupService(new SetupService() {
-            @Override
-            public void ensureSetupCompleted() throws SetupException {
-                // No-Op
-            }
-        });
+        setupServiceTest.setSetupCompleted();
 
-        mscc.setConfigurationService(new ConfigurationService() {
-            @Override
-            public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() throws SystemException  {
-                return StandardSetupHelpers.getStandardKubernetesConfig();
-            }
-        });
+        configurationServiceTest.setStandardKubernetesConfig();
 
-        System.err.println (mscc.loadKubernetesServicesConfig());
+        //System.err.println (kscc.loadKubernetesServicesConfig());
         assertTrue (new JSONObject("{\n" +
-                "    \"elasticsearch_install\": \"on\",\n" +
-                "    \"cerebro_install\": \"on\",\n" +
-                "    \"kafka_install\": \"on\",\n" +
-                "    \"zeppelin_install\": \"on\",\n" +
+                "    \"spark-runtime_ram\": \"800M\",\n" +
+                "    \"zeppelin_ram\": \"800M\",\n" +
+                "    \"kibana_ram\": \"800M\",\n" +
+                "    \"kafka-manager_ram\": \"800M\",\n" +
                 "    \"kafka-manager_install\": \"on\",\n" +
+                "    \"kafka_ram\": \"800M\",\n" +
+                "    \"kafka_cpu\": \"1\",\n" +
+                "    \"elasticsearch_cpu\": \"1\",\n" +
+                "    \"kafka-manager_cpu\": \"1\",\n" +
+                "    \"elasticsearch_install\": \"on\",\n" +
+                "    \"kafka_install\": \"on\",\n" +
+                "    \"kibana_cpu\": \"1\",\n" +
+                "    \"zeppelin_install\": \"on\",\n" +
+                "    \"spark-runtime_cpu\": \"1\",\n" +
+                "    \"logstash_cpu\": \"1\",\n" +
+                "    \"logstash_ram\": \"800M\",\n" +
+                "    \"spark-runtime_install\": \"on\",\n" +
+                "    \"cerebro_ram\": \"800M\",\n" +
+                "    \"spark-console_cpu\": \"1\",\n" +
+                "    \"spark-console_install\": \"on\",\n" +
+                "    \"elasticsearch_ram\": \"800M\",\n" +
+                "    \"spark-console_ram\": \"800M\",\n" +
+                "    \"cerebro_install\": \"on\",\n" +
+                "    \"zeppelin_cpu\": \"1\",\n" +
                 "    \"kibana_install\": \"on\",\n" +
                 "    \"logstash_install\": \"on\",\n" +
-                "    \"spark-console_install\": \"on\",\n" +
-                "    \"spark-runtime_install\": \"on\"\n" +
-                "}").similar(new JSONObject (mscc.loadKubernetesServicesConfig())));
+                "    \"cerebro_cpu\": \"1\"\n" +
+                "}").similar(new JSONObject (kscc.loadKubernetesServicesConfig())));
 
-        mscc.setSetupService(new SetupService() {
-            @Override
-            public void ensureSetupCompleted() throws SetupException {
-                throw new SetupException("Test Error");
-            }
-        });
+        setupServiceTest.setSetupError();
 
         assertEquals ("{\n" +
                 "  \"clear\": \"setup\",\n" +
                 "  \"processingPending\": false,\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", mscc.loadKubernetesServicesConfig());
+                "}", kscc.loadKubernetesServicesConfig());
 
-        mscc.setSetupService(new SetupService() {
-            @Override
-            public void ensureSetupCompleted() throws SetupException {
-                // No-Op
-            }
-        });
+        setupServiceTest.setSetupCompleted();
 
-        mscc.setConfigurationService(new ConfigurationService() {
-            @Override
-            public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() throws SystemException  {
-                throw new SystemException("Test Error");
-            }
-        });
+        configurationServiceTest.setKubernetesConfigError();
 
         assertEquals ("{\n" +
                 "  \"error\": \"Test Error\",\n" +
                 "  \"status\": \"KO\"\n" +
-                "}", mscc.loadKubernetesServicesConfig());
+                "}", kscc.loadKubernetesServicesConfig());
     }
 
     @Test
@@ -114,39 +130,9 @@ public class KubernetesServicesConfigControllerTest {
 
         HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
 
-        mscc.setKubernetesService(new KubernetesService() {
-            @Override
-            public void applyServicesConfig(KubernetesOperationsCommand command) {
-                // No Op
-            }
-        });
-
-        mscc.setConfigurationService(new ConfigurationService() {
-            @Override
-            public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) {
-                // No Op
-            }
-            @Override
-            public ServicesInstallStatusWrapper loadServicesInstallationStatus(){
-                return StandardSetupHelpers.getStandard2NodesInstallStatus();
-            }
-            @Override
-            public NodesConfigWrapper loadNodesConfig() {
-                return StandardSetupHelpers.getStandard2NodesSetup();
-            }
-            @Override
-            public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() throws SystemException  {
-                return StandardSetupHelpers.getStandardKubernetesConfig();
-            }
-            @Override
-            public void saveKubernetesServicesConfig(KubernetesServicesConfigWrapper kubeServicesConfig) throws FileException, SetupException {
-                // No Op
-            }
-        });
-
-        ServicesDefinition sd = new ServicesDefinition();
-        sd.afterPropertiesSet();
-        mscc.setServicesDefinition(sd);
+        configurationServiceTest.setStandard2NodesInstallStatus();
+        configurationServiceTest.setStandard2NodesSetup();
+        configurationServiceTest.setStandardKubernetesConfig();;
 
         assertEquals ("{\n" +
                 "  \"command\": {\n" +
@@ -162,9 +148,9 @@ public class KubernetesServicesConfigControllerTest {
                 "    \"warnings\": \"Kubernetes is not available. The changes in kubernetes services configuration and deployments will be saved but they will <strong>need to be applied again<\\/strong> another time when Kubernetes Master is available\"\n" +
                 "  },\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", mscc.reinstallKubernetesServiceConfig("{\"spark-runtime_install\":\"on\",\"kafka_install\":\"on\",\"elasticsearch_install\":\"on\",\"cerebro_install\":\"on\",\"grafana_install\":\"on\",\"zeppelin_install\":\"on\"}", session));
+                "}", kscc.reinstallKubernetesServiceConfig("{\"spark-runtime_install\":\"on\",\"kafka_install\":\"on\",\"elasticsearch_install\":\"on\",\"cerebro_install\":\"on\",\"grafana_install\":\"on\",\"zeppelin_install\":\"on\"}", session));
 
-        assertEquals ("{\"status\": \"OK\"}", mscc.applyKubernetesServicesConfig(session));
+        assertEquals ("{\"status\": \"OK\"}", kscc.applyKubernetesServicesConfig(session));
 
         assertTrue(sessionContent.isEmpty());
     }
@@ -175,12 +161,12 @@ public class KubernetesServicesConfigControllerTest {
         Map<String, Object> sessionContent = new HashMap<>();
         HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
 
-        mscc.setDemoMode(true);
+        kscc.setDemoMode(true);
 
         assertEquals ("{\n" +
                 "  \"messages\": \"Unfortunately, re-applying kubernetes configuration or changing kubernetes configuration is not possible in DEMO mode.\",\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", mscc.applyKubernetesServicesConfig(session));
+                "}", kscc.applyKubernetesServicesConfig(session));
     }
 
     @Test
@@ -189,17 +175,12 @@ public class KubernetesServicesConfigControllerTest {
         Map<String, Object> sessionContent = new HashMap<>();
         HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
 
-        mscc.setOperationsMonitoringService(new OperationsMonitoringService() {
-            @Override
-            public boolean isProcessingPending() {
-                return true;
-            }
-        });
+        operationsMonitoringService.operationsStarted(new SimpleOperationCommand("test", "test", "192.168.10.15"));
 
         assertEquals ("{\n" +
                 "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed.\",\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", mscc.applyKubernetesServicesConfig(session));
+                "}", kscc.applyKubernetesServicesConfig(session));
     }
 
     @Test
@@ -209,70 +190,31 @@ public class KubernetesServicesConfigControllerTest {
 
         HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
 
-        mscc.setKubernetesService(new KubernetesService() {
-            @Override
-            public void applyServicesConfig(KubernetesOperationsCommand command) {
-                // No Op
-            }
-        });
-
-        mscc.setConfigurationService(new ConfigurationService() {
-            @Override
-            public ServicesInstallStatusWrapper loadServicesInstallationStatus() {
-                return StandardSetupHelpers.getStandard2NodesInstallStatus();
-            }
-            @Override
-            public void saveKubernetesServicesConfig(KubernetesServicesConfigWrapper kubeServicesConfig) {
-                // No Op
-            }
-            @Override
-            public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) {
-                // No Op
-            }
-            @Override
-            public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() {
-                // No Op
-                return null;
-            }
-        });
-
-        mscc.setKubernetesServicesConfigChecker(new KubernetesServicesConfigChecker() {
-            @Override
-            public void checkKubernetesServicesSetup(KubernetesServicesConfigWrapper kubeServicesConfig) throws KubernetesServicesConfigException {
-                // No Op
-            }
-        });
-
-
-        ServicesDefinition sd = new ServicesDefinition();
-        sd.afterPropertiesSet();
-        mscc.setServicesDefinition(sd);
+        configurationServiceTest.setStandard2NodesInstallStatus();
+        configurationServiceTest.setStandard2NodesSetup();
 
         assertEquals ("{\n" +
                         "  \"command\": {\n" +
-                        "    \"uninstallations\": [\n" +
+                        "    \"uninstallations\": [],\n" +
+                        "    \"restarts\": [\n" +
+                        "      \"spark-console\",\n" +
+                        "      \"elasticsearch\",\n" +
+                        "      \"cerebro\",\n" +
+                        "      \"spark-runtime\",\n" +
+                        "      \"logstash\",\n" +
+                        "      \"kafka\",\n" +
                         "      \"kafka-manager\",\n" +
                         "      \"kibana\",\n" +
-                        "      \"logstash\",\n" +
-                        "      \"spark-console\"\n" +
+                        "      \"zeppelin\"\n" +
                         "    ],\n" +
-                        "    \"restarts\": [],\n" +
-                        "    \"installations\": [\"grafana\"],\n" +
+                        "    \"installations\": [],\n" +
                         "    \"warnings\": \"Kubernetes is not available. The changes in kubernetes services configuration and deployments will be saved but they will <strong>need to be applied again<\\/strong> another time when Kubernetes Master is available\"\n" +
                         "  },\n" +
                         "  \"status\": \"OK\"\n" +
                         "}",
-                mscc.saveKubernetesServicesConfig("{" +
-                "\"cerebro_install\":\"on\"," +
-                "\"elasticsearch_install\":\"on\"," +
-                "\"kafka_install\":\"on\"," +
-                "\"spark-runtime_install\":\"on\"," +
-                "\"grafana_install\":\"on\"," +
-                "\"zeppelin_install\":\"on\"," +
-                "\"spark-console\":\"on\"," +
-                "\"kibana\":\"on\"}", session));
+                kscc.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig().getFormattedValue(), session));
 
-        assertEquals ("{\"status\": \"OK\"}", mscc.applyKubernetesServicesConfig(session));
+        assertEquals ("{\"status\": \"OK\"}", kscc.applyKubernetesServicesConfig(session));
 
         assertTrue(sessionContent.isEmpty());
     }

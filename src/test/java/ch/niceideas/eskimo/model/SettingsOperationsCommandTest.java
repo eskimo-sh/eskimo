@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SettingsOperationsCommandTest extends AbstractServicesDefinitionTest {
 
-    protected ConfigurationService configurationService = null;
+    protected ConfigurationServiceImpl configurationService = null;
 
     private String jsonConfig = null;
     private String testForm = null;
@@ -26,7 +26,7 @@ public class SettingsOperationsCommandTest extends AbstractServicesDefinitionTes
     public void setUp() throws Exception {
         super.setUp();
 
-        configurationService = new ConfigurationService();
+        configurationService = new ConfigurationServiceImpl();
 
         configurationService.setSetupService(setupService);
         configurationService.setServicesDefinition (def);

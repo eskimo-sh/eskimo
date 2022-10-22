@@ -32,13 +32,14 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.services;
+package ch.niceideas.eskimo.services.satellite;
 
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
+import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -47,7 +48,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTest  {
+public class ServiceInstallationSorterTest extends AbstractServicesDefinitionTest {
 
     private ServicesInstallationSorter sis = null;
 
@@ -59,9 +60,9 @@ public class ServiceInstallationSorterTest extends  AbstractServicesDefinitionTe
         sis = new ServicesInstallationSorter();
         sis.setServicesDefinition(def);
 
-        ConfigurationService cs = new ConfigurationService();
+        ConfigurationServiceImpl cs = new ConfigurationServiceImpl();
         sis.setConfigurationService(cs);
-        cs.setSetupService(new SetupService() {
+        cs.setSetupService(new SetupServiceImpl() {
             public String getConfigStoragePath() {
                 return "/tmp";
             }

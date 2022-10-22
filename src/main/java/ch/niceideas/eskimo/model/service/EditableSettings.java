@@ -34,7 +34,6 @@
 
 package ch.niceideas.eskimo.model.service;
 
-import ch.niceideas.eskimo.services.EditablePropertyType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

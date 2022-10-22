@@ -38,6 +38,7 @@ import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.MasterDetection;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.mdStrategy.MdStrategy;
+import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

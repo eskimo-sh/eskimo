@@ -38,6 +38,7 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;

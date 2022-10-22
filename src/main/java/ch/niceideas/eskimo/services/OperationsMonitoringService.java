@@ -3,6 +3,8 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
+import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
+import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
 import lombok.Getter;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -110,7 +112,7 @@ public class OperationsMonitoringService implements OperationsContext {
         return systemActionLock.isLocked();
     }
 
-    void operationsStarted(JSONOpCommand operation) throws ServiceDefinitionException, NodesConfigurationException, SystemException {
+    public void operationsStarted(JSONOpCommand operation) throws ServiceDefinitionException, NodesConfigurationException, SystemException {
         if (currentOperation != null) {
             throw new IllegalStateException("Can't start an operation while another operation is in progress");
         }
@@ -130,7 +132,7 @@ public class OperationsMonitoringService implements OperationsContext {
 
     }
 
-    void operationsFinished(boolean success) {
+    public void operationsFinished(boolean success) {
         setLastOperationSuccess(success);
         systemActionLock.unlock();
         interruption.set(false);
