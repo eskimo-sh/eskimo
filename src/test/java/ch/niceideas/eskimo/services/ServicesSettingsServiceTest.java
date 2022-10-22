@@ -91,8 +91,8 @@ public class ServicesSettingsServiceTest extends AbstractSystemTest {
     }
 
     @Override
-    protected NodesConfigurationService createNodesConfigurationService() {
-        return new NodesConfigurationService() {
+    protected NodesConfigurationServiceImpl createNodesConfigurationService() {
+        return new NodesConfigurationServiceImpl() {
             @Override
             public void applyNodesConfig(ServiceOperationsCommand command) {
                 processedCommand.set(command);

@@ -55,14 +55,17 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
 
     private boolean standardKubernetesConfig = false;
     private boolean kubernetesConfigError = false;
+
     private boolean standard2NodesInstallStatus = false;
     private boolean standard2NodesSetup = false;
+    private boolean nodesConfigError = false;
 
     public void reset() {
         this.standardKubernetesConfig = false;
         this.kubernetesConfigError = false;
         this.standard2NodesInstallStatus = false;
         this.standard2NodesSetup = false;
+        this.nodesConfigError = false;
     }
 
     public void setStandardKubernetesConfig() {
@@ -80,7 +83,13 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
     }
 
     public void setStandard2NodesSetup() {
-        standard2NodesSetup = true;
+        this.standard2NodesSetup = true;
+        this.nodesConfigError = false;
+    }
+
+    public void setNodesConfigError() {
+        this.standard2NodesSetup = false;
+        this.nodesConfigError = true;
     }
 
     @Override
@@ -125,6 +134,8 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
     public NodesConfigWrapper loadNodesConfig() throws SystemException, SetupException {
         if (standard2NodesSetup) {
             return StandardSetupHelpers.getStandard2NodesSetup();
+        } else if (nodesConfigError) {
+            throw new SystemException("Test Error");
         }
         return null;
     }

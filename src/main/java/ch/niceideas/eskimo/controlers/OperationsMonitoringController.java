@@ -59,11 +59,6 @@ public class OperationsMonitoringController extends AbstractInformationControlle
     @Resource
     private OperationsMonitoringService operationsMonitoringService;
 
-    /* For tests */
-    void setOperationsMonitoringService(OperationsMonitoringService operationsMonitoringService) {
-        this.operationsMonitoringService = operationsMonitoringService;
-    }
-
     @GetMapping("/fetch-operations-status")
     @ResponseBody
     public String fetchOperationsStatus(@RequestParam(name="last-lines") String lastLinesJsonString) {

@@ -58,11 +58,6 @@ public class NotificationController extends AbstractInformationController<JSONOb
     @Resource
     private NotificationService notificationService;
 
-    /* For tests */
-    void setNotificationService(NotificationService notificationService) {
-        this.notificationService = notificationService;
-    }
-
     @GetMapping("/fetch-notifications")
     @ResponseBody
     public String fetchNotifications(@RequestParam(name="last_line") Integer lastLine) {

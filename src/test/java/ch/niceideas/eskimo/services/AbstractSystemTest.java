@@ -82,7 +82,7 @@ public abstract class AbstractSystemTest {
 
     protected SSHCommandService sshCommandService = null;
 
-    protected NodesConfigurationService nodesConfigurationService = null;
+    protected NodesConfigurationServiceImpl nodesConfigurationService = null;
 
     protected ApplicationStatusService applicationStatusService = null;
 
@@ -332,8 +332,8 @@ public abstract class AbstractSystemTest {
         return new SystemServiceImpl(false);
     }
 
-    protected NodesConfigurationService createNodesConfigurationService () {
-        return new NodesConfigurationService();
+    protected NodesConfigurationServiceImpl createNodesConfigurationService () {
+        return new NodesConfigurationServiceImpl();
     }
 
     protected KubernetesServiceImpl createKubernetesService() {

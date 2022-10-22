@@ -1,57 +1,52 @@
 package ch.niceideas.eskimo.controlers;
 
-import ch.niceideas.common.utils.Pair;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.services.NotificationService;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-cluster", "no-web-stack"})
 public class NotificationControllerTest {
 
-    private NotificationController notificationController = new NotificationController();
+    @Autowired
+    private NotificationController notificationController;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Test
     public void testFetchNotifications() {
 
-        notificationController.setNotificationService(new NotificationService() {
-            @Override
-            public Pair<Integer, List<JSONObject>> fetchElements(int lastLine) {
-                return new Pair<>(3, new ArrayList<JSONObject>(){{
-                    add(new JSONObject(new HashMap<String, String>(){{
-                        put ("Info", "Info 1");
-                        put ("Error", "Error 1");
-                        put ("Doing", "Doing 1");
-                    }}));
-                }});
-            }
-        });
+        notificationService.addInfo("Info 1");
+        notificationService.addError("Error 1");
+        notificationService.addDoing("Doing 1");
 
         assertEquals ("{\n" +
                 "  \"lastLine\": \"3\",\n" +
-                "  \"notifications\": [{\n" +
-                "    \"Info\": \"Info 1\",\n" +
-                "    \"Doing\": \"Doing 1\",\n" +
-                "    \"Error\": \"Error 1\"\n" +
-                "  }],\n" +
+                "  \"notifications\": [\n" +
+                "    {\n" +
+                "      \"type\": \"Info\",\n" +
+                "      \"message\": \"Info 1\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"type\": \"Error\",\n" +
+                "      \"message\": \"Error 1\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"type\": \"Doing\",\n" +
+                "      \"message\": \"Doing 1\"\n" +
+                "    }\n" +
+                "  ],\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", notificationController.fetchNotifications(0));
-
-        notificationController.setNotificationService(new NotificationService() {
-            @Override
-            public Pair<Integer, List<JSONObject>> fetchElements(int lastLine) {
-                throw new JSONException("Test Error");
-            }
-        });
-
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> notificationController.fetchNotifications(0));
-
-        assertEquals ("org.json.JSONException: Test Error", exception.getMessage());
     }
 }

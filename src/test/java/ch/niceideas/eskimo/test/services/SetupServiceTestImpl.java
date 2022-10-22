@@ -34,7 +34,9 @@
 
 package ch.niceideas.eskimo.test.services;
 
+import ch.niceideas.common.exceptions.CommonRTException;
 import ch.niceideas.common.json.JsonWrapper;
+import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.services.SetupException;
@@ -45,12 +47,18 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.io.File;
+import java.io.IOException;
 import java.util.Set;
 
 @Component
 @Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Profile("no-cluster")
 public class SetupServiceTestImpl implements SetupService {
+
+    private File configStoragePath = null;
 
     private boolean setupError = false;
     private boolean setupCompleted = false;
@@ -65,6 +73,35 @@ public class SetupServiceTestImpl implements SetupService {
         this.setupCompleted = true;
     }
 
+    @PreDestroy
+    public void tearDown() {
+        if (configStoragePath.exists()) {
+            try {
+                FileUtils.delete(configStoragePath);
+            } catch (FileUtils.FileDeleteFailedException e) {
+                throw new CommonRTException(e);
+            }
+        }
+    }
+
+    @PostConstruct
+    public void init() {
+        try {
+            configStoragePath = File.createTempFile("eskimo_test", "_storage");
+            if (!configStoragePath.delete()) {
+                throw new CommonRTException("Could not delete temp file before folder creation " + configStoragePath.getAbsolutePath());
+            }
+
+            if (!configStoragePath.mkdir()) {
+                throw new CommonRTException("Could not create folder " + configStoragePath.getAbsolutePath());
+            }
+
+
+        } catch (IOException e) {
+            throw new CommonRTException(e);
+        }
+    }
+
     @Override
     public String getPackagesToBuild() {
         return null;
@@ -72,7 +109,7 @@ public class SetupServiceTestImpl implements SetupService {
 
     @Override
     public String getConfigStoragePath() throws SetupException {
-        return null;
+        return configStoragePath.getAbsolutePath();
     }
 
     @Override

@@ -81,26 +81,6 @@ public class NodesConfigController extends AbstractOperationController {
     @Autowired
     private NodesConfigurationService nodesConfigurationService;
 
-    /* For tests */
-    void setSetupService(SetupService setupService) {
-        this.setupService = setupService;
-    }
-    void setNodeRangeResolver(NodeRangeResolver nodeRangeResolver) {
-        this.nodeRangeResolver = nodeRangeResolver;
-    }
-    void setServicesDefinition(ServicesDefinition servicesDefinition) {
-        this.servicesDefinition = servicesDefinition;
-    }
-    void setNodesConfigChecker(NodesConfigurationChecker nodesConfigChecker) {
-        this.nodesConfigChecker = nodesConfigChecker;
-    }
-    void setConfigurationService (ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-    void setNodesConfigurationService (NodesConfigurationService nodesConfigurationService) {
-        this.nodesConfigurationService = nodesConfigurationService;
-    }
-
     @GetMapping("/load-nodes-config")
     @ResponseBody
     public String loadNodesConfig() {

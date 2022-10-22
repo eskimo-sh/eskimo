@@ -25,14 +25,20 @@ public class AbstractOperationController {
     @Value("${eskimo.demoMode}")
     private boolean demoMode = false;
 
-    /** For tests */
-    void setSystemService(SystemService systemService) {
-        this.systemService = systemService;
-    }
-    void setNotificationService (NotificationService notificationService) { this.notificationService = notificationService; }
+    /* for tests */
     void setDemoMode (boolean demoMode) {
         this.demoMode = demoMode;
     }
+
+    // FIXME remove that stuff
+    @Deprecated
+    void setSystemService(SystemService systemService) {
+        this.systemService = systemService;
+    }
+    @Deprecated
+    void setNotificationService (NotificationService notificationService) { this.notificationService = notificationService; }
+
+    @Deprecated
     void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
         this.operationsMonitoringService = operationsMonitoringService;
     }

@@ -166,9 +166,9 @@ public class KubernetesServiceTest extends AbstractSystemTest {
 
         systemService.setLastStatusForTest(StandardSetupHelpers.getStandard2NodesSystemStatus());
 
-        kubernetesService.setNodesConfigurationService(new NodesConfigurationService() {
+        kubernetesService.setNodesConfigurationService(new NodesConfigurationServiceImpl() {
             @Override
-            void installTopologyAndSettings(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig,
+            public void installTopologyAndSettings(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig,
                                             ServicesInstallStatusWrapper servicesInstallStatus,
                                             MemoryModel memoryModel, String ipAddress) {
                 // No-Op

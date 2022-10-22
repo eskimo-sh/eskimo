@@ -1,13 +1,23 @@
 package ch.niceideas.eskimo.controlers;
 
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
+import ch.niceideas.eskimo.model.SimpleOperationCommand;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
+import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
+import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.Proxy;
@@ -17,50 +27,43 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-cluster", "no-web-stack"})
 public class NodesConfigControllerTest {
 
-    private NodesConfigController ncc = new NodesConfigController();
+    @Autowired
+    private NodesConfigController ncc;
+
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
+
+    @Autowired
+    private SetupServiceTestImpl setupServiceTest;
+
+    @Autowired
+    private OperationsMonitoringService operationsMonitoringService;
 
     @BeforeEach
     public void testSetup() {
-        ncc.setNotificationService(new NotificationService());
 
-        ncc.setOperationsMonitoringService(new OperationsMonitoringService() {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
-            }
-        });
+        if (operationsMonitoringService.isProcessingPending()) {
+            operationsMonitoringService.operationsFinished(true);
+        }
 
-        ncc.setConfigurationService(new ConfigurationServiceImpl() {
-            @Override
-            public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) {
-                // No Op
-            }
-            @Override
-            public ServicesInstallStatusWrapper loadServicesInstallationStatus(){
-                return StandardSetupHelpers.getStandard2NodesInstallStatus();
-            }
-            @Override
-            public NodesConfigWrapper loadNodesConfig() {
-                return StandardSetupHelpers.getStandard2NodesSetup();
-            }
-            @Override
-            public void saveNodesConfig(NodesConfigWrapper nodesConfig) {
-                // No Op
-            }
-        });
+        configurationServiceTest.setStandard2NodesSetup();
+        configurationServiceTest.setStandard2NodesInstallStatus();
+
+        SecurityContextHelper.loginAdmin();
+
+        ncc.setDemoMode(false);
     }
 
     @Test
     public void testLoadNodesConfig() throws Exception {
 
-        ncc.setSetupService(new SetupServiceImpl() {
-            @Override
-            public void ensureSetupCompleted() throws SetupException {
-                // No-Op
-            }
-        });
+        setupServiceTest.setSetupCompleted();
 
         //System.err.println (ncc.loadNodesConfig());
 
@@ -79,12 +82,7 @@ public class NodesConfigControllerTest {
                 "    \"gluster2\": \"on\"\n" +
                 "}").similar(new JSONObject (ncc.loadNodesConfig())));
 
-        ncc.setSetupService(new SetupServiceImpl() {
-            @Override
-            public void ensureSetupCompleted() throws SetupException {
-                throw new SetupException("Test Error");
-            }
-        });
+        setupServiceTest.setSetupError();
 
         assertEquals ("{\n" +
                 "  \"clear\": \"setup\",\n" +
@@ -92,19 +90,9 @@ public class NodesConfigControllerTest {
                 "  \"status\": \"OK\"\n" +
                 "}", ncc.loadNodesConfig());
 
-        ncc.setSetupService(new SetupServiceImpl() {
-            @Override
-            public void ensureSetupCompleted() throws SetupException {
-                // No-Op
-            }
-        });
+        setupServiceTest.setSetupCompleted();
 
-        ncc.setConfigurationService(new ConfigurationServiceImpl() {
-            @Override
-            public NodesConfigWrapper loadNodesConfig() throws SystemException, SetupException {
-                throw new SystemException("Test Error");
-            }
-        });
+        configurationServiceTest.setNodesConfigError();
 
         assertEquals ("{\n" +
                 "  \"error\": \"Test Error\",\n" +
@@ -118,24 +106,6 @@ public class NodesConfigControllerTest {
         Map<String, Object> sessionContent = new HashMap<>();
 
         HttpSession session = createHttpSession(sessionContent);
-
-        ncc.setNodesConfigurationService(new NodesConfigurationService() {
-            @Override
-            public void applyNodesConfig(ServiceOperationsCommand command) {
-                // No Op
-            }
-        });
-
-        ncc.setNodeRangeResolver(new NodeRangeResolver() {
-            @Override
-            public NodesConfigWrapper resolveRanges(NodesConfigWrapper rawNodesConfig) throws NodesConfigurationException {
-                return rawNodesConfig;
-            }
-        });
-
-        ServicesDefinition sd = new ServicesDefinition();
-        sd.afterPropertiesSet();
-        ncc.setServicesDefinition(sd);
 
         assertEquals ("{\n" +
                 "  \"command\": {\n" +
@@ -185,12 +155,7 @@ public class NodesConfigControllerTest {
 
         HttpSession session = createHttpSession(sessionContent);
 
-        ncc.setOperationsMonitoringService(new OperationsMonitoringService() {
-            @Override
-            public boolean isProcessingPending() {
-                return true;
-            }
-        });
+        operationsMonitoringService.operationsStarted(new SimpleOperationCommand("test", "test", "192.168.10.15"));
 
         assertEquals ("{\n" +
                 "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed.\",\n" +
@@ -204,31 +169,6 @@ public class NodesConfigControllerTest {
         Map<String, Object> sessionContent = new HashMap<>();
 
         HttpSession session = createHttpSession(sessionContent);
-
-        ncc.setNodesConfigurationService(new NodesConfigurationService() {
-            @Override
-            public void applyNodesConfig(ServiceOperationsCommand command) {
-                // No Op
-            }
-        });
-
-        ncc.setNodeRangeResolver(new NodeRangeResolver() {
-            @Override
-            public NodesConfigWrapper resolveRanges(NodesConfigWrapper rawNodesConfig) throws NodesConfigurationException {
-                return rawNodesConfig;
-            }
-        });
-
-        ncc.setNodesConfigChecker(new NodesConfigurationChecker() {
-            @Override
-            public void checkNodesSetup(NodesConfigWrapper nodesConfig) throws NodesConfigurationException {
-                // No Op
-            }
-        });
-
-        ServicesDefinition sd = new ServicesDefinition();
-        sd.afterPropertiesSet();
-        ncc.setServicesDefinition(sd);
 
         assertEquals ("{\n" +
                         "  \"command\": {\n" +
