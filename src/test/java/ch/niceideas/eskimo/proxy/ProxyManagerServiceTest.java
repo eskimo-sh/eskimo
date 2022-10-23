@@ -64,7 +64,7 @@ public class ProxyManagerServiceTest {
     private static final Logger logger = LogManager.getLogger(ProxyManagerServiceTest.class.getName());
 
     private ProxyManagerService pms;
-    private ServicesDefinition sd;
+    private ServicesDefinitionImpl sd;
 
     private final AtomicBoolean recreateTunnelsCalled = new AtomicBoolean(false);
     private final AtomicBoolean removeForwardersCalled = new AtomicBoolean(false);
@@ -72,7 +72,7 @@ public class ProxyManagerServiceTest {
     @BeforeEach
     public void setUp() throws Exception {
         pms = new ProxyManagerService();
-        sd = new ServicesDefinition();
+        sd = new ServicesDefinitionImpl();
         pms.setServicesDefinition(sd);
         sd.afterPropertiesSet();
         pms.setConnectionManagerService(new ConnectionManagerService() {

@@ -99,7 +99,7 @@ public abstract class AbstractSetupShellTest {
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
 
-        ServicesDefinition def = new ServicesDefinition();
+        ServicesDefinitionImpl def = new ServicesDefinitionImpl();
         SetupServiceImpl setupService = new SetupServiceImpl();
         setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
         def.setSetupService(setupService);

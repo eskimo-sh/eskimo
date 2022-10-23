@@ -62,14 +62,14 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class ServicesProxyServletTest {
 
     private ProxyManagerService pms;
-    private ServicesDefinition sd;
+    private ServicesDefinitionImpl sd;
 
     private ServicesProxyServlet servlet;
 
     @BeforeEach
     public void setUp() throws Exception {
         pms = new ProxyManagerService();
-        sd = new ServicesDefinition();
+        sd = new ServicesDefinitionImpl();
         sd.afterPropertiesSet();
         servlet = new ServicesProxyServlet(pms, sd, "", 50, 30000, 10000, 20000);
         pms.setServicesDefinition(sd);

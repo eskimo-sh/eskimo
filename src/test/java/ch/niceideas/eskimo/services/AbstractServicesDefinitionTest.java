@@ -46,13 +46,13 @@ public abstract class AbstractServicesDefinitionTest {
 
     protected SetupServiceImpl setupService = new SetupServiceImpl();
 
-    protected ServicesDefinition def;
+    protected ServicesDefinitionImpl def;
 
     protected NodeRangeResolver nrr = new NodeRangeResolver();
 
     @BeforeEach
     public void setUp() throws Exception {
-        def = new ServicesDefinition();
+        def = new ServicesDefinitionImpl();
         def.setSetupService (setupService);
         setupService.setServicesDefinition(def);
         def.afterPropertiesSet();

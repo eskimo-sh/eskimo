@@ -1,59 +1,69 @@
 package ch.niceideas.eskimo.controlers;
 
-import ch.niceideas.eskimo.model.ConditionalInstallation;
-import ch.niceideas.eskimo.model.service.Service;
-import ch.niceideas.eskimo.model.service.UIConfig;
-import ch.niceideas.eskimo.services.ServicesDefinition;
-import org.json.JSONException;
+import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.EskimoApplication;
+import ch.niceideas.eskimo.test.services.ServicesDefinitionTestImpl;
 import org.json.JSONObject;
+import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-cluster", "no-web-stack", "test-services"})
 public class ServicesControllerTest {
 
-    private ServicesController sc = new ServicesController();
+    @Autowired
+    private ServicesController sc;
+
+    @Autowired
+    private ServicesDefinitionTestImpl servicesDefinitionTest;
 
     @BeforeEach
     public void setUp() throws Exception {
-        ServicesDefinition sd = new ServicesDefinition();
-        sd.afterPropertiesSet();
-        sc.setServicesDefinition(sd);
+        servicesDefinitionTest.reset();
     }
 
     @Test
     public void testListServices() {
 
-        sc.setServicesDefinition(new ServicesDefinition() {
-            @Override
-            public String[] listServicesInOrder() {
-                return new String[] {"A", "B", "C"};
-            }
-        });
-
         assertEquals ("{\n" +
                 "  \"services\": [\n" +
-                "    \"A\",\n" +
-                "    \"B\",\n" +
-                "    \"C\"\n" +
+                "    \"distributed-time\",\n" +
+                "    \"cluster-manager\",\n" +
+                "    \"distributed-filesystem\",\n" +
+                "    \"cluster-master\",\n" +
+                "    \"cluster-slave\",\n" +
+                "    \"cluster-dashboard\",\n" +
+                "    \"broker\",\n" +
+                "    \"broker-cli\",\n" +
+                "    \"broker-manager\",\n" +
+                "    \"calculator-runtime\",\n" +
+                "    \"calculator-cli\",\n" +
+                "    \"database-manager\",\n" +
+                "    \"database\",\n" +
+                "    \"user-console\"\n" +
                 "  ],\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", sc.listServices());
 
-        sc.setServicesDefinition(new ServicesDefinition() {
-            @Override
-            public String[] listServicesInOrder() {
-                throw new JSONException("Test Error");
-            }
-        });
+        servicesDefinitionTest.setError();
 
         assertEquals ("{\n" +
-                "  \"error\": \"Test Error\",\n" +
+                "  \"error\": \"Test error\",\n" +
                 "  \"status\": \"KO\"\n" +
                 "}", sc.listServices());
     }
@@ -61,277 +71,74 @@ public class ServicesControllerTest {
     @Test
     public void testListUIServices() {
 
-        sc.setServicesDefinition(new ServicesDefinition() {
-            @Override
-            public String[] listUIServices() {
-                return new String[] {"A", "B", "C"};
-            }
-        });
-
         assertEquals ("{\n" +
                 "  \"uiServices\": [\n" +
-                "    \"A\",\n" +
-                "    \"B\",\n" +
-                "    \"C\"\n" +
+                "    \"distributed-filesystem\",\n" +
+                "    \"cluster-dashboard\",\n" +
+                "    \"broker-manager\",\n" +
+                "    \"database-manager\",\n" +
+                "    \"user-console\"\n" +
                 "  ],\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", sc.listUIServices());
 
-        sc.setServicesDefinition(new ServicesDefinition() {
-            @Override
-            public String[] listUIServices() {
-                throw new JSONException("Test Error");
-            }
-        });
+        servicesDefinitionTest.setError();
 
         assertEquals ("{\n" +
-                "  \"error\": \"Test Error\",\n" +
+                "  \"error\": \"Test error\",\n" +
                 "  \"status\": \"KO\"\n" +
                 "}", sc.listUIServices());
     }
 
     @Test
-    public void testGetUIServicesConfig() {
+    public void testGetUIServicesConfig() throws Exception {
 
-        sc.setServicesDefinition(new ServicesDefinition() {
-            @Override
-            public Map<String, UIConfig> getUIServicesConfig() {
-                return new HashMap<String, UIConfig>(){{
-                    put ("A", new UIConfig(new Service()));
-                    put ("B", new UIConfig(new Service()));
-                }};
-            }
-        });
+        String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesControllerTest/expectedUIServicesConfig.json"), StandardCharsets.UTF_8);
+
+        assertEquals (expectedResult, sc.getUIServicesConfig());
+
+        servicesDefinitionTest.setError();
 
         assertEquals ("{\n" +
-                "  \"uiServicesConfig\": {\n" +
-                "    \"A\": {\n" +
-                "      \"proxyContext\": \"./null/\",\n" +
-                "      \"waitTime\": 0,\n" +
-                "      \"urlTemplate\": \"\",\n" +
-                "      \"unique\": false\n" +
-                "    },\n" +
-                "    \"B\": {\n" +
-                "      \"proxyContext\": \"./null/\",\n" +
-                "      \"waitTime\": 0,\n" +
-                "      \"urlTemplate\": \"\",\n" +
-                "      \"unique\": false\n" +
-                "    }\n" +
-                "  },\n" +
-                "  \"status\": \"OK\"\n" +
-                "}", sc.getUIServicesConfig());
-
-        sc.setServicesDefinition(new ServicesDefinition() {
-            @Override
-            public Map<String, UIConfig> getUIServicesConfig() {
-                throw new JSONException("Test Error");
-            }
-        });
-
-        assertEquals ("{\n" +
-                "  \"error\": \"Test Error\",\n" +
+                "  \"error\": \"Test error\",\n" +
                 "  \"status\": \"KO\"\n" +
                 "}", sc.getUIServicesConfig());
     }
 
     @Test
-    public void testGetUIServicesStatusConfig() {
+    public void testGetUIServicesStatusConfig() throws Exception {
 
-        sc.setServicesDefinition(new ServicesDefinition() {
-            @Override
-            public String[] listAllServices() {
-                return new String[]{"A", "B", "C"};
-            }
-            @Override
-            public Service getService(String serviceName) {
-                Service retService = new Service();
-                retService.setName(serviceName);
-                return retService;
-            }
-        });
+        String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesControllerTest/expectedUIServicesStatusConfig.json"), StandardCharsets.UTF_8);
 
-        assertEquals ("{\n" +
-                "  \"uiServicesStatusConfig\": {\n" +
-                "    \"A\": {\n" +
-                "      \"commands\": [],\n" +
-                "      \"unique\": false,\n" +
-                "      \"group\": \"\"\n" +
-                "    },\n" +
-                "    \"B\": {\n" +
-                "      \"commands\": [],\n" +
-                "      \"unique\": false,\n" +
-                "      \"group\": \"\"\n" +
-                "    },\n" +
-                "    \"C\": {\n" +
-                "      \"commands\": [],\n" +
-                "      \"unique\": false,\n" +
-                "      \"group\": \"\"\n" +
-                "    }\n" +
-                "  },\n" +
-                "  \"status\": \"OK\"\n" +
-                "}", sc.getUIServicesStatusConfig());
+        assertEquals (expectedResult, sc.getUIServicesStatusConfig());
     }
 
     @Test
-    public void testGetServicesDependencies() {
+    public void testGetServicesDependencies() throws Exception {
 
-        sc.setServicesDefinition(new ServicesDefinition() {
-            @Override
-            public String[] listAllServices() {
-                return new String[]{"A", "B", "C"};
-            }
-            @Override
-            public Service getService(String serviceName) {
-                Service retService = new Service();
-                retService.setName(serviceName);
-                return retService;
-            }
-        });
+        String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesControllerTest/expectedServicesDependencies.json"), StandardCharsets.UTF_8);
 
-        assertEquals ("{\n" +
-                "  \"servicesDependencies\": {\n" +
-                "    \"A\": [],\n" +
-                "    \"B\": [],\n" +
-                "    \"C\": []\n" +
-                "  },\n" +
-                "  \"status\": \"OK\"\n" +
-                "}", sc.getServicesDependencies());
+        assertEquals (expectedResult, sc.getServicesDependencies());
     }
 
     @Test
-    public void testGetServicesConfigurations() {
+    public void testGetServicesConfigurations() throws Exception {
 
-        sc.setServicesDefinition(new ServicesDefinition() {
-            @Override
-            public String[] listAllServices() {
-                return new String[]{"A", "B", "C"};
-            }
-            @Override
-            public Service getService(String serviceName) {
-                Service retService = new Service();
-                retService.setName(serviceName);
-                retService.setConditional(ConditionalInstallation.NONE);
-                retService.setStatusGroup("testGroup");
-                retService.setStatusName("testName");
-                return retService;
-            }
-        });
+        //System.err.println(sc.getServicesConfigurations());
 
-        assertTrue (new JSONObject("{\n" +
-                "  \"servicesConfigurations\": {\n" +
-                "    \"A\": {\n" +
-                "      \"col\": -1,\n" +
-                "      \"kubernetes\": false,\n" +
-                "      \"conditional\": \"NONE\",\n" +
-                "      \"configOrder\": -1,\n" +
-                "      \"unique\": false,\n" +
-                "      \"name\": \"A\",\n" +
-                "      \"row\": -1,\n" +
-                "      \"title\": \"testGroup testName\",\n" +
-                "      \"mandatory\": false\n" +
-                "    },\n" +
-                "    \"B\": {\n" +
-                "      \"col\": -1,\n" +
-                "      \"kubernetes\": false,\n" +
-                "      \"conditional\": \"NONE\",\n" +
-                "      \"configOrder\": -1,\n" +
-                "      \"unique\": false,\n" +
-                "      \"name\": \"B\",\n" +
-                "      \"row\": -1,\n" +
-                "      \"title\": \"testGroup testName\",\n" +
-                "      \"mandatory\": false\n" +
-                "    },\n" +
-                "    \"C\": {\n" +
-                "      \"col\": -1,\n" +
-                "      \"kubernetes\": false,\n" +
-                "      \"conditional\": \"NONE\",\n" +
-                "      \"configOrder\": -1,\n" +
-                "      \"unique\": false,\n" +
-                "      \"name\": \"C\",\n" +
-                "      \"row\": -1,\n" +
-                "      \"title\": \"testGroup testName\",\n" +
-                "      \"mandatory\": false\n" +
-                "    }\n" +
-                "  },\n" +
-                "  \"status\": \"OK\"\n" +
-                "}").similar(new JSONObject(sc.getServicesConfigurations())));
+        String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesControllerTest/expectedServicesConfiguration.json"), StandardCharsets.UTF_8);
+
+        assertTrue (new JSONObject(expectedResult).similar(new JSONObject(sc.getServicesConfigurations())));
     }
 
     @Test
-    public void testListConfigServices() {
+    public void testListConfigServices() throws Exception {
 
-        sc.setServicesDefinition(new ServicesDefinition() {
-            @Override
-            public String[] listAllServices() {
-                return new String[]{"A", "B", "C"};
-            }
-            @Override
-            public Service getService(String serviceName) {
-                Service retService = new Service();
-                retService.setName(serviceName);
-                retService.setConditional(ConditionalInstallation.NONE);
-                retService.setStatusGroup("testGroup");
-                retService.setStatusName("testName");
-                return retService;
-            }
-            @Override
-            public String[] listMultipleServicesNonKubernetes() {
-                return new String[]{"A"};
-            }
-            @Override
-            public String[] listMandatoryServices() {
-                return new String[]{"A", "B",};
-            }
-            @Override
-            public String[] listUniqueServices() {
-                return new String[]{"C",};
-            }
-        });
+        //System.err.println(sc.listConfigServices());
 
-        assertTrue (new JSONObject("{\n" +
-                "  \"mandatoryServices\": [\n" +
-                "    \"A\",\n" +
-                "    \"B\"\n" +
-                "  ],\n" +
-                "  \"uniqueServices\": [\"C\"],\n" +
-                "  \"multipleServices\": [\"A\"],\n" +
-                "  \"servicesConfigurations\": {\n" +
-                "    \"A\": {\n" +
-                "      \"col\": -1,\n" +
-                "      \"kubernetes\": false,\n" +
-                "      \"conditional\": \"NONE\",\n" +
-                "      \"configOrder\": -1,\n" +
-                "      \"unique\": false,\n" +
-                "      \"name\": \"A\",\n" +
-                "      \"row\": -1,\n" +
-                "      \"title\": \"testGroup testName\",\n" +
-                "      \"mandatory\": false\n" +
-                "    },\n" +
-                "    \"B\": {\n" +
-                "      \"col\": -1,\n" +
-                "      \"kubernetes\": false,\n" +
-                "      \"conditional\": \"NONE\",\n" +
-                "      \"configOrder\": -1,\n" +
-                "      \"unique\": false,\n" +
-                "      \"name\": \"B\",\n" +
-                "      \"row\": -1,\n" +
-                "      \"title\": \"testGroup testName\",\n" +
-                "      \"mandatory\": false\n" +
-                "    },\n" +
-                "    \"C\": {\n" +
-                "      \"col\": -1,\n" +
-                "      \"kubernetes\": false,\n" +
-                "      \"conditional\": \"NONE\",\n" +
-                "      \"configOrder\": -1,\n" +
-                "      \"unique\": false,\n" +
-                "      \"name\": \"C\",\n" +
-                "      \"row\": -1,\n" +
-                "      \"title\": \"testGroup testName\",\n" +
-                "      \"mandatory\": false\n" +
-                "    }\n" +
-                "  },\n" +
-                "  \"status\": \"OK\"\n" +
-                "}").similar(new JSONObject(sc.listConfigServices())));
+        String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesControllerTest/expecteConfigServices.json"), StandardCharsets.UTF_8);
+
+        assertTrue(new JSONObject(expectedResult).similar(new JSONObject(sc.listConfigServices())));
     }
 
 }

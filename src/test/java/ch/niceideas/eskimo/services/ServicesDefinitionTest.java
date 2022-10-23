@@ -516,7 +516,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
     @Test
     public void testConditionalMandatory() throws Exception {
 
-        def = new ServicesDefinition();
+        def = new ServicesDefinitionImpl();
 
         initConditionalMandatory();
 

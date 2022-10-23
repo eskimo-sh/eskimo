@@ -38,6 +38,7 @@ import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.controlers.ServicesController;
 import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,7 +65,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         ServicesController sc = new ServicesController();
 
-        ServicesDefinition sd = new ServicesDefinition();
+        ServicesDefinitionImpl sd = new ServicesDefinitionImpl();
         sd.afterPropertiesSet();
 
         sc.setServicesDefinition(sd);

@@ -1,0 +1,45 @@
+{
+  "uiServicesConfig": {
+    "database-manager": {
+      "role": "*",
+      "proxyContext": "./database-manager/",
+      "title": "Database Manager",
+      "waitTime": 5000,
+      "urlTemplate": "database-manager/api/v1/namespaces/default/services/cerebro:31900/proxy/#/overview?host=http:%2F%2Fdatabase.default.svc.cluster.eskimo:9200",
+      "unique": true
+    },
+    "cluster-dashboard": {
+      "role": "ADMIN",
+      "proxyContext": "./cluster-dashboard/",
+      "title": "Cluster Dashboard",
+      "waitTime": 5000,
+      "urlTemplate": "cluster-dashboard/api/v1/namespaces/cluster-dashboard/services/https:cluster-dashboard:/proxy/#/workloads?namespace=_all",
+      "unique": true
+    },
+    "distributed-filesystem": {
+      "role": "ADMIN",
+      "proxyContext": "./distributed-filesystem/",
+      "title": "Distributed FileSystem Dashboard",
+      "waitTime": 10000,
+      "urlTemplate": "./distributed-filesystem/{NODE_ADDRESS}/management/app.html",
+      "unique": false
+    },
+    "user-console": {
+      "role": "*",
+      "proxyContext": "./user-console/",
+      "title": "USer Console",
+      "waitTime": 8000,
+      "urlTemplate": "zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/",
+      "unique": true
+    },
+    "broker-manager": {
+      "role": "ADMIN",
+      "proxyContext": "./broker-manager/",
+      "title": "Broker manager",
+      "waitTime": 6000,
+      "urlTemplate": "broker-manager/api/v1/namespaces/default/services/broker-manager:31220/proxy/",
+      "unique": true
+    }
+  },
+  "status": "OK"
+}

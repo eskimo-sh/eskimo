@@ -64,7 +64,7 @@ public abstract class AbstractSystemTest {
 
     protected ProxyManagerService proxyManagerService = null;
 
-    protected ServicesDefinition servicesDefinition = null;
+    protected ServicesDefinitionImpl servicesDefinition = null;
 
     protected SystemOperationService systemOperationService = null;
 
@@ -111,7 +111,7 @@ public abstract class AbstractSystemTest {
         clearResultBuilder();
         clearCommandScript();
 
-        servicesDefinition = new ServicesDefinition() {
+        servicesDefinition = new ServicesDefinitionImpl() {
             @Override
             public String getAllServicesString() {
                 return "kafka zookeeper ntp kube-master kube-slave kubernetes-dashboard spark-runtime kibana cerebro zeppelin kafka-manager gluster spark-console elasticsearch";

@@ -67,7 +67,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
     private String kubePackages = "kube";
 
-    private ServicesDefinition sd = new ServicesDefinition();
+    private ServicesDefinitionImpl sd = new ServicesDefinitionImpl();
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -507,7 +507,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.saveAndPrepareSetup(setupConfigWrapper.getFormattedValue());
 
-        ServicesDefinition servicesDefinition = new ServicesDefinition();
+        ServicesDefinitionImpl servicesDefinition = new ServicesDefinitionImpl();
         servicesDefinition.afterPropertiesSet();
 
         setupService.setServicesDefinition(servicesDefinition);
@@ -564,7 +564,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.saveAndPrepareSetup(setupConfigWrapper.getFormattedValue());
 
-        ServicesDefinition servicesDefinition = new ServicesDefinition();
+        ServicesDefinitionImpl servicesDefinition = new ServicesDefinitionImpl();
         servicesDefinition.afterPropertiesSet();
 
         setupService.setServicesDefinition(servicesDefinition);
@@ -614,7 +614,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.saveAndPrepareSetup(setupConfig);
 
-        ServicesDefinition servicesDefinition = new ServicesDefinition();
+        ServicesDefinitionImpl servicesDefinition = new ServicesDefinitionImpl();
         servicesDefinition.afterPropertiesSet();
 
         setupService.setServicesDefinition(servicesDefinition);
@@ -654,7 +654,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.saveAndPrepareSetup(setupConfig);
 
-        ServicesDefinition servicesDefinition = new ServicesDefinition();
+        ServicesDefinitionImpl servicesDefinition = new ServicesDefinitionImpl();
         servicesDefinition.afterPropertiesSet();
 
         setupService.setServicesDefinition(servicesDefinition);
@@ -695,7 +695,7 @@ public class SetupServiceTest extends AbstractSystemTest {
 
         setupService.saveAndPrepareSetup(setupConfig);
 
-        ServicesDefinition servicesDefinition = new ServicesDefinition();
+        ServicesDefinitionImpl servicesDefinition = new ServicesDefinitionImpl();
         servicesDefinition.afterPropertiesSet();
 
         setupService.setServicesDefinition(servicesDefinition);

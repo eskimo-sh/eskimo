@@ -4,6 +4,7 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.service.Service;
 
 import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
 import org.junit.Before;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -48,11 +49,11 @@ public class KubeStatusParserTest {
             "spark\n" +
             "spark-runtime";
 
-    private static ServicesDefinition sd;
+    private static ServicesDefinitionImpl sd;
 
     @BeforeAll
     public static void setUpClass() throws Exception {
-        sd = new ServicesDefinition();
+        sd = new ServicesDefinitionImpl();
         sd.afterPropertiesSet();
     }
 

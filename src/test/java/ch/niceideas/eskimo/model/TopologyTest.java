@@ -232,7 +232,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
 
         NodeRangeResolver nrr = new NodeRangeResolver();
 
-        def = new ServicesDefinition();
+        def = new ServicesDefinitionImpl();
         def.setSetupService (setupService);
 
         Service serviceA = new Service();

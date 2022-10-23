@@ -3,6 +3,7 @@ package ch.niceideas.eskimo.proxy;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
@@ -169,7 +170,7 @@ public class WebSocketProxyTest {
 
         @Override
         public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-            ServicesDefinition sd = new ServicesDefinition();
+            ServicesDefinitionImpl sd = new ServicesDefinitionImpl();
 
             try {
                 sd.afterPropertiesSet();

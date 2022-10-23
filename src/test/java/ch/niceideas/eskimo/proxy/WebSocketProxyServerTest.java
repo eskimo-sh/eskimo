@@ -3,6 +3,7 @@ package ch.niceideas.eskimo.proxy;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.ConnectionManagerService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.socket.CloseStatus;
@@ -24,7 +25,7 @@ public class WebSocketProxyServerTest {
     private WebSocketProxyServer server = null;
 
     private ProxyManagerService pms;
-    private ServicesDefinition sd;
+    private ServicesDefinitionImpl sd;
 
     private WebSocketSession wss1;
     private WebSocketSession wss2;
@@ -41,7 +42,7 @@ public class WebSocketProxyServerTest {
                 return new ProxyTunnelConfig(serviceId, 12345, "192.168.10.11", 8080);
             }
         };
-        sd = new ServicesDefinition();
+        sd = new ServicesDefinitionImpl();
         pms.setServicesDefinition(sd);
         sd.afterPropertiesSet();
         pms.setConnectionManagerService(new ConnectionManagerService() {

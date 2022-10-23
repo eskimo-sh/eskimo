@@ -25,7 +25,7 @@ public class WebCommandServletTest {
     @Test
     public void testKubernetesDashboardLoginCase () throws Exception {
 
-        ServicesDefinition sd = new ServicesDefinition();
+        ServicesDefinitionImpl sd = new ServicesDefinitionImpl();
         sd.afterPropertiesSet();
 
         SSHCommandService scs = new SSHCommandService() {

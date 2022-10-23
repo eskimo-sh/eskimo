@@ -1,0 +1,191 @@
+{
+  "uiServicesStatusConfig": {
+    "broker-cli": {
+      "name": "Client",
+      "commands": [{
+        "name": "Mount broker_data on Host",
+        "icon": "fa-folder",
+        "id": "mount_broker_data_brokercli"
+      }],
+      "unique": false,
+      "group": "Broker"
+    },
+    "cluster-dashboard": {
+      "name": "Dashboard",
+      "commands": [],
+      "unique": true,
+      "group": "Cluster"
+    },
+    "distributed-filesystem": {
+      "name": "Distributed Filesystem",
+      "commands": [
+        {
+          "name": "Show distributed-filesystem Logs",
+          "icon": "fa-file",
+          "id": "show_log"
+        },
+        {
+          "name": "Show Remote Server Logs",
+          "icon": "fa-file",
+          "id": "show_remote_log"
+        }
+      ],
+      "unique": false,
+      "group": ""
+    },
+    "broker": {
+      "name": "runtime",
+      "commands": [
+        {
+          "name": "Show Server Logs",
+          "icon": "fa-file",
+          "id": "show_server_log"
+        },
+        {
+          "name": "Show Controller Logs",
+          "icon": "fa-file",
+          "id": "show_controller_log"
+        },
+        {
+          "name": "Show State Change Logs",
+          "icon": "fa-file",
+          "id": "show_state_change_log"
+        },
+        {
+          "name": "Mount broker_data on Host",
+          "icon": "fa-folder",
+          "id": "mount_broker_data"
+        }
+      ],
+      "unique": false,
+      "group": "Broker"
+    },
+    "distributed-time": {
+      "name": "Distributed Time",
+      "commands": [{
+        "name": "Show Logs",
+        "icon": "fa-file",
+        "id": "show_log"
+      }],
+      "unique": false,
+      "group": ""
+    },
+    "database": {
+      "name": "Runtime",
+      "commands": [
+        {
+          "name": "Show Logs",
+          "icon": "fa-file",
+          "id": "show_log"
+        },
+        {
+          "name": "Show Search Slow Logs",
+          "icon": "fa-file",
+          "id": "show_search_slow_log"
+        },
+        {
+          "name": "Show Indexing Slow Logs",
+          "icon": "fa-file",
+          "id": "show_index_slow_log"
+        },
+        {
+          "name": "Show GC Logs",
+          "icon": "fa-file",
+          "id": "show_gc_log"
+        }
+      ],
+      "unique": false,
+      "group": "Database"
+    },
+    "cluster-slave": {
+      "name": "Slave",
+      "commands": [],
+      "unique": false,
+      "group": "Cluster"
+    },
+    "cluster-manager": {
+      "name": "Cluster Manager",
+      "commands": [{
+        "name": "Show Logs",
+        "icon": "fa-file",
+        "id": "show_log"
+      }],
+      "unique": true,
+      "group": ""
+    },
+    "broker-manager": {
+      "name": "Manager",
+      "commands": [
+        {
+          "name": "Show Logs",
+          "icon": "fa-file",
+          "id": "show_log"
+        },
+        {
+          "name": "Mount broker_data on Host",
+          "icon": "fa-folder",
+          "id": "mount_broker_data_brokermgr"
+        }
+      ],
+      "unique": true,
+      "group": "Broker"
+    },
+    "calculator-runtime": {
+      "name": "Runtime",
+      "commands": [
+        {
+          "name": "Mount calculator_eventlog on Host",
+          "icon": "fa-folder",
+          "id": "mount_calculator_eventlog"
+        },
+        {
+          "name": "Mount calculator_data on Host",
+          "icon": "fa-folder",
+          "id": "mount_calculator_data"
+        }
+      ],
+      "unique": false,
+      "group": "Calculator"
+    },
+    "database-manager": {
+      "name": "manager",
+      "commands": [],
+      "unique": true,
+      "group": "Database"
+    },
+    "calculator-cli": {
+      "name": "Client",
+      "commands": [
+        {
+          "name": "Mount calculator_eventlog on Host",
+          "icon": "fa-folder",
+          "id": "mount_calculator_eventlog_calculatorcli"
+        },
+        {
+          "name": "Mount calculator_data on Host",
+          "icon": "fa-folder",
+          "id": "mount_calculator_data_calculatorcli"
+        }
+      ],
+      "unique": false,
+      "group": "Calculator"
+    },
+    "cluster-master": {
+      "name": "Master",
+      "commands": [],
+      "unique": true,
+      "group": "Cluster"
+    },
+    "user-console": {
+      "name": "User Console",
+      "commands": [{
+        "name": "Show Logs",
+        "icon": "fa-file",
+        "id": "show_log"
+      }],
+      "unique": true,
+      "group": ""
+    }
+  },
+  "status": "OK"
+}

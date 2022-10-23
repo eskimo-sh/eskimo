@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SetupConfigControllerTest {
 
     private SetupConfigController scc = new SetupConfigController();
-    private ServicesDefinition sd = new ServicesDefinition();
+    private ServicesDefinitionImpl sd = new ServicesDefinitionImpl();
 
     @BeforeEach
     public void testSetup() throws Exception {

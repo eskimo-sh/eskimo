@@ -1,0 +1,230 @@
+{
+  "mandatoryServices": [
+    "distributed-filesystem",
+    "distributed-time"
+  ],
+  "uniqueServices": [
+    "cluster-manager",
+    "cluster-master"
+  ],
+  "multipleServices": [
+    "broker-cli",
+    "calculator-cli",
+    "cluster-slave",
+    "distributed-filesystem",
+    "distributed-time"
+  ],
+  "servicesConfigurations": {
+    "broker-cli": {
+      "kubernetes": false,
+      "col": 3,
+      "conditional": "NONE",
+      "configOrder": 7,
+      "unique": false,
+      "name": "broker-cli",
+      "icon": "images/broker-icon.png",
+      "logo": "images/broker-logo.png",
+      "row": 2,
+      "title": "Broker Client",
+      "mandatory": false
+    },
+    "cluster-dashboard": {
+      "kubernetes": true,
+      "col": -1,
+      "conditional": "NONE",
+      "configOrder": 5,
+      "unique": true,
+      "name": "cluster-dashboard",
+      "icon": "images/cluster-master-icon.png",
+      "kubeConfig": {"request": {
+        "cpu": "0.3",
+        "ram": "500M"
+      }},
+      "logo": "images/cluster-master-logo.png",
+      "row": -1,
+      "title": "Cluster Dashboard",
+      "mandatory": false
+    },
+    "distributed-filesystem": {
+      "kubernetes": false,
+      "col": 1,
+      "conditional": "NONE",
+      "configOrder": 2,
+      "unique": false,
+      "name": "distributed-filesystem",
+      "icon": "images/distributed-filesystem-icon.png",
+      "logo": "images/distributed-filesystem-logo.png",
+      "row": 2,
+      "title": "Distributed Filesystem",
+      "mandatory": true
+    },
+    "broker": {
+      "kubernetes": true,
+      "col": -1,
+      "conditional": "NONE",
+      "configOrder": 6,
+      "unique": false,
+      "name": "broker",
+      "icon": "images/broker-icon.png",
+      "kubeConfig": {"request": {
+        "cpu": "1",
+        "ram": "1G"
+      }},
+      "logo": "images/broker-logo.png",
+      "row": -1,
+      "title": "Broker runtime",
+      "mandatory": false
+    },
+    "distributed-time": {
+      "kubernetes": false,
+      "col": 1,
+      "conditional": "NONE",
+      "configOrder": 0,
+      "unique": false,
+      "name": "distributed-time",
+      "icon": "images/distributed-time-icon.png",
+      "logo": "images/distributed-time-logo.png",
+      "row": 1,
+      "title": "Distributed Time",
+      "mandatory": true
+    },
+    "database": {
+      "kubernetes": true,
+      "col": -1,
+      "conditional": "NONE",
+      "configOrder": 12,
+      "unique": false,
+      "name": "database",
+      "icon": "images/database-icon.png",
+      "kubeConfig": {"request": {
+        "cpu": "1",
+        "ram": "1G"
+      }},
+      "logo": "images/database-logo.png",
+      "row": -1,
+      "title": "Database Runtime",
+      "mandatory": false
+    },
+    "cluster-slave": {
+      "kubernetes": false,
+      "col": 1,
+      "conditional": "NONE",
+      "configOrder": 4,
+      "unique": false,
+      "name": "cluster-slave",
+      "icon": "images/cluster-slave-icon.png",
+      "logo": "images/cluster-slave-logo.png",
+      "row": 5,
+      "title": "Cluster Slave",
+      "mandatory": false
+    },
+    "cluster-manager": {
+      "kubernetes": false,
+      "col": 2,
+      "conditional": "NONE",
+      "configOrder": 1,
+      "unique": true,
+      "name": "cluster-manager",
+      "icon": "images/cluster-manager-icon.png",
+      "logo": "images/cluster-manager-logo.png",
+      "row": 1,
+      "title": "Cluster Manager",
+      "mandatory": false
+    },
+    "broker-manager": {
+      "kubernetes": true,
+      "col": -1,
+      "conditional": "NONE",
+      "configOrder": 8,
+      "unique": true,
+      "name": "broker-manager",
+      "icon": "images/broker-manager-icon.png",
+      "kubeConfig": {"request": {
+        "cpu": "0.3",
+        "ram": "400M"
+      }},
+      "logo": "images/broker-manager-logo.png",
+      "row": -1,
+      "title": "Broker Manager",
+      "mandatory": false
+    },
+    "calculator-runtime": {
+      "kubernetes": true,
+      "col": -1,
+      "conditional": "NONE",
+      "configOrder": 9,
+      "unique": false,
+      "name": "calculator-runtime",
+      "icon": "images/calculator-runtime-icon.png",
+      "kubeConfig": {"request": {
+        "cpu": "1",
+        "ram": "800M"
+      }},
+      "logo": "images/calculator-runtime-logo.png",
+      "row": -1,
+      "title": "Calculator Runtime",
+      "mandatory": false
+    },
+    "database-manager": {
+      "kubernetes": true,
+      "col": -1,
+      "conditional": "NONE",
+      "configOrder": 11,
+      "unique": true,
+      "name": "database-manager",
+      "icon": "images/database-manager-icon.png",
+      "kubeConfig": {"request": {
+        "cpu": "0.3",
+        "ram": "400M"
+      }},
+      "logo": "images/database-manager-logo.png",
+      "row": -1,
+      "title": "Database manager",
+      "mandatory": false
+    },
+    "calculator-cli": {
+      "kubernetes": false,
+      "col": 3,
+      "conditional": "NONE",
+      "configOrder": 10,
+      "unique": false,
+      "name": "calculator-cli",
+      "icon": "images/calculator-runtime-icon.png",
+      "logo": "images/calculator-runtime-logo.png",
+      "row": 3,
+      "title": "Calculator Client",
+      "mandatory": false
+    },
+    "cluster-master": {
+      "kubernetes": false,
+      "col": 2,
+      "conditional": "NONE",
+      "configOrder": 3,
+      "unique": true,
+      "name": "cluster-master",
+      "icon": "images/cluster-master-icon.png",
+      "logo": "images/cluster-master-logo.png",
+      "row": 2,
+      "title": "Cluster Master",
+      "mandatory": false
+    },
+    "user-console": {
+      "kubernetes": true,
+      "col": -1,
+      "conditional": "NONE",
+      "configOrder": 13,
+      "unique": true,
+      "name": "user-console",
+      "icon": "images/zeppelin-icon.png",
+      "kubeConfig": {"request": {
+        "cpu": "1",
+        "ram": "1G"
+      }},
+      "logo": "images/zeppelin-logo.png",
+      "row": -1,
+      "title": "User Console",
+      "mandatory": false
+    }
+  },
+  "status": "OK"
+}

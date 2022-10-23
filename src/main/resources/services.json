@@ -242,7 +242,7 @@
       "proxyTargetPort": 28901,
       "waitTime": 10000,
       "role" : "ADMIN",
-      "title": "Gluster Dashboard",
+      "title": "Gluster Dashboard"
     },
     "masterDetection": {
       "strategy" : "LOG_FILE",
@@ -976,7 +976,7 @@
       "proxyTargetPort" : 8001,
       "waitTime": 5000,
       "role" : "*",
-      "title" : "Flink Dashboard",
+      "title" : "Flink Dashboard"
     },
     "dependencies": [
       {
@@ -1204,7 +1204,7 @@
       "proxyTargetPort" : 8001,
       "waitTime": 5000,
       "role" : "*",
-      "title" : "Cerebro",
+      "title" : "Cerebro"
     },
     "dependencies": [
       {

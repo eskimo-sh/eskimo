@@ -1,0 +1,205 @@
+{
+  "servicesDependencies": {
+    "broker-cli": [],
+    "cluster-dashboard": [{
+      "mes": "RANDOM",
+      "numberOfMasters": 1,
+      "masterService": "cluster-master",
+      "restart": true,
+      "mandatory": true
+    }],
+    "distributed-filesystem": [{
+      "mes": "FIRST_NODE",
+      "numberOfMasters": 1,
+      "masterService": "cluster-manager",
+      "restart": true,
+      "mandatory": true
+    }],
+    "broker": [
+      {
+        "mes": "FIRST_NODE",
+        "numberOfMasters": 1,
+        "masterService": "cluster-manager",
+        "restart": true,
+        "mandatory": true
+      },
+      {
+        "mes": "ALL_NODES",
+        "numberOfMasters": 1,
+        "masterService": "cluster-slave",
+        "restart": true,
+        "mandatory": true
+      },
+      {
+        "mes": "RANDOM",
+        "numberOfMasters": 1,
+        "masterService": "cluster-master",
+        "restart": true,
+        "mandatory": true
+      }
+    ],
+    "distributed-time": [{
+      "mes": "FIRST_NODE",
+      "numberOfMasters": 1,
+      "masterService": "distributed-time",
+      "restart": true,
+      "mandatory": true
+    }],
+    "database": [
+      {
+        "mes": "ALL_NODES",
+        "numberOfMasters": 1,
+        "masterService": "cluster-slave",
+        "restart": true,
+        "mandatory": true
+      },
+      {
+        "mes": "RANDOM",
+        "numberOfMasters": 1,
+        "masterService": "cluster-master",
+        "restart": true,
+        "mandatory": true
+      }
+    ],
+    "cluster-slave": [
+      {
+        "mes": "FIRST_NODE",
+        "numberOfMasters": 1,
+        "masterService": "cluster-master",
+        "restart": true,
+        "mandatory": true
+      },
+      {
+        "mes": "SAME_NODE",
+        "numberOfMasters": 1,
+        "masterService": "distributed-filesystem",
+        "restart": true,
+        "mandatory": true
+      }
+    ],
+    "cluster-manager": [{
+      "mes": "RANDOM",
+      "numberOfMasters": 1,
+      "masterService": "cluster-manager",
+      "restart": true,
+      "mandatory": true
+    }],
+    "broker-manager": [
+      {
+        "mes": "FIRST_NODE",
+        "numberOfMasters": 1,
+        "masterService": "cluster-manager",
+        "restart": true,
+        "mandatory": true
+      },
+      {
+        "mes": "RANDOM",
+        "numberOfMasters": 1,
+        "masterService": "broker",
+        "restart": false,
+        "mandatory": true
+      },
+      {
+        "mes": "RANDOM",
+        "numberOfMasters": 1,
+        "masterService": "cluster-master",
+        "restart": true,
+        "mandatory": true
+      }
+    ],
+    "calculator-runtime": [
+      {
+        "mes": "FIRST_NODE",
+        "numberOfMasters": 1,
+        "masterService": "cluster-master",
+        "restart": false,
+        "mandatory": true
+      },
+      {
+        "mes": "RANDOM",
+        "numberOfMasters": 1,
+        "masterService": "cluster-master",
+        "restart": true,
+        "mandatory": true
+      }
+    ],
+    "database-manager": [
+      {
+        "mes": "RANDOM",
+        "numberOfMasters": 1,
+        "masterService": "database",
+        "restart": false,
+        "mandatory": true
+      },
+      {
+        "mes": "RANDOM",
+        "numberOfMasters": 1,
+        "masterService": "cluster-master",
+        "restart": true,
+        "mandatory": true
+      }
+    ],
+    "calculator-cli": [],
+    "cluster-master": [
+      {
+        "mes": "SAME_NODE",
+        "numberOfMasters": 1,
+        "masterService": "distributed-filesystem",
+        "restart": true,
+        "mandatory": false
+      },
+      {
+        "mes": "FIRST_NODE",
+        "numberOfMasters": 1,
+        "masterService": "cluster-master",
+        "restart": true,
+        "mandatory": true
+      },
+      {
+        "mes": "SAME_NODE",
+        "numberOfMasters": 1,
+        "masterService": "cluster-slave",
+        "restart": false,
+        "mandatory": true
+      }
+    ],
+    "user-console": [
+      {
+        "mes": "RANDOM",
+        "numberOfMasters": 1,
+        "masterService": "database",
+        "restart": false,
+        "mandatory": false
+      },
+      {
+        "mes": "FIRST_NODE",
+        "numberOfMasters": 1,
+        "masterService": "cluster-manager",
+        "restart": true,
+        "mandatory": true
+      },
+      {
+        "mes": "RANDOM",
+        "numberOfMasters": 1,
+        "masterService": "distributed-filesystem",
+        "restart": true,
+        "mandatory": false
+      },
+      {
+        "mes": "RANDOM",
+        "numberOfMasters": 1,
+        "masterService": "broker",
+        "restart": false,
+        "mandatory": false
+      },
+      {
+        "mes": "RANDOM",
+        "numberOfMasters": 1,
+        "masterService": "cluster-master",
+        "restart": true,
+        "mandatory": true
+      }
+    ]
+  },
+  "status": "OK"
+}

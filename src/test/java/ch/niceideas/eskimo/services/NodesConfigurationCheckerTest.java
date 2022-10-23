@@ -50,7 +50,7 @@ public class NodesConfigurationCheckerTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        ServicesDefinition def = new ServicesDefinition();
+        ServicesDefinitionImpl def = new ServicesDefinitionImpl();
         def.afterPropertiesSet();
         nodeConfigChecker.setServicesDefinition(def);
     }

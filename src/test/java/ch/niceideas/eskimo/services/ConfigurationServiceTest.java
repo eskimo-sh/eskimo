@@ -35,7 +35,7 @@ public class ConfigurationServiceTest {
         }
         configurationService = new ConfigurationServiceImpl();
 
-        ServicesDefinition sd = new ServicesDefinition();
+        ServicesDefinitionImpl sd = new ServicesDefinitionImpl();
         sd.afterPropertiesSet();
 
         SetupServiceImpl setupService = new SetupServiceImpl() {

@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SystemAdminControllerTest {
 
     private SystemAdminController sac = new SystemAdminController();
-    private ServicesDefinition sd = new ServicesDefinition();
+    private ServicesDefinitionImpl sd = new ServicesDefinitionImpl();
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -209,7 +209,7 @@ public class SystemAdminControllerTest {
             }
         });
 
-        ServicesDefinition sd = new ServicesDefinition();
+        ServicesDefinitionImpl sd = new ServicesDefinitionImpl();
         sd.afterPropertiesSet();
         sac.setServicesDefinition(sd);
 

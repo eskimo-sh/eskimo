@@ -38,10 +38,7 @@ import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.services.SSHCommandException;
-import ch.niceideas.eskimo.services.SSHCommandService;
-import ch.niceideas.eskimo.services.ServicesDefinition;
-import ch.niceideas.eskimo.services.StandardSetupHelpers;
+import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.services.satellite.MemoryComputer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +54,7 @@ public class MemoryComputerTest {
 
     private MemoryComputer memoryComputer = null;
 
-    private ServicesDefinition servicesDefinition;
+    private ServicesDefinitionImpl servicesDefinition;
 
     private String nodesConfigString = null;
     private String kubeServicesConfigString = null;
@@ -67,7 +64,7 @@ public class MemoryComputerTest {
         nodesConfigString =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testConfig.json"), StandardCharsets.UTF_8);
         kubeServicesConfigString =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testKubernetesConfig.json"), StandardCharsets.UTF_8);
 
-        servicesDefinition = new ServicesDefinition();
+        servicesDefinition = new ServicesDefinitionImpl();
         servicesDefinition.afterPropertiesSet();
 
         memoryComputer = new MemoryComputer();

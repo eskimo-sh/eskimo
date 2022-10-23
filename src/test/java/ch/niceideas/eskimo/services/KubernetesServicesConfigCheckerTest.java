@@ -79,7 +79,7 @@ public class KubernetesServicesConfigCheckerTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        ServicesDefinition def = new ServicesDefinition();
+        ServicesDefinitionImpl def = new ServicesDefinitionImpl();
         def.afterPropertiesSet();
 
         setupService = new SetupServiceImpl();
@@ -94,9 +94,7 @@ public class KubernetesServicesConfigCheckerTest {
         setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
         kubernetesConfigChecker.setConfigurationService(configurationService);
 
-        ServicesDefinition servicesDefinition = new ServicesDefinition();
-        servicesDefinition.afterPropertiesSet();
-        kubernetesConfigChecker.setServicesDefinition(servicesDefinition);
+        kubernetesConfigChecker.setServicesDefinition(def);
     }
 
     @Test

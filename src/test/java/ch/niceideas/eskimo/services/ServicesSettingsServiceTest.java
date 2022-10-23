@@ -73,7 +73,7 @@ public class ServicesSettingsServiceTest extends AbstractSystemTest {
         scs.setServicesDefinition(servicesDefinition);
         scs.setNodesConfigurationService(nodesConfigurationService);
 
-        servicesDefinition = new ServicesDefinition() {
+        servicesDefinition = new ServicesDefinitionImpl() {
             @Override
             public String getAllServicesString() {
                 return "kafka zookeeper ntp mesos-master spark-runtime kibana cerebro zeppelin kafka-manager gluster spark-console prometheus grafana";

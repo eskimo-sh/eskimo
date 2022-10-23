@@ -1,0 +1,96 @@
+{
+  "servicesConfigurations": {
+    "broker-cli": {
+      "kubernetes": false,
+      "col": 3,
+      "conditional": "NONE",
+      "configOrder": 7,
+      "unique": false,
+      "name": "broker-cli",
+      "icon": "images/broker-icon.png",
+      "logo": "images/broker-logo.png",
+      "row": 2,
+      "title": "Broker Client",
+      "mandatory": false
+    },
+    "cluster-slave": {
+      "kubernetes": false,
+      "col": 1,
+      "conditional": "NONE",
+      "configOrder": 4,
+      "unique": false,
+      "name": "cluster-slave",
+      "icon": "images/cluster-slave-icon.png",
+      "logo": "images/cluster-slave-logo.png",
+      "row": 5,
+      "title": "Cluster Slave",
+      "mandatory": false
+    },
+    "distributed-filesystem": {
+      "kubernetes": false,
+      "col": 1,
+      "conditional": "NONE",
+      "configOrder": 2,
+      "unique": false,
+      "name": "distributed-filesystem",
+      "icon": "images/distributed-filesystem-icon.png",
+      "logo": "images/distributed-filesystem-logo.png",
+      "row": 2,
+      "title": "Distributed Filesystem",
+      "mandatory": true
+    },
+    "cluster-manager": {
+      "kubernetes": false,
+      "col": 2,
+      "conditional": "NONE",
+      "configOrder": 1,
+      "unique": true,
+      "name": "cluster-manager",
+      "icon": "images/cluster-manager-icon.png",
+      "logo": "images/cluster-manager-logo.png",
+      "row": 1,
+      "title": "Cluster Manager",
+      "mandatory": false
+    },
+    "calculator-cli": {
+      "kubernetes": false,
+      "col": 3,
+      "conditional": "NONE",
+      "configOrder": 10,
+      "unique": false,
+      "name": "calculator-cli",
+      "icon": "images/calculator-runtime-icon.png",
+      "logo": "images/calculator-runtime-logo.png",
+      "row": 3,
+      "title": "Calculator Client",
+      "mandatory": false
+    },
+    "cluster-master": {
+      "kubernetes": false,
+      "col": 2,
+      "conditional": "NONE",
+      "configOrder": 3,
+      "unique": true,
+      "name": "cluster-master",
+      "icon": "images/cluster-master-icon.png",
+      "logo": "images/cluster-master-logo.png",
+      "row": 2,
+      "title": "Cluster Master",
+      "mandatory": false
+    },
+    "distributed-time": {
+      "kubernetes": false,
+      "col": 1,
+      "conditional": "NONE",
+      "configOrder": 0,
+      "unique": false,
+      "name": "distributed-time",
+      "icon": "images/distributed-time-icon.png",
+      "logo": "images/distributed-time-logo.png",
+      "row": 1,
+      "title": "Distributed Time",
+      "mandatory": true
+    }
+  },
+  "status": "OK"
+}
