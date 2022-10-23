@@ -7,6 +7,7 @@ import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.SimpleOperationCommand;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
+import ch.niceideas.eskimo.test.infrastructure.HttpSessionHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
@@ -105,7 +106,7 @@ public class NodesConfigControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = createHttpSession(sessionContent);
+        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
 
         assertEquals ("{\n" +
                 "  \"command\": {\n" +
@@ -138,7 +139,7 @@ public class NodesConfigControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = createHttpSession(sessionContent);
+        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
 
         ncc.setDemoMode(true);
 
@@ -153,7 +154,7 @@ public class NodesConfigControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = createHttpSession(sessionContent);
+        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
 
         operationsMonitoringService.operationsStarted(new SimpleOperationCommand("test", "test", "192.168.10.15"));
 
@@ -168,7 +169,7 @@ public class NodesConfigControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = createHttpSession(sessionContent);
+        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
 
         assertEquals ("{\n" +
                         "  \"command\": {\n" +
@@ -207,24 +208,5 @@ public class NodesConfigControllerTest {
         assertEquals ("{\"status\": \"OK\"}", ncc.applyNodesConfig(session));
 
         assertTrue(sessionContent.isEmpty());
-    }
-
-    public static HttpSession createHttpSession(Map<String, Object> sessionContent) {
-        return (HttpSession) Proxy.newProxyInstance(
-            NodesConfigController.class.getClassLoader(),
-            new Class[]{HttpSession.class},
-            (proxy, method, methodArgs) -> {
-                switch (method.getName()) {
-                    case "setAttribute":
-                        return sessionContent.put((String) methodArgs[0], methodArgs[1]);
-                    case "getAttribute":
-                        return sessionContent.get(methodArgs[0]);
-                    case "removeAttribute":
-                        return sessionContent.remove(methodArgs[0]);
-                    default:
-                        throw new UnsupportedOperationException(
-                                "Unsupported method: " + method.getName());
-                }
-            });
     }
 }

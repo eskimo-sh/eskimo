@@ -60,12 +60,17 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
     private boolean standard2NodesSetup = false;
     private boolean nodesConfigError = false;
 
+    private boolean serviceSettingsError = false;
+
+    private ServicesSettingsWrapper serviceSettings = null;
+
     public void reset() {
         this.standardKubernetesConfig = false;
         this.kubernetesConfigError = false;
         this.standard2NodesInstallStatus = false;
         this.standard2NodesSetup = false;
         this.nodesConfigError = false;
+        serviceSettingsError = false;
     }
 
     public void setStandardKubernetesConfig() {
@@ -92,14 +97,21 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
         this.nodesConfigError = true;
     }
 
+    public void setServiceSettingsError() {
+        this.serviceSettingsError = true;
+    }
+
     @Override
     public void saveServicesSettings(ServicesSettingsWrapper settings) throws FileException, SetupException {
-
+        this.serviceSettings = settings;
     }
 
     @Override
     public ServicesSettingsWrapper loadServicesSettings() throws FileException, SetupException {
-        return null;
+        if (serviceSettingsError) {
+            throw new SetupException("Test Error");
+        }
+        return serviceSettings;
     }
 
     @Override

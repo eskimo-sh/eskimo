@@ -4,6 +4,7 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.test.infrastructure.HttpSessionHelper;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -147,7 +148,7 @@ public class SetupConfigControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
+        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
 
         scc.setDemoMode (true);
 
@@ -162,7 +163,7 @@ public class SetupConfigControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
+        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
 
         scc.setOperationsMonitoringService(new OperationsMonitoringService() {
             @Override
@@ -182,7 +183,7 @@ public class SetupConfigControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
+        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
 
         scc.setSetupService(new SetupServiceImpl() {
             @Override

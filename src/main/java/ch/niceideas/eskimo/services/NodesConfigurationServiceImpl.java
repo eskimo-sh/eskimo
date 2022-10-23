@@ -134,6 +134,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
         this.operationsMonitoringService = operationsMonitoringService;
     }
 
+    @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public void applyNodesConfig(ServiceOperationsCommand command)
             throws NodesConfigurationException {
@@ -330,6 +331,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
         }
     }
 
+    @Override
     public void installTopologyAndSettings(
             NodesConfigWrapper nodesConfig,
             KubernetesServicesConfigWrapper kubeServicesConfig,
@@ -446,6 +448,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
                 status -> status.setInstallationFlag(operationId.getService(), nodeName, "OK"));
     }
 
+    @Override
     public void restartServiceForSystem(SimpleOperationCommand.SimpleOperationId operationId) throws SystemException {
         String nodeName = operationId.getNode().replace(".", "-");
 
@@ -468,7 +471,6 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
                     status -> status.setInstallationFlag(operationId.getService(), nodeName, "OK"));
         }
     }
-
 
     private void proceedWithServiceUninstallation(MessageLogger ml, String node, String service)
             throws SSHCommandException, SystemException {

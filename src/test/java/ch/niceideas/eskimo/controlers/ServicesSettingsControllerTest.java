@@ -1,15 +1,22 @@
 package ch.niceideas.eskimo.controlers;
 
-import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.ResourceUtils;
-import ch.niceideas.common.utils.StreamUtils;
-import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.OperationId;
+import ch.niceideas.common.utils.*;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.model.SettingsOperationsCommand;
+import ch.niceideas.eskimo.model.SimpleOperationCommand;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.test.infrastructure.HttpSessionHelper;
+import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
+import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -17,39 +24,42 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-cluster", "no-web-stack", "test-services"})
 public class ServicesSettingsControllerTest {
 
-    private ServicesSettingsController scc = new ServicesSettingsController();
+    @Autowired
+    private ServicesSettingsController scc;
+
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
+
+    @Autowired
+    private OperationsMonitoringService operationsMonitoringService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @BeforeEach
     public void testSetup() {
-        scc.setOperationsMonitoringService(new OperationsMonitoringService() {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
-            }
-        });
+        if (operationsMonitoringService.isProcessingPending()) {
+            operationsMonitoringService.operationsFinished(true);
+        }
+
+        SecurityContextHelper.loginAdmin();
     }
 
     @Test
     public void testLoadServicesConfig() throws Exception {
 
-        scc.setConfigurationService(new ConfigurationServiceImpl() {
-            @Override
-            public ServicesSettingsWrapper loadServicesSettings() throws FileException, SetupException {
-                try {
-                    String jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
-                    return new ServicesSettingsWrapper(jsonConfig);
-                } catch (IOException e) {
-                    throw new SetupException(e);
-                }
-            }
-        });
+        String jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
+        configurationServiceTest.saveServicesSettings(new ServicesSettingsWrapper(jsonConfig));
 
         String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesConfigControllerTest/expectedResult.json"), StandardCharsets.UTF_8);
         assertTrue(StringUtils.isNotBlank(expectedResult));
@@ -57,12 +67,7 @@ public class ServicesSettingsControllerTest {
                 expectedResult.replace("\r", "").trim(),
                 scc.loadServicesSettings().replace("\r", "").trim());
 
-        scc.setConfigurationService(new ConfigurationServiceImpl() {
-            @Override
-            public ServicesSettingsWrapper loadServicesSettings() throws FileException, SetupException {
-                throw new SetupException("Test Error");
-            }
-        });
+        configurationServiceTest.setServiceSettingsError();
 
         assertEquals ("{\n" +
                 "  \"error\": \"Test Error\",\n" +
@@ -71,22 +76,13 @@ public class ServicesSettingsControllerTest {
     }
 
     @Test
-    public void testPrepareAndSaveServicesConfig() {
+    public void testPrepareAndSaveServicesConfig() throws Exception {
 
         injectDummyService();
 
-        StringBuilder notifications = new StringBuilder();
-
-        scc.setNotificationService(new NotificationService() {
-            @Override
-            public void addError (String message) {
-                notifications.append (message);
-            }
-        });
-
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
+        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
 
         assertEquals ("{\n" +
                 "  \"command\": {\n" +
@@ -110,16 +106,15 @@ public class ServicesSettingsControllerTest {
                 "  \"status\": \"KO\"\n" +
                 "}", scc.saveServicesSettings(session));
 
-        assertEquals("Setting application failed ! Test Error", notifications.toString());
+        Pair<Integer, List<JSONObject>> notifications =  notificationService.fetchElements(0);
+        String notificationMessages = notifications.getValue().stream()
+                .map(obj -> obj.get("message").toString())
+                .collect(Collectors.joining(","));
+        assertEquals("Setting application failed ! Test Error", notificationMessages);
 
         injectDummyService();
 
-        scc.setOperationsMonitoringService(new OperationsMonitoringService() {
-            @Override
-            public boolean isProcessingPending() {
-                return true;
-            }
-        });
+        operationsMonitoringService.operationsStarted(new SimpleOperationCommand("test", "test", "192.168.10.15"));
 
         assertEquals("{\n" +
                 "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed..\",\n" +

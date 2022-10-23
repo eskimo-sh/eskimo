@@ -94,7 +94,6 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
         return servicesDefinitionFile;
     }
 
-
     @Override
     public void afterPropertiesSet() throws Exception {
 
@@ -576,7 +575,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
         }
     }
 
-
+    @Override
     public void executeInEnvironmentLock (EnvironmentOperation operation)
             throws FileException, ServiceDefinitionException, SetupException {
         JsonWrapper env = null;
@@ -610,25 +609,30 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
         return new JsonWrapper(FileUtils.readFile(envFile));
     }
 
+    @Override
     public String getAllServicesString() {
         return String.join(" ", listAllServices());
     }
 
+    @Override
     public Topology getTopology(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, String currentNode)
             throws ServiceDefinitionException, NodesConfigurationException {
         return Topology.create(nodesConfig, kubeServicesConfig, this, configuredContextPath, currentNode);
     }
 
+    @Override
     public Service getService(String serviceName) {
         return services.get (serviceName);
     }
 
+    @Override
     public String[] listAllServices() {
         return services.values().stream()
                 .map(Service::getName)
                 .sorted().toArray(String[]::new);
     }
 
+    @Override
     public String[] listAllNodesServices() {
         return services.values().stream()
                 .filter(service -> !service.isKubernetes())
@@ -636,6 +640,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 .sorted().toArray(String[]::new);
     }
 
+    @Override
     public String[] listMultipleServicesNonKubernetes() {
         return services.values().stream()
                 .filter(it -> !it.isUnique() && !it.isKubernetes())
@@ -643,6 +648,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 .sorted().toArray(String[]::new);
     }
 
+    @Override
     public String[] listMultipleServices() {
         return services.values().stream()
                 .filter(it -> !it.isUnique())
@@ -650,6 +656,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 .sorted().toArray(String[]::new);
     }
 
+    @Override
     public String[] listMandatoryServices() {
         return services.values().stream()
                 .filter(Service::isMandatory)
@@ -658,6 +665,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 .toArray(String[]::new);
     }
 
+    @Override
     public String[] listUniqueServices() {
         return services.values().stream()
                 .filter(Service::isUnique)
@@ -667,6 +675,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 .toArray(String[]::new);
     }
 
+    @Override
     public String[] listKubernetesServices() {
         return services.values().stream()
                 .filter(Service::isKubernetes)
@@ -675,6 +684,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 .toArray(String[]::new);
     }
 
+    @Override
     public String[] listProxiedServices() {
         return services.values().stream()
                 .filter(Service::isProxied)
@@ -683,6 +693,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 .toArray(String[]::new);
     }
 
+    @Override
     public String[] listUIServices() {
         return services.values().stream()
                 .filter(Service::isUiService)
@@ -691,18 +702,21 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 .toArray(String[]::new);
     }
 
+    @Override
     public Map<String, UIConfig> getUIServicesConfig() {
         return services.values().stream()
                 .filter(Service::isUiService)
                 .collect(Collectors.toMap(Service::getName, Service::getUiConfig));
     }
 
+    @Override
     public String[] listServicesInOrder() {
         return services.values().stream()
                 .sorted(Comparator.comparingInt(Service::getConfigOrder))
                 .map(Service::getName).toArray(String[]::new);
     }
 
+    @Override
     public String[] listServicesOrderedByDependencies() {
         return services.values().stream()
                 .sorted(this::compareServices)
@@ -710,6 +724,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 .toArray(String[]::new);
     }
 
+    @Override
     public String[] listKubernetesServicesOrderedByDependencies() {
         return services.values().stream()
                 .sorted(this::compareServices) // dunno why, but if I sort after filtering, it's not working (copare not called)
@@ -718,6 +733,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 .toArray(String[]::new);
     }
 
+    @Override
     public int compareServices(Service one, Service other) {
 
         // kubernetes services are always last
@@ -751,6 +767,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
         return 0;
     }
 
+    @Override
     public int compareServices(String servOne, String servOther) {
 
         Service one = getService(servOne);
@@ -759,6 +776,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
         return compareServices(one, other);
     }
 
+    @Override
     public Collection<String> getDependentServices(String service) {
         return getDependentServicesInner(service, new HashSet<>()).stream()
                 .sorted((service1, service2) -> {

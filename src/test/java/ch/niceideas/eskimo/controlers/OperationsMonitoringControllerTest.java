@@ -46,7 +46,6 @@ public class OperationsMonitoringControllerTest {
               }
         });
 
-
         operationsMonitoringService.addInfo(
                 new SimpleOperationCommand.SimpleOperationId("test", "1", "192.168.10.15"),
                 "TEST-1");
@@ -58,31 +57,6 @@ public class OperationsMonitoringControllerTest {
         operationsMonitoringService.addInfo(
                 new SimpleOperationCommand.SimpleOperationId("test", "3", "192.168.10.15"),
                 "TEST-3");
-
-        /*
-        operationsMonitoringController.setOperationsMonitoringService(new OperationsMonitoringService() {
-            @Override
-            public OperationsMonitoringStatusWrapper getOperationsMonitoringStatus (Map<String, Integer> lastLinePerOp) {
-                return new OperationsMonitoringStatusWrapper(new JSONObject(new HashMap<String, Object>() {{
-
-                    put("messages", new JSONObject(new HashMap<>() {{
-                        for (String opId : lastLinePerOp.keySet()) {
-                            put(opId, new JSONObject(new TreeMap<>() {{
-                                put("lastLine", 5);
-                                put("lines", Base64.getEncoder().encodeToString(("TEST " + opId).getBytes(StandardCharsets.UTF_8)));
-                            }}));
-                        }
-                    }}));
-
-                    put("status", new JSONObject(new HashMap<>() {{
-                        for (String opId : lastLinePerOp.keySet()) {
-                            put(opId.toString(), OperationStatus.INIT.toString());
-                        }
-                    }}));
-                }}));
-            }
-        });
-        */
 
         assertEquals ("{\n" +
                         "    \"result\": \"OK\",\n" +

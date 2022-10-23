@@ -1,9 +1,10 @@
 package ch.niceideas.eskimo.controlers;
 
-import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.model.SimpleOperationCommand;
+import ch.niceideas.eskimo.services.OperationsMonitoringService;
+import ch.niceideas.eskimo.services.StandardSetupHelpers;
+import ch.niceideas.eskimo.test.infrastructure.HttpSessionHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
@@ -13,18 +14,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.TestingAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -128,7 +123,7 @@ public class KubernetesServicesConfigControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
+        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
 
         configurationServiceTest.setStandard2NodesInstallStatus();
         configurationServiceTest.setStandard2NodesSetup();
@@ -159,7 +154,7 @@ public class KubernetesServicesConfigControllerTest {
     public void testApplyNodesConfig_demoMode() throws Exception {
 
         Map<String, Object> sessionContent = new HashMap<>();
-        HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
+        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
 
         kscc.setDemoMode(true);
 
@@ -173,7 +168,7 @@ public class KubernetesServicesConfigControllerTest {
     public void testApplyNodesConfig_processingPending() throws Exception {
 
         Map<String, Object> sessionContent = new HashMap<>();
-        HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
+        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
 
         operationsMonitoringService.operationsStarted(new SimpleOperationCommand("test", "test", "192.168.10.15"));
 
@@ -188,7 +183,7 @@ public class KubernetesServicesConfigControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = NodesConfigControllerTest.createHttpSession(sessionContent);
+        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
 
         configurationServiceTest.setStandard2NodesInstallStatus();
         configurationServiceTest.setStandard2NodesSetup();

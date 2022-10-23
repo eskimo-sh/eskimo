@@ -86,6 +86,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         this.servicesDefinition = servicesDefinition;
     }
 
+    @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public void saveServicesSettings(ServicesSettingsWrapper settings) throws FileException, SetupException {
         servicesConfigFileLock.lock();
@@ -97,6 +98,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         }
     }
 
+    @Override
     public ServicesSettingsWrapper loadServicesSettings() throws FileException, SetupException {
         servicesConfigFileLock.lock();
         try {
@@ -112,6 +114,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         }
     }
 
+    @Override
     public ServicesSettingsWrapper loadServicesConfigNoLock() throws FileException, SetupException {
         String configStoragePath = setupService.getConfigStoragePath();
         File statusFile = new File(configStoragePath + SERVICES_SETTINGS_JSON_PATH);
@@ -122,7 +125,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         return new ServicesSettingsWrapper(statusFile);
     }
 
-
+    @Override
     public void updateAndSaveServicesInstallationStatus(SystemService.StatusUpdater statusUpdater) throws FileException, SetupException {
         statusFileLock.lock();
         try {
@@ -134,6 +137,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         }
     }
 
+    @Override
     public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) throws FileException, SetupException {
         statusFileLock.lock();
         try {
@@ -144,6 +148,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         }
     }
 
+    @Override
     public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
         statusFileLock.lock();
         try {
@@ -159,6 +164,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         }
     }
 
+    @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public void saveNodesConfig(NodesConfigWrapper nodesConfig) throws FileException, SetupException {
         nodesConfigFileLock.lock();
@@ -170,6 +176,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         }
     }
 
+    @Override
     public NodesConfigWrapper loadNodesConfig() throws SystemException, SetupException {
         nodesConfigFileLock.lock();
         try {
@@ -188,6 +195,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         }
     }
 
+    @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public JsonWrapper createSetupConfigAndSaveStoragePath(String configAsString) throws SetupException, FileException {
         JsonWrapper setupConfigJSON = new JsonWrapper(configAsString);
@@ -219,12 +227,14 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         return setupConfigJSON;
     }
 
+    @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public void saveSetupConfig(String configAsString) throws SetupException, FileException {
         File configFile = new File(setupService.getConfigStoragePath() + CONFIG_JSON);
         FileUtils.writeFile(configFile, configAsString);
     }
 
+    @Override
     public String loadSetupConfig() throws FileException, SetupException {
         File configFile = new File(setupService.getConfigStoragePath() + CONFIG_JSON);
         if (!configFile.exists()) {
@@ -234,6 +244,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         return FileUtils.readFile(configFile);
     }
 
+    @Override
     public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() throws SystemException  {
         kubernetesServicesFileLock.lock();
         try {
@@ -252,6 +263,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         }
     }
 
+    @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public void saveKubernetesServicesConfig(KubernetesServicesConfigWrapper kubeServicesConfig) throws FileException, SetupException {
         kubernetesServicesFileLock.lock();

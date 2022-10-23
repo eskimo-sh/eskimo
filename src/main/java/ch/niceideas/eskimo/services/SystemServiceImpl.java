@@ -190,11 +190,13 @@ public class SystemServiceImpl implements SystemService {
         }
     }
 
+    @Override
     public void delegateApplyNodesConfig(ServiceOperationsCommand command)
             throws SystemException, NodesConfigurationException {
         nodesConfigurationService.applyNodesConfig(command);
     }
 
+    @Override
     public void showJournal(Service service, String node) throws SystemException {
         applyServiceOperation(service.getName(), node, "Showing journal of", () -> {
             if (service.isKubernetes()) {
@@ -205,6 +207,7 @@ public class SystemServiceImpl implements SystemService {
         });
     }
 
+    @Override
     public void startService(Service service, String node) throws SystemException {
         applyServiceOperation(service.getName(), node, "Starting", () -> {
             if (service.isKubernetes()) {
@@ -215,6 +218,7 @@ public class SystemServiceImpl implements SystemService {
         });
     }
 
+    @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public void stopService(Service service, String node) throws SystemException{
         applyServiceOperation(service.getName(), node, "Stopping", () -> {
@@ -226,6 +230,7 @@ public class SystemServiceImpl implements SystemService {
         });
     }
 
+    @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public void restartService(Service service, String node) throws SystemException {
         applyServiceOperation(service.getName(), node, "Restarting", () -> {
@@ -237,6 +242,7 @@ public class SystemServiceImpl implements SystemService {
         });
     }
 
+    @Override
     public void callCommand(String commandId, String serviceName, String node) throws SystemException {
         applyServiceOperation(serviceName, node, "Calling command " + commandId , () -> {
             Service service = servicesDefinition.getService(serviceName);
@@ -256,6 +262,7 @@ public class SystemServiceImpl implements SystemService {
         });
     }
 
+    @Override
     public void applyServiceOperation(String service, String node, String opLabel, ServiceOperation<String> operation) throws SystemException {
         String message = opLabel + " " + service + " on " + node;
         boolean success = false;
@@ -298,6 +305,7 @@ public class SystemServiceImpl implements SystemService {
         }
     }
 
+    @Override
     public SystemStatusWrapper getStatus() throws StatusExceptionWrapperException {
 
         // special case at application startup : if the UI request comes before the first status update
@@ -315,6 +323,7 @@ public class SystemServiceImpl implements SystemService {
         this.lastStatus.set (lastStatusForTest);
     }
 
+    @Override
     public void updateStatus() {
 
         if (statusUpdateLock.isLocked()) {
@@ -447,10 +456,12 @@ public class SystemServiceImpl implements SystemService {
         }
     }
 
+    @Override
     public String sendPing(String node) throws SSHCommandException {
         return sshCommandService.runSSHScript(node, "echo OK", false);
     }
 
+    @Override
     public <T> void performPooledOperation(
             List<T> operations, int parallelism, long operationWaitTimout, PooledOperation<T> operation)
             throws SystemException {
@@ -549,6 +560,7 @@ public class SystemServiceImpl implements SystemService {
         }
     }
 
+    @Override
     public void feedInServiceStatus (
             Map<String, String> statusMap,
             ServicesInstallStatusWrapper servicesInstallationStatus,
@@ -599,6 +611,7 @@ public class SystemServiceImpl implements SystemService {
         }
     }
 
+    @Override
     public void handleStatusChanges(
             ServicesInstallStatusWrapper servicesInstallationStatus, SystemStatusWrapper systemStatus,
             Set<String> configuredNodesAndOtherLiveNodes)
@@ -759,6 +772,7 @@ public class SystemServiceImpl implements SystemService {
         }
     }
 
+    @Override
     public void callUninstallScript(MessageLogger ml, SSHConnection connection, String service) throws SystemException {
         File containerFolder = new File(servicesSetupPath + "/" + service);
         if (!containerFolder.exists()) {
@@ -778,6 +792,7 @@ public class SystemServiceImpl implements SystemService {
         }
     }
 
+    @Override
     public void installationSetup(MessageLogger ml, SSHConnection connection, String node, String service) throws SystemException {
         try {
             exec(connection, ml, new String[]{"bash", TMP_PATH_PREFIX + service + "/setup.sh", node});
@@ -788,6 +803,7 @@ public class SystemServiceImpl implements SystemService {
         }
     }
 
+    @Override
     public void installationCleanup(MessageLogger ml, SSHConnection connection, String service, String imageName, File tmpArchiveFile) throws SSHCommandException, SystemException {
         exec(connection, ml, "rm -Rf " + TMP_PATH_PREFIX + service);
         exec(connection, ml, "rm -f " + TMP_PATH_PREFIX + service + ".tgz");
@@ -830,6 +846,7 @@ public class SystemServiceImpl implements SystemService {
         ml.addInfo(sshCommandService.runSSHCommand(connection, command));
     }
 
+    @Override
     public List<Pair<String, String>> buildDeadIps(Set<String> allNodes, NodesConfigWrapper nodesConfig, Set<String> liveIps, Set<String> deadIps) {
         List<Pair<String, String>> nodesSetup = new ArrayList<>();
 
@@ -900,6 +917,7 @@ public class SystemServiceImpl implements SystemService {
         deadIps.add(node);
     }
 
+    @Override
     public File createRemotePackageFolder(MessageLogger ml, SSHConnection connection, String node, String service, String imageName) throws SystemException, IOException, SSHCommandException {
         // 1. Find container folder, archive and copy there
 
@@ -967,6 +985,7 @@ public class SystemServiceImpl implements SystemService {
         return tmpArchiveFile;
     }
 
+    @Override
     public File createTempFile(String service, String node, String extension) throws IOException {
         return File.createTempFile(service, extension);
     }

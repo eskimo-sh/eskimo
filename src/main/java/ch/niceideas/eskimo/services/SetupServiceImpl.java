@@ -175,6 +175,7 @@ public class SetupServiceImpl implements SetupService {
         configStoragePathInternal = readConfigStoragePath();
     }
 
+    @Override
     public String getPackagesToBuild() {
         return additionalPackagesToBuild + "," + Arrays.stream(servicesDefinition.listAllServices())
                 .map (serviceName -> servicesDefinition.getService(serviceName))
@@ -185,6 +186,7 @@ public class SetupServiceImpl implements SetupService {
                 .collect(Collectors.joining(","));
     }
 
+    @Override
     public String getConfigStoragePath() throws SetupException {
         if (StringUtils.isBlank(configStoragePathInternal)) {
             throw new SetupException ("Application is not initialized properly. Missing file 'storagePath.conf' in backend working directory.");
@@ -192,6 +194,7 @@ public class SetupServiceImpl implements SetupService {
         return configStoragePathInternal;
     }
 
+    @Override
     public String getPackagesDownloadUrlRoot() {
         return packagesDownloadUrlRoot;
     }
@@ -211,6 +214,7 @@ public class SetupServiceImpl implements SetupService {
         }
     }
 
+    @Override
     public void ensureSetupCompleted() throws SetupException {
 
         // 1. Ensure config Storage path is set
@@ -274,6 +278,7 @@ public class SetupServiceImpl implements SetupService {
         }
     }
 
+    @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public SetupCommand saveAndPrepareSetup(String configAsString) throws SetupException {
 
@@ -327,6 +332,7 @@ public class SetupServiceImpl implements SetupService {
         }
     }
 
+    @Override
     public Pair<String,String> parseVersion(String name) {
 
         Matcher matcher = imageFileNamePattern.matcher(name);
@@ -339,6 +345,7 @@ public class SetupServiceImpl implements SetupService {
 
     }
 
+    @Override
     public String findLastPackageFile(String prefix, String packageName) {
 
         File packagesDistribFolder = new File (packageDistributionPath);
@@ -381,6 +388,7 @@ public class SetupServiceImpl implements SetupService {
         return new Pair<>(lastVersionFile, lastFileVersion);
     }
 
+    @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public void prepareSetup (
             JsonWrapper setupConfig,
@@ -517,6 +525,7 @@ public class SetupServiceImpl implements SetupService {
         }
     }
 
+    @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public String applySetup(SetupCommand setupCommand) {
 
@@ -617,7 +626,7 @@ public class SetupServiceImpl implements SetupService {
             }
 
             // 3. Handle updates
-            if (!applicationStatusService.isSnapshot(buildVersion)
+            if (!ApplicationStatusService.isSnapshot(buildVersion)
                     && StringUtils.isNotEmpty(servicesOrigin)
                     && servicesOrigin.equals(DOWNLOAD_FLAG)) { // for services default is build
 
@@ -655,6 +664,7 @@ public class SetupServiceImpl implements SetupService {
         }
     }
 
+    @Override
     public int compareVersion(Pair<String, String> first, Pair<String, String> second) {
 
         if (first == null) {
@@ -676,6 +686,7 @@ public class SetupServiceImpl implements SetupService {
         return Integer.valueOf (first.getValue()).compareTo(Integer.valueOf(second.getValue()));
     }
 
+    @Override
     public int compareSoftwareVersion (String firstVersion, String secondVersion) {
 
         String[] unitsFirst = firstVersion.split("[,.\\-_]");
