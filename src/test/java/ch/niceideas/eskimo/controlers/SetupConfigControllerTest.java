@@ -2,12 +2,23 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.SetupCommand;
+import ch.niceideas.eskimo.model.SimpleOperationCommand;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.test.infrastructure.HttpSessionHelper;
+import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
+import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.ServicesDefinitionTestImpl;
+import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
@@ -17,129 +28,90 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-cluster", "no-web-stack", "test-services"})
 public class SetupConfigControllerTest {
 
-    private SetupConfigController scc = new SetupConfigController();
-    private ServicesDefinitionImpl sd = new ServicesDefinitionImpl();
+    @Autowired
+    private SetupConfigController scc;
+
+    @Autowired
+    private OperationsMonitoringService operationsMonitoringService;
+
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
+
+    @Autowired
+    private SetupServiceTestImpl setupServiceTest;
 
     @BeforeEach
-    public void testSetup() throws Exception {
-        sd.afterPropertiesSet();
+    public void testSetup() {
+        if (operationsMonitoringService.isProcessingPending()) {
+            operationsMonitoringService.operationsFinished(true);
+        }
 
-        scc.setNotificationService(new NotificationService());
+        configurationServiceTest.reset();
 
-        scc.setOperationsMonitoringService(new OperationsMonitoringService() {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
-            }
-        });
+        SecurityContextHelper.loginAdmin();
+
+        scc.setDemoMode (false);
     }
 
     @Test
-    public void testLoadSetupConfig() {
+    public void testLoadSetupConfig() throws Exception {
 
-        scc.setSetupService(new SetupServiceImpl() {
-            @Override
-            public void ensureSetupCompleted() throws SetupException {
-                // No Op
-            }
-        });
-
-
-        scc.setConfigurationService(new ConfigurationServiceImpl() {
-            @Override
-            public String loadSetupConfig() throws FileException, SetupException {
-                throw new SetupException ("Application is not initialized properly. Missing file 'config.conf' system configuration");
-            }
-        });
+        configurationServiceTest.setSetupConfigNotCompletedError();
 
         assertEquals ("{\n" +
                 "  \"clear\": \"missing\",\n" +
-                "  \"isSnapshot\": true,\n" +
-                "  \"version\": \"DEV-SNAPSHOT\",\n" +
+                "  \"isSnapshot\": false,\n" +
+                "  \"version\": \"@project.version@\",\n" +
                 "  \"processingPending\": false,\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", scc.loadSetupConfig());
 
-        scc.setConfigurationService(new ConfigurationServiceImpl() {
-            @Override
-            public String loadSetupConfig() throws FileException, SetupException {
-                return "{\"config\": \"dummy\"}";
-            }
-        });
+        configurationServiceTest.saveSetupConfig("{\"config\": \"dummy\"}");
 
         assertEquals ("{\n" +
                 "    \"processingPending\": false,\n" +
-                "    \"isSnapshot\": true,\n" +
+                "    \"isSnapshot\": false,\n" +
                 "    \"config\": \"dummy\",\n" +
-                "    \"version\": \"DEV-SNAPSHOT\"\n" +
+                "    \"version\": \"@project.version@\"\n" +
                 "}", scc.loadSetupConfig());
 
-        scc.setSetupService(new SetupServiceImpl() {
-            @Override
-            public void ensureSetupCompleted() throws SetupException {
-                throw new SetupException("No loaded");
-            }
-        });
-
-        scc.setConfigurationService(new ConfigurationServiceImpl() {
-            @Override
-            public String loadSetupConfig() throws FileException, SetupException {
-                return "{\"config\": \"dummy\"}";
-            }
-        });
+        setupServiceTest.setSetupError();;
 
         assertEquals ("{\n" +
                 "    \"processingPending\": false,\n" +
                 "    \"clear\": \"setup\",\n" +
-                "    \"message\": \"No loaded\",\n" +
-                "    \"isSnapshot\": true,\n" +
+                "    \"message\": \"Test Error\",\n" +
+                "    \"isSnapshot\": false,\n" +
                 "    \"config\": \"dummy\",\n" +
-                "    \"version\": \"DEV-SNAPSHOT\"\n" +
+                "    \"version\": \"@project.version@\"\n" +
                 "}", scc.loadSetupConfig());
 
-        scc.setConfigurationService(new ConfigurationServiceImpl() {
-            @Override
-            public String loadSetupConfig() throws FileException, SetupException {
-                throw new SetupException("Setup error");
-            }
-        });
+        configurationServiceTest.setSetupConfigNotCompletedError();
 
         assertEquals ("{\n" +
                 "  \"clear\": \"missing\",\n" +
-                "  \"isSnapshot\": true,\n" +
-                "  \"version\": \"DEV-SNAPSHOT\",\n" +
+                "  \"isSnapshot\": false,\n" +
+                "  \"version\": \"@project.version@\",\n" +
                 "  \"processingPending\": false,\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", scc.loadSetupConfig());
 
-        scc.setSetupService(new SetupServiceImpl() {
-            @Override
-            public void ensureSetupCompleted() throws SetupException {
-                // No Op
-            }
-        });
+        setupServiceTest.setSetupCompleted();
+        configurationServiceTest.setSetupCompleted();
 
-        scc.setConfigurationService(new ConfigurationServiceImpl() {
-            @Override
-            public String loadSetupConfig() throws FileException, SetupException {
-                return "{\"config\": \"dummy\"}";
-            }
-        });
-
-        scc.setOperationsMonitoringService(new OperationsMonitoringService() {
-            @Override
-            public boolean isProcessingPending() {
-                return true;
-            }
-        });
+        operationsMonitoringService.operationsStarted(new SimpleOperationCommand("test", "test", "192.168.10.15"));
 
         assertEquals ("{\n" +
                 "    \"processingPending\": true,\n" +
-                "    \"isSnapshot\": true,\n" +
+                "    \"isSnapshot\": false,\n" +
                 "    \"config\": \"dummy\",\n" +
-                "    \"version\": \"DEV-SNAPSHOT\"\n" +
+                "    \"version\": \"@project.version@\"\n" +
                 "}", scc.loadSetupConfig());
     }
 
@@ -159,18 +131,13 @@ public class SetupConfigControllerTest {
     }
 
     @Test
-    public void testSaveSetup_processingPending() {
+    public void testSaveSetup_processingPending() throws Exception {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
         HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
 
-        scc.setOperationsMonitoringService(new OperationsMonitoringService() {
-            @Override
-            public boolean isProcessingPending() {
-                return true;
-            }
-        });
+        operationsMonitoringService.operationsStarted(new SimpleOperationCommand("test", "test", "192.168.10.15"));
 
         assertEquals ("{\n" +
                 "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed.\",\n" +
@@ -184,30 +151,6 @@ public class SetupConfigControllerTest {
         Map<String, Object> sessionContent = new HashMap<>();
 
         HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
-
-        scc.setSetupService(new SetupServiceImpl() {
-            @Override
-            public SetupCommand saveAndPrepareSetup(String configAsString) throws SetupException {
-                JsonWrapper setupConfigJSON = new JsonWrapper(configAsString);
-                return SetupCommand.create(setupConfigJSON, this, sd);
-            }
-            @Override
-            public void prepareSetup (
-                    JsonWrapper setupConfig,
-                    Set<String> downloadPackages, Set<String> buildPackage, Set<String> downloadMesos, Set<String> buildMesos, Set<String> packageUpdate)
-                    throws SetupException {
-                // No Op
-            }
-            @Override
-            public String getPackagesDownloadUrlRoot() {
-                return "dummy";
-            }
-            @Override
-            public String applySetup(SetupCommand setupCommand) throws JSONException {
-                // No Op
-                return "OK";
-            }
-        });
 
         assertEquals ("{\n" +
                         "  \"command\": {\n" +

@@ -39,8 +39,10 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.SetupCommand;
+import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.SetupService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -57,6 +59,9 @@ import java.util.Set;
 @Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Profile("no-cluster")
 public class SetupServiceTestImpl implements SetupService {
+
+    @Autowired
+    private ServicesDefinition servicesDefinition;
 
     private File configStoragePath = null;
 
@@ -114,7 +119,7 @@ public class SetupServiceTestImpl implements SetupService {
 
     @Override
     public String getPackagesDownloadUrlRoot() {
-        return null;
+        return "dummy";
     }
 
     @Override
@@ -126,7 +131,8 @@ public class SetupServiceTestImpl implements SetupService {
 
     @Override
     public SetupCommand saveAndPrepareSetup(String configAsString) throws SetupException {
-        return null;
+        JsonWrapper setupConfigJSON = new JsonWrapper(configAsString);
+        return SetupCommand.create(setupConfigJSON, this, servicesDefinition);
     }
 
     @Override
@@ -146,7 +152,7 @@ public class SetupServiceTestImpl implements SetupService {
 
     @Override
     public String applySetup(SetupCommand setupCommand) {
-        return null;
+        return "OK";
     }
 
     @Override

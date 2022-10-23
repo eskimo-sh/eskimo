@@ -70,14 +70,6 @@ public class SetupConfigController extends AbstractOperationController {
     @Autowired
     private ConfigurationService configurationService;
 
-    /* For tests */
-    void setSetupService(SetupService setupService) {
-        this.setupService = setupService;
-    }
-    void setConfigurationService(ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-
     @GetMapping("/load-setup")
     @ResponseBody
     public String loadSetupConfig() {

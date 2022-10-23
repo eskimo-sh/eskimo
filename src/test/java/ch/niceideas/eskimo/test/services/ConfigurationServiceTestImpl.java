@@ -62,7 +62,11 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
 
     private boolean serviceSettingsError = false;
 
+    private boolean setupConfigNotCompletedError = false;
+    private boolean setupCompleted = false;
+
     private ServicesSettingsWrapper serviceSettings = null;
+    private String setupConfigAsString;
 
     public void reset() {
         this.standardKubernetesConfig = false;
@@ -71,6 +75,8 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
         this.standard2NodesSetup = false;
         this.nodesConfigError = false;
         serviceSettingsError = false;
+        setupConfigNotCompletedError = false;
+        setupCompleted = false;
     }
 
     public void setStandardKubernetesConfig() {
@@ -99,6 +105,16 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
 
     public void setServiceSettingsError() {
         this.serviceSettingsError = true;
+    }
+
+    public void setSetupConfigNotCompletedError() {
+        this.setupConfigNotCompletedError = true;
+        setupCompleted = false;
+    }
+
+    public void setSetupCompleted() {
+        this.setupConfigNotCompletedError = false;
+        setupCompleted = true;
     }
 
     @Override
@@ -159,12 +175,16 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
 
     @Override
     public void saveSetupConfig(String configAsString) throws SetupException, FileException {
-
+        this.setupConfigNotCompletedError = false;
+        this.setupConfigAsString = configAsString;
     }
 
     @Override
     public String loadSetupConfig() throws FileException, SetupException {
-        return null;
+        if (setupConfigNotCompletedError) {
+            throw new SetupException ("Application is not initialized properly. Missing file 'config.conf' system configuration");
+        }
+        return setupConfigAsString;
     }
 
     @Override
