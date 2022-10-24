@@ -52,7 +52,7 @@ import java.util.HashMap;
 
 @Component
 @Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
-@Profile("no-cluster")
+@Profile("test-file-manager")
 public class FileManagerServiceTestImpl implements FileManagerService {
 
     @Override

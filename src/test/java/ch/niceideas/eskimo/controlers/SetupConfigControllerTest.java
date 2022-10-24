@@ -1,17 +1,12 @@
 package ch.niceideas.eskimo.controlers;
 
-import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.model.SimpleOperationCommand;
-import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.OperationsMonitoringService;
 import ch.niceideas.eskimo.test.infrastructure.HttpSessionHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
-import ch.niceideas.eskimo.test.services.ServicesDefinitionTestImpl;
 import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
-import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +18,6 @@ import org.springframework.test.context.TestPropertySource;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-cluster", "no-web-stack", "test-services"})
+@ActiveProfiles({"no-web-stack", "test-services", "test-conf", "test-setup"})
 public class SetupConfigControllerTest {
 
     @Autowired

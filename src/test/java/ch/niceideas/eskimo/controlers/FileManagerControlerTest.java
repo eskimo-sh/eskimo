@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-cluster", "no-web-stack"})
+@ActiveProfiles({"no-web-stack", "test-file-manager"})
 public class FileManagerControlerTest {
 
     @Autowired

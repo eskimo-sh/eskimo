@@ -65,7 +65,7 @@ import java.util.regex.Pattern;
 
 @Component
 @Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
-@Profile("!no-cluster")
+@Profile("!test-file-manager")
 public class FileManagerServiceImpl implements FileManagerService {
 
     private static final Logger logger = Logger.getLogger(FileManagerServiceImpl.class);

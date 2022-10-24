@@ -19,7 +19,7 @@ public class SystemStatusControllerTest {
     public void setUp() {
         ssc = new SystemStatusController();
 
-        ssc.setOperationsMonitoringService(new OperationsMonitoringService() {
+        ssc.setOperationsMonitoringService(new OperationsMonitoringServiceImpl() {
             @Override
             public boolean getLastOperationSuccess() {
                 return true;
@@ -41,7 +41,7 @@ public class SystemStatusControllerTest {
                 "  \"status\": \"OK\"\n" +
                 "}", ssc.getLastOperationResult());
 
-        ssc.setOperationsMonitoringService(new OperationsMonitoringService() {
+        ssc.setOperationsMonitoringService(new OperationsMonitoringServiceImpl() {
             @Override
             public boolean getLastOperationSuccess() {
                 throw new IllegalStateException("Test Error");

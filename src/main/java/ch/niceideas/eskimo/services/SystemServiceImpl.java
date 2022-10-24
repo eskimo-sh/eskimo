@@ -65,7 +65,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-@Profile("!no-cluster")
+@Profile("!test-system")
 public class SystemServiceImpl implements SystemService {
 
     private static final Logger logger = Logger.getLogger(SystemServiceImpl.class);

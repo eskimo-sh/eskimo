@@ -54,10 +54,25 @@ import java.util.Set;
 
 @Component
 @Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
-@Profile("no-cluster")
+@Profile("test-system")
 public class SystemServiceTestImpl implements SystemService {
 
-    private boolean returnEmptySystemStatus;
+    private boolean returnEmptySystemStatus = false;
+
+    private boolean startServiceError = false;
+
+    public void reset() {
+        this.returnEmptySystemStatus = false;
+        this.startServiceError = false;
+    }
+
+    public void setReturnEmptySystemStatus(boolean returnEmptySystemStatus) {
+        this.returnEmptySystemStatus = returnEmptySystemStatus;
+    }
+
+    public void setStartServiceError() {
+        this.startServiceError = true;
+    }
 
     @Override
     public void delegateApplyNodesConfig(ServiceOperationsCommand command) throws SystemException, NodesConfigurationException {
@@ -71,7 +86,9 @@ public class SystemServiceTestImpl implements SystemService {
 
     @Override
     public void startService(Service service, String node) throws SystemException {
-
+        if (startServiceError) {
+            throw new SystemException("Test Error");
+        }
     }
 
     @Override
@@ -87,10 +104,6 @@ public class SystemServiceTestImpl implements SystemService {
     @Override
     public void callCommand(String commandId, String serviceName, String node) throws SystemException {
 
-    }
-
-    public void setReturnEmptySystemStatus(boolean returnEmptySystemStatus) {
-        this.returnEmptySystemStatus = returnEmptySystemStatus;
     }
 
     @Override

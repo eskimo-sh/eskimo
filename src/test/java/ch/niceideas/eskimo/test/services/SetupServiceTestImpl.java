@@ -57,7 +57,7 @@ import java.util.Set;
 
 @Component
 @Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
-@Profile("no-cluster")
+@Profile("test-setup")
 public class SetupServiceTestImpl implements SetupService {
 
     @Autowired

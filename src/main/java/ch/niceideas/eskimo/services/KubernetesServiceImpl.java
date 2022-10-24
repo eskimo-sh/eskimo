@@ -61,7 +61,7 @@ import java.util.*;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-@Profile("!no-kube")
+@Profile("!test-kube")
 public class KubernetesServiceImpl implements KubernetesService {
 
     private static final Logger logger = Logger.getLogger(KubernetesServiceImpl.class);

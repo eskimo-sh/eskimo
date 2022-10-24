@@ -57,7 +57,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-@Profile("!no-cluster")
+@Profile("!test-conf")
 public class ConfigurationServiceImpl implements ConfigurationService {
 
     private static final Logger logger = Logger.getLogger(ConfigurationServiceImpl.class);

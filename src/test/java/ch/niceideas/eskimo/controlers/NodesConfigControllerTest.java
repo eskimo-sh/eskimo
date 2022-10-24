@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-cluster", "no-web-stack"})
+@ActiveProfiles({"no-web-stack", "test-system", "test-setup", "test-conf"})
 public class NodesConfigControllerTest {
 
     @Autowired

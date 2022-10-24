@@ -1,58 +1,73 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.model.SimpleOperationCommand;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
+import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
+import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.OperationsMonitoringServiceTestImpl;
+import ch.niceideas.eskimo.test.services.SystemServiceTestImpl;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-conf", "test-operations", "test-system"})
 public class SystemAdminControllerTest {
 
-    private SystemAdminController sac = new SystemAdminController();
-    private ServicesDefinitionImpl sd = new ServicesDefinitionImpl();
+    @Autowired
+    private SystemAdminController sac;
+
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private OperationsMonitoringServiceTestImpl operationsMonitoringServiceTest;
+
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
+
+    @Autowired
+    private SystemServiceTestImpl systemServiceTest;
+
 
     @BeforeEach
-    public void setUp() throws Exception {
-        sd.afterPropertiesSet();
-        sac.setServicesDefinition(sd);
+    public void testSetup() {
 
-        sac.setNotificationService(new NotificationService());
+        configurationServiceTest.reset();
 
-        sac.setOperationsMonitoringService(new OperationsMonitoringService() {
-            @Override
-            public boolean isProcessingPending() {
-                return false;
-            }
-        });
+        systemServiceTest.reset();
+
+        operationsMonitoringServiceTest.reset();
+
+        SecurityContextHelper.loginAdmin();
+
+        sac.setDemoMode(false);
     }
 
     @Test
     public void testInterruptProcessing() {
 
-        sac.setOperationsMonitoringService(new OperationsMonitoringService() {
-            @Override
-            public void interruptProcessing() {
-                // No Op
-            }
-        });
-
         assertEquals ("{\"status\": \"OK\"}", sac.interruptProcessing());
 
-        sac.setOperationsMonitoringService(new OperationsMonitoringService() {
-            @Override
-            public void interruptProcessing() {
-                throw new JSONException("Test Error");
-            }
-        });
+        operationsMonitoringServiceTest.setInteruptProcessingError();
 
         assertEquals ("{\n" +
                 "  \"error\": \"Test Error\",\n" +
@@ -62,12 +77,7 @@ public class SystemAdminControllerTest {
 
     @Test
     public void testShowJournal() {
-        sac.setSystemService(new SystemServiceImpl(false) {
-            @Override
-            public void showJournal(Service service, String node) {
-                // No Op
-            }
-        });
+
         assertEquals ("{\n" +
                 "  \"messages\": \"zookeeper journal display from 192.168.10.11.\",\n" +
                 "  \"status\": \"OK\"\n" +
@@ -76,23 +86,13 @@ public class SystemAdminControllerTest {
 
     @Test
     public void testStartService() {
-        sac.setSystemService(new SystemServiceImpl(false) {
-            @Override
-            public void startService(Service service, String node) {
-                // No Op
-            }
-        });
+
         assertEquals ("{\n" +
                 "  \"messages\": \"zookeeper has been started successfuly on 192.168.10.11.\",\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", sac.startService("zookeeper", "192.168.10.11"));
 
-        sac.setSystemService(new SystemServiceImpl(false) {
-            @Override
-            public void startService(Service service, String node) throws SystemException {
-                throw new SystemException("Test Error");
-            }
-        });
+        systemServiceTest.setStartServiceError();
 
         assertEquals ("{\n" +
                 "  \"error\": \"Test Error\",\n" +
@@ -102,12 +102,7 @@ public class SystemAdminControllerTest {
 
     @Test
     public void testStopService() {
-        sac.setSystemService(new SystemServiceImpl(false) {
-            @Override
-            public void stopService(Service service, String node) {
-                // No Op
-            }
-        });
+
         assertEquals ("{\n" +
                 "  \"messages\": \"zookeeper has been stopped successfuly on 192.168.10.11.\",\n" +
                 "  \"status\": \"OK\"\n" +
@@ -116,12 +111,7 @@ public class SystemAdminControllerTest {
 
     @Test
     public void testRestartService() {
-        sac.setSystemService(new SystemServiceImpl(false) {
-            @Override
-            public void restartService(Service service, String node) {
-                // No Op
-            }
-        });
+
         assertEquals ("{\n" +
                 "  \"messages\": \"zookeeper has been restarted successfuly on 192.168.10.11.\",\n" +
                 "  \"status\": \"OK\"\n" +
@@ -130,12 +120,7 @@ public class SystemAdminControllerTest {
 
     @Test
     public void testServiceActionCustom() {
-        sac.setSystemService(new SystemServiceImpl(false) {
-            @Override
-            public void callCommand(String commandId, String serviceName, String node) {
-                // No Op
-            }
-        });
+
         assertEquals ("{\n" +
                 "  \"messages\": \"command show_log for zookeeper has been executed successfuly on 192.168.10.11.\",\n" +
                 "  \"status\": \"OK\"\n" +
@@ -154,14 +139,9 @@ public class SystemAdminControllerTest {
     }
 
     @Test
-    public void testReinstallService_processingPending() {
+    public void testReinstallService_processingPending() throws Exception {
 
-        sac.setOperationsMonitoringService(new OperationsMonitoringService() {
-            @Override
-            public boolean isProcessingPending() {
-                return true;
-            }
-        });
+        operationsMonitoringServiceTest.operationsStarted(new SimpleOperationCommand("test", "test", "192.168.10.15"));
 
         assertEquals ("{\n" +
                 "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed.\",\n" +
@@ -172,53 +152,20 @@ public class SystemAdminControllerTest {
     @Test
     public void testReinstallService() throws Exception {
 
-        AtomicBoolean called = new AtomicBoolean(false);
+        configurationServiceTest.setStandard2NodesSetup();
+        configurationServiceTest.setStandard2NodesInstallStatus();
 
-        sac.setSystemService(new SystemServiceImpl(false) {
-
-            @Override
-            public void delegateApplyNodesConfig(ServiceOperationsCommand command)  {
-                // No Op
-            }
-
-        });
-
-        sac.setConfigurationService(new ConfigurationServiceImpl() {
-            @Override
-            public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
-                ServicesInstallStatusWrapper retWrapper = StandardSetupHelpers.getStandard2NodesInstallStatus();
-                assertEquals ("OK", retWrapper.getValueForPathAsString("zookeeper_installed_on_IP_192-168-10-13"));
-                return retWrapper;
-            }
-            @Override
-            public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) throws FileException, JSONException, SetupException {
-                called.set(true);
-                // should have bneen removed
-                assertNull(status.getValueForPathAsString("zookeeper_installed_on_IP_192-168-10-13"));
-            }
-            @Override
-            public NodesConfigWrapper loadNodesConfig() throws SystemException, SetupException {
-                return StandardSetupHelpers.getStandard2NodesSetup();
-            }
-        });
-
-        sac.setNodeRangeResolver(new NodeRangeResolver() {
-            @Override
-            public NodesConfigWrapper resolveRanges(NodesConfigWrapper rawNodesConfig) throws NodesConfigurationException {
-                return rawNodesConfig;
-            }
-        });
-
-        ServicesDefinitionImpl sd = new ServicesDefinitionImpl();
-        sd.afterPropertiesSet();
-        sac.setServicesDefinition(sd);
+        assertEquals ("OK", configurationServiceTest.loadServicesInstallationStatus().getValueForPathAsString("zookeeper_installed_on_IP_192-168-10-13"));
 
         assertEquals ("{\n" +
                 "  \"messages\": \"zookeeper has been reinstalled successfuly on 192.168.10.13.\",\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", sac.reinstallService("zookeeper", "192.168.10.13"));
 
-        assertTrue(called.get());
+        // should have been remove prior to reinstall and not set back since reinstall is mocked (No-Op)
+        assertNull (configurationServiceTest.loadServicesInstallationStatus().getValueForPathAsString("zookeeper_installed_on_IP_192-168-10-13"));
+
+        assertTrue(configurationServiceTest.isSaveServicesInstallationStatusCalled());
     }
 
 }

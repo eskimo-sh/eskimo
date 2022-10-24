@@ -7,9 +7,9 @@ import ch.niceideas.eskimo.model.SettingsOperationsCommand;
 import ch.niceideas.eskimo.model.SimpleOperationCommand;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.test.infrastructure.HttpSessionHelper;
+import ch.niceideas.eskimo.test.infrastructure.NotificationHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
-import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +24,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-cluster", "no-web-stack", "test-services"})
+@ActiveProfiles({"no-web-stack", "test-services", "test-conf"})
 public class ServicesSettingsControllerTest {
 
     @Autowired
@@ -106,11 +105,8 @@ public class ServicesSettingsControllerTest {
                 "  \"status\": \"KO\"\n" +
                 "}", scc.saveServicesSettings(session));
 
-        Pair<Integer, List<JSONObject>> notifications =  notificationService.fetchElements(0);
-        String notificationMessages = notifications.getValue().stream()
-                .map(obj -> obj.get("message").toString())
-                .collect(Collectors.joining(","));
-        assertEquals("Setting application failed ! Test Error", notificationMessages);
+
+        assertEquals("Setting application failed ! Test Error", NotificationHelper.getAssembledNotifications(notificationService));
 
         injectDummyService();
 

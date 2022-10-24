@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-@Profile("!no-nodes")
+@Profile("!test-nodes-conf")
 public class NodesConfigurationServiceImpl implements NodesConfigurationService {
 
     private static final Logger logger = Logger.getLogger(NodesConfigurationServiceImpl.class);

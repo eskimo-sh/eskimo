@@ -68,17 +68,6 @@ public class SystemAdminController extends AbstractOperationController {
     @Autowired
     private NodeRangeResolver nodeRangeResolver;
 
-    /* for tests */
-    void setServicesDefinition(ServicesDefinition servicesDefinition) {
-        this.servicesDefinition = servicesDefinition;
-    }
-    void setNodeRangeResolver(NodeRangeResolver nodeRangeResolver) {
-        this.nodeRangeResolver = nodeRangeResolver;
-    }
-    void setConfigurationService (ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-
     @GetMapping("/interupt-processing")
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")

@@ -50,7 +50,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @Component
 @Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
-@Profile("no-cluster")
+@Profile("test-conf")
 public class ConfigurationServiceTestImpl implements ConfigurationService {
 
     private boolean standardKubernetesConfig = false;
@@ -67,6 +67,7 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
 
     private ServicesSettingsWrapper serviceSettings = null;
     private String setupConfigAsString;
+    private ServicesInstallStatusWrapper installStatus = null;
 
     public void reset() {
         this.standardKubernetesConfig = false;
@@ -74,9 +75,13 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
         this.standard2NodesInstallStatus = false;
         this.standard2NodesSetup = false;
         this.nodesConfigError = false;
-        serviceSettingsError = false;
-        setupConfigNotCompletedError = false;
-        setupCompleted = false;
+        this.serviceSettingsError = false;
+        this.setupConfigNotCompletedError = false;
+        this.setupCompleted = false;
+
+        this.serviceSettings = null;
+        this.setupConfigAsString = null;
+        this.installStatus = null;
     }
 
     public void setStandardKubernetesConfig() {
@@ -90,7 +95,8 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
     }
 
     public void setStandard2NodesInstallStatus() {
-        standard2NodesInstallStatus = true;
+        this.standard2NodesInstallStatus = true;
+        this.installStatus = null;
     }
 
     public void setStandard2NodesSetup() {
@@ -117,6 +123,10 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
         setupCompleted = true;
     }
 
+    public boolean isSaveServicesInstallationStatusCalled () {
+        return this.installStatus != null;
+    }
+
     @Override
     public void saveServicesSettings(ServicesSettingsWrapper settings) throws FileException, SetupException {
         this.serviceSettings = settings;
@@ -137,7 +147,7 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
 
     @Override
     public void saveServicesInstallationStatus(ServicesInstallStatusWrapper status) throws FileException, SetupException {
-
+        this.installStatus = status;
     }
 
     @Override
@@ -147,6 +157,9 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
 
     @Override
     public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
+        if (this.installStatus != null) {
+            return this.installStatus;
+        }
         if (standard2NodesInstallStatus) {
             return StandardSetupHelpers.getStandard2NodesInstallStatus();
         }

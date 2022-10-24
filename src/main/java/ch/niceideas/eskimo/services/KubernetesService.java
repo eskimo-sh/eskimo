@@ -35,23 +35,12 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.model.service.MemoryModel;
+import ch.niceideas.eskimo.model.KubernetesOperationsCommand;
+import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
+import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.service.Service;
-import ch.niceideas.eskimo.proxy.ProxyManagerService;
-import ch.niceideas.eskimo.utils.KubeStatusParser;
-import org.apache.log4j.Logger;
-import org.json.JSONException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.prepost.PreAuthorize;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import java.util.Map;
 
 
 public interface KubernetesService {

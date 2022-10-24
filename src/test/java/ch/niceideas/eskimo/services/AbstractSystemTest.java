@@ -88,7 +88,7 @@ public abstract class AbstractSystemTest {
 
     protected ConnectionManagerService connectionManagerService;
 
-    protected OperationsMonitoringService operationsMonitoringService;
+    protected OperationsMonitoringServiceImpl operationsMonitoringService;
 
     protected StringBuilder testSSHCommandResultBuilder = new StringBuilder(10000);
     protected StringBuilder testSSHCommandScript = new StringBuilder(10000);
@@ -219,7 +219,7 @@ public abstract class AbstractSystemTest {
 
         notificationService = new NotificationService();
 
-        operationsMonitoringService = new OperationsMonitoringService();
+        operationsMonitoringService = new OperationsMonitoringServiceImpl();
         operationsMonitoringService.setNotificationService(notificationService);
         operationsMonitoringService.setConfigurationService(configurationService);
         operationsMonitoringService.setNodeRangeResolver(nodeRangeResolver);
