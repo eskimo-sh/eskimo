@@ -52,7 +52,7 @@ public class ServicesSettingsServiceTest extends AbstractSystemTest {
     private String jsonConfig = null;
     private String testForm = null;
 
-    private ServicesSettingsService scs;
+    private ServicesSettingsServiceImpl scs;
 
     private AtomicReference<ServiceOperationsCommand> processedCommand = new AtomicReference<>();
 
@@ -62,7 +62,7 @@ public class ServicesSettingsServiceTest extends AbstractSystemTest {
         jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
         testForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testForm.json"), StandardCharsets.UTF_8);
 
-        scs = new ServicesSettingsService();
+        scs = new ServicesSettingsServiceImpl();
 
         scs.setSystemService(systemService);
         scs.setSystemOperationService(systemOperationService);

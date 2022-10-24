@@ -20,7 +20,7 @@ public class SettingsOperationsCommandTest extends AbstractServicesDefinitionTes
 
     private String expectedJson = null;
 
-    private ServicesSettingsService scs;
+    private ServicesSettingsServiceImpl scs;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -36,7 +36,7 @@ public class SettingsOperationsCommandTest extends AbstractServicesDefinitionTes
 
         expectedJson = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SettingsOperationsCommandTest/expected.json"), StandardCharsets.UTF_8);
 
-        scs = new ServicesSettingsService();
+        scs = new ServicesSettingsServiceImpl();
 
         scs.setConfigurationService(configurationService);
 

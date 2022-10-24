@@ -65,14 +65,6 @@ public class ServicesSettingsController extends AbstractOperationController{
     @Autowired
     private ConfigurationService configurationService;
 
-    /* For tests */
-    void setServicesSettingsService(ServicesSettingsService servicesSettingsService) {
-        this.servicesSettingsService = servicesSettingsService;
-    }
-    void setConfigurationService(ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-
     @GetMapping("/load-services-settings")
     @ResponseBody
     public String loadServicesSettings() {

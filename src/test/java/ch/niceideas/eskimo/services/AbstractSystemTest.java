@@ -72,7 +72,7 @@ public abstract class AbstractSystemTest {
 
     protected ServicesInstallationSorter servicesInstallationSorter = null;
 
-    protected ServicesSettingsService servicesSettingsService = null;
+    protected ServicesSettingsServiceImpl servicesSettingsService = null;
 
     protected MemoryComputer memoryComputer = null;
 
@@ -244,7 +244,7 @@ public abstract class AbstractSystemTest {
 
         operationsMonitoringService.setServicesInstallationSorter(servicesInstallationSorter);
 
-        servicesSettingsService = new ServicesSettingsService();
+        servicesSettingsService = new ServicesSettingsServiceImpl();
         servicesSettingsService.setSystemService(systemService);
         servicesSettingsService.setSystemOperationService(systemOperationService);
         servicesSettingsService.setMemoryComputer(memoryComputer);

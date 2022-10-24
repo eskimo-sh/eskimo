@@ -10,6 +10,7 @@ import ch.niceideas.eskimo.test.infrastructure.HttpSessionHelper;
 import ch.niceideas.eskimo.test.infrastructure.NotificationHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.ServicesSettingsServiceTestImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-services", "test-conf"})
+@ActiveProfiles({"no-web-stack", "test-services", "test-conf", "test-services-settings"})
 public class ServicesSettingsControllerTest {
 
     @Autowired
@@ -45,6 +46,9 @@ public class ServicesSettingsControllerTest {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private ServicesSettingsServiceTestImpl servicesSettingsServiceTest;
+
     @BeforeEach
     public void testSetup() {
         if (operationsMonitoringService.isProcessingPending()) {
@@ -52,6 +56,8 @@ public class ServicesSettingsControllerTest {
         }
 
         SecurityContextHelper.loginAdmin();
+
+        servicesSettingsServiceTest.reset();
     }
 
     @Test
@@ -77,11 +83,11 @@ public class ServicesSettingsControllerTest {
     @Test
     public void testPrepareAndSaveServicesConfig() throws Exception {
 
-        injectDummyService();
-
         Map<String, Object> sessionContent = new HashMap<>();
 
         HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
+
+        String jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
 
         assertEquals ("{\n" +
                 "  \"command\": {\n" +
@@ -89,16 +95,11 @@ public class ServicesSettingsControllerTest {
                 "    \"restarts\": []\n" +
                 "  },\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", scc.prepareSaveServicesSettings("{\"dummyJson\" : \"dummyJson\"}", session));
+                "}", scc.prepareSaveServicesSettings(jsonConfig, session));
 
         assertEquals ("{\"status\": \"OK\"}", scc.saveServicesSettings(session));
 
-        scc.setServicesSettingsService(new ServicesSettingsService() {
-            @Override
-            public void applyServicesSettings(SettingsOperationsCommand command) throws FileException, SetupException, SystemException  {
-                throw new SetupException("Test Error");
-            }
-        });
+        servicesSettingsServiceTest.setApplyServicesSettingsError();
 
         assertEquals ("{\n" +
                 "  \"error\": \"VGVzdCBFcnJvcg==\",\n" +
@@ -108,7 +109,7 @@ public class ServicesSettingsControllerTest {
 
         assertEquals("Setting application failed ! Test Error", NotificationHelper.getAssembledNotifications(notificationService));
 
-        injectDummyService();
+        servicesSettingsServiceTest.reset();
 
         operationsMonitoringService.operationsStarted(new SimpleOperationCommand("test", "test", "192.168.10.15"));
 
@@ -116,27 +117,5 @@ public class ServicesSettingsControllerTest {
                 "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed..\",\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", scc.saveServicesSettings(session));
-    }
-
-    void injectDummyService() {
-        scc.setServicesSettingsService(new ServicesSettingsService() {
-            @Override
-            public ServicesSettingsWrapper prepareSaveSettings (
-                    String settingsFormAsString,
-                    Map<String, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
-                    List<String> restartedServices) throws FileException, SetupException {
-                String jsonConfig = null;
-                try {
-                    jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
-                } catch (IOException e) {
-                    fail (e.getMessage());
-                }
-                return new ServicesSettingsWrapper(jsonConfig);
-            }
-            @Override
-            public void applyServicesSettings(SettingsOperationsCommand command) throws FileException, SetupException, SystemException {
-                // No Op
-            }
-        });
     }
 }
