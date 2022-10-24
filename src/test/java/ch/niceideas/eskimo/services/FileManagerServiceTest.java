@@ -38,6 +38,7 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import com.trilead.ssh2.SFTPv3Client;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
@@ -196,15 +197,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
             }
         };
 
-        HttpServletResponse proxyResponse = (HttpServletResponse) Proxy.newProxyInstance(
-                FileManagerServiceTest.class.getClassLoader(),
-                new Class[] { HttpServletResponse.class },
-                (proxy, method, methodArgs) -> {
-                    if (method.getName().equals("getOutputStream")) {
-                        return streamWrapper;
-                    }
-                    return null;
-                });
+        HttpServletResponse proxyResponse = HttpObjectsHelper.createHttpServletResponse(new HashMap<>(), streamWrapper);
 
         sc.downloadFile("localhost", tempFile.getParent(), tempFile.getName(), new FileManagerServiceImpl.HttpServletResponseAdapter(){
 

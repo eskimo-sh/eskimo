@@ -3,11 +3,11 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.eskimo.services.TerminalService;
 import ch.niceideas.eskimo.terminal.ScreenImage;
 import ch.niceideas.eskimo.terminal.Terminal;
+import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import org.junit.jupiter.api.Test;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,19 +56,7 @@ public class TerminalControllerTest {
 
         Map<String, String> headers = new HashMap<>();
 
-        HttpServletResponse httpServletResponse = (HttpServletResponse) Proxy.newProxyInstance(
-                NodesConfigController.class.getClassLoader(),
-                new Class[]{HttpServletResponse.class},
-                (proxy, method, methodArgs) -> {
-                    if (method.getName().equals("setContentType")) {
-                        return headers.put ("Content-Type", (String)methodArgs[0]);
-                    } else if (method.getName().equals("addHeader")) {
-                        return headers.put ((String)methodArgs[0], (String)methodArgs[1]);
-                    } else {
-                        throw new UnsupportedOperationException(
-                                "Unsupported method: " + method.getName());
-                    }
-                });
+        HttpServletResponse httpServletResponse = HttpObjectsHelper.createHttpServletResponse(headers, null);
 
         assertEquals ("<pre class='term '><span class='f7 b0 cur'> </span><span class='f7 b0'>                                                           \n" +
                 "                                                            \n" +

@@ -1,8 +1,8 @@
 package ch.niceideas.eskimo.proxy;
 
-import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import org.apache.catalina.ssi.ByteArrayServletOutputStream;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.Test;
@@ -13,10 +13,8 @@ import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class WebCommandServletTest {
 
@@ -60,31 +58,15 @@ public class WebCommandServletTest {
 
         ByteArrayServletOutputStream responseOutputStream = new ByteArrayServletOutputStream();
 
-        Map<String, Object> headers = new HashMap<>();
-        AtomicReference<String> contentType = new AtomicReference<>();
+        Map<String, String> headers = new HashMap<>();
 
-        HttpServletResponse servletResponse = (HttpServletResponse) Proxy.newProxyInstance(
-                ServicesProxyServletTest.class.getClassLoader(),
-                new Class[] { HttpServletResponse.class },
-                (proxy, method, methodArgs) -> {
-                    if (method.getName().equals("getOutputStream")) {
-                        return responseOutputStream;
-                    } else if (method.getName().equals("setContentType")) {
-                        contentType.set ((String)methodArgs[0]);
-                        return null;
-                    } else if (method.getName().equals("setIntHeader")) {
-                        return headers.put ((String)methodArgs[0], methodArgs[1]);
-                    } else {
-                        throw new UnsupportedOperationException(
-                                "Unsupported method: " + method.getName());
-                    }
-                });
+        HttpServletResponse servletResponse = HttpObjectsHelper.createHttpServletResponse(headers, null);
 
         WebCommandServlet wcs = new WebCommandServlet(sd, scs, cs);
         wcs.service(servletRequest, servletResponse);
 
         String result = new String (responseOutputStream.toByteArray(), StandardCharsets.UTF_8);
         assertEquals("{\"value\": \"TEST_TOKEN\"}", result);
-        assertEquals("application/json", contentType.get());
+        assertEquals("application/json", headers.get("Content-Type"));
     }
 }

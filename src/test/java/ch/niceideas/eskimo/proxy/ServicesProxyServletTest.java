@@ -36,10 +36,11 @@ package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SSHConnection;
-import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
+import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.model.service.proxy.ReplacementContext;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import org.apache.catalina.ssi.ByteArrayServletOutputStream;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpRequest;
@@ -47,7 +48,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.entity.BasicHttpEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Replace;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -57,7 +57,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class ServicesProxyServletTest {
 
@@ -314,64 +313,13 @@ public class ServicesProxyServletTest {
 
         ByteArrayServletOutputStream responseOutputStream = new ByteArrayServletOutputStream();
 
-        HttpRequest proxyRequest = (HttpRequest) Proxy.newProxyInstance(
-                ServicesProxyServletTest.class.getClassLoader(),
-                new Class[] { HttpRequest.class },
-                (proxy, method, methodArgs) -> {
-                    throw new UnsupportedOperationException(
-                            "Unsupported method: " + method.getName());
-                });
+        HttpRequest proxyRequest = HttpObjectsHelper.createHttpRequest();
 
-        HttpResponse proxyResponse = (HttpResponse) Proxy.newProxyInstance(
-                ServicesProxyServletTest.class.getClassLoader(),
-                new Class[] { HttpResponse.class },
-                (proxy, method, methodArgs) -> {
-                    if (method.getName().equals("getEntity")) {
-                        return proxyServedEntity;
-                    } else {
-                        throw new UnsupportedOperationException(
-                            "Unsupported method: " + method.getName());
-                    }
-                });
+        HttpResponse proxyResponse = HttpObjectsHelper.createHttpResponse(proxyServedEntity);
 
-        HttpServletRequest servletRequest = (HttpServletRequest) Proxy.newProxyInstance(
-                ServicesProxyServletTest.class.getClassLoader(),
-                new Class[] { HttpServletRequest.class },
-                (proxy, method, methodArgs) -> {
-                    switch (method.getName()) {
-                        case "getRequestURI":
-                            return "/cerebro/statistics?server=192.168.10.13";
-                        case "getPathInfo":
-                            return "/cerebro/statistics";
-                        case "getRequestURL":
-                            return new StringBuffer("http://localhost:9090/cerebro/statistics");
-                        case "getQueryString":
-                            return "server=192.168.10.13";
-                        case "getContextPath":
-                            return null;
-                        case "getScheme":
-                            return "http";
-                        case "getServerName":
-                            return "localhost";
-                        case "getServerPort":
-                            return 9191;
-                        default:
-                            throw new UnsupportedOperationException(
-                                    "Unsupported method: " + method.getName());
-                    }
-                });
+        HttpServletRequest servletRequest = HttpObjectsHelper.createHttpServletRequest("cerebro");
 
-        HttpServletResponse servletResponse = (HttpServletResponse) Proxy.newProxyInstance(
-                ServicesProxyServletTest.class.getClassLoader(),
-                new Class[] { HttpServletResponse.class },
-                (proxy, method, methodArgs) -> {
-                    if (method.getName().equals("getOutputStream")) {
-                        return responseOutputStream;
-                    } else {
-                        throw new UnsupportedOperationException(
-                            "Unsupported method: " + method.getName());
-                    }
-                });
+        HttpServletResponse servletResponse = HttpObjectsHelper.createHttpServletResponse(new HashMap<>(), responseOutputStream);
 
         servlet.copyResponseEntity(proxyResponse, servletResponse, proxyRequest, servletRequest);
 

@@ -3,7 +3,7 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.SimpleOperationCommand;
 import ch.niceideas.eskimo.services.OperationsMonitoringService;
-import ch.niceideas.eskimo.test.infrastructure.HttpSessionHelper;
+import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
@@ -114,7 +114,7 @@ public class SetupConfigControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
+        HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
         scc.setDemoMode (true);
 
@@ -129,7 +129,7 @@ public class SetupConfigControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
+        HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
         operationsMonitoringService.operationsStarted(new SimpleOperationCommand("test", "test", "192.168.10.15"));
 
@@ -144,7 +144,7 @@ public class SetupConfigControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
+        HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
         assertEquals ("{\n" +
                         "  \"command\": {\n" +

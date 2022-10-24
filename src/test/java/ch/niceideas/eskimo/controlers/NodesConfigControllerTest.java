@@ -1,13 +1,9 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.ServiceOperationsCommand;
-import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.SimpleOperationCommand;
 import ch.niceideas.eskimo.services.*;
-import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
-import ch.niceideas.eskimo.test.infrastructure.HttpSessionHelper;
+import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
@@ -21,7 +17,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
 import javax.servlet.http.HttpSession;
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -106,7 +101,7 @@ public class NodesConfigControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
+        HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
         assertEquals ("{\n" +
                 "  \"command\": {\n" +
@@ -139,7 +134,7 @@ public class NodesConfigControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
+        HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
         ncc.setDemoMode(true);
 
@@ -154,7 +149,7 @@ public class NodesConfigControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
+        HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
         operationsMonitoringService.operationsStarted(new SimpleOperationCommand("test", "test", "192.168.10.15"));
 
@@ -169,7 +164,7 @@ public class NodesConfigControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
+        HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
         assertEquals ("{\n" +
                         "  \"command\": {\n" +

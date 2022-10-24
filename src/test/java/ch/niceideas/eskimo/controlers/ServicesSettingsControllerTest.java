@@ -3,10 +3,9 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
-import ch.niceideas.eskimo.model.SettingsOperationsCommand;
 import ch.niceideas.eskimo.model.SimpleOperationCommand;
 import ch.niceideas.eskimo.services.*;
-import ch.niceideas.eskimo.test.infrastructure.HttpSessionHelper;
+import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import ch.niceideas.eskimo.test.infrastructure.NotificationHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
@@ -20,10 +19,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -85,7 +82,7 @@ public class ServicesSettingsControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
+        HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
         String jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
 

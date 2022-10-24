@@ -4,7 +4,7 @@ import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.SimpleOperationCommand;
 import ch.niceideas.eskimo.services.OperationsMonitoringService;
 import ch.niceideas.eskimo.services.StandardSetupHelpers;
-import ch.niceideas.eskimo.test.infrastructure.HttpSessionHelper;
+import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
@@ -123,7 +123,7 @@ public class KubernetesServicesConfigControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
+        HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
         configurationServiceTest.setStandard2NodesInstallStatus();
         configurationServiceTest.setStandard2NodesSetup();
@@ -154,7 +154,7 @@ public class KubernetesServicesConfigControllerTest {
     public void testApplyNodesConfig_demoMode() throws Exception {
 
         Map<String, Object> sessionContent = new HashMap<>();
-        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
+        HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
         kscc.setDemoMode(true);
 
@@ -168,7 +168,7 @@ public class KubernetesServicesConfigControllerTest {
     public void testApplyNodesConfig_processingPending() throws Exception {
 
         Map<String, Object> sessionContent = new HashMap<>();
-        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
+        HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
         operationsMonitoringService.operationsStarted(new SimpleOperationCommand("test", "test", "192.168.10.15"));
 
@@ -183,7 +183,7 @@ public class KubernetesServicesConfigControllerTest {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
-        HttpSession session = HttpSessionHelper.createHttpSession(sessionContent);
+        HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
         configurationServiceTest.setStandard2NodesInstallStatus();
         configurationServiceTest.setStandard2NodesSetup();
