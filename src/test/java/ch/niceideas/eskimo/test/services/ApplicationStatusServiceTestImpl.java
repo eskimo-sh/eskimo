@@ -32,26 +32,31 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.exceptions.CommonBusinessException;
 
-public class NodesConfigurationException extends CommonBusinessException {
+package ch.niceideas.eskimo.test.services;
 
-    static final long serialVersionUID = -3387512211124229248L;
+import ch.niceideas.common.json.JsonWrapper;
+import ch.niceideas.eskimo.services.ApplicationStatusService;
+import org.json.JSONObject;
+import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
-    public NodesConfigurationException() {
+@Component
+@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Profile("test-app-status")
+public class ApplicationStatusServiceTestImpl implements ApplicationStatusService  {
+
+    @Override
+    public JsonWrapper getStatus() {
+        return new JsonWrapper( new JSONObject("{\"status\":\"OK\"}"));
     }
 
-    public NodesConfigurationException(String message) {
-        super(message);
-    }
+    @Override
+    public void updateStatus() {
 
-    public NodesConfigurationException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public NodesConfigurationException(Throwable cause) {
-        super(cause);
     }
 }

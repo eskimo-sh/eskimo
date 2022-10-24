@@ -40,6 +40,7 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -58,16 +59,22 @@ import java.util.Set;
 public class SystemServiceTestImpl implements SystemService {
 
     private boolean returnEmptySystemStatus = false;
+    private boolean returnOKSystemStatus = false;
 
     private boolean startServiceError = false;
 
     public void reset() {
         this.returnEmptySystemStatus = false;
+        this.returnOKSystemStatus = false;
         this.startServiceError = false;
     }
 
-    public void setReturnEmptySystemStatus(boolean returnEmptySystemStatus) {
-        this.returnEmptySystemStatus = returnEmptySystemStatus;
+    public void setReturnEmptySystemStatus() {
+        this.returnEmptySystemStatus = true;
+    }
+
+    public void setReturnOKSystemStatus() {
+        this.returnOKSystemStatus = true;
     }
 
     public void setStartServiceError() {
@@ -110,6 +117,8 @@ public class SystemServiceTestImpl implements SystemService {
     public SystemStatusWrapper getStatus() throws StatusExceptionWrapperException {
         if (returnEmptySystemStatus) {
             return SystemStatusWrapper.empty();
+        } else  if (returnOKSystemStatus) {
+            return new SystemStatusWrapper("{\"status\":\"OK\"}");
         }
         return null;
     }

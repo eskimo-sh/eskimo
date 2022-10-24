@@ -49,7 +49,7 @@ public class KubernetesServicesConfigControllerTest {
     @BeforeEach
     public void testSetup() {
 
-        systemSeviceTest.setReturnEmptySystemStatus(true);
+        systemSeviceTest.setReturnEmptySystemStatus();
 
         if (operationsMonitoringService.isProcessingPending()) {
             operationsMonitoringService.operationsFinished(true);

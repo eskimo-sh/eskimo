@@ -89,7 +89,7 @@ public class SetupConfigController extends AbstractOperationController {
             }
 
             configWrapper.setValueForPath("version", buildVersion);
-            configWrapper.setValueForPath("isSnapshot", ApplicationStatusService.isSnapshot(buildVersion));
+            configWrapper.setValueForPath("isSnapshot", ApplicationStatusServiceImpl.isSnapshot(buildVersion));
 
             configWrapper.setValueForPath("processingPending", operationsMonitoringService.isProcessingPending());
 
@@ -104,7 +104,7 @@ public class SetupConfigController extends AbstractOperationController {
             logger.debug(e, e);
             return ReturnStatusHelper.createClearStatus("missing", operationsMonitoringService.isProcessingPending(), map -> {
                 map.put("version", buildVersion);
-                map.put("isSnapshot", ApplicationStatusService.isSnapshot(buildVersion));
+                map.put("isSnapshot", ApplicationStatusServiceImpl.isSnapshot(buildVersion));
             });
         }
     }

@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;

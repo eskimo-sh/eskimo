@@ -32,7 +32,7 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.services;
+package ch.niceideas.eskimo.services.satellite;
 
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
@@ -40,6 +40,7 @@ import ch.niceideas.eskimo.model.service.Dependency;
 import ch.niceideas.eskimo.model.service.KubeRequest;
 import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
 import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.services.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;

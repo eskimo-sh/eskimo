@@ -2,6 +2,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.MemoryModel;
+import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 
 import java.io.IOException;
 

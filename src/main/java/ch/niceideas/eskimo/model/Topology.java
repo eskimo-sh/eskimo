@@ -43,6 +43,7 @@ import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
 import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 

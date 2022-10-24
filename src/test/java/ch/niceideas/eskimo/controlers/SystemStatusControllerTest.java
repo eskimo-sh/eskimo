@@ -1,52 +1,48 @@
 package ch.niceideas.eskimo.controlers;
 
-import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.eskimo.model.MasterStatusWrapper;
-import ch.niceideas.eskimo.model.SystemStatusWrapper;
-import ch.niceideas.eskimo.services.*;
-import org.json.JSONObject;
+import ch.niceideas.eskimo.EskimoApplication;
+import ch.niceideas.eskimo.test.services.OperationsMonitoringServiceTestImpl;
+import ch.niceideas.eskimo.test.services.SystemServiceTestImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-app-status", "test-master", "test-operations", "test-system"})
 public class SystemStatusControllerTest {
 
+    @Autowired
     private SystemStatusController ssc;
+
+    @Autowired
+    private OperationsMonitoringServiceTestImpl operationsMonitoringServiceTest;
+
+    @Autowired
+    private SystemServiceTestImpl systemServiceTest;
 
     @BeforeEach
     public void setUp() {
-        ssc = new SystemStatusController();
-
-        ssc.setOperationsMonitoringService(new OperationsMonitoringServiceImpl() {
-            @Override
-            public boolean getLastOperationSuccess() {
-                return true;
-            }
-        });
+        operationsMonitoringServiceTest.operationsFinished(true);
     }
 
     @Test
     public void testgetLastOperationResult() {
-
-        ssc.setMasterService(new MasterService() {
-            public MasterStatusWrapper getMasterStatus() {
-                return MasterStatusWrapper.empty();
-            }
-        });
 
         assertEquals ("{\n" +
                 "  \"success\": true,\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", ssc.getLastOperationResult());
 
-        ssc.setOperationsMonitoringService(new OperationsMonitoringServiceImpl() {
-            @Override
-            public boolean getLastOperationSuccess() {
-                throw new IllegalStateException("Test Error");
-            }
-        });
+        operationsMonitoringServiceTest.setLastOperationSuccessError();
 
         IllegalStateException exception = assertThrows(IllegalStateException.class,
                 () -> ssc.getLastOperationResult());
@@ -57,33 +53,7 @@ public class SystemStatusControllerTest {
     @Test
     public void testGetStatus() {
 
-        ssc.setSetupService(new SetupServiceImpl() {
-            @Override
-            public void ensureSetupCompleted() throws SetupException {
-                // No Op
-            }
-        });
-
-        ssc.setSystemService(new SystemServiceImpl(false) {
-            @Override
-            public SystemStatusWrapper getStatus() {
-                return new SystemStatusWrapper("{\"status\":\"OK\"}");
-            }
-        });
-
-        ssc.setMasterService(new MasterService() {
-            @Override
-            public MasterStatusWrapper getMasterStatus() {
-                return MasterStatusWrapper.empty();
-            }
-        });
-
-        ssc.setStatusService(new ApplicationStatusService() {
-            @Override
-            public JsonWrapper getStatus() {
-                return new JsonWrapper( new JSONObject("{\"status\":\"OK\"}"));
-            }
-        });
+        systemServiceTest.setReturnOKSystemStatus();
 
         assertEquals ("{\n" +
                 "  \"nodeServicesStatus\": {\"status\": \"OK\"},\n" +
@@ -92,12 +62,7 @@ public class SystemStatusControllerTest {
                 "  \"status\": \"OK\"\n" +
                 "}", ssc.getStatus());
 
-        ssc.setSystemService(new SystemServiceImpl(false) {
-            @Override
-            public SystemStatusWrapper getStatus()  {
-                return new SystemStatusWrapper("{}");
-            }
-        });
+        systemServiceTest.setReturnEmptySystemStatus();
 
         assertEquals ("{\n" +
                 "  \"clear\": \"nodes\",\n" +

@@ -40,6 +40,8 @@ import ch.niceideas.eskimo.model.KubernetesOperationsCommand;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.satellite.KubernetesServicesConfigChecker;
+import ch.niceideas.eskimo.services.satellite.KubernetesServicesConfigException;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;

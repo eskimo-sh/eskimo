@@ -495,7 +495,7 @@ public class SetupServiceTest extends AbstractSystemTest {
             }
         });
 
-        setupService.setApplicationStatusService(new ApplicationStatusService() {
+        setupService.setApplicationStatusService(new ApplicationStatusServiceImpl() {
             public boolean isSnapshot() {
                 return false;
             }
@@ -552,7 +552,7 @@ public class SetupServiceTest extends AbstractSystemTest {
             }
         });
 
-        setupService.setApplicationStatusService(new ApplicationStatusService() {
+        setupService.setApplicationStatusService(new ApplicationStatusServiceImpl() {
             public boolean isSnapshot() {
                 return false;
             }

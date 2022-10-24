@@ -32,26 +32,29 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.exceptions.CommonBusinessException;
+package ch.niceideas.eskimo.test.services;
 
-public class KubernetesServicesConfigException extends CommonBusinessException {
+import ch.niceideas.eskimo.model.MasterStatusWrapper;
+import ch.niceideas.eskimo.services.MasterService;
+import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
-    static final long serialVersionUID = -3387512211124229248L;
+@Component
+@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Profile("test-master")
+public class MasterServiceTestImpl implements MasterService {
 
-    public KubernetesServicesConfigException() {
+    @Override
+    public MasterStatusWrapper getMasterStatus() throws MasterExceptionWrapperException {
+        return MasterStatusWrapper.empty();
     }
 
-    public KubernetesServicesConfigException(String message) {
-        super(message);
-    }
+    @Override
+    public void updateStatus() {
 
-    public KubernetesServicesConfigException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public KubernetesServicesConfigException(Throwable cause) {
-        super(cause);
     }
 }

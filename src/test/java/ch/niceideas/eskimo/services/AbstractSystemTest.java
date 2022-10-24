@@ -84,7 +84,7 @@ public abstract class AbstractSystemTest {
 
     protected NodesConfigurationServiceImpl nodesConfigurationService = null;
 
-    protected ApplicationStatusService applicationStatusService = null;
+    protected ApplicationStatusServiceImpl applicationStatusService = null;
 
     protected ConnectionManagerService connectionManagerService;
 
@@ -150,7 +150,7 @@ public abstract class AbstractSystemTest {
 
         setupService.setConfigurationService (configurationService);
 
-        applicationStatusService = new ApplicationStatusService();
+        applicationStatusService = new ApplicationStatusServiceImpl();
         applicationStatusService.setConfigurationService(configurationService);
         applicationStatusService.setServicesDefinition(servicesDefinition);
 

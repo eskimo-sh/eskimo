@@ -35,32 +35,15 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.Service;
-import ch.niceideas.eskimo.proxy.ProxyManagerService;
-import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
-import ch.niceideas.eskimo.utils.SystemStatusParser;
-import org.apache.log4j.Logger;
-import org.json.JSONException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Component;
+import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 
-import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 public interface SystemService {
 

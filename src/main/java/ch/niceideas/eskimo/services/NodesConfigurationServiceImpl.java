@@ -9,6 +9,7 @@ import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.services.satellite.MemoryComputer;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
+import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

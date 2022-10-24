@@ -32,7 +32,7 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.services;
+package ch.niceideas.eskimo.services.satellite;
 
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
@@ -40,6 +40,7 @@ import ch.niceideas.eskimo.model.NodesConfigWrapper.ParsedNodesConfigProperty;
 import ch.niceideas.eskimo.model.service.Dependency;
 import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
 import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -57,7 +58,8 @@ public class NodesConfigurationChecker {
     @Autowired
     private ServicesDefinition servicesDefinition;
 
-    void setServicesDefinition (ServicesDefinition servicesDefinition) {
+    @Deprecated
+    public void setServicesDefinition (ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
     }
 

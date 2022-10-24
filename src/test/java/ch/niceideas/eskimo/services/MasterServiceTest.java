@@ -45,7 +45,7 @@ public class MasterServiceTest extends AbstractSystemTest {
 
     private static final Logger logger = Logger.getLogger(MasterServiceTest.class);
 
-    private MasterService ms = new MasterService();
+    private MasterServiceImpl ms = new MasterServiceImpl();
 
     @BeforeEach
     @Override

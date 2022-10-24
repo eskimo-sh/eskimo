@@ -32,10 +32,16 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.services;
+package ch.niceideas.eskimo.services.satellite;
 
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.services.ConfigurationServiceImpl;
+import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
+import ch.niceideas.eskimo.services.SetupServiceImpl;
+import ch.niceideas.eskimo.services.SystemServiceTest;
+import ch.niceideas.eskimo.services.satellite.KubernetesServicesConfigChecker;
+import ch.niceideas.eskimo.services.satellite.KubernetesServicesConfigException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

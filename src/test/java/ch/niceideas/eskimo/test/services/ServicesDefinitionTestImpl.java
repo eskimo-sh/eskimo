@@ -42,6 +42,7 @@ import ch.niceideas.eskimo.model.Topology;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.model.service.UIConfig;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import org.json.JSONException;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;

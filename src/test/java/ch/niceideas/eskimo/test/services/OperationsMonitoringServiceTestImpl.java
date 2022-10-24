@@ -40,7 +40,7 @@ import ch.niceideas.eskimo.model.JSONOpCommand;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.OperationId;
 import ch.niceideas.eskimo.model.OperationsMonitoringStatusWrapper;
-import ch.niceideas.eskimo.services.NodesConfigurationException;
+import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.services.OperationsMonitoringService;
 import ch.niceideas.eskimo.services.ServiceDefinitionException;
 import ch.niceideas.eskimo.services.SystemException;
@@ -63,11 +63,17 @@ public class OperationsMonitoringServiceTestImpl implements OperationsMonitoring
 
     private JSONOpCommand currentOperation = null;
     private boolean lastOperationSuccess = false;
+    private boolean lastOperationSuccessError = false;
 
     public void reset() {
         this.interuptProcessingError = false;
         this.currentOperation = null;
         this.lastOperationSuccess = false;
+        this.lastOperationSuccessError = false;
+    }
+
+    public void setLastOperationSuccessError() {
+        this.lastOperationSuccessError = true;
     }
 
     public void setInteruptProcessingError() {
@@ -112,6 +118,9 @@ public class OperationsMonitoringServiceTestImpl implements OperationsMonitoring
 
     @Override
     public boolean getLastOperationSuccess() {
+        if (lastOperationSuccessError) {
+            throw new IllegalStateException("Test Error");
+        }
         return lastOperationSuccess;
     }
 

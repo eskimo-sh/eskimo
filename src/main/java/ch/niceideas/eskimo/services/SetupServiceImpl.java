@@ -39,6 +39,7 @@ import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.MessageLogger;
 import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -142,7 +143,7 @@ public class SetupServiceImpl implements SetupService {
     void setSystemService (SystemService systemService) {
         this.systemService = systemService;
     }
-    void setConfigurationService (ConfigurationService configurationService) {
+    public void setConfigurationService (ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
     void setServicesDefinition (ServicesDefinition servicesDefinition) {
@@ -424,7 +425,7 @@ public class SetupServiceImpl implements SetupService {
 
         } else {
 
-            if (ApplicationStatusService.isSnapshot(buildVersion)) {
+            if (ApplicationStatusServiceImpl.isSnapshot(buildVersion)) {
                 throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
             }
 
@@ -443,7 +444,7 @@ public class SetupServiceImpl implements SetupService {
         String kubeOrigin = (String) setupConfig.getValueForPath("setup-kube-origin");
         if (StringUtils.isEmpty(kubeOrigin) || kubeOrigin.equals(DOWNLOAD_FLAG)) { // for Kube default is download
 
-            if (ApplicationStatusService.isSnapshot(buildVersion)) {
+            if (ApplicationStatusServiceImpl.isSnapshot(buildVersion)) {
                 throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
             }
 
@@ -462,7 +463,7 @@ public class SetupServiceImpl implements SetupService {
         }
 
         // 3. Find out about upgrades
-        if (!ApplicationStatusService.isSnapshot(buildVersion)
+        if (!ApplicationStatusServiceImpl.isSnapshot(buildVersion)
                 && StringUtils.isNotEmpty(servicesOrigin) && servicesOrigin.equals(DOWNLOAD_FLAG) // for services default is build
                 && packagesVersion != null) {
             Set<String> updates = new HashSet<>();
@@ -569,7 +570,7 @@ public class SetupServiceImpl implements SetupService {
 
                 } else {
 
-                    if (ApplicationStatusService.isSnapshot(buildVersion)) {
+                    if (ApplicationStatusServiceImpl.isSnapshot(buildVersion)) {
                         throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
                     }
 
@@ -598,7 +599,7 @@ public class SetupServiceImpl implements SetupService {
             if (!missingKubePackages.isEmpty()) {
                 if (StringUtils.isEmpty(kubeOrigin) || kubeOrigin.equals(DOWNLOAD_FLAG)) { // for kube default is download
 
-                    if (ApplicationStatusService.isSnapshot(buildVersion)) {
+                    if (ApplicationStatusServiceImpl.isSnapshot(buildVersion)) {
                         throw new SetupException(NO_DOWNLOAD_IN_SNAPSHOT_ERROR);
                     }
 
@@ -626,7 +627,7 @@ public class SetupServiceImpl implements SetupService {
             }
 
             // 3. Handle updates
-            if (!ApplicationStatusService.isSnapshot(buildVersion)
+            if (!ApplicationStatusServiceImpl.isSnapshot(buildVersion)
                     && StringUtils.isNotEmpty(servicesOrigin)
                     && servicesOrigin.equals(DOWNLOAD_FLAG)) { // for services default is build
 

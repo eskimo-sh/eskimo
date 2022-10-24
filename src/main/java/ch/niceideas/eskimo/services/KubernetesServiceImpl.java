@@ -44,6 +44,7 @@ import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.services.satellite.MemoryComputer;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
+import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.utils.KubeStatusParser;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
