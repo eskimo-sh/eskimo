@@ -63,10 +63,13 @@ public class SystemServiceTestImpl implements SystemService {
 
     private boolean startServiceError = false;
 
+    private boolean standard2NodesStatus = false;
+
     public void reset() {
         this.returnEmptySystemStatus = false;
         this.returnOKSystemStatus = false;
         this.startServiceError = false;
+        this.standard2NodesStatus = false;
     }
 
     public void setReturnEmptySystemStatus() {
@@ -79,6 +82,10 @@ public class SystemServiceTestImpl implements SystemService {
 
     public void setStartServiceError() {
         this.startServiceError = true;
+    }
+
+    public void setStandard2NodesStatus() {
+        this.standard2NodesStatus = true;
     }
 
     @Override
@@ -119,6 +126,8 @@ public class SystemServiceTestImpl implements SystemService {
             return SystemStatusWrapper.empty();
         } else  if (returnOKSystemStatus) {
             return new SystemStatusWrapper("{\"status\":\"OK\"}");
+        } else if (standard2NodesStatus) {
+            return StandardSetupHelpers.getStandard2NodesSystemStatus();
         }
         return null;
     }

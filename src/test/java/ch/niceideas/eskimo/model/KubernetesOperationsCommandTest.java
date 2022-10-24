@@ -34,9 +34,16 @@
 
 package ch.niceideas.eskimo.model;
 
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.test.services.SystemServiceTestImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,26 +51,33 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionTest {
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-system", "test-setup"})
+public class KubernetesOperationsCommandTest {
 
-    private SystemService systemService = new SystemServiceImpl() {
+    @Autowired
+    private SystemServiceTestImpl systemServiceTest;
 
-    };
+    @Autowired
+    private ServicesDefinition servicesDefinition;
 
     @BeforeEach
-    @Override
     public void setUp() throws Exception {
-        super.setUp();
+        systemServiceTest.reset();
     }
 
     @Test
     public void testNoChanges() {
 
+        systemServiceTest.setStandard2NodesStatus();
+
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
 
-        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, systemService,
+        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(servicesDefinition, systemServiceTest,
                 KubernetesServicesConfigWrapper.empty(), savedServicesInstallStatus, kubeServicesConfig);
 
         assertEquals(0, koc.getInstallations().size());
@@ -78,14 +92,9 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
 
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
 
-        SystemService ss = new SystemServiceImpl() {
-            @Override
-            public SystemStatusWrapper getStatus() {
-                return StandardSetupHelpers.getStandard2NodesSystemStatus();
-            }
-        };
+        systemServiceTest.setStandard2NodesStatus();
 
-        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, ss,
+        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(servicesDefinition, systemServiceTest,
                 KubernetesServicesConfigWrapper.empty(), savedServicesInstallStatus, kubeServicesConfig);
 
         assertEquals(1, koc.getInstallations().size());
@@ -104,15 +113,9 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
         kubeServicesConfig.getJSONObject().remove("kafka-manager_install");
 
-        SystemService ss = new SystemServiceImpl() {
-            @Override
-            public SystemStatusWrapper getStatus() throws StatusExceptionWrapperException {
-                return StandardSetupHelpers.getStandard2NodesSystemStatus();
-            }
-        };
+        systemServiceTest.setStandard2NodesStatus();
 
-
-        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, ss,
+        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(servicesDefinition, systemServiceTest,
                 KubernetesServicesConfigWrapper.empty(), savedServicesInstallStatus, kubeServicesConfig);
 
         assertEquals(0, koc.getInstallations().size());
@@ -129,7 +132,13 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
         KubernetesOperationsCommand moc = prepareFourOps();
 
         assertEquals("{\n" +
-                "  \"restarts\": [],\n" +
+                "  \"restarts\": [\n" +
+                "    \"spark-console\",\n" +
+                "    \"elasticsearch\",\n" +
+                "    \"spark-runtime\",\n" +
+                "    \"logstash\",\n" +
+                "    \"kafka\"\n" +
+                "  ],\n" +
                 "  \"uninstallations\": [\n" +
                 "    \"kafka-manager\",\n" +
                 "    \"zeppelin\"\n" +
@@ -150,14 +159,9 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
         kubeServicesConfig.getJSONObject().remove("kafka-manager_install");
         kubeServicesConfig.getJSONObject().remove("zeppelin_install");
 
-        SystemService ss = new SystemServiceImpl() {
-            @Override
-            public SystemStatusWrapper getStatus() {
-                return StandardSetupHelpers.getStandard2NodesSystemStatus();
-            }
-        };
+        systemServiceTest.setStandard2NodesStatus();
 
-        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, ss,
+        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(servicesDefinition, systemServiceTest,
                 KubernetesServicesConfigWrapper.empty(), savedServicesInstallStatus, kubeServicesConfig);
 
         assertEquals(2, koc.getInstallations().size());
@@ -172,7 +176,10 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
 
         List<KubernetesOperationsCommand.KubernetesOperationId> opInOrder = moc.getAllOperationsInOrder(null);
 
-        assertEquals ("Installation_Topology-All-Nodes,installation_cerebro,installation_kibana,uninstallation_kafka-manager,uninstallation_zeppelin", opInOrder.stream().map(KubernetesOperationsCommand.KubernetesOperationId::toString).collect(Collectors.joining(",")));
+        assertEquals ("Installation_Topology-All-Nodes,installation_cerebro,installation_kibana," +
+                        "uninstallation_kafka-manager,uninstallation_zeppelin," +
+                        "restart_spark-console,restart_elasticsearch,restart_spark-runtime,restart_logstash,restart_kafka",
+                opInOrder.stream().map(KubernetesOperationsCommand.KubernetesOperationId::toString).collect(Collectors.joining(",")));
     }
 
     @Test
@@ -181,18 +188,13 @@ public class KubernetesOperationsCommandTest extends AbstractServicesDefinitionT
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
-        kubeServicesConfig.setValueForPath("kafka_cpu", "1");
+        kubeServicesConfig.setValueForPath("kafka_cpu", "2");
         kubeServicesConfig.setValueForPath("zeppelin_ram", "3000m");
 
-        SystemService ss = new SystemServiceImpl() {
-            @Override
-            public SystemStatusWrapper getStatus() {
-                return StandardSetupHelpers.getStandard2NodesSystemStatus();
-            }
-        };
+        systemServiceTest.setStandard2NodesStatus();
 
-        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(def, ss,
-                KubernetesServicesConfigWrapper.empty(), savedServicesInstallStatus, kubeServicesConfig);
+        KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(servicesDefinition, systemServiceTest,
+                StandardSetupHelpers.getStandardKubernetesConfig(), savedServicesInstallStatus, kubeServicesConfig);
 
         assertEquals(0, koc.getInstallations().size());
         assertEquals(0, koc.getUninstallations().size());

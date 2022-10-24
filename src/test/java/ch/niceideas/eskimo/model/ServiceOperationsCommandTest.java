@@ -36,11 +36,18 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -50,7 +57,17 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest {
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack"})
+public class ServiceOperationsCommandTest {
+
+    @Autowired
+    private ServicesDefinition servicesDefinition;
+
+    @Autowired
+    private NodeRangeResolver nodeRangeResolver;
 
     @Test
     public void testNoChanges() throws Exception {
@@ -59,7 +76,8 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+                servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         assertEquals(0, oc.getInstallations().size());
         assertEquals(0, oc.getUninstallations().size());
@@ -74,7 +92,8 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+                servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         assertEquals(1, oc.getInstallations().size());
         assertEquals("kube-master", oc.getInstallations().get(0).getService());
@@ -95,7 +114,8 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
         nodesConfig.getJSONObject().remove("kube-master");
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+                servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         assertEquals(0, oc.getInstallations().size());
 
@@ -130,7 +150,8 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+                servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         assertEquals(1, oc.getInstallations().size());
 
@@ -164,7 +185,8 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
             put ("ntp2", "on");
         }} );
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+                servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         //System.err.println (oc.toJSON());
 
@@ -215,7 +237,8 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         InputStream nodesStatusStream = ResourceUtils.getResourceAsStream("OperationsCommandTest/nodes-status.json");
         ServicesInstallStatusWrapper status = new ServicesInstallStatusWrapper(StreamUtils.getAsString(nodesStatusStream, StandardCharsets.UTF_8));
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(def, nrr, status, newNodesConfig);
+        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+                servicesDefinition, nodeRangeResolver, status, newNodesConfig);
 
         assertNotNull(oc);
 
@@ -239,7 +262,8 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
 
         nodesConfig.setValueForPath("zookeeper", "1");
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+                servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         //System.err.println (oc.toJSON());
 
@@ -262,7 +286,8 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         savedServicesInstallStatus.setValueForPath("logstash_installed_on_IP_192-168-10-11", "restart");
         savedServicesInstallStatus.setValueForPath("logstash_installed_on_IP_192-168-10-13", "restart");
 
-        ServiceOperationsCommand oc2 = ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+        ServiceOperationsCommand oc2 = ServiceOperationsCommand.create(
+                servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         System.err.println (oc2.toJSON());
 
@@ -286,7 +311,8 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
 
         nodesConfig.setValueForPath("zookeeper", "1");
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+                servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         //System.err.println (oc.toJSON());
 
@@ -311,7 +337,8 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         savedServicesInstallStatus.setValueForPath("logstash_installed_on_IP_192-168-10-11", "restart");
         savedServicesInstallStatus.setValueForPath("logstash_installed_on_IP_192-168-10-13", "restart");
 
-        ServiceOperationsCommand oc2 = ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+        ServiceOperationsCommand oc2 = ServiceOperationsCommand.create(
+                servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         System.err.println (oc2.toJSON());
 
@@ -335,7 +362,8 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
 
         nodesConfig.setValueForPath("zookeeper", "1");
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+                servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         //System.err.println (oc.toJSON());
 
@@ -365,7 +393,8 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
         savedServicesInstallStatus.setValueForPath("gluster_installed_on_IP_192-168-10-13", "OK");
         savedServicesInstallStatus.setValueForPath("kube-master_installed_on_IP_192-168-10-13", "OK");
 
-        ServiceOperationsCommand oc2 = ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+        ServiceOperationsCommand oc2 = ServiceOperationsCommand.create(
+                servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         System.err.println (oc2.toJSON());
 
@@ -414,7 +443,8 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
 
         nodesConfig.setValueForPath("zookeeper", "1");
 
-        return ServiceOperationsCommand.create(def, nrr, savedServicesInstallStatus, nodesConfig);
+        return ServiceOperationsCommand.create(
+                servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
     }
 
     @Test
@@ -426,7 +456,7 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
             @Override
             public ServicesInstallationSorter getServicesInstallationSorter() {
                 ServicesInstallationSorter sis = new ServicesInstallationSorter();
-                sis.setServicesDefinition(def);
+                sis.setServicesDefinition(servicesDefinition);
                 ConfigurationServiceImpl cs = new ConfigurationServiceImpl();
                 sis.setConfigurationService(cs);
                 cs.setSetupService(new SetupServiceImpl() {
@@ -438,7 +468,7 @@ public class ServiceOperationsCommandTest extends AbstractServicesDefinitionTest
             }
 
             @Override
-            public NodesConfigWrapper getNodesConfig() throws NodesConfigurationException {
+            public NodesConfigWrapper getNodesConfig() {
                 NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
                 nodesConfig.getJSONObject().remove("kube-slave1");
                 nodesConfig.getJSONObject().remove("etcd1");

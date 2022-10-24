@@ -1,10 +1,19 @@
 package ch.niceideas.eskimo.controlers;
 
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.services.TerminalService;
 import ch.niceideas.eskimo.terminal.ScreenImage;
 import ch.niceideas.eskimo.terminal.Terminal;
 import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
+import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
+import ch.niceideas.eskimo.test.services.TerminalServiceTestImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -13,28 +22,29 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-terminal"})
 public class TerminalControllerTest {
 
-    private TerminalController tc = new TerminalController();
+    @Autowired
+    private TerminalController tc;
+
+    @Autowired
+    private TerminalServiceTestImpl terminalServiceTest;
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        SecurityContextHelper.loginAdmin();
+    }
 
     @Test
     public void testRemoveTerminal() {
 
-        tc.setTerminalService(new TerminalService() {
-            @Override
-            public void removeTerminal (String sessionId) throws IOException {
-                // No Op
-            }
-        });
-
         assertEquals ("{\"status\": \"OK\"}", tc.removeTerminal("ABC"));
 
-        tc.setTerminalService(new TerminalService() {
-            @Override
-            public void removeTerminal (String sessionId) throws IOException {
-                throw new IOException("Error Test");
-            }
-        });
+        terminalServiceTest.setRemoveTerminalError();
 
         assertEquals ("{\n" +
                 "  \"error\": \"Error Test\",\n" +
@@ -45,14 +55,6 @@ public class TerminalControllerTest {
 
     @Test
     public void testPostUpdate() {
-
-        tc.setTerminalService(new TerminalService() {
-            @Override
-            public ScreenImage postUpdate(String terminalBody) throws IOException {
-                Terminal t = new Terminal(60, 24);
-                return t.dumpHtml(true, 30);
-            }
-        });
 
         Map<String, String> headers = new HashMap<>();
 

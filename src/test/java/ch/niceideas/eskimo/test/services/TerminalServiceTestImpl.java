@@ -32,46 +32,46 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.SSHConnection;
+
+package ch.niceideas.eskimo.test.services;
+
+import ch.niceideas.eskimo.services.TerminalService;
 import ch.niceideas.eskimo.terminal.ScreenImage;
-import ch.niceideas.eskimo.terminal.Session;
-import ch.niceideas.eskimo.terminal.SshProcessWithPty;
-import com.trilead.ssh2.Connection;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import ch.niceideas.eskimo.terminal.Terminal;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
-import javax.annotation.PreDestroy;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
 
+@Component
+@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Profile("test-terminal")
+public class TerminalServiceTestImpl implements TerminalService {
 
-public interface TerminalService {
+    private boolean removeTerminalError = false;
 
-    void removeTerminal (String sessionId) throws IOException;
+    public void reset() {
+        this.removeTerminalError = false;
+    }
 
-    ScreenImage postUpdate(String terminalBody) throws IOException;
+    public void setRemoveTerminalError() {
+        this.removeTerminalError = true;
+    }
 
-    class TerminalException extends RuntimeException {
-
-        static final long serialVersionUID = -331151672312431248L;
-
-        TerminalException(Throwable cause) {
-            super(cause);
+    @Override
+    public void removeTerminal(String sessionId) throws IOException {
+        if (removeTerminalError) {
+            throw new IOException("Error Test");
         }
+    }
+
+    @Override
+    public ScreenImage postUpdate(String terminalBody) throws IOException {
+        Terminal t = new Terminal(60, 24);
+        return t.dumpHtml(true, 30);
     }
 }

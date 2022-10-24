@@ -66,7 +66,7 @@ public class TerminalServiceTest extends AbstractBaseSSHTest {
 
     private ProxyManagerService pms = null;
 
-    private TerminalService ts = null;
+    private TerminalServiceImpl ts = null;
 
     private SetupServiceImpl setupService = null;
 
@@ -81,7 +81,7 @@ public class TerminalServiceTest extends AbstractBaseSSHTest {
 
         cm = new ConnectionManagerService(privateKeyRaw, getSShPort());
 
-        ts = new TerminalService();
+        ts = new TerminalServiceImpl();
 
         ts.setConnectionManagerService(cm);
 

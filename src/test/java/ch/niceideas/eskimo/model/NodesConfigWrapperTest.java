@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class NodesConfigWrapperTest extends AbstractServicesDefinitionTest {
+public class NodesConfigWrapperTest {
 
     NodesConfigWrapper ncw = new NodesConfigWrapper("{\n" +
             "    \"elasticsearch3\": \"on\",\n" +
