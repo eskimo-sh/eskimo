@@ -5,15 +5,20 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.services.AbstractServicesDefinitionTest;
+import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SetupException;
-import ch.niceideas.eskimo.services.SetupService;
-import ch.niceideas.eskimo.services.SystemServiceTest;
+import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
+import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
 import ch.niceideas.eskimo.utils.OSDetector;
-import com.google.javascript.jscomp.jarjar.com.google.common.util.concurrent.AbstractService;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,18 +26,28 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
-public class SetupCommandTest extends AbstractServicesDefinitionTest {
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-setup"})
+public class SetupCommandTest {
+
+    @Autowired
+    private SetupServiceTestImpl setupServiceTest;
+
+    @Autowired
+    private ServicesDefinition servicesDefinition;
 
     private String setupConfig = null;
 
     @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         setupConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/setupConfig.json"), StandardCharsets.UTF_8);
+
+        SecurityContextHelper.loginAdmin();
     }
 
     @Test
@@ -65,7 +80,7 @@ public class SetupCommandTest extends AbstractServicesDefinitionTest {
                 "  \"none\": false,\n" +
                 "  \"downloadPackages\": [],\n" +
                 "  \"packageUpdates\": [],\n" +
-                "  \"packageDownloadUrl\": \"https://niceideas.ch/eskimo/\"\n" +
+                "  \"packageDownloadUrl\": \"dummy\"\n" +
                 "}", setupCommand.toJSON().toString(2));
     }
 
@@ -76,14 +91,13 @@ public class SetupCommandTest extends AbstractServicesDefinitionTest {
         packageDevPathTest.delete();
         packageDevPathTest.mkdirs();
 
-        setupService.setPackagesDevPathForTests(packageDevPathTest.getAbsolutePath());
-        setupService.setPackageDistributionPath(packageDevPathTest.getAbsolutePath());
+        setupServiceTest.setPackageDistributionPath(packageDevPathTest.getAbsolutePath());
 
         FileUtils.writeFile(new File (packageDevPathTest.getAbsolutePath() + "/build.sh"),
                 "#!/bin/bash\n" +
                         "echo $@\n");
 
-        return SetupCommand.create(new JsonWrapper(setupConfig), setupService, def);
+        return SetupCommand.create(new JsonWrapper(setupConfig), setupServiceTest, servicesDefinition);
     }
 
     @Test

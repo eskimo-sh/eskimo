@@ -2,6 +2,7 @@ package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.ConnectionManagerService;
+import ch.niceideas.eskimo.services.ConnectionManagerServiceImpl;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,9 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class WebSocketProxyServerTest {
 
-    private WebSocketProxyServer server = null;
+    private WebSocketProxyServerImpl server = null;
 
-    private ProxyManagerService pms;
+    private ProxyManagerServiceImpl pms;
     private ServicesDefinitionImpl sd;
 
     private WebSocketSession wss1;
@@ -36,7 +37,7 @@ public class WebSocketProxyServerTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        pms = new ProxyManagerService() {
+        pms = new ProxyManagerServiceImpl() {
             @Override
             public ProxyTunnelConfig getTunnelConfig(String serviceId) {
                 return new ProxyTunnelConfig(serviceId, 12345, "192.168.10.11", 8080);
@@ -45,9 +46,9 @@ public class WebSocketProxyServerTest {
         sd = new ServicesDefinitionImpl();
         pms.setServicesDefinition(sd);
         sd.afterPropertiesSet();
-        pms.setConnectionManagerService(new ConnectionManagerService() {
+        pms.setConnectionManagerService(new ConnectionManagerServiceImpl() {
         });
-        server = new WebSocketProxyServer(pms, sd) {
+        server = new WebSocketProxyServerImpl(pms, sd) {
             @Override
             protected WebSocketProxyForwarder createForwarder(String serviceId, WebSocketSession webSocketServerSession, String targetPath) {
                 return new WebSocketProxyForwarder(serviceId, targetPath, pms, webSocketServerSession) {

@@ -39,6 +39,7 @@ import ch.niceideas.eskimo.AbstractBaseSSHTest;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import ch.niceideas.eskimo.proxy.ProxyManagerServiceImpl;
 import com.trilead.ssh2.LocalPortForwarder;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -64,9 +65,9 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         return new ProcessShellCommandFactory();
     }
 
-    private ProxyManagerService pms = null;
+    private ProxyManagerServiceImpl pms = null;
 
-    private ConnectionManagerService cm = null;
+    private ConnectionManagerServiceImpl cm = null;
 
     private SetupServiceImpl setupService = null;
 
@@ -80,9 +81,9 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         setupService.setConfigStoragePathInternal(tempPath);
         FileUtils.writeFile(new File(tempPath + "/config.json"), "{ \"ssh_username\" : \"test\" }");
 
-        cm = new ConnectionManagerService(privateKeyRaw, getSShPort());
+        cm = new ConnectionManagerServiceImpl(privateKeyRaw, getSShPort());
 
-        pms = new ProxyManagerService();
+        pms = new ProxyManagerServiceImpl();
         pms.setConnectionManagerService(cm);
         cm.setProxyManagerService(pms);
         pms.setConnectionManagerService(cm);
@@ -176,7 +177,7 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         final List<String> createCalledFor = new ArrayList<>();
         final List<String> dropCalledFor = new ArrayList<>();
 
-        ConnectionManagerService cm = new ConnectionManagerService(privateKeyRaw, getSShPort()) {
+        ConnectionManagerServiceImpl cm = new ConnectionManagerServiceImpl(privateKeyRaw, getSShPort()) {
             @Override
             protected SSHConnection createConnectionInternal(String node, int operationTimeout) {
                 return new SSHConnection(node, getSShPort()) {
@@ -196,7 +197,7 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
             }
         };
 
-        ProxyManagerService pms = new ProxyManagerService() {
+        ProxyManagerServiceImpl pms = new ProxyManagerServiceImpl() {
             public List<ProxyTunnelConfig> getTunnelConfigForHost (String host) {
                 return forwarderConfig;
             }

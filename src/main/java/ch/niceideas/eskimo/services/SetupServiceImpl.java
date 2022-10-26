@@ -105,7 +105,7 @@ public class SetupServiceImpl implements SetupService {
     private String storagePathConfDir = System.getProperty("user.dir");
 
     @Value("${system.packageDistributionPath}")
-    private String packageDistributionPath = "./packages_distrib";
+    protected String packageDistributionPath = "./packages_distrib";
 
     @Value("${setup.packagesDevPath}")
     private String packagesDevPath = "./packages_dev";
@@ -128,6 +128,7 @@ public class SetupServiceImpl implements SetupService {
     private String configStoragePathInternal = null;
 
     /** For tests */
+    @Deprecated
     void setBuildVersion (String buildVersion) {
         this.buildVersion = buildVersion;
     }
@@ -253,7 +254,7 @@ public class SetupServiceImpl implements SetupService {
         }
     }
 
-    void findMissingKube(File packagesDistribFolder, Set<String> missingServices) {
+    protected void findMissingKube(File packagesDistribFolder, Set<String> missingServices) {
         for (String kubePackage : kubePackages.split(",")) {
             if (Arrays.stream(Objects.requireNonNull(packagesDistribFolder.listFiles()))
                     .noneMatch(file ->
@@ -266,7 +267,7 @@ public class SetupServiceImpl implements SetupService {
         }
     }
 
-    void findMissingPackages(File packagesDistribFolder, Set<String> missingServices) {
+    protected void findMissingPackages(File packagesDistribFolder, Set<String> missingServices) {
         for (String service : getPackagesToBuild().split(",")) {
             if (Arrays.stream(Objects.requireNonNull(packagesDistribFolder.listFiles()))
                     .noneMatch(file ->
@@ -489,7 +490,7 @@ public class SetupServiceImpl implements SetupService {
 
     }
 
-    void fillInPackages(Set<String> downloadPackages, JsonWrapper packagesVersion, Set<String> missingServices) {
+    protected void fillInPackages(Set<String> downloadPackages, JsonWrapper packagesVersion, Set<String> missingServices) {
         for (String packageName : missingServices) {
 
             String softwareVersion = (String) packagesVersion.getValueForPath(packageName+".software");

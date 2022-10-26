@@ -458,8 +458,22 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                         "#Kubernetes Topology\n" +
                         "export ESKIMO_KUBE_REQUEST_CEREBRO_CPU=1\n" +
                         "export ESKIMO_KUBE_REQUEST_CEREBRO_RAM=1024\n" +
+                        "export ESKIMO_KUBE_REQUEST_ELASTICSEARCH_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_ELASTICSEARCH_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_KAFKA_MANAGER_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_KAFKA_MANAGER_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_KAFKA_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_KAFKA_RAM=800M\n" +
                         "export ESKIMO_KUBE_REQUEST_KIBANA_CPU=2\n" +
-                        "export ESKIMO_KUBE_REQUEST_KIBANA_RAM=2048m\n",
+                        "export ESKIMO_KUBE_REQUEST_KIBANA_RAM=2048m\n" +
+                        "export ESKIMO_KUBE_REQUEST_LOGSTASH_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_LOGSTASH_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_SPARK_CONSOLE_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_SPARK_CONSOLE_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_SPARK_RUNTIME_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_SPARK_RUNTIME_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_ZEPPELIN_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_ZEPPELIN_RAM=800M\n",
                 topology.getTopologyScriptForNode (
                         StandardSetupHelpers.getStandard2NodesSetup(),
                         kubeConfig,
@@ -516,7 +530,25 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                         "export ESKIMO_NODE_COUNT=2\n" +
                         "export ALL_NODES_LIST=192.168.10.11,192.168.10.13\n" +
                         "\n" +
-                        "#Kubernetes Topology\n",
+                        "#Kubernetes Topology\n" +
+                        "export ESKIMO_KUBE_REQUEST_CEREBRO_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_CEREBRO_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_ELASTICSEARCH_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_ELASTICSEARCH_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_KAFKA_MANAGER_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_KAFKA_MANAGER_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_KAFKA_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_KAFKA_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_KIBANA_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_KIBANA_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_LOGSTASH_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_LOGSTASH_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_SPARK_CONSOLE_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_SPARK_CONSOLE_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_SPARK_RUNTIME_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_SPARK_RUNTIME_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_ZEPPELIN_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_ZEPPELIN_RAM=800M\n",
                 topology.getTopologyScriptForNode (
                         StandardSetupHelpers.getStandard2NodesSetup(),
                         StandardSetupHelpers.getStandardKubernetesConfig(),

@@ -38,6 +38,7 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import ch.niceideas.eskimo.proxy.ProxyManagerServiceImpl;
 import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import com.trilead.ssh2.SFTPv3Client;
 import org.apache.sshd.server.command.CommandFactory;
@@ -72,9 +73,9 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
         Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
-    private ConnectionManagerService cm = null;
+    private ConnectionManagerServiceImpl cm = null;
 
-    private ProxyManagerService pms = null;
+    private ProxyManagerServiceImpl pms = null;
 
     private FileManagerServiceImpl sc = null;
 
@@ -91,7 +92,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
         setupService.setConfigStoragePathInternal(tempPath);
         FileUtils.writeFile(new File(tempPath + "/config.json"), "{ \"ssh_username\" : \"test\" }");
 
-        cm = new ConnectionManagerService(privateKeyRaw, getSShPort());
+        cm = new ConnectionManagerServiceImpl(privateKeyRaw, getSShPort());
 
         sc = new FileManagerServiceImpl();
 
@@ -101,7 +102,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
         sc.setConnectionManagerService(cm);
         sc.setSshCommandService(scs);
 
-        pms = new ProxyManagerService();
+        pms = new ProxyManagerServiceImpl();
         pms.setConnectionManagerService(cm);
         cm.setProxyManagerService(pms);
         pms.setConnectionManagerService(cm);

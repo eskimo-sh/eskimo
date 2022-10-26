@@ -60,14 +60,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ServicesProxyServletTest {
 
-    private ProxyManagerService pms;
+    private ProxyManagerServiceImpl pms;
     private ServicesDefinitionImpl sd;
 
     private ServicesProxyServlet servlet;
 
     @BeforeEach
     public void setUp() throws Exception {
-        pms = new ProxyManagerService();
+        pms = new ProxyManagerServiceImpl();
         sd = new ServicesDefinitionImpl();
         sd.afterPropertiesSet();
         servlet = new ServicesProxyServlet(pms, sd, "", 50, 30000, 10000, 20000);
@@ -79,7 +79,7 @@ public class ServicesProxyServletTest {
             }
         });
 
-        pms.setConnectionManagerService(new ConnectionManagerService() {
+        pms.setConnectionManagerService(new ConnectionManagerServiceImpl() {
             @Override
             protected void recreateTunnels(SSHConnection connection, String node){
                 // No Op
@@ -89,7 +89,7 @@ public class ServicesProxyServletTest {
                 // No Op
             }
         });
-        pms.setWebSocketProxyServer(new WebSocketProxyServer(pms, sd) {
+        pms.setWebSocketProxyServer(new WebSocketProxyServerImpl(pms, sd) {
             @Override
             public void removeForwardersForService(String serviceId) {
                 // No Op

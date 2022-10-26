@@ -179,7 +179,7 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
 
         nodesConfigurationService.setSshCommandService(sshCommandService);
 
-        nodesConfigurationService.setConnectionManagerService(new ConnectionManagerService() {
+        nodesConfigurationService.setConnectionManagerService(new ConnectionManagerServiceImpl() {
             @Override
             public SSHConnection getPrivateConnection (String node) {
                 return null;
@@ -292,7 +292,7 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
 
         nodesConfigurationService.setSshCommandService(sshCommandService);
 
-        nodesConfigurationService.setConnectionManagerService(new ConnectionManagerService() {
+        nodesConfigurationService.setConnectionManagerService(new ConnectionManagerServiceImpl() {
             @Override
             public SSHConnection getPrivateConnection (String node) {
                 return null;

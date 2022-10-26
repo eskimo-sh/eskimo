@@ -201,7 +201,7 @@ public class WebSocketProxyTest {
                 .setHandshakeHandler(new DefaultHandshakeHandler(upgradeStrategy));
 
             // The Eskimo websocket proxy infrastructure
-            registry.addHandler(new WebSocketProxyServer(new ProxyManagerService() {
+            registry.addHandler(new WebSocketProxyServerImpl(new ProxyManagerServiceImpl() {
                             @Override
                             public ProxyTunnelConfig getTunnelConfig(String serviceId) {
                                 if (serviceId.equals("cerebro")) {

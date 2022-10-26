@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import ch.niceideas.eskimo.proxy.ProxyManagerServiceImpl;
 import ch.niceideas.eskimo.terminal.ScreenImage;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
@@ -62,9 +63,9 @@ public class TerminalServiceTest extends AbstractBaseSSHTest {
         Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
-    private ConnectionManagerService cm = null;
+    private ConnectionManagerServiceImpl cm = null;
 
-    private ProxyManagerService pms = null;
+    private ProxyManagerServiceImpl pms = null;
 
     private TerminalServiceImpl ts = null;
 
@@ -79,13 +80,13 @@ public class TerminalServiceTest extends AbstractBaseSSHTest {
         setupService.setConfigStoragePathInternal(tempPath);
         FileUtils.writeFile(new File(tempPath + "/config.json"), "{ \"ssh_username\" : \"test\" }");
 
-        cm = new ConnectionManagerService(privateKeyRaw, getSShPort());
+        cm = new ConnectionManagerServiceImpl(privateKeyRaw, getSShPort());
 
         ts = new TerminalServiceImpl();
 
         ts.setConnectionManagerService(cm);
 
-        pms = new ProxyManagerService();
+        pms = new ProxyManagerServiceImpl();
         pms.setConnectionManagerService(cm);
         cm.setProxyManagerService(pms);
         pms.setConnectionManagerService(cm);

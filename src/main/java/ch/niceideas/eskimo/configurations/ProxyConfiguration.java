@@ -73,6 +73,9 @@ public class ProxyConfiguration implements WebSocketConfigurer {
     private ConfigurationService configurationService;
 
     @Autowired
+    private WebSocketProxyServer webSocketProxyServer;
+
+    @Autowired
     private Environment env;
 
     @Value("${server.servlet.context-path:#{null}}")
@@ -171,7 +174,7 @@ public class ProxyConfiguration implements WebSocketConfigurer {
                 .map(serviceName -> servicesDefinition.getService(serviceName))
                 .map(service -> "/ws/" + service.getName() + "/**")
                 .toArray(String[]::new);
-        registry.addHandler(new WebSocketProxyServer(proxyManagerService, servicesDefinition), allWsUrls);
+        registry.addHandler(webSocketProxyServer, allWsUrls);
     }
 
     @Bean

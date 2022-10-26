@@ -34,10 +34,15 @@
 
 package ch.niceideas.eskimo.proxy;
 
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
+import ch.niceideas.eskimo.test.services.ServicesDefinitionTestImpl;
+import ch.niceideas.eskimo.test.services.WebSocketProxyServerTestImpl;
 import com.trilead.ssh2.LocalPortForwarder;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.log4j.spi.LoggingEvent;
@@ -47,6 +52,11 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -59,62 +69,73 @@ import static org.apache.logging.log4j.core.config.Configurator.setLevel;
 import static org.apache.logging.log4j.core.config.Configurator.setRootLevel;
 import static org.junit.jupiter.api.Assertions.*;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-web-socket", "test-conf", "test-connection-manager"})
 public class ProxyManagerServiceTest {
 
     private static final Logger logger = LogManager.getLogger(ProxyManagerServiceTest.class.getName());
 
+    @Autowired
     private ProxyManagerService pms;
-    private ServicesDefinitionImpl sd;
 
-    private final AtomicBoolean recreateTunnelsCalled = new AtomicBoolean(false);
-    private final AtomicBoolean removeForwardersCalled = new AtomicBoolean(false);
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
+
+    @Autowired
+    private WebSocketProxyServerTestImpl webSocketProxyServerTest;
+
+    @Autowired
+    private ConnectionManagerServiceTestImpl connectionManagerServiceTest;
 
     @BeforeEach
     public void setUp() throws Exception {
-        pms = new ProxyManagerService();
-        sd = new ServicesDefinitionImpl();
-        pms.setServicesDefinition(sd);
-        sd.afterPropertiesSet();
-        pms.setConnectionManagerService(new ConnectionManagerService() {
-            @Override
-            public void recreateTunnels(String host) {
-                recreateTunnelsCalled.set(true);
-            }
-        });
-        pms.setConfigurationService(new ConfigurationServiceImpl() {
-            @Override
-            public ServicesInstallStatusWrapper loadServicesInstallationStatus() {
-                return StandardSetupHelpers.getStandard2NodesInstallStatus();
-            }
-        });
-        pms.setWebSocketProxyServer(new WebSocketProxyServer(pms, sd) {
-            @Override
-            public void removeForwardersForService(String serviceId) {
-                removeForwardersCalled.set(true);
-            }
-        });
+
+        configurationServiceTest.setStandard2NodesInstallStatus();
+
+        pms.removeServerForService ("gluster", "192.168.10.11");
+        pms.removeServerForService ("gluster", "192.168.10.13");
+
+        pms.removeServerForService ("zeppelin", "192.168.10.11");
+
+        pms.removeServerForService ("flink-runtime", "192.168.10.11");
+        pms.removeServerForService ("flink-runtime", "192.168.10.12");
+        pms.removeServerForService ("flink-runtime", "192.168.10.13");
+
+        pms.removeServerForService ("kubernetes-dashboard", "192.168.10.11");
+        pms.removeServerForService ("kubernetes-dashboard", "192.168.10.13");
+
+        pms.removeServerForService ("kibana", "192.168.10.11");
+        pms.removeServerForService ("kibana", "192.168.10.13");
+
+        connectionManagerServiceTest.reset();
+        webSocketProxyServerTest.reset();
     }
 
     @Test
     public void testDumpProxyTunnelConfig() throws Exception {
 
-        Logger testLogger = LogManager.getLogger(ProxyManagerService.class.getName());
+        Logger testLogger = LogManager.getLogger(ProxyManagerServiceImpl.class.getName());
         try {
-            setLevel(ProxyManagerService.class.getName(), Level.DEBUG);
+            setLevel(ProxyManagerServiceImpl.class.getName(), Level.DEBUG);
 
             StringBuilder builder = new StringBuilder();
 
             Appender testAppender = (Appender) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{Appender.class}, (proxy, method, args) -> {
-                if (method.getName().equals("isStarted")) {
-                    return true;
-                } else if (method.getName().equals("getName")) {
-                    return "test";
-                } else if (method.getName().equals("append")) {
-                    org.apache.logging.log4j.core.impl.Log4jLogEvent event = (org.apache.logging.log4j.core.impl.Log4jLogEvent) args[0];
-                    builder.append(event.getMessage().getFormattedMessage());
-                    builder.append("\n");
+                switch (method.getName()) {
+                    case "isStarted":
+                        return true;
+                    case "getName":
+                        return "test";
+                    case "append":
+                        org.apache.logging.log4j.core.impl.Log4jLogEvent event = (org.apache.logging.log4j.core.impl.Log4jLogEvent) args[0];
+                        builder.append(event.getMessage().getFormattedMessage());
+                        builder.append("\n");
+                        // no break
+                    default:
+                        return null;
                 }
-                return null;
             });
 
             ((org.apache.logging.log4j.core.Logger) testLogger).addAppender(testAppender);
@@ -154,40 +175,6 @@ public class ProxyManagerServiceTest {
     @Test
     public void testServerForServiceManagemement_reproduceFlinRuntimeProblem() throws Exception {
 
-        final List<String> openedForwarders = new ArrayList<>();
-        final List<String> closedForwarders = new ArrayList<>();
-
-        ConnectionManagerService cms = new ConnectionManagerService() {
-
-            @Override
-            protected LocalPortForwarderWrapper createPortForwarder(SSHConnection connection, ProxyTunnelConfig config) throws ConnectionManagerException {
-                openedForwarders.add (config.getLocalPort() + "/" + config.getNode() + "/" + config.getRemotePort());
-                return new LocalPortForwarderWrapper(
-                        config.getServiceName(), connection, config.getLocalPort(), config.getNode(), config.getRemotePort()) {
-                    @Override
-                    public void close() {
-                        closedForwarders.add (config.getLocalPort() + "/" + config.getNode() + "/" + config.getRemotePort());
-                    }
-                };
-            }
-            @Override
-            protected SSHConnection createConnectionInternal(String node, int operationTimeout){
-                return new SSHConnection(node, operationTimeout) {
-                    @Override
-                    public LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect){
-                        return null;
-                    }
-                };
-            }
-        };
-        pms.setConnectionManagerService(cms);
-        cms.setProxyManagerService(pms);
-
-
-        WebSocketProxyServer wsps = new WebSocketProxyServer(pms, sd) {
-        };
-        pms.setWebSocketProxyServer(wsps);
-
         logger.info (" ---- flink-runtime detected on 192.168.10.12");
         pms.updateServerForService ("flink-runtime", "192.168.10.12");
 
@@ -197,13 +184,13 @@ public class ProxyManagerServiceTest {
         logger.info (" ---- now flink-runtime detected on 192.168.10.13");
         pms.updateServerForService ("flink-runtime", "192.168.10.13");
 
-        assertEquals(2, openedForwarders.size());
-        assertEquals(1, closedForwarders.size());
+        assertEquals(2, connectionManagerServiceTest.getOpenedForwarders().size());
+        assertEquals(1, connectionManagerServiceTest.getClosedForwarders().size());
 
-        String firstForwarder = openedForwarders.get(0);
-        String secondForwarder = openedForwarders.get(1);
+        String firstForwarder = connectionManagerServiceTest.getOpenedForwarders().get(0);
+        String secondForwarder = connectionManagerServiceTest.getOpenedForwarders().get(1);
 
-        String closedForwarder = closedForwarders.get(0);
+        String closedForwarder = connectionManagerServiceTest.getClosedForwarders().get(0);
 
         assertTrue(firstForwarder.endsWith("192.168.10.11/8001"));
         assertTrue(secondForwarder.endsWith("192.168.10.11/8001"));
@@ -214,79 +201,79 @@ public class ProxyManagerServiceTest {
     @Test
     public void testServerForServiceManagemement_Kubernetes_kbeProxy() throws Exception {
 
-        assertFalse(recreateTunnelsCalled.get());
-        assertFalse(removeForwardersCalled.get());
+        assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
+        assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
 
         pms.updateServerForService("kubernetes-dashboard", "192.168.10.11");
 
-        assertTrue(recreateTunnelsCalled.get());
-        assertTrue(removeForwardersCalled.get());
+        assertTrue(connectionManagerServiceTest.isRecreateTunnelsCalled());
+        assertTrue(webSocketProxyServerTest.isRemoveForwardersCalled());
 
-        recreateTunnelsCalled.set(false);
-        removeForwardersCalled.set(false);
+        connectionManagerServiceTest.reset();
+        webSocketProxyServerTest.reset();
 
         pms.updateServerForService("kubernetes-dashboard", "192.168.10.11");
 
         // should not have been recreated
-        assertFalse(recreateTunnelsCalled.get());
-        assertFalse(removeForwardersCalled.get());
+        assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
+        assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
 
         pms.updateServerForService("kubernetes-dashboard", "192.168.10.13");
 
         // since kub service are redirected to poxy on kube master, no tunnel recreation should occur when service moves
-        assertFalse(recreateTunnelsCalled.get());
-        assertFalse(removeForwardersCalled.get());
+        assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
+        assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
     }
 
     @Test
     public void testServerForServiceManagemement_Kubernetes_noKubeProxy() throws Exception {
 
-        assertFalse(recreateTunnelsCalled.get());
-        assertFalse(removeForwardersCalled.get());
+        assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
+        assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
 
         pms.updateServerForService("kibana", "192.168.10.11");
 
-        assertTrue(recreateTunnelsCalled.get());
-        assertTrue(removeForwardersCalled.get());
+        assertTrue(connectionManagerServiceTest.isRecreateTunnelsCalled());
+        assertTrue(webSocketProxyServerTest.isRemoveForwardersCalled());
 
-        recreateTunnelsCalled.set(false);
-        removeForwardersCalled.set(false);
+        connectionManagerServiceTest.reset();
+        webSocketProxyServerTest.reset();
 
         pms.updateServerForService("kibana", "192.168.10.11");
 
         // should not have been recreated
-        assertFalse(recreateTunnelsCalled.get());
-        assertFalse(removeForwardersCalled.get());
+        assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
+        assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
 
         pms.updateServerForService("kibana", "192.168.10.13");
 
-        assertTrue(recreateTunnelsCalled.get());
-        assertTrue(removeForwardersCalled.get());
+        assertTrue(connectionManagerServiceTest.isRecreateTunnelsCalled());
+        assertTrue(webSocketProxyServerTest.isRemoveForwardersCalled());
     }
 
     @Test
     public void testServerForServiceManagemement() throws Exception {
 
-        assertFalse(recreateTunnelsCalled.get());
-        assertFalse(removeForwardersCalled.get());
+        assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
+        assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
 
         pms.updateServerForService("gluster", "192.168.10.11");
 
-        assertTrue(recreateTunnelsCalled.get());
-        assertTrue(removeForwardersCalled.get());
+        assertTrue(connectionManagerServiceTest.isRecreateTunnelsCalled());
+        assertTrue(webSocketProxyServerTest.isRemoveForwardersCalled());
 
-        recreateTunnelsCalled.set(false);
-        removeForwardersCalled.set(false);
+        connectionManagerServiceTest.reset();
+        webSocketProxyServerTest.reset();
 
         pms.updateServerForService("gluster", "192.168.10.11");
 
         // should not have been recreated
-        assertFalse(recreateTunnelsCalled.get());
-        assertFalse(removeForwardersCalled.get());
+        assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
+        assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
 
         pms.updateServerForService("gluster", "192.168.10.13");
 
-        assertTrue(recreateTunnelsCalled.get());
-        assertTrue(removeForwardersCalled.get());
+        assertTrue(connectionManagerServiceTest.isRecreateTunnelsCalled());
+        assertTrue(webSocketProxyServerTest.isRemoveForwardersCalled());
     }
 }

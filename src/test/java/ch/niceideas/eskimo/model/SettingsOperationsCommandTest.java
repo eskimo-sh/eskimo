@@ -2,57 +2,64 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
+import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-conf"})
 public class SettingsOperationsCommandTest extends AbstractServicesDefinitionTest {
 
-    protected ConfigurationServiceImpl configurationService = null;
+    @Autowired
+    private ServicesSettingsService scs;
+
+    @Autowired
+    protected ConfigurationServiceTestImpl configurationServiceTest;
 
     private String jsonConfig = null;
     private String testForm = null;
 
     private String expectedJson = null;
 
-    private ServicesSettingsServiceImpl scs;
+
 
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-
-        configurationService = new ConfigurationServiceImpl();
-
-        configurationService.setSetupService(setupService);
-        configurationService.setServicesDefinition (def);
 
         jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
         testForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testForm.json"), StandardCharsets.UTF_8);
 
         expectedJson = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SettingsOperationsCommandTest/expected.json"), StandardCharsets.UTF_8);
 
-        scs = new ServicesSettingsServiceImpl();
-
-        scs.setConfigurationService(configurationService);
-
-        scs.setServicesDefinition(def);
+        SecurityContextHelper.loginAdmin();
     }
 
     @Test
     public void toJSON () throws Exception {
 
-        configurationService.saveNodesConfig(StandardSetupHelpers.getStandard2NodesSetup());
+        configurationServiceTest.setStandard2NodesSetup();
 
-        configurationService.saveServicesSettings(new ServicesSettingsWrapper(jsonConfig));
+        configurationServiceTest.saveServicesSettings(new ServicesSettingsWrapper(jsonConfig));
 
         SettingsOperationsCommand command = SettingsOperationsCommand.create(testForm, scs);
 
-        System.err.println (command.toJSON());
+        //System.err.println (command.toJSON());
         assertTrue (new JSONObject(expectedJson).similar(command.toJSON()));
     }
 

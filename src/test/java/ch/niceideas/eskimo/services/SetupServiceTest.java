@@ -50,7 +50,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SetupServiceTest extends AbstractSystemTest {
@@ -478,11 +478,11 @@ public class SetupServiceTest extends AbstractSystemTest {
                 return updateFile;
             }
             @Override
-            void findMissingPackages(File packagesDistribFolder, Set<String> missingServices) {
+            public void findMissingPackages(File packagesDistribFolder, Set<String> missingServices) {
                 // No-Op
             }
             @Override
-            void findMissingKube(File packagesDistribFolder, Set<String> missingServices) {
+            public void findMissingKube(File packagesDistribFolder, Set<String> missingServices) {
                 // No-Op
             }
             @Override
@@ -539,11 +539,11 @@ public class SetupServiceTest extends AbstractSystemTest {
                 return new JsonWrapper(packagesVersionFile);
             }
             @Override
-            void findMissingPackages(File packagesDistribFolder, Set<String> missingServices) {
+            public void findMissingPackages(File packagesDistribFolder, Set<String> missingServices) {
                 // No-Op
             }
             @Override
-            void findMissingKube(File packagesDistribFolder, Set<String> missingServices) {
+            public void findMissingKube(File packagesDistribFolder, Set<String> missingServices) {
                 // No-Op
             }
             @Override

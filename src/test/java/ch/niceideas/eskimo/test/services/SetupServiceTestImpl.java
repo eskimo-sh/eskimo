@@ -38,10 +38,11 @@ import ch.niceideas.common.exceptions.CommonRTException;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.SetupCommand;
-import ch.niceideas.eskimo.services.ServicesDefinition;
-import ch.niceideas.eskimo.services.SetupException;
-import ch.niceideas.eskimo.services.SetupService;
+import ch.niceideas.eskimo.services.*;
+import org.apache.log4j.Logger;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
@@ -53,12 +54,15 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
 @Component
 @Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Profile("test-setup")
-public class SetupServiceTestImpl implements SetupService {
+public class SetupServiceTestImpl extends SetupServiceImpl implements SetupService {
+
+    private static final Logger logger = Logger.getLogger(SetupServiceTestImpl.class);
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -76,6 +80,10 @@ public class SetupServiceTestImpl implements SetupService {
     public void setSetupCompleted() {
         this.setupError = false;
         this.setupCompleted = true;
+    }
+
+    public void setPackageDistributionPath(String packageDistributionPath) {
+        this.packageDistributionPath = packageDistributionPath;
     }
 
     @PreDestroy
@@ -109,7 +117,7 @@ public class SetupServiceTestImpl implements SetupService {
 
     @Override
     public String getPackagesToBuild() {
-        return null;
+        return super.getPackagesToBuild();
     }
 
     @Override
@@ -147,6 +155,40 @@ public class SetupServiceTestImpl implements SetupService {
 
     @Override
     public void prepareSetup(JsonWrapper setupConfig, Set<String> downloadPackages, Set<String> buildPackage, Set<String> downloadKube, Set<String> buildKube, Set<String> packageUpdate) throws SetupException {
+
+        File packagesDistribFolder = null;
+        try {
+            packagesDistribFolder = new File(packageDistributionPath).getCanonicalFile();
+        } catch (IOException e) {
+            logger.error (e, e);
+            throw new SetupException (e.getMessage(), e);
+        }
+        if (!packagesDistribFolder.exists()) {
+            throw new UnsupportedOperationException("test packages distrib path folder should be created beforehand");
+        }
+
+        // 1. Find out about missing packages
+        String servicesOrigin = (String) setupConfig.getValueForPath("setup-services-origin");
+        if (StringUtils.isEmpty(servicesOrigin) || servicesOrigin.equals(BUILD_FLAG)) { // for services default is build
+
+            findMissingPackages(packagesDistribFolder, buildPackage);
+
+        } else {
+
+            throw new UnsupportedOperationException("test service doesn't support download");
+
+        }
+
+        // 2. Find out about missing Kube distrib
+        String kubeOrigin = (String) setupConfig.getValueForPath("setup-kube-origin");
+        if (StringUtils.isEmpty(kubeOrigin) || kubeOrigin.equals(DOWNLOAD_FLAG)) { // for Kube default is download
+
+            throw new UnsupportedOperationException("test service doesn't support download");
+
+        } else {
+            findMissingKube(packagesDistribFolder, buildKube);
+        }
+
 
     }
 

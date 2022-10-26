@@ -39,6 +39,7 @@ import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import ch.niceideas.eskimo.proxy.ProxyManagerServiceImpl;
 import ch.niceideas.eskimo.utils.KubeStatusParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,8 +72,8 @@ public class KubernetesServiceTest extends AbstractSystemTest {
     }
 
     @Override
-    protected ProxyManagerService createProxyManagerService() {
-        return new ProxyManagerService() {
+    protected ProxyManagerServiceImpl createProxyManagerService() {
+        return new ProxyManagerServiceImpl() {
             @Override
             public ProxyTunnelConfig getTunnelConfig(String serviceId) {
                 return new ProxyTunnelConfig("dummyService", 12345, "192.178.10.11", 5050);

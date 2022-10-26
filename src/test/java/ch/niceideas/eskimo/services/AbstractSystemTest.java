@@ -40,7 +40,9 @@ import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import ch.niceideas.eskimo.proxy.ProxyManagerServiceImpl;
 import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
+import ch.niceideas.eskimo.proxy.WebSocketProxyServerImpl;
 import ch.niceideas.eskimo.services.satellite.MemoryComputer;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
@@ -62,7 +64,7 @@ public abstract class AbstractSystemTest {
 
     protected NotificationService notificationService = null;
 
-    protected ProxyManagerService proxyManagerService = null;
+    protected ProxyManagerServiceImpl proxyManagerService = null;
 
     protected ServicesDefinitionImpl servicesDefinition = null;
 
@@ -131,12 +133,12 @@ public abstract class AbstractSystemTest {
         proxyManagerService.setServicesDefinition(servicesDefinition);
         proxyManagerService.setConfigurationService(configurationService);
 
-        proxyManagerService.setConnectionManagerService(new ConnectionManagerService() {
+        proxyManagerService.setConnectionManagerService(new ConnectionManagerServiceImpl() {
             @Override
             public void recreateTunnels(String host) {
             }
         });
-        proxyManagerService.setWebSocketProxyServer(new WebSocketProxyServer(proxyManagerService, servicesDefinition) {
+        proxyManagerService.setWebSocketProxyServer(new WebSocketProxyServerImpl(proxyManagerService, servicesDefinition) {
             @Override
             public void removeForwardersForService(String serviceId) {
             }
@@ -254,7 +256,7 @@ public abstract class AbstractSystemTest {
         servicesSettingsService.setNodesConfigurationService(nodesConfigurationService);
         servicesSettingsService.setServicesDefinition(servicesDefinition);
 
-        connectionManagerService = new ConnectionManagerService() {
+        connectionManagerService = new ConnectionManagerServiceImpl() {
             @Override
             public SSHConnection getPrivateConnection (String node) {
                 return null;
@@ -304,8 +306,8 @@ public abstract class AbstractSystemTest {
         nodesConfigurationService.setOperationsMonitoringService(operationsMonitoringService);
     }
 
-    protected ProxyManagerService createProxyManagerService() {
-        return new ProxyManagerService();
+    protected ProxyManagerServiceImpl createProxyManagerService() {
+        return new ProxyManagerServiceImpl();
     }
 
     protected ConfigurationServiceImpl createConfigurationService() {
