@@ -48,13 +48,19 @@ public class HttpObjectsHelper {
                         case "getRequestURI":
                             if ("cerebro".equals(service)) {
                                 return "/cerebro/statistics?server=192.168.10.13";
-                            } else {
+                            } else if ("spark-console".equals(service)) {
+                                return "/spark-console/history/spark-application-1653861510346/jobs/";
+                            } else if ("eskimo-command".equals(service)) {
+                                return "/eskimo-command/kubeDashboardLoginToken";
+                            }else {
                                 throw new UnsupportedOperationException(
                                         "Unsupported method: " + method.getName());
                             }
                         case "getPathInfo":
                             if ("cerebro".equals(service)) {
                                 return "/cerebro/statistics";
+                            } else if ("spark-console".equals(service)) {
+                                return "/history/spark-application-1653861510346/jobs/";
                             } else {
                                 throw new UnsupportedOperationException(
                                         "Unsupported method: " + method.getName());
@@ -62,6 +68,8 @@ public class HttpObjectsHelper {
                         case "getRequestURL":
                             if ("cerebro".equals(service)) {
                                 return new StringBuffer("http://localhost:9090/cerebro/statistics");
+                            } else if ("spark-console".equals(service)) {
+                                return new StringBuffer("http://localhost:9191/history/spark-application-1652639268719/jobs/");
                             } else {
                                 throw new UnsupportedOperationException(
                                         "Unsupported method: " + method.getName());
@@ -69,6 +77,13 @@ public class HttpObjectsHelper {
                         case "getQueryString":
                             if ("cerebro".equals(service)) {
                                 return "server=192.168.10.13";
+                            } else {
+                                throw new UnsupportedOperationException(
+                                        "Unsupported method: " + method.getName());
+                            }
+                        case "getServletPath":
+                            if ("eskimo-command".equals(service)) {
+                                return "/eskimo-command";
                             } else {
                                 throw new UnsupportedOperationException(
                                         "Unsupported method: " + method.getName());
@@ -89,7 +104,7 @@ public class HttpObjectsHelper {
     }
 
     public static HttpServletResponse createHttpServletResponse (
-            Map<String, String> headers,
+            Map<String, Object> headers,
             OutputStream responseOutputStream) {
         return (HttpServletResponse) Proxy.newProxyInstance(
                 NodesConfigController.class.getClassLoader(),
@@ -98,9 +113,11 @@ public class HttpObjectsHelper {
                     if (method.getName().equals("getOutputStream")) {
                         return responseOutputStream;
                     } else if (method.getName().equals("setContentType")) {
-                        return headers.put ("Content-Type", (String)methodArgs[0]);
+                        return headers.put ("Content-Type", methodArgs[0]);
                     } else if (method.getName().equals("addHeader")) {
-                        return headers.put ((String)methodArgs[0], (String)methodArgs[1]);
+                        return headers.put ((String)methodArgs[0], methodArgs[1]);
+                    } else if (method.getName().equals("setIntHeader")) {
+                        return headers.put ((String)methodArgs[0], methodArgs[1]);
                     } else {
                         throw new UnsupportedOperationException(
                                 "Unsupported method: " + method.getName());

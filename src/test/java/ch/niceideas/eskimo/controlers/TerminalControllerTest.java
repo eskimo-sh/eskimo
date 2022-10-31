@@ -56,7 +56,7 @@ public class TerminalControllerTest {
     @Test
     public void testPostUpdate() {
 
-        Map<String, String> headers = new HashMap<>();
+        Map<String, Object> headers = new HashMap<>();
 
         HttpServletResponse httpServletResponse = HttpObjectsHelper.createHttpServletResponse(headers, null);
 

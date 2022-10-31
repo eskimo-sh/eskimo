@@ -35,12 +35,16 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.model.service.proxy.ReplacementContext;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
+import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
+import ch.niceideas.eskimo.test.services.WebSocketProxyServerTestImpl;
 import org.apache.catalina.ssi.ByteArrayServletOutputStream;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpRequest;
@@ -48,6 +52,11 @@ import org.apache.http.HttpResponse;
 import org.apache.http.entity.BasicHttpEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -58,60 +67,59 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-web-socket", "test-conf", "test-connection-manager"})
 public class ServicesProxyServletTest {
 
-    private ProxyManagerServiceImpl pms;
-    private ServicesDefinitionImpl sd;
+    @Autowired
+    private ProxyManagerService pms;
+
+    @Autowired
+    private ServicesDefinition servicesDefinition;
+
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
+
+    @Autowired
+    private WebSocketProxyServerTestImpl webSocketProxyServerTest;
+
+    @Autowired
+    private ConnectionManagerServiceTestImpl connectionManagerServiceTest;
 
     private ServicesProxyServlet servlet;
 
     @BeforeEach
     public void setUp() throws Exception {
-        pms = new ProxyManagerServiceImpl();
-        sd = new ServicesDefinitionImpl();
-        sd.afterPropertiesSet();
-        servlet = new ServicesProxyServlet(pms, sd, "", 50, 30000, 10000, 20000);
-        pms.setServicesDefinition(sd);
+        configurationServiceTest.setStandard2NodesInstallStatus();
 
-        pms.setConfigurationService(new ConfigurationServiceImpl() {
-            public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
-                return StandardSetupHelpers.getStandard2NodesInstallStatus();
-            }
-        });
+        pms.removeServerForService ("gluster", "192.168.10.11");
+        pms.removeServerForService ("gluster", "192.168.10.13");
 
-        pms.setConnectionManagerService(new ConnectionManagerServiceImpl() {
-            @Override
-            protected void recreateTunnels(SSHConnection connection, String node){
-                // No Op
-            }
-            @Override
-            public void recreateTunnels(String host) {
-                // No Op
-            }
-        });
-        pms.setWebSocketProxyServer(new WebSocketProxyServerImpl(pms, sd) {
-            @Override
-            public void removeForwardersForService(String serviceId) {
-                // No Op
-            }
-        });
+        pms.removeServerForService ("zeppelin", "192.168.10.11");
+
+        pms.removeServerForService ("flink-runtime", "192.168.10.11");
+        pms.removeServerForService ("flink-runtime", "192.168.10.12");
+        pms.removeServerForService ("flink-runtime", "192.168.10.13");
+
+        pms.removeServerForService ("kubernetes-dashboard", "192.168.10.11");
+        pms.removeServerForService ("kubernetes-dashboard", "192.168.10.13");
+
+        pms.removeServerForService ("kibana", "192.168.10.11");
+        pms.removeServerForService ("kibana", "192.168.10.13");
+
+        connectionManagerServiceTest.reset();
+        webSocketProxyServerTest.reset();
+
+        servlet = new ServicesProxyServlet(pms, servicesDefinition, "/", 5, 10000, 10000, 10000);
     }
 
     @Test
     public void testGetTargetUri() throws Exception {
-        HttpServletRequest request = (HttpServletRequest) Proxy.newProxyInstance(
-                ServicesProxyServletTest.class.getClassLoader(),
-                new Class[] { HttpServletRequest.class },
-                (proxy, method, methodArgs) -> {
-                    if (method.getName().equals("getRequestURI")) {
-                        return "/cerebro/statistics";
-                    } else if (method.getName().equals("getPathInfo")) {
-                        return "/cerebro/statistics";
-                    } else {
-                        throw new UnsupportedOperationException(
-                                "Unsupported method: " + method.getName());
-                    }
-                });
+
+        HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("cerebro");
+
         pms.updateServerForService("cerebro", "192.168.10.11");
 
         assertEquals ("http://localhost:"
@@ -122,22 +130,9 @@ public class ServicesProxyServletTest {
 
     @Test
     public void testRewriteUrlFromRequest() throws Exception {
-        HttpServletRequest request = (HttpServletRequest) Proxy.newProxyInstance(
-                ServicesProxyServletTest.class.getClassLoader(),
-                new Class[] { HttpServletRequest.class },
-                (proxy, method, methodArgs) -> {
-                    switch (method.getName()) {
-                        case "getRequestURI":
-                            return "/cerebro/statistics?server=192.168.10.13";
-                        case "getPathInfo":
-                            return "/cerebro/statistics";
-                        case "getQueryString":
-                            return "server=192.168.10.13";
-                        default:
-                            throw new UnsupportedOperationException(
-                                    "Unsupported method: " + method.getName());
-                    }
-                });
+
+        HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("cerebro");
+
         pms.updateServerForService("cerebro", "192.168.10.11");
 
         assertEquals("http://localhost:"
@@ -148,32 +143,9 @@ public class ServicesProxyServletTest {
 
     @Test
     public void testRewriteUrlFromResponse() throws Exception {
-        HttpServletRequest request = (HttpServletRequest) Proxy.newProxyInstance(
-                ServicesProxyServletTest.class.getClassLoader(),
-                new Class[] { HttpServletRequest.class },
-                (proxy, method, methodArgs) -> {
-                    switch (method.getName()) {
-                        case "getRequestURI":
-                            return "/cerebro/statistics?server=192.168.10.13";
-                        case "getPathInfo":
-                            return "/cerebro/statistics";
-                        case "getRequestURL":
-                            return new StringBuffer("http://localhost:9090/cerebro/statistics");
-                        case "getQueryString":
-                            return "server=192.168.10.13";
-                        case "getContextPath":
-                            return null;
-                        case "getScheme":
-                            return "http";
-                        case "getServerName":
-                            return "localhost";
-                        case "getServerPort":
-                            return 9191;
-                        default:
-                            throw new UnsupportedOperationException(
-                                    "Unsupported method: " + method.getName());
-                    }
-                });
+
+        HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("cerebro");
+
         pms.updateServerForService("cerebro", "192.168.10.11");
 
         assertEquals("http://localhost:9090/cerebro/nodeStats/statistics=192.168.10.13",
@@ -184,35 +156,11 @@ public class ServicesProxyServletTest {
 
     @Test
     public void testRewriteUrlFromResponse_sparkHistoryCase() throws Exception {
-        HttpServletRequest request = (HttpServletRequest) Proxy.newProxyInstance(
-                ServicesProxyServletTest.class.getClassLoader(),
-                new Class[] { HttpServletRequest.class },
-                (proxy, method, methodArgs) -> {
-                    switch (method.getName()) {
-                        case "getRequestURI":
-                            return "/spark-console/history/spark-application-1653861510346/jobs/";
-                        case "getPathInfo":
-                            return "/history/spark-application-1653861510346/jobs/";
-                        case "getRequestURL":
-                            return new StringBuffer("http://localhost:9191/history/spark-application-1652639268719/jobs/");
-                        case "getQueryString":
-                            return "";
-                        case "getContextPath":
-                            return "";
-                        case "getScheme":
-                            return "http";
-                        case "getServerName":
-                            return "localhost";
-                        case "getServerPort":
-                            return 9191;
-                        default:
-                            throw new UnsupportedOperationException(
-                                    "Unsupported method: " + method.getName());
-                    }
-                });
+        HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("spark-console");
+
         pms.updateServerForService("spark-console", "192.168.10.11");
 
-        http://localhost:9191/history/spark-application-1653861510346/jobs/
+        // http://localhost:9191/history/spark-application-1653861510346/jobs/
 
         assertEquals("http://localhost:9191/spark-console/history/spark-application-1652639268719/jobs/",
                 servlet.rewriteUrlFromResponse(request, "http://localhost:9191/history/spark-application-1652639268719/jobs/"));
@@ -221,7 +169,7 @@ public class ServicesProxyServletTest {
     @Test
     public void testNominalReplacements() throws Exception {
 
-        Service kafkaManagerService = sd.getService("kafka-manager");
+        Service kafkaManagerService = servicesDefinition.getService("kafka-manager");
 
         String toReplace  = "\n <a href='/toto.txt'>\na/a>";
         //String contextPath, String prefixPath
@@ -235,7 +183,7 @@ public class ServicesProxyServletTest {
     @Test
     public void testZeppelinReplacements() throws Exception {
 
-        Service zeppelinService = sd.getService("zeppelin");
+        Service zeppelinService = servicesDefinition.getService("zeppelin");
 
         String toReplace = "function(e, t, n) {\n" +
                 "    \"use strict\";\n" +
@@ -339,66 +287,13 @@ public class ServicesProxyServletTest {
 
         Map<String, Object> headers = new HashMap<>();
 
-        HttpRequest proxyRequest = (HttpRequest) Proxy.newProxyInstance(
-                ServicesProxyServletTest.class.getClassLoader(),
-                new Class[] { HttpRequest.class },
-                (proxy, method, methodArgs) -> {
-                    throw new UnsupportedOperationException(
-                            "Unsupported method: " + method.getName());
-                });
+        HttpRequest proxyRequest = HttpObjectsHelper.createHttpRequest();
 
-        HttpResponse proxyResponse = (HttpResponse) Proxy.newProxyInstance(
-                ServicesProxyServletTest.class.getClassLoader(),
-                new Class[] { HttpResponse.class },
-                (proxy, method, methodArgs) -> {
-                    if (method.getName().equals("getEntity")) {
-                        return proxyServedEntity;
-                    } else {
-                        throw new UnsupportedOperationException(
-                                "Unsupported method: " + method.getName());
-                    }
-                });
+        HttpResponse proxyResponse = HttpObjectsHelper.createHttpResponse(proxyServedEntity);
 
-        HttpServletRequest servletRequest = (HttpServletRequest) Proxy.newProxyInstance(
-                ServicesProxyServletTest.class.getClassLoader(),
-                new Class[] { HttpServletRequest.class },
-                (proxy, method, methodArgs) -> {
-                    switch (method.getName()) {
-                        case "getRequestURI":
-                            return "/cerebro/statistics?server=192.168.10.13";
-                        case "getPathInfo":
-                            return "/cerebro/statistics";
-                        case "getRequestURL":
-                            return new StringBuffer("http://localhost:9090/cerebro/statistics");
-                        case "getQueryString":
-                            return "server=192.168.10.13";
-                        case "getContextPath":
-                            return null;
-                        case "getScheme":
-                            return "http";
-                        case "getServerName":
-                            return "localhost";
-                        case "getServerPort":
-                            return 9191;
-                        default:
-                            throw new UnsupportedOperationException(
-                                    "Unsupported method: " + method.getName());
-                    }
-                });
+        HttpServletRequest servletRequest = HttpObjectsHelper.createHttpServletRequest("cerebro");
 
-        HttpServletResponse servletResponse = (HttpServletResponse) Proxy.newProxyInstance(
-                ServicesProxyServletTest.class.getClassLoader(),
-                new Class[] { HttpServletResponse.class },
-                (proxy, method, methodArgs) -> {
-                    if (method.getName().equals("getOutputStream")) {
-                        return responseOutputStream;
-                    } else if (method.getName().equals("setIntHeader")) {
-                        return headers.put ((String)methodArgs[0], methodArgs[1]);
-                    } else {
-                        throw new UnsupportedOperationException(
-                                "Unsupported method: " + method.getName());
-                    }
-                });
+        HttpServletResponse servletResponse = HttpObjectsHelper.createHttpServletResponse(headers, responseOutputStream);
 
         servlet.copyResponseEntity(proxyResponse, servletResponse, proxyRequest, servletRequest);
 

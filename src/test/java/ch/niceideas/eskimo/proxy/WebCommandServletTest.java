@@ -41,24 +41,11 @@ public class WebCommandServletTest {
             }
         };
 
-        HttpServletRequest servletRequest = (HttpServletRequest) Proxy.newProxyInstance(
-                ServicesProxyServletTest.class.getClassLoader(),
-                new Class[] { HttpServletRequest.class },
-                (proxy, method, methodArgs) -> {
-                    switch (method.getName()) {
-                        case "getRequestURI":
-                            return "/eskimo-command/kubeDashboardLoginToken";
-                        case "getServletPath":
-                            return "/eskimo-command";
-                        default:
-                            throw new UnsupportedOperationException(
-                                    "Unsupported method: " + method.getName());
-                    }
-                });
+        HttpServletRequest servletRequest = HttpObjectsHelper.createHttpServletRequest("eskimo-command");
 
         ByteArrayServletOutputStream responseOutputStream = new ByteArrayServletOutputStream();
 
-        Map<String, String> headers = new HashMap<>();
+        Map<String, Object> headers = new HashMap<>();
 
         HttpServletResponse servletResponse = HttpObjectsHelper.createHttpServletResponse(headers, null);
 
