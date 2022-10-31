@@ -72,12 +72,6 @@ public abstract class AbstractWebTest {
         server = TestResourcesServer.getServer(isCoverageRun());
         server.startServer(className);
 
-        /*
-        WebDriverManager.chromedriver()
-                .clearDriverCache()
-                .clearResolutionCache();
-        */
-
         ChromeOptions co = new ChromeOptions();
 
         co.setCapability(CapabilityType.UNHANDLED_PROMPT_BEHAVIOUR, "ignore");
@@ -131,14 +125,6 @@ public abstract class AbstractWebTest {
     @AfterEach
     public void tearDown() throws Exception {
         server.postTestMethodHook(this::js);
-
-        /*
-        if (driver != null) {
-            driver.close();
-        }
-        */
-
-        //Thread.sleep (200);
     }
 
     private void initDriver() throws InterruptedException {

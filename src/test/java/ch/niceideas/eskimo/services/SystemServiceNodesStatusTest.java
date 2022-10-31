@@ -96,7 +96,7 @@ public class SystemServiceNodesStatusTest extends AbstractSystemTest {
     @Test
     public void testGetStatus() throws Exception {
 
-        systemService.setSshCommandService(new SSHCommandService() {
+        systemService.setSshCommandService(new SSHCommandServiceImpl() {
             @Override
             public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
                 return runSSHScript((String)null, script, throwsException);

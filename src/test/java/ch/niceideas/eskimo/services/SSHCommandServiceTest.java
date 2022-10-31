@@ -65,7 +65,7 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
 
     private ProxyManagerServiceImpl pms = null;
 
-    private SSHCommandService scs = null;
+    private SSHCommandServiceImpl scs = null;
 
     private SetupServiceImpl setupService = null;
 
@@ -81,7 +81,7 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
 
         cm = new ConnectionManagerServiceImpl(privateKeyRaw, getSShPort());
 
-        scs = new SSHCommandService();
+        scs = new SSHCommandServiceImpl();
 
         scs.setConnectionManagerService(cm);
 

@@ -140,7 +140,7 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
 
         AtomicReference<String> command = new AtomicReference<>();
 
-        nodesConfigurationService.setSshCommandService(new SSHCommandService() {
+        nodesConfigurationService.setSshCommandService(new SSHCommandServiceImpl() {
             @Override
             public String runSSHScript(SSHConnection connection, String script){
                 return (String) command.get();
@@ -219,7 +219,7 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 nodesConfig
         );
 
-        SSHCommandService sshCommandService = new SSHCommandService() {
+        SSHCommandService sshCommandService = new SSHCommandServiceImpl() {
             @Override
             public synchronized String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
                 return runSSHScript((String)null, script, throwsException);

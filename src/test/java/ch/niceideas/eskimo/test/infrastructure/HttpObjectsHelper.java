@@ -2,18 +2,37 @@ package ch.niceideas.eskimo.test.infrastructure;
 
 import ch.niceideas.eskimo.controlers.NodesConfigController;
 import ch.niceideas.eskimo.proxy.ServicesProxyServletTest;
+import ch.niceideas.eskimo.proxy.WebSocketProxyForwarderTest;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.BasicHttpEntity;
+import org.springframework.web.socket.WebSocketSession;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.OutputStream;
 import java.lang.reflect.Proxy;
+import java.util.List;
 import java.util.Map;
 
 public class HttpObjectsHelper {
+
+    public static WebSocketSession createWebSocketSession(List<Object> messages) {
+        return (WebSocketSession) Proxy.newProxyInstance(
+                WebSocketProxyForwarderTest.class.getClassLoader(),
+                new Class[]{WebSocketSession.class},
+                (proxy, method, methodArgs) -> {
+                    if (method.getName().equals("isOpen")) {
+                        return true;
+                    } else if (method.getName().equals("sendMessage")) {
+                        return messages.add (methodArgs[0]);
+                    } else {
+                        throw new UnsupportedOperationException(
+                                "Unsupported method: " + method.getName());
+                    }
+                });
+    }
 
     public static HttpRequest createHttpRequest() {
         return (HttpRequest) Proxy.newProxyInstance(

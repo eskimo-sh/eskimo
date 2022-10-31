@@ -145,7 +145,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
         configurationService.saveKubernetesServicesConfig(kubeServicesConfig);
 
-        systemService.setSshCommandService(new SSHCommandService() {
+        systemService.setSshCommandService(new SSHCommandServiceImpl() {
             @Override
             public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
                 return runSSHScript((String)null, script, throwsException);
@@ -215,7 +215,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         Pair<String, String> nodeNumnberAndIpAddress = new Pair<>(""+nodeNbr, ipAddress);
 
-        systemService.setSshCommandService(new SSHCommandService() {
+        systemService.setSshCommandService(new SSHCommandServiceImpl() {
             @Override
             public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
                 return runSSHScript((String)null, script, throwsException);
@@ -274,7 +274,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
         configurationService.saveKubernetesServicesConfig(kubeServicesConfig);
 
-        systemService.setSshCommandService(new SSHCommandService() {
+        systemService.setSshCommandService(new SSHCommandServiceImpl() {
             @Override
             public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
                 return runSSHScript((String)null, script, throwsException);
@@ -332,7 +332,7 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         Pair<String, String> nbrAndPair = new Pair<>(""+nodeNbr, ipAddress);
 
-        systemService.setSshCommandService(new SSHCommandService() {
+        systemService.setSshCommandService(new SSHCommandServiceImpl() {
             @Override
             public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
                 return runSSHScript((String)null, script, throwsException);

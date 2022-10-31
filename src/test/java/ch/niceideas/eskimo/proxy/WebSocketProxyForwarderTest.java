@@ -1,5 +1,6 @@
 package ch.niceideas.eskimo.proxy;
 
+import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.socket.WebSocketMessage;
@@ -26,33 +27,9 @@ public class WebSocketProxyForwarderTest {
         clientMessages = new ArrayList<>();
         serverMessages = new ArrayList<>();
 
-        clientSession = (WebSocketSession) Proxy.newProxyInstance(
-                WebSocketProxyForwarderTest.class.getClassLoader(),
-                new Class[]{WebSocketSession.class},
-                (proxy, method, methodArgs) -> {
-                    if (method.getName().equals("isOpen")) {
-                        return true;
-                    } else if (method.getName().equals("sendMessage")) {
-                        return clientMessages.add (methodArgs[0]);
-                    } else {
-                        throw new UnsupportedOperationException(
-                                "Unsupported method: " + method.getName());
-                    }
-                });
+        clientSession = HttpObjectsHelper.createWebSocketSession(clientMessages);
 
-        serverSession = (WebSocketSession) Proxy.newProxyInstance(
-                WebSocketProxyForwarderTest.class.getClassLoader(),
-                new Class[]{WebSocketSession.class},
-                (proxy, method, methodArgs) -> {
-                    if (method.getName().equals("isOpen")) {
-                        return true;
-                    } else if (method.getName().equals("sendMessage")) {
-                        return serverMessages.add (methodArgs[0]);
-                    } else {
-                        throw new UnsupportedOperationException(
-                                "Unsupported method: " + method.getName());
-                    }
-                });
+        serverSession = HttpObjectsHelper.createWebSocketSession(serverMessages);
 
         forwarder = new WebSocketProxyForwarder("zeppelin", "/zeppelin", null, serverSession) {
             @Override
@@ -65,7 +42,7 @@ public class WebSocketProxyForwarderTest {
     @Test
     public void testForwardMessage() throws Exception {
 
-        forwarder.forwardMessage(new WebSocketMessage<Object>() {
+        forwarder.forwardMessage(new WebSocketMessage<>() {
 
             @Override
             public Object getPayload() {

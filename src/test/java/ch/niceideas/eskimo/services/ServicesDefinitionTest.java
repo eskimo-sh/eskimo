@@ -505,7 +505,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                 "}", logCommand.toStatusConfigJSON().toString(2));
 
         AtomicReference<String> callRef = new AtomicReference<>();
-        logCommand.call("192.168.10.11", new SSHCommandService() {
+        logCommand.call("192.168.10.11", new SSHCommandServiceImpl() {
             public String runSSHCommand(String node, String command) {
                 callRef.set(node + "-" + command);
                 return callRef.get();

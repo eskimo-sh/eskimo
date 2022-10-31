@@ -79,7 +79,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
     private FileManagerServiceImpl sc = null;
 
-    private SSHCommandService scs = null;
+    private SSHCommandServiceImpl scs = null;
 
     private SetupServiceImpl setupService = null;
 
@@ -96,7 +96,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
         sc = new FileManagerServiceImpl();
 
-        scs = new SSHCommandService();
+        scs = new SSHCommandServiceImpl();
         scs.setConnectionManagerService(cm);
 
         sc.setConnectionManagerService(cm);

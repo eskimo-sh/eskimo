@@ -48,8 +48,7 @@ import java.io.IOException;
 import java.util.StringTokenizer;
 
 import static org.junit.Assert.fail;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SettingsInjectorTest {
 
@@ -97,13 +96,13 @@ public class SettingsInjectorTest {
     public void setUp() throws Exception {
     
         // ensure presence of jq command !!!
-        assertTrue(getCmdPathFileStr("jq") != null, "'jq' command is found in path");
+        assertNotNull(getCmdPathFileStr("jq"), "'jq' command is found in path");
 
         // Create temp folder
         File tempFile = File.createTempFile("settings_injector_", "");
-        tempFile.delete();
+        assertTrue (tempFile.delete());
 
-        tempFile.mkdirs();
+        assertTrue (tempFile.mkdirs());
         tempFolder = tempFile.getCanonicalPath();
 
         // Copy configuration files to tempFolder
@@ -130,7 +129,7 @@ public class SettingsInjectorTest {
         assertTrue(esFile.exists());
 
         File targetEsFile = new File(tempFile, "usr_local_lib/" + file);
-        targetEsFile.getParentFile().mkdirs();
+        assertTrue (targetEsFile.getParentFile().mkdirs());
         assertFalse(targetEsFile.exists());
 
         FileUtils.copy(esFile, targetEsFile);

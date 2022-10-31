@@ -130,7 +130,7 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
                 nodesConfig
         );
 
-        SSHCommandService sshCommandService = new SSHCommandService() {
+        SSHCommandService sshCommandService = new SSHCommandServiceImpl() {
             @Override
             public synchronized String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
                 return runSSHScript((String)null, script, throwsException);
@@ -234,7 +234,7 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
                 nodesConfig
         );
 
-        SSHCommandService sshCommandService = new SSHCommandService() {
+        SSHCommandService sshCommandService = new SSHCommandServiceImpl() {
             @Override
             public synchronized String runSSHScript(SSHConnection connection, String script, boolean throwsException) throws SSHCommandException {
                 return runSSHScript((String)null, script, throwsException);

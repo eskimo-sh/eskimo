@@ -70,7 +70,7 @@ public class MemoryComputerTest {
         memoryComputer = new MemoryComputer();
         memoryComputer.setServicesDefinition(servicesDefinition);
 
-        memoryComputer.setSshCommandService(new SSHCommandService() {
+        memoryComputer.setSshCommandService(new SSHCommandServiceImpl() {
             @Override
             public String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException {
                 switch (node) {
@@ -210,7 +210,7 @@ public class MemoryComputerTest {
         memoryComputer = new MemoryComputer();
         memoryComputer.setServicesDefinition(servicesDefinition);
 
-        memoryComputer.setSshCommandService(new SSHCommandService() {
+        memoryComputer.setSshCommandService(new SSHCommandServiceImpl() {
             @Override
             public String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException {
                 return "MemTotal:        20000000 kB";

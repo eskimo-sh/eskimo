@@ -160,7 +160,7 @@ public abstract class AbstractSystemTest {
 
         systemService = createSystemService();
 
-        sshCommandService = new SSHCommandService() {
+        sshCommandService = new SSHCommandServiceImpl() {
             @Override
             public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
                 return runSSHScript("192.168.10.11", script, throwsException);

@@ -34,253 +34,34 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.ResourceUtils;
-import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.SSHConnection;
-import com.trilead.ssh2.ChannelCondition;
-import com.trilead.ssh2.Connection;
-import com.trilead.ssh2.SCPClient;
-import com.trilead.ssh2.Session;
-import org.apache.log4j.Logger;
-import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-@Component
-public class SSHCommandService {
+public interface SSHCommandService {
 
-    private static final Logger logger = Logger.getLogger(SSHCommandService.class);
+    String runSSHScript(SSHConnection connection, String script) throws SSHCommandException;
 
-    @Autowired
-    private ConnectionManagerService connectionManagerService;
+    String runSSHScript(String node, String script) throws SSHCommandException;
 
-    @Autowired
-    private ConfigurationService configurationService;
+    String runSSHCommand(SSHConnection connection, String[] command) throws SSHCommandException;
 
-    /** For tests */
-    public void setConnectionManagerService(ConnectionManagerService connectionManagerService) {
-        this.connectionManagerService = connectionManagerService;
-    }
+    String runSSHScriptPath(SSHConnection connection, String scriptName) throws SSHCommandException;
 
-    public String runSSHScript(SSHConnection connection, String script) throws SSHCommandException {
-        return runSSHScript(connection, script, true);
-    }
+    String runSSHScriptPath(String node, String scriptName) throws SSHCommandException;
 
-    public String runSSHScript(String node, String script) throws SSHCommandException {
-        return runSSHScript(node, script, true);
-    }
+    String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException;
 
-    public String runSSHCommand(SSHConnection connection, String[] command) throws SSHCommandException {
-        StringBuilder sb = new StringBuilder();
-        for (String cmd : command) {
-            sb.append (cmd);
-            sb.append (" ");
-        }
-        return runSSHCommand(connection, sb.toString());
-    }
+    String runSSHScript(SSHConnection connection, String script, boolean throwsException) throws SSHCommandException;
 
-    public String runSSHScriptPath(SSHConnection connection, String scriptName) throws SSHCommandException {
-        return runSSHScript(connection, getScriptContent(scriptName));
-    }
+    String runSSHCommand(String node, String command) throws SSHCommandException;
 
-    public String runSSHScriptPath(String node, String scriptName) throws SSHCommandException {
-        return runSSHScript(node, getScriptContent(scriptName));
-    }
+    String runSSHCommand(SSHConnection connection, String command) throws SSHCommandException;
 
-    String getScriptContent(String scriptName) throws SSHCommandException {
-        InputStream scriptIs = ResourceUtils.getResourceAsStream(scriptName);
-        if (scriptIs == null) {
-            throw new SSHCommandException("Impossible to load script " + scriptName);
-        }
+    void copySCPFile(String node, String filePath) throws SSHCommandException;
 
-        String scriptContent = null;
-        try (BufferedReader reader = new BufferedReader (new InputStreamReader(scriptIs))) {
-            String line = null;
-            StringBuilder scriptBuilder = new StringBuilder();
-
-            while ((line = reader.readLine()) != null) {
-                scriptBuilder.append(line);
-                scriptBuilder.append("\n");
-            }
-
-            scriptContent = scriptBuilder.toString();
-        } catch (IOException e) {
-            logger.error(e, e);
-            throw new SSHCommandException(e);
-        }
-        return scriptContent;
-    }
-
-    public String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException {
-        try {
-            SSHConnection connection = connectionManagerService.getSharedConnection(node);
-
-            return runSSHScript(connection, script, throwsException);
-
-        } catch (ConnectionManagerException e) {
-            logger.error(e.getMessage());
-            logger.debug(e, e);
-            throw new SSHCommandException(e);
-
-        }
-    }
-
-    public String runSSHScript(SSHConnection connection, String script, boolean throwsException) throws SSHCommandException {
-
-        Session session = null;
-        try (ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
-             ByteArrayOutputStream baosErr = new ByteArrayOutputStream()) {
-
-            session = connection.openSession();
-            session.execCommand("bash --login -s");
-
-            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(session.getStdin()));
-
-            out.write(script);
-            out.close();
-
-            PumpThread t1 = new PumpThread(session.getStdout(), baosOut);
-            t1.start();
-            PumpThread t2 = new PumpThread(session.getStderr(), baosErr);
-            t2.start();
-
-            session.getStdin().close();
-            t1.join();
-            t2.join();
-
-            // wait for some time since the delivery of the exit status often gets delayed
-            session.waitForCondition(ChannelCondition.EXIT_STATUS, connection.getReadTimeout());
-            Integer r = session.getExitStatus();
-
-            if (r == null) {
-                throw new IOException("Could not get a return status within " + connection.getReadTimeout() + " milliseconds");
-            }
-
-            int retValue = r;
-
-            String outResult = baosOut.toString();
-            String errResult = baosErr.toString();
-
-            String result = outResult
-                    + (StringUtils.isNotBlank(outResult) && StringUtils.isNotBlank(errResult) ? "\n" : "")
-                    + errResult;
-
-            if (retValue == 0 || !throwsException) {
-                return result;
-            } else {
-                throw new SSHCommandException(result);
-            }
-
-        } catch (InterruptedException e) {
-            logger.error(e, e);
-            Thread.currentThread().interrupt();
-            throw new SSHCommandException(e);
-
-        } catch (IOException e) {
-            logger.error(e, e);
-            throw new SSHCommandException(e);
-
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
-    }
-
-    public String runSSHCommand(String node, String command) throws SSHCommandException {
-        try {
-            SSHConnection connection = connectionManagerService.getSharedConnection(node);
-            return runSSHCommand(connection, command);
-        } catch (ConnectionManagerException e) {
-            logger.error (e, e);
-            throw new SSHCommandException(e);
-        }
-    }
-
-    public String runSSHCommand(SSHConnection connection, String command) throws SSHCommandException {
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            int retValue = connection.exec(command, baos);
-
-            if (retValue == 0) {
-                return baos.toString();
-            } else {
-                throw new SSHCommandException("Command exited with return code " + retValue + "\n" + baos.toString());
-            }
-
-        } catch (InterruptedException | IOException e) {
-            logger.error (e, e);
-            throw new SSHCommandException(e);
-        }
-    }
-
-    public void copySCPFile(String node, String filePath) throws SSHCommandException {
-        try {
-            SSHConnection connection = connectionManagerService.getSharedConnection(node);
-            copySCPFile(connection, filePath);
-
-        } catch (ConnectionManagerException e) {
-            logger.error (e, e);
-            throw new SSHCommandException(e);
-        }
-    }
-
-    public void copySCPFile(SSHConnection connection, String filePath) throws SSHCommandException {
-
-        try {
-
-            JsonWrapper systemConfig = new JsonWrapper(configurationService.loadSetupConfig());
-
-            //SCPClient scp = new SCPClient(connection);
-            SCPClient scp = connection.createSCPClient();
-
-            scp.put(filePath, "/home/" + systemConfig.getValueForPath("ssh_username"), "0755");
-
-            // scp is stateless and doesn't nee to be closed
-
-        } catch (IOException  | FileException | JSONException | SetupException e) {
-            logger.error (e, e);
-            throw new SSHCommandException(e);
-        }
-    }
-
-    private static final class PumpThread extends Thread {
-        private final InputStream in;
-        private final OutputStream out;
-
-        /**
-         * Instantiates a new Pump thread.
-         *
-         * @param in  the in
-         * @param out the out
-         */
-        PumpThread(InputStream in, OutputStream out) {
-            super("pump thread");
-            this.in = in;
-            this.out = out;
-        }
-
-        @Override
-        public void run() {
-            byte[] buf = new byte[1024];
-            try {
-                while(true) {
-                    int len = in.read(buf);
-                    if(len<0) {
-                        in.close();
-                        return;
-                    }
-                    out.write(buf,0,len);
-                }
-            } catch (IOException e) {
-                logger.warn(e.getMessage());
-                logger.debug(e, e);
-            }
-        }
-    }
+    void copySCPFile(SSHConnection connection, String filePath) throws SSHCommandException;
 }
