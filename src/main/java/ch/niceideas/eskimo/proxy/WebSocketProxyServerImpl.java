@@ -36,14 +36,17 @@ public class WebSocketProxyServerImpl extends AbstractWebSocketHandler implement
     @Autowired
     private ServicesDefinition servicesDefinition;
 
-    private final Map<String, Map<String, Map<String, WebSocketProxyForwarder>>> forwarders = new ConcurrentHashMap<>();
+    protected final Map<String, Map<String, Map<String, WebSocketProxyForwarder>>> forwarders = new ConcurrentHashMap<>();
 
     /* For tests */
-    Map<String, Map<String, Map<String, WebSocketProxyForwarder>>> getForwarders() {
+    protected Map<String, Map<String, Map<String, WebSocketProxyForwarder>>> getForwarders() {
         return Collections.unmodifiableMap(forwarders);
     }
 
-    @Deprecated
+    public WebSocketProxyServerImpl() {
+    }
+
+    /* Need hat one for tests */
     public WebSocketProxyServerImpl(ProxyManagerService proxyManagerService, ServicesDefinition servicesDefinition) {
         this.proxyManagerService = proxyManagerService;
         this.servicesDefinition = servicesDefinition;
@@ -89,7 +92,7 @@ public class WebSocketProxyServerImpl extends AbstractWebSocketHandler implement
         });
     }
 
-    protected WebSocketProxyForwarder createForwarder(String serviceId, WebSocketSession webSocketServerSession, String targetPath) {
+    public WebSocketProxyForwarder createForwarder(String serviceId, WebSocketSession webSocketServerSession, String targetPath) {
         return new WebSocketProxyForwarder(serviceId, targetPath, proxyManagerService, webSocketServerSession);
     }
 

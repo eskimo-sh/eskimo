@@ -61,7 +61,7 @@ public class NodeRangeResolverTest {
     public void testRangeOverlapNode() throws Exception {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("node_id2", "192.168.10.11-192.168.10.14");
                 put("cerebro", "1");
@@ -97,7 +97,7 @@ public class NodeRangeResolverTest {
     @Test
     public void testEmptyRange() throws Exception {
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("node_id2", "192.168.10.15-192.168.10.14");
                 put("cerebro", "1");
@@ -133,7 +133,7 @@ public class NodeRangeResolverTest {
     @Test
     public void testRangeOverlapRange() throws Exception {
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11-192.168.10.13");
                 put("node_id2", "192.168.10.13-192.168.10.14");
                 put("cerebro", "1");
@@ -194,7 +194,7 @@ public class NodeRangeResolverTest {
     @Test
     public void testNominal() throws Exception {
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("node_id2", "192.168.11.12-192.168.11.14");
             put("cerebro", "1");
@@ -225,7 +225,7 @@ public class NodeRangeResolverTest {
 
         assertNotNull(resolvedConfig);
 
-        NodesConfigWrapper expectedResultConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper expectedResultConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("node_id2", "192.168.11.12");
             put("node_id3", "192.168.11.13");

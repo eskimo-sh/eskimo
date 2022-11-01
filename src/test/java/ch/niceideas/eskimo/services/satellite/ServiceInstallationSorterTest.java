@@ -34,13 +34,20 @@
 
 package ch.niceideas.eskimo.services.satellite;
 
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
+import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,26 +55,28 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class ServiceInstallationSorterTest extends AbstractServicesDefinitionTest {
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-setup"})
+public class ServiceInstallationSorterTest {
 
-    private ServicesInstallationSorter sis = null;
+    @Autowired
+    private ServicesInstallationSorter sis;
+
+    @Autowired
+    private ServicesDefinition servicesDefinition;
+
+    @Autowired
+    private NodeRangeResolver nodeRangeResolver;
+
+    @Autowired
+    private SetupServiceTestImpl setupServiceTest;
 
     NodesConfigWrapper nodesConfig = null;
 
     @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
-        sis = new ServicesInstallationSorter();
-        sis.setServicesDefinition(def);
-
-        ConfigurationServiceImpl cs = new ConfigurationServiceImpl();
-        sis.setConfigurationService(cs);
-        cs.setSetupService(new SetupServiceImpl() {
-            public String getConfigStoragePath() {
-                return "/tmp";
-            }
-        });
-
         nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
     }
 
@@ -75,8 +84,8 @@ public class ServiceInstallationSorterTest extends AbstractServicesDefinitionTes
     public void testNoMixUpOfKubeAndNonKube() throws Exception {
 
         ServiceOperationsCommand restartCommand = ServiceOperationsCommand.createForRestartsOnly(
-                def,
-                nrr,
+                servicesDefinition,
+                nodeRangeResolver,
                 new String[] {"kube-master", "kube-slave", "gluster", "cerebro", "kibana"},
                 StandardSetupHelpers.getStandard2NodesInstallStatus(),
                 StandardSetupHelpers.getStandard2NodesSetup()
@@ -119,7 +128,8 @@ public class ServiceInstallationSorterTest extends AbstractServicesDefinitionTes
 
         ServicesInstallStatusWrapper savesServicesInstallStatus = new ServicesInstallStatusWrapper (new HashMap<>());
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(def, nrr, savesServicesInstallStatus, nodesConfig);
+        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+                servicesDefinition, nodeRangeResolver, savesServicesInstallStatus, nodesConfig);
 
         List<List<ServiceOperationsCommand.ServiceOperationId>> orderedInstall = sis.orderOperations (oc.getInstallations(), nodesConfig);
 

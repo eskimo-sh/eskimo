@@ -41,6 +41,7 @@ import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -54,7 +55,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Component
-@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Profile("test-system")
 public class SystemServiceTestImpl implements SystemService {
 

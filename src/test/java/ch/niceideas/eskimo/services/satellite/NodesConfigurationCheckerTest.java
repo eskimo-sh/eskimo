@@ -34,29 +34,33 @@
 
 package ch.niceideas.eskimo.services.satellite;
 
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationChecker;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack"})
 public class NodesConfigurationCheckerTest {
 
-    private final NodesConfigurationChecker nodeConfigChecker = new NodesConfigurationChecker();
-
-    @BeforeEach
-    public void setUp() throws Exception {
-
-        ServicesDefinitionImpl def = new ServicesDefinitionImpl();
-        def.afterPropertiesSet();
-        nodeConfigChecker.setServicesDefinition(def);
-    }
+    @Autowired
+    private NodesConfigurationChecker nodeConfigChecker;
 
     @Test
     public void testRangeOfIps() throws Exception {

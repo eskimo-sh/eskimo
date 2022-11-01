@@ -69,7 +69,7 @@ public class WebSocketProxyForwarder {
         return headers;
     }
 
-    WebSocketSession createWebSocketClientSession() {
+    protected WebSocketSession createWebSocketClientSession() {
         String targetWsUri = "(undefined yet)";
         try {
 

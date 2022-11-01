@@ -33,7 +33,7 @@ public class WebSocketProxyForwarderTest {
 
         forwarder = new WebSocketProxyForwarder("zeppelin", "/zeppelin", null, serverSession) {
             @Override
-            WebSocketSession createWebSocketClientSession() {
+            public WebSocketSession createWebSocketClientSession() {
                 return clientSession;
             }
         };

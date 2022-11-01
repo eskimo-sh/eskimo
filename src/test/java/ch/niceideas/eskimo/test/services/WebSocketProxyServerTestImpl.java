@@ -1,58 +1,76 @@
 package ch.niceideas.eskimo.test.services;
 
+import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import ch.niceideas.eskimo.proxy.WebSocketProxyForwarder;
 import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
+import ch.niceideas.eskimo.proxy.WebSocketProxyServerImpl;
+import ch.niceideas.eskimo.services.ServicesDefinition;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
-@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Profile("test-web-socket")
-public class WebSocketProxyServerTestImpl implements WebSocketProxyServer {
+public class WebSocketProxyServerTestImpl extends WebSocketProxyServerImpl implements WebSocketProxyServer {
 
     private final AtomicBoolean removeForwardersCalled = new AtomicBoolean(false);
+    private final AtomicInteger closedCalls = new AtomicInteger(0);
+
+    @Autowired
+    private ProxyManagerService proxyManagerService;
+
+    public WebSocketProxyServerTestImpl(ProxyManagerService proxyManagerService, ServicesDefinition servicesDefinition) {
+        super(proxyManagerService, servicesDefinition);
+    }
 
     public boolean isRemoveForwardersCalled() {
         return removeForwardersCalled.get();
     }
 
+    public int getClosedCallsCount() {
+        return closedCalls.get();
+    }
+
     public void reset() {
         removeForwardersCalled.set(false);
+        closedCalls.set(0);
+        forwarders.clear();
     }
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession webSocketSession) throws Exception {
+    public WebSocketProxyForwarder createForwarder(String serviceId, WebSocketSession webSocketServerSession, String targetPath) {
 
-    }
-
-    @Override
-    public void handleMessage(WebSocketSession webSocketServerSession, WebSocketMessage<?> webSocketMessage) throws Exception {
-
-    }
-
-    @Override
-    public void handleTransportError(WebSocketSession webSocketSession, Throwable throwable) throws Exception {
-
-    }
-
-    @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-
-    }
-
-    @Override
-    public boolean supportsPartialMessages() {
-        return false;
+        return new WebSocketProxyForwarder(serviceId, targetPath, proxyManagerService, webSocketServerSession) {
+            @Override
+            protected WebSocketSession createWebSocketClientSession() {
+                return null;
+            }
+            @Override
+            public void forwardMessage(WebSocketMessage<?> webSocketMessage) throws IOException {
+                // No-Op
+            }
+            @Override
+            public void close() {
+                closedCalls.incrementAndGet();
+            }
+        };
     }
 
     @Override
     public void removeForwardersForService(String serviceId) {
         removeForwardersCalled.set(true);
+        super.removeForwardersForService (serviceId);
     }
+
 }

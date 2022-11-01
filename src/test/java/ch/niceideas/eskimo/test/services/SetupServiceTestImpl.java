@@ -44,6 +44,7 @@ import ch.niceideas.eskimo.services.*;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -58,7 +59,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Component
-@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Profile("test-setup")
 public class SetupServiceTestImpl extends SetupServiceImpl implements SetupService {
 
@@ -209,6 +210,6 @@ public class SetupServiceTestImpl extends SetupServiceImpl implements SetupServi
 
     @Override
     public String getStoragePathConfDir() {
-        return null;
+        return configStoragePath.getAbsolutePath();
     }
 }

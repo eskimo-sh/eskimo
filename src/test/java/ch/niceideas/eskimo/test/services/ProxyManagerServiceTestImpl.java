@@ -35,27 +35,74 @@
 
 package ch.niceideas.eskimo.test.services;
 
-import ch.niceideas.eskimo.model.MasterStatusWrapper;
-import ch.niceideas.eskimo.services.MasterService;
+import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
+import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import ch.niceideas.eskimo.services.ConnectionManagerException;
+import org.apache.http.HttpHost;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.WebApplicationContext;
+
+import java.util.Collection;
+import java.util.List;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
-@Profile("test-master")
-public class MasterServiceTestImpl implements MasterService {
+@Profile("test-proxy")
+public class ProxyManagerServiceTestImpl implements ProxyManagerService {
 
-    @Override
-    public MasterStatusWrapper getMasterStatus() throws MasterExceptionWrapperException {
-        return MasterStatusWrapper.empty();
+    private int tomcatServerLocalPort;
+
+    public void setTomcatLocalPort(int tomcatServerLocalPort) {
+        this.tomcatServerLocalPort = tomcatServerLocalPort;
     }
 
     @Override
-    public void updateStatus() {
+    public HttpHost getServerHost(String serviceId) {
+        return null;
+    }
+
+    @Override
+    public String getServerURI(String serviceName, String pathInfo) {
+        return null;
+    }
+
+    @Override
+    public String extractHostFromPathInfo(String pathInfo) {
+        return null;
+    }
+
+    @Override
+    public List<ProxyTunnelConfig> getTunnelConfigForHost(String host) {
+        return null;
+    }
+
+    @Override
+    public void updateServerForService(String serviceName, String runtimeNode) throws ConnectionManagerException {
 
     }
+
+    @Override
+    public void removeServerForService(String serviceName, String runtimeNode) {
+
+    }
+
+    @Override
+    public Collection<String> getAllTunnelConfigKeys() {
+        return null;
+    }
+
+    @Override
+    public ProxyTunnelConfig getTunnelConfig(String serviceId) {
+        if (serviceId.equals("cerebro")) {
+            return new ProxyTunnelConfig("cerebro", tomcatServerLocalPort, "dummy", -1);
+        }
+        if (serviceId.equals("grafana")) {
+            return new ProxyTunnelConfig("grafana", tomcatServerLocalPort, "dummy", -1);
+        }
+        return new ProxyTunnelConfig(serviceId, 12345, "192.168.10.11", 8080);
+    }
+
 }

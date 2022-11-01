@@ -42,6 +42,7 @@ import ch.niceideas.eskimo.services.ConnectionManagerException;
 import ch.niceideas.eskimo.services.ConnectionManagerService;
 import ch.niceideas.eskimo.services.ConnectionManagerServiceImpl;
 import com.trilead.ssh2.LocalPortForwarder;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -54,7 +55,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
-@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Profile("test-connection-manager")
 public class ConnectionManagerServiceTestImpl extends ConnectionManagerServiceImpl implements ConnectionManagerService {
 

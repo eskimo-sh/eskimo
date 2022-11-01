@@ -30,4 +30,6 @@ public interface WebSocketProxyServer extends WebSocketHandler {
     void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception;
 
     void removeForwardersForService(String serviceId);
+
+    WebSocketProxyForwarder createForwarder(String serviceId, WebSocketSession webSocketServerSession, String targetPath);
 }

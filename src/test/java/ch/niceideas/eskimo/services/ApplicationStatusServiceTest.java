@@ -1,17 +1,30 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
+import ch.niceideas.eskimo.EskimoApplication;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class ApplicationStatusServiceTest extends AbstractSystemTest {
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-conf"})
+public class ApplicationStatusServiceTest {
+
+    @Autowired
+    private ApplicationStatusService applicationStatusService;
 
     @Test
     public void testUpdateAndGetStatus() {
@@ -31,8 +44,8 @@ public class ApplicationStatusServiceTest extends AbstractSystemTest {
         assertNotNull (appStatus);
 
         assertEquals("30s", appStatus.getValueForPathAsString("monitoringDashboardRefreshPeriod"));
-        assertEquals("DEV-SNAPSHOT", appStatus.getValueForPathAsString("buildVersion"));
-        assertEquals("LATEST DEV", appStatus.getValueForPathAsString("buildTimestamp"));
+        assertEquals("@project.version@", appStatus.getValueForPathAsString("buildVersion"));
+        assertEquals("@maven.build.timestamp@", appStatus.getValueForPathAsString("buildTimestamp"));
         assertEquals("(Setup incomplete)", appStatus.getValueForPathAsString("sshUsername"));
         assertEquals("true", appStatus.getValueForPathAsString("enableKubernetes"));
 

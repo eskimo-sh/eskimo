@@ -81,10 +81,12 @@ public class MemoryComputer {
     private long reservedMemoryMb = 1000;
 
     /** For tests only */
+    @Deprecated
     public void setServicesDefinition(ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
     }
     /** For tests only*/
+    @Deprecated
     public void setSshCommandService(SSHCommandService sshCommandService) {
         this.sshCommandService = sshCommandService;
     }

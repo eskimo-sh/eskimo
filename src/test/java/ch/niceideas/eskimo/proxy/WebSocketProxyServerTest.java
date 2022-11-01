@@ -1,12 +1,20 @@
 package ch.niceideas.eskimo.proxy;
 
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.ConnectionManagerService;
 import ch.niceideas.eskimo.services.ConnectionManagerServiceImpl;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
+import ch.niceideas.eskimo.test.services.ProxyManagerServiceTestImpl;
+import ch.niceideas.eskimo.test.services.WebSocketProxyServerTestImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
@@ -21,54 +29,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-conf", "test-proxy", "test-web-socket"}) // using test implementation that overrides default implementation
 public class WebSocketProxyServerTest {
 
-    private WebSocketProxyServerImpl server = null;
-
-    private ProxyManagerServiceImpl pms;
-    private ServicesDefinitionImpl sd;
+    @Autowired
+    private WebSocketProxyServerTestImpl server = null;
 
     private WebSocketSession wss1;
     private WebSocketSession wss2;
 
-    private AtomicInteger closedCalls;
-
-    
     @BeforeEach
     public void setUp() throws Exception {
-
-        pms = new ProxyManagerServiceImpl() {
-            @Override
-            public ProxyTunnelConfig getTunnelConfig(String serviceId) {
-                return new ProxyTunnelConfig(serviceId, 12345, "192.168.10.11", 8080);
-            }
-        };
-        sd = new ServicesDefinitionImpl();
-        pms.setServicesDefinition(sd);
-        sd.afterPropertiesSet();
-        pms.setConnectionManagerService(new ConnectionManagerServiceImpl() {
-        });
-        server = new WebSocketProxyServerImpl(pms, sd) {
-            @Override
-            protected WebSocketProxyForwarder createForwarder(String serviceId, WebSocketSession webSocketServerSession, String targetPath) {
-                return new WebSocketProxyForwarder(serviceId, targetPath, pms, webSocketServerSession) {
-                    @Override
-                    WebSocketSession createWebSocketClientSession() {
-                        return null;
-                    }
-                    @Override
-                    public void forwardMessage(WebSocketMessage<?> webSocketMessage) throws IOException {
-                        // No-Op
-                    }
-                    @Override
-                    public void close() {
-                        closedCalls.incrementAndGet();
-                    }
-                };
-            }
-        };
-
-        pms.setWebSocketProxyServer (server);
 
         wss1 = new StandardWebSocketSession(null, null, null, null) {
             @Override
@@ -84,7 +58,7 @@ public class WebSocketProxyServerTest {
             }
         };
 
-        closedCalls = new AtomicInteger(0);
+        server.reset();
     }
 
     @Test
@@ -120,7 +94,7 @@ public class WebSocketProxyServerTest {
 
         assertEquals(0, forwarders.size());
 
-        assertEquals(2, closedCalls.get());
+        assertEquals(2, server.getClosedCallsCount());
     }
 
     @Test
@@ -140,6 +114,6 @@ public class WebSocketProxyServerTest {
 
         assertNotNull(forwarders.get("cerebro").get(wss1.getId()).get("/test"));
 
-        assertEquals(1, closedCalls.get());
+        assertEquals(1, server.getClosedCallsCount());
     }
 }

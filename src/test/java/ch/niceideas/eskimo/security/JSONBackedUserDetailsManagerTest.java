@@ -81,8 +81,9 @@ public class JSONBackedUserDetailsManagerTest {
     public void testAddUserPersisted() throws Exception {
 
         User newUser = new User("test_user", passwordEncoder.encode("test_password"),
-                true, true, true, true, new ArrayList<SimpleGrantedAuthority>() {{
-            add (new SimpleGrantedAuthority("admin"));
+                true, true, true, true,
+                new ArrayList<SimpleGrantedAuthority>() {{
+                    add (new SimpleGrantedAuthority("admin"));
                 }}
         );
 

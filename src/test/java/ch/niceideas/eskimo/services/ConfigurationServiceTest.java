@@ -1,30 +1,43 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
+import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.utils.OSDetector;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.File;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-setup"})
 public class ConfigurationServiceTest {
 
     private static final Logger logger = Logger.getLogger(ConfigurationServiceTest.class);
 
-    private File tmpFile = null;
+    @Autowired
+    private ConfigurationService configurationService;
 
-    private ConfigurationServiceImpl configurationService = null;
+    private File tmpFile = null;
 
     @BeforeEach
     public void setUp() throws Exception {
+
         try {
             tmpFile = File.createTempFile("test_", "_configurationService");
             tmpFile.delete();
@@ -33,24 +46,8 @@ public class ConfigurationServiceTest {
             logger.error (e, e);
             throw new SetupException(e);
         }
-        configurationService = new ConfigurationServiceImpl();
 
-        ServicesDefinitionImpl sd = new ServicesDefinitionImpl();
-        sd.afterPropertiesSet();
-
-        SetupServiceImpl setupService = new SetupServiceImpl() {
-            @Override
-            public String getConfigStoragePath() {
-                return tmpFile.getAbsolutePath();
-            }
-        };
-        configurationService.setSetupService(setupService);
-        configurationService.setServicesDefinition(sd);
-
-        File storagePathConfDir = File.createTempFile("eskimo_storage", "");
-        storagePathConfDir.delete();
-        storagePathConfDir.mkdirs();
-        setupService.setStoragePathConfDir(storagePathConfDir.getCanonicalPath());
+        SecurityContextHelper.loginAdmin();
     }
 
     @Test

@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.services.satellite;
 
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.services.ConfigurationServiceImpl;
@@ -42,8 +43,15 @@ import ch.niceideas.eskimo.services.SetupServiceImpl;
 import ch.niceideas.eskimo.services.SystemServiceTest;
 import ch.niceideas.eskimo.services.satellite.KubernetesServicesConfigChecker;
 import ch.niceideas.eskimo.services.satellite.KubernetesServicesConfigException;
+import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.HashMap;
 
@@ -51,11 +59,20 @@ import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-conf", "test-setup"})
 public class KubernetesServicesConfigCheckerTest {
 
-    private KubernetesServicesConfigChecker kubernetesConfigChecker = new KubernetesServicesConfigChecker();
-    private ConfigurationServiceImpl configurationService = new ConfigurationServiceImpl();
-    private SetupServiceImpl setupService = new SetupServiceImpl();
+    @Autowired
+    private KubernetesServicesConfigChecker kubernetesConfigChecker;
+
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
+
+    @Autowired
+    private SetupServiceTestImpl setupServiceTest;
 
     NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
         put("node_id1", "192.168.10.11");
@@ -84,23 +101,8 @@ public class KubernetesServicesConfigCheckerTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-
-        ServicesDefinitionImpl def = new ServicesDefinitionImpl();
-        def.afterPropertiesSet();
-
-        setupService = new SetupServiceImpl();
-        configurationService.setSetupService(setupService);
-
-        setupService.setConfigurationService (configurationService);
-
-        configurationService.setSetupService(setupService);
-
-        kubernetesConfigChecker.setServicesDefinition(def);
-
-        setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
-        kubernetesConfigChecker.setConfigurationService(configurationService);
-
-        kubernetesConfigChecker.setServicesDefinition(def);
+        configurationServiceTest.reset();
+        configurationServiceTest.saveNodesConfig(nodesConfig);
     }
 
     @Test
@@ -112,7 +114,7 @@ public class KubernetesServicesConfigCheckerTest {
             put("ntp1", "on");
             put("prometheus1", "on");
         }});
-        configurationService.saveNodesConfig(nodesConfig);
+        configurationServiceTest.saveNodesConfig(nodesConfig);
 
         KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
 
@@ -129,17 +131,17 @@ public class KubernetesServicesConfigCheckerTest {
     @Test
     public void testSparkButNoKube() throws Exception {
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("ntp1", "on");
             put("prometheus1", "on");
 
         }});
-        configurationService.saveNodesConfig(nodesConfig);
+        configurationServiceTest.saveNodesConfig(nodesConfig);
 
         KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
 
-            KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>() {{
+            KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<>() {{
                 put("spark-runtime_install", "on");
             }});
 
@@ -152,7 +154,7 @@ public class KubernetesServicesConfigCheckerTest {
     @Test
     public void testZeppelinButNoZookeeper() throws Exception {
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("ntp1", "on");
             put("prometheus1", "on");
@@ -160,11 +162,11 @@ public class KubernetesServicesConfigCheckerTest {
             put("kube-slave1", "on");
 
         }});
-        configurationService.saveNodesConfig(nodesConfig);
+        configurationServiceTest.saveNodesConfig(nodesConfig);
 
         KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
 
-            KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>() {{
+            KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<>() {{
                 put("elasticsearch_install", "on");
                 put("zeppelin_installed", "on");
             }});
@@ -178,18 +180,18 @@ public class KubernetesServicesConfigCheckerTest {
     @Test
     public void testNonKubernetesServiceCanBeSelected() throws Exception {
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("ntp1", "on");
             put("prometheus1", "on");
             put("elasticsearch1", "on");
             put("zookeeper", "1");
         }});
-        configurationService.saveNodesConfig(nodesConfig);
+        configurationServiceTest.saveNodesConfig(nodesConfig);
 
         KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
 
-            KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>() {{
+            KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<>() {{
                 put("zookeeper_installed", "on");
             }});
 
@@ -202,15 +204,11 @@ public class KubernetesServicesConfigCheckerTest {
     @Test
     public void testCheckKubernetesSetupOK() throws Exception {
 
-        configurationService.saveNodesConfig(nodesConfig);
-
         kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
     }
 
     @Test
     public void testCheckKubernetesSetup_missingCpuSetting() throws Exception {
-
-        configurationService.saveNodesConfig(nodesConfig);
 
         kubeServicesConfig.removeRootKey("cerebro_cpu");
 
@@ -224,8 +222,6 @@ public class KubernetesServicesConfigCheckerTest {
     @Test
     public void testCheckKubernetesSetup_missingRamSetting() throws Exception {
 
-        configurationService.saveNodesConfig(nodesConfig);
-
         kubeServicesConfig.removeRootKey("cerebro_ram");
 
         KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
@@ -238,8 +234,6 @@ public class KubernetesServicesConfigCheckerTest {
     @Test
     public void testCheckKubernetesSetup_missingCpuWrong() throws Exception {
 
-        configurationService.saveNodesConfig(nodesConfig);
-
         kubeServicesConfig.setValueForPath("cerebro_cpu", "1l");
 
         KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
@@ -251,8 +245,6 @@ public class KubernetesServicesConfigCheckerTest {
 
     @Test
     public void testCheckKubernetesSetup_missingRamWrong() throws Exception {
-
-        configurationService.saveNodesConfig(nodesConfig);
 
         kubeServicesConfig.setValueForPath("cerebro_ram", "100ui");
 

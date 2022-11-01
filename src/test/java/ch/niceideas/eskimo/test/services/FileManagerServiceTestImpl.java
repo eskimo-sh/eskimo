@@ -39,6 +39,7 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.services.FileManagerService;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -51,7 +52,7 @@ import java.util.Base64;
 import java.util.HashMap;
 
 @Component
-@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 @Profile("test-file-manager")
 public class FileManagerServiceTestImpl implements FileManagerService {
 

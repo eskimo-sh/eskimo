@@ -96,7 +96,7 @@ public class FileManagerServiceImpl implements FileManagerService {
     @Value("${fileManager.maxFileSize}")
     protected int maxFileSize = 2097152;
 
-    /* Controlers are singleton */
+    /* Session scope */
     private final Map<String, SFTPv3Client> sftpClients = new ConcurrentHashMap<>();
 
 

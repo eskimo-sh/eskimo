@@ -42,6 +42,7 @@ import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.services.*;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -49,7 +50,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
 @Component
-@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Profile("test-conf")
 public class ConfigurationServiceTestImpl implements ConfigurationService {
 
@@ -69,6 +70,8 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
     private String setupConfigAsString;
     private ServicesInstallStatusWrapper installStatus = null;
 
+    private NodesConfigWrapper nodesConfig = null;
+
     public void reset() {
         this.standardKubernetesConfig = false;
         this.kubernetesConfigError = false;
@@ -82,6 +85,8 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
         this.serviceSettings = null;
         this.setupConfigAsString = null;
         this.installStatus = null;
+
+        this.nodesConfig = null;
     }
 
     public void setStandardKubernetesConfig() {
@@ -168,7 +173,7 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
 
     @Override
     public void saveNodesConfig(NodesConfigWrapper nodesConfig) throws FileException, SetupException {
-
+        this.nodesConfig = nodesConfig;
     }
 
     @Override
@@ -178,7 +183,7 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
         } else if (nodesConfigError) {
             throw new SystemException("Test Error");
         }
-        return null;
+        return nodesConfig;
     }
 
     @Override

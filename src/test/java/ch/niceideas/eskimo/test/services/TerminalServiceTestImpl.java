@@ -39,6 +39,7 @@ package ch.niceideas.eskimo.test.services;
 import ch.niceideas.eskimo.services.TerminalService;
 import ch.niceideas.eskimo.terminal.ScreenImage;
 import ch.niceideas.eskimo.terminal.Terminal;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -48,7 +49,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.io.IOException;
 
 @Component
-@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Profile("test-terminal")
 public class TerminalServiceTestImpl implements TerminalService {
 

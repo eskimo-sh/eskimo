@@ -38,61 +38,117 @@ package ch.niceideas.eskimo.test.services;
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.services.SSHCommandException;
 import ch.niceideas.eskimo.services.SSHCommandService;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 @Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Profile("test-ssh")
 public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     private String returnResult = null;
 
+    private ConnectionResultBuilder connectionResultBuilder = null;
+    private NodeResultBuilder nodeResultBuilder = null;
+
+    public interface ConnectionResultBuilder {
+        String build (SSHConnection connection, String script);
+    }
+
+    public interface NodeResultBuilder {
+        String build (String node, String script);
+    }
+
+    public void reset() {
+        this.connectionResultBuilder = null;
+        this.nodeResultBuilder = null;
+        this.returnResult = null;
+    }
+
     public void setResult(String returnResult) {
         this.returnResult = returnResult;
     }
 
+    public void setConnectionResultBuilder(ConnectionResultBuilder connectionResultBuilder) {
+        this.connectionResultBuilder = connectionResultBuilder;
+    }
+
+    public void setNodeResultBuilder(NodeResultBuilder nodeResultBuilder) {
+        this.nodeResultBuilder = nodeResultBuilder;
+    }
+
     @Override
     public String runSSHScript(SSHConnection connection, String script) throws SSHCommandException {
+        if (connectionResultBuilder != null) {
+            return connectionResultBuilder.build(connection, script);
+        }
         return returnResult;
     }
 
     @Override
     public String runSSHScript(String node, String script) throws SSHCommandException {
+        if (nodeResultBuilder != null) {
+            return nodeResultBuilder.build(node, script);
+        }
         return returnResult;
     }
 
     @Override
     public String runSSHCommand(SSHConnection connection, String[] command) throws SSHCommandException {
+        if (connectionResultBuilder != null) {
+            return connectionResultBuilder.build(connection, String.join(",", command));
+        }
         return returnResult;
     }
 
     @Override
     public String runSSHScriptPath(SSHConnection connection, String scriptName) throws SSHCommandException {
+        if (connectionResultBuilder != null) {
+            return connectionResultBuilder.build(connection, scriptName);
+        }
         return returnResult;
     }
 
     @Override
     public String runSSHScriptPath(String node, String scriptName) throws SSHCommandException {
+        if (nodeResultBuilder != null) {
+            return nodeResultBuilder.build(node, scriptName);
+        }
         return returnResult;
     }
 
     @Override
     public String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException {
+        if (nodeResultBuilder != null) {
+            return nodeResultBuilder.build(node, script);
+        }
         return returnResult;
     }
 
     @Override
     public String runSSHScript(SSHConnection connection, String script, boolean throwsException) throws SSHCommandException {
+        if (connectionResultBuilder != null) {
+            return connectionResultBuilder.build(connection, script);
+        }
         return returnResult;
     }
 
     @Override
     public String runSSHCommand(String node, String command) throws SSHCommandException {
+        if (nodeResultBuilder != null) {
+            return nodeResultBuilder.build(node, command);
+        }
         return returnResult;
     }
 
     @Override
     public String runSSHCommand(SSHConnection connection, String command) throws SSHCommandException {
+        if (connectionResultBuilder != null) {
+            return connectionResultBuilder.build(connection, command);
+        }
         return returnResult;
     }
 

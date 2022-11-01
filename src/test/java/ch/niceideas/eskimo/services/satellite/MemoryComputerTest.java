@@ -36,12 +36,20 @@ package ch.niceideas.eskimo.services.satellite;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.services.satellite.MemoryComputer;
+import ch.niceideas.eskimo.test.services.SSHCommandServiceTestImpl;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -50,11 +58,20 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-ssh"})
 public class MemoryComputerTest {
 
-    private MemoryComputer memoryComputer = null;
+    @Autowired
+    private MemoryComputer memoryComputer;
 
-    private ServicesDefinitionImpl servicesDefinition;
+    @Autowired
+    private ServicesDefinition servicesDefinition;
+
+    @Autowired
+    private SSHCommandServiceTestImpl sshCommandServiceTest;
 
     private String nodesConfigString = null;
     private String kubeServicesConfigString = null;
@@ -64,31 +81,14 @@ public class MemoryComputerTest {
         nodesConfigString =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testConfig.json"), StandardCharsets.UTF_8);
         kubeServicesConfigString =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testKubernetesConfig.json"), StandardCharsets.UTF_8);
 
-        servicesDefinition = new ServicesDefinitionImpl();
-        servicesDefinition.afterPropertiesSet();
-
-        memoryComputer = new MemoryComputer();
-        memoryComputer.setServicesDefinition(servicesDefinition);
-
-        memoryComputer.setSshCommandService(new SSHCommandServiceImpl() {
-            @Override
-            public String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException {
-                switch (node) {
-                    case "192.168.10.11":
-                        return "MemTotal:        5969796 kB";
-                    case "192.168.10.12":
-                        return "MemTotal:        5799444 kB";
-                    default:
-                        return "MemTotal:        3999444 kB";
-                }
-            }
-            @Override
-            public String runSSHCommand(String node, String command) throws SSHCommandException {
-                return null;
-            }
-            @Override
-            public void copySCPFile(String node, String filePath) throws SSHCommandException {
-                // just do nothing
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
+            switch (node) {
+                case "192.168.10.11":
+                    return "MemTotal:        5969796 kB";
+                case "192.168.10.12":
+                    return "MemTotal:        5799444 kB";
+                default:
+                    return "MemTotal:        3999444 kB";
             }
         });
     }

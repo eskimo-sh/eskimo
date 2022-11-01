@@ -44,6 +44,7 @@ import org.apache.http.HttpHost;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -58,6 +59,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+@Profile("!test-proxy")
 public class ProxyManagerServiceImpl implements ProxyManagerService {
 
     private static final Logger logger = Logger.getLogger(ProxyManagerServiceImpl.class);
