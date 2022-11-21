@@ -117,6 +117,7 @@ public class KubernetesServiceImpl implements KubernetesService {
     private int kubernetesOperationWaitTimoutSeconds = 100 * 60; // 100 minutes
 
     /* For tests */
+    @Deprecated
     void setServicesDefinition(ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
     }

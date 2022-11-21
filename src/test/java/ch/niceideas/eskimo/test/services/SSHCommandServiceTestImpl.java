@@ -51,6 +51,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     private String returnResult = null;
     private StringBuilder executedCommands = new StringBuilder();
+    private StringBuilder executedScpCommands = new StringBuilder();
 
     private ConnectionResultBuilder connectionResultBuilder = null;
     private NodeResultBuilder nodeResultBuilder = null;
@@ -67,11 +68,16 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
         return executedCommands.toString();
     }
 
+    public String getExecutedScpCommands() {
+        return executedScpCommands.toString();
+    }
+
     public void reset() {
         this.connectionResultBuilder = null;
         this.nodeResultBuilder = null;
         this.returnResult = null;
         this.executedCommands = new StringBuilder();
+        this.executedScpCommands = new StringBuilder();
     }
 
     public void setResult(String returnResult) {
@@ -108,7 +114,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHCommand(SSHConnection connection, String[] command) throws SSHCommandException {
-        executedCommands.append(String.join("\n", command));
+        executedCommands.append(String.join(" ", command));
         executedCommands.append("\n");
         if (connectionResultBuilder != null) {
             return connectionResultBuilder.build(connection, String.join(",", command));
@@ -178,12 +184,12 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public void copySCPFile(String node, String filePath) throws SSHCommandException {
-        // No-Op
+        this.executedScpCommands.append(node).append(":").append(filePath).append("\n");
     }
 
     @Override
     public void copySCPFile(SSHConnection connection, String filePath) throws SSHCommandException {
-        // No-Op
+        this.executedScpCommands.append(connection != null ? connection.getHostname() : "null").append(":").append(filePath).append("\n");
     }
 
 }

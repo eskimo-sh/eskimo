@@ -37,10 +37,23 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.AbstractBaseSSHTest;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
+import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
+import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
+import ch.niceideas.eskimo.test.services.OperationsMonitoringServiceTestImpl;
+import ch.niceideas.eskimo.test.services.SSHCommandServiceTestImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,62 +65,54 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class NodesConfigurationServiceTest extends AbstractSystemTest {
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-system", "test-operation", "test-operations", "test-proxy", "test-kube", "test-ssh", "test-connection-manager"})
+public class NodesConfigurationServiceTest {
 
     private String testRunUUID = UUID.randomUUID().toString();
 
+    @Autowired
+    private NodesConfigurationService nodesConfigurationService;
+
+    @Autowired
+    private SSHCommandServiceTestImpl sshCommandServiceTest;
+
+    @Autowired
+    private OperationsMonitoringServiceTestImpl operationsMonitoringServiceTest;
+
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
+
+    @Autowired
+    private NodeRangeResolver nodeRangeResolver;
+
+    @Autowired
+    private ServicesDefinition servicesDefinition;
+
+    @Autowired
+    private ConnectionManagerServiceTestImpl connectionManagerServiceTest;
+
     @BeforeEach
-    @Override
+
     public void setUp() throws Exception {
-        super.setUp();
-        setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
+        SecurityContextHelper.loginAdmin();
+        operationsMonitoringServiceTest.operationsFinished(true);
+        connectionManagerServiceTest.dontConnect();
+        sshCommandServiceTest.reset();
     }
 
-    @Override
-    protected SystemServiceImpl createSystemService() {
-        SystemServiceImpl ss = new SystemServiceImpl(false) {
-            @Override
-            public File createTempFile(String serviceOrFlag, String node, String extension) throws IOException {
-                File retFile = new File (System.getProperty("java.io.tmpdir") + "/" + serviceOrFlag+"-"+testRunUUID+"-"+ node +extension);
-                retFile.createNewFile();
-                return retFile;
-            }
-        };
-        ss.setConfigurationService(configurationService);
-        return ss;
-    }
-
-    @Override
-    protected SetupServiceImpl createSetupService() {
-        return new SetupServiceImpl() {
-            @Override
-            public String findLastPackageFile(String prefix, String packageName) {
-                return prefix+"_"+packageName+"_dummy_1.dummy";
-            }
-        };
-    }
 
     @Test
     public void testInstallEskimoBaseSystem() throws Exception {
-
-        nodesConfigurationService.setConnectionManagerService(new ConnectionManagerServiceImpl() {
-
-            @Override
-            public SSHConnection getPrivateConnection (String node) {
-                return null;
-            }
-            @Override
-            public SSHConnection getSharedConnection (String node) {
-                return null;
-            }
-        });
 
         StringBuilder sb = new StringBuilder();
         MessageLogger ml = new MessageLogger() {
             @Override
             public void addInfo(String message) {
                 if (StringUtils.isNotBlank(message)) {
-                    sb.append(message + "\n");
+                    sb.append(message).append("\n");
                 }
             }
 
@@ -115,7 +120,7 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
             public void addInfo(String[] messages) {
                 if (messages != null && messages.length > 0) {
                     for (String message : messages) {
-                        sb.append(message + "\n");
+                        sb.append(message).append("\n");
                     }
                 }
             }
@@ -128,32 +133,23 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 " - Copying gluster-mount script\n" +
                 " - Copying eskimo-kubectl script\n", sb.toString());
 
-        assertEquals ("192.168.10.11-./services_setup/base-eskimo/jq-1.6-linux64\n" +
-                "192.168.10.11-./services_setup/base-eskimo/gluster_mount.sh\n" +
-                "192.168.10.11-./services_setup/base-eskimo/eskimo-kubectl", testSCPCommands.toString().trim());
+        assertEquals ("192.168.10.11:./services_setup/base-eskimo/jq-1.6-linux64\n" +
+                "192.168.10.11:./services_setup/base-eskimo/gluster_mount.sh\n" +
+                "192.168.10.11:./services_setup/base-eskimo/eskimo-kubectl", sshCommandServiceTest.getExecutedScpCommands().toString().trim());
 
-        assertTrue (testSSHCommandScript.toString().startsWith("#!/bin/bash\n"));
+        assertTrue (sshCommandServiceTest.getExecutedCommands().startsWith("#!/bin/bash\n"));
     }
 
     @Test
     public void testGetNodeFlavour() throws Exception {
 
-        AtomicReference<String> command = new AtomicReference<>();
-
-        nodesConfigurationService.setSshCommandService(new SSHCommandServiceImpl() {
-            @Override
-            public String runSSHScript(SSHConnection connection, String script){
-                return (String) command.get();
-            }
-        });
-
-        command.set("debian");
+        sshCommandServiceTest.setResult("debian");
         assertEquals ("debian", nodesConfigurationService.getNodeFlavour(null));
 
-        command.set("redhat");
+        sshCommandServiceTest.setResult("redhat");
         assertEquals ("redhat", nodesConfigurationService.getNodeFlavour(null));
 
-        command.set("suse");
+        sshCommandServiceTest.setResult("suse");
         assertEquals ("suse", nodesConfigurationService.getNodeFlavour(null));
     }
 
@@ -162,10 +158,10 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
 
         nodesConfigurationService.copyCommand("source", "target", null);
 
-        assertEquals ("192.168.10.11-./services_setup/base-eskimo/source", testSCPCommands.toString().trim());
+        assertEquals ("null:./services_setup/base-eskimo/source", sshCommandServiceTest.getExecutedScpCommands().trim());
         assertEquals ("sudo mv source target \n" +
                 "sudo chown root.root target \n" +
-                "sudo chmod 755 target \n", testSSHCommandScript.toString());
+                "sudo chmod 755 target \n", sshCommandServiceTest.getExecutedCommands());
     }
 
     @Test
@@ -176,41 +172,41 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 put("ntp_installed_on_IP_192-168-10-13", "OK");
         }});
 
-        configurationService.saveServicesInstallationStatus(savedStatus);
-        configurationService.saveNodesConfig(StandardSetupHelpers.getStandard2NodesSetup());
+        configurationServiceTest.saveServicesInstallationStatus(savedStatus);
+        configurationServiceTest.setStandard2NodesSetup();
 
         ServiceOperationsCommand command = ServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedStatus, StandardSetupHelpers.getStandard2NodesSetup());
 
-        operationsMonitoringService.operationsStarted(command);
+        operationsMonitoringServiceTest.operationsStarted(command);
 
         // testing zookeeper installation
         nodesConfigurationService.installService(new ServiceOperationsCommand.ServiceOperationId("installation", "zookeeper", "192.168.10.13"));
 
-        assertTrue(testSSHCommandScript.toString().startsWith("rm -Rf /tmp/zookeeper\n" +
+        assertTrue(sshCommandServiceTest.getExecutedCommands().startsWith("rm -Rf /tmp/zookeeper\n" +
                 "rm -f /tmp/zookeeper.tgz\n"));
 
-        assertTrue(testSSHCommandScript.toString().contains(
+        assertTrue(sshCommandServiceTest.getExecutedCommands().contains(
                 "tar xfz /tmp/zookeeper.tgz --directory=/tmp/\n" +
                 "chmod 755 /tmp/zookeeper/setup.sh\n"));
-        assertTrue(testSSHCommandScript.toString().contains(
+        assertTrue(sshCommandServiceTest.getExecutedCommands().contains(
                 "bash /tmp/zookeeper/setup.sh 192.168.10.13 \n" +
                 "rm -Rf /tmp/zookeeper\n" +
                 "rm -f /tmp/zookeeper.tgz\n"));
 
-        operationsMonitoringService.operationsFinished(true);
+        operationsMonitoringServiceTest.operationsFinished(true);
     }
 
     @Test
     public void testApplyNodesConfig() throws Exception {
 
         ServicesInstallStatusWrapper servicesInstallStatus = new ServicesInstallStatusWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/serviceInstallStatus.json"), StandardCharsets.UTF_8));
-        configurationService.saveServicesInstallationStatus(servicesInstallStatus);
+        configurationServiceTest.saveServicesInstallationStatus(servicesInstallStatus);
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper (StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/rawNodesConfig.json"), StandardCharsets.UTF_8));
-        configurationService.saveNodesConfig(nodesConfig);
+        configurationServiceTest.saveNodesConfig(nodesConfig);
 
-        configurationService.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
+        configurationServiceTest.setStandardKubernetesConfig();
 
         ServiceOperationsCommand command = ServiceOperationsCommand.create(
                 servicesDefinition,
@@ -219,74 +215,24 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 nodesConfig
         );
 
-        SSHCommandService sshCommandService = new SSHCommandServiceImpl() {
-            @Override
-            public synchronized String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
-                return runSSHScript((String)null, script, throwsException);
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
+            if (script.equals("echo OK")) {
+                return "OK";
             }
-            @Override
-            public synchronized String runSSHScript(String node, String script, boolean throwsException) {
-                testSSHCommandScript.append(script).append("\n");
-                if (script.equals("echo OK")) {
-                    return "OK";
-                }
-                if (script.equals("if [[ -f /etc/debian_version ]]; then echo debian; fi")) {
-                    return "debian";
-                }
-                if (script.endsWith("cat /proc/meminfo | grep MemTotal")) {
-                    return "MemTotal:        9982656 kB";
-                }
-
-                return testSSHCommandResultBuilder.toString();
+            if (script.equals("if [[ -f /etc/debian_version ]]; then echo debian; fi")) {
+                return "debian";
             }
-            @Override
-            public synchronized String runSSHCommand(SSHConnection connection, String command) {
-                return runSSHCommand((String)null, command);
+            if (script.endsWith("cat /proc/meminfo | grep MemTotal")) {
+                return "MemTotal:        9982656 kB";
             }
-            @Override
-            public synchronized String runSSHCommand(String node, String command) {
-                testSSHCommandScript.append(command).append("\n");
-                if (command.equals("cat /etc/eskimo_flag_base_system_installed")) {
-                    return "OK";
-                }
-
-                return testSSHCommandResultBuilder.toString();
-            }
-            @Override
-            public synchronized void copySCPFile(SSHConnection connection, String filePath) {
-                // just do nothing
-            }
-            @Override
-            public synchronized void copySCPFile(String node, String filePath) {
-                // just do nothing
-            }
-        };
-
-        nodesConfigurationService.setKubernetesService(new KubernetesServiceImpl() {
-
-            @Override
-            public String restartServiceInternal(Service service, String node) throws KubernetesException, SSHCommandException {
-                // No-Op
-                return null;
-            }
+            return null;
         });
 
-        systemService.setSshCommandService(sshCommandService);
-
-        memoryComputer.setSshCommandService(sshCommandService);
-
-        nodesConfigurationService.setSshCommandService(sshCommandService);
-
-        nodesConfigurationService.setConnectionManagerService(new ConnectionManagerServiceImpl() {
-
-            @Override
-            public SSHConnection getPrivateConnection (String node) {
-                return null;
+        sshCommandServiceTest.setConnectionResultBuilder((connection, script) -> {
+            if (script.equals("cat /etc/eskimo_flag_base_system_installed")) {
+                return "OK";
             }
-            @Override
-            public SSHConnection getSharedConnection (String node)  {
-                return null;
-            }
+            return null;
         });
 
         nodesConfigurationService.applyNodesConfig(command);
@@ -297,7 +243,7 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
         String expectedCommandEnd = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedCommandsEnd.txt"), StandardCharsets.UTF_8);
         expectedCommandEnd = expectedCommandEnd.replace("{UUID}", testRunUUID);
 
-        String commandString = testSSHCommandScript.toString();
+        String commandString = sshCommandServiceTest.getExecutedCommands();
 
         for (String commandStart : expectedCommandStart.split("\n")) {
             assertTrue (commandString.contains(commandStart.replace("\r", "")), commandStart + "\nis contained in \n" + commandString);
@@ -324,19 +270,18 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
             put("ntp2", "on");
         }});
 
-        configurationService.saveServicesInstallationStatus(savedStatus);
-        configurationService.saveNodesConfig(nodesConfig);
+        configurationServiceTest.saveServicesInstallationStatus(savedStatus);
+        configurationServiceTest.saveNodesConfig(nodesConfig);
 
         ServiceOperationsCommand command = ServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedStatus, nodesConfig);
 
-        operationsMonitoringService.operationsStarted(command);
-
+        operationsMonitoringServiceTest.operationsStarted(command);
 
         // testing zookeeper installation
         nodesConfigurationService.uninstallService(new ServiceOperationsCommand.ServiceOperationId("uninstallation", "zookeeper", "192.168.10.11"));
 
-        assertTrue(testSSHCommandScript.toString().contains(
+        assertTrue(sshCommandServiceTest.getExecutedCommands().contains(
                 "sudo systemctl stop zookeeper\n" +
                 "if [[ -d /lib/systemd/system/ ]]; then echo found_standard; fi\n" +
                 "sudo rm -f  /usr/lib/systemd/system/zookeeper.service\n" +
@@ -345,7 +290,7 @@ public class NodesConfigurationServiceTest extends AbstractSystemTest {
                 "sudo systemctl daemon-reload\n" +
                 "sudo systemctl reset-failed\n"));
 
-        operationsMonitoringService.operationsFinished(true);
+        operationsMonitoringServiceTest.operationsFinished(true);
     }
 
 }

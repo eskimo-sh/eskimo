@@ -43,4 +43,29 @@ public class NodesConfigurationServiceTestImpl implements NodesConfigurationServ
     public void restartServiceForSystem(SimpleOperationCommand.SimpleOperationId operationId) throws SystemException {
         // No-Op
     }
+
+    @Override
+    public void installEskimoBaseSystem(MessageLogger ml, String node) throws SSHCommandException {
+
+    }
+
+    @Override
+    public String getNodeFlavour(SSHConnection connection) throws SSHCommandException, SystemException {
+        return "debian";
+    }
+
+    @Override
+    public void copyCommand (String source, String target, SSHConnection connection) throws SSHCommandException {
+
+    }
+
+    @Override
+    public void uninstallService(ServiceOperationsCommand.ServiceOperationId operationId) throws SystemException {
+
+    }
+
+    @Override
+    public void installService(ServiceOperationsCommand.ServiceOperationId operationId) {
+
+    }
 }

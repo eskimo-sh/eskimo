@@ -283,7 +283,8 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
         }
     }
 
-    void installEskimoBaseSystem(MessageLogger ml, String node) throws SSHCommandException {
+    @Override
+    public void installEskimoBaseSystem(MessageLogger ml, String node) throws SSHCommandException {
         SSHConnection connection = null;
         try {
             connection = connectionManagerService.getPrivateConnection(node);
@@ -314,7 +315,8 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
         return sshCommandService.runSSHScriptPath(node, servicesSetupPath + "/base-eskimo/install-kubernetes.sh");
     }
 
-    void copyCommand (String source, String target, SSHConnection connection) throws SSHCommandException {
+    @Override
+    public void copyCommand (String source, String target, SSHConnection connection) throws SSHCommandException {
         sshCommandService.copySCPFile(connection, servicesSetupPath + "/base-eskimo/" + source);
         sshCommandService.runSSHCommand(connection, new String[]{"sudo", "mv", source, target});
         sshCommandService.runSSHCommand(connection, new String[]{"sudo", "chown", "root.root", target});
@@ -425,7 +427,8 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
         }
     }
 
-    void uninstallService(ServiceOperationsCommand.ServiceOperationId operationId) throws SystemException {
+    @Override
+    public void uninstallService(ServiceOperationsCommand.ServiceOperationId operationId) throws SystemException {
         String nodeName = operationId.getNode().replace(".", "-");
         systemOperationService.applySystemOperation(operationId,
                 ml -> proceedWithServiceUninstallation(ml, operationId.getNode(), operationId.getService()),
@@ -441,8 +444,8 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
         proxyManagerService.removeServerForService(operationId.getService(), operationId.getNode());
     }
 
-    void installService(ServiceOperationsCommand.ServiceOperationId operationId)
-            throws SystemException {
+    @Override
+    public void installService(ServiceOperationsCommand.ServiceOperationId operationId) throws SystemException {
         String nodeName = operationId.getNode().replace(".", "-");
         systemOperationService.applySystemOperation(operationId,
                 ml -> proceedWithServiceInstallation(ml, operationId.getNode(), operationId.getService()),
@@ -558,7 +561,8 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
         sshCommandService.runSSHCommand(connection, new String[]{"sudo", "chmod", mode, file});
     }
 
-    String getNodeFlavour(SSHConnection connection) throws SSHCommandException, SystemException {
+    @Override
+    public String getNodeFlavour(SSHConnection connection) throws SSHCommandException, SystemException {
         // Find out if debian or RHEL or SUSE
         String flavour = null;
         String rawIsDebian = sshCommandService.runSSHScript(connection, "if [[ -f /etc/debian_version ]]; then echo debian; fi");

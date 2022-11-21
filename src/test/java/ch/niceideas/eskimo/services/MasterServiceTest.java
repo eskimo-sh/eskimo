@@ -34,90 +34,113 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.eskimo.model.*;
-import org.apache.log4j.Logger;
+import ch.niceideas.eskimo.EskimoApplication;
+import ch.niceideas.eskimo.model.SSHConnection;
+import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.SSHCommandServiceTestImpl;
+import ch.niceideas.eskimo.test.services.SystemServiceTestImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class MasterServiceTest extends AbstractSystemTest {
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-conf", "test-system", "test-operation", "test-proxy", "test-nodes-conf", "test-ssh", "test-connection-manager"})
+public class MasterServiceTest {
 
-    private static final Logger logger = Logger.getLogger(MasterServiceTest.class);
+    @Autowired
+    private MasterServiceImpl masterService;
 
-    private MasterServiceImpl ms = new MasterServiceImpl();
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
+
+    @Autowired
+    private SystemServiceTestImpl systemServiceTest;
+
+    @Autowired
+    private SSHCommandServiceTestImpl sshCommandServiceTest;
 
     @BeforeEach
-    @Override
     public void setUp() throws Exception {
-        super.setUp();
-        setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
+        configurationServiceTest.setStandard2NodesSetup();
+        configurationServiceTest.setStandard2NodesInstallStatus();
+        configurationServiceTest.setStandardKubernetesConfig();
 
-        ms.setConfigurationService(configurationService);
-        ms.setNodeRangeResolver(nodeRangeResolver);
-        ms.setNotificationService(notificationService);
-        ms.setServicesDefinition(servicesDefinition);
-        ms.setSshCommandService(sshCommandService);
-        ms.setSystemService(systemService);
-    }
+        systemServiceTest.setStandard2NodesStatus();
 
-    @Override
-    protected ConfigurationServiceImpl createConfigurationService() {
-        return new ConfigurationServiceImpl() {
-            @Override
-            public NodesConfigWrapper loadNodesConfig() {
-                return StandardSetupHelpers.getStandard2NodesSetup();
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
+            if (script.equals("echo OK")) {
+                return "OK";
             }
-            @Override
-            public ServicesInstallStatusWrapper loadServicesInstallationStatus() {
-                return StandardSetupHelpers.getStandard2NodesInstallStatus();
+            if (script.endsWith("cat /proc/meminfo | grep MemTotal")) {
+                switch (node) {
+                    case "192.168.10.11":
+                        return "MemTotal:        5969796 kB";
+                    case "192.168.10.12":
+                        return "MemTotal:        5799444 kB";
+                    default:
+                        return "MemTotal:        3999444 kB";
+                }
             }
-            @Override
-            public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() {
-                return StandardSetupHelpers.getStandardKubernetesConfig();
+            if (script.equals("grep 'I am the new leader' /var/log/gluster/egmi/egmi.log")) {
+                if (node.equals("192.168.10.11")) {
+                    return "2021-01-17 22:44:05,633 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: status - options: all detail\n" +
+                            "2021-01-17 22:44:36,564 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options: \n" +
+                            "2021-01-17 22:44:36,682 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options: \n" +
+                            "2021-01-17 22:44:36,746 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: status - options: all detail\n" +
+                            "2021-01-17 22:44:52,559 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: test-node1] Event received: WatchedEvent state:SyncConnected type:NodeDeleted path:/egmi/egmi_election/p_0000000000\n" +
+                            "2021-01-17 22:44:52,561 INFO c.n.e.e.z.ElectionProcess [Thread-1-EventThread] [Process: test-node1] I am the new leader!\n" +
+                            "2021-01-17 22:44:52,566 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: test-node1] Event received: WatchedEvent state:SyncConnected type:NodeDataChanged path:/egmi/master_id\n" +
+                            "2021-01-17 22:44:52,567 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: test-node1] Master changed: test-node1\n" +
+                            "2021-01-17 22:44:59,136 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status\n" +
+                            "2021-01-17 22:44:59,360 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: pool - subcommand: list - options: \n" +
+                            "2021-01-17 22:44:59,449 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-1] About to execute command: volume - subcommand: info - options: \n";
+                }
             }
-        };
-    }
-
-    @Override
-    protected SystemServiceImpl createSystemService() {
-        return new SystemServiceImpl(false) {
-            @Override
-            public SystemStatusWrapper getStatus() {
-                return StandardSetupHelpers.getStandard2NodesSystemStatus();
-            }
-        };
+            return null;
+        });
     }
 
     @Test
+    @DirtiesContext
     public void testUpdateStatus() throws Exception {
 
-        assertEquals(0, ms.getServiceMasterNodes().size());
-        assertEquals(0, ms.getServiceMasterTimestamps().size());
+        assertEquals(0, masterService.getServiceMasterNodes().size());
+        assertEquals(0, masterService.getServiceMasterTimestamps().size());
 
-        ms.updateStatus();
+        masterService.updateStatus();
 
-        assertEquals(1, ms.getServiceMasterNodes().size());
-        assertEquals(1, ms.getServiceMasterTimestamps().size());
+        assertEquals(1, masterService.getServiceMasterNodes().size());
+        assertEquals(1, masterService.getServiceMasterTimestamps().size());
 
-        assertEquals("192.168.10.11", ms.getServiceMasterNodes().get("gluster"));
-        assertNotNull(ms.getServiceMasterTimestamps().get("gluster"));
+        assertEquals("192.168.10.11", masterService.getServiceMasterNodes().get("gluster"));
+        assertNotNull(masterService.getServiceMasterTimestamps().get("gluster"));
     }
 
     @Test
+    @DirtiesContext
     public void testGetMasterStatus() throws Exception {
 
-        assertEquals(0, ms.getServiceMasterNodes().size());
-        assertEquals(0, ms.getServiceMasterTimestamps().size());
+        assertEquals(0, masterService.getServiceMasterNodes().size());
+        assertEquals(0, masterService.getServiceMasterTimestamps().size());
 
         // this sets a default master
-        ms.getMasterStatus();
+        masterService.getMasterStatus();
 
-        assertEquals(1, ms.getServiceMasterNodes().size());
-        assertEquals(1, ms.getServiceMasterTimestamps().size());
+        assertEquals(1, masterService.getServiceMasterNodes().size());
+        assertEquals(1, masterService.getServiceMasterTimestamps().size());
 
-        assertEquals("192.168.10.11", ms.getServiceMasterNodes().get("gluster"));
-        assertNotNull(ms.getServiceMasterTimestamps().get("gluster"));
+        assertEquals("192.168.10.11", masterService.getServiceMasterNodes().get("gluster"));
+        assertNotNull(masterService.getServiceMasterTimestamps().get("gluster"));
     }
 
 }

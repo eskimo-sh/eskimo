@@ -96,6 +96,7 @@ public class MasterServiceImpl implements MasterService {
     /**
      * for tests
      */
+    @Deprecated
     void setSshCommandService(SSHCommandService sshCommandService) {
         this.sshCommandService = sshCommandService;
     }
@@ -146,6 +147,8 @@ public class MasterServiceImpl implements MasterService {
         if (statusRefreshScheduler != null) {
             statusRefreshScheduler.shutdown();
         }
+        serviceMasterNodes.clear();
+        serviceMasterTimestamps.clear();
     }
 
     @Override
