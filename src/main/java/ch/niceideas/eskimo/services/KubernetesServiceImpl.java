@@ -251,7 +251,7 @@ public class KubernetesServiceImpl implements KubernetesService {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    void installService(KubernetesOperationsCommand.KubernetesOperationId operation, String kubeMasterNode)
+    public void installService(KubernetesOperationsCommand.KubernetesOperationId operation, String kubeMasterNode)
             throws SystemException {
         systemOperationService.applySystemOperation(operation,
                 logger -> proceedWithKubernetesServiceInstallation(logger, kubeMasterNode, operation.getService()),
@@ -259,7 +259,7 @@ public class KubernetesServiceImpl implements KubernetesService {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    void uninstallService(KubernetesOperationsCommand.KubernetesOperationId operation, String kubeMasterNode) throws SystemException {
+    public void uninstallService(KubernetesOperationsCommand.KubernetesOperationId operation, String kubeMasterNode) throws SystemException {
         String nodeIp = null;
         try {
             Pair<String, String> nodeNameAndStatus = this.getServiceRuntimeNode(servicesDefinition.getService(operation.getService()), kubeMasterNode);
@@ -484,7 +484,7 @@ public class KubernetesServiceImpl implements KubernetesService {
             // Nodes re-setup (topology)
             systemOperationService.applySystemOperation(new KubernetesOperationsCommand.KubernetesOperationId("Installation", TOPOLOGY_ALL_NODES),
                     ml -> {
-                        systemService.performPooledOperation (new ArrayList<>(liveIps), parallelismInstallThreadCount, baseInstallWaitTimout,
+                        systemService.performPooledOperation (new ArrayList<String>(liveIps), parallelismInstallThreadCount, baseInstallWaitTimout,
                                 (operation, error) -> {
                                     // topology
                                     if (error.get() == null) {

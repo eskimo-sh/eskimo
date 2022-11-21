@@ -50,6 +50,7 @@ import org.springframework.stereotype.Component;
 public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     private String returnResult = null;
+    private StringBuilder executedCommands = new StringBuilder();
 
     private ConnectionResultBuilder connectionResultBuilder = null;
     private NodeResultBuilder nodeResultBuilder = null;
@@ -62,10 +63,15 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
         String build (String node, String script);
     }
 
+    public String getExecutedCommands() {
+        return executedCommands.toString();
+    }
+
     public void reset() {
         this.connectionResultBuilder = null;
         this.nodeResultBuilder = null;
         this.returnResult = null;
+        this.executedCommands = new StringBuilder();
     }
 
     public void setResult(String returnResult) {
@@ -82,6 +88,8 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHScript(SSHConnection connection, String script) throws SSHCommandException {
+        executedCommands.append(script);
+        executedCommands.append("\n");
         if (connectionResultBuilder != null) {
             return connectionResultBuilder.build(connection, script);
         }
@@ -90,6 +98,8 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHScript(String node, String script) throws SSHCommandException {
+        executedCommands.append(script);
+        executedCommands.append("\n");
         if (nodeResultBuilder != null) {
             return nodeResultBuilder.build(node, script);
         }
@@ -98,6 +108,8 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHCommand(SSHConnection connection, String[] command) throws SSHCommandException {
+        executedCommands.append(String.join("\n", command));
+        executedCommands.append("\n");
         if (connectionResultBuilder != null) {
             return connectionResultBuilder.build(connection, String.join(",", command));
         }
@@ -106,6 +118,8 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHScriptPath(SSHConnection connection, String scriptName) throws SSHCommandException {
+        executedCommands.append(scriptName);
+        executedCommands.append("\n");
         if (connectionResultBuilder != null) {
             return connectionResultBuilder.build(connection, scriptName);
         }
@@ -114,6 +128,8 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHScriptPath(String node, String scriptName) throws SSHCommandException {
+        executedCommands.append(scriptName);
+        executedCommands.append("\n");
         if (nodeResultBuilder != null) {
             return nodeResultBuilder.build(node, scriptName);
         }
@@ -122,6 +138,8 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException {
+        executedCommands.append(script);
+        executedCommands.append("\n");
         if (nodeResultBuilder != null) {
             return nodeResultBuilder.build(node, script);
         }
@@ -130,6 +148,8 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHScript(SSHConnection connection, String script, boolean throwsException) throws SSHCommandException {
+        executedCommands.append(script);
+        executedCommands.append("\n");
         if (connectionResultBuilder != null) {
             return connectionResultBuilder.build(connection, script);
         }
@@ -138,6 +158,8 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHCommand(String node, String command) throws SSHCommandException {
+        executedCommands.append(command);
+        executedCommands.append("\n");
         if (nodeResultBuilder != null) {
             return nodeResultBuilder.build(node, command);
         }
@@ -146,6 +168,8 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHCommand(SSHConnection connection, String command) throws SSHCommandException {
+        executedCommands.append(command);
+        executedCommands.append("\n");
         if (connectionResultBuilder != null) {
             return connectionResultBuilder.build(connection, command);
         }

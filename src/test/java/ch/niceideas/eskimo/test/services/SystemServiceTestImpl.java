@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.test.services;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.*;
@@ -50,9 +51,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.Serializable;
+import java.util.*;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -66,11 +66,25 @@ public class SystemServiceTestImpl implements SystemService {
 
     private boolean standard2NodesStatus = false;
 
+    private boolean pingError = false;
+
+    private final List<String> executedActions = new ArrayList<>();
+
     public void reset() {
         this.returnEmptySystemStatus = false;
         this.returnOKSystemStatus = false;
         this.startServiceError = false;
         this.standard2NodesStatus = false;
+        this.pingError = false;
+        this.executedActions.clear();
+    }
+
+    public List<String> getExecutedActions() {
+        return Collections.unmodifiableList(executedActions);
+    }
+
+    public void setPingError() {
+        this.pingError = true;
     }
 
     public void setReturnEmptySystemStatus() {
@@ -89,6 +103,8 @@ public class SystemServiceTestImpl implements SystemService {
         this.standard2NodesStatus = true;
     }
 
+    private List<Pair<? extends Serializable, PooledOperation<? extends Serializable>>> appliedOperations = new ArrayList<>();
+
     @Override
     public void delegateApplyNodesConfig(ServiceOperationsCommand command) throws SystemException, NodesConfigurationException {
 
@@ -96,11 +112,12 @@ public class SystemServiceTestImpl implements SystemService {
 
     @Override
     public void showJournal(Service service, String node) throws SystemException {
-
+        executedActions.add ("Show Journal - " + service + " - " + node);
     }
 
     @Override
     public void startService(Service service, String node) throws SystemException {
+        executedActions.add ("Start service - " + service + " - " + node);
         if (startServiceError) {
             throw new SystemException("Test Error");
         }
@@ -108,17 +125,17 @@ public class SystemServiceTestImpl implements SystemService {
 
     @Override
     public void stopService(Service service, String node) throws SystemException {
-
+        executedActions.add ("Stop service - " + service + " - " + node);
     }
 
     @Override
     public void restartService(Service service, String node) throws SystemException {
-
+        executedActions.add ("restart service - " + service + " - " + node);
     }
 
     @Override
     public void callCommand(String commandId, String serviceName, String node) throws SystemException {
-
+        executedActions.add ("Call command  - " + commandId + " - " + serviceName + " - " + node);
     }
 
     @Override
@@ -138,6 +155,10 @@ public class SystemServiceTestImpl implements SystemService {
 
     }
 
+    public List<Pair<? extends Serializable, PooledOperation<? extends Serializable>>> getAppliedOperations() {
+        return Collections.unmodifiableList(appliedOperations);
+    }
+
     @Override
     public void handleStatusChanges(ServicesInstallStatusWrapper servicesInstallationStatus, SystemStatusWrapper systemStatus, Set<String> configuredNodesAndOtherLiveNodes) throws FileException, SetupException {
 
@@ -145,17 +166,20 @@ public class SystemServiceTestImpl implements SystemService {
 
     @Override
     public List<Pair<String, String>> buildDeadIps(Set<String> allNodes, NodesConfigWrapper nodesConfig, Set<String> liveIps, Set<String> deadIps) {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
-    public <T> void performPooledOperation(List<T> operations, int parallelism, long operationWaitTimout, PooledOperation<T> operation) throws SystemException {
-
+    public <T extends Serializable> void performPooledOperation(List<T> operations, int parallelism, long operationWaitTimout, PooledOperation<T> operation) throws SystemException {
+        operations.forEach(op -> appliedOperations.add(new Pair<>(op, operation)));
     }
 
     @Override
     public String sendPing(String node) throws SSHCommandException {
-        return null;
+        if (pingError) {
+            throw new SSHCommandException("Node dead");
+        }
+        return "OK";
     }
 
     @Override
@@ -165,7 +189,7 @@ public class SystemServiceTestImpl implements SystemService {
 
     @Override
     public void callUninstallScript(MessageLogger ml, SSHConnection connection, String service) throws SystemException {
-
+        executedActions.add ("call Uninstall script  - " + service + " - " + connection.getHostname());
     }
 
     @Override
@@ -175,21 +199,54 @@ public class SystemServiceTestImpl implements SystemService {
 
     @Override
     public void installationSetup(MessageLogger ml, SSHConnection connection, String node, String service) throws SystemException {
-
+        executedActions.add ("Installation setup  - " + service + " - " + node + " - " + connection.getHostname());
     }
 
     @Override
     public void installationCleanup(MessageLogger ml, SSHConnection connection, String service, String imageName, File tmpArchiveFile) throws SSHCommandException, SystemException {
-
+        executedActions.add ("Installation cleanup  - " + service + " - " + imageName + " - " + connection.getHostname());
     }
 
     @Override
     public void applyServiceOperation(String service, String node, String opLabel, ServiceOperation<String> operation) throws SystemException {
-
+        executedActions.add ("Apply service operation  - " + service + " - " + node + " - " + opLabel);
     }
 
     @Override
     public void feedInServiceStatus(Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus, String node, String nodeName, String referenceNodeName, String service, boolean shall, boolean installed, boolean running) throws ConnectionManagerException {
+        if (StringUtils.isBlank(nodeName)) {
+            throw new IllegalArgumentException("nodeName can't be null");
+        }
+        if (StringUtils.isBlank(service)) {
+            throw new IllegalArgumentException("service can't be null");
+        }
 
+        if (shall) {
+            if (!installed) {
+
+                statusMap.put(SystemStatusWrapper.buildStatusFlag(service, nodeName), "NA");
+
+            } else {
+
+                // check if services is running ?
+                // check if service running using SSH
+
+                if (!running) {
+                    statusMap.put(SystemStatusWrapper.buildStatusFlag (service, nodeName), "KO");
+
+                } else {
+
+                    if (servicesInstallationStatus.isServiceOK (service, referenceNodeName)) {
+                        statusMap.put(SystemStatusWrapper.buildStatusFlag (service, nodeName), "OK");
+                    } else {
+                        statusMap.put(SystemStatusWrapper.buildStatusFlag (service, nodeName), "restart");
+                    }
+                }
+            }
+        } else {
+            if (installed) {
+                statusMap.put(SystemStatusWrapper.buildStatusFlag (service, nodeName), "TD"); // To Be Deleted
+            }
+        }
     }
 }

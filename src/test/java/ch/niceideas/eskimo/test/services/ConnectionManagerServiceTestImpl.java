@@ -36,11 +36,13 @@
 
 package ch.niceideas.eskimo.test.services;
 
+import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.ConnectionManagerException;
 import ch.niceideas.eskimo.services.ConnectionManagerService;
 import ch.niceideas.eskimo.services.ConnectionManagerServiceImpl;
+import ch.niceideas.eskimo.services.SetupException;
 import com.trilead.ssh2.LocalPortForwarder;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
@@ -49,6 +51,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -64,18 +67,50 @@ public class ConnectionManagerServiceTestImpl extends ConnectionManagerServiceIm
     final List<String> openedForwarders = new ArrayList<>();
     final List<String> closedForwarders = new ArrayList<>();
 
+    final List<String> createCalledFor = new ArrayList<>();
+    final List<String> dropCalledFor = new ArrayList<>();
+
+    private boolean doConnect = true;
+
+    public List<String> getCreateCallFor() {
+        return Collections.unmodifiableList(createCalledFor);
+    }
+
+    public List<String> getDropCallFor() {
+        return Collections.unmodifiableList(dropCalledFor);
+    }
+
     public boolean isRecreateTunnelsCalled() {
         return recreateTunnelsCalled.get();
     }
 
     public void reset() {
         recreateTunnelsCalled.set(false);
-        openedForwarders.clear();
-        closedForwarders.clear();
         connectionMap.clear();
         portForwardersMap.clear();
         connectionAges.clear();
         connectionsToCloseLazily.clear();
+        resetCountersOnly();
+        doConnect = true;
+    }
+
+    public void resetCountersOnly() {
+        createCalledFor.clear();
+        dropCalledFor.clear();
+        openedForwarders.clear();
+        closedForwarders.clear();
+    }
+
+    public void dontConnect() {
+        doConnect = false;
+    }
+
+    public void setPrivateSShKeyContent(String privateSShKeyContent) {
+        this.privateSShKeyContent = privateSShKeyContent;
+    }
+
+    public void setSShPort(int sshPort) {
+        this.sshPort = sshPort;
     }
 
     public List<String> getOpenedForwarders() {
@@ -93,7 +128,7 @@ public class ConnectionManagerServiceTestImpl extends ConnectionManagerServiceIm
 
     @Override
     public SSHConnection getSharedConnection(String node) throws ConnectionManagerException {
-        return getSharedConnection(node);
+        return super.getSharedConnection(node);
     }
 
     @Override
@@ -115,13 +150,39 @@ public class ConnectionManagerServiceTestImpl extends ConnectionManagerServiceIm
     }
 
     @Override
-    protected SSHConnection createConnectionInternal(String node, int operationTimeout){
-        return new SSHConnection(node, operationTimeout) {
+    protected SSHConnection createConnectionInternal(String node, int operationTimeout) throws IOException, SetupException, FileException {
+        SSHConnection connection = new SSHConnection(node, sshPort, operationTimeout) {
+            private boolean isClosed = false;
             @Override
-            public LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect){
+            public synchronized LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect) {
+                createCalledFor.add(""+port_to_connect);
                 return null;
             }
+            @Override
+            public synchronized void sendIgnorePacket() throws IOException {
+                // NO-OP
+                if (isClosed) {
+                    throw new IOException("channel is closed");
+                }
+                super.sendIgnorePacket();
+            }
+            public void close() {
+                isClosed = true;
+                super.close();
+            }
         };
+
+        if (doConnect) {
+            return connect(connection);
+        } else {
+            return connection;
+        }
+    }
+
+    @Override
+    protected void dropTunnelsToBeClosed(SSHConnection connection, String node)  {
+        super.dropTunnelsToBeClosed(connection, node);
+        dropCalledFor.add(node);
     }
 
     @Override

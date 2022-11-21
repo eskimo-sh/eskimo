@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public abstract class JSONInstallOpCommand<T extends Serializable> implements JSONOpCommand {
+public abstract class JSONInstallOpCommand<T extends OperationId> implements JSONOpCommand {
 
     @Getter
     private final ArrayList<T> installations = new ArrayList<>();

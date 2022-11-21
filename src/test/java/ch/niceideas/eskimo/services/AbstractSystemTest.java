@@ -68,7 +68,7 @@ public abstract class AbstractSystemTest {
 
     protected ServicesDefinitionImpl servicesDefinition = null;
 
-    protected SystemOperationService systemOperationService = null;
+    protected SystemOperationServiceImpl systemOperationService = null;
 
     protected NodeRangeResolver nodeRangeResolver = null;
 
@@ -228,9 +228,8 @@ public abstract class AbstractSystemTest {
 
         setupService.setOperationsMonitoringService(operationsMonitoringService);
 
-        systemOperationService = new SystemOperationService();
+        systemOperationService = new SystemOperationServiceImpl();
         systemOperationService.setNotificationService(notificationService);
-        systemOperationService.setSystemService(systemService);
         systemOperationService.setConfigurationService(configurationService);
         systemOperationService.setOperationsMonitoringService(operationsMonitoringService);
 

@@ -15,7 +15,8 @@ public interface NodesConfigurationService {
             NodesConfigWrapper nodesConfig,
             KubernetesServicesConfigWrapper kubeServicesConfig,
             ServicesInstallStatusWrapper servicesInstallStatus,
-            MemoryModel memoryModel, String node)
+            MemoryModel memoryModel,
+            String node)
             throws SystemException, SSHCommandException, IOException;
 
     void restartServiceForSystem(SimpleOperationCommand.SimpleOperationId operationId) throws SystemException;

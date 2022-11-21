@@ -57,6 +57,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.*;
@@ -463,7 +464,7 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public <T> void performPooledOperation(
+    public <T extends Serializable> void performPooledOperation(
             List<T> operations, int parallelism, long operationWaitTimout, PooledOperation<T> operation)
             throws SystemException {
 

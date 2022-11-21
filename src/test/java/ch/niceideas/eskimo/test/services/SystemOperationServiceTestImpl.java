@@ -33,30 +33,74 @@
  */
 
 
-package ch.niceideas.eskimo.services;
+package ch.niceideas.eskimo.test.services;
 
-import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.ProcessHelper;
-import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.MessageLogger;
 import ch.niceideas.eskimo.model.OperationId;
+import ch.niceideas.eskimo.services.SystemException;
+import ch.niceideas.eskimo.services.SystemOperationService;
+import ch.niceideas.eskimo.services.SystemService;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public interface SystemOperationService {
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+@Profile("test-operation")
+public class SystemOperationServiceTestImpl implements SystemOperationService {
 
-    void applySystemOperation(OperationId operationId, SystemOperation operation, SystemService.StatusUpdater statusUpdater)
-            throws SystemException;
+    private static final Logger logger = Logger.getLogger(SystemOperationServiceTestImpl.class);
 
+    private boolean mockCalls = true;
 
-    interface SystemOperation {
-        void call(MessageLogger logger)
-                throws ProcessHelper.ProcessHelperException, SSHCommandException, SystemException, IOException,
-                       FileUtils.FileDeleteFailedException;
+    private List<Pair<OperationId, SystemOperation>> appliedOperations = new ArrayList<>();
+
+    public void setMockCalls (boolean mockCalls) {
+        this.mockCalls = mockCalls;
+    }
+
+    public void reset() {
+        appliedOperations.clear();
+        mockCalls = true;
+    }
+
+    public List<Pair<OperationId, SystemOperation>> getAppliedOperations() {
+        return Collections.unmodifiableList(appliedOperations);
+    }
+
+    @Override
+    public void applySystemOperation(OperationId operationId, SystemOperation operation, SystemService.StatusUpdater statusUpdater) throws SystemException {
+        if (mockCalls) {
+            appliedOperations.add(new Pair<>(operationId, operation));
+        } else {
+
+            try {
+
+                operation.call(new MessageLogger() {
+
+                    @Override
+                    public void addInfo(String message) {
+                        logger.info (message);
+                    }
+
+                    @Override
+                    public void addInfo(String[] messages) {
+                        logger.info (messages);
+                    }
+                });
+
+            } catch (Exception e) {
+                logger.debug(e, e);
+                logger.warn ("Exception will be thrown as SystemException - " + e.getClass() + ":" + e.getMessage());
+                throw new SystemException(e);
+            }
+        }
     }
 }

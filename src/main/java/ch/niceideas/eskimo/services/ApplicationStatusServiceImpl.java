@@ -193,14 +193,16 @@ public class ApplicationStatusServiceImpl implements ApplicationStatusService {
 
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-            systemStatus.setValueForPath("username", auth.getName());
+            if (auth != null) {
+                systemStatus.setValueForPath("username", auth.getName());
 
-            @SuppressWarnings({"unchecked"})
-            Collection<SimpleGrantedAuthority> authorities = (Collection<SimpleGrantedAuthority>) auth.getAuthorities();
+                @SuppressWarnings({"unchecked"})
+                Collection<SimpleGrantedAuthority> authorities = (Collection<SimpleGrantedAuthority>) auth.getAuthorities();
 
-            systemStatus.setValueForPath("roles", auth.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.joining(",")));
+                systemStatus.setValueForPath("roles", auth.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.joining(",")));
+            }
 
             lastStatus.set (systemStatus);
 

@@ -42,6 +42,7 @@ import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -73,7 +74,7 @@ public interface SystemService {
 
     List<Pair<String, String>> buildDeadIps(Set<String> allNodes, NodesConfigWrapper nodesConfig, Set<String> liveIps, Set<String> deadIps);
 
-    <T> void performPooledOperation(
+    <T extends Serializable> void performPooledOperation(
             List<T> operations, int parallelism, long operationWaitTimout, PooledOperation<T> operation)
             throws SystemException;
 

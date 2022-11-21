@@ -45,8 +45,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -55,8 +54,19 @@ public class ProxyManagerServiceTestImpl implements ProxyManagerService {
 
     private int tomcatServerLocalPort;
 
+    private Map<String, List<ProxyTunnelConfig>> forwarderConfigForHosts = new HashMap<>();
+
+    public void setForwarderConfigForHosts (String host, List<ProxyTunnelConfig> forwardersConfig) {
+        forwarderConfigForHosts.put (host, forwardersConfig);
+    }
+
     public void setTomcatLocalPort(int tomcatServerLocalPort) {
         this.tomcatServerLocalPort = tomcatServerLocalPort;
+    }
+
+    public void reset() {
+        this.forwarderConfigForHosts.clear();
+        this.tomcatServerLocalPort = 0;
     }
 
     @Override
@@ -76,7 +86,7 @@ public class ProxyManagerServiceTestImpl implements ProxyManagerService {
 
     @Override
     public List<ProxyTunnelConfig> getTunnelConfigForHost(String host) {
-        return null;
+        return Optional.ofNullable(forwarderConfigForHosts.get(host)).orElse(Collections.emptyList());
     }
 
     @Override

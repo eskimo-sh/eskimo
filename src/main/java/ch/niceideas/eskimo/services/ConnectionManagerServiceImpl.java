@@ -70,7 +70,7 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
     private ConfigurationService configurationService;
 
     @Value("${connectionManager.defaultSSHPort}")
-    private int sshPort = 22;
+    protected int sshPort = 22;
 
     @Value("${connectionManager.tcpConnectionTimeout}")
     private int tcpConnectionTimeout = 30000;
@@ -97,7 +97,7 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
 
     protected final Map<String, Long> connectionAges = new HashMap<>();
 
-    private String privateSShKeyContent = null;
+    protected String privateSShKeyContent = null;
 
     protected final List<SSHConnection> connectionsToCloseLazily = new ArrayList<>();
 
@@ -273,6 +273,10 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
 
         logger.info ("Creating connection to " + node);
         SSHConnection connection = new SSHConnection(node, sshPort, operationTimeout);
+        return connect(connection);
+    }
+
+    protected SSHConnection connect(SSHConnection connection) throws IOException, FileException, SetupException {
         connection.setTCPNoDelay(true);
         connection.connect(null, tcpConnectionTimeout, sshKeyExchangeTimeout); // TCP timeout, Key exchange timeout
 

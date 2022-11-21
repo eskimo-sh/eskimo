@@ -37,9 +37,11 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
-import ch.niceideas.eskimo.proxy.ProxyManagerService;
-import ch.niceideas.eskimo.proxy.ProxyManagerServiceImpl;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
+import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
+import ch.niceideas.eskimo.test.services.SSHCommandServiceTestImpl;
 import com.trilead.ssh2.SFTPv3Client;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
@@ -47,19 +49,27 @@ import org.json.JSONObject;
 import org.junit.Assume;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.lang.reflect.Proxy;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-proxy", "test-ssh", "test-connection-manager"})
 public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
     @Override
@@ -73,53 +83,34 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
         Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
-    private ConnectionManagerServiceImpl cm = null;
+    @Autowired
+    private ConnectionManagerServiceTestImpl connectionManagerServiceTest;
 
-    private ProxyManagerServiceImpl pms = null;
+    @Autowired
+    private SSHCommandServiceTestImpl sshCommandServiceTest;
 
-    private FileManagerServiceImpl sc = null;
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
 
-    private SSHCommandServiceImpl scs = null;
-
-    private SetupServiceImpl setupService = null;
-
-    private ConfigurationServiceImpl cs = null;
+    private FileManagerServiceImpl fms = null;
 
     @BeforeEach
     public void setUp() throws Exception {
-        setupService = new SetupServiceImpl();
-        String tempPath = SystemServiceTest.createTempStoragePath();
-        setupService.setConfigStoragePathInternal(tempPath);
-        FileUtils.writeFile(new File(tempPath + "/config.json"), "{ \"ssh_username\" : \"test\" }");
 
-        cm = new ConnectionManagerServiceImpl(privateKeyRaw, getSShPort());
+        fms = new FileManagerServiceImpl();
+        fms.setConnectionManagerService(connectionManagerServiceTest);
+        fms.setSshCommandService(sshCommandServiceTest);
 
-        sc = new FileManagerServiceImpl();
+        configurationServiceTest.saveSetupConfig("{ \"ssh_username\" : \"test\" }");
 
-        scs = new SSHCommandServiceImpl();
-        scs.setConnectionManagerService(cm);
-
-        sc.setConnectionManagerService(cm);
-        sc.setSshCommandService(scs);
-
-        pms = new ProxyManagerServiceImpl();
-        pms.setConnectionManagerService(cm);
-        cm.setProxyManagerService(pms);
-        pms.setConnectionManagerService(cm);
-
-        cs = new ConfigurationServiceImpl();
-        cs.setSetupService(setupService);
-
-        cm.setConfigurationService(cs);
+        connectionManagerServiceTest.setPrivateSShKeyContent(privateKeyRaw);
+        connectionManagerServiceTest.setSShPort(getSShPort());
     }
 
     @Test
     public void testConnectSftp() throws Exception {
-        assertNotNull (sshd);
-        assertNotNull (cm);
-        assertNotNull (sc);
 
-        Pair<String, JSONObject> result = sc.navigateFileManager("localhost", "/", ".");
+        Pair<String, JSONObject> result = fms.navigateFileManager("localhost", "/", ".");
 
         assertEquals ("/", result.getKey());
 
@@ -132,11 +123,8 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
     @Test
     public void testNavigateSftp() throws Exception {
-        assertNotNull (sshd);
-        assertNotNull (cm);
-        assertNotNull (sc);
 
-        Pair<String, JSONObject> result = sc.navigateFileManager("localhost", "/", "boot");
+        Pair<String, JSONObject> result = fms.navigateFileManager("localhost", "/", "boot");
 
         assertEquals ("/boot", result.getKey());
 
@@ -150,15 +138,15 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
     @Test
     public void testIsTextMimeType() {
 
-        assertTrue(sc.isTextMimeType("text/plain"));
-        assertTrue(sc.isTextMimeType("text/csv"));
+        assertTrue(fms.isTextMimeType("text/plain"));
+        assertTrue(fms.isTextMimeType("text/csv"));
 
-        assertTrue(sc.isTextMimeType("application/resource-lists-diff+xml"));
-        assertTrue(sc.isTextMimeType("application/xslt+xml"));
+        assertTrue(fms.isTextMimeType("application/resource-lists-diff+xml"));
+        assertTrue(fms.isTextMimeType("application/xslt+xml"));
 
-        assertTrue(sc.isTextMimeType("application/javascript"));
+        assertTrue(fms.isTextMimeType("application/javascript"));
 
-        assertFalse(sc.isTextMimeType("application/x-xpinstall"));
+        assertFalse(fms.isTextMimeType("application/x-xpinstall"));
     }
 
     @Test
@@ -168,7 +156,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
         FileUtils.writeFile(tempFile, "Test File Content");
         assertTrue(tempFile.exists());
 
-        sc.deletePath("localhost", tempFile.getParent(), tempFile.getName());
+        fms.deletePath("localhost", tempFile.getParent(), tempFile.getName());
 
         assertFalse(tempFile.exists());
     }
@@ -200,7 +188,9 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
         HttpServletResponse proxyResponse = HttpObjectsHelper.createHttpServletResponse(new HashMap<>(), streamWrapper);
 
-        sc.downloadFile("localhost", tempFile.getParent(), tempFile.getName(), new FileManagerServiceImpl.HttpServletResponseAdapter(){
+        sshCommandServiceTest.setResult("plain/text");
+
+        fms.downloadFile("localhost", tempFile.getParent(), tempFile.getName(), new FileManagerServiceImpl.HttpServletResponseAdapter(){
 
             @Override
             public void setContentType(String type) {
@@ -220,10 +210,11 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
     }
 
     void getTestClient(String mimeType) throws IOException, ConnectionManagerException {
-        sc = new FileManagerServiceImpl() {
+        fms = new FileManagerServiceImpl() {
+
             @Override
             SFTPv3Client getClient(@RequestParam("address") String node) throws ConnectionManagerException, IOException {
-                return new SFTPv3Client(cm.getSharedConnection("localhost").getUnder());
+                return new SFTPv3Client(connectionManagerServiceTest.getSharedConnection("localhost").getUnder());
             }
             @Override
             String getFileMimeType(String node, String newPath) throws SSHCommandException {
@@ -252,10 +243,10 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
         getTestClient("inode/directory");
 
-        sc.setConnectionManagerService(cm);
-        sc.setSshCommandService(scs);
+        fms.setConnectionManagerService(connectionManagerServiceTest);
+        fms.setSshCommandService(sshCommandServiceTest);
 
-        JSONObject result = sc.openFile("localhost", "/etc", "passwd");
+        JSONObject result = fms.openFile("localhost", "/etc", "passwd");
 
         assertEquals ("{\n" +
                 "  \"content\": {\"test\": {\n" +
@@ -276,10 +267,10 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
         getTestClient("no read permission");
 
-        sc.setConnectionManagerService(cm);
-        sc.setSshCommandService(scs);
+        fms.setConnectionManagerService(connectionManagerServiceTest);
+        fms.setSshCommandService(sshCommandServiceTest);
 
-        JSONObject result = sc.openFile("localhost", "/etc", "passwd");
+        JSONObject result = fms.openFile("localhost", "/etc", "passwd");
 
         assertEquals ("{\n" +
                 "  \"accessible\": false,\n" +
@@ -296,10 +287,10 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
         getTestClient("application/binary");
 
-        sc.setConnectionManagerService(cm);
-        sc.setSshCommandService(scs);
+        fms.setConnectionManagerService(connectionManagerServiceTest);
+        fms.setSshCommandService(sshCommandServiceTest);
 
-        JSONObject result = sc.openFile("localhost", tempFile.getParent(), tempFile.getName());
+        JSONObject result = fms.openFile("localhost", tempFile.getParent(), tempFile.getName());
 
         assertEquals ("{\n" +
                 "  \"accessible\": true,\n" +
@@ -316,15 +307,15 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
         getTestClient("text/plain");
 
-        sc.setConnectionManagerService(cm);
-        sc.setSshCommandService(scs);
+        fms.setConnectionManagerService(connectionManagerServiceTest);
+        fms.setSshCommandService(sshCommandServiceTest);
 
-        JSONObject result = sc.openFile("localhost", tempFile.getParent(), tempFile.getName());
+        JSONObject result = fms.openFile("localhost", tempFile.getParent(), tempFile.getName());
 
         assertEquals (tempFile.getAbsolutePath(), result.getString("fileName"));
         assertEquals (Base64.getEncoder().encodeToString("ABCD".getBytes()), result.getString("fileContent"));
 
-        tempFile.delete();
+        assertTrue (tempFile.delete());
     }
 
     @Test
@@ -339,10 +330,10 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
         getTestClient("text/plain");
 
-        sc.setConnectionManagerService(cm);
-        sc.setSshCommandService(scs);
+        fms.setConnectionManagerService(connectionManagerServiceTest);
+        fms.setSshCommandService(sshCommandServiceTest);
 
-        JSONObject result = sc.openFile("localhost", tempFile.getParent(), tempFile.getName());
+        JSONObject result = fms.openFile("localhost", tempFile.getParent(), tempFile.getName());
 
         assertEquals ("{\n" +
                 "  \"accessible\": true,\n" +
@@ -350,7 +341,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
                 "  \"status\": \"OK\"\n" +
                 "}", result.toString(2));
 
-        tempFile.delete();
+        assertTrue (tempFile.delete());
     }
 
     @Test
@@ -358,13 +349,13 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
         File tempFile = File.createTempFile("test", "sftp");
 
-        tempFile.delete();
+        assertTrue (tempFile.delete());
 
-        sc.createFile("localhost", "/tmp/", tempFile.getName());
+        fms.createFile("localhost", "/tmp/", tempFile.getName());
 
         assertTrue(tempFile.exists());
 
-        IOException exception = assertThrows(IOException.class, () -> sc.createFile("localhost", "/", tempFile.getName()));
+        IOException exception = assertThrows(IOException.class, () -> fms.createFile("localhost", "/", tempFile.getName()));
 
         assertTrue(exception.getMessage().contains("Permission denied"));
 

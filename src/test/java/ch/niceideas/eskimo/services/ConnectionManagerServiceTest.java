@@ -36,10 +36,13 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.proxy.ProxyManagerServiceImpl;
+import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
+import ch.niceideas.eskimo.test.services.ProxyManagerServiceTestImpl;
 import com.trilead.ssh2.LocalPortForwarder;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -49,6 +52,11 @@ import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.File;
 import java.lang.reflect.Proxy;
@@ -58,6 +66,10 @@ import java.util.List;
 import static org.apache.logging.log4j.core.config.Configurator.setLevel;
 import static org.junit.jupiter.api.Assertions.*;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-proxy", "test-connection-manager"})
 public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
 
     @Override
@@ -65,33 +77,16 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         return new ProcessShellCommandFactory();
     }
 
-    private ProxyManagerServiceImpl pms = null;
+    @Autowired
+    private ProxyManagerServiceTestImpl proxyManagerServiceTest;
 
-    private ConnectionManagerServiceImpl cm = null;
-
-    private SetupServiceImpl setupService = null;
-
-    private ConfigurationServiceImpl cs = null;
+    @Autowired
+    private ConnectionManagerServiceTestImpl connectionManagerServiceTest;
 
     @BeforeEach
     public void setUp() throws Exception {
-        setupService = new SetupServiceImpl();
-        String tempPath = SystemServiceTest.createTempStoragePath();
-
-        setupService.setConfigStoragePathInternal(tempPath);
-        FileUtils.writeFile(new File(tempPath + "/config.json"), "{ \"ssh_username\" : \"test\" }");
-
-        cm = new ConnectionManagerServiceImpl(privateKeyRaw, getSShPort());
-
-        pms = new ProxyManagerServiceImpl();
-        pms.setConnectionManagerService(cm);
-        cm.setProxyManagerService(pms);
-        pms.setConnectionManagerService(cm);
-
-        cs = new ConfigurationServiceImpl();
-        cs.setSetupService(setupService);
-
-        cm.setConfigurationService(cs);
+        connectionManagerServiceTest.reset();
+        proxyManagerServiceTest.reset();
     }
 
     @Test
@@ -99,18 +94,18 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         assertNotNull (sshd);
 
         // create a connection to localhost
-        SSHConnection connection = cm.getSharedConnection("localhost");
+        SSHConnection connection = connectionManagerServiceTest.getSharedConnection("localhost");
         assertNotNull(connection);
 
         // get a second connection and make sure it matches
-        SSHConnection second = cm.getSharedConnection("localhost");
+        SSHConnection second = connectionManagerServiceTest.getSharedConnection("localhost");
         assertNotNull(second);
         assertSame(connection, second);
 
         // close connection and make sure it gets properly recreated
         second.close();
 
-        SSHConnection newOne = cm.getSharedConnection("localhost");
+        SSHConnection newOne = connectionManagerServiceTest.getSharedConnection("localhost");
         assertNotNull(newOne);
         assertNotSame (newOne, second);
     }
@@ -118,9 +113,9 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
     @Test
     public void testDumpPortForwardersMap() throws Exception {
 
-        Logger testLogger = LogManager.getLogger(ConnectionManagerService.class.getName());
+        Logger testLogger = LogManager.getLogger(ConnectionManagerServiceImpl.class.getName());
         try {
-            setLevel(ConnectionManagerService.class.getName(), Level.DEBUG);
+            setLevel(ConnectionManagerServiceImpl.class.getName(), Level.DEBUG);
 
             StringBuilder builder = new StringBuilder();
 
@@ -168,76 +163,45 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
     @Test
     public void testLocalPortForwarderWrapper() throws Exception {
 
-        final List<ProxyTunnelConfig> forwarderConfig = new ArrayList<ProxyTunnelConfig>(){{
+        proxyManagerServiceTest.setForwarderConfigForHosts("localhost", new ArrayList<ProxyTunnelConfig>(){{
             add (new ProxyTunnelConfig("dummyService", 6123, "localhost", 123));
             add (new ProxyTunnelConfig("dummyService",6124, "localhost", 124));
             add (new ProxyTunnelConfig("dummyService",6125, "localhost", 125));
-        }};
+        }});
 
-        final List<String> createCalledFor = new ArrayList<>();
-        final List<String> dropCalledFor = new ArrayList<>();
+        SSHConnection connection = connectionManagerServiceTest.getSharedConnection("localhost");
 
-        ConnectionManagerServiceImpl cm = new ConnectionManagerServiceImpl(privateKeyRaw, getSShPort()) {
-            @Override
-            protected SSHConnection createConnectionInternal(String node, int operationTimeout) {
-                return new SSHConnection(node, getSShPort()) {
-                    public synchronized LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect) {
-                        createCalledFor.add(""+port_to_connect);
-                        return null;
-                    }
-                    public synchronized void sendIgnorePacket() {
-                        // NO-OP
-                    }
-                };
-            }
-            @Override
-            protected void dropTunnelsToBeClosed(SSHConnection connection, String node)  {
-                super.dropTunnelsToBeClosed(connection, node);
-                dropCalledFor.add(node);
-            }
-        };
+        assertEquals(3, connectionManagerServiceTest.getCreateCallFor().size());
+        assertEquals("123,124,125", String.join(",", connectionManagerServiceTest.getCreateCallFor()));
 
-        ProxyManagerServiceImpl pms = new ProxyManagerServiceImpl() {
-            public List<ProxyTunnelConfig> getTunnelConfigForHost (String host) {
-                return forwarderConfig;
-            }
-        };
-        pms.setConnectionManagerService(cm);
-        cm.setProxyManagerService(pms);
-        pms.setConnectionManagerService(cm);
-
-        SSHConnection connection = cm.getSharedConnection("localhost");
-
-        assertEquals(3, createCalledFor.size());
-        assertEquals("123,124,125", String.join(",", createCalledFor));
-
-        assertEquals(1, dropCalledFor.size());
+        assertEquals(1, connectionManagerServiceTest.getDropCallFor().size());
 
         assertNotNull(connection);
 
-        createCalledFor.clear();
-        dropCalledFor.clear();
+        connectionManagerServiceTest.resetCountersOnly();
 
-        cm.recreateTunnels("localhost");
+        connectionManagerServiceTest.recreateTunnels("localhost");
 
         // nothing actually recreated since nothing changed
-        assertEquals(0, createCalledFor.size());
-        assertEquals(1, dropCalledFor.size());
+        assertEquals(0, connectionManagerServiceTest.getCreateCallFor().size());
+        assertEquals(1, connectionManagerServiceTest.getDropCallFor().size());
 
-        forwarderConfig.clear();
-        forwarderConfig.add (new ProxyTunnelConfig("dummyService", 20123, "localhost", 11123));
-        forwarderConfig.add (new ProxyTunnelConfig("dummyService",20124, "localhost", 11124));
-        forwarderConfig.add (new ProxyTunnelConfig("dummyService",20125, "localhost", 11125));
-
-        createCalledFor.clear();
-        dropCalledFor.clear();
-
-        cm.recreateTunnels("localhost");
-
-        assertEquals(3, createCalledFor.size());
+        proxyManagerServiceTest.reset();
+        proxyManagerServiceTest.setForwarderConfigForHosts("localhost", new ArrayList<ProxyTunnelConfig>(){{
+            add (new ProxyTunnelConfig("dummyService", 20123, "localhost", 11123));
+            add (new ProxyTunnelConfig("dummyService",20124, "localhost", 11124));
+            add (new ProxyTunnelConfig("dummyService",20125, "localhost", 11125));
+        }});
 
 
-        assertEquals(1, dropCalledFor.size());
+        connectionManagerServiceTest.resetCountersOnly();
+
+        connectionManagerServiceTest.recreateTunnels("localhost");
+
+        assertEquals(3, connectionManagerServiceTest.getCreateCallFor().size());
+
+
+        assertEquals(1, connectionManagerServiceTest.getDropCallFor().size());
 
     }
 }

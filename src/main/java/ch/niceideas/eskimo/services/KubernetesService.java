@@ -70,4 +70,8 @@ public interface KubernetesService {
     void applyServicesConfig(KubernetesOperationsCommand command) throws KubernetesException;
 
     boolean shouldInstall(KubernetesServicesConfigWrapper kubeServicesConfig, String service);
+
+    void uninstallService(KubernetesOperationsCommand.KubernetesOperationId operation, String kubeMasterNode) throws SystemException;
+
+    void installService(KubernetesOperationsCommand.KubernetesOperationId operation, String kubeMasterNode) throws SystemException;
 }
