@@ -35,35 +35,46 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.eskimo.EskimoApplication;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack"})
 public class NotificationServiceTest {
 
-    private NotificationService ns = null;
+    @Autowired
+    private NotificationService notificationService;
 
     @BeforeEach
     public void setUp() throws Exception {
-        ns = new NotificationService();
-        ns.addError("Test");
-        ns.addInfo("Test2");
+        notificationService.clear();
+        notificationService.addError("Test");
+        notificationService.addInfo("Test2");
     }
 
     @Test
     public void testNominal() throws Exception {
 
-        Pair<Integer,List<JSONObject>> result = ns.fetchElements(0);
+        Pair<Integer,List<JSONObject>> result = notificationService.fetchElements(0);
 
         assertEquals(2, (int) result.getKey());
         assertEquals("{\"type\":\"Error\",\"message\":\"Test\"}", result.getValue().get(0).toString());
         assertEquals("{\"type\":\"Info\",\"message\":\"Test2\"}", result.getValue().get(1).toString());
 
-        Pair<Integer,List<JSONObject>> result2 = ns.fetchElements(2);
+        Pair<Integer,List<JSONObject>> result2 = notificationService.fetchElements(2);
 
         assertEquals(2, (int) result2.getKey());
         assertEquals(0, result2.getValue().size());
@@ -72,7 +83,7 @@ public class NotificationServiceTest {
     @Test
     public void testCorruptedIndex() throws Exception {
 
-        Pair<Integer, List<JSONObject>> result = ns.fetchElements(20);
+        Pair<Integer, List<JSONObject>> result = notificationService.fetchElements(20);
 
         assertEquals(2, (int) result.getKey());
         assertEquals("{\"type\":\"Error\",\"message\":\"Test\"}", result.getValue().get(0).toString());
@@ -82,9 +93,9 @@ public class NotificationServiceTest {
     @Test
     public void testClear() throws Exception {
 
-        ns.clear();
+        notificationService.clear();
 
-        Pair<Integer, List<JSONObject>> result = ns.fetchElements(0);
+        Pair<Integer, List<JSONObject>> result = notificationService.fetchElements(0);
 
         assertEquals(0, (int) result.getKey());
         assertEquals(0, result.getValue().size());
@@ -96,22 +107,22 @@ public class NotificationServiceTest {
         testNominal();
 
         for (int i = 0; i < 1000; i++) {
-            ns.addError("Test__"+i);
+            notificationService.addError("Test__"+i);
         }
 
-        Pair<Integer,List<JSONObject>> result2 = ns.fetchElements(2);
+        Pair<Integer,List<JSONObject>> result2 = notificationService.fetchElements(2);
 
         assertEquals(1002, (int) result2.getKey());
 
-        Pair<Integer,List<JSONObject>> result3 = ns.fetchElements(1002);
+        Pair<Integer,List<JSONObject>> result3 = notificationService.fetchElements(1002);
 
         assertEquals(1002, (int) result3.getKey());
         assertEquals(0, result3.getValue().size());
 
-        ns.addError("TestX");
-        ns.addInfo("TestY");
+        notificationService.addError("TestX");
+        notificationService.addInfo("TestY");
 
-        Pair<Integer,List<JSONObject>> result4 = ns.fetchElements(1002);
+        Pair<Integer,List<JSONObject>> result4 = notificationService.fetchElements(1002);
 
         assertEquals(1004, (int) result4.getKey());
         assertEquals(2, result4.getValue().size());
@@ -119,7 +130,7 @@ public class NotificationServiceTest {
         assertEquals("{\"type\":\"Error\",\"message\":\"TestX\"}", result4.getValue().get(0).toString());
         assertEquals("{\"type\":\"Info\",\"message\":\"TestY\"}", result4.getValue().get(1).toString());
 
-        Pair<Integer,List<JSONObject>> result5 = ns.fetchElements(1004);
+        Pair<Integer,List<JSONObject>> result5 = notificationService.fetchElements(1004);
 
         assertEquals(1004, (int) result5.getKey());
         assertEquals(0, result5.getValue().size());

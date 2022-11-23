@@ -42,6 +42,7 @@ import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.services.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
@@ -53,6 +54,9 @@ import org.springframework.web.context.WebApplicationContext;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Profile("test-conf")
 public class ConfigurationServiceTestImpl implements ConfigurationService {
+
+    @Autowired
+    private ServicesDefinition servicesDefinition;
 
     private boolean standardKubernetesConfig = false;
     private boolean kubernetesConfigError = false;
@@ -142,12 +146,15 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
         if (serviceSettingsError) {
             throw new SetupException("Test Error");
         }
-        return serviceSettings;
+        if (serviceSettings != null) {
+            return serviceSettings;
+        }
+        return ServicesSettingsWrapper.initEmpty(servicesDefinition);
     }
 
     @Override
     public ServicesSettingsWrapper loadServicesConfigNoLock() throws FileException, SetupException {
-        return null;
+        return loadServicesSettings ();
     }
 
     @Override
@@ -168,7 +175,7 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
         if (standard2NodesInstallStatus) {
             return StandardSetupHelpers.getStandard2NodesInstallStatus();
         }
-        return null;
+        return ServicesInstallStatusWrapper.empty();
     }
 
     @Override
@@ -183,7 +190,10 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
         } else if (nodesConfigError) {
             throw new SystemException("Test Error");
         }
-        return nodesConfig;
+        if (nodesConfig != null) {
+            return nodesConfig;
+        }
+        return NodesConfigWrapper.empty();
     }
 
     @Override

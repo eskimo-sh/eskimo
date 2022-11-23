@@ -233,6 +233,6 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
         if (error) {
             throw new JSONException("Test error");
         }
-        return getDependentServices(service);
+        return super.getDependentServices(service);
     }
 }

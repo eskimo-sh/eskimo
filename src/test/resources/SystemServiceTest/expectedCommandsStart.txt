@@ -1,16 +1,14 @@
-echo OK
-sudo ls
 cat /proc/meminfo | grep MemTotal
 cat /proc/meminfo | grep MemTotal
 cat /etc/eskimo_flag_base_system_installed
-cat /etc/eskimo_flag_base_system_installed
-
-sudo chmod 755 /etc/eskimo_topology.sh
-
-sudo chmod 755 /etc/eskimo_topology.sh
-
-sudo chmod 755 /etc/eskimo_services-settings.json
-cat /etc/eskimo_flag_k8s_installed
-
-sudo chmod 755 /etc/eskimo_services-settings.json
-cat /etc/eskimo_flag_k8s_installed
+./services_setup/base-eskimo/install-eskimo-base-system.sh
+sudo mv jq-1.6-linux64 /usr/local/bin/jq
+sudo chown root.root /usr/local/bin/jq
+sudo chmod 755 /usr/local/bin/jq
+sudo mv gluster_mount.sh /usr/local/sbin/gluster_mount.sh
+sudo chown root.root /usr/local/sbin/gluster_mount.sh
+sudo chmod 755 /usr/local/sbin/gluster_mount.sh
+sudo mv eskimo-kubectl /usr/local/bin/eskimo-kubectl
+sudo chown root.root /usr/local/bin/eskimo-kubectl
+sudo chmod 755 /usr/local/bin/eskimo-kubectl
+sudo bash -c "echo OK > /etc/eskimo_flag_base_system_installed"

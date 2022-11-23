@@ -43,10 +43,7 @@ import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
-import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
-import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
-import ch.niceideas.eskimo.test.services.OperationsMonitoringServiceTestImpl;
-import ch.niceideas.eskimo.test.services.SSHCommandServiceTestImpl;
+import ch.niceideas.eskimo.test.services.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,13 +91,22 @@ public class NodesConfigurationServiceTest {
     @Autowired
     private ConnectionManagerServiceTestImpl connectionManagerServiceTest;
 
-    @BeforeEach
+    @Autowired
+    private SystemOperationServiceTestImpl systemOperationServiceTest;
 
+    @Autowired
+    private SystemServiceTestImpl systemServiceTest;
+
+    @BeforeEach
     public void setUp() throws Exception {
         SecurityContextHelper.loginAdmin();
         operationsMonitoringServiceTest.operationsFinished(true);
         connectionManagerServiceTest.dontConnect();
         sshCommandServiceTest.reset();
+        systemServiceTest.reset();
+        sshCommandServiceTest.setResult("");
+        systemOperationServiceTest.setMockCalls(false);
+        systemServiceTest.setMockCalls(false);
     }
 
 
@@ -137,7 +143,16 @@ public class NodesConfigurationServiceTest {
                 "192.168.10.11:./services_setup/base-eskimo/gluster_mount.sh\n" +
                 "192.168.10.11:./services_setup/base-eskimo/eskimo-kubectl", sshCommandServiceTest.getExecutedScpCommands().toString().trim());
 
-        assertTrue (sshCommandServiceTest.getExecutedCommands().startsWith("#!/bin/bash\n"));
+        assertEquals ("./services_setup/base-eskimo/install-eskimo-base-system.sh\n" +
+                "sudo mv jq-1.6-linux64 /usr/local/bin/jq\n" +
+                "sudo chown root.root /usr/local/bin/jq\n" +
+                "sudo chmod 755 /usr/local/bin/jq\n" +
+                "sudo mv gluster_mount.sh /usr/local/sbin/gluster_mount.sh\n" +
+                "sudo chown root.root /usr/local/sbin/gluster_mount.sh\n" +
+                "sudo chmod 755 /usr/local/sbin/gluster_mount.sh\n" +
+                "sudo mv eskimo-kubectl /usr/local/bin/eskimo-kubectl\n" +
+                "sudo chown root.root /usr/local/bin/eskimo-kubectl\n" +
+                "sudo chmod 755 /usr/local/bin/eskimo-kubectl\n", sshCommandServiceTest.getExecutedCommands());
     }
 
     @Test
@@ -159,9 +174,9 @@ public class NodesConfigurationServiceTest {
         nodesConfigurationService.copyCommand("source", "target", null);
 
         assertEquals ("null:./services_setup/base-eskimo/source", sshCommandServiceTest.getExecutedScpCommands().trim());
-        assertEquals ("sudo mv source target \n" +
-                "sudo chown root.root target \n" +
-                "sudo chmod 755 target \n", sshCommandServiceTest.getExecutedCommands());
+        assertEquals ("sudo mv source target\n" +
+                "sudo chown root.root target\n" +
+                "sudo chmod 755 target\n", sshCommandServiceTest.getExecutedCommands());
     }
 
     @Test
@@ -183,16 +198,11 @@ public class NodesConfigurationServiceTest {
         // testing zookeeper installation
         nodesConfigurationService.installService(new ServiceOperationsCommand.ServiceOperationId("installation", "zookeeper", "192.168.10.13"));
 
-        assertTrue(sshCommandServiceTest.getExecutedCommands().startsWith("rm -Rf /tmp/zookeeper\n" +
-                "rm -f /tmp/zookeeper.tgz\n"));
+        String executedActions = String.join("\n", systemServiceTest.getExecutedActions());
 
-        assertTrue(sshCommandServiceTest.getExecutedCommands().contains(
-                "tar xfz /tmp/zookeeper.tgz --directory=/tmp/\n" +
-                "chmod 755 /tmp/zookeeper/setup.sh\n"));
-        assertTrue(sshCommandServiceTest.getExecutedCommands().contains(
-                "bash /tmp/zookeeper/setup.sh 192.168.10.13 \n" +
-                "rm -Rf /tmp/zookeeper\n" +
-                "rm -f /tmp/zookeeper.tgz\n"));
+        assertEquals ("" +
+                "Installation setup  - zookeeper - 192.168.10.13 - 192.168.10.13\n" +
+                "Installation cleanup  - zookeeper - zookeeper - 192.168.10.13", executedActions);
 
         operationsMonitoringServiceTest.operationsFinished(true);
     }
@@ -245,6 +255,27 @@ public class NodesConfigurationServiceTest {
 
         String commandString = sshCommandServiceTest.getExecutedCommands();
 
+        System.err.println (systemServiceTest.getExecutedActions());
+
+        assertEquals ("Installation setup  - kube-master - 192.168.10.15 - 192.168.10.15\n" +
+                "Installation cleanup  - kube-master - kube-master - 192.168.10.15\n" +
+                "Installation setup  - kube-slave - 192.168.10.15 - 192.168.10.15\n" +
+                "Installation cleanup  - kube-slave - null - 192.168.10.15\n" +
+                "Installation setup  - kube-slave - 192.168.10.13 - 192.168.10.13\n" +
+                "Installation cleanup  - kube-slave - null - 192.168.10.13\n" +
+                "Installation setup  - spark-console - 192.168.10.15 - 192.168.10.15\n" +
+                "Installation cleanup  - spark-console - spark - 192.168.10.15\n" +
+                "Installation setup  - elasticsearch - 192.168.10.15 - 192.168.10.15\n" +
+                "Installation cleanup  - elasticsearch - elasticsearch - 192.168.10.15\n" +
+                "Installation setup  - elasticsearch - 192.168.10.13 - 192.168.10.13\n" +
+                "Installation cleanup  - elasticsearch - elasticsearch - 192.168.10.13\n" +
+                "Installation setup  - spark-runtime - 192.168.10.15 - 192.168.10.15\n" +
+                "Installation cleanup  - spark-runtime - spark - 192.168.10.15\n" +
+                "Installation setup  - spark-runtime - 192.168.10.13 - 192.168.10.13\n" +
+                "Installation cleanup  - spark-runtime - spark - 192.168.10.13\n" +
+                "Installation setup  - zeppelin - 192.168.10.15 - 192.168.10.15\n" +
+                "Installation cleanup  - zeppelin - zeppelin - 192.168.10.15", String.join("\n", systemServiceTest.getExecutedActions()));
+
         for (String commandStart : expectedCommandStart.split("\n")) {
             assertTrue (commandString.contains(commandStart.replace("\r", "")), commandStart + "\nis contained in \n" + commandString);
         }
@@ -252,6 +283,8 @@ public class NodesConfigurationServiceTest {
         for (String commandEnd : expectedCommandEnd.split("\n")) {
             assertTrue (commandString.contains(commandEnd.replace("\r", "")), commandEnd + "\nis contained in \n" + commandString);
         }
+
+        //systemServiceTest.getExecutedActions()
     }
 
     @Test

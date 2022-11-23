@@ -151,7 +151,7 @@ public class SetupServiceTestImpl extends SetupServiceImpl implements SetupServi
 
     @Override
     public String findLastPackageFile(String prefix, String packageName) {
-        return null;
+        return "eskimo_kube_1.23.5_1.tar.gz";
     }
 
     @Override

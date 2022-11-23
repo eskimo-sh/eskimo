@@ -53,6 +53,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -67,6 +68,12 @@ public class SystemServiceTestImpl implements SystemService {
     private boolean standard2NodesStatus = false;
 
     private boolean pingError = false;
+
+    private boolean mockCalls = true;
+
+    public void setMockCalls (boolean mockCalls) {
+        this.mockCalls = mockCalls;
+    }
 
     private final List<String> executedActions = new ArrayList<>();
 
@@ -166,12 +173,33 @@ public class SystemServiceTestImpl implements SystemService {
 
     @Override
     public List<Pair<String, String>> buildDeadIps(Set<String> allNodes, NodesConfigWrapper nodesConfig, Set<String> liveIps, Set<String> deadIps) {
-        return Collections.emptyList();
+        liveIps.addAll(nodesConfig.getNodeAddresses());
+
+        List<Pair<String, String>> nodesSetup = new ArrayList<>();
+
+        // Find out about dead IPs
+        Set<String> nodesToTest = new HashSet<>(allNodes);
+        nodesToTest.addAll(nodesConfig.getNodeAddresses());
+        for (String node : nodesToTest) {
+
+            nodesSetup.add(new Pair<>("node_setup", node));
+        }
+
+        return nodesSetup;
     }
 
     @Override
     public <T extends Serializable> void performPooledOperation(List<T> operations, int parallelism, long operationWaitTimout, PooledOperation<T> operation) throws SystemException {
-        operations.forEach(op -> appliedOperations.add(new Pair<>(op, operation)));
+        operations.forEach(op ->  {
+            appliedOperations.add(new Pair<>(op, operation));
+            if (!this.mockCalls) {
+                try {
+                    operation.call(op, new AtomicReference<>());
+                } catch (SystemException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     @Override
@@ -184,7 +212,7 @@ public class SystemServiceTestImpl implements SystemService {
 
     @Override
     public File createTempFile(String service, String node, String extension) throws IOException {
-        return null;
+        return File.createTempFile(service, extension);
     }
 
     @Override

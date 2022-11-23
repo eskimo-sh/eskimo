@@ -1,12 +1,5 @@
 
+sudo chmod 755 /etc/eskimo_services-settings.json
+cat /etc/eskimo_flag_k8s_installed
+./services_setup/base-eskimo/install-kubernetes.sh
 sudo bash -c "echo OK > /etc/eskimo_flag_k8s_installed"
-
-bash /tmp/kube-master/setup.sh 192.168.10.15
-bash /tmp/kube-slave/setup.sh 192.168.10.13
-bash /tmp/kube-slave/setup.sh 192.168.10.15
-bash /tmp/elasticsearch/setup.sh 192.168.10.15
-bash /tmp/elasticsearch/setup.sh 192.168.10.13
-bash /tmp/spark-runtime/setup.sh 192.168.10.15
-bash /tmp/spark-runtime/setup.sh 192.168.10.13
-bash /tmp/spark-console/setup.sh 192.168.10.15
-bash /tmp/zeppelin/setup.sh 192.168.10.15
