@@ -41,6 +41,7 @@ import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;

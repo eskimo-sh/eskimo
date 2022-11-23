@@ -40,6 +40,7 @@ import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.*;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationChecker;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

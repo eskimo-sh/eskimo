@@ -42,6 +42,7 @@ import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.Topology;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;

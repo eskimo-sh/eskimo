@@ -41,6 +41,7 @@ import ch.niceideas.eskimo.model.KubernetesOperationsCommand;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
+import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.*;
 import org.junit.jupiter.api.BeforeEach;
