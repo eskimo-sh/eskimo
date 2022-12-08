@@ -43,6 +43,7 @@ import ch.niceideas.eskimo.model.service.proxy.ProxyReplacement;
 import ch.niceideas.eskimo.model.service.proxy.UrlRewriting;
 import ch.niceideas.eskimo.model.service.proxy.WebCommand;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import lombok.Getter;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -82,6 +83,9 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
     private final ReentrantLock persistEnvLock = new ReentrantLock();
 
     private final Map<String, Service> services = new HashMap<>();
+
+    private Service kubeMasterService;
+    private Service kubeSlaveService;
 
     /** For tests only */
     public void addService(Service service) {
@@ -136,6 +140,22 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
             Boolean kubernetes = (Boolean) servicesConfig.getValueForPath(serviceString+".config.kubernetes");
             service.setKubernetes(kubernetes != null && kubernetes); // false by default
+
+            Boolean kubeMaster = (Boolean) servicesConfig.getValueForPath(serviceString+".config.kubeMaster");
+            if (kubeMaster != null && kubeMaster) {
+                if (kubeMasterService != null) {
+                    throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is defined as kube master but another servce " + kubeMasterService.getName() + " is already");
+                }
+                kubeMasterService = service;
+            }
+
+            Boolean kubeSlave = (Boolean) servicesConfig.getValueForPath(serviceString+".config.kubeSlave");
+            if (kubeSlave != null && kubeSlave) {
+                if (kubeSlaveService != null) {
+                    throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is defined as kube slave but another servce " + kubeSlaveService.getName() + " is already");
+                }
+                kubeSlaveService = service;
+            }
 
             Boolean registryOnly = (Boolean) servicesConfig.getValueForPath(serviceString+".config.registryOnly");
             service.setRegistryOnly(registryOnly != null && registryOnly); // false by default
@@ -404,16 +424,6 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 }
             }
 
-            // Kubernetes services have an implicit dependency on kubernetes
-            if (service.isKubernetes()) {
-                Dependency kubeDependency = new Dependency();
-                kubeDependency.setMes(MasterElectionStrategy.RANDOM);
-                kubeDependency.setMasterService(getKubeMasterServuce());
-                kubeDependency.setNumberOfMasters(1);
-                kubeDependency.setMandatory(true);
-                service.addDependency(kubeDependency);
-            }
-
             if (servicesConfig.hasPath(serviceString+".config.kubeConfig")) {
 
                 KubeConfig kubeConfig = new KubeConfig();
@@ -524,11 +534,26 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 command -> command.setService(getService(webCommandServices.get(command)))
         );
 
-        enforceConsistency();
-    }
+        try {
+            services.values().stream()
+                    .filter(Service::isKubernetes)
+                    .forEach(service -> {
+                        // Kubernetes services have an implicit dependency on kubernetes
+                            Dependency kubeDependency = new Dependency();
+                            kubeDependency.setMes(MasterElectionStrategy.RANDOM);
+                            if (getKubeMasterService() == null) {
+                                throw new IllegalArgumentException("No Kube Master service found !");
+                            }
+                            kubeDependency.setMasterService(getKubeMasterService().getName());
+                            kubeDependency.setNumberOfMasters(1);
+                            kubeDependency.setMandatory(true);
+                            service.addDependency(kubeDependency);
+                    });
+        } catch (IllegalArgumentException e) {
+            throw new ServiceDefinitionException(e.getMessage(), e);
+        }
 
-    protected String getKubeMasterServuce() {
-        return KubernetesService.KUBE_MASTER;
+        enforceConsistency();
     }
 
     private void enforceConsistency() throws ServiceDefinitionException {
@@ -789,6 +814,16 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                     }
                     return service1.compareTo(service2);
                 }).collect(Collectors.toList());
+    }
+
+    @Override
+    public Service getKubeMasterService() {
+        return kubeMasterService;
+    }
+
+    @Override
+    public Service getKubeSlaveService() {
+        return kubeSlaveService;
     }
 
     private Set<String> getDependentServicesInner(String service, Set<String> currentSet) {

@@ -117,7 +117,7 @@ public abstract class AbstractSetupShellTest {
 
         FileUtils.writeFile(new File (jailPath + "/eskimo-topology.sh"),
                 topology.getTopologyScriptForNode(
-                        nodesConfig, kubeServicesConfig, StandardSetupHelpers.getStandard2NodesInstallStatus(), new MemoryModel(new HashMap<>()), 1));
+                        nodesConfig, kubeServicesConfig, StandardSetupHelpers.getStandard2NodesInstallStatus(), def, new MemoryModel(new HashMap<>()), 1));
         ProcessHelper.exec(new String[]{"chmod", "755", jailPath + "/eskimo-topology.sh"}, true);
 
         String testFileConf = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getCamelCaseServiceName()+"SetupShellTest/testFile.conf"), StandardCharsets.UTF_8);

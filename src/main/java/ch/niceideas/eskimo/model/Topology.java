@@ -510,6 +510,7 @@ public class Topology {
             NodesConfigWrapper nodesConfig,
             KubernetesServicesConfigWrapper kubeConfig,
             ServicesInstallStatusWrapper serviceInstallStatus,
+            ServicesDefinition servicesDefinition,
             MemoryModel memoryModel, int nodeNbr)
                     throws NodesConfigurationException, SetupException, FileException {
         StringBuilder sb = new StringBuilder();
@@ -565,9 +566,10 @@ public class Topology {
         appendExport(sb, ALL_NODES_LIST, allNodes);
 
         // Kubernetes Topology
-        if (nodesConfig.hasServiceConfigured(KubernetesService.KUBE_MASTER) &&
-                (   nodesConfig.isServiceOnNode(KubernetesService.KUBE_MASTER, nodeNbr)
-                 || nodesConfig.isServiceOnNode(KubernetesService.KUBE_SLAVE, nodeNbr))) {
+        if (servicesDefinition.getKubeMasterService() != null
+                && nodesConfig.hasServiceConfigured(servicesDefinition.getKubeMasterService().getName()) &&
+                (   nodesConfig.isServiceOnNode(servicesDefinition.getKubeMasterService().getName(), nodeNbr)
+                 || nodesConfig.isServiceOnNode(servicesDefinition.getKubeSlaveService().getName(), nodeNbr))) {
             // No. In the end we need kubernetes topology on every node where a kube service might be potentially running
             /*
                 && kubeConfig.hasEnabledServices()

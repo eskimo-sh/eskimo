@@ -383,6 +383,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                         nodesConfig,
                         createTestKubernetesConfig(),
                         ServicesInstallStatusWrapper.empty(),
+                        def,
                         emptyModel, 1));
 
         assertEquals ("#Topology\n" +
@@ -402,6 +403,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                         nodesConfig,
                         createTestKubernetesConfig(),
                         ServicesInstallStatusWrapper.empty(),
+                        def,
                         emptyModel, 2));
 
         assertEquals ("#Topology\n" +
@@ -419,6 +421,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                         nodesConfig,
                         createTestKubernetesConfig(),
                         ServicesInstallStatusWrapper.empty(),
+                        def,
                         emptyModel, 3));
     }
 
@@ -479,6 +482,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                         StandardSetupHelpers.getStandard2NodesSetup(),
                         kubeConfig,
                         ServicesInstallStatusWrapper.empty(),
+                        def,
                         emptyModel, 1));
     }
 
@@ -554,6 +558,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                         StandardSetupHelpers.getStandard2NodesSetup(),
                         StandardSetupHelpers.getStandardKubernetesConfig(),
                         StandardSetupHelpers.getStandard2NodesInstallStatus(),
+                        def,
                         emptyModel, 1));
     }
 
@@ -598,7 +603,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 topology.getTopologyScriptForNode (
                         nodesConfig,
                         createTestKubernetesConfig(),
-                        ServicesInstallStatusWrapper.empty(), memoryModel, 1));
+                        ServicesInstallStatusWrapper.empty(), def, memoryModel, 1));
     }
 
 
@@ -641,7 +646,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 "export MEMORY_SERVICE_C=300\n",
                 topology.getTopologyScriptForNode (nodesConfig,
                         createTestKubernetesConfig(),
-                        ServicesInstallStatusWrapper.empty(), memoryModel, 1));
+                        ServicesInstallStatusWrapper.empty(), def, memoryModel, 1));
     }
 
 
@@ -686,7 +691,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 topology.getTopologyScriptForNode (
                         nodesConfig,
                         createTestKubernetesConfig(),
-                        ServicesInstallStatusWrapper.empty(), emptyModel, 1));
+                        ServicesInstallStatusWrapper.empty(), def, emptyModel, 1));
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_C_1=192.168.10.12\n" +
@@ -703,6 +708,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                         nodesConfig,
                         createTestKubernetesConfig(),
                         ServicesInstallStatusWrapper.empty(),
+                        def,
                         emptyModel, 3));
     }
 
@@ -754,7 +760,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 topology.getTopologyScriptForNode (
                         nodesConfig,
                         kubeServicesConfig,
-                        ServicesInstallStatusWrapper.empty(), emptyModel, 2));
+                        ServicesInstallStatusWrapper.empty(), def, emptyModel, 2));
 
         // now change topology and ensure node numbers for services A and C are unchanged
         nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
@@ -793,7 +799,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 topology.getTopologyScriptForNode (
                         nodesConfig,
                         kubeServicesConfig,
-                        ServicesInstallStatusWrapper.empty(), emptyModel, 3));
+                        ServicesInstallStatusWrapper.empty(), def, emptyModel, 3));
     }
 
     @Test
@@ -907,7 +913,7 @@ public class TopologyTest extends AbstractServicesDefinitionTest {
                 topology.getTopologyScriptForNode (
                         nodesConfig,
                         createTestKubernetesConfig(),
-                        ServicesInstallStatusWrapper.empty(), emptyModel, 3));
+                        ServicesInstallStatusWrapper.empty(), def, emptyModel, 3));
     }
 
     @Test

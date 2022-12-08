@@ -36,13 +36,20 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.*;
+import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationChecker;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -52,72 +59,83 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-services"})
+public class ServicesDefinitionTest {
+
+    @Autowired
+    private ServicesDefinition servicesDefinition;
+
+    @Autowired
+    private NodeRangeResolver nodeRangeResolver;
+
+    @Autowired
+    private NodesConfigurationChecker nodesConfigurationChecker;
 
     private String jsonNodesConfig = null;
     private String jsonKubernetesConfig = null;
     private String jsonMinimalConfig = null;
 
-    private MemoryModel emptyModel = new MemoryModel(Collections.emptyMap());
+    private final MemoryModel emptyModel = new MemoryModel(Collections.emptyMap());
 
     @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
-        jsonNodesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testConfig.json"), StandardCharsets.UTF_8);
-        jsonKubernetesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testKubernetesConfig.json"), StandardCharsets.UTF_8);
-        jsonMinimalConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testMinimalConfig.json"), StandardCharsets.UTF_8);
+        jsonNodesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testConfig2.json"), StandardCharsets.UTF_8);
+        jsonKubernetesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testKubernetesConfig2.json"), StandardCharsets.UTF_8);
+        jsonMinimalConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/testMinimalConfig2.json"), StandardCharsets.UTF_8);
     }
 
     @Test
     public void testServiceToStringNoStackOverflow() {
-        assertDoesNotThrow(() ->  def.getService("flink-runtime").toString());
+        assertDoesNotThrow(() ->  servicesDefinition.getService("calculator-runtime").toString());
     }
 
     @Test
     public void testAfterPropertiesSet() throws Exception {
-        assertEquals (23, def.listAllServices().length);
+        assertEquals (14, servicesDefinition.listAllServices().length);
     }
 
     @Test
     public void testServiceHasDependency() {
 
-        assertFalse (def.getService("ntp").hasDependency(def.getService("zeppelin")));
-        assertFalse (def.getService("gluster").hasDependency(def.getService("kube-master")));
-        assertFalse (def.getService("zookeeper").hasDependency(def.getService("spark-console")));
-        assertFalse (def.getService("zookeeper").hasDependency(def.getService("kafka")));
+        assertFalse (servicesDefinition.getService("distributed-time").hasDependency(servicesDefinition.getService("user-console")));
+        assertFalse (servicesDefinition.getService("distributed-filesystem").hasDependency(servicesDefinition.getService("cluster-master")));
+        assertFalse (servicesDefinition.getService("cluster-manager").hasDependency(servicesDefinition.getService("broker-manager")));
+        assertFalse (servicesDefinition.getService("cluster-manager").hasDependency(servicesDefinition.getService("broker")));
 
-        assertTrue (def.getService("kafka").hasDependency(def.getService("zookeeper")));
-        assertTrue (def.getService("kube-slave").hasDependency(def.getService("kube-master")));
+        assertTrue (servicesDefinition.getService("broker").hasDependency(servicesDefinition.getService("cluster-manager")));
+        assertTrue (servicesDefinition.getService("cluster-slave").hasDependency(servicesDefinition.getService("cluster-master")));
     }
 
     @Test
     public void testMinimalExample() throws Exception {
 
-        Topology topology = def.getTopology(
+        Topology topology = servicesDefinition.getTopology(
                 new NodesConfigWrapper(jsonMinimalConfig),
                 KubernetesServicesConfigWrapper.empty(),
                 "192.168.56.23");
 
         assertEquals ("#Topology\n" +
-                "export MASTER_NTP_1=192.168.56.21\n" +
-                "export MASTER_PROMETHEUS_1=192.168.56.21\n" +
-                "export MASTER_ZOOKEEPER_1=192.168.56.21\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
+                "export MASTER_CLUSTER_MANAGER_1=192.168.56.21\n" +
+                "export MASTER_DISTRIBUTED_TIME_1=192.168.56.21\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
     }
 
     @Test
     public void testRealLifeExample() throws Exception {
 
-        Topology topology = def.getTopology(
+        Topology topology = servicesDefinition.getTopology(
                 new NodesConfigWrapper(jsonNodesConfig),
                 new KubernetesServicesConfigWrapper(jsonKubernetesConfig),
                 "192.168.10.11");
 
         assertEquals (
                 "#Topology\n" +
-                        "export MASTER_GLUSTER_1=192.168.10.11\n" +
-                        "export MASTER_KUBE_MASTER_1=192.168.10.11\n" +
-                        "export MASTER_NTP_1=192.168.10.11\n" +
-                        "export MASTER_ZOOKEEPER_1=192.168.10.11\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
+                        "export MASTER_CLUSTER_MANAGER_1=192.168.10.11\n" +
+                        "export MASTER_CLUSTER_MASTER_1=192.168.10.11\n" +
+                        "export MASTER_DISTRIBUTED_FILESYSTEM_1=192.168.10.11\n" +
+                        "export MASTER_DISTRIBUTED_TIME_1=192.168.10.11\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
     }
 
     @Test
@@ -125,49 +143,40 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(jsonNodesConfig);
 
-        Topology topology = def.getTopology(
+        Topology topology = servicesDefinition.getTopology(
                 nodesConfig,
                 new KubernetesServicesConfigWrapper(jsonKubernetesConfig),
                 "192.168.10.11");
 
         assertEquals ("#Topology\n" +
-                        "export MASTER_GLUSTER_1=192.168.10.11\n" +
-                        "export MASTER_KUBE_MASTER_1=192.168.10.11\n" +
-                        "export MASTER_NTP_1=192.168.10.11\n" +
-                        "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
+                        "export MASTER_CLUSTER_MANAGER_1=192.168.10.11\n" +
+                        "export MASTER_CLUSTER_MASTER_1=192.168.10.11\n" +
+                        "export MASTER_DISTRIBUTED_FILESYSTEM_1=192.168.10.11\n" +
+                        "export MASTER_DISTRIBUTED_TIME_1=192.168.10.11\n" +
                         "\n" +
                         "#Eskimo installation status\n" +
-                        "export ESKIMO_INSTALLED_kafka_manager_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_kube_slave_1921681013=OK\n" +
-                        "export ESKIMO_INSTALLED_logstash_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_kube_slave_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_kibana_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_spark_console_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_elasticsearch_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_ntp_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_cerebro_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_zookeeper_1921681013=OK\n" +
-                        "export ESKIMO_INSTALLED_spark_runtime_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_kafka_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_etcd_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_ntp_1921681013=OK\n" +
-                        "export ESKIMO_INSTALLED_etcd_1921681013=OK\n" +
-                        "export ESKIMO_INSTALLED_gluster_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_gluster_1921681013=OK\n" +
-                        "export ESKIMO_INSTALLED_kube_master_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_zeppelin_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_distributed_time_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_master_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_distributed_time_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_user_console_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_distributed_filesystem_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_distributed_filesystem_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_manager_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_database_manager_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_slave_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_broker_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_slave_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_database_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_calculator_runtime_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_broker_manager_KUBERNETES_NODE=OK\n" +
                         "\n" +
                         "#Additional Environment\n" +
-                        "export ALL_NODES_LIST_etcd=192.168.10.11,192.168.10.12,192.168.10.13\n" +
-                        "export NODE_NBR_ETCD_1921681012=2\n" +
-                        "export NODE_NBR_ETCD_1921681013=3\n" +
-                        "export NODE_NBR_ETCD_1921681011=1\n" +
-                        "export ALL_NODES_LIST_gluster=192.168.10.11,192.168.10.12\n" +
-                        "export ALL_NODES_LIST_kube_slave=192.168.10.11,192.168.10.12,192.168.10.13\n" +
-                        "export NODE_NBR_KUBE_SLAVE_1921681013=3\n" +
-                        "export NODE_NBR_KUBE_SLAVE_1921681012=2\n" +
-                        "export NODE_NBR_KUBE_SLAVE_1921681011=1\n" +
-                        "export NODE_NBR_ZOOKEEPER_1921681011=1\n" +
+                        "export NODE_NBR_CLUSTER_MANAGER_1921681011=2\n" +
+                        "export ALL_NODES_LIST_cluster_slave=192.168.10.11,192.168.10.12,192.168.10.13\n" +
+                        "export NODE_NBR_CLUSTER_SLAVE_1921681011=1\n" +
+                        "export NODE_NBR_CLUSTER_SLAVE_1921681013=3\n" +
+                        "export NODE_NBR_CLUSTER_SLAVE_1921681012=2\n" +
+                        "export ALL_NODES_LIST_distributed_filesystem=192.168.10.11,192.168.10.12\n" +
                         "\n" +
                         "#Self identification\n" +
                         "export SELF_IP_ADDRESS=192.168.10.11\n" +
@@ -176,69 +185,63 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                         "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n" +
                         "\n" +
                         "#Kubernetes Topology\n",
-                topology.getTopologyScriptForNode(nodesConfig, StandardSetupHelpers.getStandardKubernetesConfig(), StandardSetupHelpers.getStandard2NodesInstallStatus(), emptyModel, 1));
+                topology.getTopologyScriptForNode(nodesConfig,
+                        new KubernetesServicesConfigWrapper(jsonKubernetesConfig),
+                        StandardSetupHelpers.getStandard2NodesTestInstallStatus(), servicesDefinition, emptyModel, 1));
     }
 
     @Test
     public void testRealLifeExampleSingleNodes() throws Exception {
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
-            put("zookeeper", "1");
-            put("kube-master", "1");
-            put("kube-slave1", "on");
-            put("ntp", "1");
-            put("etcd", "1");
+            put("cluster-manager", "1");
+            put("cluster-master", "1");
+            put("cluster-slave1", "on");
+            put("distributed-time", "1");
         }});
 
-        KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>() {{
-            put("spark-console_install", "on");
-            put("cerebro_install", "on");
-            put("kibana_install", "on");
-            put("zeppelin_install", "on");
-            put("elasticsearch_install", "on");
-            put("kafka_install", "on");
-            put("spark-runtime_install", "on");
-            put("logstash_install", "on");
+        KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<>() {{
+            
+            put("database-manager_install", "on");
+
+            put("user-console_install", "on");
+            
+            put("database_install", "on");
+            put("broker_install", "on");
+            put("calculator-runtime_install", "on");
         }});
 
-        Topology topology = def.getTopology(
+        Topology topology = servicesDefinition.getTopology(
                 nodesConfig,
                 kubeServicesConfig,
                 "192.168.10.11");
 
         assertEquals ("#Topology\n" +
-                        "export MASTER_KUBE_MASTER_1=192.168.10.11\n" +
-                        "export MASTER_NTP_1=192.168.10.11\n" +
-                        "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
+                        "export MASTER_CLUSTER_MANAGER_1=192.168.10.11\n" +
+                        "export MASTER_CLUSTER_MASTER_1=192.168.10.11\n" +
+                        "export MASTER_DISTRIBUTED_TIME_1=192.168.10.11\n" +
                         "\n" +
                         "#Eskimo installation status\n" +
-                        "export ESKIMO_INSTALLED_kafka_manager_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_kube_slave_1921681013=OK\n" +
-                        "export ESKIMO_INSTALLED_logstash_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_kube_slave_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_kibana_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_spark_console_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_elasticsearch_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_ntp_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_cerebro_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_zookeeper_1921681013=OK\n" +
-                        "export ESKIMO_INSTALLED_spark_runtime_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_kafka_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_etcd_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_ntp_1921681013=OK\n" +
-                        "export ESKIMO_INSTALLED_etcd_1921681013=OK\n" +
-                        "export ESKIMO_INSTALLED_gluster_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_gluster_1921681013=OK\n" +
-                        "export ESKIMO_INSTALLED_kube_master_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_zeppelin_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_distributed_time_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_master_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_distributed_time_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_user_console_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_distributed_filesystem_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_distributed_filesystem_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_manager_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_database_manager_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_slave_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_broker_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_slave_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_database_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_calculator_runtime_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_broker_manager_KUBERNETES_NODE=OK\n" +
                         "\n" +
                         "#Additional Environment\n" +
-                        "export ALL_NODES_LIST_etcd=192.168.10.11\n" +
-                        "export NODE_NBR_ETCD_1921681011=1\n" +
-                        "export ALL_NODES_LIST_kube_slave=192.168.10.11\n" +
-                        "export NODE_NBR_KUBE_SLAVE_1921681011=1\n" +
-                        "export NODE_NBR_ZOOKEEPER_1921681011=1\n" +
+                        "export NODE_NBR_CLUSTER_MANAGER_1921681011=2\n" +
+                        "export ALL_NODES_LIST_cluster_slave=192.168.10.11\n" +
+                        "export NODE_NBR_CLUSTER_SLAVE_1921681011=1\n" +
                         "\n" +
                         "#Self identification\n" +
                         "export SELF_IP_ADDRESS=192.168.10.11\n" +
@@ -247,189 +250,162 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                         "export ALL_NODES_LIST=192.168.10.11\n" +
                         "\n" +
                         "#Kubernetes Topology\n",
-                topology.getTopologyScriptForNode(nodesConfig, StandardSetupHelpers.getStandardKubernetesConfig(), StandardSetupHelpers.getStandard2NodesInstallStatus(), emptyModel, 1));
+                topology.getTopologyScriptForNode(nodesConfig,
+                        new KubernetesServicesConfigWrapper (jsonKubernetesConfig),
+                        StandardSetupHelpers.getStandard2NodesTestInstallStatus(), servicesDefinition, emptyModel, 1));
     }
 
     @Test
     public void testListServicesOrderedByDependencies() throws Exception {
 
-        String[] orderedServices = def.listServicesOrderedByDependencies();
+        String[] orderedServices = servicesDefinition.listServicesOrderedByDependencies();
 
-        assertEquals(23, orderedServices.length);
+        assertEquals(14, orderedServices.length);
 
-        assertTrue (orderedServices[0].equals("zookeeper")
-                || orderedServices[0].equals("ntp")
-                || orderedServices[0].equals("prometheus")
-                || orderedServices[0].equals("gluster"));
+        assertTrue (orderedServices[0].equals("cluster-manager")
+                || orderedServices[0].equals("distributed-time")
+                || orderedServices[0].equals("broker-cli"));
 
-        assertTrue (orderedServices[orderedServices.length - 1].equals("zeppelin")
-                || orderedServices[orderedServices.length - 1].equals("spark-runtime"));
+        assertTrue (orderedServices[orderedServices.length - 1].equals("user-console")
+                || orderedServices[orderedServices.length - 1].equals("calculator-runtime"));
 
     }
 
     @Test
     public void testListServicesInOrder() throws Exception {
 
-        String[] orderedServices = def.listServicesInOrder();
+        String[] orderedServices = servicesDefinition.listServicesInOrder();
 
-        assertEquals(23, orderedServices.length, String.join(",", orderedServices));
+        assertEquals(14, orderedServices.length, String.join(",", orderedServices));
 
         assertArrayEquals(new String[] {
-                "ntp",
-                "zookeeper",
-                "prometheus",
-                "grafana",
-                "gluster",
-                "etcd",
-                "kube-master",
-                "kube-slave",
-                "kubernetes-dashboard",
-                "kafka",
-                "kafka-cli",
-                "kafka-manager",
-                "spark-console",
-                "spark-runtime",
-                "spark-cli",
-                "flink-runtime",
-                "flink-cli",
-                "logstash",
-                "logstash-cli",
-                "cerebro",
-                "elasticsearch",
-                "kibana",
-                "zeppelin"
+                "distributed-time",
+                "cluster-manager",
+                "distributed-filesystem",
+                "cluster-master",
+                "cluster-slave",
+                "cluster-dashboard",
+                "broker",
+                "broker-cli",
+                "broker-manager",
+                "calculator-runtime",
+                "calculator-cli",
+                "database-manager",
+                "database",
+                "user-console"
         }, orderedServices);
     }
 
     @Test
     public void testListUniqueServices() throws Exception {
 
-        String[] orderedServices = def.listUniqueServices();
+        String[] orderedServices = servicesDefinition.listUniqueServices();
 
         assertEquals(2, orderedServices.length);
 
         assertArrayEquals(new String[] {
-                "kube-master",
-                "zookeeper"
+                "cluster-manager",
+                "cluster-master"
         }, orderedServices);
     }
 
     @Test
     public void testListKubernetesServices() throws Exception {
-        String[] kubernetesServices = def.listKubernetesServices();
+        String[] kubernetesServices = servicesDefinition.listKubernetesServices();
 
-        assertEquals(12, kubernetesServices.length);
+        assertEquals(7, kubernetesServices.length);
 
         assertArrayEquals(new String[] {
-                "cerebro",
-                "elasticsearch",
-                "flink-runtime",
-                "grafana",
-                "kafka",
-                "kafka-manager",
-                "kibana",
-                "kubernetes-dashboard",
-                "logstash",
-                "spark-console",
-                "spark-runtime",
-                "zeppelin"
+                "broker",
+                "broker-manager",
+                "calculator-runtime",
+                "cluster-dashboard",
+                "database",
+                "database-manager",
+                "user-console"
         }, kubernetesServices);
     }
 
     @Test
     public void testListUIServices() throws Exception {
 
-        String[] orderedServices = def.listUIServices();
+        String[] orderedServices = servicesDefinition.listUIServices();
 
-        assertEquals(9, orderedServices.length, String.join(",", orderedServices));
+        assertEquals(5, orderedServices.length, String.join(",", orderedServices));
 
         assertArrayEquals(new String[] {
-                "grafana",
-                "gluster",
-                "kubernetes-dashboard",
-                "kafka-manager",
-                "spark-console",
-                "flink-runtime",
-                "cerebro",
-                "kibana",
-                "zeppelin",
+                "distributed-filesystem",
+                "cluster-dashboard",
+                "broker-manager",
+                "database-manager",
+                "user-console",
         }, orderedServices);
     }
 
     @Test
     public void testListMultipleServices() throws Exception {
 
-        String[] orderedServices = def.listMultipleServicesNonKubernetes();
+        String[] orderedServices = servicesDefinition.listMultipleServicesNonKubernetes();
 
-        assertEquals(9, orderedServices.length);
+        assertEquals(5, orderedServices.length);
 
         assertArrayEquals(new String[] {
-                "etcd",
-                "flink-cli",
-                "gluster",
-                "kafka-cli",
-                "kube-slave",
-                "logstash-cli",
-                "ntp",
-                "prometheus",
-                "spark-cli"
+                "broker-cli",
+                "calculator-cli",
+                "cluster-slave",
+                "distributed-filesystem",
+                "distributed-time"
         }, orderedServices);
     }
 
     @Test
     public void testGetDependentServices() throws Exception {
 
-        String[] elasticsearchDep = def.getDependentServices("elasticsearch").toArray(new String[0]);
-        assertEquals(3, elasticsearchDep.length);
+        String[] elasticsearchDep = servicesDefinition.getDependentServices("database").toArray(new String[0]);
+        assertEquals(2, elasticsearchDep.length);
         assertArrayEquals(new String[] {
-                "cerebro",
-                "kibana",
-                "zeppelin"
+                "database-manager",
+                "user-console"
         }, elasticsearchDep);
 
-        String[] zookeeperDep = def.getDependentServices("zookeeper").toArray(new String[0]);
-        assertEquals(6, zookeeperDep.length, String.join(",", zookeeperDep));
+        String[] zookeeperDep = servicesDefinition.getDependentServices("cluster-manager").toArray(new String[0]);
+        assertEquals(5, zookeeperDep.length, String.join(",", zookeeperDep));
         assertArrayEquals(new String[] {
-                "zookeeper",
-                "gluster",
-                "flink-runtime",
-                "kafka",
-                "kafka-manager",
-                "zeppelin"
+                "cluster-manager",
+                "broker",
+                "broker-manager",
+                "distributed-filesystem",
+                "user-console"
         }, zookeeperDep);
     }
 
     @Test
     public void testZookeeperOnRange() throws Exception {
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
-            put("zookeeper", "1");
-            put("gluster1", "on");
-            put("ntp1", "on");
-            put("prometheus1", "on");
+            put("cluster-manager", "1");
+            put("distributed-filesystem1", "on");
+            put("distributed-time1", "on");
             put("node_id2", "192.168.10.13-192.168.10.14");
-            put("gluster2", "on");
-            put("ntp2", "on");
-            put("prometheus2", "on");
+            put("distributed-filesystem2", "on");
+            put("distributed-time2", "on");
         }});
 
         KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<>());
 
-        Topology topology = def.getTopology(
-                nrr.resolveRanges(nodesConfig),
+        Topology topology = servicesDefinition.getTopology(
+                nodeRangeResolver.resolveRanges(nodesConfig),
                 kubeServicesConfig,
                 "192.168.10.11");
 
         assertEquals ("#Topology\n" +
-                        "export MASTER_NTP_1=192.168.10.11\n" +
-                        "export MASTER_PROMETHEUS_1=192.168.10.11\n" +
-                        "export MASTER_ZOOKEEPER_1=192.168.10.11\n" +
+                        "export MASTER_CLUSTER_MANAGER_1=192.168.10.11\n" +
+                        "export MASTER_DISTRIBUTED_TIME_1=192.168.10.11\n" +
                         "\n" +
                         "#Additional Environment\n" +
-                        "export ALL_NODES_LIST_gluster=192.168.10.11,192.168.10.13,192.168.10.14\n" +
-                        "export ALL_NODES_LIST_prometheus=192.168.10.11,192.168.10.13,192.168.10.14\n" +
-                        "export NODE_NBR_ZOOKEEPER_1921681011=1\n" +
+                        "export NODE_NBR_CLUSTER_MANAGER_1921681011=2\n" +
+                        "export ALL_NODES_LIST_distributed_filesystem=192.168.10.11,192.168.10.13,192.168.10.14\n" +
                         "\n" +
                         "#Self identification\n" +
                         "export SELF_IP_ADDRESS=192.168.10.11\n" +
@@ -437,15 +413,15 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
                         "export ESKIMO_NODE_COUNT=3\n" +
                         "export ALL_NODES_LIST=192.168.10.11,192.168.10.13,192.168.10.14\n",
                 topology.getTopologyScriptForNode(
-                        nrr.resolveRanges(nodesConfig),
+                        nodeRangeResolver.resolveRanges(nodesConfig),
                         StandardSetupHelpers.getStandardKubernetesConfig(),
-                        ServicesInstallStatusWrapper.empty(), emptyModel, 1));
+                        ServicesInstallStatusWrapper.empty(), servicesDefinition, emptyModel, 1));
     }
 
     @Test
     public void testEditableConfiguration() throws Exception {
 
-        Service sparkService = def.getService("spark-runtime");
+        Service sparkService = servicesDefinition.getService("calculator-runtime");
         assertNotNull(sparkService);
 
         List<EditableSettings> confs = sparkService.getEditableSettings();
@@ -455,7 +431,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         EditableSettings conf = confs.get(0);
         assertNotNull(conf);
 
-        assertEquals("spark-defaults.conf", conf.getFilename());
+        assertEquals("calculator-defaults.conf", conf.getFilename());
         assertEquals (EditablePropertyType.VARIABLE, conf.getPropertyType());
         assertEquals ("{name}={value}", conf.getPropertyFormat());
         assertEquals("#", conf.getCommentPrefix());
@@ -468,14 +444,14 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
         EditableProperty firstProp = props.get(0);
         assertNotNull(firstProp);
 
-        assertEquals("spark.driver.memory", firstProp.getName());
+        assertEquals("calculator.driver.memory", firstProp.getName());
         assertEquals("Limiting the driver (client) memory", firstProp.getComment());
         assertEquals("800m", firstProp.getDefaultValue());
 
         EditableProperty lastProp = props.get(7);
         assertNotNull(lastProp);
 
-        assertEquals("spark.dynamicAllocation.shuffleTracking.timeout", lastProp.getName());
+        assertEquals("calculator.dynamicAllocation.shuffleTracking.timeout", lastProp.getName());
         assertEquals("When shuffle tracking is enabled, controls the timeout for executors that are holding shuffle data - should be consistent with spark.dynamicAllocation.cachedExecutorIdleTimeout.", lastProp.getComment());
         assertEquals("300s", lastProp.getDefaultValue());
 
@@ -489,7 +465,7 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
 
     @Test
     public void testCommandFrameworkDefinition() throws Exception {
-        Service ntp = def.getService("ntp");
+        Service ntp = servicesDefinition.getService("distributed-time");
         assertNotNull (ntp.getCommands());
         assertEquals (1, ntp.getCommands().size());
 
@@ -513,43 +489,40 @@ public class ServicesDefinitionTest extends AbstractServicesDefinitionTest {
             }
         });
         assertNotNull(callRef.get());
-        assertEquals("192.168.10.11-cat /var/log/ntp/ntp.log", callRef.get());
+        assertEquals("192.168.10.11-cat /var/log/distributed-time/distributed-time.log", callRef.get());
     }
 
     @Test
     public void testConditionalMandatory() throws Exception {
 
-        def = new ServicesDefinitionImpl();
-
-        initConditionalMandatory();
-
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
         }});
 
-        NodesConfigurationChecker nodeConfigChecker = new NodesConfigurationChecker();
-        nodeConfigChecker.setServicesDefinition(def);
+        nodesConfigurationChecker.checkNodesSetup(nodesConfig);
 
-        nodeConfigChecker.checkNodesSetup(nodesConfig);
-
-        NodesConfigWrapper nodesConfig2 = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig2 = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("node_id2", "192.168.10.12");
         }});
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            nodeConfigChecker.checkNodesSetup(nodesConfig2);
+            nodesConfigurationChecker.checkNodesSetup(nodesConfig2);
         });
 
-        assertEquals("Inconsistency found : service service_a is mandatory on all nodes but some nodes are lacking it.", exception.getMessage());
+        assertEquals("Inconsistency found : service distributed-filesystem is mandatory on all nodes but some nodes are lacking it.", exception.getMessage());
 
-        NodesConfigWrapper nodesConfig3 = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig3 = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("node_id2", "192.168.10.12");
-            put("service_a1", "on");
-            put("service_a2", "on");
+            put("cluster-manager", "1");
+            put("distributed-time1", "on");
+            put("distributed-time2", "on");
+            put("distributed-filesystem1", "on");
+            put("distributed-filesystem2", "on");
         }});
 
-        nodeConfigChecker.checkNodesSetup(nodesConfig3);
+        nodesConfigurationChecker.checkNodesSetup(nodesConfig3);
+
     }
 }

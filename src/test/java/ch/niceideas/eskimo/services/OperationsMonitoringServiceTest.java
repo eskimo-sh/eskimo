@@ -36,14 +36,24 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
+import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
+import ch.niceideas.eskimo.test.services.*;
 import org.apache.log4j.Logger;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,45 +61,61 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class OperationsMonitoringServiceTest extends AbstractSystemTest {
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-system", "test-operation", "test-proxy", "test-kube", "test-ssh", "test-conf", "test-connection-manager"})
+public class OperationsMonitoringServiceTest {
 
     private static final Logger logger = Logger.getLogger(OperationsMonitoringServiceTest.class);
 
     private String testRunUUID = UUID.randomUUID().toString();
 
+    @Autowired
+    private OperationsMonitoringService operationsMonitoringService;
+
+    @Autowired
+    private NodesConfigurationService nodesConfigurationService;
+
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
+
+    @Autowired
+    private SSHCommandServiceTestImpl sshCommandServiceTest;
+
+    @Autowired
+    private ConnectionManagerServiceTestImpl connectionManagerServiceTest;
+
+    @Autowired
+    private ServicesDefinition servicesDefinition;
+
+    @Autowired
+    private NodeRangeResolver nodeRangeResolver;
+
+    @Autowired
+    private SystemOperationServiceTestImpl systemOperationServiceTest;
+
+    @Autowired
+    private SystemServiceTestImpl systemServiceTest;
+
     @BeforeEach
-    @Override
     public void setUp() throws Exception {
-        super.setUp();
-        setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
-    }
-
-    @Override
-    protected SystemServiceImpl createSystemService() {
-        SystemServiceImpl ss = new SystemServiceImpl(false) {
-            @Override
-            public File createTempFile(String serviceOrFlag, String node, String extension) throws IOException {
-                File retFile = new File (System.getProperty("java.io.tmpdir") + "/" + serviceOrFlag+"-"+testRunUUID+"-"+ node +extension);
-                retFile.createNewFile();
-                return retFile;
-            }
-        };
-        ss.setConfigurationService(configurationService);
-        return ss;
-    }
-
-    @Override
-    protected SetupServiceImpl createSetupService() {
-        return new SetupServiceImpl() {
-            @Override
-            public String findLastPackageFile(String prefix, String packageName) {
-                return prefix+"_"+packageName+"_dummy_1.dummy";
-            }
-        };
+        SecurityContextHelper.loginAdmin();
+        connectionManagerServiceTest.reset();
+        connectionManagerServiceTest.dontConnect();
+        sshCommandServiceTest.reset();
+        systemOperationServiceTest.setMockCalls(false);
+        systemServiceTest.setMockCalls(false);
+        try {
+            operationsMonitoringService.operationsFinished(true);
+        } catch (Exception e) {
+            logger.debug (e, e);
+        }
     }
 
     @Test
@@ -114,15 +140,16 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
     }
 
     @Test
+    @DirtiesContext
     public void testGetOperationsMonitoringStatus() throws Exception {
 
         ServicesInstallStatusWrapper servicesInstallStatus = new ServicesInstallStatusWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/serviceInstallStatus.json"), StandardCharsets.UTF_8));
-        configurationService.saveServicesInstallationStatus(servicesInstallStatus);
+        configurationServiceTest.saveServicesInstallationStatus(servicesInstallStatus);
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper (StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/rawNodesConfig.json"), StandardCharsets.UTF_8));
-        configurationService.saveNodesConfig(nodesConfig);
+        configurationServiceTest.saveNodesConfig(nodesConfig);
 
-        configurationService.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
+        configurationServiceTest.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
 
         ServiceOperationsCommand command = ServiceOperationsCommand.create(
                 servicesDefinition,
@@ -131,76 +158,25 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
                 nodesConfig
         );
 
-        SSHCommandService sshCommandService = new SSHCommandServiceImpl() {
-            @Override
-            public synchronized String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
-                return runSSHScript((String)null, script, throwsException);
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
+            if (script.equals("echo OK")) {
+                return "OK";
             }
-            @Override
-            public synchronized String runSSHScript(String node, String script, boolean throwsException) {
-                testSSHCommandScript.append(script).append("\n");
-                if (script.equals("echo OK")) {
-                    return "OK";
-                }
-                if (script.equals("if [[ -f /etc/debian_version ]]; then echo debian; fi")) {
-                    return "debian";
-                }
-                if (script.endsWith("cat /proc/meminfo | grep MemTotal")) {
-                    return "MemTotal:        9982656 kB";
-                }
-
-                return testSSHCommandResultBuilder.toString();
+            if (script.equals("if [[ -f /etc/debian_version ]]; then echo debian; fi")) {
+                return "debian";
             }
-            @Override
-            public synchronized String runSSHCommand(SSHConnection connection, String command) {
-                return runSSHCommand((String)null, command);
+            if (script.endsWith("cat /proc/meminfo | grep MemTotal")) {
+                return "MemTotal:        9982656 kB";
             }
-            @Override
-            public synchronized String runSSHCommand(String node, String command) {
-                testSSHCommandScript.append(command).append("\n");
-                if (command.equals("cat /etc/eskimo_flag_base_system_installed")) {
-                    return "OK";
-                }
-
-                return testSSHCommandResultBuilder.toString();
+            if (script.equals("cat /etc/eskimo_flag_base_system_installed")) {
+                return "OK";
             }
-            @Override
-            public synchronized void copySCPFile(SSHConnection connection, String filePath) {
-                // just do nothing
-            }
-            @Override
-            public synchronized void copySCPFile(String node, String filePath)  {
-                // just do nothing
-            }
-        };
-
-        systemService.setSshCommandService(sshCommandService);
-
-        memoryComputer.setSshCommandService(sshCommandService);
-
-        nodesConfigurationService.setSshCommandService(sshCommandService);
-
-        nodesConfigurationService.setConnectionManagerService(new ConnectionManagerServiceImpl() {
-            @Override
-            public SSHConnection getPrivateConnection (String node) {
-                return null;
-            }
-            @Override
-            public SSHConnection getSharedConnection (String node) {
-                return null;
-            }
-        });
-
-        nodesConfigurationService.setKubernetesService(new KubernetesServiceImpl() {
-
-            @Override
-            public String restartServiceInternal(Service service, String node) throws KubernetesException, SSHCommandException {
-                // No Op
-                return null;
-            }
+            return null;
         });
 
         nodesConfigurationService.applyNodesConfig(command);
+
+        Thread.sleep (1000);
 
         OperationsMonitoringStatusWrapper operationsMonitoringStatus = operationsMonitoringService.getOperationsMonitoringStatus(new HashMap<>());
         assertNotNull (operationsMonitoringStatus);
@@ -218,15 +194,16 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
     public void testInterruptionReporting() throws Exception {
 
         final Object monitor = new Object();
+        final AtomicBoolean doWait = new AtomicBoolean(true);
         final AtomicInteger waitCount = new AtomicInteger();
 
         ServicesInstallStatusWrapper servicesInstallStatus = new ServicesInstallStatusWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/serviceInstallStatus.json"), StandardCharsets.UTF_8));
-        configurationService.saveServicesInstallationStatus(servicesInstallStatus);
+        configurationServiceTest.saveServicesInstallationStatus(servicesInstallStatus);
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper (StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/rawNodesConfig.json"), StandardCharsets.UTF_8));
-        configurationService.saveNodesConfig(nodesConfig);
+        configurationServiceTest.saveNodesConfig(nodesConfig);
 
-        configurationService.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
+        configurationServiceTest.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
 
         ServiceOperationsCommand command = ServiceOperationsCommand.create(
                 servicesDefinition,
@@ -235,82 +212,46 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
                 nodesConfig
         );
 
-        SSHCommandService sshCommandService = new SSHCommandServiceImpl() {
-            @Override
-            public synchronized String runSSHScript(SSHConnection connection, String script, boolean throwsException) throws SSHCommandException {
-                return runSSHScript((String)null, script, throwsException);
-            }
-            @Override
-            public synchronized String runSSHScript(String node, String script, boolean throwsException) {
-                testSSHCommandScript.append(script).append("\n");
-                if (script.equals("echo OK")) {
-                    return "OK";
-                }
-                if (script.equals("if [[ -f /etc/debian_version ]]; then echo debian; fi")) {
-                    return "debian";
-                }
-                if (script.endsWith("cat /proc/meminfo | grep MemTotal")) {
-                    return "MemTotal:        9982656 kB";
-                }
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
 
-                synchronized (monitor) {
-                    try {
-                        waitCount.incrementAndGet();
+            if (script.equals("echo OK")) {
+                return "OK";
+            }
+            if (script.equals("if [[ -f /etc/debian_version ]]; then echo debian; fi")) {
+                return "debian";
+            }
+            if (script.endsWith("cat /proc/meminfo | grep MemTotal")) {
+                return "MemTotal:        9982656 kB";
+            }
+            if (script.equals("cat /etc/eskimo_flag_base_system_installed")) {
+                return "OK";
+            }
+
+            synchronized (monitor) {
+                try {
+                    waitCount.incrementAndGet();
+                    if (doWait.get()) {
                         monitor.wait();
-                    } catch (InterruptedException e) {
-                        logger.error (e, e);
                     }
+                } catch (InterruptedException e) {
+                    logger.error (e, e);
                 }
+            }
 
-                return testSSHCommandResultBuilder.toString();
-            }
-            @Override
-            public synchronized String runSSHCommand(SSHConnection connection, String command) throws SSHCommandException {
-                return runSSHCommand((String)null, command);
-            }
-            @Override
-            public synchronized String runSSHCommand(String node, String command) {
-                testSSHCommandScript.append(command).append("\n");
-                if (command.equals("cat /etc/eskimo_flag_base_system_installed")) {
-                    return "OK";
-                }
-
-                return testSSHCommandResultBuilder.toString();
-            }
-            @Override
-            public synchronized void copySCPFile(SSHConnection connection, String filePath) {
-                // just do nothing
-            }
-            @Override
-            public synchronized void copySCPFile(String node, String filePath)  {
-                // just do nothing
-            }
-        };
-
-        systemService.setSshCommandService(sshCommandService);
-
-        memoryComputer.setSshCommandService(sshCommandService);
-
-        nodesConfigurationService.setSshCommandService(sshCommandService);
-
-        nodesConfigurationService.setConnectionManagerService(new ConnectionManagerServiceImpl() {
-            @Override
-            public SSHConnection getPrivateConnection (String node) {
-                return null;
-            }
-            @Override
-            public SSHConnection getSharedConnection (String node) {
-                return null;
-            }
+            return null;
         });
 
-        new Thread(() -> {
+        Thread t = new Thread(() -> {
             try {
+                SecurityContextHelper.loginAdmin();
                 nodesConfigurationService.applyNodesConfig(command);
             } catch (NodesConfigurationException e) {
                 logger.error (e, e);
             }
-        }).start();
+        });
+        t.start();
+
+        //Thread.sleep (1000);
 
         AtomicInteger previousCount = new AtomicInteger();
         Awaitility.await().atMost(10, TimeUnit.SECONDS).until(() -> {
@@ -326,7 +267,10 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
 
         operationsMonitoringService.interruptProcessing();
 
+        doWait.set(false);
+        Thread.sleep(1000);
         synchronized (monitor) {
+
             monitor.notifyAll();
         }
 
@@ -343,6 +287,8 @@ public class OperationsMonitoringServiceTest extends AbstractSystemTest {
 
         // same test as above but keep all operations pending (object.wait selectively / then object.notifyAll())
         // test that the operations selectively blocked are kept running and all the ones not started are cancelled
+
+        t.join();
     }
 
 

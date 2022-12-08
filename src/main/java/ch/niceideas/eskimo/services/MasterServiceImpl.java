@@ -189,7 +189,7 @@ public class MasterServiceImpl implements MasterService {
 
                     List<String> serviceNodes;
                     if (service.isKubernetes()) {
-                        serviceNodes = nodesConfig.getAllNodeAddressesWithService(KubernetesService.KUBE_MASTER);
+                        serviceNodes = nodesConfig.getAllNodeAddressesWithService(servicesDefinition.getKubeMasterService().getName());
                     } else {
                         // get any node where it's supposed to be install (always the same one)
                         serviceNodes = nodesConfig.getAllNodeAddressesWithService(service.getName());

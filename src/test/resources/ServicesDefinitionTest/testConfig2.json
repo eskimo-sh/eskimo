@@ -1,0 +1,21 @@
+{
+  "node_id1": "192.168.10.11",
+  "node_id2": "192.168.10.12",
+  "node_id3": "192.168.10.13",
+  "distributed-filesystem1": "on",
+  "distributed-filesystem2": "on",
+  "distributed-time1": "on",
+  "distributed-time2": "on",
+  "distributed-time3": "on",
+  "cluster-slave1": "on",
+  "cluster-slave2": "on",
+  "cluster-slave3": "on",
+  "cluster-master": "1",
+  "cluster-manager": "1",
+  "broker-cli1": "on",
+  "broker-cli2": "on",
+  "broker-cli3": "on",
+  "calculator-cli1": "on",
+  "calculator-cli2": "on",
+  "calculator-cli3": "on"
+}

@@ -85,6 +85,25 @@ public class StandardSetupHelpers {
         }});
     }
 
+    public static ServicesInstallStatusWrapper getStandard2NodesTestInstallStatus() {
+        return new ServicesInstallStatusWrapper(new HashMap<>() {{
+            put("database-manager_installed_on_IP_KUBERNETES_NODE", "OK");
+            put("database_installed_on_IP_KUBERNETES_NODE", "OK");
+            put("distributed-filesystem_installed_on_IP_192-168-10-11", "OK");
+            put("distributed-filesystem_installed_on_IP_192-168-10-13", "OK");
+            put("broker-manager_installed_on_IP_KUBERNETES_NODE", "OK");
+            put("broker_installed_on_IP_KUBERNETES_NODE", "OK");
+            put("cluster-slave_installed_on_IP_192-168-10-11", "OK");
+            put("cluster-slave_installed_on_IP_192-168-10-13", "OK");
+            put("cluster-master_installed_on_IP_192-168-10-11", "OK");
+            put("distributed-time_installed_on_IP_192-168-10-11", "OK");
+            put("distributed-time_installed_on_IP_192-168-10-13", "OK");
+            put("calculator-runtime_installed_on_IP_KUBERNETES_NODE", "OK");
+            put("user-console_installed_on_IP_KUBERNETES_NODE", "OK");
+            put("cluster-manager_installed_on_IP_192-168-10-13", "OK");
+        }});
+    }
+
     public static SystemStatusWrapper getStandard2NodesSystemStatus() {
         return  new SystemStatusWrapper (new HashMap<>() {{
             put("node_address_192-168-10-11", "192.168.10.11");

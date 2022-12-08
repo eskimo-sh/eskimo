@@ -73,6 +73,7 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
     private ServicesSettingsWrapper serviceSettings = null;
     private String setupConfigAsString;
     private ServicesInstallStatusWrapper installStatus = null;
+    private KubernetesServicesConfigWrapper kubeServicesConfig = null;
 
     private NodesConfigWrapper nodesConfig = null;
 
@@ -89,6 +90,7 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
         this.serviceSettings = null;
         this.setupConfigAsString = null;
         this.installStatus = null;
+        this.kubeServicesConfig = null;
 
         this.nodesConfig = null;
     }
@@ -164,7 +166,9 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
 
     @Override
     public void updateAndSaveServicesInstallationStatus(SystemService.StatusUpdater statusUpdater) throws FileException, SetupException {
-
+        if (this.installStatus != null) {
+            statusUpdater.updateStatus(this.installStatus);
+        }
     }
 
     @Override
@@ -221,6 +225,8 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
             return StandardSetupHelpers.getStandardKubernetesConfig();
         } else if (kubernetesConfigError) {
             throw new SystemException("Test Error");
+        } else if (this.kubeServicesConfig != null) {
+            return this.kubeServicesConfig;
         } else {
             return KubernetesServicesConfigWrapper.empty();
         }
@@ -228,7 +234,7 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
 
     @Override
     public void saveKubernetesServicesConfig(KubernetesServicesConfigWrapper kubeServicesConfig) throws FileException, SetupException {
-
+        this.kubeServicesConfig = kubeServicesConfig;
     }
 
 }

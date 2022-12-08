@@ -45,8 +45,6 @@ import java.util.Map;
 
 public interface KubernetesService {
 
-    String KUBE_MASTER = "kube-master";
-    String KUBE_SLAVE = "kube-slave";
     String TOPOLOGY_ALL_NODES = "Topology (All Nodes)";
 
     String STATUS_RUNNING = "Running";

@@ -1,30 +1,30 @@
 {
-  "filename": "spark-defaults.conf",
+  "filename": "calculator-defaults.conf",
   "propertyFormat": "{name}={value}",
   "commentPrefix": "#",
-  "service": "spark-runtime",
+  "service": "calculator-runtime",
   "propertyType": "VARIABLE",
   "filesystemService": "spark",
   "properties": [
     {
-      "name": "spark.driver.memory",
+      "name": "calculator.driver.memory",
       "defaultValue": "800m",
       "comment": "Limiting the driver (client) memory"
     },
     {
-      "name": "spark.rpc.numRetries",
+      "name": "calculator.rpc.numRetries",
       "defaultValue": "5",
       "comment": "Number of times to retry before an RPC task gives up. An RPC task will run at most times of this number."
     },
     {
-      "name": "spark.rpc.retry.wait",
+      "name": "calculator.rpc.retry.wait",
       "defaultValue": "5s",
       "comment": "Duration for an RPC ask operation to wait before retrying."
     },
     {
-      "name": "spark.scheduler.mode",
+      "name": "calculator.scheduler.mode",
       "defaultValue": "FAIR",
-      "comment": "The scheduling mode between jobs submitted to the same SparkContext. \nCan be FIFO or FAIR. FAIR Seem not to work well with Kubernetes"
+      "comment": "The scheduling mode between jobs submitted to the same CalculatorContext. \nCan be FIFO or FAIR. FAIR Seem not to work well with Kubernetes"
     },
     {
       "name": "spark.locality.wait",
@@ -32,27 +32,27 @@
       "comment": "How long to wait to launch a data-local task before giving up and launching it on a less-local node."
     },
     {
-      "name": "spark.dynamicAllocation.executorIdleTimeout",
+      "name": "calculator.dynamicAllocation.executorIdleTimeout",
       "defaultValue": "200s",
       "comment": "If dynamic allocation is enabled and an executor has been idle for more than this duration, the executor will be removed. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)"
     },
     {
-      "name": "spark.dynamicAllocation.cachedExecutorIdleTimeout",
+      "name": "calculator.dynamicAllocation.cachedExecutorIdleTimeout",
       "defaultValue": "300s",
       "comment": "If dynamic allocation is enabled and an executor which has cached data blocks has been idle for more than this duration, the executor will be removed - should be consistent with spark.dynamicAllocation.shuffleTracking.timeout. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)"
     },
     {
-      "name": "spark.dynamicAllocation.shuffleTracking.timeout",
+      "name": "calculator.dynamicAllocation.shuffleTracking.timeout",
       "defaultValue": "300s",
       "comment": "When shuffle tracking is enabled, controls the timeout for executors that are holding shuffle data - should be consistent with spark.dynamicAllocation.cachedExecutorIdleTimeout."
     },
     {
-      "name": "spark.dynamicAllocation.schedulerBacklogTimeout",
+      "name": "calculator.dynamicAllocation.schedulerBacklogTimeout",
       "defaultValue": "5s",
       "comment": "\tIf dynamic allocation is enabled and there have been pending tasks backlogged for more than this duration, new executors will be requested."
     },
     {
-      "name": "spark.executor.memory",
+      "name": "calculator.executor.memory",
       "defaultValue": "[ESKIMO_DEFAULT]",
       "comment": "Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology). \nUSE [ESKIMO_DEFAULT] to leave untouched or e.g. 800m, 1.2g, etc."
     }

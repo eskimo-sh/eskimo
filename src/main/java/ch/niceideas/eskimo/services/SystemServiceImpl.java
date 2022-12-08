@@ -74,8 +74,6 @@ public class SystemServiceImpl implements SystemService {
 
     public static final String TMP_PATH_PREFIX = "/tmp/";
 
-    public static final String KUBERNETES_SERVICE_NAME = KubernetesService.KUBE_MASTER;
-
     @Autowired
     private ProxyManagerService proxyManagerService;
 
@@ -388,7 +386,7 @@ public class SystemServiceImpl implements SystemService {
                 } catch (KubernetesException e) {
                     logger.debug(e, e);
                     // workaround : flag all Kubernetes services as KO on kube node
-                    String kubeNode = servicesInstallationStatus.getFirstNode(KUBERNETES_SERVICE_NAME);
+                    String kubeNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterService().getName());
                     if (StringUtils.isNotBlank(kubeNode)) {
                         String kubeNodeName = kubeNode.replace(".", "-");
                         KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
@@ -636,14 +634,14 @@ public class SystemServiceImpl implements SystemService {
                     if (nodeName.equals(ServicesInstallStatusWrapper.KUBERNETES_NODE)) {
 
                         // if kubernetes is not available, don't do anything
-                        String kubeNodeName = systemStatus.getFirstNodeName(KUBERNETES_SERVICE_NAME);
+                        String kubeNodeName = systemStatus.getFirstNodeName(servicesDefinition.getKubeMasterService().getName());
                         if (StringUtils.isBlank(kubeNodeName)) { // if Kubernetes is not found, don't touch anything. Let's wait for it to come back.
                             //notificationService.addError("Kubernetes inconsistency.");
                             //logger.warn("Kubernetes could not be found - not potentially flagging kubernetes services as disappeared as long as kubernetes is not back.");
                             continue;
                         }
 
-                        if (!systemStatus.isServiceOKOnNode(KUBERNETES_SERVICE_NAME, kubeNodeName)) {
+                        if (!systemStatus.isServiceOKOnNode(servicesDefinition.getKubeMasterService().getName(), kubeNodeName)) {
                             //logger.warn("Kubernetes is not OK - not potentially flagging kubernetes services as disappeared as long as kubernetes is not back.");
 
                             // reset missing counter on kubernetes services when kube is down

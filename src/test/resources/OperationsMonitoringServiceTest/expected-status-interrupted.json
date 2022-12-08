@@ -14,8 +14,8 @@
       "lastLine": 0
     },
     "Check--Install_Base-System_192-168-10-15": {
-      "lines": "",
-      "lastLine": 0
+      "lines": "Q2hlY2tpbmcgLyBJbnN0YWxsaW5nIEJhc2Ugc3lzdGVtCkluc3RhbGxpbmcgVG9wb2xvZ3kgYW5kIHNldHRpbmdzCkNoZWNraW5nIC8gSW5zdGFsbGluZyBLdWJlcm5ldGVzCi0tPiBEb25lIDogQ2hlY2sgLyBJbnN0YWxsIG9mIEJhc2UgU3lzdGVtIG9uIDE5Mi4xNjguMTAuMTUKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQotLT4gQ29tcGxldGVkIFN1Y2Nlc3NmdWx5Lgo=",
+      "lastLine": 6
     },
     "installation_zeppelin_192-168-10-15": {
       "lines": "",
@@ -148,7 +148,7 @@
     "installation_spark-console_192-168-10-15": "CANCELLED",
     "restart_kafka_kubernetes": "CANCELLED",
     "Check--Install_Base-System_192-168-10-13": "CANCELLED",
-    "Check--Install_Base-System_192-168-10-15": "CANCELLED",
+    "Check--Install_Base-System_192-168-10-15": "COMPLETE",
     "installation_zeppelin_192-168-10-15": "CANCELLED",
     "installation_kube-slave_192-168-10-13": "CANCELLED",
     "installation_kube-slave_192-168-10-15": "CANCELLED",

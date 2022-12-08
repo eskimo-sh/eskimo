@@ -38,10 +38,12 @@ package ch.niceideas.eskimo.test.services;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.MessageLogger;
 import ch.niceideas.eskimo.model.OperationId;
+import ch.niceideas.eskimo.services.OperationsMonitoringService;
 import ch.niceideas.eskimo.services.SystemException;
 import ch.niceideas.eskimo.services.SystemOperationService;
 import ch.niceideas.eskimo.services.SystemService;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
@@ -58,7 +60,10 @@ public class SystemOperationServiceTestImpl implements SystemOperationService {
 
     private static final Logger logger = Logger.getLogger(SystemOperationServiceTestImpl.class);
 
-    private boolean mockCalls = true;
+    @Autowired
+    private OperationsMonitoringService operationsMonitoringService;
+
+    private boolean mockCalls = false;
 
     private List<Pair<OperationId, SystemOperation>> appliedOperations = new ArrayList<>();
 
@@ -77,29 +82,50 @@ public class SystemOperationServiceTestImpl implements SystemOperationService {
 
     @Override
     public void applySystemOperation(OperationId operationId, SystemOperation operation, SystemService.StatusUpdater statusUpdater) throws SystemException {
-        if (mockCalls) {
-            appliedOperations.add(new Pair<>(operationId, operation));
-        } else {
+        appliedOperations.add(new Pair<>(operationId, operation));
+        if (!mockCalls) {
 
-            try {
+            if (!operationsMonitoringService.isInterrupted()) {
 
-                operation.call(new MessageLogger() {
+                String message = operationId.getMessage();
 
-                    @Override
-                    public void addInfo(String message) {
-                        logger.info (message);
-                    }
+                try {
 
-                    @Override
-                    public void addInfo(String[] messages) {
-                        logger.info (messages);
-                    }
-                });
+                    operationsMonitoringService.startOperation(operationId);
+                    operation.call(new MessageLogger() {
 
-            } catch (Exception e) {
-                logger.debug(e, e);
-                logger.warn ("Exception will be thrown as SystemException - " + e.getClass() + ":" + e.getMessage());
-                throw new SystemException(e);
+                        @Override
+                        public void addInfo(String message) {
+                            logger.info(message);
+                        }
+
+                        @Override
+                        public void addInfo(String[] messages) {
+                            logger.info(messages);
+                        }
+                    });
+
+                    operationsMonitoringService.addInfo(operationId, "--> Done : "
+                            + message
+                            + "\n-------------------------------------------------------------------------------\n"
+                            + "--> Completed Successfuly.");
+
+                } catch (Exception e) {
+                    logger.debug(e, e);
+                    logger.warn("Exception will be thrown as SystemException - " + e.getClass() + ":" + e.getMessage());
+
+                    operationsMonitoringService.addInfo(operationId, "--> Done : "
+                            + message
+                            + "\n-------------------------------------------------------------------------------\n"
+                            + "--> Completed in error : "
+                            + e.getMessage());
+
+                    operationsMonitoringService.endOperationError(operationId);
+
+                    throw new SystemException(e);
+                } finally {
+                    operationsMonitoringService.endOperation(operationId);
+                }
             }
         }
     }

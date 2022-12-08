@@ -1,0 +1,12 @@
+{
+  "node_id1": "192.168.56.21",
+  "cluster-manager": "1",
+  "distributed-filesystem1": "on",
+  "distributed-time1": "on",
+  "node_id2": "192.168.56.22",
+  "distributed-filesystem2": "on",
+  "distributed-time2": "on",
+  "node_id3": "192.168.56.23",
+  "distributed-filesystem3": "on",
+  "distributed-time3": "on"
+}

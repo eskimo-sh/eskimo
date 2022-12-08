@@ -89,8 +89,11 @@ public interface ServicesDefinition {
 
     Collection<String> getDependentServices(String service);
 
+    Service getKubeMasterService();
 
-    public interface EnvironmentOperation {
+    Service getKubeSlaveService();
+
+    interface EnvironmentOperation {
         void call(JsonWrapper persistentEnvironment) throws ServiceDefinitionException;
     }
 }

@@ -69,7 +69,7 @@ public class SystemServiceTestImpl implements SystemService {
 
     private boolean pingError = false;
 
-    private boolean mockCalls = true;
+    private boolean mockCalls = false;
 
     public void setMockCalls (boolean mockCalls) {
         this.mockCalls = mockCalls;

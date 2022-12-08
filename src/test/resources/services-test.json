@@ -5,6 +5,7 @@
       "imageName" : "distributed-time",
       "order": 0,
       "mandatory": true,
+      "conditional" : "MULTIPLE_NODES",
       "name" : "Distributed Time",
       "selectionLayout" : { "row" : 1, "col" : 1},
       "memory": "negligible",
@@ -91,6 +92,7 @@
       "imageName" : "distributed-filesystem",
       "order": 2,
       "mandatory": true,
+      "conditional" : "MULTIPLE_NODES",
       "name" : "Distributed Filesystem",
       "selectionLayout" : { "row" : 2, "col" : 1},
       "memory": "negligible",
@@ -179,6 +181,7 @@
     "config": {
       "imageName" : "cluster-master",
       "order": 3,
+      "kubeMaster" : true,
       "unique": true,
       "group" : "Cluster",
       "name" : "Master",
@@ -218,6 +221,7 @@
   "cluster-slave": {
     "config": {
       "order": 4,
+      "kubeSlave" : true,
       "group" : "Cluster",
       "name" : "Slave",
       "selectionLayout" : { "row" : 5, "col" : 1},
@@ -881,7 +885,6 @@
       }
     ]
   },
-
 
 
 

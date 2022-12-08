@@ -347,6 +347,7 @@
     "config": {
       "imageName" : "kube-master",
       "order": 6,
+      "kubeMaster" : true,
       "unique": true,
       "group" : "Kubernetes",
       "name" : "Master",
@@ -393,6 +394,7 @@
   "kube-slave": {
     "config": {
       "order": 7,
+      "kubeSlave" : true,
       "group" : "Kubernetes",
       "name" : "Slave",
       "selectionLayout" : { "row" : 5, "col" : 1},

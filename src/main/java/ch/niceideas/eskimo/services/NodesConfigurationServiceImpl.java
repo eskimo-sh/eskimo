@@ -392,7 +392,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             try {
                 FileUtils.writeFile(tempTopologyFile, servicesDefinition
                         .getTopology(nodesConfig, kubeServicesConfig, node)
-                        .getTopologyScriptForNode(nodesConfig, kubeServicesConfig, servicesInstallStatus, memoryModel, nodesConfig.getNodeNumber (node)));
+                        .getTopologyScriptForNode(nodesConfig, kubeServicesConfig, servicesInstallStatus, servicesDefinition, memoryModel, nodesConfig.getNodeNumber (node)));
             } catch (ServiceDefinitionException | NodesConfigurationException | FileException e) {
                 logger.error (e, e);
                 throw new SystemException(e);

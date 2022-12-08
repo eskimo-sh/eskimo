@@ -67,7 +67,7 @@ public class KubernetesServiceImpl implements KubernetesService {
 
     private static final Logger logger = Logger.getLogger(KubernetesServiceImpl.class);
 
-    public static final String KUBE_MASTER_NOT_INSTALLED = "Couldn't find service " + KUBE_MASTER + " in installation status";
+    public static final String KUBE_MASTER_NOT_INSTALLED = "Couldn't find service KUBE-MASTER in installation status";
     public static final String KUBE_NA_FLAG = "KUBERNETES_NA";
     public static final String KUBERNETES_NODE = "kubernetes node";
 
@@ -160,7 +160,7 @@ public class KubernetesServiceImpl implements KubernetesService {
         systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Showing journal", () -> {
             if (service.isKubernetes()) {
                 try {
-                    String kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(KUBE_MASTER);
+                    String kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(servicesDefinition.getKubeMasterService().getName());
                     if (StringUtils.isBlank(kubeMasterNode)) {
                         throw new KubernetesException(KUBE_MASTER_NOT_INSTALLED);
                     }
@@ -191,7 +191,7 @@ public class KubernetesServiceImpl implements KubernetesService {
         systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, opLabel, () -> {
             if (service.isKubernetes()) {
                 try {
-                    String kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(KUBE_MASTER);
+                    String kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(servicesDefinition.getKubeMasterService().getName());
                     if (StringUtils.isBlank(kubeMasterNode)) {
                         throw new KubernetesException(KUBE_MASTER_NOT_INSTALLED);
                     }
@@ -219,7 +219,7 @@ public class KubernetesServiceImpl implements KubernetesService {
         if (service.isKubernetes()) {
             if (!service.isRegistryOnly()) {
                 try {
-                    String kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(KUBE_MASTER);
+                    String kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(servicesDefinition.getKubeMasterService().getName());
                     if (StringUtils.isBlank(kubeMasterNode)) {
                         throw new KubernetesException(KUBE_MASTER_NOT_INSTALLED);
                     }
@@ -324,7 +324,7 @@ public class KubernetesServiceImpl implements KubernetesService {
 
             KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
 
-            String kubeMasterNode = servicesInstallationStatus.getFirstNode(KUBE_MASTER);
+            String kubeMasterNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterService().getName());
             if (kubeServicesConfig == null || StringUtils.isBlank(kubeMasterNode) && kubeServicesConfig.hasEnabledServices()) {
                 logger.warn("Kubernetes is not installed");
             }
@@ -367,11 +367,11 @@ public class KubernetesServiceImpl implements KubernetesService {
                         if (StringUtils.isNotBlank(kubeMasterNode)) {
                             nodeName = kubeMasterNode.replace(".", "-");
                         } else {
-                            nodeName = servicesInstallationStatus.getFirstNodeName(KUBE_MASTER);
+                            nodeName = servicesInstallationStatus.getFirstNodeName(servicesDefinition.getKubeMasterService().getName());
                         }
                         // last attempt, get it from theoretical perspective
                         if (StringUtils.isBlank(nodeName)) {
-                            nodeName = configurationService.loadNodesConfig().getFirstNodeName(KUBE_MASTER);
+                            nodeName = configurationService.loadNodesConfig().getFirstNodeName(servicesDefinition.getKubeMasterService().getName());
                         }
                     }
 
@@ -418,7 +418,7 @@ public class KubernetesServiceImpl implements KubernetesService {
             // Find out node running Kubernetes
             ServicesInstallStatusWrapper servicesInstallStatus = configurationService.loadServicesInstallationStatus();
 
-            String kubeMasterNode = servicesInstallStatus.getFirstNode(KUBE_MASTER);
+            String kubeMasterNode = servicesInstallStatus.getFirstNode(servicesDefinition.getKubeMasterService().getName());
             if (StringUtils.isBlank(kubeMasterNode)) {
 
                 notificationService.addError("Kube Master doesn't seem to be installed");
@@ -428,7 +428,7 @@ public class KubernetesServiceImpl implements KubernetesService {
                 // special case : if some Kubernetes services are getting uninstalled, and Kubernetes is nowhere installed or anything, let's force flag them as uninstalled
                 try {
                     SystemStatusWrapper lastStatus = systemService.getStatus();
-                    String kubeMasterNodeName = lastStatus.getFirstNodeName(KUBE_MASTER);
+                    String kubeMasterNodeName = lastStatus.getFirstNodeName(servicesDefinition.getKubeMasterService().getName());
                     if (StringUtils.isBlank(kubeMasterNodeName)) {
 
                         if (!command.getUninstallations().isEmpty()) {
@@ -561,7 +561,7 @@ public class KubernetesServiceImpl implements KubernetesService {
         try {
             ServicesInstallStatusWrapper servicesInstallationStatus = configurationService.loadServicesInstallationStatus();
 
-            String kubeMasterNode = servicesInstallationStatus.getFirstNode(KUBE_MASTER);
+            String kubeMasterNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterService().getName());
 
             String ping = null;
             if (!StringUtils.isBlank(kubeMasterNode)) {
