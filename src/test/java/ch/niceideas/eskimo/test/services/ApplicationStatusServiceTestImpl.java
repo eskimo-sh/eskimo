@@ -59,4 +59,7 @@ public class ApplicationStatusServiceTestImpl implements ApplicationStatusServic
     public void updateStatus() {
 
     }
+
+    public void setSnapshot(boolean b) {
+    }
 }

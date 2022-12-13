@@ -36,10 +36,7 @@
 package ch.niceideas.eskimo.test.services;
 
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.eskimo.model.JSONOpCommand;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.OperationId;
-import ch.niceideas.eskimo.model.OperationsMonitoringStatusWrapper;
+import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.services.OperationsMonitoringService;
 import ch.niceideas.eskimo.services.ServiceDefinitionException;
@@ -52,6 +49,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -66,11 +64,20 @@ public class OperationsMonitoringServiceTestImpl implements OperationsMonitoring
     private boolean lastOperationSuccess = false;
     private boolean lastOperationSuccessError = false;
 
+    private StringBuilder messagesCollector = new StringBuilder();
+
+    private MessagingManager messagingManager = new MessagingManager();
+
     public void reset() {
         this.interuptProcessingError = false;
         this.currentOperation = null;
         this.lastOperationSuccess = false;
         this.lastOperationSuccessError = false;
+        this.messagesCollector = new StringBuilder();
+    }
+
+    public String getAllMessages() {
+        return messagesCollector.toString();
     }
 
     public void setLastOperationSuccessError() {
@@ -127,22 +134,26 @@ public class OperationsMonitoringServiceTestImpl implements OperationsMonitoring
 
     @Override
     public void addGlobalInfo(String message) {
-
+        messagesCollector.append(message).append("\n");
     }
 
     @Override
     public void addInfo(OperationId operation, String message) {
-
+        messagesCollector.append(operation).append(" : ").append(message).append("\n");
+        messagingManager.addLine(message);
     }
 
     @Override
     public void addInfo(OperationId operation, String[] messages) {
-
+        Arrays.stream(messages).forEach(
+                message -> messagesCollector.append(operation).append(" : ").append(message).append("\n")
+        );
+        messagingManager.addLines(messages);
     }
 
     @Override
     public List<String> getNewMessages(OperationId operation, int lastLine) {
-        return null;
+        return messagingManager.getSubList(lastLine);
     }
 
     @Override

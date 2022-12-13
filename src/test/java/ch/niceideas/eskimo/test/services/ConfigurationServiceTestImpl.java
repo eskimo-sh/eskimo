@@ -37,12 +37,15 @@ package ch.niceideas.eskimo.test.services;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
@@ -50,10 +53,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Profile("test-conf")
 public class ConfigurationServiceTestImpl implements ConfigurationService {
+
+    private static final Logger logger = Logger.getLogger(ConfigurationServiceTestImpl.class);
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -202,7 +209,29 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
 
     @Override
     public JsonWrapper createSetupConfigAndSaveStoragePath(String configAsString) throws SetupException, FileException {
-        return null;
+
+        JsonWrapper setupConfigJSON = new JsonWrapper(configAsString);
+
+        // First thing first : save storage path
+        String configStoragePath = (String) setupConfigJSON.getValueForPath("setup_storage");
+
+        File storagePath = new File(configStoragePath);
+        if (!storagePath.exists()) {
+
+            if (!storagePath.mkdirs()) {
+                logger.debug ("mkdirs " + storagePath + " failed. Will crash on next line.");
+            }
+
+            if (!storagePath.exists()) {
+                throw new SetupException("Path \"" + configStoragePath + "\" doesn't exist and couldn't be created.");
+            }
+        }
+        if (!storagePath.canWrite()) {
+            String username = System.getProperty("user.name");
+            throw new SetupException("User " + username + " cannot write in path " + storagePath + " doesn't exist.");
+        }
+
+        return new JsonWrapper(configAsString);
     }
 
     @Override

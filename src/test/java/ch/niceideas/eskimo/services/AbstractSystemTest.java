@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+@Deprecated
 public abstract class AbstractSystemTest {
 
     private static final Logger logger = Logger.getLogger(AbstractSystemTest.class);

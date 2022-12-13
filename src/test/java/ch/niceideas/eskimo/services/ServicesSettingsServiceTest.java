@@ -36,82 +36,103 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.model.SettingsOperationsCommand;
+import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
+import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
+import ch.niceideas.eskimo.test.services.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ServicesSettingsServiceTest extends AbstractSystemTest {
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-system", "test-operation", "test-operations", "test-proxy", "test-kube", "test-ssh", "test-connection-manager"})
+public class ServicesSettingsServiceTest {
 
     private String jsonConfig = null;
     private String testForm = null;
 
-    private ServicesSettingsServiceImpl scs;
+    @Autowired
+    private ServicesSettingsService servicesSettingsService;
+
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
+
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private SystemOperationServiceTestImpl systemOperationServiceTest;
+
+    @Autowired
+    private SystemServiceTestImpl systemServiceTest;
+
+    @Autowired
+    private SSHCommandServiceTestImpl sshCommandServiceTest;
+
+    @Autowired
+    private OperationsMonitoringServiceTestImpl operationsMonitoringServiceTest;
+
+    @Autowired
+    private ConnectionManagerServiceTestImpl connectionManagerServiceTest;
+
 
     private AtomicReference<ServiceOperationsCommand> processedCommand = new AtomicReference<>();
 
     @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
+
         jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
         testForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testForm.json"), StandardCharsets.UTF_8);
 
-        scs = new ServicesSettingsServiceImpl();
+        SecurityContextHelper.loginAdmin();
+        operationsMonitoringServiceTest.operationsFinished(true);
+        connectionManagerServiceTest.dontConnect();
+        sshCommandServiceTest.reset();
+        systemServiceTest.reset();
+        sshCommandServiceTest.setResult("");
+        systemOperationServiceTest.setMockCalls(false);
+        systemServiceTest.setMockCalls(false);
 
-        scs.setSystemService(systemService);
-        scs.setSystemOperationService(systemOperationService);
-        scs.setMemoryComputer(memoryComputer);
-        scs.setOperationsMonitoringService(operationsMonitoringService);
-        scs.setServicesInstallationSorter(servicesInstallationSorter);
-        scs.setConfigurationService(configurationService);
-        scs.setServicesDefinition(servicesDefinition);
-        scs.setNodesConfigurationService(nodesConfigurationService);
-
-        servicesDefinition = new ServicesDefinitionImpl() {
-            @Override
-            public String getAllServicesString() {
-                return "kafka zookeeper ntp mesos-master spark-runtime kibana cerebro zeppelin kafka-manager gluster spark-console prometheus grafana";
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
+            if (script.equals("echo OK")) {
+                return "OK";
             }
-            @Override
-            public String[] listAllServices() {
-                return new String[] {"kafka",  "zookeeper", "ntp", "mesos-master", "spark-runtime", "kibana", "cerebro", "zeppelin", "kafka-manager", "gluster", "spark-console", "elasticsearch", "prometheus", "grafana"};
+            if (script.equals("if [[ -f /etc/debian_version ]]; then echo debian; fi")) {
+                return "debian";
             }
-        };
-        servicesDefinition.afterPropertiesSet();
-        scs.setServicesDefinition(servicesDefinition);
-        scs.setNodeRangeResolver(nodeRangeResolver);
-
-        setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
-    }
-
-    @Override
-    protected NodesConfigurationServiceImpl createNodesConfigurationService() {
-        return new NodesConfigurationServiceImpl() {
-            @Override
-            public void applyNodesConfig(ServiceOperationsCommand command) {
-                processedCommand.set(command);
+            if (script.endsWith("cat /proc/meminfo | grep MemTotal")) {
+                return "MemTotal:        9982656 kB";
             }
-        };
+            return null;
+        });
     }
 
     @Test
     public void testSaveAndApplyServicesConfig() throws Exception {
         //fail ("To Be Implemented");
 
-        configurationService.saveNodesConfig(StandardSetupHelpers.getStandard2NodesSetup());
-        configurationService.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
-        configurationService.saveServicesInstallationStatus(StandardSetupHelpers.getStandard2NodesInstallStatus());
+        configurationServiceTest.saveNodesConfig(StandardSetupHelpers.getStandard2NodesSetup());
+        configurationServiceTest.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
+        configurationServiceTest.saveServicesInstallationStatus(StandardSetupHelpers.getStandard2NodesInstallStatus());
 
-        configurationService.saveServicesSettings(new ServicesSettingsWrapper(jsonConfig));
+        configurationServiceTest.saveServicesSettings(new ServicesSettingsWrapper(jsonConfig));
 
-        SettingsOperationsCommand command = SettingsOperationsCommand.create(testForm, scs);
+        SettingsOperationsCommand command = SettingsOperationsCommand.create(testForm, servicesSettingsService);
 
         assertEquals (4, command.getRestartedServices().size());
 
@@ -120,9 +141,9 @@ public class ServicesSettingsServiceTest extends AbstractSystemTest {
         assertEquals ("kafka", command.getRestartedServices().get(2));
         assertEquals ("spark-runtime", command.getRestartedServices().get(3));
 
-        scs.applyServicesSettings(command);
+        servicesSettingsService.applyServicesSettings(command);
 
-        ServicesSettingsWrapper newConfig = configurationService.loadServicesSettings();
+        ServicesSettingsWrapper newConfig = configurationServiceTest.loadServicesSettings();
 
         // test elasticsearch config
         assertEquals ("bootstrap.memory_lock", newConfig.getValueForPath("settings.8.settings.0.properties.0.name"));
@@ -195,26 +216,17 @@ public class ServicesSettingsServiceTest extends AbstractSystemTest {
         assertEquals ("[ESKIMO_DEFAULT]", newConfig.getValueForPath("settings.12.settings.0.properties.7.defaultValue"));
         assertNull(newConfig.getValueForPath("settings.12.settings.0.properties.7.value"));
 
-        StringBuilder sb = new StringBuilder();
-        notificationService.fetchElements(1).getValue().stream()
-                .map (msg -> msg.get("message"))
-                .forEach(msg -> sb.append (msg).append("\n"));
+        String notifications = operationsMonitoringServiceTest.getAllMessages();
 
-        String notifications = sb.toString();
+        //System.err.println (notifications);
 
-        System.err.println (notifications);
+        assertTrue(notifications.contains("Check--Install_Settings_192-168-10-11 : --> Done : Check / Install of Settings on 192.168.10.11"));
+        assertTrue(notifications.contains("Check--Install_Settings_192-168-10-13 : --> Done : Check / Install of Settings on 192.168.10.13"));
 
-        assertTrue(notifications.contains("Check / Install of Settings on 192.168.10.11 succeeded"));
-        assertTrue(notifications.contains("Check / Install of Settings on 192.168.10.13 succeeded"));
-
-        assertTrue (notifications.contains("Executing restart on elasticsearch on (kubernetes)\n" +
-                "Executing restart on elasticsearch on (kubernetes) succeeded\n" +
-                "Executing restart on grafana on (kubernetes)\n" +
-                "Executing restart on grafana on (kubernetes) succeeded\n" +
-                "Executing restart on spark-runtime on (kubernetes)\n" +
-                "Executing restart on spark-runtime on (kubernetes) succeeded\n" +
-                "Executing restart on kafka on (kubernetes)\n" +
-                "Executing restart on kafka on (kubernetes) succeeded"));
+        assertTrue(notifications.contains("Done : Executing restart on elasticsearch on (kubernetes)"));
+        assertTrue(notifications.contains("Done : Executing restart on grafana on (kubernetes)"));
+        assertTrue(notifications.contains("Done : Executing restart on spark-runtime on (kubernetes)"));
+        assertTrue(notifications.contains("Done : Executing restart on kafka on (kubernetes)"));
     }
 
 }

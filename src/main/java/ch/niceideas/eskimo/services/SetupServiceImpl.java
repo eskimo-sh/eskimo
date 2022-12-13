@@ -67,7 +67,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-@Profile("!test-setup")
+@Profile({"!test-setup & !setup-under-test"})
 public class SetupServiceImpl implements SetupService {
 
     private static final Logger logger = Logger.getLogger(SetupServiceImpl.class);
@@ -102,7 +102,7 @@ public class SetupServiceImpl implements SetupService {
     @Autowired
     private OperationsMonitoringService operationsMonitoringService;
 
-    private String storagePathConfDir = System.getProperty("user.dir");
+    protected String storagePathConfDir = System.getProperty("user.dir");
 
     @Value("${system.packageDistributionPath}")
     protected String packageDistributionPath = "./packages_distrib";
@@ -117,24 +117,22 @@ public class SetupServiceImpl implements SetupService {
     private String kubePackages = "kube";
 
     @Value("${setup.packagesDownloadUrlRoot}")
-    private String packagesDownloadUrlRoot = "https://niceideas.ch/eskimo/";
+    private String packagesDownloadUrlRoot = "https://www.eskimo.sh/eskimo/V0.4/";
 
     @Value("${setup.temporaryBuildFolder}")
     private String temporaryBuildFolder = "/tmp";
 
     @Value("${build.version}")
-    private String buildVersion = "DEV-SNAPSHOT";
+    protected String buildVersion = "DEV-SNAPSHOT";
 
     private String configStoragePathInternal = null;
 
     /** For tests */
     @Deprecated
-    void setBuildVersion (String buildVersion) {
-        this.buildVersion = buildVersion;
-    }
     public void setConfigStoragePathInternal(String configStoragePathInternal) {
         this.configStoragePathInternal = configStoragePathInternal;
     }
+    @Deprecated /* Move to SetupServiceUnderTest */
     public void setPackageDistributionPath(String packageDistributionPath) {
         this.packageDistributionPath = packageDistributionPath;
     }
@@ -153,6 +151,7 @@ public class SetupServiceImpl implements SetupService {
     void setApplicationStatusService (ApplicationStatusService applicationStatusService) {
         this.applicationStatusService = applicationStatusService;
     }
+    @Deprecated /* Move to SetupServiceUnderTest */
     public void setPackagesDevPathForTests (String packagesDevPathForTest) {
         this.packagesDevPath = packagesDevPathForTest;
     }
@@ -166,10 +165,7 @@ public class SetupServiceImpl implements SetupService {
         this.notificationService = notificationService;
     }
 
-    void setStoragePathConfDir (String storagePathConfDir) {
-        this.storagePathConfDir = storagePathConfDir;
-    }
-
+    @Override
     public String getStoragePathConfDir() { return storagePathConfDir; }
 
     @PostConstruct
@@ -201,7 +197,7 @@ public class SetupServiceImpl implements SetupService {
         return packagesDownloadUrlRoot;
     }
 
-    String readConfigStoragePath() {
+    protected String readConfigStoragePath() {
         // First read config storage path
         File entryFile = new File(storagePathConfDir + "/storagePath.conf");
         if (!entryFile.exists()) {
@@ -364,7 +360,7 @@ public class SetupServiceImpl implements SetupService {
         return lastVersion.getKey().getName();
     }
 
-    Pair<File, Pair<String, String>> findLastVersion(String prefix, String packageName, File packagesDistribFolder) {
+    protected Pair<File, Pair<String, String>> findLastVersion(String prefix, String packageName, File packagesDistribFolder) {
 
         List<File> imageFiles = Arrays.stream(Objects.requireNonNull(packagesDistribFolder.listFiles()))
                 .filter(file -> file.getName().contains(prefix) && file.getName().contains("_" + packageName + "_"))

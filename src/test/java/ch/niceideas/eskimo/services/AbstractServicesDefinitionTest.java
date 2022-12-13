@@ -42,6 +42,7 @@ import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import org.junit.jupiter.api.BeforeEach;
 
+@Deprecated
 public abstract class AbstractServicesDefinitionTest {
 
     protected SetupServiceImpl setupService = new SetupServiceImpl();
