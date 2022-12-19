@@ -22,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-conf"})
-public class SettingsOperationsCommandTest extends AbstractServicesDefinitionTest {
+@ActiveProfiles({"no-web-stack", "test-conf", "test-setup", "test-system"})
+public class SettingsOperationsCommandTest {
 
     @Autowired
     private ServicesSettingsService scs;
@@ -40,7 +40,6 @@ public class SettingsOperationsCommandTest extends AbstractServicesDefinitionTes
 
     @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
 
         jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
         testForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testForm.json"), StandardCharsets.UTF_8);

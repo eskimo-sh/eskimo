@@ -35,12 +35,19 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.*;
+import ch.niceideas.eskimo.test.services.OperationsMonitoringServiceTestImpl;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,17 +55,29 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class SystemOperationServiceTest extends AbstractSystemTest {
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-system", "test-operations", "test-proxy", "test-kube", "test-ssh", "test-connection-manager"})
+public class SystemOperationServiceTest {
+
+    @Autowired
+    private OperationsMonitoringServiceTestImpl operationsMonitoringServiceTest;
+
+    @Autowired
+    private SystemOperationService systemOperationService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
-        operationsMonitoringService.operationsStarted(new SimpleOperationCommand("test", "test", "test"));
+        operationsMonitoringServiceTest.operationsStarted(new SimpleOperationCommand("test", "test", "test"));
     }
 
     @AfterEach
     public void tearDown() throws Exception {
-        operationsMonitoringService.operationsFinished(true);
+        operationsMonitoringServiceTest.operationsFinished(true);
     }
 
     @Test
@@ -70,10 +89,10 @@ public class SystemOperationServiceTest extends AbstractSystemTest {
                 ml -> ml.addInfo("In operation"),
                 null);
 
-        Pair<Integer, String> messages = operationsMonitoringService.fetchNewMessages(operation, 0);
+        Pair<Integer, String> messages = operationsMonitoringServiceTest.fetchNewMessages(operation, 0);
         //Pair<Integer, String> messages = messagingService.fetchElements(0);
         assertNotNull (messages);
-        assertEquals(Integer.valueOf (5), messages.getKey());
+        assertEquals(Integer.valueOf (3), messages.getKey());
         assertEquals("\n" +
                 "Executing test on test on test\n" +
                 "In operation\n" +

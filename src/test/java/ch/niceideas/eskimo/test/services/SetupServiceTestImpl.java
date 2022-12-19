@@ -151,7 +151,10 @@ public class SetupServiceTestImpl extends SetupServiceImpl implements SetupServi
 
     @Override
     public String findLastPackageFile(String prefix, String packageName) {
-        return "eskimo_kube_1.23.5_1.tar.gz";
+        if (packageName.equals("kube")) {
+            return "eskimo_kube_1.23.5_1.tar.gz";
+        }
+        return prefix+"_"+packageName+"_dummy_1.dummy";
     }
 
     @Override

@@ -39,6 +39,7 @@ import ch.niceideas.eskimo.AbstractBaseSSHTest;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.proxy.ProxyManagerServiceImpl;
 import ch.niceideas.eskimo.terminal.ScreenImage;
+import ch.niceideas.eskimo.test.testwrappers.SetupServiceUnderTest;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.junit.Assume;
@@ -69,13 +70,13 @@ public class TerminalServiceTest extends AbstractBaseSSHTest {
 
     private TerminalServiceImpl ts = null;
 
-    private SetupServiceImpl setupService = null;
+    private SetupServiceUnderTest setupService = null;
 
     private ConfigurationServiceImpl cs = null;
 
     @BeforeEach
     public void setUp() throws Exception {
-        setupService = new SetupServiceImpl();
+        setupService = new SetupServiceUnderTest();
         String tempPath = SystemServiceTest.createTempStoragePath();
         setupService.setConfigStoragePathInternal(tempPath);
         FileUtils.writeFile(new File(tempPath + "/config.json"), "{ \"ssh_username\" : \"test\" }");

@@ -6,6 +6,8 @@ import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
+import ch.niceideas.eskimo.test.services.SSHCommandServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-system", "test-setup", "test-conf"})
+@ActiveProfiles({"no-web-stack", "test-system", "test-setup", "test-conf", "test-connection-manager", "test-ssh"})
 public class NodesConfigControllerTest {
 
     @Autowired
@@ -41,6 +43,12 @@ public class NodesConfigControllerTest {
     @Autowired
     private OperationsMonitoringService operationsMonitoringService;
 
+    @Autowired
+    private ConnectionManagerServiceTestImpl connectionManagerServiceTest;
+
+    @Autowired
+    private SSHCommandServiceTestImpl sshCommandServiceTest;
+
     @BeforeEach
     public void testSetup() {
 
@@ -53,7 +61,22 @@ public class NodesConfigControllerTest {
 
         SecurityContextHelper.loginAdmin();
 
+        connectionManagerServiceTest.dontConnect();
+
         ncc.setDemoMode(false);
+
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
+            if (script.equals("echo OK")) {
+                return "OK";
+            }
+            if (script.equals("if [[ -f /etc/debian_version ]]; then echo debian; fi")) {
+                return "debian";
+            }
+            if (script.endsWith("cat /proc/meminfo | grep MemTotal")) {
+                return "MemTotal:        9982656 kB";
+            }
+            return null;
+        });
     }
 
     @Test

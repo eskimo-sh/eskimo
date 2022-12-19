@@ -29,7 +29,7 @@
     "distributed-filesystem": {
       "kubernetes": false,
       "col": 1,
-      "conditional": "NONE",
+      "conditional": "MULTIPLE_NODES",
       "configOrder": 2,
       "unique": false,
       "name": "distributed-filesystem",
@@ -81,7 +81,7 @@
     "distributed-time": {
       "kubernetes": false,
       "col": 1,
-      "conditional": "NONE",
+      "conditional": "MULTIPLE_NODES",
       "configOrder": 0,
       "unique": false,
       "name": "distributed-time",

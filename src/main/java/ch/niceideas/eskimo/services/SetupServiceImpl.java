@@ -94,7 +94,7 @@ public class SetupServiceImpl implements SetupService {
     private ConfigurationService configurationService;
 
     @Autowired
-    private ServicesDefinition servicesDefinition;
+    protected ServicesDefinition servicesDefinition;
 
     @Autowired
     private ApplicationStatusService applicationStatusService;
@@ -125,29 +125,26 @@ public class SetupServiceImpl implements SetupService {
     @Value("${build.version}")
     protected String buildVersion = "DEV-SNAPSHOT";
 
-    private String configStoragePathInternal = null;
+    protected String configStoragePathInternal = null;
 
     /** For tests */
-    @Deprecated
-    public void setConfigStoragePathInternal(String configStoragePathInternal) {
-        this.configStoragePathInternal = configStoragePathInternal;
-    }
     @Deprecated /* Move to SetupServiceUnderTest */
     public void setPackageDistributionPath(String packageDistributionPath) {
         this.packageDistributionPath = packageDistributionPath;
     }
+    @Deprecated
     void setKubePackages (String kubePackages) {
         this.kubePackages = kubePackages;
     }
+    @Deprecated
     void setSystemService (SystemService systemService) {
         this.systemService = systemService;
     }
+    @Deprecated
     public void setConfigurationService (ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
-    void setServicesDefinition (ServicesDefinition servicesDefinition) {
-        this.servicesDefinition = servicesDefinition;
-    }
+    @Deprecated
     void setApplicationStatusService (ApplicationStatusService applicationStatusService) {
         this.applicationStatusService = applicationStatusService;
     }
@@ -155,12 +152,15 @@ public class SetupServiceImpl implements SetupService {
     public void setPackagesDevPathForTests (String packagesDevPathForTest) {
         this.packagesDevPath = packagesDevPathForTest;
     }
+    @Deprecated
     void setSystemOperationService (SystemOperationService systemOperationService) {
         this.systemOperationService = systemOperationService;
     }
+    @Deprecated
     void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
         this.operationsMonitoringService = operationsMonitoringService;
     }
+    @Deprecated
     void setNotificationService (NotificationService notificationService) {
         this.notificationService = notificationService;
     }

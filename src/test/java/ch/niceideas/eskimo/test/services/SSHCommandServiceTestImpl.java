@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
 @Profile("test-ssh")
 public class SSHCommandServiceTestImpl implements SSHCommandService {
 
-    private String returnResult = null;
+    private String returnResult = "";
     private StringBuilder executedCommands = new StringBuilder();
     private StringBuilder executedScpCommands = new StringBuilder();
 
@@ -75,7 +75,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     public void reset() {
         this.connectionResultBuilder = null;
         this.nodeResultBuilder = null;
-        this.returnResult = null;
+        this.returnResult = "";
         this.executedCommands = new StringBuilder();
         this.executedScpCommands = new StringBuilder();
     }

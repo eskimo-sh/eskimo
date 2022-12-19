@@ -67,7 +67,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-@Profile("!test-system")
+@Profile({"!test-system & !system-under-test"})
 public class SystemServiceImpl implements SystemService {
 
     private static final Logger logger = Logger.getLogger(SystemServiceImpl.class);
@@ -124,32 +124,39 @@ public class SystemServiceImpl implements SystemService {
 
     private final ReentrantLock statusUpdateLock = new ReentrantLock();
     private final ScheduledExecutorService statusRefreshScheduler;
-    private final AtomicReference<SystemStatusWrapper> lastStatus = new AtomicReference<>();
-    private final AtomicReference<Exception> lastStatusException = new AtomicReference<>();
+    protected final AtomicReference<SystemStatusWrapper> lastStatus = new AtomicReference<>();
+    protected final AtomicReference<Exception> lastStatusException = new AtomicReference<>();
 
     private final Map<String, Integer> serviceMissingCounter = new ConcurrentHashMap<>();
 
     /**
      * for tests
      */
+    @Deprecated
     void setSshCommandService(SSHCommandService sshCommandService) {
         this.sshCommandService = sshCommandService;
     }
+    @Deprecated
     void setNotificationService(NotificationService notificationService) {
         this.notificationService = notificationService;
     }
+    @Deprecated
     void setServicesDefinition(ServicesDefinition servicesDefinition) {
         this.servicesDefinition = servicesDefinition;
     }
+    @Deprecated
     void setSetupService(SetupService setupService) {
         this.setupService = setupService;
     }
+    @Deprecated
     void setProxyManagerService(ProxyManagerService proxyManagerService) {
         this.proxyManagerService = proxyManagerService;
     }
+    @Deprecated
     void setNodeRangeResolver (NodeRangeResolver nodeRangeResolver) {
         this.nodeRangeResolver = nodeRangeResolver;
     }
+    @Deprecated
     void setConfigurationService (ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
@@ -317,10 +324,6 @@ public class SystemServiceImpl implements SystemService {
             throw new StatusExceptionWrapperException (lastStatusException.get());
         }
         return lastStatus.get();
-    }
-
-    void setLastStatusForTest(SystemStatusWrapper lastStatusForTest) {
-        this.lastStatus.set (lastStatusForTest);
     }
 
     @Override
@@ -504,7 +507,7 @@ public class SystemServiceImpl implements SystemService {
         }
     }
 
-    void fetchNodeStatus
+    protected void fetchNodeStatus
             (NodesConfigWrapper nodesConfig, Map<String, String> statusMap, Pair<String, String> nbrAndPair,
              ServicesInstallStatusWrapper servicesInstallationStatus)
                 throws SystemException {
@@ -754,7 +757,7 @@ public class SystemServiceImpl implements SystemService {
         return changes;
     }
 
-    void checkServiceDisappearance(SystemStatusWrapper systemStatus) {
+    protected void checkServiceDisappearance(SystemStatusWrapper systemStatus) {
 
         if (lastStatus.get() != null) {
 

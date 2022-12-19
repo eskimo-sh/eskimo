@@ -34,59 +34,75 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.common.utils.*;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
+import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
+import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.SSHCommandServiceTestImpl;
+import ch.niceideas.eskimo.test.testwrappers.SystemServiceUnderTest;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SystemServiceTest extends AbstractSystemTest {
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-proxy", "test-ssh", "test-connection-manager", "system-under-test"})
+public class SystemServiceTest {
 
     private static final Logger logger = Logger.getLogger(SystemServiceTest.class);
 
-    private String testRunUUID = UUID.randomUUID().toString();
+    protected String systemStatusTest = null;
+    protected String expectedFullStatus = null;
+    protected String expectedPrevStatusServicesRemoved = null;
+    protected String expectedPrevStatusAllServicesStay = null;
+
+    @Autowired
+    private ServicesDefinition servicesDefinition;
+
+    @Autowired
+    private SystemServiceUnderTest systemService;
+
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
+
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private OperationsMonitoringService operationsMonitoringService;
+
+    @Autowired
+    private SSHCommandServiceTestImpl sshCommandServiceTest;
 
     @BeforeEach
-    @Override
     public void setUp() throws Exception {
-        super.setUp();
-        setupService.setConfigStoragePathInternal(createTempStoragePath());
+        SecurityContextHelper.loginAdmin();
+        configurationServiceTest.reset();
+        sshCommandServiceTest.reset();
+        notificationService.clear();
+        systemStatusTest = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/systemStatusTest.log"), StandardCharsets.UTF_8);
+        expectedFullStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedFullStatus.json"), StandardCharsets.UTF_8);
+        expectedPrevStatusServicesRemoved = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedPrevStatusServicesRemoved.json"), StandardCharsets.UTF_8);
+        expectedPrevStatusAllServicesStay = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedPrevStatusAllServicesStay.json"), StandardCharsets.UTF_8);
     }
 
-    @Override
-    protected SystemServiceImpl createSystemService() {
-        SystemServiceImpl ss = new SystemServiceImpl(false) {
-            @Override
-            public File createTempFile(String serviceOrFlag, String node, String extension) throws IOException {
-                File retFile = new File ("/tmp/" + serviceOrFlag + "-" + testRunUUID + "-" + node + extension);
-                retFile.createNewFile();
-                return retFile;
-            }
-        };
-        ss.setConfigurationService(configurationService);
-        return ss;
-    }
-
-    @Override
-    protected SetupServiceImpl createSetupService() {
-        return new SetupServiceImpl() {
-            @Override
-            public String findLastPackageFile(String prefix, String packageName) {
-                return prefix+"_"+packageName+"_dummy_1.dummy";
-            }
-        };
-    }
 
     public static String createTempStoragePath() throws Exception {
         File dtempFileName = File.createTempFile("test_systemservice_", "config_storage");
@@ -100,25 +116,25 @@ public class SystemServiceTest extends AbstractSystemTest {
     @Test
     public void testShowJournal() throws Exception {
         systemService.showJournal(servicesDefinition.getService("ntp"), "192.168.10.11");
-        assertEquals ("sudo journalctl -u ntp", testSSHCommandScript.toString().trim());
+        assertEquals ("sudo journalctl -u ntp", sshCommandServiceTest.getExecutedCommands().trim());
     }
 
     @Test
     public void testStartService() throws Exception {
         systemService.startService(servicesDefinition.getService("ntp"), "192.168.10.11");
-        assertEquals ("sudo systemctl start ntp", testSSHCommandScript.toString().trim());
+        assertEquals ("sudo systemctl start ntp", sshCommandServiceTest.getExecutedCommands().trim());
     }
 
     @Test
     public void testStopService() throws Exception {
         systemService.stopService(servicesDefinition.getService("ntp"), "192.168.10.11");
-        assertEquals ("sudo systemctl stop ntp", testSSHCommandScript.toString().trim());
+        assertEquals ("sudo systemctl stop ntp", sshCommandServiceTest.getExecutedCommands().trim());
     }
 
     @Test
     public void testRestartService() throws Exception {
         systemService.restartService(servicesDefinition.getService("ntp"), "192.168.10.11");
-        assertEquals ("sudo systemctl restart ntp", testSSHCommandScript.toString().trim());
+        assertEquals ("sudo systemctl restart ntp", sshCommandServiceTest.getExecutedCommands().trim());
     }
 
     @Test
@@ -130,21 +146,36 @@ public class SystemServiceTest extends AbstractSystemTest {
         assertEquals("Command dummy is unknown for service ntp", exception.getMessage());
 
         systemService.callCommand("show_log", "ntp", "192.168.10.11");
-        assertEquals ("cat /var/log/ntp/ntp.log", testSSHCommandScript.toString().trim());
+        assertEquals ("cat /var/log/ntp/ntp.log", sshCommandServiceTest.getExecutedCommands().trim());
     }
 
     @Test
     public void testUpdateStatusWithKubernetesException() throws Exception {
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
-        configurationService.saveNodesConfig(nodesConfig);
+        configurationServiceTest.saveNodesConfig(nodesConfig);
 
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        configurationService.saveServicesInstallationStatus(servicesInstallStatus);
+        configurationServiceTest.saveServicesInstallationStatus(servicesInstallStatus);
 
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
-        configurationService.saveKubernetesServicesConfig(kubeServicesConfig);
+        configurationServiceTest.saveKubernetesServicesConfig(kubeServicesConfig);
 
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
+            if (script.equals("echo OK")) {
+                return "OK";
+            }
+            if (script.startsWith("sudo systemctl status --no-pager")) {
+                return systemStatusTest;
+            }
+            return "";
+        });
+
+        sshCommandServiceTest.setConnectionResultBuilder((connection, script) -> {
+            return script;
+        });
+
+        /*
         systemService.setSshCommandService(new SSHCommandServiceImpl() {
             @Override
             public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
@@ -179,6 +210,7 @@ public class SystemServiceTest extends AbstractSystemTest {
                 // just do nothing
             }
         });
+        */
 
         systemService.updateStatus();
 
@@ -215,6 +247,21 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         Pair<String, String> nodeNumnberAndIpAddress = new Pair<>(""+nodeNbr, ipAddress);
 
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
+            if (script.equals("echo OK")) {
+                return "OK";
+            }
+            if (script.startsWith("sudo systemctl status --no-pager")) {
+                return systemStatusTest;
+            }
+            return "";
+        });
+
+        sshCommandServiceTest.setConnectionResultBuilder((connection, script) -> {
+            return script;
+        });
+
+        /*
         systemService.setSshCommandService(new SSHCommandServiceImpl() {
             @Override
             public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
@@ -249,7 +296,7 @@ public class SystemServiceTest extends AbstractSystemTest {
                 // just do nothing
             }
         });
-
+        */
 
         systemService.fetchNodeStatus (nodesConfig, statusMap, nodeNumnberAndIpAddress, servicesInstallStatus);
 
@@ -266,14 +313,29 @@ public class SystemServiceTest extends AbstractSystemTest {
     public void testUpdateStatus() throws Exception {
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
-        configurationService.saveNodesConfig(nodesConfig);
+        configurationServiceTest.saveNodesConfig(nodesConfig);
 
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        configurationService.saveServicesInstallationStatus(servicesInstallStatus);
+        configurationServiceTest.saveServicesInstallationStatus(servicesInstallStatus);
 
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
-        configurationService.saveKubernetesServicesConfig(kubeServicesConfig);
+        configurationServiceTest.saveKubernetesServicesConfig(kubeServicesConfig);
 
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
+            if (script.equals("echo OK")) {
+                return "OK";
+            }
+            if (script.startsWith("sudo systemctl status --no-pager")) {
+                return systemStatusTest;
+            }
+            return "";
+        });
+
+        sshCommandServiceTest.setConnectionResultBuilder((connection, script) -> {
+            return script;
+        });
+
+        /*
         systemService.setSshCommandService(new SSHCommandServiceImpl() {
             @Override
             public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
@@ -308,6 +370,7 @@ public class SystemServiceTest extends AbstractSystemTest {
                 // just do nothing
             }
         });
+        */
 
         systemService.updateStatus();
 
@@ -332,6 +395,21 @@ public class SystemServiceTest extends AbstractSystemTest {
 
         Pair<String, String> nbrAndPair = new Pair<>(""+nodeNbr, ipAddress);
 
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
+            if (script.equals("echo OK")) {
+                return "OK";
+            }
+            if (script.startsWith("sudo systemctl status --no-pager")) {
+                return systemStatusTest;
+            }
+            return "";
+        });
+
+        sshCommandServiceTest.setConnectionResultBuilder((connection, script) -> {
+            return script;
+        });
+
+        /*
         systemService.setSshCommandService(new SSHCommandServiceImpl() {
             @Override
             public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
@@ -366,6 +444,7 @@ public class SystemServiceTest extends AbstractSystemTest {
                 // just do nothing
             }
         });
+        */
 
         servicesInstallStatus.setValueForPath("etcd_installed_on_IP_192-168-10-11", "restart");
         servicesInstallStatus.setValueForPath("gluster_installed_on_IP_192-168-10-11", "restart");
@@ -484,7 +563,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
 
         // no changes so empty (since not saved !)
-        ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
+        ServicesInstallStatusWrapper resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
         assertEquals ("{}", resultPrevStatus.getFormattedValue());
 
         // run it four more times
@@ -493,7 +572,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         }
 
         // now I have changes
-        resultPrevStatus = configurationService.loadServicesInstallationStatus();
+        resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
 
         // etcd is missing
         System.err.println (resultPrevStatus.getFormattedValue());
@@ -524,7 +603,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
 
         // no changes so empty (since not saved !)
-        ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
+        ServicesInstallStatusWrapper resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
         assertEquals ("{}", resultPrevStatus.getFormattedValue());
 
         // run it four more times
@@ -533,7 +612,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         }
 
         // now I have changes
-        resultPrevStatus = configurationService.loadServicesInstallationStatus();
+        resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
 
         // nothing is removed (don't act on node down)
         System.err.println (resultPrevStatus.getFormattedValue());
@@ -556,7 +635,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
 
         // no changes so empty (since not saved !)
-        ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
+        ServicesInstallStatusWrapper resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
         assertEquals ("{}", resultPrevStatus.getFormattedValue());
 
         // run it four more times
@@ -565,7 +644,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         }
 
         // now I have changes
-        resultPrevStatus = configurationService.loadServicesInstallationStatus();
+        resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
 
         JSONObject expectedPrevStatusJson = new JSONObject(expectedPrevStatusServicesRemoved);
         expectedPrevStatusJson.put("etcd_installed_on_IP_192-168-10-11", "OK"); // need to re-add this since the expectedPrevStatusServicesRemoved is for another test
@@ -594,7 +673,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
 
         // no changes so empty (since not saved !)
-        ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
+        ServicesInstallStatusWrapper resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
         assertEquals ("{}", resultPrevStatus.getFormattedValue());
 
         // run it four more times
@@ -603,7 +682,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         }
 
         // Since the Kubernetes service status change has not been saved (since marazthon is down), it's still empty !!
-        resultPrevStatus = configurationService.loadServicesInstallationStatus();
+        resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
 
         assertEquals("{}", resultPrevStatus.getJSONObject().toString(2));
     }
@@ -639,7 +718,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
 
         // no changes so empty (since not saved !)
-        ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
+        ServicesInstallStatusWrapper resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
         assertEquals ("{}", resultPrevStatus.getFormattedValue());
 
         // run it four more times
@@ -648,7 +727,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         }
 
         // now I have changes
-        resultPrevStatus = configurationService.loadServicesInstallationStatus();
+        resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
 
         // kafka and elasticsearch have been kept
         System.err.println (resultPrevStatus.getFormattedValue());
@@ -699,7 +778,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
 
         // no changes so empty (since not saved !)
-        ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
+        ServicesInstallStatusWrapper resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
         assertEquals ("{}", resultPrevStatus.getFormattedValue());
 
         // run it four more times
@@ -708,7 +787,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         }
 
         // now I have changes
-        resultPrevStatus = configurationService.loadServicesInstallationStatus();
+        resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
 
         // kafka and elasticsearch have been kept
         System.err.println (resultPrevStatus.getFormattedValue());
@@ -745,7 +824,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
 
         // no changes so empty (since not saved !)
-        ServicesInstallStatusWrapper resultPrevStatus = configurationService.loadServicesInstallationStatus();
+        ServicesInstallStatusWrapper resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
         assertEquals ("{}", resultPrevStatus.getFormattedValue());
 
         // run it four more times
@@ -754,7 +833,7 @@ public class SystemServiceTest extends AbstractSystemTest {
         }
 
         // now I have changes
-        resultPrevStatus = configurationService.loadServicesInstallationStatus();
+        resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
 
         // everything has been removed
         System.err.println(resultPrevStatus.getFormattedValue());

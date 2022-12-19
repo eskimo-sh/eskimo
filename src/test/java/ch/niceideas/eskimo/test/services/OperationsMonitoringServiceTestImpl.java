@@ -158,7 +158,7 @@ public class OperationsMonitoringServiceTestImpl implements OperationsMonitoring
 
     @Override
     public Pair<Integer, String> fetchNewMessages(OperationId operation, int lastLine) {
-        return null;
+        return messagingManager.fetchElements(lastLine);
     }
 
     @Override

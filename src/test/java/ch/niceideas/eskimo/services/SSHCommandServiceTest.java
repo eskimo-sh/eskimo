@@ -36,18 +36,32 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.proxy.ProxyManagerServiceImpl;
+import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
+import ch.niceideas.eskimo.test.testwrappers.SetupServiceUnderTest;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.Assume;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "setup-under-test", "test-conf", "test-connection-manager", "test-system", "test-operation"})
 public class SSHCommandServiceTest extends AbstractBaseSSHTest {
 
     @Override
@@ -61,58 +75,42 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
         Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
-    private ConnectionManagerServiceImpl cm = null;
+    @Autowired
+    private SSHCommandService sshCommandService;
 
-    private ProxyManagerServiceImpl pms = null;
+    @Autowired
+    private SetupServiceUnderTest setupService;
 
-    private SSHCommandServiceImpl scs = null;
+    @Autowired
+    private ConnectionManagerServiceTestImpl connectionManagerServiceTest;
 
-    private SetupServiceImpl setupService = null;
-
-    private ConfigurationServiceImpl cs = null;
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
 
     @BeforeEach
     public void setUp() throws Exception {
 
-        setupService = new SetupServiceImpl();
         String tempPath = SystemServiceTest.createTempStoragePath();
         setupService.setConfigStoragePathInternal(tempPath);
         FileUtils.writeFile(new File(tempPath + "/config.json"), "{ \"ssh_username\" : \"test\" }");
 
-        cm = new ConnectionManagerServiceImpl(privateKeyRaw, getSShPort());
+        connectionManagerServiceTest.reset();
 
-        scs = new SSHCommandServiceImpl();
+        connectionManagerServiceTest.setPrivateSShKeyContent(privateKeyRaw);
+        connectionManagerServiceTest.setSShPort(getSShPort());
 
-        scs.setConnectionManagerService(cm);
-
-        pms = new ProxyManagerServiceImpl();
-        pms.setConnectionManagerService(cm);
-        cm.setProxyManagerService(pms);
-        pms.setConnectionManagerService(cm);
-
-        cs = new ConfigurationServiceImpl();
-        cs.setSetupService(setupService);
-
-        cm.setConfigurationService(cs);
+        configurationServiceTest.saveSetupConfig("{ \"ssh_username\" : \"test\" }");
     }
 
     @Test
     public void testRunSSHCommandStdOut() throws Exception {
-        assertNotNull (sshd);
-        assertNotNull (cm);
-        assertNotNull (scs);
-
-        assertEquals ("1\n", scs.runSSHCommand("localhost", "echo 1"));
+        assertEquals ("1\n", sshCommandService.runSSHCommand("localhost", "echo 1"));
     }
 
     @Test
     public void testRunSSHCommandStdErr() throws Exception {
-        assertNotNull (sshd);
-        assertNotNull (cm);
-        assertNotNull (scs);
-
         try {
-            scs.runSSHCommand("localhost", "/bin/bash -c /bin/tada");
+            sshCommandService.runSSHCommand("localhost", "/bin/bash -c /bin/tada");
             fail ("Exception expected");
         } catch (SSHCommandException e) {
             assertNotNull(e);
@@ -127,34 +125,22 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
 
     @Test
     public void testRunSSHScriptStdOut() throws Exception {
-        assertNotNull (sshd);
-        assertNotNull (cm);
-        assertNotNull (scs);
-
         assertEquals ("1\n" +
                 "2\n" +
-                "3\n", scs.runSSHScript("localhost", "echo 1; echo 2 && echo 3;"));
+                "3\n", sshCommandService.runSSHScript("localhost", "echo 1; echo 2 && echo 3;"));
     }
 
     @Test
     public void testRunSSHScriptNewLinesStdOut() throws Exception {
-        assertNotNull (sshd);
-        assertNotNull (cm);
-        assertNotNull (scs);
-
         assertEquals ("1\n" +
                 "2\n" +
-                "3\n", scs.runSSHScript("localhost", "echo 1\necho 2\necho 3;"));
+                "3\n", sshCommandService.runSSHScript("localhost", "echo 1\necho 2\necho 3;"));
     }
 
     @Test
     public void testRunSSHScriptErr() throws Exception {
-        assertNotNull (sshd);
-        assertNotNull (cm);
-        assertNotNull (scs);
-
         try {
-            scs.runSSHScript("localhost", "/bin/tada");
+            sshCommandService.runSSHScript("localhost", "/bin/tada");
             fail ("Exception expected");
         } catch (SSHCommandException e) {
             assertNotNull(e);

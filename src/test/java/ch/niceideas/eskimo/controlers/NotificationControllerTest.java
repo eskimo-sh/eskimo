@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack"})
+@ActiveProfiles({"no-web-stack", "test-system", "test-setup"})
 public class NotificationControllerTest {
 
     @Autowired

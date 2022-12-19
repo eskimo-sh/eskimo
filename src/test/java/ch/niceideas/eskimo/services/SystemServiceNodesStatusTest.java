@@ -37,98 +37,77 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
+import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.SSHCommandServiceTestImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SystemServiceNodesStatusTest extends AbstractSystemTest {
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-operations", "test-proxy", "test-ssh", "test-connection-manager"})
+public class SystemServiceNodesStatusTest {
 
     private String testRunUUID = UUID.randomUUID().toString();
 
+    @Autowired
+    private SystemService systemService;
+
+    @Autowired
+    private SSHCommandServiceTestImpl sshCommandServiceTest;
+
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
+
+    protected String systemStatusTest = null;
+
     @BeforeEach
-    @Override
     public void setUp() throws Exception {
-        super.setUp();
-        setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
+        sshCommandServiceTest.reset();
+        systemStatusTest = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/systemStatusTest.log"), StandardCharsets.UTF_8);
     }
-
-    @Override
-    protected SystemServiceImpl createSystemService() {
-        SystemServiceImpl ss = new SystemServiceImpl(false) {
-            @Override
-            public File createTempFile(String serviceOrFlag, String node, String extension) throws IOException {
-                File retFile = new File ("/tmp/"+serviceOrFlag+"-"+testRunUUID+"-"+ node +extension);
-                retFile.createNewFile();
-                return retFile;
-            }
-        };
-        ss.setConfigurationService(configurationService);
-        return ss;
-    }
-
-    @Override
-    protected ConfigurationServiceImpl createConfigurationService() {
-        return new ConfigurationServiceImpl() {
-            @Override
-            public NodesConfigWrapper loadNodesConfig() {
-                return StandardSetupHelpers.getStandard2NodesSetup();
-            }
-            @Override
-            public ServicesInstallStatusWrapper loadServicesInstallationStatus() {
-                return StandardSetupHelpers.getStandard2NodesInstallStatus();
-            }
-            @Override
-            public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() {
-                return StandardSetupHelpers.getStandardKubernetesConfig();
-            }
-        };
-    }
-
 
     @Test
     public void testGetStatus() throws Exception {
 
-        systemService.setSshCommandService(new SSHCommandServiceImpl() {
-            @Override
-            public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
-                return runSSHScript((String)null, script, throwsException);
+        configurationServiceTest.setStandardKubernetesConfig();
+        configurationServiceTest.setStandard2NodesInstallStatus();
+        configurationServiceTest.setStandard2NodesSetup();
+
+        sshCommandServiceTest.setNodeResultBuilder( (node, script) -> {
+            if (script.equals("echo OK")) {
+                return "OK";
             }
-            @Override
-            public String runSSHScript(String node, String script, boolean throwsException) {
-                testSSHCommandScript.append(script).append("\n");
-                if (script.equals("echo OK")) {
-                    return "OK";
-                }
-                if (script.startsWith("sudo systemctl status --no-pager")) {
-                    return systemStatusTest;
-                }
-                return testSSHCommandResultBuilder.toString();
+            if (script.startsWith("sudo systemctl status --no-pager")) {
+                return systemStatusTest;
             }
-            @Override
-            public String runSSHCommand(SSHConnection connection, String command) {
-                return runSSHCommand((String)null, command);
+            return "";
+        });
+
+        sshCommandServiceTest.setConnectionResultBuilder((connection, script) -> {
+            if (script.equals("echo OK")) {
+                return "OK";
             }
-            @Override
-            public String runSSHCommand(String node, String command) {
-                testSSHCommandScript.append(command).append("\n");
-                return testSSHCommandResultBuilder.toString();
+            if (script.startsWith("sudo systemctl status --no-pager")) {
+                return systemStatusTest;
             }
-            @Override
-            public void copySCPFile(SSHConnection connection, String filePath) {
-                // just do nothing
-            }
-            @Override
-            public void copySCPFile(String node, String filePath)  {
-                // just do nothing
-            }
+            return "";
         });
 
         systemService.updateStatus();

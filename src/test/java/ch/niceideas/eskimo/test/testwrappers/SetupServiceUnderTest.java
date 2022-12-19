@@ -40,6 +40,7 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.MessageLogger;
+import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.SetupService;
 import ch.niceideas.eskimo.services.SetupServiceImpl;
@@ -78,6 +79,14 @@ public class SetupServiceUnderTest extends SetupServiceImpl implements SetupServ
     private boolean dontBuild = false;
 
     private boolean tweaLastVersionForTests = false;
+
+    public void setServicesDefinition (ServicesDefinition servicesDefinition) {
+        this.servicesDefinition = servicesDefinition;
+    }
+
+    public void setConfigStoragePathInternal(String configStoragePathInternal) {
+        this.configStoragePathInternal = configStoragePathInternal;
+    }
 
     public void reset() {
         builtPackageList.clear();

@@ -7,6 +7,7 @@ import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SystemServiceTestImpl;
 import org.json.JSONObject;
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-system", "test-setup", "test-conf"})
+@ActiveProfiles({"no-web-stack", "test-system", "test-setup", "test-conf", "test-connection-manager", "test-ssh"})
 public class KubernetesServicesConfigControllerTest {
 
     @Autowired
@@ -46,6 +47,9 @@ public class KubernetesServicesConfigControllerTest {
     @Autowired
     private OperationsMonitoringService operationsMonitoringService;
 
+    @Autowired
+    private ConnectionManagerServiceTestImpl connectionManagerServiceTest;
+
     @BeforeEach
     public void testSetup() {
 
@@ -58,6 +62,8 @@ public class KubernetesServicesConfigControllerTest {
         SecurityContextHelper.loginAdmin();
 
         configurationServiceTest.reset();
+
+        connectionManagerServiceTest.dontConnect();
 
         kscc.setDemoMode(false);
     }

@@ -43,6 +43,7 @@ import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.Topology;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
+import ch.niceideas.eskimo.test.testwrappers.SetupServiceUnderTest;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
@@ -101,7 +102,7 @@ public abstract class AbstractSetupShellTest {
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
 
         ServicesDefinitionImpl def = new ServicesDefinitionImpl();
-        SetupServiceImpl setupService = new SetupServiceImpl();
+        SetupServiceUnderTest setupService = new SetupServiceUnderTest();
         setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
         def.setSetupService(setupService);
         def.afterPropertiesSet();
