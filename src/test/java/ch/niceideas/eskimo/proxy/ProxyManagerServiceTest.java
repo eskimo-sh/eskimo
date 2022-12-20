@@ -111,6 +111,8 @@ public class ProxyManagerServiceTest {
 
         connectionManagerServiceTest.reset();
         webSocketProxyServerTest.reset();
+
+        connectionManagerServiceTest.dontConnect();
     }
 
     @Test
@@ -237,6 +239,7 @@ public class ProxyManagerServiceTest {
         assertTrue(webSocketProxyServerTest.isRemoveForwardersCalled());
 
         connectionManagerServiceTest.reset();
+        connectionManagerServiceTest.dontConnect();
         webSocketProxyServerTest.reset();
 
         proxyManagerService.updateServerForService("kibana", "192.168.10.11");
@@ -263,6 +266,7 @@ public class ProxyManagerServiceTest {
         assertTrue(webSocketProxyServerTest.isRemoveForwardersCalled());
 
         connectionManagerServiceTest.reset();
+        connectionManagerServiceTest.dontConnect();
         webSocketProxyServerTest.reset();
 
         proxyManagerService.updateServerForService("gluster", "192.168.10.11");

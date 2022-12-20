@@ -1,0 +1,18 @@
+{
+  "node_id1": "192.168.10.11",
+  "node_id2": "192.168.10.12",
+  "node_id3": "192.168.10.13",
+  "gluster1": "on",
+  "gluster2": "on",
+  "ntp1": "on",
+  "ntp2": "on",
+  "ntp3": "on",
+  "etcd1": "on",
+  "etcd2": "on",
+  "etcd3": "on",
+  "kube-slave1": "on",
+  "kube-slave2": "on",
+  "kube-slave3": "on",
+  "kube-master": "1",
+  "zookeeper": "1"
+}

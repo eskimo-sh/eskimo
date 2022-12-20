@@ -62,7 +62,7 @@ import java.util.Set;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
-@Profile({"setup-under-test", "!test-setup"})
+@Profile({"setup-under-test"})
 public class SetupServiceUnderTest extends SetupServiceImpl implements SetupService {
 
     private static final Logger logger = Logger.getLogger(SetupServiceUnderTest.class);

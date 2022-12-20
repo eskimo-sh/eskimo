@@ -164,7 +164,7 @@ public class SetupConfigControllerTest {
                     "\"filename-ssh-key\":\"ssh_key\"," +
                     "\"content-ssh-key\":\"DUMMY\"," +
                     "\"setup-kube-origin\":\"download\"," +
-                    "\"setup-services-origin\":\"build\"}", session));
+                    "\"setup-services-origin\":\"download\"}", session));
 
         assertEquals ("OK", scc.applySetup(session));
 

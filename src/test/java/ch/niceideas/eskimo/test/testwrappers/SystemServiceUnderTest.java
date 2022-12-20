@@ -52,7 +52,7 @@ import java.util.Map;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
-@Profile({"system-under-test", "!test-system"})
+@Profile({"system-under-test"})
 public class SystemServiceUnderTest extends SystemServiceImpl implements SystemService {
 
     public void setLastStatusForTest(SystemStatusWrapper lastStatusForTest) {

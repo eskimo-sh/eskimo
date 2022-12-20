@@ -27,9 +27,6 @@ public class SystemAdminControllerTest {
     private SystemAdminController sac;
 
     @Autowired
-    private NotificationService notificationService;
-
-    @Autowired
     private OperationsMonitoringServiceTestImpl operationsMonitoringServiceTest;
 
     @Autowired

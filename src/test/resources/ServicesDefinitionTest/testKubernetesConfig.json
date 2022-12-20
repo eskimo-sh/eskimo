@@ -1,0 +1,11 @@
+{
+  "cerebro_install": "on",
+  "zeppelin_install": "on",
+  "kafka-manager_install": "on",
+  "kibana_install": "on",
+  "spark-console_install": "on",
+  "kafka_install": "on",
+  "spark-runtime_install": "on",
+  "logstash_install": "on",
+  "elasticsearch_install": "on"
+}

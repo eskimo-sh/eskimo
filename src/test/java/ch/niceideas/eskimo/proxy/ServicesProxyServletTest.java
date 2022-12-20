@@ -110,6 +110,7 @@ public class ServicesProxyServletTest {
         pms.removeServerForService ("kibana", "192.168.10.13");
 
         connectionManagerServiceTest.reset();
+        connectionManagerServiceTest.dontConnect();
         webSocketProxyServerTest.reset();
 
         servlet = new ServicesProxyServlet(pms, servicesDefinition, "/", 5, 10000, 10000, 10000);

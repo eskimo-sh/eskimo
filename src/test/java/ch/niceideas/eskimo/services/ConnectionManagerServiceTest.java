@@ -41,6 +41,7 @@ import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.proxy.ProxyManagerServiceImpl;
+import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
 import ch.niceideas.eskimo.test.services.ProxyManagerServiceTestImpl;
 import com.trilead.ssh2.LocalPortForwarder;
@@ -83,10 +84,18 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
     @Autowired
     private ConnectionManagerServiceTestImpl connectionManagerServiceTest;
 
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
+
     @BeforeEach
     public void setUp() throws Exception {
         connectionManagerServiceTest.reset();
         proxyManagerServiceTest.reset();
+
+        configurationServiceTest.saveSetupConfig("{ \"ssh_username\" : \"test\" }");
+
+        connectionManagerServiceTest.setPrivateSShKeyContent(privateKeyRaw);
+        connectionManagerServiceTest.setSShPort(getSShPort());
     }
 
     @Test

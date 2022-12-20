@@ -7,6 +7,7 @@ import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
+import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
 import ch.niceideas.eskimo.utils.OSDetector;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +34,9 @@ public class ConfigurationServiceTest {
     @Autowired
     private ConfigurationService configurationService;
 
+    @Autowired
+    private SetupServiceTestImpl setupServiceTest;
+
     private File tmpFile = null;
 
     @BeforeEach
@@ -46,6 +50,8 @@ public class ConfigurationServiceTest {
             logger.error (e, e);
             throw new SetupException(e);
         }
+
+        setupServiceTest.setConfigStoragePath(tmpFile);
 
         SecurityContextHelper.loginAdmin();
     }

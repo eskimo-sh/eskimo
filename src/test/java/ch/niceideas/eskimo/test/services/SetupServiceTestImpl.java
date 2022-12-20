@@ -41,6 +41,7 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.services.*;
+import lombok.Setter;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,7 @@ import java.util.Set;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
-@Profile({"test-setup", "!setup-under-test"})
+@Profile({"test-setup"})
 public class SetupServiceTestImpl extends SetupServiceImpl implements SetupService {
 
     private static final Logger logger = Logger.getLogger(SetupServiceTestImpl.class);
@@ -68,6 +69,7 @@ public class SetupServiceTestImpl extends SetupServiceImpl implements SetupServi
     @Autowired
     private ServicesDefinition servicesDefinition;
 
+    @Setter
     private File configStoragePath = null;
 
     private boolean setupError = false;
@@ -179,7 +181,7 @@ public class SetupServiceTestImpl extends SetupServiceImpl implements SetupServi
 
         } else {
 
-            throw new UnsupportedOperationException("test service doesn't support download");
+            logger.warn("test service doesn't support download");
 
         }
 
@@ -187,7 +189,7 @@ public class SetupServiceTestImpl extends SetupServiceImpl implements SetupServi
         String kubeOrigin = (String) setupConfig.getValueForPath("setup-kube-origin");
         if (StringUtils.isEmpty(kubeOrigin) || kubeOrigin.equals(DOWNLOAD_FLAG)) { // for Kube default is download
 
-            throw new UnsupportedOperationException("test service doesn't support download");
+            logger.warn("test service doesn't support download");
 
         } else {
             findMissingKube(packagesDistribFolder, buildKube);
