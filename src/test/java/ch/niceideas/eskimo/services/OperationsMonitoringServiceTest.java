@@ -181,7 +181,7 @@ public class OperationsMonitoringServiceTest {
         OperationsMonitoringStatusWrapper operationsMonitoringStatus = operationsMonitoringService.getOperationsMonitoringStatus(new HashMap<>());
         assertNotNull (operationsMonitoringStatus);
 
-        //System.err.println (operationsMonitoringStatus.getFormattedValue());
+        System.err.println (operationsMonitoringStatus.getFormattedValue());
 
         OperationsMonitoringStatusWrapper expectedStatus = new OperationsMonitoringStatusWrapper (
                 StreamUtils.getAsString(ResourceUtils.getResourceAsStream("OperationsMonitoringServiceTest/expected-status.json"), StandardCharsets.UTF_8));
@@ -279,11 +279,21 @@ public class OperationsMonitoringServiceTest {
 
         //System.err.println (operationsMonitoringStatus.getFormattedValue());
 
-        OperationsMonitoringStatusWrapper expectedStatus = new OperationsMonitoringStatusWrapper (
-                StreamUtils.getAsString(ResourceUtils.getResourceAsStream("OperationsMonitoringServiceTest/expected-status-interrupted.json"), StandardCharsets.UTF_8));
-
-        //assertEquals (expectedStatus.getFormattedValue(), operationsMonitoringStatus.getFormattedValue());
-        assertTrue (expectedStatus.getJSONObject().similar(operationsMonitoringStatus.getJSONObject()));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_spark-console_192-168-10-15"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.restart_kafka_kubernetes"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_zeppelin_192-168-10-15"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_kube-slave_192-168-10-13"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_kube-slave_192-168-10-15"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_spark-runtime_192-168-10-13"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_kube-master_192-168-10-15"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.restart_cerebro_kubernetes"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_elasticsearch_192-168-10-13"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.restart_kibana_kubernetes"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_elasticsearch_192-168-10-15"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.restart_kafka-manager_kubernetes"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.restart_logstash_kubernetes"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_spark-runtime_192-168-10-15"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.restart_grafana_kubernetes"));
 
         // same test as above but keep all operations pending (object.wait selectively / then object.notifyAll())
         // test that the operations selectively blocked are kept running and all the ones not started are cancelled

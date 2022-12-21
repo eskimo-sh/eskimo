@@ -63,7 +63,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-system", "test-operation", "test-proxy", "test-nodes-conf", "test-ssh", "test-connection-manager"})
+@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-operations", "test-system", "test-operation", "test-proxy", "test-nodes-conf", "test-ssh", "test-connection-manager"})
 public class KubernetesServiceTest {
 
     @Autowired
@@ -96,6 +96,9 @@ public class KubernetesServiceTest {
     @Autowired
     private KubernetesService kubernetesService;
 
+    @Autowired
+    private OperationsMonitoringServiceTestImpl operationsMonitoringServiceTest;
+
     @BeforeEach
     public void setUp() throws Exception {
         systemServiceTest.reset();
@@ -114,6 +117,10 @@ public class KubernetesServiceTest {
         systemOperationServiceTest.setMockCalls(false);
 
         connectionManagerServiceTest.dontConnect();
+
+        operationsMonitoringServiceTest.operationsFinished(true);
+
+        sshCommandServiceTest.reset();
     }
 
     private List<String> getInstallations() {
@@ -216,12 +223,7 @@ public class KubernetesServiceTest {
 
         //System.err.println (testSSHCommandScript.toString());
 
-        assertEquals("cat /proc/meminfo | grep MemTotal\n" +
-                "cat /proc/meminfo | grep MemTotal\n" +
-                "/usr/local/bin/kubectl get pod --all-namespaces -o wide 2>/dev/null \n" +
-                "/usr/local/bin/kubectl get service --all-namespaces -o wide 2>/dev/null \n" +
-                "/bin/ls -1 /var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/\n" +
-                "/usr/local/bin/kubectl get pod --all-namespaces -o wide 2>/dev/null \n" +
+        assertEquals("/usr/local/bin/kubectl get pod --all-namespaces -o wide 2>/dev/null \n" +
                 "/usr/local/bin/kubectl get service --all-namespaces -o wide 2>/dev/null \n" +
                 "/bin/ls -1 /var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/\n" +
                 "eskimo-kubectl uninstall cerebro 192.168.10.11\n", sshCommandServiceTest.getExecutedCommands());
@@ -244,6 +246,8 @@ public class KubernetesServiceTest {
                 serviceInstallStatus,
                 new KubernetesServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("KubernetesServiceTest/kubernetes-services-config.json"), StandardCharsets.UTF_8))
         );
+
+        operationsMonitoringServiceTest.operationsStarted(command);
 
         kubernetesService.installService(new KubernetesOperationsCommand.KubernetesOperationId("installation", "cerebro"), "192.168.10.11");
 

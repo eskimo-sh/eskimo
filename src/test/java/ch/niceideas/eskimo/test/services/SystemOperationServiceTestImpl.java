@@ -111,7 +111,7 @@ public class SystemOperationServiceTestImpl implements SystemOperationService {
                             + "--> Completed Successfuly.");
 
                 } catch (Exception e) {
-                    logger.debug(e, e);
+                    logger.error(e, e);
                     logger.warn("Exception will be thrown as SystemException - " + e.getClass() + ":" + e.getMessage());
 
                     operationsMonitoringService.addInfo(operationId, "--> Done : "

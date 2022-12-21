@@ -6,10 +6,7 @@ import ch.niceideas.eskimo.services.OperationsMonitoringService;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
-import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
-import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
-import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
-import ch.niceideas.eskimo.test.services.SystemServiceTestImpl;
+import ch.niceideas.eskimo.test.services.*;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,6 +47,9 @@ public class KubernetesServicesConfigControllerTest {
     @Autowired
     private ConnectionManagerServiceTestImpl connectionManagerServiceTest;
 
+    @Autowired
+    private SSHCommandServiceTestImpl sshCommandServiceTest;
+
     @BeforeEach
     public void testSetup() {
 
@@ -66,6 +66,19 @@ public class KubernetesServicesConfigControllerTest {
         connectionManagerServiceTest.dontConnect();
 
         kscc.setDemoMode(false);
+
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
+            if (script.equals("echo OK")) {
+                return "OK";
+            }
+            if (script.equals("if [[ -f /etc/debian_version ]]; then echo debian; fi")) {
+                return "debian";
+            }
+            if (script.endsWith("cat /proc/meminfo | grep MemTotal")) {
+                return "MemTotal:        9982656 kB";
+            }
+            return null;
+        });
     }
 
     @Test

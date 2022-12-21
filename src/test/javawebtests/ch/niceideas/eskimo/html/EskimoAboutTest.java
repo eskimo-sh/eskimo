@@ -56,6 +56,7 @@ public class EskimoAboutTest extends AbstractWebTest {
     public void testNominal() throws Exception {
 
         js("eskimoAbout.showAbout()");
+        Thread.sleep(100);
 
         assertCssValue("#about-modal", "display", "block");
         assertCssValue("#about-modal", "visibility", "visible");

@@ -81,7 +81,7 @@ public class EskimoOperationsCommandTest extends AbstractWebTest {
         testShowCommand();
 
         // TODO replace this by waitForElementCss ("operations-command-button-validate", "display", "block")
-        //Thread.sleep(2000);
+        Thread.sleep(2000);
 
         getElementById("operations-command-button-validate").click();
 

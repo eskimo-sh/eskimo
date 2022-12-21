@@ -85,15 +85,19 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
     private JSONOpCommand currentOperation = null;
 
     /* For tests */
+    @Deprecated
     void setNotificationService(NotificationService notificationService) {
         this.notificationService = notificationService;
     }
+    @Deprecated
     void setConfigurationService (ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
+    @Deprecated
     void setNodeRangeResolver (NodeRangeResolver nodeRangeResolver) {
         this.nodeRangeResolver = nodeRangeResolver;
     }
+    @Deprecated
     void setServicesInstallationSorter (ServicesInstallationSorter servicesInstallationSorter) {
         this.servicesInstallationSorter = servicesInstallationSorter;
     }
