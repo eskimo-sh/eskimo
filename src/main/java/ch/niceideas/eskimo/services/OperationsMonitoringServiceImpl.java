@@ -84,24 +84,6 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
     private final Map<OperationId, OperationStatus> operationStatus = new ConcurrentHashMap<>();
     private JSONOpCommand currentOperation = null;
 
-    /* For tests */
-    @Deprecated
-    void setNotificationService(NotificationService notificationService) {
-        this.notificationService = notificationService;
-    }
-    @Deprecated
-    void setConfigurationService (ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-    @Deprecated
-    void setNodeRangeResolver (NodeRangeResolver nodeRangeResolver) {
-        this.nodeRangeResolver = nodeRangeResolver;
-    }
-    @Deprecated
-    void setServicesInstallationSorter (ServicesInstallationSorter servicesInstallationSorter) {
-        this.servicesInstallationSorter = servicesInstallationSorter;
-    }
-
     @Override
     public OperationsMonitoringStatusWrapper getOperationsMonitoringStatus (Map<String, Integer> lastLinePerOp) {
 

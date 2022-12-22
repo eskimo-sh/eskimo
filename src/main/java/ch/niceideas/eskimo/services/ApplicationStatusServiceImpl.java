@@ -96,14 +96,6 @@ public class ApplicationStatusServiceImpl implements ApplicationStatusService {
     private final Timer timer;
     private final AtomicReference<JsonWrapper> lastStatus = new AtomicReference<>();
 
-    /* for tests */
-    void setConfigurationService(ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-    void setServicesDefinition(ServicesDefinition servicesDefinition) {
-        this.servicesDefinition = servicesDefinition;
-    }
-
     // constructor for spring
     public ApplicationStatusServiceImpl() {
         this.timer = new Timer(true);

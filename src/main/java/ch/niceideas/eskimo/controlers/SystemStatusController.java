@@ -78,23 +78,6 @@ public class SystemStatusController {
     @Value("${build.version}")
     private String buildVersion = "DEV-SNAPSHOT";
 
-    /* For tests */
-    void setSetupService(SetupService setupService) {
-        this.setupService = setupService;
-    }
-    void setSystemService(SystemService systemService) {
-        this.systemService = systemService;
-    }
-    void setStatusService(ApplicationStatusService statusService) {
-        this.statusService = statusService;
-    }
-    void setMasterService(MasterService masterService) {
-        this.masterService = masterService;
-    }
-    void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
-        this.operationsMonitoringService  = operationsMonitoringService;
-    }
-
     @GetMapping("/get-last-operation-result")
     @ResponseBody
     public String getLastOperationResult() {

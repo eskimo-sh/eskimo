@@ -129,47 +129,6 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
     @Value("${system.packageDistributionPath}")
     private String packageDistributionPath = "./packages_distrib";
 
-    /* For tests */
-    void setServicesInstallationSorter (ServicesInstallationSorter servicesInstallationSorter) {
-        this.servicesInstallationSorter = servicesInstallationSorter;
-    }
-    void setNodeRangeResolver (NodeRangeResolver nodeRangeResolver) {
-        this.nodeRangeResolver = nodeRangeResolver;
-    }
-    void setMemoryComputer (MemoryComputer memoryComputer) {
-        this.memoryComputer = memoryComputer;
-    }
-    void setConfigurationService (ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-    void setSystemOperationService(SystemOperationService systemOperationService) {
-        this.systemOperationService = systemOperationService;
-    }
-    void setSshCommandService(SSHCommandService sshCommandService) {
-        this.sshCommandService = sshCommandService;
-    }
-    void setServicesDefinition(ServicesDefinition servicesDefinition) {
-        this.servicesDefinition = servicesDefinition;
-    }
-    void setSetupService(SetupService setupService) {
-        this.setupService = setupService;
-    }
-    void setProxyManagerService(ProxyManagerService proxyManagerService) {
-        this.proxyManagerService = proxyManagerService;
-    }
-    void setKubernetesService (KubernetesService kubernetesService) {
-        this.kubernetesService = kubernetesService;
-    }
-    void setSystemService (SystemService systemService) {
-        this.systemService = systemService;
-    }
-    void setConnectionManagerService (ConnectionManagerService connectionManagerService) {
-        this.connectionManagerService = connectionManagerService;
-    }
-    void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
-        this.operationsMonitoringService = operationsMonitoringService;
-    }
-
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public void applyNodesConfig(ServiceOperationsCommand command)

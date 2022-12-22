@@ -96,25 +96,6 @@ public class MasterServiceImpl implements MasterService {
     /**
      * for tests
      */
-    @Deprecated
-    void setSshCommandService(SSHCommandService sshCommandService) {
-        this.sshCommandService = sshCommandService;
-    }
-    void setNotificationService(NotificationService notificationService) {
-        this.notificationService = notificationService;
-    }
-    void setServicesDefinition(ServicesDefinition servicesDefinition) {
-        this.servicesDefinition = servicesDefinition;
-    }
-    void setConfigurationService (ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-    void setNodeRangeResolver (NodeRangeResolver nodeRangeResolver) {
-        this.nodeRangeResolver = nodeRangeResolver;
-    }
-    void setSystemService (SystemService systemService) {
-        this.systemService = systemService;
-    }
     Map<String, String>  getServiceMasterNodes() {
         return Collections.unmodifiableMap(serviceMasterNodes);
     }

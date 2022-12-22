@@ -30,19 +30,6 @@ public class AbstractOperationController {
         this.demoMode = demoMode;
     }
 
-    // FIXME remove that stuff
-    @Deprecated
-    void setSystemService(SystemService systemService) {
-        this.systemService = systemService;
-    }
-    @Deprecated
-    void setNotificationService (NotificationService notificationService) { this.notificationService = notificationService; }
-
-    @Deprecated
-    void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
-        this.operationsMonitoringService = operationsMonitoringService;
-    }
-
     protected String returnCommand(JSONOpCommand command) {
         return ReturnStatusHelper.createOKStatus(map -> map.put("command", command.toJSON()));
     }

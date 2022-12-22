@@ -78,14 +78,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Autowired
     private ServicesDefinition servicesDefinition;
 
-    /* For tests */
-    public void setSetupService(SetupService setupService) {
-        this.setupService = setupService;
-    }
-    public void setServicesDefinition(ServicesDefinition servicesDefinition) {
-        this.servicesDefinition = servicesDefinition;
-    }
-
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public void saveServicesSettings(ServicesSettingsWrapper settings) throws FileException, SetupException {

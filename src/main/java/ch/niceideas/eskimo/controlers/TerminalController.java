@@ -56,11 +56,6 @@ public class TerminalController {
     @Autowired
     private TerminalService terminalService;
 
-    /* For tests */
-    void setTerminalService(TerminalService terminalService) {
-        this.terminalService = terminalService;
-    }
-
     @GetMapping("/terminal-remove")
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")

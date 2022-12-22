@@ -88,6 +88,14 @@ public class SetupServiceUnderTest extends SetupServiceImpl implements SetupServ
         this.configStoragePathInternal = configStoragePathInternal;
     }
 
+    public void setPackagesDevPathForTests (String packagesDevPathForTest) {
+        this.packagesDevPath = packagesDevPathForTest;
+    }
+
+    public void setPackageDistributionPath(String packageDistributionPath) {
+        this.packageDistributionPath = packageDistributionPath;
+    }
+
     public void reset() {
         builtPackageList.clear();
         downloadPackageList.clear();

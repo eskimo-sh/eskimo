@@ -64,20 +64,6 @@ public class SystemOperationServiceImpl implements SystemOperationService {
     @Autowired
     private OperationsMonitoringService operationsMonitoringService;
 
-    /* For tests */
-    @Deprecated
-    void setNotificationService(NotificationService notificationService) {
-        this.notificationService = notificationService;
-    }
-    @Deprecated
-    void setConfigurationService (ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-    @Deprecated
-    void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
-        this.operationsMonitoringService = operationsMonitoringService;
-    }
-
     @Override
     public void applySystemOperation(OperationId operationId, SystemOperation operation, SystemService.StatusUpdater statusUpdater)
             throws SystemException  {

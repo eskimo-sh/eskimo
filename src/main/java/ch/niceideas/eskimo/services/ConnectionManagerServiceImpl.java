@@ -134,20 +134,6 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
         timer.cancel();
     }
 
-    // constructor for tests
-    @Deprecated
-    public ConnectionManagerServiceImpl(String privateSShKeyContent, int sshPort) {
-        this.timer = new Timer(true);
-        this.privateSShKeyContent = privateSShKeyContent;
-        this.sshPort = sshPort;
-    }
-    public void setProxyManagerService (ProxyManagerService proxyManagerService) {
-        this.proxyManagerService = proxyManagerService;
-    }
-    public void setConfigurationService (ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-
     @Override
     public SSHConnection getPrivateConnection (String node) throws ConnectionManagerException {
         try {

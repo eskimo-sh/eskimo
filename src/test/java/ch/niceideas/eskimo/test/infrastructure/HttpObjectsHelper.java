@@ -129,17 +129,18 @@ public class HttpObjectsHelper {
                 NodesConfigController.class.getClassLoader(),
                 new Class[]{HttpServletResponse.class},
                 (proxy, method, methodArgs) -> {
-                    if (method.getName().equals("getOutputStream")) {
-                        return responseOutputStream;
-                    } else if (method.getName().equals("setContentType")) {
-                        return headers.put ("Content-Type", methodArgs[0]);
-                    } else if (method.getName().equals("addHeader")) {
-                        return headers.put ((String)methodArgs[0], methodArgs[1]);
-                    } else if (method.getName().equals("setIntHeader")) {
-                        return headers.put ((String)methodArgs[0], methodArgs[1]);
-                    } else {
-                        throw new UnsupportedOperationException(
-                                "Unsupported method: " + method.getName());
+                    switch (method.getName()) {
+                        case "getOutputStream":
+                            return responseOutputStream;
+                        case "setContentType":
+                            return headers.put("Content-Type", methodArgs[0]);
+                        case "addHeader":
+                            return headers.put((String) methodArgs[0], methodArgs[1]);
+                        case "setIntHeader":
+                            return headers.put((String) methodArgs[0], methodArgs[1]);
+                        default:
+                            throw new UnsupportedOperationException(
+                                    "Unsupported method: " + method.getName());
                     }
                 });
 

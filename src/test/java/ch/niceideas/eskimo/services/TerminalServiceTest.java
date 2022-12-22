@@ -36,21 +36,33 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
+import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.proxy.ProxyManagerServiceImpl;
 import ch.niceideas.eskimo.terminal.ScreenImage;
+import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
 import ch.niceideas.eskimo.test.testwrappers.SetupServiceUnderTest;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.junit.Assume;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-ssh", "test-conf", "test-connection-manager", "test-system", "test-operation"})
 public class TerminalServiceTest extends AbstractBaseSSHTest {
 
     @Override
@@ -64,44 +76,28 @@ public class TerminalServiceTest extends AbstractBaseSSHTest {
         Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
-    private ConnectionManagerServiceImpl cm = null;
+    @Autowired
+    private ConnectionManagerServiceTestImpl connectionManagerServiceTest;
 
-    private ProxyManagerServiceImpl pms = null;
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
 
+    @Autowired
     private TerminalServiceImpl ts = null;
-
-    private SetupServiceUnderTest setupService = null;
-
-    private ConfigurationServiceImpl cs = null;
 
     @BeforeEach
     public void setUp() throws Exception {
-        setupService = new SetupServiceUnderTest();
-        String tempPath = SystemServiceTest.createTempStoragePath();
-        setupService.setConfigStoragePathInternal(tempPath);
-        FileUtils.writeFile(new File(tempPath + "/config.json"), "{ \"ssh_username\" : \"test\" }");
 
-        cm = new ConnectionManagerServiceImpl(privateKeyRaw, getSShPort());
+        connectionManagerServiceTest.reset();
 
-        ts = new TerminalServiceImpl();
+        configurationServiceTest.saveSetupConfig("{ \"ssh_username\" : \"test\" }");
 
-        ts.setConnectionManagerService(cm);
-
-        pms = new ProxyManagerServiceImpl();
-        pms.setConnectionManagerService(cm);
-        cm.setProxyManagerService(pms);
-        pms.setConnectionManagerService(cm);
-
-        cs = new ConfigurationServiceImpl();
-        cs.setSetupService(setupService);
-
-        cm.setConfigurationService(cs);
+        connectionManagerServiceTest.setPrivateSShKeyContent(privateKeyRaw);
+        connectionManagerServiceTest.setSShPort(getSShPort());
     }
 
     @Test
     public void testNominal() throws Exception {
-        assertNotNull (sshd);
-        assertNotNull (cm);
 
         ScreenImage si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=0");
 

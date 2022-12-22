@@ -129,47 +129,6 @@ public class SystemServiceImpl implements SystemService {
 
     private final Map<String, Integer> serviceMissingCounter = new ConcurrentHashMap<>();
 
-    /**
-     * for tests
-     */
-    @Deprecated
-    void setSshCommandService(SSHCommandService sshCommandService) {
-        this.sshCommandService = sshCommandService;
-    }
-    @Deprecated
-    void setNotificationService(NotificationService notificationService) {
-        this.notificationService = notificationService;
-    }
-    @Deprecated
-    void setServicesDefinition(ServicesDefinition servicesDefinition) {
-        this.servicesDefinition = servicesDefinition;
-    }
-    @Deprecated
-    void setSetupService(SetupService setupService) {
-        this.setupService = setupService;
-    }
-    @Deprecated
-    void setProxyManagerService(ProxyManagerService proxyManagerService) {
-        this.proxyManagerService = proxyManagerService;
-    }
-    @Deprecated
-    void setNodeRangeResolver (NodeRangeResolver nodeRangeResolver) {
-        this.nodeRangeResolver = nodeRangeResolver;
-    }
-    @Deprecated
-    void setConfigurationService (ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-    void setKubernetesService (KubernetesService kubernetesService) {
-        this.kubernetesService = kubernetesService;
-    }
-    void setNodesConfigurationService (NodesConfigurationService nodesConfigurationService) {
-        this.nodesConfigurationService = nodesConfigurationService;
-    }
-    void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
-        this.operationsMonitoringService = operationsMonitoringService;
-    }
-
     // constructor for spring
     public SystemServiceImpl() {
         this (true);

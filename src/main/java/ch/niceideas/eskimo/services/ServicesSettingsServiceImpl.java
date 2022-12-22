@@ -105,35 +105,6 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
 
     private final ReentrantLock servicesSettingsApplyLock = new ReentrantLock();
 
-    /* For tests */
-    public void setServicesDefinition(ServicesDefinition servicesDefinition) {
-        this.servicesDefinition = servicesDefinition;
-    }
-    public void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
-        this.operationsMonitoringService = operationsMonitoringService;
-    }
-    public void setServicesInstallationSorter (ServicesInstallationSorter servicesInstallationSorter) {
-        this.servicesInstallationSorter = servicesInstallationSorter;
-    }
-    public void setSystemService (SystemService systemService) {
-        this.systemService = systemService;
-    }
-    public void setMemoryComputer (MemoryComputer memoryComputer) {
-        this.memoryComputer = memoryComputer;
-    }
-    public void setSystemOperationService (SystemOperationService systemOperationService) {
-        this.systemOperationService = systemOperationService;
-    }
-    public void setConfigurationService (ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-    void setNodesConfigurationService (NodesConfigurationService nodesConfigurationService) {
-        this.nodesConfigurationService = nodesConfigurationService;
-    }
-    void setNodeRangeResolver (NodeRangeResolver nodeRangeResolver) {
-        this.nodeRangeResolver = nodeRangeResolver;
-    }
-
     @PreAuthorize("hasAuthority('ADMIN')")
     public void applyServicesSettings(SettingsOperationsCommand command) throws FileException, SetupException, SystemException  {
 

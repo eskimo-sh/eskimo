@@ -62,12 +62,6 @@ public class SSHCommandServiceImpl implements SSHCommandService {
     @Autowired
     private ConfigurationService configurationService;
 
-    /** For tests */
-    @Deprecated
-    public void setConnectionManagerService(ConnectionManagerService connectionManagerService) {
-        this.connectionManagerService = connectionManagerService;
-    }
-
     public String runSSHScript(SSHConnection connection, String script) throws SSHCommandException {
         return runSSHScript(connection, script, true);
     }

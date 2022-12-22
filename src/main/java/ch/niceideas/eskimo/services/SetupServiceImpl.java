@@ -85,9 +85,6 @@ public class SetupServiceImpl implements SetupService {
     private NotificationService notificationService;
 
     @Autowired
-    private SystemService systemService;
-
-    @Autowired
     private SystemOperationService systemOperationService;
 
     @Autowired
@@ -95,9 +92,6 @@ public class SetupServiceImpl implements SetupService {
 
     @Autowired
     protected ServicesDefinition servicesDefinition;
-
-    @Autowired
-    private ApplicationStatusService applicationStatusService;
 
     @Autowired
     private OperationsMonitoringService operationsMonitoringService;
@@ -108,7 +102,7 @@ public class SetupServiceImpl implements SetupService {
     protected String packageDistributionPath = "./packages_distrib";
 
     @Value("${setup.packagesDevPath}")
-    private String packagesDevPath = "./packages_dev";
+    protected String packagesDevPath = "./packages_dev";
 
     @Value("${setup.additionalPackagesToBuild}")
     private String additionalPackagesToBuild = "base-eskimo";
@@ -126,44 +120,6 @@ public class SetupServiceImpl implements SetupService {
     protected String buildVersion = "DEV-SNAPSHOT";
 
     protected String configStoragePathInternal = null;
-
-    /** For tests */
-    @Deprecated /* Move to SetupServiceUnderTest */
-    public void setPackageDistributionPath(String packageDistributionPath) {
-        this.packageDistributionPath = packageDistributionPath;
-    }
-    @Deprecated
-    void setKubePackages (String kubePackages) {
-        this.kubePackages = kubePackages;
-    }
-    @Deprecated
-    void setSystemService (SystemService systemService) {
-        this.systemService = systemService;
-    }
-    @Deprecated
-    public void setConfigurationService (ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-    @Deprecated
-    void setApplicationStatusService (ApplicationStatusService applicationStatusService) {
-        this.applicationStatusService = applicationStatusService;
-    }
-    @Deprecated /* Move to SetupServiceUnderTest */
-    public void setPackagesDevPathForTests (String packagesDevPathForTest) {
-        this.packagesDevPath = packagesDevPathForTest;
-    }
-    @Deprecated
-    void setSystemOperationService (SystemOperationService systemOperationService) {
-        this.systemOperationService = systemOperationService;
-    }
-    @Deprecated
-    void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
-        this.operationsMonitoringService = operationsMonitoringService;
-    }
-    @Deprecated
-    void setNotificationService (NotificationService notificationService) {
-        this.notificationService = notificationService;
-    }
 
     @Override
     public String getStoragePathConfDir() { return storagePathConfDir; }

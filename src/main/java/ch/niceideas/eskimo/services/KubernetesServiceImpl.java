@@ -116,45 +116,6 @@ public class KubernetesServiceImpl implements KubernetesService {
     @Value("${system.kubernetesOperationWaitTimoutSeconds}")
     private int kubernetesOperationWaitTimoutSeconds = 100 * 60; // 100 minutes
 
-    /* For tests */
-    @Deprecated
-    void setServicesDefinition(ServicesDefinition servicesDefinition) {
-        this.servicesDefinition = servicesDefinition;
-    }
-    void setConfigurationService (ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-    void setOperationsMonitoringService (OperationsMonitoringService operationsMonitoringService) {
-        this.operationsMonitoringService = operationsMonitoringService;
-    }
-    void setNotificationService(NotificationService notificationService) {
-        this.notificationService = notificationService;
-    }
-    void setSystemService(SystemService systemService) {
-        this.systemService = systemService;
-    }
-    void setMemoryComputer(MemoryComputer memoryComputer) {
-        this.memoryComputer = memoryComputer;
-    }
-    void setSystemOperationService(SystemOperationService systemOperationService) {
-        this.systemOperationService = systemOperationService;
-    }
-    void setNodesConfigurationService(NodesConfigurationService nodesConfigurationService) {
-        this.nodesConfigurationService = nodesConfigurationService;
-    }
-    void setConnectionManagerService (ConnectionManagerService connectionManagerService) {
-        this.connectionManagerService = connectionManagerService;
-    }
-    void setProxyManagerService(ProxyManagerService proxyManagerService) {
-        this.proxyManagerService = proxyManagerService;
-    }
-    void setSshCommandService (SSHCommandService sshCommandService) {
-        this.sshCommandService = sshCommandService;
-    }
-    void setNodeRangeResolver (NodeRangeResolver nodeRangeResolver) {
-        this.nodeRangeResolver = nodeRangeResolver;
-    }
-
     @Override
     public void showJournal(Service service, String node) throws SystemException {
         systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Showing journal", () -> {

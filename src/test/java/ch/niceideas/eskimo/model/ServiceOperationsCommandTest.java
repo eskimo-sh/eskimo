@@ -42,6 +42,8 @@ import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
+import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +63,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack"})
+@ActiveProfiles({"no-web-stack", "test-conf"})
 public class ServiceOperationsCommandTest {
 
     @Autowired
@@ -69,6 +71,9 @@ public class ServiceOperationsCommandTest {
 
     @Autowired
     private NodeRangeResolver nodeRangeResolver;
+
+    @Autowired
+    private ConfigurationServiceTestImpl configurationServiceTest;
 
     @Test
     public void testNoChanges() throws Exception {
@@ -458,13 +463,7 @@ public class ServiceOperationsCommandTest {
             public ServicesInstallationSorter getServicesInstallationSorter() {
                 ServicesInstallationSorter sis = new ServicesInstallationSorter();
                 sis.setServicesDefinition(servicesDefinition);
-                ConfigurationServiceImpl cs = new ConfigurationServiceImpl();
-                sis.setConfigurationService(cs);
-                cs.setSetupService(new SetupServiceImpl() {
-                    public String getConfigStoragePath() {
-                        return "/tmp";
-                    }
-                });
+                sis.setConfigurationService(configurationServiceTest);
                 return sis;
             }
 
