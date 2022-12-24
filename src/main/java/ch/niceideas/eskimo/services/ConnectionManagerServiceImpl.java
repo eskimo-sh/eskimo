@@ -47,6 +47,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
@@ -57,7 +58,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 @Component
-@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.INTERFACES)
 @Profile("!test-connection-manager")
 public class ConnectionManagerServiceImpl implements ConnectionManagerService{
 
@@ -282,7 +283,6 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
         }
         return connection;
     }
-
 
     protected void dropTunnelsToBeClosed(SSHConnection connection, String node) {
 

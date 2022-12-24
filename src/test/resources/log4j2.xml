@@ -44,7 +44,7 @@ Software.
 
     <Loggers>
         <!-- LOG everything at INFO level -->
-        <Root level="debug">
+        <Root level="info">
             <AppenderRef ref="Console" />
         </Root>
 
@@ -52,6 +52,8 @@ Software.
         <Logger name="com" level="info"/>
         <Logger name="ch" level="info"/>
         <Logger name="ch.niceideas.eskimo.services" level="debug"/>
+        <Logger name="org.springframework.web.servlet.handler" level="info"/>
+        <Logger name="org.springframework.web.servlet.handler.AbstractHandlerMethodMapping" level="info"/>
     </Loggers>
 
 </Configuration>

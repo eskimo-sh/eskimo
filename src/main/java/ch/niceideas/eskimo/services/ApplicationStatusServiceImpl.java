@@ -191,7 +191,7 @@ public class ApplicationStatusServiceImpl implements ApplicationStatusService {
                 @SuppressWarnings({"unchecked"})
                 Collection<SimpleGrantedAuthority> authorities = (Collection<SimpleGrantedAuthority>) auth.getAuthorities();
 
-                systemStatus.setValueForPath("roles", auth.getAuthorities().stream()
+                systemStatus.setValueForPath("roles", authorities.stream()
                         .map(GrantedAuthority::getAuthority)
                         .collect(Collectors.joining(",")));
             }

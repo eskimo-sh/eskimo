@@ -105,6 +105,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
 
     private final ReentrantLock servicesSettingsApplyLock = new ReentrantLock();
 
+    @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public void applyServicesSettings(SettingsOperationsCommand command) throws FileException, SetupException, SystemException  {
 
@@ -200,6 +201,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
         }
     }
 
+    @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public ServicesSettingsWrapper prepareSaveSettings (
             String settingsFormAsString,

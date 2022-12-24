@@ -48,6 +48,7 @@ import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -109,7 +110,7 @@ public abstract class AbstractWebTest {
         driver.navigate().refresh();
 
         // wait for page to load
-        Wait<WebDriver> wait = new WebDriverWait(driver, 100);
+        Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(100));
         wait.until(innerDriver -> {
             return String
                     .valueOf(((JavascriptExecutor) innerDriver).executeScript("return document.readyState"))

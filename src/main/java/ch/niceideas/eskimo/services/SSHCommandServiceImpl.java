@@ -62,14 +62,17 @@ public class SSHCommandServiceImpl implements SSHCommandService {
     @Autowired
     private ConfigurationService configurationService;
 
+    @Override
     public String runSSHScript(SSHConnection connection, String script) throws SSHCommandException {
         return runSSHScript(connection, script, true);
     }
 
+    @Override
     public String runSSHScript(String node, String script) throws SSHCommandException {
         return runSSHScript(node, script, true);
     }
 
+    @Override
     public String runSSHCommand(SSHConnection connection, String[] command) throws SSHCommandException {
         StringBuilder sb = new StringBuilder();
         for (String cmd : command) {
@@ -79,10 +82,12 @@ public class SSHCommandServiceImpl implements SSHCommandService {
         return runSSHCommand(connection, sb.toString());
     }
 
+    @Override
     public String runSSHScriptPath(SSHConnection connection, String scriptName) throws SSHCommandException {
         return runSSHScript(connection, getScriptContent(scriptName));
     }
 
+    @Override
     public String runSSHScriptPath(String node, String scriptName) throws SSHCommandException {
         return runSSHScript(node, getScriptContent(scriptName));
     }
@@ -111,6 +116,7 @@ public class SSHCommandServiceImpl implements SSHCommandService {
         return scriptContent;
     }
 
+    @Override
     public String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException {
         try {
             SSHConnection connection = connectionManagerService.getSharedConnection(node);
@@ -125,6 +131,7 @@ public class SSHCommandServiceImpl implements SSHCommandService {
         }
     }
 
+    @Override
     public String runSSHScript(SSHConnection connection, String script, boolean throwsException) throws SSHCommandException {
 
         Session session = null;
@@ -187,6 +194,7 @@ public class SSHCommandServiceImpl implements SSHCommandService {
         }
     }
 
+    @Override
     public String runSSHCommand(String node, String command) throws SSHCommandException {
         try {
             SSHConnection connection = connectionManagerService.getSharedConnection(node);
@@ -197,6 +205,7 @@ public class SSHCommandServiceImpl implements SSHCommandService {
         }
     }
 
+    @Override
     public String runSSHCommand(SSHConnection connection, String command) throws SSHCommandException {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -214,6 +223,7 @@ public class SSHCommandServiceImpl implements SSHCommandService {
         }
     }
 
+    @Override
     public void copySCPFile(String node, String filePath) throws SSHCommandException {
         try {
             SSHConnection connection = connectionManagerService.getSharedConnection(node);
@@ -225,6 +235,7 @@ public class SSHCommandServiceImpl implements SSHCommandService {
         }
     }
 
+    @Override
     public void copySCPFile(SSHConnection connection, String filePath) throws SSHCommandException {
 
         try {
