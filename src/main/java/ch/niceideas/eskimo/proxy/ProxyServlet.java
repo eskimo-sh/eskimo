@@ -2,20 +2,24 @@ package ch.niceideas.eskimo.proxy;
 
 
 import ch.niceideas.common.utils.StringUtils;
-import org.apache.http.*;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.AbortableHttpRequest;
-import org.apache.http.client.utils.URIUtils;
-import org.apache.http.config.SocketConfig;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicHttpEntityEnclosingRequest;
-import org.apache.http.message.BasicHttpRequest;
-import org.apache.http.message.HeaderGroup;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.cookie.StandardCookieSpec;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.utils.URIUtils;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.io.SocketConfig;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.InputStreamEntity;
+import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
+import org.apache.hc.core5.http.message.BasicHeader;
+import org.apache.hc.core5.http.message.HeaderGroup;
+import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
+import org.apache.hc.core5.pool.PoolReusePolicy;
+import org.apache.hc.core5.util.Timeout;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -30,6 +34,13 @@ import java.util.*;
 public class ProxyServlet extends HttpServlet {
 
     private static final Logger logger = Logger.getLogger(ProxyServlet.class);
+
+    public static final String COOKIE            = "Cookie";
+    public static final String COOKIE2           = "Cookie2";
+    public static final String SET_COOKIE        = "Set-Cookie";
+    public static final String SET_COOKIE2       = "Set-Cookie2";
+
+    private static int MAX_CONNECTION_PER_ROUTE = 5;
 
     /* INIT PARAMETER NAME CONSTANTS */
 
@@ -197,23 +208,18 @@ public class ProxyServlet extends HttpServlet {
         initTarget();//sets target*
     }
 
-    /**
-     * Sub-classes can override specific behaviour of {@link org.apache.http.client.config.RequestConfig}.
-     */
     protected RequestConfig buildRequestConfig() {
         return RequestConfig.custom()
                 .setRedirectsEnabled(doHandleRedirects)
-                .setCookieSpec(CookieSpecs.IGNORE_COOKIES) // we handle them in the servlet instead
-                .setConnectTimeout(connectTimeout)
-                .setSocketTimeout(readTimeout)
+                .setCookieSpec(StandardCookieSpec.IGNORE) // we handle them in the servlet instead
+                //.setConnectTimeout(Timeout.ofMilliseconds(connectTimeout))
+                .setConnectTimeout(Timeout.defaultsToDisabled(connectTimeout == -1 ? null : Timeout.ofMilliseconds(connectTimeout)))
+                .setResponseTimeout(Timeout.defaultsToDisabled(readTimeout == -1 ? null : Timeout.ofMilliseconds(readTimeout)))
                 //.setCircularRedirectsAllowed(true)
-                .setConnectionRequestTimeout(connectionRequestTimeout)
+                .setConnectionRequestTimeout(Timeout.defaultsToDisabled(connectionRequestTimeout == -1 ? null : Timeout.ofMilliseconds(connectionRequestTimeout)))
                 .build();
     }
 
-    /**
-     * Sub-classes can override specific behaviour of {@link org.apache.http.config.SocketConfig}.
-     */
     protected SocketConfig buildSocketConfig() {
 
         if (readTimeout < 1) {
@@ -221,7 +227,7 @@ public class ProxyServlet extends HttpServlet {
         }
 
         return SocketConfig.custom()
-                .setSoTimeout(readTimeout)
+                .setSoTimeout(Timeout.ofMilliseconds(readTimeout))
                 .build();
     }
 
@@ -239,13 +245,18 @@ public class ProxyServlet extends HttpServlet {
     }
 
     protected HttpClient createHttpClient() {
-        HttpClientBuilder clientBuilder = HttpClientBuilder.create()
-                .setDefaultRequestConfig(buildRequestConfig())
-                .setDefaultSocketConfig(buildSocketConfig());
 
-        clientBuilder.setMaxConnTotal(maxConnections);
+        PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
+                .setDefaultSocketConfig(buildSocketConfig())
+                .setMaxConnPerRoute(MAX_CONNECTION_PER_ROUTE)
+                .setMaxConnTotal(maxConnections)
+                .setPoolConcurrencyPolicy(PoolConcurrencyPolicy.LAX)
+                .setConnPoolPolicy(PoolReusePolicy.LIFO)
+                .build();
 
-        clientBuilder.setMaxConnPerRoute(5);
+        HttpClientBuilder clientBuilder = HttpClients.custom()
+                .setConnectionManager(connectionManager)
+                .setDefaultRequestConfig(buildRequestConfig());
 
         if (useSystemProperties)
             clientBuilder.useSystemProperties();
@@ -277,9 +288,6 @@ public class ProxyServlet extends HttpServlet {
                     } catch (IOException e) {
                         logger.error("While destroying servlet, shutting down HttpClient: " + e, e);
                     }
-                } else {
-                    //Older releases require we do this:
-                    proxyClient.getConnectionManager().shutdown();
                 }
             }
         }
@@ -303,13 +311,14 @@ public class ProxyServlet extends HttpServlet {
         String method = servletRequest.getMethod();
         String proxyRequestUri = rewriteUrlFromRequest(servletRequest);
 
-        HttpRequest proxyRequest;
+        ClassicHttpRequest proxyRequest;
         //spec: RFC 2616, sec 4.3: either of these two headers signal that there is a message body.
-        if (servletRequest.getHeader(HttpHeaders.CONTENT_LENGTH) != null ||
+        if ( (servletRequest.getHeader(HttpHeaders.CONTENT_LENGTH) != null
+                && !servletRequest.getHeader(HttpHeaders.CONTENT_LENGTH).trim().equals("0")) ||
                 servletRequest.getHeader(HttpHeaders.TRANSFER_ENCODING) != null) {
             proxyRequest = newProxyRequestWithEntity(method, proxyRequestUri, servletRequest);
         } else {
-            proxyRequest = new BasicHttpRequest(method, proxyRequestUri);
+            proxyRequest = new BasicClassicHttpRequest(method, proxyRequestUri);
         }
 
         copyRequestHeaders(servletRequest, proxyRequest);
@@ -328,9 +337,9 @@ public class ProxyServlet extends HttpServlet {
 
             // Pass the response code. This method with the "reason phrase" is deprecated but it's the
             //   only way to pass the reason along too.
-            int statusCode = proxyResponse.getStatusLine().getStatusCode();
+            int statusCode = proxyResponse.getCode();
 
-            servletResponse.setStatus(statusCode, proxyResponse.getStatusLine().getReasonPhrase());
+            servletResponse.setStatus(statusCode, proxyResponse.getReasonPhrase());
 
             // Copying response headers to make sure SESSIONID or other Cookie which comes from the remote
             // server will be saved in client when the proxied url was redirected to another one.
@@ -351,8 +360,11 @@ public class ProxyServlet extends HttpServlet {
             handleRequestException(proxyRequest, e);
         } finally {
             // make sure the entire entity was consumed, so the connection is released
-            if (proxyResponse != null)
-                EntityUtils.consumeQuietly(proxyResponse.getEntity());
+            if (proxyResponse != null) {
+                if (proxyResponse instanceof HttpEntityContainer) {
+                    EntityUtils.consumeQuietly(((HttpEntityContainer)proxyResponse).getEntity());
+                }
+            }
             //Note: Don't need to close servlet outputStream:
             // http://stackoverflow.com/questions/1159168/should-one-call-close-on-httpservletresponse-getoutputstream-getwriter
         }
@@ -361,10 +373,12 @@ public class ProxyServlet extends HttpServlet {
     @SuppressWarnings("deprecation")
     protected void handleRequestException(HttpRequest proxyRequest, Exception e) throws ServletException, IOException {
         //abort request, according to best practice with HttpClient
+        /*
         if (proxyRequest instanceof AbortableHttpRequest) {
             AbortableHttpRequest abortableHttpRequest = (AbortableHttpRequest) proxyRequest;
             abortableHttpRequest.abort();
         }
+        */
         if (e instanceof RuntimeException) {
             throw (RuntimeException) e;
         }
@@ -383,23 +397,30 @@ public class ProxyServlet extends HttpServlet {
         }
     }
 
-    protected HttpResponse doExecute(HttpServletRequest servletRequest, HttpRequest proxyRequest) throws IOException {
+    protected HttpResponse doExecute(HttpServletRequest servletRequest, ClassicHttpRequest proxyRequest) throws IOException {
         if (doLog) {
             log("proxy " + servletRequest.getMethod() + " uri: " + servletRequest.getRequestURI() + " -- " +
-                    proxyRequest.getRequestLine().getUri());
+                    proxyRequest.getRequestUri());
         }
         return getHttpClient(servletRequest.getSession()).execute(getTargetHost(servletRequest), proxyRequest);
     }
 
-    protected HttpRequest newProxyRequestWithEntity(String method, String proxyRequestUri,
+    protected ClassicHttpRequest newProxyRequestWithEntity(String method, String proxyRequestUri,
                                                     HttpServletRequest servletRequest)
             throws IOException {
-        HttpEntityEnclosingRequest eProxyRequest =
-                new BasicHttpEntityEnclosingRequest(method, proxyRequestUri);
+
+        BasicClassicHttpRequest eProxyRequest =
+                new BasicClassicHttpRequest(method, proxyRequestUri);
+
         // Add the input entity (streamed)
         //  note: we don't bother ensuring we close the servletInputStream since the container handles it
         eProxyRequest.setEntity(
-                new InputStreamEntity(servletRequest.getInputStream(), getContentLength(servletRequest)));
+                new InputStreamEntity(servletRequest.getInputStream(),
+                getContentLength(servletRequest),
+                        ContentType.create (
+                                !servletRequest.getContentType().contains(";") ?
+                                        servletRequest.getContentType() :
+                                        servletRequest.getContentType().substring(0, servletRequest.getContentType().indexOf(";")))));
         return eProxyRequest;
     }
 
@@ -466,7 +487,7 @@ public class ProxyServlet extends HttpServlet {
                 headerValue = host.getHostName();
                 if (host.getPort() != -1)
                     headerValue += ":" + host.getPort();
-            } else if (!doPreserveCookies && headerName.equalsIgnoreCase(org.apache.http.cookie.SM.COOKIE)) {
+            } else if (!doPreserveCookies && headerName.equalsIgnoreCase(COOKIE)) {
                 headerValue = getRealCookie(headerValue);
             }
             proxyRequest.addHeader(headerName, headerValue);
@@ -495,7 +516,7 @@ public class ProxyServlet extends HttpServlet {
      */
     protected void copyResponseHeaders(HttpResponse proxyResponse, HttpServletRequest servletRequest,
                                        HttpServletResponse servletResponse) {
-        for (Header header : proxyResponse.getAllHeaders()) {
+        for (Header header : proxyResponse.getHeaders()) {
             copyResponseHeader(servletRequest, servletResponse, header);
         }
     }
@@ -510,8 +531,8 @@ public class ProxyServlet extends HttpServlet {
         if (hopByHopHeaders.containsHeader(headerName))
             return;
         String headerValue = header.getValue();
-        if (headerName.equalsIgnoreCase(org.apache.http.cookie.SM.SET_COOKIE) ||
-                headerName.equalsIgnoreCase(org.apache.http.cookie.SM.SET_COOKIE2)) {
+        if (headerName.equalsIgnoreCase(SET_COOKIE) ||
+                headerName.equalsIgnoreCase(SET_COOKIE2)) {
             copyProxyCookie(servletRequest, servletResponse, headerValue);
         } else if (headerName.equalsIgnoreCase(HttpHeaders.LOCATION)) {
             // LOCATION Header may have to be rewritten.
@@ -586,10 +607,12 @@ public class ProxyServlet extends HttpServlet {
     protected void copyResponseEntity(HttpResponse proxyResponse, HttpServletResponse servletResponse,
                                       HttpRequest proxyRequest, HttpServletRequest servletRequest)
             throws IOException {
-        HttpEntity entity = proxyResponse.getEntity();
-        if (entity != null) {
-            OutputStream servletOutputStream = servletResponse.getOutputStream();
-            entity.writeTo(servletOutputStream);
+        if (proxyResponse instanceof HttpEntityContainer) {
+            HttpEntity entity = ((HttpEntityContainer)proxyResponse).getEntity();
+            if (entity != null) {
+                OutputStream servletOutputStream = servletResponse.getOutputStream();
+                entity.writeTo(servletOutputStream);
+            }
         }
     }
 

@@ -2,13 +2,11 @@ package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.ServicesDefinition;
-import org.apache.http.NoHttpResponseException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
-import org.springframework.lang.NonNullApi;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketMessage;
@@ -74,7 +72,7 @@ public class WebSocketProxyServerImpl extends AbstractWebSocketHandler implement
 
         try {
             getForwarder(serviceId, webSocketServerSession, targetPath).forwardMessage(webSocketMessage);
-        } catch (IllegalStateException | SocketException | NoHttpResponseException e) {
+        } catch (IllegalStateException | SocketException e) {
             logger.error (uri + " - got " + e.getClass() + ":" + e.getMessage());
             webSocketServerSession.close();
         }

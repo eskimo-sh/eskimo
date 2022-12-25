@@ -36,7 +36,7 @@ package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.ConnectionManagerException;
-import org.apache.http.HttpHost;
+import org.apache.hc.core5.http.HttpHost;
 
 import java.io.IOException;
 import java.net.ServerSocket;

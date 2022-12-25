@@ -40,7 +40,7 @@ import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.*;
-import org.apache.http.HttpHost;
+import org.apache.hc.core5.http.HttpHost;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -49,13 +49,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Component
@@ -104,7 +101,7 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
         if (config == null) {
             throw new IllegalStateException("No config found for " + serviceId);
         }
-        return new HttpHost("localhost", config.getLocalPort(), "http");
+        return new HttpHost("http", "localhost", config.getLocalPort());
     }
 
     public String getServerURI(String serviceName, String pathInfo) {

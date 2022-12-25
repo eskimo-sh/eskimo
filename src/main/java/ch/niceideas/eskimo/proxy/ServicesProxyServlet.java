@@ -42,11 +42,11 @@ import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.model.service.proxy.ReplacementContext;
 import ch.niceideas.eskimo.services.ServicesDefinition;
-import org.apache.http.*;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.message.BasicHttpEntityEnclosingRequest;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.io.entity.InputStreamEntity;
+import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -204,10 +204,11 @@ public class ServicesProxyServlet extends ProxyServlet {
     }
 
     @Override
-    protected HttpRequest newProxyRequestWithEntity(String method, String proxyRequestUri,
+    protected ClassicHttpRequest newProxyRequestWithEntity(String method, String proxyRequestUri,
                                                     HttpServletRequest servletRequest) throws IOException {
 
-        HttpEntityEnclosingRequest eProxyRequest = new BasicHttpEntityEnclosingRequest(method, proxyRequestUri);
+        BasicClassicHttpRequest eProxyRequest =
+                new BasicClassicHttpRequest(method, proxyRequestUri);
 
         if (APPLICATION_X_WWW_FORM_URLENCODED.equals(servletRequest.getContentType()) || getContentLengthOverride(servletRequest) == 0){
             List<NameValuePair> formparams = new ArrayList<>();
@@ -218,12 +219,15 @@ public class ServicesProxyServlet extends ProxyServlet {
                 formparams.add(new BasicNameValuePair(name, value));
             }
             if (!formparams.isEmpty()){
-                UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(formparams, "UTF-8");
+                UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(formparams, StandardCharsets.UTF_8);
                 eProxyRequest.setEntity(urlEncodedFormEntity);
             }
         } else {
             eProxyRequest.setEntity(
-                    new InputStreamEntity(servletRequest.getInputStream(), getContentLengthOverride(servletRequest)));
+                    new InputStreamEntity(
+                            servletRequest.getInputStream(),
+                            getContentLengthOverride(servletRequest),
+                            ContentType.create (servletRequest.getContentType())));
         }
         return eProxyRequest;
     }
@@ -269,57 +273,58 @@ public class ServicesProxyServlet extends ProxyServlet {
                                       HttpRequest proxyRequest, HttpServletRequest servletRequest)
             throws IOException {
 
-        String serviceName = getServiceName(servletRequest);
-        Service service = servicesDefinition.getService(serviceName);
+        if (proxyResponse instanceof HttpEntityContainer) {
+            String serviceName = getServiceName(servletRequest);
+            Service service = servicesDefinition.getService(serviceName);
 
-        HttpEntity entity = proxyResponse.getEntity();
+            HttpEntity entity = ((HttpEntityContainer)proxyResponse).getEntity();
 
-        Charset encoding = null;
-        try {
-            if (entity != null && entity.getContentEncoding() != null) {
-                encoding = Charset.forName(entity.getContentEncoding().getValue());
-            } else {
+            Charset encoding = null;
+            try {
+                if (entity != null && entity.getContentEncoding() != null) {
+                    encoding = Charset.forName(entity.getContentEncoding());
+                } else {
+                    encoding = StandardCharsets.UTF_8;
+                }
+            } catch (UnsupportedCharsetException e) {
+                logger.warn(e.getMessage());
                 encoding = StandardCharsets.UTF_8;
             }
-        } catch (UnsupportedCharsetException e) {
-            logger.warn (e.getMessage());
-            encoding = StandardCharsets.UTF_8;
-        }
 
-        String contextPathPrefix = getContextPath ();
-        String prefixPath = getPrefixPath(servletRequest, contextPathPrefix);
-        ReplacementContext context = new ReplacementContext(contextPathPrefix, prefixPath,
-                getFullServerRoot (servletRequest),
-                getFullServerRootNoContext (servletRequest),
-                getAppRoot (servletRequest),
-                getAppRootNoContext (servletRequest));
+            String contextPathPrefix = getContextPath();
+            String prefixPath = getPrefixPath(servletRequest, contextPathPrefix);
+            ReplacementContext context = new ReplacementContext(contextPathPrefix, prefixPath,
+                    getFullServerRoot(servletRequest),
+                    getFullServerRootNoContext(servletRequest),
+                    getAppRoot(servletRequest),
+                    getAppRootNoContext(servletRequest));
 
-        boolean isText = false;
-        if (entity != null && entity.getContentType() != null) {
-            isText = Arrays.stream(entity.getContentType().getElements())
-                    .map(HeaderElement::getName)
-                    .anyMatch(name -> name.contains("text") || name.contains("javascript") || name.contains("json"));
-        }
-
-        if (!isText) {
-            if (entity != null) {
-                OutputStream servletOutputStream = servletResponse.getOutputStream();
-                entity.writeTo(servletOutputStream);
+            boolean isText = false;
+            if (entity != null && entity.getContentType() != null) {
+                String contentType = entity.getContentType();
+                isText = contentType.contains("text") || contentType.contains("javascript") || contentType.contains("json");
             }
 
-        } else {
+            if (!isText) {
+                if (entity != null) {
+                    OutputStream servletOutputStream = servletResponse.getOutputStream();
+                    entity.writeTo(servletOutputStream);
+                }
 
-            String inputString = StreamUtils.getAsString(entity.getContent(), encoding);
+            } else {
 
-            String resultString = performReplacements(service, servletRequest.getRequestURI(), context, inputString);
+                String inputString = StreamUtils.getAsString(entity.getContent(), encoding);
 
-            byte[] result = resultString.getBytes(encoding);
+                String resultString = performReplacements(service, servletRequest.getRequestURI(), context, inputString);
 
-            // overwrite content length header
-            servletResponse.setIntHeader(HttpHeaders.CONTENT_LENGTH, result.length);
+                byte[] result = resultString.getBytes(encoding);
 
-            OutputStream servletOutputStream = servletResponse.getOutputStream();
-            StreamUtils.copy(new ByteArrayInputStream(result), servletOutputStream);
+                // overwrite content length header
+                servletResponse.setIntHeader(HttpHeaders.CONTENT_LENGTH, result.length);
+
+                OutputStream servletOutputStream = servletResponse.getOutputStream();
+                StreamUtils.copy(new ByteArrayInputStream(result), servletOutputStream);
+            }
         }
     }
 
@@ -365,7 +370,7 @@ public class ServicesProxyServlet extends ProxyServlet {
     @Override
     protected void copyResponseHeaders(HttpResponse proxyResponse, HttpServletRequest servletRequest,
                                        HttpServletResponse servletResponse) {
-        for (Header header : proxyResponse.getAllHeaders()) {
+        for (Header header : proxyResponse.getHeaders()) {
             if (header.getName().equals("X-Frame-Options")) {
                 servletResponse.addHeader(header.getName(), "SAMEORIGIN");
             } else {

@@ -38,7 +38,7 @@ package ch.niceideas.eskimo.test.services;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.services.ConnectionManagerException;
-import org.apache.http.HttpHost;
+import org.apache.hc.core5.http.HttpHost;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;

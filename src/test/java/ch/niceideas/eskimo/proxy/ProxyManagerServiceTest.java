@@ -54,6 +54,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -116,6 +117,7 @@ public class ProxyManagerServiceTest {
     }
 
     @Test
+    @DirtiesContext
     public void testDumpProxyTunnelConfig() throws Exception {
 
         Logger testLogger = LogManager.getLogger(ProxyManagerServiceImpl.class.getName());
@@ -158,6 +160,7 @@ public class ProxyManagerServiceTest {
     }
 
     @Test
+    @DirtiesContext
     public void testGetServerURI() throws Exception {
         proxyManagerService.updateServerForService("zeppelin", "192.168.10.11");
 
@@ -175,7 +178,8 @@ public class ProxyManagerServiceTest {
     }
 
     @Test
-    public void testServerForServiceManagemement_reproduceFlinRuntimeProblem() throws Exception {
+    @DirtiesContext
+    public void testServerForServiceManagemement_reproduceFlinkRuntimeProblem() throws Exception {
 
         logger.info (" ---- flink-runtime detected on 192.168.10.12");
         proxyManagerService.updateServerForService ("flink-runtime", "192.168.10.12");
@@ -201,6 +205,7 @@ public class ProxyManagerServiceTest {
     }
 
     @Test
+    @DirtiesContext
     public void testServerForServiceManagemement_Kubernetes_kbeProxy() throws Exception {
 
         assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
@@ -228,6 +233,7 @@ public class ProxyManagerServiceTest {
     }
 
     @Test
+    @DirtiesContext
     public void testServerForServiceManagemement_Kubernetes_noKubeProxy() throws Exception {
 
         assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
@@ -255,6 +261,7 @@ public class ProxyManagerServiceTest {
     }
 
     @Test
+    @DirtiesContext
     public void testServerForServiceManagemement() throws Exception {
 
         assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());

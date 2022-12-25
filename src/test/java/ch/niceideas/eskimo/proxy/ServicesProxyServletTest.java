@@ -34,22 +34,20 @@
 
 package ch.niceideas.eskimo.proxy;
 
-import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.model.SSHConnection;
-import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.model.service.proxy.ReplacementContext;
-import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
 import ch.niceideas.eskimo.test.services.WebSocketProxyServerTestImpl;
 import org.apache.catalina.ssi.ByteArrayServletOutputStream;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.entity.BasicHttpEntity;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpRequest;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,8 +58,6 @@ import org.springframework.test.context.TestPropertySource;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -257,8 +253,7 @@ public class ServicesProxyServletTest {
 
         String testString = "TEST ABC STRING";
 
-        BasicHttpEntity proxyServedEntity = new BasicHttpEntity();
-        proxyServedEntity.setContent(new ByteArrayInputStream(testString.getBytes()));
+        ByteArrayEntity proxyServedEntity = new ByteArrayEntity(testString.getBytes(), ContentType.create("plain/text"));
 
         ByteArrayServletOutputStream responseOutputStream = new ByteArrayServletOutputStream();
 
@@ -280,9 +275,7 @@ public class ServicesProxyServletTest {
 
         String testString = "src=\"/TEST ABC STRING";
 
-        BasicHttpEntity proxyServedEntity = new BasicHttpEntity();
-        proxyServedEntity.setContent(new ByteArrayInputStream(testString.getBytes()));
-        proxyServedEntity.setContentType("plain/text");
+        ByteArrayEntity proxyServedEntity = new ByteArrayEntity(testString.getBytes(), ContentType.create("plain/text"));
 
         ByteArrayServletOutputStream responseOutputStream = new ByteArrayServletOutputStream();
 

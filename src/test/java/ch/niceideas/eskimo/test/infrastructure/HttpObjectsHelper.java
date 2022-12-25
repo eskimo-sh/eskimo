@@ -3,9 +3,7 @@ package ch.niceideas.eskimo.test.infrastructure;
 import ch.niceideas.eskimo.controlers.NodesConfigController;
 import ch.niceideas.eskimo.proxy.ServicesProxyServletTest;
 import ch.niceideas.eskimo.proxy.WebSocketProxyForwarderTest;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.entity.BasicHttpEntity;
+import org.apache.hc.core5.http.*;
 import org.springframework.web.socket.WebSocketSession;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,17 +35,17 @@ public class HttpObjectsHelper {
     public static HttpRequest createHttpRequest() {
         return (HttpRequest) Proxy.newProxyInstance(
                 ServicesProxyServletTest.class.getClassLoader(),
-                new Class[] { HttpRequest.class },
+                new Class[] { ClassicHttpRequest.class },
                 (proxy, method, methodArgs) -> {
                     throw new UnsupportedOperationException(
                             "Unsupported method: " + method.getName());
                 });
     }
 
-    public static HttpResponse createHttpResponse(BasicHttpEntity proxyServedEntity) {
+    public static HttpResponse createHttpResponse(HttpEntity proxyServedEntity) {
         return (HttpResponse) Proxy.newProxyInstance(
                 ServicesProxyServletTest.class.getClassLoader(),
-                new Class[] { HttpResponse.class },
+                new Class[] { ClassicHttpResponse.class },
                 (proxy, method, methodArgs) -> {
                     if (method.getName().equals("getEntity")) {
                         return proxyServedEntity;

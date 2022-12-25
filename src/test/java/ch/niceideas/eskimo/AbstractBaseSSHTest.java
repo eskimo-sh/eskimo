@@ -39,7 +39,7 @@ import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
-import org.apache.commons.codec.binary.Base64;
+import org.apache.hc.client5.http.utils.Base64;
 import org.apache.log4j.Logger;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.UserAuthFactory;

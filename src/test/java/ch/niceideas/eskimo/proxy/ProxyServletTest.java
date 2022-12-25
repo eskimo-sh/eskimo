@@ -6,14 +6,19 @@ import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.servletunit.ServletRunner;
 import com.meterware.servletunit.ServletUnitClient;
-import org.apache.http.*;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.DefaultBHttpServerConnection;
-import org.apache.http.impl.DefaultConnectionReuseStrategy;
-import org.apache.http.impl.DefaultHttpResponseFactory;
-import org.apache.http.protocol.*;
-import org.apache.http.util.Asserts;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.config.Http1Config;
+import org.apache.hc.core5.http.impl.DefaultConnectionReuseStrategy;
+import org.apache.hc.core5.http.impl.io.DefaultBHttpServerConnection;
+import org.apache.hc.core5.http.impl.io.DefaultClassicHttpResponseFactory;
+import org.apache.hc.core5.http.impl.io.HttpService;
+import org.apache.hc.core5.http.io.HttpRequestHandler;
+import org.apache.hc.core5.http.io.HttpServerConnection;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.protocol.*;
+import org.apache.hc.core5.util.Asserts;
+import org.apache.hc.core5.util.Timeout;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,8 +71,8 @@ public class ProxyServletTest {
     @BeforeEach
     public void setUp() throws Exception {
         localTestServer = new LocalTestServer(null, null);
-        localTestServer.start();
         localTestServer.register("/targetPath*", new RequestInfoHandler());//matches /targetPath and /targetPath/blahblah
+        localTestServer.start();
 
         servletRunner = new ServletRunner();
 
@@ -115,7 +120,7 @@ public class ProxyServletTest {
         localTestServer.register("/targetPath*", (request, response, context) -> {
             response.setHeader(HttpHeaders.LOCATION, request.getFirstHeader("xxTarget").getValue());
             response.setHeader(COOKIE_SET_HEADER, "JSESSIONID=1234; path=/;");
-            response.setStatusCode(HttpStatus.SC_MOVED_TEMPORARILY);
+            response.setCode(HttpStatus.SC_MOVED_TEMPORARILY);
         });//matches /targetPath and /targetPath/blahblah
         GetMethodWebRequest request = makeGetMethodRequest(sourceBaseUri + "/%64%69%72%2F");
         assertRedirect(request, "/dummy", "/dummy");//TODO represents a bug to fix
@@ -169,7 +174,8 @@ public class ProxyServletTest {
         //"Proxy-Authenticate" is a hop-by-hop header
         final String HEADER = "Proxy-Authenticate";
         localTestServer.register("/targetPath*", new RequestInfoHandler() {
-            public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
+            @Override
+            public void handle(ClassicHttpRequest request, ClassicHttpResponse response, HttpContext context) throws HttpException, IOException {
                 assertNull(request.getFirstHeader(HEADER));
                 response.setHeader(HEADER, "from-server");
                 super.handle(request, response, context);
@@ -187,7 +193,8 @@ public class ProxyServletTest {
         final String FOR_HEADER = "X-Forwarded-For";
 
         localTestServer.register("/targetPath*", new RequestInfoHandler() {
-            public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
+            @Override
+            public void handle(ClassicHttpRequest request, ClassicHttpResponse response, HttpContext context) throws HttpException, IOException {
                 Header xForwardedForHeader = request.getFirstHeader(FOR_HEADER);
                 assertEquals("192.168.1.1, 127.0.0.1", xForwardedForHeader.getValue());
                 super.handle(request, response, context);
@@ -205,7 +212,8 @@ public class ProxyServletTest {
         final String PROTO_HEADER = "X-Forwarded-Proto";
 
         localTestServer.register("/targetPath*", new RequestInfoHandler() {
-            public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
+            @Override
+            public void handle(ClassicHttpRequest request, ClassicHttpResponse response, HttpContext context) throws HttpException, IOException {
                 Header xForwardedForHeader = request.getFirstHeader(FOR_HEADER);
                 Header xForwardedProtoHeader = request.getFirstHeader(PROTO_HEADER);
                 assertEquals("127.0.0.1", xForwardedForHeader.getValue());
@@ -223,7 +231,8 @@ public class ProxyServletTest {
         final String HEADER = "HEADER_TO_TEST";
 
         localTestServer.register("/targetPath*", new RequestInfoHandler() {
-            public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
+            @Override
+            public void handle(ClassicHttpRequest request, ClassicHttpResponse response, HttpContext context) throws HttpException, IOException {
                 Header headerToTest = request.getFirstHeader(HEADER);
                 assertEquals("VALUE_TO_TEST", headerToTest.getValue());
 
@@ -242,7 +251,8 @@ public class ProxyServletTest {
         final String HEADER = "HEADER_TO_TEST";
 
         localTestServer.register("/targetPath*", new RequestInfoHandler() {
-            public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
+            @Override
+            public void handle(ClassicHttpRequest request, ClassicHttpResponse response, HttpContext context) throws HttpException, IOException {
                 response.setHeader(HEADER, "VALUE_TO_TEST");
                 super.handle(request, response, context);
             }
@@ -258,7 +268,8 @@ public class ProxyServletTest {
     public void testSetCookie() throws Exception {
         final String HEADER = "Set-Cookie";
         localTestServer.register("/targetPath*", new RequestInfoHandler() {
-            public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
+            @Override
+            public void handle(ClassicHttpRequest request, ClassicHttpResponse response, HttpContext context) throws HttpException, IOException {
                 response.setHeader(HEADER, "JSESSIONID=1234; Path=/proxy/path/that/we/dont/want; Expires=Wed, 13 Jan 2021 22:23:01 GMT; Domain=.foo.bar.com; HttpOnly");
                 super.handle(request, response, context);
             }
@@ -274,7 +285,8 @@ public class ProxyServletTest {
     public void testSetCookie2() throws Exception {
         final String HEADER = "Set-Cookie2";
         localTestServer.register("/targetPath*", new RequestInfoHandler() {
-            public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
+            @Override
+            public void handle(ClassicHttpRequest request, ClassicHttpResponse response, HttpContext context) throws HttpException, IOException {
                 response.setHeader(HEADER, "JSESSIONID=1234; Path=/proxy/path/that/we/dont/want; Max-Age=3600; Domain=.foo.bar.com; Secure");
                 super.handle(request, response, context);
             }
@@ -303,7 +315,8 @@ public class ProxyServletTest {
 
         final String HEADER = "Set-Cookie";
         localTestServer.register("/targetPath*", new RequestInfoHandler() {
-            public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
+            @Override
+            public void handle(ClassicHttpRequest request, ClassicHttpResponse response, HttpContext context) throws HttpException, IOException {
                 response.setHeader(HEADER, "JSESSIONID=1234; Path=/proxy/path/that/we/dont/want; Expires=Wed, 13 Jan 2021 22:23:01 GMT; Domain=.foo.bar.com; HttpOnly");
                 super.handle(request, response, context);
             }
@@ -319,7 +332,8 @@ public class ProxyServletTest {
     public void testSetCookieHttpOnly() throws Exception { //See GH #50
         final String HEADER = "Set-Cookie";
         localTestServer.register("/targetPath*", new RequestInfoHandler() {
-            public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
+            @Override
+            public void handle(ClassicHttpRequest request, ClassicHttpResponse response, HttpContext context) throws HttpException, IOException {
                 response.setHeader(HEADER, "JSESSIONID=1234; Path=/proxy/path/that/we/dont/want/; HttpOnly");
                 super.handle(request, response, context);
             }
@@ -336,7 +350,8 @@ public class ProxyServletTest {
         final StringBuffer captureCookieValue = new StringBuffer();
         final String HEADER = "Cookie";
         localTestServer.register("/targetPath*", new RequestInfoHandler() {
-            public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
+            @Override
+            public void handle(ClassicHttpRequest request, ClassicHttpResponse response, HttpContext context) throws HttpException, IOException {
                 captureCookieValue.append(request.getHeaders(HEADER)[0].getValue());
                 super.handle(request, response, context);
             }
@@ -362,7 +377,8 @@ public class ProxyServletTest {
         final AtomicInteger requestCounter = new AtomicInteger(1);
         final StringBuffer captureCookieValue = new StringBuffer();
         localTestServer.register("/targetPath*", new RequestInfoHandler() {
-            public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
+            @Override
+            public void handle(ClassicHttpRequest request, ClassicHttpResponse response, HttpContext context) throws HttpException, IOException {
                 // there shouldn't be a cookie sent since each user request in this test is logging in for the first time
                 if (request.getFirstHeader("Cookie") != null) {
                     captureCookieValue.append(request.getFirstHeader("Cookie"));
@@ -393,10 +409,10 @@ public class ProxyServletTest {
         localTestServer.register("/targetPath/test", (request, response, context) -> {
             // Redirect to the requested URL with / appended
             response.setHeader(HttpHeaders.LOCATION, targetBaseUri + "/test/");
-            response.setStatusCode(HttpStatus.SC_MOVED_TEMPORARILY);
+            response.setCode(HttpStatus.SC_MOVED_TEMPORARILY);
             response.setHeader(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8");
             // Set body of the response. We need it not-empty for the test.
-            response.setEntity(new ByteArrayEntity(CONTENT.getBytes(StandardCharsets.UTF_8)));
+            response.setEntity(new ByteArrayEntity(CONTENT.getBytes(StandardCharsets.UTF_8), ContentType.create("text/plain")));
         });
         GetMethodWebRequest req = makeGetMethodRequest(sourceBaseUri + "/test");
         // We expect a redirect with a / at the end
@@ -428,7 +444,8 @@ public class ProxyServletTest {
         final String HEADER = "Host";
         final String[] proxyHost = new String[1];
         localTestServer.register("/targetPath*", new RequestInfoHandler() {
-            public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
+            @Override
+            public void handle(ClassicHttpRequest request, ClassicHttpResponse response, HttpContext context) throws HttpException, IOException {
                 proxyHost[0] = request.getHeaders(HEADER)[0].getValue();
                 super.handle(request, response, context);
             }
@@ -582,28 +599,31 @@ public class ProxyServletTest {
      */
     protected static class RequestInfoHandler implements HttpRequestHandler {
 
-        public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
+        public void handle(ClassicHttpRequest request, ClassicHttpResponse response, HttpContext context) throws HttpException, IOException {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             PrintWriter pw = new PrintWriter(baos, false);
-            final RequestLine rl = request.getRequestLine();
+            /*
+            request.getRequestLine();
+            */
+            final String rl = request.getMethod() + " " + request.getRequestUri() + " " + request.getVersion();
             pw.println("REQUESTLINE: " + rl);
 
-            for (Header header : request.getAllHeaders()) {
+            for (Header header : request.getHeaders()) {
                 pw.println(header.getName() + ": " + header.getValue());
             }
             pw.println("BODY: (below)");
             pw.flush();//done with pw now
 
-            if (request instanceof HttpEntityEnclosingRequest) {
-                HttpEntityEnclosingRequest enclosingRequest = (HttpEntityEnclosingRequest) request;
-                HttpEntity entity = enclosingRequest.getEntity();
+            HttpEntity entity = request.getEntity();
+            if (entity != null) {
                 byte[] body = EntityUtils.toByteArray(entity);
                 baos.write(body);
             }
 
-            response.setStatusCode(200);
+            response.setEntity(new ByteArrayEntity(baos.toByteArray(), ContentType.create("text/plain")));
+
+            response.setCode(200);
             response.setReasonPhrase("TESTREASON");
-            response.setEntity(new ByteArrayEntity(baos.toByteArray()));
         }
     }
 
@@ -621,7 +641,7 @@ public class ProxyServletTest {
                 new InetSocketAddress("127.0.0.1", 0);
 
         /** The request handler registry. */
-        private final UriHttpRequestHandlerMapper handlerRegistry;
+        private final RequestHandlerRegistry<HttpRequestHandler> handlerRegistry;
 
         private final HttpService httpservice;
 
@@ -648,23 +668,22 @@ public class ProxyServletTest {
 
         private volatile int timeout;
 
+        @SuppressWarnings("unchecked")
         public LocalTestServer(
                 final HttpProcessor proc,
                 final ConnectionReuseStrategy reuseStrat,
-                final HttpResponseFactory responseFactory,
-                final HttpExpectationVerifier expectationVerifier,
+                final HttpResponseFactory<ClassicHttpResponse> responseFactory,
                 final SSLContext sslcontext,
                 final boolean forceSSLAuth,
                 final String[] enabledProtocols) {
             super();
-            this.handlerRegistry = new UriHttpRequestHandlerMapper();
+            this.handlerRegistry = new RequestHandlerRegistry<>();
             this.workers = Collections.synchronizedSet(new HashSet<>());
             this.httpservice = new HttpService(
                     proc != null ? proc : newProcessor(),
-                    reuseStrat != null ? reuseStrat: newConnectionReuseStrategy(),
-                    responseFactory != null ? responseFactory: newHttpResponseFactory(),
                     handlerRegistry,
-                    expectationVerifier);
+                    reuseStrat != null ? reuseStrat: newConnectionReuseStrategy(),
+                    responseFactory != null ? responseFactory: newHttpResponseFactory());
             this.sslcontext = sslcontext;
             this.forceSSLAuth = forceSSLAuth;
             this.enabledProtocols = enabledProtocols;
@@ -673,7 +692,7 @@ public class ProxyServletTest {
         public LocalTestServer(
                 final HttpProcessor proc,
                 final ConnectionReuseStrategy reuseStrat) {
-            this(proc, reuseStrat, null, null, null, false, null);
+            this(proc, reuseStrat, null, null, false, null);
         }
 
         /**
@@ -682,7 +701,7 @@ public class ProxyServletTest {
          * @return  a protocol processor for server-side use
          */
         protected HttpProcessor newProcessor() {
-            return new ImmutableHttpProcessor(
+            return new DefaultHttpProcessor(
                     new ResponseDate(),
                     new ResponseServer(ORIGIN),
                     new ResponseContent(),
@@ -694,7 +713,7 @@ public class ProxyServletTest {
         }
 
         protected HttpResponseFactory newHttpResponseFactory() {
-            return DefaultHttpResponseFactory.INSTANCE;
+            return DefaultClassicHttpResponseFactory.INSTANCE;
         }
 
 
@@ -705,16 +724,7 @@ public class ProxyServletTest {
          * @param handler   the handler to apply
          */
         public void register(final String pattern, final HttpRequestHandler handler) {
-            handlerRegistry.register(pattern, handler);
-        }
-
-        /**
-         * Unregisters a handler from the local registry.
-         *
-         * @param pattern   the URL pattern
-         */
-        public void unregister(final String pattern) {
-            handlerRegistry.unregister(pattern);
+            handlerRegistry.register(null, pattern, handler);
         }
 
         /**
@@ -793,7 +803,7 @@ public class ProxyServletTest {
          * @return DefaultBHttpServerConnection.
          */
         protected DefaultBHttpServerConnection createHttpServerConnection() {
-            return new DefaultBHttpServerConnection(8 * 1024);
+            return new DefaultBHttpServerConnection("http", Http1Config.DEFAULT);
         }
 
         /**
@@ -816,7 +826,7 @@ public class ProxyServletTest {
                         acceptedConnections.incrementAndGet();
                         final DefaultBHttpServerConnection conn = createHttpServerConnection();
                         conn.bind(socket);
-                        conn.setSocketTimeout(timeout);
+                        conn.setSocketTimeout(Timeout.ofMilliseconds(timeout));
                         // Start worker thread
                         final Worker worker = new Worker(conn);
                         workers.add(worker);
@@ -859,17 +869,19 @@ public class ProxyServletTest {
 
             @Override
             public void run() {
+                logger.info ("Running worker");
                 final HttpContext context = new BasicHttpContext();
                 try {
                     while (this.conn.isOpen() && !Thread.interrupted()) {
                         httpservice.handleRequest(this.conn, context);
                     }
                 } catch (final Exception ex) {
+                    logger.error (ex, ex);
                     this.exception = ex;
                 } finally {
                     workers.remove(this);
                     try {
-                        this.conn.shutdown();
+                        this.conn.close();;
                     } catch (final IOException ignore) {
                     }
                 }
@@ -878,7 +890,7 @@ public class ProxyServletTest {
             public void shutdown() {
                 interrupt();
                 try {
-                    this.conn.shutdown();
+                    this.conn.close();
                 } catch (final IOException ignore) {
                 }
             }
