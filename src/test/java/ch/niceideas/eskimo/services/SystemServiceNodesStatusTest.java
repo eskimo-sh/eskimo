@@ -38,8 +38,7 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.test.StandardSetupHelpers;
+import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SSHCommandServiceTestImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,12 +49,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ContextConfiguration(classes = EskimoApplication.class)
@@ -63,8 +58,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestPropertySource("classpath:application-test.properties")
 @ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-operations", "test-proxy", "test-ssh", "test-connection-manager"})
 public class SystemServiceNodesStatusTest {
-
-    private String testRunUUID = UUID.randomUUID().toString();
 
     @Autowired
     private SystemService systemService;

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @ContextConfiguration(classes = EskimoApplication.class)
@@ -87,8 +88,8 @@ public class SetupCommandTest {
         assumeTrue(OSDetector.isUnix());
 
         File packageDevPathTest = File.createTempFile("test_setup_service_package_dev", "folder");
-        packageDevPathTest.delete();
-        packageDevPathTest.mkdirs();
+        assertTrue (packageDevPathTest.delete());
+        assertTrue (packageDevPathTest.mkdirs());
 
         setupServiceTest.setPackageDistributionPath(packageDevPathTest.getAbsolutePath());
 

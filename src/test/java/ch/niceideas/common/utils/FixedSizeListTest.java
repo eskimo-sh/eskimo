@@ -40,7 +40,7 @@ public class FixedSizeListTest {
     }
 
     @Test
-    public void testMaxSize() throws Exception {
+    public void testMaxSize() {
 
         for (int i  = 0; i < 100; i++) {
             testList.add(""+ThreadLocalRandom.current().nextInt(100000000));
@@ -72,7 +72,7 @@ public class FixedSizeListTest {
     }
 
     @Test
-    public void testEqualsHashCode() throws Exception {
+    public void testEqualsHashCode() {
         FixedSizeList<String> testList2 = new FixedSizeList<>(10);
 
         testList.add("0");

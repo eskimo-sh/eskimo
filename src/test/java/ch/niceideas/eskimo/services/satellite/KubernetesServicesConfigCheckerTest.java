@@ -37,12 +37,6 @@ package ch.niceideas.eskimo.services.satellite;
 import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.services.ConfigurationServiceImpl;
-import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
-import ch.niceideas.eskimo.services.SetupServiceImpl;
-import ch.niceideas.eskimo.services.SystemServiceTest;
-import ch.niceideas.eskimo.services.satellite.KubernetesServicesConfigChecker;
-import ch.niceideas.eskimo.services.satellite.KubernetesServicesConfigException;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +49,6 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.util.HashMap;
 
-import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -71,10 +64,7 @@ public class KubernetesServicesConfigCheckerTest {
     @Autowired
     private ConfigurationServiceTestImpl configurationServiceTest;
 
-    @Autowired
-    private SetupServiceTestImpl setupServiceTest;
-
-    NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+    NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
         put("node_id1", "192.168.10.11");
         put("kube-master", "1");
         put("kube-slave", "1");
@@ -108,7 +98,7 @@ public class KubernetesServicesConfigCheckerTest {
     @Test
     public void testOneCerebroButNoES() throws Exception {
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("cerebro", "1");
             put("ntp1", "on");
@@ -118,7 +108,7 @@ public class KubernetesServicesConfigCheckerTest {
 
         KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
 
-            KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<String, Object>() {{
+            KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<>() {{
                 put("cerebro_installed", "on");
             }});
 
@@ -208,49 +198,45 @@ public class KubernetesServicesConfigCheckerTest {
     }
 
     @Test
-    public void testCheckKubernetesSetup_missingCpuSetting() throws Exception {
+    public void testCheckKubernetesSetup_missingCpuSetting() {
 
         kubeServicesConfig.removeRootKey("cerebro_cpu");
 
-        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
-            kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
-        });
+        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class,
+                () -> kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig));
 
         assertEquals("Inconsistency found : Kubernetes Service cerebro is enabled but misses CPU request setting", exception.getMessage());
     }
 
     @Test
-    public void testCheckKubernetesSetup_missingRamSetting() throws Exception {
+    public void testCheckKubernetesSetup_missingRamSetting() {
 
         kubeServicesConfig.removeRootKey("cerebro_ram");
 
-        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
-            kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
-        });
+        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class,
+                () -> kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig));
 
         assertEquals("Inconsistency found : Kubernetes Service cerebro is enabled but misses RAM request setting", exception.getMessage());
     }
 
     @Test
-    public void testCheckKubernetesSetup_missingCpuWrong() throws Exception {
+    public void testCheckKubernetesSetup_missingCpuWrong() {
 
         kubeServicesConfig.setValueForPath("cerebro_cpu", "1l");
 
-        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
-            kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
-        });
+        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class,
+                () -> kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig));
 
         assertEquals("CPU definition for cerebro doesn't match expected REGEX - [0-9\\\\.]+[m]{0,1}", exception.getMessage());
     }
 
     @Test
-    public void testCheckKubernetesSetup_missingRamWrong() throws Exception {
+    public void testCheckKubernetesSetup_missingRamWrong() {
 
         kubeServicesConfig.setValueForPath("cerebro_ram", "100ui");
 
-        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
-            kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
-        });
+        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class,
+                () -> kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig));
 
         assertEquals("RAM definition for cerebro doesn't match expected REGEX - [0-9\\.]+[EPTGMk]{0,1}", exception.getMessage());
     }

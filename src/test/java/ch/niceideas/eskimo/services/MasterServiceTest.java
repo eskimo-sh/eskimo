@@ -112,7 +112,7 @@ public class MasterServiceTest {
 
     @Test
     @DirtiesContext
-    public void testUpdateStatus() throws Exception {
+    public void testUpdateStatus() {
 
         assertEquals(0, masterService.getServiceMasterNodes().size());
         assertEquals(0, masterService.getServiceMasterTimestamps().size());

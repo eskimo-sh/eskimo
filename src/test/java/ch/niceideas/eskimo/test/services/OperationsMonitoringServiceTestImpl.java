@@ -37,10 +37,10 @@ package ch.niceideas.eskimo.test.services;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.services.OperationsMonitoringService;
 import ch.niceideas.eskimo.services.ServiceDefinitionException;
 import ch.niceideas.eskimo.services.SystemException;
+import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
 import org.json.JSONException;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -74,6 +74,7 @@ public class OperationsMonitoringServiceTestImpl implements OperationsMonitoring
         this.lastOperationSuccess = false;
         this.lastOperationSuccessError = false;
         this.messagesCollector = new StringBuilder();
+        this.messagingManager = new MessagingManager();
     }
 
     public String getAllMessages() {

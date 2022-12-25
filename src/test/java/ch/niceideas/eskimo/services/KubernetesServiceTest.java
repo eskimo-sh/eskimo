@@ -106,7 +106,7 @@ public class KubernetesServiceTest {
         configurationServiceTest.reset();
         configurationServiceTest.saveSetupConfig("{ \"ssh_username\" : \"test\" }");
 
-        proxyManagerServiceTest.setForwarderConfigForHosts("localhost", new ArrayList<ProxyTunnelConfig>(){{
+        proxyManagerServiceTest.setForwarderConfigForHosts("localhost", new ArrayList<>(){{
             add (new ProxyTunnelConfig("dummyService", 12345, "192.178.10.11", 5050));
         }});
 
@@ -324,7 +324,7 @@ public class KubernetesServiceTest {
     }
 
     @Test
-    public void testShouldInstall () throws Exception {
+    public void testShouldInstall () {
 
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
 

@@ -48,7 +48,7 @@ public class StringUtilsTest  {
     private static final String SOURCE = "abc erd ohd the ad lazy fox jumps over ad my beautiful self again and is'nt that just sad nope ?";
 
     @Test
-    public void testIsIntegerValue() throws Exception {
+    public void testIsIntegerValue() {
            
         assertFalse(StringUtils.isIntegerValue("=1+2"));
         assertFalse(StringUtils.isIntegerValue("abc"));
@@ -64,7 +64,7 @@ public class StringUtilsTest  {
     }
 
     @Test
-    public void testIsNumericValue() throws Exception {
+    public void testIsNumericValue() {
            
         assertFalse(StringUtils.isNumericValue("=1+2"));      
         assertFalse(StringUtils.isNumericValue("abc"));
@@ -89,7 +89,7 @@ public class StringUtilsTest  {
     }
 
     @Test
-    public void testFirstLetterLowerCase() throws Exception {
+    public void testFirstLetterLowerCase() {
         assertEquals("abcdf", StringUtils.firstLetterLowerCase("abcdf"));
         assertEquals("abcdf", StringUtils.firstLetterLowerCase("Abcdf"));
 
@@ -101,7 +101,7 @@ public class StringUtilsTest  {
     }
 
     @Test
-    public void testFirstLetterUpperCase() throws Exception {
+    public void testFirstLetterUpperCase() {
         assertEquals("Abcdf", StringUtils.firstLetterUpperCase("abcdf"));
         assertEquals("Abcdf", StringUtils.firstLetterUpperCase("Abcdf"));
 
@@ -140,7 +140,7 @@ public class StringUtilsTest  {
     }
 
     @Test
-    public void testPadRight() throws Exception {
+    public void testPadRight() {
         assertEquals("a  ", StringUtils.padRight("a", 3));
         assertEquals("a    ", StringUtils.padRight("a", 5));
         assertEquals("a         ", StringUtils.padRight("a", 10));
@@ -148,7 +148,7 @@ public class StringUtilsTest  {
     }
 
     @Test
-    public void testPadLeft() throws Exception {
+    public void testPadLeft() {
         assertEquals("  a", StringUtils.padLeft("a", 3));
         assertEquals("    a", StringUtils.padLeft("a", 5));
         assertEquals("         a", StringUtils.padLeft("a", 10));
@@ -156,7 +156,7 @@ public class StringUtilsTest  {
     }
 
     @Test 
-    public void testGetHexString() throws Exception {
+    public void testGetHexString() {
         
         assertEquals ("616161", StringUtils.getHexString("aaa".getBytes(StandardCharsets.UTF_8)));
         
@@ -165,7 +165,7 @@ public class StringUtilsTest  {
     }
     
     @Test
-    public void testReverseString() throws Exception {
+    public void testReverseString() {
     	
     	assertEquals ("Jerome is name My", StringUtils.reverseString("My name is Jerome"));
     	assertEquals ("string a is this", StringUtils.reverseString("this is a string"));
@@ -173,7 +173,7 @@ public class StringUtilsTest  {
     }
 
     @Test
-    public void testMultipleSearch() throws Exception {
+    public void testMultipleSearch() {
         
         String source = "abc erd ohd the lazy fox jumps over my beautiful self again and is'nt that just sad";
         String[] searches = {"abc", "def", "myself", "fox", "jumps", "jerome", "kehrli"};
@@ -182,14 +182,14 @@ public class StringUtilsTest  {
     }
 
     @Test
-    public void testLastIndexOf() throws Exception {
+    public void testLastIndexOf() {
 
 
         assertEquals(88, StringUtils.lastIndexOf(SOURCE, "ad".toCharArray()));
     }
 
     @Test
-    public void testUrlEncodeDecode() throws Exception {
+    public void testUrlEncodeDecode() {
         String sourceString = "test encode\n with & some nutty?characters!";
         String encoded = StringUtils.urlEncode(sourceString);
         assertEquals("test+encode%0A+with+%26+some+nutty%3Fcharacters%21", encoded);
@@ -197,19 +197,19 @@ public class StringUtilsTest  {
     }
 
     @Test
-    public void testToUnicodeLiteral() throws Exception {
+    public void testToUnicodeLiteral() {
         assertEquals ("\\u0054\\u006F\\u00E9\\u00E0\\u0042\\u0065\\u00E8\\u00FC\\u0049\\u006D\\u0070\\u006C\\u0065\\u006D\\u0065\\u006E\\u0074\\u0065\\u0064", StringUtils.toUnicodeLiteral("ToéàBeèüImplemented"));
     }
 
     @Test
-    public void testTrimToSize() throws Exception {
+    public void testTrimToSize() {
         assertEquals("abc erd ...", StringUtils.trimToSize(SOURCE, 15));
         assertEquals("abc erd ...", StringUtils.trimToSize(SOURCE, 14));
         assertEquals("abc erd ...", StringUtils.trimToSize(SOURCE, 12));
     }
 
     @Test
-    public void testMultipleSearches() throws Exception {
+    public void testMultipleSearches() {
         int[] results = StringUtils.multipleSearch(SOURCE, new String[]{"abc", "ad", "self"});
         StringBuilder sb = new StringBuilder();
         Arrays.stream(results).forEach(intVal -> sb.append(intVal).append("_"));

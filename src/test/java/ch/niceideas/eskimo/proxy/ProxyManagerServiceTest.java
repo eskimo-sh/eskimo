@@ -35,21 +35,13 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.model.SSHConnection;
-import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
-import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
-import ch.niceideas.eskimo.test.services.ServicesDefinitionTestImpl;
 import ch.niceideas.eskimo.test.services.WebSocketProxyServerTestImpl;
-import com.trilead.ssh2.LocalPortForwarder;
-import org.apache.logging.log4j.core.Appender;
-import org.apache.log4j.spi.LoggingEvent;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.Appender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,15 +51,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.apache.logging.log4j.core.config.Configurator.setLevel;
-import static org.apache.logging.log4j.core.config.Configurator.setRootLevel;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ContextConfiguration(classes = EskimoApplication.class)

@@ -38,7 +38,7 @@ import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,9 +69,6 @@ public class ServiceInstallationSorterTest {
 
     @Autowired
     private NodeRangeResolver nodeRangeResolver;
-
-    @Autowired
-    private SetupServiceTestImpl setupServiceTest;
 
     NodesConfigWrapper nodesConfig = null;
 

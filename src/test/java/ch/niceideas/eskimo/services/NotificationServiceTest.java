@@ -81,7 +81,7 @@ public class NotificationServiceTest {
     }
 
     @Test
-    public void testCorruptedIndex() throws Exception {
+    public void testCorruptedIndex() {
 
         Pair<Integer, List<JSONObject>> result = notificationService.fetchElements(20);
 
@@ -91,7 +91,7 @@ public class NotificationServiceTest {
     }
 
     @Test
-    public void testClear() throws Exception {
+    public void testClear() {
 
         notificationService.clear();
 

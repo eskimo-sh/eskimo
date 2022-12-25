@@ -36,12 +36,10 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.MessagingManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MessagingManagerTest {
 
@@ -75,7 +73,7 @@ public class MessagingManagerTest {
     }
 
     @Test
-    public void testCorruptedIndex() throws Exception {
+    public void testCorruptedIndex() {
 
         Pair<Integer,String> result = ms.fetchElements(20);
 
@@ -91,7 +89,7 @@ public class MessagingManagerTest {
     */
 
     @Test
-    public void testClear() throws Exception {
+    public void testClear() {
 
         ms.clear();
 
@@ -102,7 +100,7 @@ public class MessagingManagerTest {
     }
 
     @Test
-    public void testMultipleUsers() throws Exception {
+    public void testMultipleUsers() {
 
         ms.clear();
 
@@ -157,12 +155,14 @@ public class MessagingManagerTest {
         assertEquals(0, (int) result1_4.getKey());
         assertEquals("", result1_4.getValue());
         lastLineUser1 = result1_4.getKey();
+        assertNotEquals (-1, lastLineUser1);
 
         Pair<Integer,String> result2_3 = ms.fetchElements(lastLineUser2);
 
         assertEquals(0, (int) result2_3.getKey());
         assertEquals("", result2_3.getValue());
         lastLineUser2 = result2_3.getKey();
+        assertNotEquals (-1, lastLineUser2);
     }
 
     @Test
@@ -171,7 +171,7 @@ public class MessagingManagerTest {
         testNominal();
 
         for (int i = 0; i < 100000; i++) {
-            ms.addLines("Test__"+i);
+            ms.addLines("Test__" + i);
         }
 
         Pair<Integer,String> result2 = ms.fetchElements(2);

@@ -1,26 +1,16 @@
 package ch.niceideas.eskimo.controlers;
 
-import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.services.FileManagerServiceImpl;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Proxy;
-import java.util.Base64;
-import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

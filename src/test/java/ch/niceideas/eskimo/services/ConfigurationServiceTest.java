@@ -44,8 +44,8 @@ public class ConfigurationServiceTest {
 
         try {
             tmpFile = File.createTempFile("test_", "_configurationService");
-            tmpFile.delete();
-            tmpFile.mkdirs();
+            assertTrue (tmpFile.delete());
+            assertTrue (tmpFile.mkdirs());
         } catch (IOException e) {
             logger.error (e, e);
             throw new SetupException(e);
@@ -91,9 +91,7 @@ public class ConfigurationServiceTest {
         assertEquals("Application is not initialized properly. Missing file 'config.conf' system configuration", exception.getMessage());
 
         final JsonWrapper sc = new JsonWrapper("{\"test\": \"OK\"}");
-        exception = assertThrows(SetupException.class, () -> {
-            configurationService.createSetupConfigAndSaveStoragePath(sc.getFormattedValue());
-        });
+        exception = assertThrows(SetupException.class, () -> configurationService.createSetupConfigAndSaveStoragePath(sc.getFormattedValue()));
 
         assertEquals("config Storage path cannot be empty.", exception.getMessage());
 

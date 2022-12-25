@@ -712,6 +712,7 @@ public class ProxyServletTest {
             return DefaultConnectionReuseStrategy.INSTANCE;
         }
 
+        @SuppressWarnings("unchecked")
         protected HttpResponseFactory newHttpResponseFactory() {
             return DefaultClassicHttpResponseFactory.INSTANCE;
         }

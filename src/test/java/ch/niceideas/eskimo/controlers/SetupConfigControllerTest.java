@@ -75,7 +75,7 @@ public class SetupConfigControllerTest {
                 "    \"version\": \"@project.version@\"\n" +
                 "}", scc.loadSetupConfig());
 
-        setupServiceTest.setSetupError();;
+        setupServiceTest.setSetupError();
 
         assertEquals ("{\n" +
                 "    \"processingPending\": false,\n" +

@@ -37,15 +37,12 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.proxy.ProxyManagerService;
-import ch.niceideas.eskimo.proxy.ProxyManagerServiceImpl;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
 import ch.niceideas.eskimo.test.testwrappers.SetupServiceUnderTest;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
-import org.checkerframework.checker.units.qual.A;
-import org.junit.Assume;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +69,7 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
     /** Run Test on Linux only */
     @BeforeEach
     public void beforeMethod() {
-        Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
+        Assumptions.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
     @Autowired
@@ -108,7 +105,7 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
     }
 
     @Test
-    public void testRunSSHCommandStdErr() throws Exception {
+    public void testRunSSHCommandStdErr() {
         try {
             sshCommandService.runSSHCommand("localhost", "/bin/bash -c /bin/tada");
             fail ("Exception expected");
@@ -138,7 +135,7 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
     }
 
     @Test
-    public void testRunSSHScriptErr() throws Exception {
+    public void testRunSSHScriptErr() {
         try {
             sshCommandService.runSSHScript("localhost", "/bin/tada");
             fail ("Exception expected");

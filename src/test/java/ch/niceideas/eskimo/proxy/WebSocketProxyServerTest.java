@@ -1,12 +1,6 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
-import ch.niceideas.eskimo.services.ConnectionManagerService;
-import ch.niceideas.eskimo.services.ConnectionManagerServiceImpl;
-import ch.niceideas.eskimo.services.ServicesDefinition;
-import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
-import ch.niceideas.eskimo.test.services.ProxyManagerServiceTestImpl;
 import ch.niceideas.eskimo.test.services.WebSocketProxyServerTestImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,14 +11,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.adapter.standard.StandardWebSocketSession;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

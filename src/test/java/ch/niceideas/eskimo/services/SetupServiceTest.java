@@ -35,9 +35,11 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.*;
+import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.model.MessageLogger;
 import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.ApplicationStatusServiceTestImpl;
@@ -56,13 +58,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
@@ -89,15 +89,9 @@ public class SetupServiceTest {
 
     private String setupConfig = null;
 
-    private String packagesVersionFile = null;
-
-    private File tempConfigStoragePath = null;
-
     private File tempPackagesDistribPath = null;
 
-    private File tempPackagesDevPath = null;
-
-    private String kubePackages = "kube";
+    private static final String kubePackages = "kube";
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -107,20 +101,20 @@ public class SetupServiceTest {
 
         setupConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/setupConfig.json"), StandardCharsets.UTF_8);
 
-        packagesVersionFile = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/eskimo_packages_versions.json"), StandardCharsets.UTF_8);
+        String packagesVersionFile = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/eskimo_packages_versions.json"), StandardCharsets.UTF_8);
         setupService.setPackagesVersionFile(packagesVersionFile);
 
         FileUtils.delete(new File ("/tmp/setupConfigTest"));
 
-        tempConfigStoragePath = File.createTempFile("test_setup_service", "folder");
-        tempConfigStoragePath.delete();
+        File tempConfigStoragePath = File.createTempFile("test_setup_service", "folder");
+        assertTrue (tempConfigStoragePath.delete());
 
         tempPackagesDistribPath = File.createTempFile("test_setup_service_distrib", "folder");
-        tempPackagesDistribPath.delete();
+        assertTrue (tempPackagesDistribPath.delete());
 
-        tempPackagesDevPath = File.createTempFile("test_setup_service_dev", "folder");
-        tempPackagesDevPath.delete();
-        tempPackagesDevPath.mkdir();
+        File tempPackagesDevPath = File.createTempFile("test_setup_service_dev", "folder");
+        assertTrue (tempPackagesDevPath.delete());
+        assertTrue (tempPackagesDevPath.mkdir());
 
         setupService.setConfigStoragePathInternal(tempConfigStoragePath.getCanonicalPath());
         setupService.setPackageDistributionPath(tempPackagesDistribPath.getCanonicalPath());
@@ -249,8 +243,8 @@ public class SetupServiceTest {
         assumeTrue(OSDetector.isUnix());
 
         File packageDevPathTest = File.createTempFile("test_setup_service_package_dev", "folder");
-        packageDevPathTest.delete();
-        packageDevPathTest.mkdirs();
+        assertTrue (packageDevPathTest.delete());
+        assertTrue (packageDevPathTest.mkdirs());
 
         setupService.setPackagesDevPathForTests(packageDevPathTest.getAbsolutePath());
         setupService.setPackageDistributionPath(packageDevPathTest.getAbsolutePath());
@@ -283,8 +277,8 @@ public class SetupServiceTest {
     public void testDownloadPackage() throws Exception {
 
         File packageDevPathTest = File.createTempFile("test_setup_service_package_dev", "folder");
-        packageDevPathTest.delete();
-        packageDevPathTest.mkdirs();
+        assertTrue (packageDevPathTest.delete());
+        assertTrue (packageDevPathTest.mkdirs());
 
         setupService.setPackageDistributionPath(packageDevPathTest.getAbsolutePath());
 
@@ -299,9 +293,11 @@ public class SetupServiceTest {
 
         setupService.downloadPackage("cerebro_0.8.4_1", "cerebro_0.8.4_1.tgz");
 
-        assertEquals (1, packageDevPathTest.listFiles().length);
-        assertEquals("cerebro_0.8.4_1.tgz", packageDevPathTest.listFiles()[0].getName());
-        assertEquals("TEST DOWNLOADED CONTENT", FileUtils.readFile(packageDevPathTest.listFiles()[0]));
+        File[] files = packageDevPathTest.listFiles();
+        assertNotNull(files);
+        assertEquals (1, files.length);
+        assertEquals("cerebro_0.8.4_1.tgz", files[0].getName());
+        assertEquals("TEST DOWNLOADED CONTENT", FileUtils.readFile(files[0]));
 
         FileUtils.delete(packageDevPathTest);
     }
@@ -310,8 +306,8 @@ public class SetupServiceTest {
     public void testReadConfigStoragePath() throws Exception {
 
         File storagePathTest = File.createTempFile("test_setup_storage", "folder");
-        storagePathTest.delete();
-        storagePathTest.mkdirs();
+        assertTrue (storagePathTest.delete());
+        assertTrue (storagePathTest.mkdirs());
 
         setupService.setStoragePathConfDir(storagePathTest.getAbsolutePath());
 
@@ -340,7 +336,7 @@ public class SetupServiceTest {
             }}));
         }}));
         Set<String> downloadPackages = new HashSet<>();
-        Set<String> missingServices = new HashSet<String>(){{
+        Set<String> missingServices = new HashSet<>(){{
             add("cerebro");
             add("elasticsearch");
             add("kibana");
@@ -395,7 +391,7 @@ public class SetupServiceTest {
     }
 
     @Test
-    public void testCompareSoftwareVersion() throws Exception {
+    public void testCompareSoftwareVersion() {
 
         assertEquals(0, setupService.compareSoftwareVersion("1.1.1", "1.1.1"));
         assertEquals(0, setupService.compareSoftwareVersion("1.1_1", "1.1_1"));

@@ -211,15 +211,15 @@ public class MemoryComputerTest {
 
         memoryComputer.setSshCommandService(new SSHCommandServiceImpl() {
             @Override
-            public String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException {
+            public String runSSHScript(String node, String script, boolean throwsException) {
                 return "MemTotal:        20000000 kB";
             }
             @Override
-            public String runSSHCommand(String node, String command) throws SSHCommandException {
+            public String runSSHCommand(String node, String command) {
                 return null;
             }
             @Override
-            public void copySCPFile(String node, String filePath) throws SSHCommandException {
+            public void copySCPFile(String node, String filePath) {
                 // just do nothing
             }
         });

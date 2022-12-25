@@ -1,12 +1,9 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.model.OperationStatus;
 import ch.niceideas.eskimo.model.OperationsContext;
-import ch.niceideas.eskimo.model.OperationsMonitoringStatusWrapper;
 import ch.niceideas.eskimo.model.SimpleOperationCommand;
 import ch.niceideas.eskimo.services.OperationsMonitoringService;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,11 +11,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)

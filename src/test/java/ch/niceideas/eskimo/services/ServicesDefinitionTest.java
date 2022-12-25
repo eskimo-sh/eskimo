@@ -256,7 +256,7 @@ public class ServicesDefinitionTest {
     }
 
     @Test
-    public void testListServicesOrderedByDependencies() throws Exception {
+    public void testListServicesOrderedByDependencies() {
 
         String[] orderedServices = servicesDefinition.listServicesOrderedByDependencies();
 
@@ -272,7 +272,7 @@ public class ServicesDefinitionTest {
     }
 
     @Test
-    public void testListServicesInOrder() throws Exception {
+    public void testListServicesInOrder() {
 
         String[] orderedServices = servicesDefinition.listServicesInOrder();
 
@@ -297,7 +297,7 @@ public class ServicesDefinitionTest {
     }
 
     @Test
-    public void testListUniqueServices() throws Exception {
+    public void testListUniqueServices() {
 
         String[] orderedServices = servicesDefinition.listUniqueServices();
 
@@ -310,7 +310,7 @@ public class ServicesDefinitionTest {
     }
 
     @Test
-    public void testListKubernetesServices() throws Exception {
+    public void testListKubernetesServices() {
         String[] kubernetesServices = servicesDefinition.listKubernetesServices();
 
         assertEquals(7, kubernetesServices.length);
@@ -327,7 +327,7 @@ public class ServicesDefinitionTest {
     }
 
     @Test
-    public void testListUIServices() throws Exception {
+    public void testListUIServices() {
 
         String[] orderedServices = servicesDefinition.listUIServices();
 
@@ -343,7 +343,7 @@ public class ServicesDefinitionTest {
     }
 
     @Test
-    public void testListMultipleServices() throws Exception {
+    public void testListMultipleServices() {
 
         String[] orderedServices = servicesDefinition.listMultipleServicesNonKubernetes();
 
@@ -359,7 +359,7 @@ public class ServicesDefinitionTest {
     }
 
     @Test
-    public void testGetDependentServices() throws Exception {
+    public void testGetDependentServices() {
 
         String[] elasticsearchDep = servicesDefinition.getDependentServices("database").toArray(new String[0]);
         assertEquals(2, elasticsearchDep.length);

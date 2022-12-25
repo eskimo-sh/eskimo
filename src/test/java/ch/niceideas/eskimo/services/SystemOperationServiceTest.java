@@ -36,7 +36,8 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.model.*;
+import ch.niceideas.eskimo.model.OperationId;
+import ch.niceideas.eskimo.model.SimpleOperationCommand;
 import ch.niceideas.eskimo.test.services.OperationsMonitoringServiceTestImpl;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -76,7 +77,7 @@ public class SystemOperationServiceTest {
     }
 
     @AfterEach
-    public void tearDown() throws Exception {
+    public void tearDown() {
         operationsMonitoringServiceTest.operationsFinished(true);
     }
 

@@ -46,7 +46,7 @@ import com.trilead.ssh2.SFTPv3Client;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.json.JSONObject;
-import org.junit.Assume;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +80,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
     /** Run Test on Linux only */
     @BeforeEach
     public void beforeMethod() {
-        Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
+        Assumptions.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
     @Autowired
@@ -209,7 +209,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
         assertEquals (originalContent, downloadedContent);
     }
 
-    void getTestClient(String mimeType) throws IOException, ConnectionManagerException {
+    void getTestClient(String mimeType) {
         fms = new FileManagerServiceImpl() {
 
             @Override
@@ -217,11 +217,11 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
                 return new SFTPv3Client(connectionManagerServiceTest.getSharedConnection("localhost").getUnder());
             }
             @Override
-            String getFileMimeType(String node, String newPath) throws SSHCommandException {
+            String getFileMimeType(String node, String newPath) {
                 return mimeType;
             }
             @Override
-            public Pair<String, JSONObject> navigateFileManager(String node, String folder, String subFolder) throws IOException {
+            public Pair<String, JSONObject> navigateFileManager(String node, String folder, String subFolder) {
                 return new Pair<>("/test", new JSONObject(new HashMap<String, Object>() {{
 
                     put ("test", new JSONObject(new HashMap<String, Object>() {{
@@ -239,7 +239,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
     }
 
     @Test
-    public void testOpenFileDirectory() throws Exception {
+    public void testOpenFileDirectory() {
 
         getTestClient("inode/directory");
 
@@ -263,7 +263,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
     }
 
     @Test
-    public void testOpenFileNoPermission() throws Exception {
+    public void testOpenFileNoPermission() {
 
         getTestClient("no read permission");
 

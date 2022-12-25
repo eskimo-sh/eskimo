@@ -37,10 +37,8 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.model.SettingsOperationsCommand;
-import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.*;
@@ -53,7 +51,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -73,9 +70,6 @@ public class ServicesSettingsServiceTest {
     private ConfigurationServiceTestImpl configurationServiceTest;
 
     @Autowired
-    private NotificationService notificationService;
-
-    @Autowired
     private SystemOperationServiceTestImpl systemOperationServiceTest;
 
     @Autowired
@@ -89,9 +83,6 @@ public class ServicesSettingsServiceTest {
 
     @Autowired
     private ConnectionManagerServiceTestImpl connectionManagerServiceTest;
-
-
-    private AtomicReference<ServiceOperationsCommand> processedCommand = new AtomicReference<>();
 
     @BeforeEach
     public void setUp() throws Exception {

@@ -34,18 +34,14 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.proxy.ProxyManagerService;
-import ch.niceideas.eskimo.proxy.ProxyManagerServiceImpl;
 import ch.niceideas.eskimo.terminal.ScreenImage;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
-import ch.niceideas.eskimo.test.testwrappers.SetupServiceUnderTest;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
-import org.junit.Assume;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,9 +50,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
-import java.io.File;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ContextConfiguration(classes = EskimoApplication.class)
@@ -73,7 +66,7 @@ public class TerminalServiceTest extends AbstractBaseSSHTest {
     /** Run Test on Linux only */
     @BeforeEach
     public void beforeMethod() {
-        Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
+        Assumptions.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
     @Autowired

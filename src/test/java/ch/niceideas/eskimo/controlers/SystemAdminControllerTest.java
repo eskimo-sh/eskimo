@@ -2,7 +2,6 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.SimpleOperationCommand;
-import ch.niceideas.eskimo.services.NotificationService;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.OperationsMonitoringServiceTestImpl;
@@ -116,7 +115,7 @@ public class SystemAdminControllerTest {
     }
 
     @Test
-    public void testReinstallService_demoMode() throws Exception {
+    public void testReinstallService_demoMode() {
 
         sac.setDemoMode(true);
 

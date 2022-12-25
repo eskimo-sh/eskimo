@@ -129,7 +129,7 @@ public abstract class AbstractBaseSSHTest {
         //sshd.setCommandFactory(new ProcessShellCommandFactory());
         sshd.setCommandFactory(getSShSubsystemToUse());
 
-        sshd.setShellFactory(new ProcessShellFactory("bash", Arrays.asList(new String [] {"/bin/bash", "-i"})));
+        sshd.setShellFactory(new ProcessShellFactory("bash", Arrays.asList("/bin/bash", "-i")));
 
         List<SubsystemFactory> namedFactoryList = new ArrayList<>();
         namedFactoryList.add(new SftpSubsystemFactory());
@@ -180,7 +180,7 @@ public abstract class AbstractBaseSSHTest {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(downloadedFile))) {
             char[] buf = new char[1024];
-            for (int numRead = 0; (numRead = reader.read(buf)) != -1; buf = new char[1024]) {
+            for (int numRead; (numRead = reader.read(buf)) != -1; buf = new char[1024]) {
                 fileData.append(String.valueOf(buf, 0, numRead));
             }
         }

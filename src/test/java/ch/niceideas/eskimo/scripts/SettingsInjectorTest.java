@@ -38,8 +38,8 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.ProcessHelper;
 import ch.niceideas.common.utils.ResourceUtils;
 import org.apache.log4j.Logger;
-import org.junit.Assume;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +47,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
-import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SettingsInjectorTest {
@@ -69,7 +68,7 @@ public class SettingsInjectorTest {
     /** Run Test on Linux only */
     @BeforeEach
     public void beforeMethod() {
-        Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
+        Assumptions.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
     
     public static String getCmdPathFileStr(String command) {
@@ -141,7 +140,7 @@ public class SettingsInjectorTest {
     @AfterEach
     public void tearDown() throws Exception {
         if (tempFolder != null) {
-            new File(tempFolder).delete();
+            FileUtils.delete(new File (tempFolder));
         }
     }
 

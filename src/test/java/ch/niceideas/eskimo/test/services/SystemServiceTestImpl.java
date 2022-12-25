@@ -77,6 +77,8 @@ public class SystemServiceTestImpl implements SystemService {
 
     private final List<String> executedActions = new ArrayList<>();
 
+    private final List<Pair<? extends Serializable, PooledOperation<? extends Serializable>>> appliedOperations = new ArrayList<>();
+
     public void reset() {
         this.returnEmptySystemStatus = false;
         this.returnOKSystemStatus = false;
@@ -84,6 +86,7 @@ public class SystemServiceTestImpl implements SystemService {
         this.standard2NodesStatus = false;
         this.pingError = false;
         this.executedActions.clear();
+        this.appliedOperations.clear();
     }
 
     public List<String> getExecutedActions() {
@@ -109,8 +112,6 @@ public class SystemServiceTestImpl implements SystemService {
     public void setStandard2NodesStatus() {
         this.standard2NodesStatus = true;
     }
-
-    private List<Pair<? extends Serializable, PooledOperation<? extends Serializable>>> appliedOperations = new ArrayList<>();
 
     @Override
     public void delegateApplyNodesConfig(ServiceOperationsCommand command) throws SystemException, NodesConfigurationException {

@@ -46,30 +46,30 @@ public class KubernetesServicesConfigWrapperTest {
             "}");
 
     @Test
-    public void testGetEnabledServices() throws Exception {
+    public void testGetEnabledServices()  {
         assertEquals ("cerebro,elasticsearch,flink-runtime,grafana,kafka-manager,kafka,kibana,kubernetes-dashboard,logstash,spark-console,spark-runtime,zeppelin", String.join(",", kscw.getEnabledServices()));
     }
 
     @Test
-    public void testGetCpuSetting() throws Exception {
+    public void testGetCpuSetting() {
         assertEquals ("0.4", kscw.getCpuSetting("elasticsearch"));
         assertEquals ("0.2", kscw.getCpuSetting("cerebro"));
     }
 
     @Test
-    public void testGetRamSetting() throws Exception {
+    public void testGetRamSetting() {
         assertEquals ("1024M", kscw.getRamSetting("elasticsearch"));
         assertEquals ("800M", kscw.getRamSetting("cerebro"));
     }
 
     @Test
-    public void testIsServiceInstallRequired() throws Exception {
+    public void testIsServiceInstallRequired() {
         assertTrue (kscw.isServiceInstallRequired("elasticsearch"));
         assertFalse (kscw.isServiceInstallRequired("dummy"));
     }
 
     @Test
-    public void testHasEnabledServices() throws Exception {
+    public void testHasEnabledServices() {
         assertTrue (kscw.hasEnabledServices());
 
         KubernetesServicesConfigWrapper other = new KubernetesServicesConfigWrapper(kscw.getFormattedValue());
@@ -83,7 +83,7 @@ public class KubernetesServicesConfigWrapperTest {
     }
 
     @Test
-    public void testIsDifferentConfig() throws Exception {
+    public void testIsDifferentConfig() {
         assertFalse (kscw.isDifferentConfig(new KubernetesServicesConfigWrapper(kscw.getFormattedValue()), "zeppelin"));
         assertFalse (kscw.isDifferentConfig(new KubernetesServicesConfigWrapper(kscw.getFormattedValue()), "elasticsearch"));
         assertFalse (kscw.isDifferentConfig(new KubernetesServicesConfigWrapper(kscw.getFormattedValue()), "cerebro"));

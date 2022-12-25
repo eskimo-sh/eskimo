@@ -40,23 +40,23 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.SetupCommand;
-import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.services.SetupException;
+import ch.niceideas.eskimo.services.SetupService;
+import ch.niceideas.eskimo.services.SetupServiceImpl;
 import lombok.Setter;
 import org.apache.log4j.Logger;
-import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.WebApplicationContext;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 @Component

@@ -5,7 +5,10 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -13,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SessionTest {
 
-    private AtomicReference<String> sizeSet = new AtomicReference<>();
+    private final AtomicReference<String> sizeSet = new AtomicReference<>();
 
     /** Run Test on Linux only */
     @BeforeEach
@@ -50,7 +53,7 @@ public class SessionTest {
         return new ProcessWithPty() {
             final DataOutputStream out = new DataOutputStream(base.getOutputStream());
             @Override
-            public void setWindowSize(int width, int height) throws IOException {
+            public void setWindowSize(int width, int height) {
                 sizeSet.set(width+"x"+height);
             }
 

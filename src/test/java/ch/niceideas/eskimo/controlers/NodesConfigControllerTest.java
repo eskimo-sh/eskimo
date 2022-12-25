@@ -80,7 +80,7 @@ public class NodesConfigControllerTest {
     }
 
     @Test
-    public void testLoadNodesConfig() throws Exception {
+    public void testLoadNodesConfig() {
 
         setupServiceTest.setSetupCompleted();
 
@@ -120,7 +120,7 @@ public class NodesConfigControllerTest {
     }
 
     @Test
-    public void testReinstallNodesConfig() throws Exception {
+    public void testReinstallNodesConfig() {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
@@ -153,7 +153,7 @@ public class NodesConfigControllerTest {
     }
 
     @Test
-    public void testSaveNodesConfig_demoMode() throws Exception {
+    public void testSaveNodesConfig_demoMode() {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
@@ -183,7 +183,7 @@ public class NodesConfigControllerTest {
     }
 
     @Test
-    public void testSaveNodesConfig() throws Exception {
+    public void testSaveNodesConfig() {
 
         Map<String, Object> sessionContent = new HashMap<>();
 

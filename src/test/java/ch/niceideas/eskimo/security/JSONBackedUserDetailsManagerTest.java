@@ -68,7 +68,7 @@ public class JSONBackedUserDetailsManagerTest {
     }
 
     @Test
-    public void testDefaultUserInitialization() throws Exception {
+    public void testDefaultUserInitialization() {
         assertTrue (mgr.userExists("admin"));
 
         assertTrue (passwordEncoder.matches("password", mgr.loadUserByUsername("admin").getPassword()));

@@ -1,9 +1,6 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.services.TerminalService;
-import ch.niceideas.eskimo.terminal.ScreenImage;
-import ch.niceideas.eskimo.terminal.Terminal;
 import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.TerminalServiceTestImpl;
@@ -16,7 +13,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 

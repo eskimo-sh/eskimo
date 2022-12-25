@@ -20,14 +20,14 @@ public class TerminalTest {
     }
 
     @Test
-    public void testDump() throws Exception {
+    public void testDump() {
         Terminal term = new Terminal(80, 24);
         term.write("A");
         assertEquals (1920, term.dump().length());
     }
 
     @Test
-    public void testDumpLatin1() throws Exception {
+    public void testDumpLatin1() {
         Terminal term = new Terminal(80, 24);
         term.write("A");
         assertEquals("A                                                                               \n" +
@@ -57,7 +57,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testWrite() throws Exception {
+    public void testWrite() {
         Terminal term = new Terminal(80, 24);
 
         term.write("A");
@@ -68,7 +68,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCsiA() throws Exception {
+    public void testCsiA() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -86,7 +86,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCsiB() throws Exception {
+    public void testCsiB() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -104,7 +104,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCsiC() throws Exception {
+    public void testCsiC() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -122,7 +122,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCsiD() throws Exception {
+    public void testCsiD() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -140,7 +140,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCsiE() throws Exception {
+    public void testCsiE() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -158,7 +158,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCsiF() throws Exception {
+    public void testCsiF() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -176,7 +176,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCsiG() throws Exception {
+    public void testCsiG() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -194,7 +194,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCsiH() throws Exception {
+    public void testCsiH() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -212,7 +212,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCsiJ() throws Exception {
+    public void testCsiJ() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -268,7 +268,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCsiLowerA() throws Exception {
+    public void testCsiLowerA() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -286,7 +286,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCsiLowerD() throws Exception {
+    public void testCsiLowerD() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -305,7 +305,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCsiLowerE() throws Exception {
+    public void testCsiLowerE() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -323,7 +323,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCsiLowerF() throws Exception {
+    public void testCsiLowerF() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -341,7 +341,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCsiLowerHAndL() throws Exception {
+    public void testCsiLowerHAndL() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -366,7 +366,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCsiLowerM() throws Exception {
+    public void testCsiLowerM() {
         Terminal term = new Terminal(80, 24);
 
         term.write("\u001B[?39m");
@@ -379,7 +379,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCsiLowerN() throws Exception {
+    public void testCsiLowerN() {
         Terminal term = new Terminal(80, 24);
 
         term.write("\u001B[?39m");
@@ -392,7 +392,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCsiLowerR() throws Exception {
+    public void testCsiLowerR() {
         Terminal term = new Terminal(80, 24);
 
         term.write("\u001B[?12;18r");
@@ -402,7 +402,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCsiLowerS() throws Exception {
+    public void testCsiLowerS() {
         final AtomicBoolean called = new AtomicBoolean(true);
         Terminal term = new Terminal(80, 24){
             public void saveCursor() {
@@ -446,7 +446,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testEscRi() throws Exception {
+    public void testEscRi() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -464,7 +464,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testEscDa() throws Exception {
+    public void testEscDa() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -483,7 +483,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testEsc0x08() throws Exception {
+    public void testEsc0x08() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -501,7 +501,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testEsc0x09() throws Exception {
+    public void testEsc0x09() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -519,7 +519,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testEscBackslashR() throws Exception {
+    public void testEscBackslashR() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());
@@ -537,7 +537,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testEscCursorDown() throws Exception {
+    public void testEscCursorDown() {
         Terminal term = new Terminal(80, 24);
 
         assertEquals (0, term.getCx());

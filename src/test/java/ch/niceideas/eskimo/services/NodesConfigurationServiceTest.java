@@ -38,7 +38,10 @@ import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.model.*;
+import ch.niceideas.eskimo.model.MessageLogger;
+import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.model.ServiceOperationsCommand;
+import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
@@ -64,7 +67,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-system", "test-operation", "test-operations", "test-proxy", "test-kube", "test-ssh", "test-connection-manager"})
 public class NodesConfigurationServiceTest {
 
-    private String testRunUUID = UUID.randomUUID().toString();
+    private final String testRunUUID = UUID.randomUUID().toString();
 
     @Autowired
     private NodesConfigurationService nodesConfigurationService;
@@ -137,7 +140,7 @@ public class NodesConfigurationServiceTest {
 
         assertEquals ("192.168.10.11:./services_setup/base-eskimo/jq-1.6-linux64\n" +
                 "192.168.10.11:./services_setup/base-eskimo/gluster_mount.sh\n" +
-                "192.168.10.11:./services_setup/base-eskimo/eskimo-kubectl", sshCommandServiceTest.getExecutedScpCommands().toString().trim());
+                "192.168.10.11:./services_setup/base-eskimo/eskimo-kubectl", sshCommandServiceTest.getExecutedScpCommands().trim());
 
         assertEquals ("./services_setup/base-eskimo/install-eskimo-base-system.sh\n" +
                 "sudo mv jq-1.6-linux64 /usr/local/bin/jq\n" +
@@ -178,7 +181,7 @@ public class NodesConfigurationServiceTest {
     @Test
     public void testInstallService() throws Exception {
 
-        ServicesInstallStatusWrapper savedStatus = new ServicesInstallStatusWrapper(new HashMap<String, Object>() {{
+        ServicesInstallStatusWrapper savedStatus = new ServicesInstallStatusWrapper(new HashMap<>() {{
                 put("ntp_installed_on_IP_192-168-10-11", "OK");
                 put("ntp_installed_on_IP_192-168-10-13", "OK");
         }});
@@ -286,13 +289,13 @@ public class NodesConfigurationServiceTest {
     @Test
     public void testUninstallation() throws Exception {
 
-        ServicesInstallStatusWrapper savedStatus = new ServicesInstallStatusWrapper(new HashMap<String, Object>() {{
+        ServicesInstallStatusWrapper savedStatus = new ServicesInstallStatusWrapper(new HashMap<>() {{
             put("ntp_installed_on_IP_192-168-10-11", "OK");
             put("ntp_installed_on_IP_192-168-10-13", "OK");
             put("zookeeper_installed_on_IP_192-168-10-11", "OK");
         }});
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("ntp1", "on");
             put("node_id2", "192.168.10.13");

@@ -36,11 +36,6 @@ package ch.niceideas.eskimo.services.satellite;
 
 import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.services.ServicesDefinition;
-import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
-import ch.niceideas.eskimo.services.satellite.NodesConfigurationChecker;
-import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -81,7 +76,7 @@ public class NodesConfigurationCheckerTest {
     }
 
     @Test
-    public void testNotAnIpAddress() throws Exception {
+    public void testNotAnIpAddress() {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
@@ -160,7 +155,7 @@ public class NodesConfigurationCheckerTest {
     }
 
     @Test
-    public void testUniqueServiceOnRange() throws Exception {
+    public void testUniqueServiceOnRange() {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
@@ -189,7 +184,7 @@ public class NodesConfigurationCheckerTest {
     }
 
     @Test
-    public void testMissingGluster() throws Exception {
+    public void testMissingGluster() {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
@@ -212,7 +207,7 @@ public class NodesConfigurationCheckerTest {
     }
 
     @Test
-    public void testNoIPConfigured() throws Exception {
+    public void testNoIPConfigured() {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
@@ -226,7 +221,7 @@ public class NodesConfigurationCheckerTest {
     }
 
     @Test
-    public void testKeyGreaterThanNodeNumber() throws Exception {
+    public void testKeyGreaterThanNodeNumber() {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
@@ -240,7 +235,7 @@ public class NodesConfigurationCheckerTest {
     }
 
     @Test
-    public void testNoPrometheus() throws Exception {
+    public void testNoPrometheus() {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
@@ -273,7 +268,7 @@ public class NodesConfigurationCheckerTest {
     }
 
     @Test
-    public void testNoGlusterOnSingleNode() throws Exception {
+    public void testNoGlusterOnSingleNode() {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
@@ -293,7 +288,7 @@ public class NodesConfigurationCheckerTest {
     }
 
     @Test
-    public void testKubeSlaveButNoKubeMaster() throws Exception {
+    public void testKubeSlaveButNoKubeMaster() {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
@@ -314,7 +309,7 @@ public class NodesConfigurationCheckerTest {
     }
 
     @Test
-    public void testGlusterButNoZookeeper() throws Exception {
+    public void testGlusterButNoZookeeper() {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
@@ -335,7 +330,7 @@ public class NodesConfigurationCheckerTest {
     }
 
     @Test
-    public void testNoKubernetesServiceCanBeSelected() throws Exception {
+    public void testNoKubernetesServiceCanBeSelected() {
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");

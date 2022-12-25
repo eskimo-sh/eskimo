@@ -16,7 +16,7 @@ public class ProcessHelperTest {
     }
 
     @Test
-    public void testExecSimple() throws Exception {
+    public void testExecSimple() {
 
         String result = ProcessHelper.exec("ls /etc");
         assertTrue(result.contains("passwd"));

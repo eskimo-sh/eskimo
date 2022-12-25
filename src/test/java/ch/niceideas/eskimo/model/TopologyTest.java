@@ -35,7 +35,9 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.eskimo.model.service.*;
-import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.ServiceDefinitionException;
+import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
+import ch.niceideas.eskimo.services.SystemServiceTest;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
@@ -46,13 +48,12 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.HashMap;
 
-import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TopologyTest {
 
-    private MemoryModel emptyModel = new MemoryModel(Collections.emptyMap());
+    private final MemoryModel emptyModel = new MemoryModel(Collections.emptyMap());
 
     protected SetupServiceUnderTest setupService = new SetupServiceUnderTest();
 

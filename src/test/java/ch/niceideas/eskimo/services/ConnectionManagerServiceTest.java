@@ -129,14 +129,16 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
             StringBuilder builder = new StringBuilder();
 
             Appender testAppender = (Appender) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{Appender.class}, (proxy, method, args) -> {
-                if (method.getName().equals("isStarted")) {
-                    return true;
-                } else if (method.getName().equals("getName")) {
-                    return "test";
-                } else if (method.getName().equals("append")) {
-                    org.apache.logging.log4j.core.impl.Log4jLogEvent event = (org.apache.logging.log4j.core.impl.Log4jLogEvent) args[0];
-                    builder.append(event.getMessage().getFormattedMessage());
-                    builder.append("\n");
+                switch (method.getName()) {
+                    case "isStarted":
+                        return true;
+                    case "getName":
+                        return "test";
+                    case "append":
+                        org.apache.logging.log4j.core.impl.Log4jLogEvent event = (org.apache.logging.log4j.core.impl.Log4jLogEvent) args[0];
+                        builder.append(event.getMessage().getFormattedMessage());
+                        builder.append("\n");
+                        break;
                 }
                 return null;
             });
@@ -172,7 +174,7 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
     @Test
     public void testLocalPortForwarderWrapper() throws Exception {
 
-        proxyManagerServiceTest.setForwarderConfigForHosts("localhost", new ArrayList<ProxyTunnelConfig>(){{
+        proxyManagerServiceTest.setForwarderConfigForHosts("localhost", new ArrayList<>(){{
             add (new ProxyTunnelConfig("dummyService", 6123, "localhost", 123));
             add (new ProxyTunnelConfig("dummyService",6124, "localhost", 124));
             add (new ProxyTunnelConfig("dummyService",6125, "localhost", 125));
@@ -196,7 +198,7 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         assertEquals(1, connectionManagerServiceTest.getDropCallFor().size());
 
         proxyManagerServiceTest.reset();
-        proxyManagerServiceTest.setForwarderConfigForHosts("localhost", new ArrayList<ProxyTunnelConfig>(){{
+        proxyManagerServiceTest.setForwarderConfigForHosts("localhost", new ArrayList<>(){{
             add (new ProxyTunnelConfig("dummyService", 20123, "localhost", 11123));
             add (new ProxyTunnelConfig("dummyService",20124, "localhost", 11124));
             add (new ProxyTunnelConfig("dummyService",20125, "localhost", 11125));

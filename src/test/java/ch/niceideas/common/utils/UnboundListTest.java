@@ -17,7 +17,7 @@ public class UnboundListTest {
     }
 
     @Test
-    public void testNominalAddAndGet() throws Exception {
+    public void testNominalAddAndGet() {
 
         addElementsFirst();
 
@@ -67,7 +67,7 @@ public class UnboundListTest {
     }
 
     @Test
-    public void testGetIndexOutOfBounds() throws Exception {
+    public void testGetIndexOutOfBounds() {
         addElementsFirst();
 
         testList.get(4);
@@ -81,7 +81,7 @@ public class UnboundListTest {
     }
 
     @Test
-    public void testSubList() throws Exception {
+    public void testSubList() {
         addElementsFirst();
 
         // test few cases
@@ -124,7 +124,7 @@ public class UnboundListTest {
     }
 
     @Test
-    public void testSize() throws Exception {
+    public void testSize() {
         addElementsFirst();
 
         assertEquals(5, testList.size());
@@ -147,7 +147,7 @@ public class UnboundListTest {
     }
 
     @Test
-    public void testIsEmptyAndClear() throws Exception {
+    public void testIsEmptyAndClear() {
         testSize();
         assertEquals(114, testList.size());
 
@@ -165,7 +165,7 @@ public class UnboundListTest {
     }
 
     @Test
-    public void testContains() throws Exception {
+    public void testContains() {
         addElementsFirst();
 
         assertTrue(testList.contains("0"));
@@ -194,7 +194,7 @@ public class UnboundListTest {
     }
 
     @Test
-    public void testRemove() throws Exception {
+    public void testRemove() {
         addElementsFirst();
 
         addElementsSecond();
@@ -216,7 +216,7 @@ public class UnboundListTest {
     }
 
     @Test
-    public void testAddAll() throws Exception {
+    public void testAddAll() {
         addElementsFirst();
 
         addElementsSecond();
@@ -224,7 +224,7 @@ public class UnboundListTest {
         assertEquals(11, testList.size());
 
         //System.err.println (String.join(",", testList));
-        testList.addAll(Arrays.asList(new String[] {"11", "12", "13"}));
+        testList.addAll(Arrays.asList("11", "12", "13"));
         //System.err.println (String.join(",", testList));
 
         assertFalse(testList.contains("3"));
@@ -238,13 +238,13 @@ public class UnboundListTest {
     }
 
     @Test
-    public void testIteratot() throws Exception {
+    public void testIteratot() {
         addElementsFirst();
         addElementsSecond();
         assertEquals(11, testList.size());
 
         assertEquals("1,2,3,4,5,6,7,8,9,10", String.join(",", testList));
-        testList.addAll(Arrays.asList(new String[] {"11", "12", "13"}));
+        testList.addAll(Arrays.asList("11", "12", "13"));
         assertEquals ("4,5,6,7,8,9,10,11,12,13", String.join(",", testList));
     }
 }

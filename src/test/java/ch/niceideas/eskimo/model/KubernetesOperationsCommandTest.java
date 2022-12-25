@@ -184,7 +184,7 @@ public class KubernetesOperationsCommandTest {
     }
 
     @Test
-    public void testRestarts() throws Exception {
+    public void testRestarts() {
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 

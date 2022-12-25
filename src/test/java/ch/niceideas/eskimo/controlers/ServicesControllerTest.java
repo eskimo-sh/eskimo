@@ -5,8 +5,6 @@ import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.test.services.ServicesDefinitionTestImpl;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

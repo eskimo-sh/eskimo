@@ -82,7 +82,7 @@ public class KubernetesServicesConfigControllerTest {
     }
 
     @Test
-    public void testLoadKubernetesServicesConfig() throws Exception {
+    public void testLoadKubernetesServicesConfig() {
 
         setupServiceTest.setSetupCompleted();
 
@@ -138,7 +138,7 @@ public class KubernetesServicesConfigControllerTest {
     }
 
     @Test
-    public void testReinstallKubernetesServicesConfig() throws Exception {
+    public void testReinstallKubernetesServicesConfig() {
 
         Map<String, Object> sessionContent = new HashMap<>();
 
@@ -146,7 +146,7 @@ public class KubernetesServicesConfigControllerTest {
 
         configurationServiceTest.setStandard2NodesInstallStatus();
         configurationServiceTest.setStandard2NodesSetup();
-        configurationServiceTest.setStandardKubernetesConfig();;
+        configurationServiceTest.setStandardKubernetesConfig();
 
         assertEquals ("{\n" +
                 "  \"command\": {\n" +
@@ -170,7 +170,7 @@ public class KubernetesServicesConfigControllerTest {
     }
 
     @Test
-    public void testApplyNodesConfig_demoMode() throws Exception {
+    public void testApplyNodesConfig_demoMode() {
 
         Map<String, Object> sessionContent = new HashMap<>();
         HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
@@ -198,7 +198,7 @@ public class KubernetesServicesConfigControllerTest {
     }
 
     @Test
-    public void testSaveKubernetesServicesConfig() throws Exception {
+    public void testSaveKubernetesServicesConfig() {
 
         Map<String, Object> sessionContent = new HashMap<>();
 

@@ -1,8 +1,7 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SSHCommandServiceTestImpl;
@@ -17,7 +16,6 @@ import org.springframework.test.context.TestPropertySource;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;

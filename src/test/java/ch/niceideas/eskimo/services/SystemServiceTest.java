@@ -53,7 +53,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -109,7 +108,7 @@ public class SystemServiceTest {
         FileUtils.delete (dtempFileName); // delete file to create directory below
 
         File configStoragePathFile = new File (dtempFileName.getAbsolutePath() + "/");
-        configStoragePathFile.mkdirs();
+        assertTrue (configStoragePathFile.mkdirs());
         return configStoragePathFile.getAbsolutePath();
     }
 
@@ -171,46 +170,7 @@ public class SystemServiceTest {
             return "";
         });
 
-        sshCommandServiceTest.setConnectionResultBuilder((connection, script) -> {
-            return script;
-        });
-
-        /*
-        systemService.setSshCommandService(new SSHCommandServiceImpl() {
-            @Override
-            public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
-                return runSSHScript((String)null, script, throwsException);
-            }
-            @Override
-            public String runSSHCommand(SSHConnection connection, String command) {
-                return runSSHCommand((String)null, command);
-            }
-            @Override
-            public void copySCPFile(SSHConnection connection, String filePath) {
-                // just do nothing
-            }
-            @Override
-            public String runSSHScript(String node, String script, boolean throwsException) {
-                testSSHCommandScript.append(script).append("\n");
-                if (script.equals("echo OK")) {
-                    return "OK";
-                }
-                if (script.startsWith("sudo systemctl status --no-pager")) {
-                    return systemStatusTest;
-                }
-                return testSSHCommandResultBuilder.toString();
-            }
-            @Override
-            public String runSSHCommand(String node, String command) {
-                testSSHCommandScript.append(command).append("\n");
-                return testSSHCommandResultBuilder.toString();
-            }
-            @Override
-            public void copySCPFile(String node, String filePath) {
-                // just do nothing
-            }
-        });
-        */
+        sshCommandServiceTest.setConnectionResultBuilder((connection, script) -> script);
 
         systemService.updateStatus();
 
@@ -257,46 +217,7 @@ public class SystemServiceTest {
             return "";
         });
 
-        sshCommandServiceTest.setConnectionResultBuilder((connection, script) -> {
-            return script;
-        });
-
-        /*
-        systemService.setSshCommandService(new SSHCommandServiceImpl() {
-            @Override
-            public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
-                return runSSHScript((String)null, script, throwsException);
-            }
-            @Override
-            public String runSSHCommand(SSHConnection connection, String command) {
-                return runSSHCommand((String)null, command);
-            }
-            @Override
-            public void copySCPFile(SSHConnection connection, String filePath) {
-                // just do nothing
-            }
-            @Override
-            public String runSSHScript(String node, String script, boolean throwsException) {
-                testSSHCommandScript.append(script).append("\n");
-                if (script.equals("echo OK")) {
-                    return "OK";
-                }
-                if (script.startsWith("sudo systemctl status --no-pager")) {
-                    return systemStatusTest;
-                }
-                return testSSHCommandResultBuilder.toString();
-            }
-            @Override
-            public String runSSHCommand(String node, String command) {
-                testSSHCommandScript.append(command).append("\n");
-                return testSSHCommandResultBuilder.toString();
-            }
-            @Override
-            public void copySCPFile(String node, String filePath){
-                // just do nothing
-            }
-        });
-        */
+        sshCommandServiceTest.setConnectionResultBuilder((connection, script) -> script);
 
         systemService.fetchNodeStatus (nodesConfig, statusMap, nodeNumnberAndIpAddress, servicesInstallStatus);
 
@@ -331,46 +252,7 @@ public class SystemServiceTest {
             return "";
         });
 
-        sshCommandServiceTest.setConnectionResultBuilder((connection, script) -> {
-            return script;
-        });
-
-        /*
-        systemService.setSshCommandService(new SSHCommandServiceImpl() {
-            @Override
-            public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
-                return runSSHScript((String)null, script, throwsException);
-            }
-            @Override
-            public String runSSHCommand(SSHConnection connection, String command) {
-                return runSSHCommand((String)null, command);
-            }
-            @Override
-            public void copySCPFile(SSHConnection connection, String filePath) {
-                // just do nothing
-            }
-            @Override
-            public String runSSHScript(String node, String script, boolean throwsException) {
-                testSSHCommandScript.append(script).append("\n");
-                if (script.equals("echo OK")) {
-                    return "OK";
-                }
-                if (script.startsWith("sudo systemctl status --no-pager")) {
-                    return systemStatusTest;
-                }
-                return testSSHCommandResultBuilder.toString();
-            }
-            @Override
-            public String runSSHCommand(String node, String command) {
-                testSSHCommandScript.append(command).append("\n");
-                return testSSHCommandResultBuilder.toString();
-            }
-            @Override
-            public void copySCPFile(String node, String filePath) {
-                // just do nothing
-            }
-        });
-        */
+        sshCommandServiceTest.setConnectionResultBuilder((connection, script) -> script);
 
         systemService.updateStatus();
 
@@ -405,46 +287,7 @@ public class SystemServiceTest {
             return "";
         });
 
-        sshCommandServiceTest.setConnectionResultBuilder((connection, script) -> {
-            return script;
-        });
-
-        /*
-        systemService.setSshCommandService(new SSHCommandServiceImpl() {
-            @Override
-            public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
-                return runSSHScript((String)null, script, throwsException);
-            }
-            @Override
-            public String runSSHCommand(SSHConnection connection, String command) {
-                return runSSHCommand((String)null, command);
-            }
-            @Override
-            public void copySCPFile(SSHConnection connection, String filePath) {
-                // just do nothing
-            }
-            @Override
-            public String runSSHScript(String node, String script, boolean throwsException){
-                testSSHCommandScript.append(script).append("\n");
-                if (script.equals("echo OK")) {
-                    return "OK";
-                }
-                if (script.startsWith("sudo systemctl status --no-pager")) {
-                    return systemStatusTest;
-                }
-                return testSSHCommandResultBuilder.toString();
-            }
-            @Override
-            public String runSSHCommand(String node, String command) {
-                testSSHCommandScript.append(command).append("\n");
-                return testSSHCommandResultBuilder.toString();
-            }
-            @Override
-            public void copySCPFile(String node, String filePath) {
-                // just do nothing
-            }
-        });
-        */
+        sshCommandServiceTest.setConnectionResultBuilder((connection, script) -> script);
 
         servicesInstallStatus.setValueForPath("etcd_installed_on_IP_192-168-10-11", "restart");
         servicesInstallStatus.setValueForPath("gluster_installed_on_IP_192-168-10-11", "restart");
@@ -461,7 +304,7 @@ public class SystemServiceTest {
     }
 
     @Test
-    public void testCheckServiceDisappearance() throws Exception {
+    public void testCheckServiceDisappearance() {
 
         SystemStatusWrapper prevSystemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
         prevSystemStatus.getJSONObject().remove("service_kafka-manager_192-168-10-11");
@@ -488,7 +331,7 @@ public class SystemServiceTest {
     }
 
     @Test
-    public void testCheckServiceDisappearanceWithRestarts() throws Exception {
+    public void testCheckServiceDisappearanceWithRestarts() {
 
         SystemStatusWrapper prevSystemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
         prevSystemStatus.getJSONObject().remove("service_kafka-manager_192-168-10-11");
@@ -520,7 +363,7 @@ public class SystemServiceTest {
     }
 
     @Test
-    public void testCheckServiceDisappearanceNodeDown() throws Exception {
+    public void testCheckServiceDisappearanceNodeDown() {
 
         SystemStatusWrapper prevSystemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
 
@@ -550,7 +393,7 @@ public class SystemServiceTest {
     @Test
     public void testHandleStatusChanges() throws Exception {
 
-        Set<String> configuredAndLiveIps = new HashSet<String>(){{
+        Set<String> configuredAndLiveIps = new HashSet<>(){{
             add("192.168.10.11");
             add("192.168.10.13");
         }};
@@ -582,7 +425,7 @@ public class SystemServiceTest {
     @Test
     public void testHandleStatusChangesNodeDown() throws Exception {
 
-        Set<String> configuredAndLiveIps = new HashSet<String>(){{
+        Set<String> configuredAndLiveIps = new HashSet<>(){{
             add("192.168.10.11");
             add("192.168.10.13");
         }};
@@ -622,7 +465,7 @@ public class SystemServiceTest {
     @Test
     public void testHandleStatusChangesKubernetesService() throws Exception {
 
-        Set<String> configuredAndLiveIps = new HashSet<String>(){{
+        Set<String> configuredAndLiveIps = new HashSet<>(){{
             add("192.168.10.11");
             add("192.168.10.13");
         }};
@@ -659,7 +502,7 @@ public class SystemServiceTest {
     @Test
     public void testHandleStatusChangesKubernetesServiceWhenKubernetesDown() throws Exception {
 
-        Set<String> configuredAndLiveIps = new HashSet<String>(){{
+        Set<String> configuredAndLiveIps = new HashSet<>(){{
             add("192.168.10.11");
             add("192.168.10.13");
         }};
@@ -690,7 +533,7 @@ public class SystemServiceTest {
     @Test
     public void testHandleStatusChangeMoreServicesRemoved() throws Exception {
 
-        Set<String> configuredAndLiveIps = new HashSet<String>(){{
+        Set<String> configuredAndLiveIps = new HashSet<>(){{
             add("192.168.10.11");
             add("192.168.10.13");
         }};
@@ -750,7 +593,7 @@ public class SystemServiceTest {
     @Test
     public void testHandleStatusChangeWhenNodeRemovedFromConfig() throws Exception {
 
-        Set<String> configuredAndLiveIps = new HashSet<String>(){{
+        Set<String> configuredAndLiveIps = new HashSet<>(){{
             add("192.168.10.11");
             add("192.168.10.13");
         }};
@@ -798,7 +641,7 @@ public class SystemServiceTest {
     @Test
     public void testHandleStatusChangeWhenNodeRemovedFromConfigAndNodeIsDown() throws Exception {
 
-        Set<String> configuredAndLiveIps = new HashSet<String>(){{
+        Set<String> configuredAndLiveIps = new HashSet<>(){{
             add("192.168.10.11");
         }};
 

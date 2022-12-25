@@ -18,7 +18,7 @@ public class FileUtilsTest {
         FileUtils.delete(fileToDelete);
         assertFalse (fileToDelete.exists());
 
-        fileToDelete.mkdirs();
+        assertTrue (fileToDelete.mkdirs());
         assertTrue(fileToDelete.exists());
 
         File ftd1 = File.createTempFile("test", "delete", fileToDelete);

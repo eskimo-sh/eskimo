@@ -57,7 +57,7 @@ public class WebSocketProxyServerTestImpl extends WebSocketProxyServerImpl imple
                 return null;
             }
             @Override
-            public void forwardMessage(WebSocketMessage<?> webSocketMessage) throws IOException {
+            public void forwardMessage(WebSocketMessage<?> webSocketMessage) {
                 // No-Op
             }
             @Override

@@ -76,14 +76,14 @@ public class NodesConfigWrapperTest {
             "}");
 
     @Test
-    public void testHasServiceConfigured() throws Exception {
+    public void testHasServiceConfigured() {
         assertTrue(ncw.hasServiceConfigured("kube-master"));
         assertTrue(ncw.hasServiceConfigured("ntp"));
         assertFalse(ncw.hasServiceConfigured("blablabla"));
     }
 
     @Test
-    public void testIsServiceOnNode() throws Exception {
+    public void testIsServiceOnNode() {
         assertTrue(ncw.isServiceOnNode("kube-master", 1));
         assertFalse(ncw.isServiceOnNode("kube-master", 2));
 
@@ -92,31 +92,31 @@ public class NodesConfigWrapperTest {
     }
 
     @Test
-    public void testGetNodeAddressKeys() throws Exception {
+    public void testGetNodeAddressKeys() {
         assertEquals ("node_id1,node_id2,node_id3", String.join(",", ncw.getNodeAddressKeys()));
     }
 
     @Test
-    public void testGetServiceKeys() throws Exception {
+    public void testGetServiceKeys() {
         assertEquals ("elasticsearch1,elasticsearch2,elasticsearch3,gluster1,gluster2,gluster3,k8s-slave1,k8s-slave2,k8s-slave3,kafka1,kafka2,kafka3,kube-master,logstash1,logstash2,logstash3,ntp1,ntp2,ntp3,prometheus1,prometheus2,prometheus3,zookeeper", String.join(",", ncw.getServiceKeys()));
     }
 
     @Test
-    public void testGetNodeAddress() throws Exception {
+    public void testGetNodeAddress() {
         assertEquals ("192.168.56.21", ncw.getNodeAddress(1));
         assertEquals ("192.168.56.22", ncw.getNodeAddress(2));
         assertEquals ("192.168.56.23", ncw.getNodeAddress(3));
     }
 
     @Test
-    public void testGetNodeName() throws Exception {
+    public void testGetNodeName() {
         assertEquals ("192-168-56-21", ncw.getNodeName(1));
         assertEquals ("192-168-56-22", ncw.getNodeName(2));
         assertEquals ("192-168-56-23", ncw.getNodeName(3));
     }
 
     @Test
-    public void testGetAllNodeAddressesWithService() throws Exception {
+    public void testGetAllNodeAddressesWithService() {
         assertEquals ("192.168.56.21,192.168.56.22,192.168.56.23", String.join(",", ncw.getAllNodeAddressesWithService("ntp")));
         assertEquals ("192.168.56.21", String.join(",", ncw.getAllNodeAddressesWithService("kube-master")));
     }
@@ -134,14 +134,14 @@ public class NodesConfigWrapperTest {
     }
 
     @Test
-    public void testGetNodeNumbers() throws Exception {
+    public void testGetNodeNumbers() {
         assertEquals ("1,2,3", ncw.getNodeNumbers("elasticsearch").stream().map(nbr -> "" + nbr).collect(Collectors.joining(",")));
         assertEquals ("1,2,3", ncw.getNodeNumbers("k8s-slave").stream().map(nbr -> "" + nbr).collect(Collectors.joining(",")));
         assertEquals ("1", ncw.getNodeNumbers("zookeeper").stream().map(nbr -> "" + nbr).collect(Collectors.joining(",")));
     }
 
     @Test
-    public void testGetFirstNodeName() throws Exception {
+    public void testGetFirstNodeName() {
         assertEquals ("192-168-56-21", ncw.getFirstNodeName("elasticsearch"));
         assertEquals ("192-168-56-21", ncw.getFirstNodeName("ntp"));
         assertEquals ("192-168-56-21", ncw.getFirstNodeName("zookeeper"));

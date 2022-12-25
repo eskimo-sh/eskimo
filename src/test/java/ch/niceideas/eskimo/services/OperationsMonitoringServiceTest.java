@@ -38,7 +38,6 @@ import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
@@ -55,11 +54,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -73,8 +69,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class OperationsMonitoringServiceTest {
 
     private static final Logger logger = Logger.getLogger(OperationsMonitoringServiceTest.class);
-
-    private String testRunUUID = UUID.randomUUID().toString();
 
     @Autowired
     private OperationsMonitoringService operationsMonitoringService;

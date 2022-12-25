@@ -1,10 +1,13 @@
 package ch.niceideas.eskimo.controlers;
 
-import ch.niceideas.common.utils.*;
+import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.model.SimpleOperationCommand;
-import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.NotificationService;
+import ch.niceideas.eskimo.services.OperationsMonitoringService;
 import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import ch.niceideas.eskimo.test.infrastructure.NotificationHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
@@ -23,7 +26,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)

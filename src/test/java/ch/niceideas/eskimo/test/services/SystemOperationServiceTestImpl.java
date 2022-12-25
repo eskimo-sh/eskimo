@@ -65,7 +65,7 @@ public class SystemOperationServiceTestImpl implements SystemOperationService {
 
     private boolean mockCalls = false;
 
-    private List<Pair<OperationId, SystemOperation>> appliedOperations = new ArrayList<>();
+    private final List<Pair<OperationId, SystemOperation>> appliedOperations = new ArrayList<>();
 
     public void setMockCalls (boolean mockCalls) {
         this.mockCalls = mockCalls;

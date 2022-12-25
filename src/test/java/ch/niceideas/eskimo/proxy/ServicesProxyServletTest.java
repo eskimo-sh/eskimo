@@ -164,7 +164,7 @@ public class ServicesProxyServletTest {
     }
 
     @Test
-    public void testNominalReplacements() throws Exception {
+    public void testNominalReplacements() {
 
         Service kafkaManagerService = servicesDefinition.getService("kafka-manager");
 
