@@ -71,7 +71,9 @@ public class UsualServer implements TestResourcesServer {
     }
 
     public void stopServer() throws Exception {
-        jetty.stop();
+        if (jetty != null) {
+            jetty.stop();
+        }
     }
 
     public void postTestMethodHook(JsRunner runner) {
