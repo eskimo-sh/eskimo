@@ -76,21 +76,9 @@ public class TerminalController {
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     public String postUpdate(@RequestBody String terminalBody, HttpServletResponse resp) {
-
         try {
-            ScreenImage si = terminalService.postUpdate(terminalBody);
-
-            resp.setContentType("application/xml;charset=UTF-8");
-            if (si.cursorX != -1 || si.cursorY != -1) {
-                resp.addHeader("Cursor-X", String.valueOf(si.cursorX));
-                resp.addHeader("Cursor-Y", String.valueOf(si.cursorY));
-            }
-            resp.addHeader("Screen-X", String.valueOf(si.screenX));
-            resp.addHeader("Screen-Y", String.valueOf(si.screenY));
-            resp.addHeader("Screen-Timestamp", String.valueOf(si.timestamp));
-
-            return si.screen;
-
+            return terminalService.postUpdate(terminalBody)
+                    .renderResponse(resp);
         } catch (IOException e) {
             logger.error(e, e);
             return e.getMessage();

@@ -64,7 +64,7 @@ public class JSONBackedUserDetailsManagerTest {
 
         tmpUsersFile = File.createTempFile("users-config", ".json");
 
-        mgr = new JSONBackedUserDetailsManager(tmpUsersFile.getAbsolutePath());
+        mgr = new JSONBackedUserDetailsManager(tmpUsersFile.getAbsolutePath(), passwordEncoder);
     }
 
     @Test
@@ -89,10 +89,12 @@ public class JSONBackedUserDetailsManagerTest {
 
         mgr.createUser(newUser);
 
-        JSONBackedUserDetailsManager otherMgr = new JSONBackedUserDetailsManager(tmpUsersFile.getAbsolutePath());
+        JSONBackedUserDetailsManager otherMgr = new JSONBackedUserDetailsManager(
+                tmpUsersFile.getAbsolutePath(), passwordEncoder);
 
         assertTrue (otherMgr.userExists("test_user"));
-        assertTrue (passwordEncoder.matches("test_password", otherMgr.loadUserByUsername("test_user").getPassword()));
+        assertTrue (passwordEncoder.matches("test_password",
+                otherMgr.loadUserByUsername("test_user").getPassword()));
     }
 
     @Test
@@ -103,7 +105,8 @@ public class JSONBackedUserDetailsManagerTest {
 
         mgr.deleteUser("test_user");
 
-        JSONBackedUserDetailsManager otherMgr = new JSONBackedUserDetailsManager(tmpUsersFile.getAbsolutePath());
+        JSONBackedUserDetailsManager otherMgr = new JSONBackedUserDetailsManager(
+                tmpUsersFile.getAbsolutePath(), passwordEncoder);
 
         assertFalse (otherMgr.userExists("test_user"));
     }
@@ -119,7 +122,8 @@ public class JSONBackedUserDetailsManagerTest {
 
         mgr.updatePassword(testUser, passwordEncoder.encode("other-password"));
 
-        JSONBackedUserDetailsManager otherMgr = new JSONBackedUserDetailsManager(tmpUsersFile.getAbsolutePath());
+        JSONBackedUserDetailsManager otherMgr = new JSONBackedUserDetailsManager(
+                tmpUsersFile.getAbsolutePath(), passwordEncoder);
 
         assertTrue (otherMgr.userExists("test_user"));
         assertTrue (passwordEncoder.matches("other-password", otherMgr.loadUserByUsername("test_user").getPassword()));
@@ -141,7 +145,8 @@ public class JSONBackedUserDetailsManagerTest {
 
         mgr.changePassword("test_password", "other-password");
 
-        JSONBackedUserDetailsManager otherMgr = new JSONBackedUserDetailsManager(tmpUsersFile.getAbsolutePath());
+        JSONBackedUserDetailsManager otherMgr = new JSONBackedUserDetailsManager(
+                tmpUsersFile.getAbsolutePath(), passwordEncoder);
 
         assertTrue (otherMgr.userExists("test_user"));
         assertTrue (passwordEncoder.matches("other-password", otherMgr.loadUserByUsername("test_user").getPassword()));

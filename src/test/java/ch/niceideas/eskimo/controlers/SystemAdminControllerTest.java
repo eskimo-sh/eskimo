@@ -128,7 +128,7 @@ public class SystemAdminControllerTest {
     @Test
     public void testReinstallService_processingPending() throws Exception {
 
-        operationsMonitoringServiceTest.operationsStarted(new SimpleOperationCommand("test", "test", "192.168.10.15"));
+        operationsMonitoringServiceTest.startCommand(new SimpleOperationCommand("test", "test", "192.168.10.15"));
 
         assertEquals ("{\n" +
                 "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed.\",\n" +

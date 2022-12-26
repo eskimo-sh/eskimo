@@ -36,8 +36,7 @@ public class KubeStatusParser {
         for (String podStatusLine: allPodStatus.split("\n")) {
             String[] fields = podStatusLine.split("[ \t]{2,}");
             if (podHeader == null) {
-                podHeader = new LinkedList<>();
-                podHeader.addAll(Arrays.asList(fields));
+                podHeader = new LinkedList<>(Arrays.asList(fields));
             } else {
                 HashMap<String, String> podMap = new HashMap<>();
                 for (int i = 0; i < fields.length; i++) {
@@ -72,20 +71,20 @@ public class KubeStatusParser {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append ("POD STATUSES\n");
-        for (String podName : podStatuses.keySet()) {
-            sb.append (podName + " : ");
-            podStatuses.get(podName).keySet().forEach(key -> sb.append(key + "=" + podStatuses.get(podName).get(key) + ", "));
-            sb.append ("\n");
-        }
+        appendStatuses(podStatuses, sb);
         sb.append ("SERVICE STATUSES\n");
-        for (String serviceName : serviceStatuses.keySet()) {
-            sb.append (serviceName + " : ");
-            serviceStatuses.get(serviceName).keySet().forEach(key -> sb.append(key + "=" + serviceStatuses.get(serviceName).get(key) + ", "));
+        appendStatuses(serviceStatuses, sb);
+        sb.append ("REGISTRY SERVICES\n");
+        registryServices.forEach(service -> sb.append(service).append("\n"));
+        return sb.toString();
+    }
+
+    private void appendStatuses(Map<String, Map<String, String>> statuses, StringBuilder sb) {
+        for (String podName : statuses.keySet()) {
+            sb.append(podName).append(" : ");
+            statuses.get(podName).keySet().forEach(key -> sb.append(key).append("=").append(statuses.get(podName).get(key)).append(", "));
             sb.append ("\n");
         }
-        sb.append ("REGISTRY SERVICES\n");
-        registryServices.forEach(service -> sb.append(service + "\n"));
-        return sb.toString();
     }
 
     private String getServiceIp(String service) {

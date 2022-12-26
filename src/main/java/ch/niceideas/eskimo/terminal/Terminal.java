@@ -520,6 +520,7 @@ public class Terminal {
     }
 
     @Esc({"\u0005", "\u001B[c", "\u001B[0c", "\u001BZ"})
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void escDa() {
         outBuffer = new StringBuilder("\u001B[?6c");
     }
@@ -528,6 +529,7 @@ public class Terminal {
      * Backspace.
      */
     @Esc("\u0008")
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void esc0x08() {
         cx = max(0, cx - 1);
     }
@@ -536,6 +538,7 @@ public class Terminal {
      * Tab.
      */
     @Esc("\u0009")
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void esc0x09() {
         cx = (((cx / 8) + 1) * 8) % width;
     }
@@ -544,6 +547,7 @@ public class Terminal {
      * Carriage return
      */
     @Esc("\r")
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void esc0x0d() {
         cl = false;
         cx = 0;
@@ -553,6 +557,7 @@ public class Terminal {
             "\u001B=", "\u001B>", "\u001B(0", "\u001B(A",
             "\u001B(B", "\u001B]R", "\u001BD", "\u001BE", "\u001BH",
             "\u001BN", "\u001BO", "\u001Ba", "\u001Bn", "\u001Bo"})
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void noOp() {
     }
 
@@ -569,25 +574,30 @@ public class Terminal {
     }
 
     @Esc("\u001BM")
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void escRi() {
         cy = max(st, cy - 1);
         if (cy == st)
             scrollDown(st, sb);
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiUpperA(int[] i) {
         cy = max(st, cy - defaultsTo(i, 1));
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiUpperB(int[] i) {
         cy = min(sb, cy + defaultsTo(i, 1));
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiUpperC(int[] i) {
         cx = min(width - 1, cx + defaultsTo(i, 1));
         cl = false;
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiUpperD(int[] i) {
         cx = max(0, cx - defaultsTo(i, 1));
         cl = false;
@@ -600,22 +610,26 @@ public class Terminal {
         return (args.length == 0) ? defaultValue : args[0];
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiUpperE(int[] i) {
         csiUpperB(i);
         cx = 0;
         cl = false;
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiUpperF(int[] i) {
         csiUpperA(i);
         cx = 0;
         cl = false;
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiUpperG(int[] i) {
         cx = min(width, i[0]) - 1;
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiUpperH(int[] i) {
         if (i.length < 2) i = new int[]{1, 1};
         cx = min(width, i[1]) - 1;
@@ -623,39 +637,42 @@ public class Terminal {
         cl = false;
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiUpperJ(int[] i) {
         switch (defaultsTo(i, 0)) {
             default:
             case 0:
                 zero(cy, cx, height, 0);
-                return;
+                break;
             case 1:
                 zero(0, 0, cx, cy);
-                return;
+                break;
             case 2:
                 zero(0, 0, height, 0);
-                return;
+                break;
         }
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiUpperK(int... i) {
         switch (defaultsTo(i, 0)) {
             default:
             case 0:
                 zero(cy, cx, cy, width);
-                return;
+                break;
             case 1:
                 zero(cy, 0, cy, cx);
-                return;
+                break;
             case 2:
                 zero(cy, 0, cy, width);
-                return;
+                break;
         }
     }
 
     /**
      * Insert lines.
      */
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiUpperL(int[] args) {
         for (int i = 0; i < defaultsTo(args, 1); i++)
             if (cy < sb)
@@ -665,6 +682,7 @@ public class Terminal {
     /**
      * Delete lines.
      */
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiUpperM(int[] args) {
         if (cy >= st && cy <= sb)
             for (int i = 0; i < defaultsTo(args, 1); i++)
@@ -674,6 +692,7 @@ public class Terminal {
     /**
      * Delete n chars
      */
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiUpperP(int[] args) {
         int _cy = cy;
         int _cx = cx;
@@ -682,38 +701,47 @@ public class Terminal {
         poke(_cy, _cx, end.substring(defaultsTo(args, 1)));
     }
 
+    @SuppressWarnings("unused")
     void csiUpperX(int[] args) {
         zero(cy, cx, cy, cx + args[0]);
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiLowerA(int[] args) {
         csiUpperC(args);
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiLowerC(int[] args) {
         // noop
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiLowerD(int[] args) {
         cy = min(height, args[0]) - 1;
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiLowerE(int[] args) {
         csiUpperB(args);
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiLowerF(int[] args) {
         csiUpperH(args);
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiLowerH(int[] args) {
         showCursor = true;
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiLowerL(int[] args) {
         showCursor = false;
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiLowerM(int[] args) {
         if (args.length == 0) {
             sgr = 0x0700;
@@ -734,6 +762,7 @@ public class Terminal {
         }
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiLowerR(int[] args) {
         if (args.length < 2) args = new int[]{0, height};
         st = min(height, args[0]) - 1;
@@ -741,11 +770,13 @@ public class Terminal {
         sb = max(sb, st);
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiLowerS(int[] args) {
         sb = max(sb, st);
         saveCursor();
     }
 
+    @SuppressWarnings("unused") /* Actually used through reflection */
     void csiLowerU(int[] args) {
         restoreCursor();
     }

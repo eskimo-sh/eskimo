@@ -51,7 +51,6 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
 
     private static final Logger logger = Logger.getLogger(EskimoKubernetesServicesConfigCheckerTest.class);
 
-
     JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
         put("node_id1", "192.168.10.11");
         put("kube-master", "1");

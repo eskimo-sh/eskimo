@@ -58,12 +58,6 @@ public class NodesConfigurationChecker {
     @Autowired
     private ServicesDefinition servicesDefinition;
 
-    @Deprecated
-    public void setServicesDefinition (ServicesDefinition servicesDefinition) {
-        this.servicesDefinition = servicesDefinition;
-    }
-
-
     public void checkNodesSetup(NodesConfigWrapper nodesConfig) throws NodesConfigurationException {
 
         // check IP addresses and ranges configuration

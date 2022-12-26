@@ -114,7 +114,7 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public void delegateApplyNodesConfig(ServiceOperationsCommand command) throws SystemException, NodesConfigurationException {
+    public void delegateApplyNodesConfig(ServiceOperationsCommand command) throws NodesConfigurationException {
 
     }
 

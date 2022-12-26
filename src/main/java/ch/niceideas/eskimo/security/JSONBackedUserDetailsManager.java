@@ -54,6 +54,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.util.Assert;
 
@@ -89,13 +90,12 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
 
     private final String jsonFilePath;
 
-    private BCryptPasswordEncoder passwordEncoder = null;
+    private PasswordEncoder passwordEncoder;
 
-    public JSONBackedUserDetailsManager(String jsonFilePath) throws FileException {
+    public JSONBackedUserDetailsManager(String jsonFilePath, PasswordEncoder passwordEncoder) throws FileException {
 
         this.jsonFilePath = jsonFilePath;
-
-        passwordEncoder = new BCryptPasswordEncoder(11);
+        this.passwordEncoder = passwordEncoder;
 
         File configFile = new File(jsonFilePath);
         if (!configFile.exists()) {
@@ -130,6 +130,7 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
         }
     }
 
+    @Override
     public void createUser(UserDetails user) {
         Assert.isTrue(!userExists(user.getUsername()), "user should not exist");
 
@@ -167,12 +168,14 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
         }
     }
 
+    @Override
     public void deleteUser(String username) {
         users.remove(username.toLowerCase());
 
         saveUserConfig();
     }
 
+    @Override
     public void updateUser(UserDetails user) {
         Assert.isTrue(userExists(user.getUsername()), "user should exist");
 
@@ -181,10 +184,12 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
         saveUserConfig();
     }
 
+    @Override
     public boolean userExists(String username) {
         return users.containsKey(username.toLowerCase());
     }
 
+    @Override
     public void changePassword(String oldPassword, String newPassword) {
         Authentication currentUser = SecurityContextHolder.getContext()
                 .getAuthentication();
@@ -235,6 +240,7 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
         return mutableUser;
     }
 
+    @Override
     public UserDetails loadUserByUsername(String username) {
 
         if (username == null) {

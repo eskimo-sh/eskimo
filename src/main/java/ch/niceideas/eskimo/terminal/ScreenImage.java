@@ -74,16 +74,16 @@ public final class ScreenImage implements Serializable {
         this.screenY = t.height;
     }
 
-    public void renderResponse(HttpServletResponse rsp) throws IOException {
-        rsp.setContentType("application/xml;charset=UTF-8");
-        if(this.cursorX!=-1 || this.cursorY!=-1) {
-            rsp.addHeader("Cursor-X",String.valueOf(cursorX));
-            rsp.addHeader("Cursor-Y",String.valueOf(cursorY));
+    public String renderResponse(HttpServletResponse resp) throws IOException {
+        resp.setContentType("application/xml;charset=UTF-8");
+        if (cursorX != -1 || cursorY != -1) {
+            resp.addHeader("Cursor-X", String.valueOf(cursorX));
+            resp.addHeader("Cursor-Y", String.valueOf(cursorY));
         }
-        rsp.addHeader("Screen-X",String.valueOf(screenX));
-        rsp.addHeader("Screen-Y", String.valueOf(screenY));
-        rsp.addHeader("Screen-Timestamp", String.valueOf(timestamp));
-        rsp.getWriter().println(screen);
+        resp.addHeader("Screen-X", String.valueOf(screenX));
+        resp.addHeader("Screen-Y", String.valueOf(screenY));
+        resp.addHeader("Screen-Timestamp", String.valueOf(timestamp));
+        return screen;
     }
 
     private static final long serialVersionUID = 1L;

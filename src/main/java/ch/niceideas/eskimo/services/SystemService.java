@@ -51,7 +51,7 @@ public interface SystemService {
     String SERVICE_PREFIX = "Service ";
     String SHOULD_NOT_HAPPEN_FROM_HERE = " should not happen from here.";
 
-    void delegateApplyNodesConfig(ServiceOperationsCommand command) throws SystemException, NodesConfigurationException;
+    void delegateApplyNodesConfig(ServiceOperationsCommand command) throws NodesConfigurationException;
 
     void showJournal(Service service, String node) throws SystemException;
 

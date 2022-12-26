@@ -374,7 +374,7 @@ public class KubernetesServiceImpl implements KubernetesService {
         boolean success = false;
         try {
 
-            operationsMonitoringService.operationsStarted(command);
+            operationsMonitoringService.startCommand(command);
 
             // Find out node running Kubernetes
             ServicesInstallStatusWrapper servicesInstallStatus = configurationService.loadServicesInstallationStatus();
@@ -446,7 +446,7 @@ public class KubernetesServiceImpl implements KubernetesService {
             // Nodes re-setup (topology)
             systemOperationService.applySystemOperation(new KubernetesOperationsCommand.KubernetesOperationId("Installation", TOPOLOGY_ALL_NODES),
                     ml -> {
-                        systemService.performPooledOperation (new ArrayList<String>(liveIps), parallelismInstallThreadCount, baseInstallWaitTimout,
+                        systemService.performPooledOperation (new ArrayList<>(liveIps), parallelismInstallThreadCount, baseInstallWaitTimout,
                                 (operation, error) -> {
                                     // topology
                                     if (error.get() == null) {
@@ -483,7 +483,7 @@ public class KubernetesServiceImpl implements KubernetesService {
             notificationService.addError("Kubernetes Services installation failed !");
             throw new KubernetesException(e);
         } finally {
-            operationsMonitoringService.operationsFinished(success);
+            operationsMonitoringService.endCommand(success);
             logger.info ("Kubernetes Deployment Operations Completed.");
         }
     }

@@ -46,12 +46,10 @@ import static org.awaitility.Awaitility.await;
 
 public class EskimoServicesSelectionTest extends AbstractWebTest {
 
-    private String jsonServices = null;
-
     @BeforeEach
     public void setUp() throws Exception {
 
-        jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"), StandardCharsets.UTF_8);
+        String jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"), StandardCharsets.UTF_8);
 
         loadScript("bootstrap-5.2.0.js");
 

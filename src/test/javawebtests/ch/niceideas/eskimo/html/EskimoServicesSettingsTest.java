@@ -43,8 +43,6 @@ import java.nio.charset.StandardCharsets;
 
 public class EskimoServicesSettingsTest extends AbstractWebTest {
 
-    private String jsonConfig = null;
-
     @BeforeEach
     public void setUp() throws Exception {
 
@@ -61,7 +59,7 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
 
         waitForElementIdInDOM("reset-services-settings-btn");
 
-        jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
+        String jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
 
         js("window.TEST_SERVICE_SETTINGS = " + jsonConfig + ";");
 

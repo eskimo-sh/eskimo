@@ -131,7 +131,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                         servicesInstallationSorter, servicesDefinition, nodesConfig, dirtyServices);
 
                 boolean success = false;
-                operationsMonitoringService.operationsStarted(restartCommand);
+                operationsMonitoringService.startCommand(restartCommand);
                 try {
 
                     Set<String> liveIps = new HashSet<>();
@@ -187,7 +187,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                     }
 
                 } finally {
-                    operationsMonitoringService.operationsFinished(success);
+                    operationsMonitoringService.endCommand(success);
                     logger.info ("System Deployment Operations Completed.");
                 }
             }

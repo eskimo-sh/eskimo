@@ -49,12 +49,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EskimoNodesConfigTest extends AbstractWebTest {
 
-    private String jsonServices = null;
-
     @BeforeEach
     public void setUp() throws Exception {
 
-        jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"), StandardCharsets.UTF_8);
+        String jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"), StandardCharsets.UTF_8);
 
         loadScript("eskimoUtils.js");
         loadScript("eskimoNodesConfigurationChecker.js");

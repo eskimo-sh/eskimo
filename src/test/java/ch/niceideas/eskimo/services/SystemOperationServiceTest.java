@@ -73,12 +73,12 @@ public class SystemOperationServiceTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        operationsMonitoringServiceTest.operationsStarted(new SimpleOperationCommand("test", "test", "test"));
+        operationsMonitoringServiceTest.startCommand(new SimpleOperationCommand("test", "test", "test"));
     }
 
     @AfterEach
     public void tearDown() {
-        operationsMonitoringServiceTest.operationsFinished(true);
+        operationsMonitoringServiceTest.endCommand(true);
     }
 
     @Test

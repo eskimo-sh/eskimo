@@ -99,7 +99,7 @@ public class NodesConfigurationServiceTest {
     @BeforeEach
     public void setUp() throws Exception {
         SecurityContextHelper.loginAdmin();
-        operationsMonitoringServiceTest.operationsFinished(true);
+        operationsMonitoringServiceTest.endCommand(true);
         connectionManagerServiceTest.dontConnect();
         sshCommandServiceTest.reset();
         systemServiceTest.reset();
@@ -192,7 +192,7 @@ public class NodesConfigurationServiceTest {
         ServiceOperationsCommand command = ServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedStatus, StandardSetupHelpers.getStandard2NodesSetup());
 
-        operationsMonitoringServiceTest.operationsStarted(command);
+        operationsMonitoringServiceTest.startCommand(command);
 
         // testing zookeeper installation
         nodesConfigurationService.installService(new ServiceOperationsCommand.ServiceOperationId("installation", "zookeeper", "192.168.10.13"));
@@ -203,7 +203,7 @@ public class NodesConfigurationServiceTest {
                 "Installation setup  - zookeeper - 192.168.10.13 - 192.168.10.13\n" +
                 "Installation cleanup  - zookeeper - zookeeper - 192.168.10.13", executedActions);
 
-        operationsMonitoringServiceTest.operationsFinished(true);
+        operationsMonitoringServiceTest.endCommand(true);
     }
 
     @Test
@@ -308,7 +308,7 @@ public class NodesConfigurationServiceTest {
         ServiceOperationsCommand command = ServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedStatus, nodesConfig);
 
-        operationsMonitoringServiceTest.operationsStarted(command);
+        operationsMonitoringServiceTest.startCommand(command);
 
         // testing zookeeper installation
         nodesConfigurationService.uninstallService(new ServiceOperationsCommand.ServiceOperationId("uninstallation", "zookeeper", "192.168.10.11"));
@@ -322,7 +322,7 @@ public class NodesConfigurationServiceTest {
                 "sudo systemctl daemon-reload\n" +
                 "sudo systemctl reset-failed\n"));
 
-        operationsMonitoringServiceTest.operationsFinished(true);
+        operationsMonitoringServiceTest.endCommand(true);
     }
 
 }

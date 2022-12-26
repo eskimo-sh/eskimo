@@ -486,7 +486,7 @@ public class SetupServiceImpl implements SetupService {
         boolean success = false;
         try {
 
-            operationsMonitoringService.operationsStarted(setupCommand);
+            operationsMonitoringService.startCommand(setupCommand);
 
             JsonWrapper setupConfig = setupCommand.getRawSetup();
 
@@ -614,7 +614,7 @@ public class SetupServiceImpl implements SetupService {
             return ReturnStatusHelper.createErrorStatus (e);
 
         } finally {
-            operationsMonitoringService.operationsFinished (success);
+            operationsMonitoringService.endCommand(success);
         }
     }
 

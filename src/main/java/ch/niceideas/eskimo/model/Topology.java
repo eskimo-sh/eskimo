@@ -354,16 +354,16 @@ public class Topology {
     }
 
     private String handleMissingMaster(ConfigurationOwner nodesConfig, Dependency dep, Service service, String masterIp, int countOfMaster) throws NodesConfigurationException {
-        return handleMissingMasterInternal (nodesConfig, dep, service, masterIp,
+        return handleMissingMasterInternal (nodesConfig, dep, masterIp,
                 "Dependency " + dep.getMasterService() + " for service " + service.getName() + " could not found occurence " + countOfMaster);
     }
 
     private String handleMissingMaster(ConfigurationOwner nodesConfig, Dependency dep, Service service, String masterIp) throws NodesConfigurationException {
-        return handleMissingMasterInternal (nodesConfig, dep, service, masterIp,
+        return handleMissingMasterInternal (nodesConfig, dep, masterIp,
                 "Dependency " + dep.getMasterService() + " for service" + service.getName() + " could not be found");
     }
 
-    private String handleMissingMasterInternal(ConfigurationOwner nodesConfig, Dependency dep, Service service, String masterIp, String message) throws NodesConfigurationException {
+    private String handleMissingMasterInternal(ConfigurationOwner nodesConfig, Dependency dep, String masterIp, String message) throws NodesConfigurationException {
         if (masterIp == null) {
             if (!dep.isMandatory(nodesConfig)) {
                 // if none could be found, then well ... none could be found
@@ -480,7 +480,7 @@ public class Topology {
         sb.append("\n");
     }
 
-    public String getTopologyScript(ServicesInstallStatusWrapper serviceInstallStatus) throws SetupException, FileException {
+    public String getTopologyScript(ServicesInstallStatusWrapper serviceInstallStatus) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("#Topology\n");
@@ -495,11 +495,13 @@ public class Topology {
             serviceInstallStatus.getInstalledServicesFlags()
                     .forEach(serviceInstallStatusGlag -> {
                         Pair<String, String> serviceInstall = ServicesInstallStatusWrapper.parseInstallStatusFlag(serviceInstallStatusGlag);
-                        String installedService = serviceInstall.getKey();
-                        String nodeName = serviceInstall.getValue();
-                        appendExport(sb,
-                                "ESKIMO_INSTALLED_" + installedService.replace("-", "_") + "_" + nodeName.replace("-", ""),
-                                serviceInstallStatus.getValueForPathAsString(serviceInstallStatusGlag));
+                        if (serviceInstall != null) {
+                            String installedService = serviceInstall.getKey();
+                            String nodeName = serviceInstall.getValue();
+                            appendExport(sb,
+                                    "ESKIMO_INSTALLED_" + installedService.replace("-", "_") + "_" + nodeName.replace("-", ""),
+                                    serviceInstallStatus.getValueForPathAsString(serviceInstallStatusGlag));
+                        }
                     });
         }
 

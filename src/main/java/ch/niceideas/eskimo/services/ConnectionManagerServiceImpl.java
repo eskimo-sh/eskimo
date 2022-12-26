@@ -39,7 +39,6 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
-import com.trilead.ssh2.LocalPortForwarder;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +51,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
-import java.net.BindException;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -228,7 +226,7 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
                         return getConnectionInternal(node);
                     }
 
-                    try (ConnectionOperationWatchDog sg = new ConnectionOperationWatchDog(connection)) {
+                    try (ConnectionOperationWatchDog ignored = new ConnectionOperationWatchDog(connection)) {
                         //connection.ping(); // this is too buggy !!! Waits for the socket outputStream result like forever and seems impossible to kill
                         connection.sendIgnorePacket();
                     }

@@ -34,8 +34,10 @@
 
 package ch.niceideas.eskimo.html;
 
+import ch.niceideas.common.exceptions.CommonBusinessException;
 import ch.niceideas.eskimo.html.infra.TestResourcesServer;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import io.github.bonigarcia.wdm.config.WebDriverManagerException;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -57,7 +59,7 @@ public abstract class AbstractWebTest {
 
     private static final Logger logger = Logger.getLogger(AbstractWebTest.class);
 
-    private static File jsCoverageFlagFile = new File("target/jsCoverageFlag");
+    private static final File jsCoverageFlagFile = new File("target/jsCoverageFlag");
 
     private static final int INCREMENTAL_WAIT_MS = 500;
     private static final int MAX_WAIT_RETRIES = 50;
@@ -83,9 +85,20 @@ public abstract class AbstractWebTest {
         co.addArguments("--headless");
         co.addArguments("--disable-gpu");
 
-        driver = WebDriverManager.chromedriver()
-                .capabilities(co)
-                .create();
+        for (int i = 0; i < 3; i++) { // 3 attempts
+            try {
+                driver = WebDriverManager.chromedriver()
+                        .capabilities(co)
+                        .create();
+            } catch (WebDriverManagerException e) {
+                if (i < 2) {
+                    logger.error (e, e);
+                    Thread.sleep (500);
+                } else {
+                    throw new CommonBusinessException(e);
+                }
+            }
+        }
 
         driver.get("http://localhost:9001/src/test/resources/GenericTestPage.html");
     }
@@ -111,11 +124,9 @@ public abstract class AbstractWebTest {
 
         // wait for page to load
         Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(100));
-        wait.until(innerDriver -> {
-            return String
-                    .valueOf(((JavascriptExecutor) innerDriver).executeScript("return document.readyState"))
-                    .equals("complete");
-        });
+        wait.until(innerDriver -> String
+                .valueOf(((JavascriptExecutor) innerDriver).executeScript("return document.readyState"))
+                .equals("complete"));
 
         assertEquals("Generic Test Page", driver.getTitle());
 

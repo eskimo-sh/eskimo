@@ -31,7 +31,7 @@ public class SystemStatusControllerTest {
 
     @BeforeEach
     public void setUp() {
-        operationsMonitoringServiceTest.operationsFinished(true);
+        operationsMonitoringServiceTest.endCommand(true);
     }
 
     @Test

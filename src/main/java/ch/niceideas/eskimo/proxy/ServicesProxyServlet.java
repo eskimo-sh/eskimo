@@ -36,10 +36,10 @@ package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.model.service.proxy.PageScripter;
 import ch.niceideas.eskimo.model.service.proxy.ProxyReplacement;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
-import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.model.service.proxy.ReplacementContext;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
@@ -63,7 +63,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ServicesProxyServlet extends ProxyServlet {
 
@@ -279,7 +278,7 @@ public class ServicesProxyServlet extends ProxyServlet {
 
             HttpEntity entity = ((HttpEntityContainer)proxyResponse).getEntity();
 
-            Charset encoding = null;
+            Charset encoding;
             try {
                 if (entity != null && entity.getContentEncoding() != null) {
                     encoding = Charset.forName(entity.getContentEncoding());

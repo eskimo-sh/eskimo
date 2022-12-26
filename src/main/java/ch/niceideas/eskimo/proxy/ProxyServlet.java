@@ -40,7 +40,7 @@ public class ProxyServlet extends HttpServlet {
     public static final String SET_COOKIE        = "Set-Cookie";
     public static final String SET_COOKIE2       = "Set-Cookie2";
 
-    private static int MAX_CONNECTION_PER_ROUTE = 5;
+    private static final int MAX_CONNECTION_PER_ROUTE = 5;
 
     /* INIT PARAMETER NAME CONSTANTS */
 
@@ -105,7 +105,7 @@ public class ProxyServlet extends HttpServlet {
     protected static final String ATTR_TARGET_HOST =
             ProxyServlet.class.getSimpleName() + ".targetHost";
 
-    private static Map<String, String> overridingClientHheaders = new HashMap<>() {{
+    private static final Map<String, String> overridingClientHheaders = new HashMap<>() {{
             put ("accept-encoding", "gzip, deflate");
         }};
 
@@ -277,7 +277,6 @@ public class ProxyServlet extends HttpServlet {
 
     public static class ProxySessionListener implements HttpSessionListener {
 
-        @SuppressWarnings("deprecation")
         @Override
         public void sessionDestroyed(HttpSessionEvent se) {
             HttpClient proxyClient = (HttpClient) se.getSession().getAttribute(SESSION_HTTP_CLIENT);
@@ -293,7 +292,6 @@ public class ProxyServlet extends HttpServlet {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse)
             throws ServletException, IOException {
@@ -370,7 +368,6 @@ public class ProxyServlet extends HttpServlet {
         }
     }
 
-    @SuppressWarnings("deprecation")
     protected void handleRequestException(HttpRequest proxyRequest, Exception e) throws ServletException, IOException {
         //abort request, according to best practice with HttpClient
         /*
@@ -740,7 +737,7 @@ public class ProxyServlet extends HttpServlet {
             char c = in.charAt(i);
             boolean escape = true;
             if (c < 128) {
-                if (asciiQueryChars.get((int) c) && !(encodePercent && c == '%')) {
+                if (asciiQueryChars.get(c) && !(encodePercent && c == '%')) {
                     escape = false;
                 }
             } else if (!Character.isISOControl(c) && !Character.isSpaceChar(c)) {//not-ascii

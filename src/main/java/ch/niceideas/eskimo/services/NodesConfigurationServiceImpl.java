@@ -139,7 +139,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
             logger.info ("Starting System Deployment Operations.");
 
-            operationsMonitoringService.operationsStarted(command);
+            operationsMonitoringService.startCommand(command);
 
             NodesConfigWrapper rawNodesConfig = command.getRawConfig();
             NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
@@ -272,7 +272,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             logger.error (e, e);
             throw new NodesConfigurationException(e);
         } finally {
-            operationsMonitoringService.operationsFinished(success);
+            operationsMonitoringService.endCommand(success);
             logger.info ("System Deployment Operations Completed.");
         }
     }

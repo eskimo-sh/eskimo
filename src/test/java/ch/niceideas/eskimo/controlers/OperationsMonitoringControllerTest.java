@@ -31,7 +31,7 @@ public class OperationsMonitoringControllerTest {
     @Test
     public void testFetchOperationsStatus() throws Exception {
 
-        operationsMonitoringService.operationsStarted(new SimpleOperationCommand("test", "test", "192.168.10.15") {
+        operationsMonitoringService.startCommand(new SimpleOperationCommand("test", "test", "192.168.10.15") {
               @Override
               public List<SimpleOperationId> getAllOperationsInOrder(OperationsContext context) {
                   return new ArrayList<>() {{

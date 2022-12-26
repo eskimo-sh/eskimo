@@ -76,32 +76,35 @@ public class PackageVersionGenerator {
 
         Map<String, Pair<String, String>> packages = new HashMap<>();
 
-        for (File packageFile : workingDirectory.listFiles()) {
+        File[] files = workingDirectory.listFiles();
+        if (files != null && files.length > 0) {
+            for (File packageFile : files) {
 
-            String fileName = packageFile.getName();
+                String fileName = packageFile.getName();
 
-            if ((fileName.startsWith(SetupService.DOCKER_TEMPLATE_PREFIX)
-                    || fileName.startsWith(SetupService.KUBE_PREFIX)
+                if ((fileName.startsWith(SetupService.DOCKER_TEMPLATE_PREFIX)
+                        || fileName.startsWith(SetupService.KUBE_PREFIX)
                 ) && fileName.endsWith("tar.gz")) {
 
-                String packageName;
-                if (fileName.startsWith(SetupService.DOCKER_TEMPLATE_PREFIX)) {
-                    packageName = fileName.substring(
-                            SetupService.DOCKER_TEMPLATE_PREFIX.length(),
-                            fileName.indexOf("_", SetupService.DOCKER_TEMPLATE_PREFIX.length() + 1));
-                } else {
-                    packageName = fileName.substring(
-                            SetupService.KUBE_PREFIX.length(),
-                            fileName.indexOf("_", SetupService.KUBE_PREFIX.length() + 1));
+                    String packageName;
+                    if (fileName.startsWith(SetupService.DOCKER_TEMPLATE_PREFIX)) {
+                        packageName = fileName.substring(
+                                SetupService.DOCKER_TEMPLATE_PREFIX.length(),
+                                fileName.indexOf("_", SetupService.DOCKER_TEMPLATE_PREFIX.length() + 1));
+                    } else {
+                        packageName = fileName.substring(
+                                SetupService.KUBE_PREFIX.length(),
+                                fileName.indexOf("_", SetupService.KUBE_PREFIX.length() + 1));
+                    }
+
+                    Pair<String, String> version = setupService.parseVersion(fileName);
+
+                    Pair<String, String> previousVersion = packages.computeIfAbsent(packageName, k -> version);
+                    if (setupService.compareVersion(version, previousVersion) > 0) {
+                        packages.put(packageName, version);
+                    }
+
                 }
-
-                Pair<String,String> version = setupService.parseVersion(fileName);
-
-                Pair<String,String> previousVersion = packages.computeIfAbsent(packageName, k -> version);
-                if (setupService.compareVersion(version, previousVersion) > 0) {
-                    packages.put (packageName, version);
-                }
-
             }
         }
 

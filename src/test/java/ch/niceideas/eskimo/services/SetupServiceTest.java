@@ -97,7 +97,7 @@ public class SetupServiceTest {
     public void setUp() throws Exception {
 
         SecurityContextHelper.loginAdmin();
-        operationsMonitoringServiceTest.operationsFinished(true);
+        operationsMonitoringServiceTest.endCommand(true);
 
         setupConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/setupConfig.json"), StandardCharsets.UTF_8);
 
@@ -254,7 +254,7 @@ public class SetupServiceTest {
                 "echo $@\n");
 
         SetupCommand setupCommand = SetupCommand.create(new JsonWrapper(setupConfig), setupService, servicesDefinition);
-        operationsMonitoringServiceTest.operationsStarted(setupCommand);
+        operationsMonitoringServiceTest.startCommand(setupCommand);
 
         setupService.buildPackage("cerebro");
 
@@ -270,7 +270,7 @@ public class SetupServiceTest {
 
         FileUtils.delete(packageDevPathTest);
 
-        operationsMonitoringServiceTest.operationsFinished(true);
+        operationsMonitoringServiceTest.endCommand(true);
     }
 
     @Test
@@ -289,7 +289,7 @@ public class SetupServiceTest {
         setupService.setBuildVersion("1.0");
 
         SetupCommand setupCommand = SetupCommand.create(setupConfigJson, setupService, servicesDefinition);
-        operationsMonitoringServiceTest.operationsStarted(setupCommand);
+        operationsMonitoringServiceTest.startCommand(setupCommand);
 
         setupService.downloadPackage("cerebro_0.8.4_1", "cerebro_0.8.4_1.tgz");
 

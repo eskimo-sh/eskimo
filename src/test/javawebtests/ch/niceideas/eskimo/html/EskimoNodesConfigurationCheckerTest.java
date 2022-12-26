@@ -54,12 +54,10 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
     private static final Logger logger = Logger.getLogger(EskimoNodesConfigurationCheckerTest.class);
 
-    private String jsonServices = null;
-
     @BeforeEach
     public void setUp() throws Exception {
 
-        jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"), StandardCharsets.UTF_8);
+        String jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"), StandardCharsets.UTF_8);
 
         loadScript("eskimoNodesConfigurationChecker.js");
 

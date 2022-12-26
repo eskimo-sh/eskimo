@@ -59,13 +59,6 @@ public class KubernetesServicesConfigChecker {
     @Autowired
     private ConfigurationService configurationService;
 
-    void setServicesDefinition (ServicesDefinition servicesDefinition) {
-        this.servicesDefinition = servicesDefinition;
-    }
-    void setConfigurationService (ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-
     public void checkKubernetesServicesSetup(KubernetesServicesConfigWrapper kubeServicesConfig) throws KubernetesServicesConfigException {
 
         try {

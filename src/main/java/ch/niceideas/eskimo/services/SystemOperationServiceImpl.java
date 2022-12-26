@@ -35,8 +35,6 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.ProcessHelper;
 import ch.niceideas.eskimo.model.MessageLogger;
 import ch.niceideas.eskimo.model.OperationId;
 import org.apache.log4j.Logger;
@@ -45,8 +43,6 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)

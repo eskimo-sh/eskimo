@@ -56,7 +56,7 @@ public class KubernetesServicesConfigControllerTest {
         systemSeviceTest.setReturnEmptySystemStatus();
 
         if (operationsMonitoringService.isProcessingPending()) {
-            operationsMonitoringService.operationsFinished(true);
+            operationsMonitoringService.endCommand(true);
         }
 
         SecurityContextHelper.loginAdmin();
@@ -189,7 +189,7 @@ public class KubernetesServicesConfigControllerTest {
         Map<String, Object> sessionContent = new HashMap<>();
         HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
-        operationsMonitoringService.operationsStarted(new SimpleOperationCommand("test", "test", "192.168.10.15"));
+        operationsMonitoringService.startCommand(new SimpleOperationCommand("test", "test", "192.168.10.15"));
 
         assertEquals ("{\n" +
                 "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed.\",\n" +

@@ -91,7 +91,7 @@ public class ServicesSettingsServiceTest {
         testForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testForm.json"), StandardCharsets.UTF_8);
 
         SecurityContextHelper.loginAdmin();
-        operationsMonitoringServiceTest.operationsFinished(true);
+        operationsMonitoringServiceTest.endCommand(true);
         connectionManagerServiceTest.dontConnect();
         sshCommandServiceTest.reset();
         systemServiceTest.reset();

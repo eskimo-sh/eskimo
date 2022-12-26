@@ -47,9 +47,9 @@ public interface OperationsMonitoringService extends OperationsContext {
 
     boolean isProcessingPending();
 
-    void operationsStarted(JSONOpCommand operation) throws ServiceDefinitionException, NodesConfigurationException, SystemException;
+    void startCommand(JSONOpCommand operation) throws ServiceDefinitionException, NodesConfigurationException, SystemException;
 
-    void operationsFinished(boolean success);
+    void endCommand(boolean success);
 
     void interruptProcessing();
 

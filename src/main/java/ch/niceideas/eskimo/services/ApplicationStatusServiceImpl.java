@@ -67,13 +67,11 @@ import java.util.stream.Collectors;
 public class ApplicationStatusServiceImpl implements ApplicationStatusService {
 
     private static final Logger logger = Logger.getLogger(ApplicationStatusServiceImpl.class);
+
     public static final String SSH_USERNAME_FIELD = "sshUsername";
 
     @Autowired
     private ConfigurationService configurationService;
-
-    @Autowired
-    private ServicesDefinition servicesDefinition;
 
     @Value("${status.monitoringDashboardID:NONE}")
     private String monitoringDashboardId = null;

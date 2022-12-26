@@ -106,7 +106,7 @@ public class OperationsMonitoringServiceTest {
         systemOperationServiceTest.setMockCalls(false);
         systemServiceTest.setMockCalls(false);
         try {
-            operationsMonitoringService.operationsFinished(true);
+            operationsMonitoringService.endCommand(true);
         } catch (Exception e) {
             logger.debug (e, e);
         }
@@ -121,13 +121,13 @@ public class OperationsMonitoringServiceTest {
         assertFalse(operationsMonitoringService.isInterrupted());
 
         // test interruption
-        operationsMonitoringService.operationsStarted(new SimpleOperationCommand("test", "test", "test"));
+        operationsMonitoringService.startCommand(new SimpleOperationCommand("test", "test", "test"));
 
         operationsMonitoringService.interruptProcessing();
 
         assertTrue(operationsMonitoringService.isInterrupted());
 
-        operationsMonitoringService.operationsFinished(true);
+        operationsMonitoringService.endCommand(true);
 
         // no processing anymore
         assertFalse(operationsMonitoringService.isInterrupted());

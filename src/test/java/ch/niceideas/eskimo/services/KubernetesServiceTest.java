@@ -118,7 +118,7 @@ public class KubernetesServiceTest {
 
         connectionManagerServiceTest.dontConnect();
 
-        operationsMonitoringServiceTest.operationsFinished(true);
+        operationsMonitoringServiceTest.endCommand(true);
 
         sshCommandServiceTest.reset();
     }
@@ -247,7 +247,7 @@ public class KubernetesServiceTest {
                 new KubernetesServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("KubernetesServiceTest/kubernetes-services-config.json"), StandardCharsets.UTF_8))
         );
 
-        operationsMonitoringServiceTest.operationsStarted(command);
+        operationsMonitoringServiceTest.startCommand(command);
 
         kubernetesService.installService(new KubernetesOperationsCommand.KubernetesOperationId("installation", "cerebro"), "192.168.10.11");
 

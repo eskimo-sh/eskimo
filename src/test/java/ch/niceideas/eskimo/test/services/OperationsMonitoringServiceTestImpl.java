@@ -105,7 +105,7 @@ public class OperationsMonitoringServiceTestImpl implements OperationsMonitoring
     }
 
     @Override
-    public void operationsStarted(JSONOpCommand operation) throws ServiceDefinitionException, NodesConfigurationException, SystemException {
+    public void startCommand(JSONOpCommand operation) throws ServiceDefinitionException, NodesConfigurationException, SystemException {
         if (currentOperation != null) {
             throw new IllegalStateException("Can't start an operation while another operation is in progress");
         }
@@ -113,7 +113,7 @@ public class OperationsMonitoringServiceTestImpl implements OperationsMonitoring
     }
 
     @Override
-    public void operationsFinished(boolean success) {
+    public void endCommand(boolean success) {
         this.lastOperationSuccess = success;
         this.currentOperation = null;
     }

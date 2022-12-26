@@ -139,7 +139,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
     }
 
     @Override
-    public void operationsStarted(JSONOpCommand operation) throws ServiceDefinitionException, NodesConfigurationException, SystemException {
+    public void startCommand(JSONOpCommand operation) throws ServiceDefinitionException, NodesConfigurationException, SystemException {
         if (currentOperation != null) {
             throw new IllegalStateException("Can't start an operation while another operation is in progress");
         }
@@ -160,7 +160,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
     }
 
     @Override
-    public void operationsFinished(boolean success) {
+    public void endCommand(boolean success) {
         setLastOperationSuccess(success);
         systemActionLock.unlock();
         interruption.set(false);

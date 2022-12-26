@@ -214,8 +214,8 @@ public class TerminalServiceImpl implements TerminalService {
 
                 try {
                     removeTerminal(sessionId);
-                } catch (IOException ignored) {
-                    logger.debug (ignored);
+                } catch (IOException dumped) {
+                    logger.debug (dumped);
                 }
                 return getSession(terminalBody, sessionWidth, sessionHeight, sessionId);
             }

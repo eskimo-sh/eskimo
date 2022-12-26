@@ -40,20 +40,26 @@ import ch.niceideas.eskimo.security.JSONBackedUserDetailsManager;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.UserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfiguration {
 
     private static final Logger logger = Logger.getLogger(WebSecurityConfiguration.class);
     public static final String LOGIN_PAGE_URL = "/login.html";
@@ -67,8 +73,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${eskimo.demoMode}")
     private boolean demoMode = false;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         final String contextPath = getContextPath();
 
@@ -108,6 +114,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .csrf().disable()
             // disabling Same origin policy on iframes (eskimo uses this extensively)
             .headers().frameOptions().disable();
+
+        return http.build();
     }
 
     private String getContextPath() {
@@ -124,16 +132,14 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                  acceptHeader.contains("json") || acceptHeader.contains("javascript"));
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService())
-                .passwordEncoder(new BCryptPasswordEncoder(11));
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(11);
     }
 
-    @Override
-    public UserDetailsService userDetailsService() {
+    @Bean
+    public UserDetailsManager userDetailsService() {
         try {
-            return new JSONBackedUserDetailsManager(userJsonFilePath);
+            return new JSONBackedUserDetailsManager(userJsonFilePath, passwordEncoder());
         } catch (FileException | JSONException e) {
             logger.error (e, e);
             throw new ConfigurationException(e);

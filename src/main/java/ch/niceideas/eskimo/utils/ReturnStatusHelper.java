@@ -63,7 +63,7 @@ public class ReturnStatusHelper {
     public static String createErrorStatus (String errorMessage) {
 
         try {
-            return new JSONObject(new HashMap<String, Object>() {{
+            return new JSONObject(new HashMap<>() {{
                 put("status", "KO");
                 put("error", errorMessage);
             }}).toString(2);
@@ -112,7 +112,7 @@ public class ReturnStatusHelper {
         String errorMessageBuilder = buildFullMessage(e);
 
         try {
-            return new JSONObject(new HashMap<String, Object>() {{
+            return new JSONObject(new HashMap<>() {{
                 put("status", "KO");
                 put("error", Base64.getEncoder().encodeToString(errorMessageBuilder.getBytes()));
             }}).toString(2);
@@ -125,7 +125,7 @@ public class ReturnStatusHelper {
     public static String createClearStatus (String flag, boolean processingPending) {
 
         try {
-            return new JSONObject(new HashMap<String, Object>() {{
+            return new JSONObject(new HashMap<>() {{
                 put("status", "OK");
                 put("processingPending", processingPending);
                 put("clear", flag);

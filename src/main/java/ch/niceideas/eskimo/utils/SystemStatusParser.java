@@ -76,7 +76,7 @@ public class SystemStatusParser {
                 handleServiceFound (
                         contentLines[i].substring(
                                 (contentLines[i].indexOf('●') > -1 ? contentLines[i].indexOf('●') :
-                                        (contentLines[i].indexOf("○") > -1 ? contentLines[i].indexOf("○") : contentLines[i].indexOf('×'))) + 2,
+                                        (contentLines[i].contains("○") ? contentLines[i].indexOf("○") : contentLines[i].indexOf('×'))) + 2,
                                 contentLines[i].indexOf(".service")),
                         i,
                         contentLines);

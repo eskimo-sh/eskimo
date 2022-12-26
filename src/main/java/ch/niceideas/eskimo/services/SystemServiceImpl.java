@@ -158,7 +158,7 @@ public class SystemServiceImpl implements SystemService {
 
     @Override
     public void delegateApplyNodesConfig(ServiceOperationsCommand command)
-            throws SystemException, NodesConfigurationException {
+            throws NodesConfigurationException {
         nodesConfigurationService.applyNodesConfig(command);
     }
 
@@ -237,7 +237,7 @@ public class SystemServiceImpl implements SystemService {
 
         try {
 
-            operationsMonitoringService.operationsStarted(new SimpleOperationCommand(opLabel, service, node));
+            operationsMonitoringService.startCommand(new SimpleOperationCommand(opLabel, service, node));
 
             operationsMonitoringService.startOperation(operationId);
 
@@ -267,7 +267,7 @@ public class SystemServiceImpl implements SystemService {
 
             operationsMonitoringService.endOperation(operationId);
 
-            operationsMonitoringService.operationsFinished(success);
+            operationsMonitoringService.endCommand(success);
         }
     }
 
@@ -455,7 +455,9 @@ public class SystemServiceImpl implements SystemService {
 
         threadPool.shutdown();
         try {
-            threadPool.awaitTermination(operationWaitTimout, TimeUnit.SECONDS);
+            if (!threadPool.awaitTermination(operationWaitTimout, TimeUnit.SECONDS)) {
+                logger.warn ("Could not complete operation within " + operationWaitTimout + " seconds");
+            }
         } catch (InterruptedException e) {
             logger.debug (e, e);
         }
