@@ -1,0 +1,103 @@
+<!--
+This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
+well to this individual file than to the Eskimo Project as a whole.
+
+Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+Author : eskimo.sh / https://www.eskimo.sh
+
+Eskimo is available under a dual licensing model : commercial and GNU AGPL.
+If you did not acquire a commercial licence for Eskimo, you can still use it and consider it free software under the
+terms of the GNU Affero Public License. You can redistribute it and/or modify it under the terms of the GNU Affero
+Public License  as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+any later version.
+Compliance to each and every aspect of the GNU Affero Public License is mandatory for users who did no acquire a
+commercial license.
+
+Eskimo is distributed as a free software under GNU AGPL in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+Affero Public License for more details.
+
+You should have received a copy of the GNU Affero Public License along with Eskimo. If not,
+see <https://www.gnu.org/licenses/> or write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA, 02110-1301 USA.
+
+You can be released from the requirements of the license by purchasing a commercial license. Buying such a
+commercial license is mandatory as soon as :
+- you develop activities involving Eskimo without disclosing the source code of your own product, software,
+  platform, use cases or scripts.
+- you deploy eskimo as part of a commercial product, platform or software.
+For more information, please contact eskimo.sh at https://www.eskimo.sh
+
+The above copyright notice and this licensing notice shall be included in all copies or substantial portions of the
+Software.
+-->
+
+
+<div id="edit-user-modal" class="modal fade" role="dialog">
+    <div id="edit-user-modal-dialog" class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="edit-user-title">Edit USer Information </h4>
+                <button type="button" class="btn-close" id="edit-user-header-close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div id="edit-user-overlay" class="loading-overlay" style="display:none;">
+                    <div class="spinner"></div>
+                </div>
+
+                <div style="display:none" id="edit-user-alert" class="alert alert-danger col-sm-12"></div>
+
+                <div class="col-md-12 col-sd-12">
+
+                    <form id="edit-user-form">
+
+                        <div class="row">
+                            <div class="col-md-3"></div>
+                            <label class="col-md-3 control-label" id="label_user_id">User ID</label>
+                            <div class="col-md-6">
+                                <input id="edit-user-user-id" name="edit-user-user-id" type="text"
+                                       class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3"></div>
+                            <label class="col-md-3 control-label" id="label_cur_password">Current Password</label>
+                            <div class="col-md-6">
+                                <input id="edit-user-current-password" name="edit-user-current-password" type="text"
+                                       class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3"></div>
+                            <label class="col-md-3 control-label" id="label_new_password">New Password</label>
+                            <div class="col-md-6">
+                                <input id="edit-user-new-password" name="edit-user-new-password" type="text"
+                                       class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3"></div>
+                            <label class="col-md-3 control-label" id="label_repeaat_password">Repeat Password</label>
+                            <div class="col-md-6">
+                                <input id="edit-user-repeat-password" name="edit-user-repeat-password" type="text"
+                                       class="form-control">
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="edit-user-input-button-cancel">Cancel</button>
+                <button type="button" class="btn btn-info" id="edit-user-input-button-validate">OK</button>
+            </div>
+        </div>
+    </div>
+</div>

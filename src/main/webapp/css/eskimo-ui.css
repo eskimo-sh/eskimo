@@ -818,3 +818,59 @@ html[data-sidenav-size=condensed]:not(.authentication-bg) .inner-content-inner-f
     text-overflow: ellipsis;
     white-space: normal;
 }
+
+.loading-overlay {
+    background: #ffffff;
+    color: #666666;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 5000;
+    top: 0;
+    left: 0;
+    float: left;
+    text-align: center;
+    padding-top: 50px;
+    opacity: .80;
+}
+
+.io-overlay {
+    padding-top: 10px;
+}
+
+
+.spinner-small {
+    margin: 0 auto;
+    height: 12px;
+    width: 12px;
+    animation: rotate 0.8s infinite linear;
+    border: 5px solid deepskyblue;
+    border-right-color: transparent;
+    border-radius: 50%;
+}
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.spinner {
+    margin: 0 auto;
+    height: 64px;
+    width: 64px;
+    animation: rotate 0.8s infinite linear;
+    border: 5px solid deepskyblue;
+    border-right-color: transparent;
+    border-radius: 50%;
+}
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

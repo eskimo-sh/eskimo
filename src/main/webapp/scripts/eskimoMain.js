@@ -53,6 +53,7 @@ eskimo.Main = function() {
     let eskimoNotifications = null;
     let eskimoServices = null;
     let eskimoServicesSelection = null;
+    let eskimoEditUser = null;
 
     let eskimoKubernetesServicesSelection = null;
     let eskimoKubernetesServicesConfig = null;
@@ -94,6 +95,7 @@ eskimo.Main = function() {
         eskimoKubernetesServicesSelection = new eskimo.KubernetesServicesSelection();
         eskimoSystemStatus = new eskimo.SystemStatus();
         eskimoAbout = new eskimo.About();
+        eskimoEditUser = new eskimo.EditUser();
 
         // B. Inject dependencies
         let initObject = {
@@ -198,6 +200,8 @@ eskimo.Main = function() {
         //     + PROCESSING PENDING DETECTION LOGIC
 
         eskimoAbout.initialize();
+
+        eskimoEditUser.initialize();
 
         $(window).resize (this.windowResize);
 
@@ -583,13 +587,17 @@ eskimo.Main = function() {
     this.getAbout = function() {
         return eskimoAbout;
     };
+    this.getEditUser = function() {
+        return eskimoEditUser;
+    }
 
     this.windowResize = function() {
 
-        var viewPortHeight = $("body").innerHeight();
-        var viewPortWidth = $("body").innerWidth();
+        const body = $("body");
+        const viewPortHeight = body.innerHeight();
+        const viewPortWidth = body.innerWidth();
 
-        var headerHeight = $("#hoe-header").height();;
+        let headerHeight = $("#hoe-header").height();
 
         $(".inner-content").css("height", (viewPortHeight - headerHeight) + "px");
     };

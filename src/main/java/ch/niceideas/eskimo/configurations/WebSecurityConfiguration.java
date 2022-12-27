@@ -108,6 +108,7 @@ public class WebSecurityConfiguration {
                     .passwordParameter("eskimo-password")
                 .defaultSuccessUrl("/index.html",true)
                 .and()
+            .userDetailsService(userDetailsService())
             .logout().permitAll()
                 .and()
              // disabling CSRF security as long as not implemented backend side
@@ -132,6 +133,7 @@ public class WebSecurityConfiguration {
                  acceptHeader.contains("json") || acceptHeader.contains("javascript"));
     }
 
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(11);
     }

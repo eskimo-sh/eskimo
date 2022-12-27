@@ -1,6 +1,7 @@
 package ch.niceideas.eskimo.test.infrastructure;
 
 import ch.niceideas.eskimo.controlers.NodesConfigController;
+import ch.niceideas.eskimo.proxy.ProxyServlet;
 import ch.niceideas.eskimo.proxy.ServicesProxyServletTest;
 import ch.niceideas.eskimo.proxy.WebSocketProxyForwarderTest;
 import org.apache.hc.core5.http.*;
@@ -113,6 +114,21 @@ public class HttpObjectsHelper {
                             return "localhost";
                         case "getServerPort":
                             return 9191;
+                        case "getAttribute":
+                            if (methodArgs[0].equals(ProxyServlet.class.getSimpleName() + ".targetUri")) {
+                                if ("cerebro".equals(service)) {
+                                    return "http://localhost:9090/";
+                                } else if ("spark-console".equals(service)) {
+                                    return "http://localhost:9191/";
+                                } else {
+                                    throw new UnsupportedOperationException(
+                                            "Unsupported method: " + method.getName());
+                                }
+                            } else {
+                                throw new UnsupportedOperationException(
+                                        "Unsupported attribute: " + methodArgs[0]);
+                            }
+
                         default:
                             throw new UnsupportedOperationException(
                                     "Unsupported method: " + method.getName());

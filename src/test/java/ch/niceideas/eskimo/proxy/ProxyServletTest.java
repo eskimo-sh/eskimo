@@ -1,5 +1,6 @@
 package ch.niceideas.eskimo.proxy;
 
+import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.PostMethodWebRequest;
 import com.meterware.httpunit.WebRequest;
@@ -901,5 +902,12 @@ public class ProxyServletTest {
             }
 
         }
+    }
+
+    @Test
+    public void testRewriteUrlFromRequest() {
+        // ensure no double slashes situation
+        String test = new ProxyServlet().rewriteUrlFromRequest(HttpObjectsHelper.createHttpServletRequest("cerebro"));
+        assertEquals("http://localhost:9090/cerebro/statistics?server=192.168.10.13", test);
     }
 }

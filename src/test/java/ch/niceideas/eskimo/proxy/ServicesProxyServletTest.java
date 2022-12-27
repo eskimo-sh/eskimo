@@ -295,4 +295,5 @@ public class ServicesProxyServletTest {
 
         assertEquals(29, headers.get(HttpHeaders.CONTENT_LENGTH));
     }
+
 }

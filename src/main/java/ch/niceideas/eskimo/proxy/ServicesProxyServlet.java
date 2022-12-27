@@ -188,7 +188,11 @@ public class ServicesProxyServlet extends ProxyServlet {
             // Need to remove host from pathInfo
             if (!service.isUnique()) {
                 int slashIndex = pathInfo.indexOf('/');
-                pathInfo = slashIndex > -1 ? pathInfo.substring(slashIndex) : "";
+                pathInfo = slashIndex > -1 ? pathInfo.substring(slashIndex + 1)  : "";
+                /*
+                I added + 1 but it's not working !!!, still end up with double slash
+                Add a test for it !!!'
+                */
             }
 
             // getPathInfo() returns decoded string, so we need encodeUriQuery to encode "%" characters
@@ -226,7 +230,9 @@ public class ServicesProxyServlet extends ProxyServlet {
                     new InputStreamEntity(
                             servletRequest.getInputStream(),
                             getContentLengthOverride(servletRequest),
-                            ContentType.create (servletRequest.getContentType())));
+                            ContentType.create (!servletRequest.getContentType().contains(";") ?
+                                    servletRequest.getContentType() :
+                                    servletRequest.getContentType().substring(0, servletRequest.getContentType().indexOf(";")))));
         }
         return eProxyRequest;
     }
