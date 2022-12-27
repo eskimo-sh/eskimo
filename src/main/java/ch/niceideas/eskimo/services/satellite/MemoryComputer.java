@@ -80,18 +80,6 @@ public class MemoryComputer {
     @Value("${system.reservedMemoryOnNodes}")
     private long reservedMemoryMb = 1000;
 
-    /** For tests only */
-    @Deprecated
-    public void setServicesDefinition(ServicesDefinition servicesDefinition) {
-        this.servicesDefinition = servicesDefinition;
-    }
-    /** For tests only*/
-    @Deprecated
-    public void setSshCommandService(SSHCommandService sshCommandService) {
-        this.sshCommandService = sshCommandService;
-    }
-
-
     public MemoryModel buildMemoryModel (NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, Set<String> deadIps) throws SystemException {
         return new MemoryModel(computeMemory(nodesConfig, kubeServicesConfig, deadIps));
     }

@@ -67,9 +67,6 @@ public class MemoryComputerTest {
     private MemoryComputer memoryComputer;
 
     @Autowired
-    private ServicesDefinition servicesDefinition;
-
-    @Autowired
     private SSHCommandServiceTestImpl sshCommandServiceTest;
 
     private String nodesConfigString = null;
@@ -178,7 +175,7 @@ public class MemoryComputerTest {
     @Test
     public void testGetMemoryMap() throws Exception {
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("service_b1", "on");
@@ -206,23 +203,7 @@ public class MemoryComputerTest {
     @Test
     public void testOtherConfig() throws Exception {
 
-        memoryComputer = new MemoryComputer();
-        memoryComputer.setServicesDefinition(servicesDefinition);
-
-        memoryComputer.setSshCommandService(new SSHCommandServiceImpl() {
-            @Override
-            public String runSSHScript(String node, String script, boolean throwsException) {
-                return "MemTotal:        20000000 kB";
-            }
-            @Override
-            public String runSSHCommand(String node, String command) {
-                return null;
-            }
-            @Override
-            public void copySCPFile(String node, String filePath) {
-                // just do nothing
-            }
-        });
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> "MemTotal:        20000000 kB");
 
         Map<String, Map<String, Long>> res = memoryComputer.computeMemory(
                 StandardSetupHelpers.getStandard2NodesSetup(),

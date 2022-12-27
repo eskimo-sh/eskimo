@@ -57,16 +57,6 @@ public class ServicesInstallationSorter {
     @Autowired
     private ConfigurationService configurationService;
 
-    /** For tests only */
-    public void setServicesDefinition(ServicesDefinition servicesDefinition) {
-        this.servicesDefinition = servicesDefinition;
-    }
-
-    public void setConfigurationService(ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-
-
     public <T extends OperationId> List<List<T>> orderOperations  (
             List<T> operations,
             NodesConfigWrapper nodesConfig) throws NodesConfigurationException, ServiceDefinitionException, SystemException {

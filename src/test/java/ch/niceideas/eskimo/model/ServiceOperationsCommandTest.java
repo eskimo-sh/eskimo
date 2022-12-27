@@ -74,6 +74,9 @@ public class ServiceOperationsCommandTest {
     @Autowired
     private ConfigurationServiceTestImpl configurationServiceTest;
 
+    @Autowired
+    private ServicesInstallationSorter servicesInstallationSorter;
+
     @Test
     public void testNoChanges() throws Exception {
 
@@ -138,7 +141,7 @@ public class ServiceOperationsCommandTest {
 
         ServiceOperationsCommand oc = prepareFiveOps();
 
-        System.err.println (oc.toJSON());
+        //System.err.println (oc.toJSON());
 
         assertTrue (new JSONObject(
                 "{\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
@@ -294,7 +297,7 @@ public class ServiceOperationsCommandTest {
         ServiceOperationsCommand oc2 = ServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
-        System.err.println (oc2.toJSON());
+        //System.err.println (oc2.toJSON());
 
         assertTrue (new JSONObject(
                 "{\"restarts\":[{\"zookeeper\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"etcd\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.13\"},{\"kube-slave\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"cerebro\":\"(kubernetes)\"},{\"spark-console\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
@@ -401,7 +404,7 @@ public class ServiceOperationsCommandTest {
         ServiceOperationsCommand oc2 = ServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
-        System.err.println (oc2.toJSON());
+        //System.err.println (oc2.toJSON());
 
         assertTrue (new JSONObject("{" +
                 "\"restarts\":[{\"kube-master\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"cerebro\":\"(kubernetes)\"},{\"spark-console\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
@@ -460,10 +463,7 @@ public class ServiceOperationsCommandTest {
         List<ServiceOperationsCommand.ServiceOperationId> opsInOrder =  oc.getAllOperationsInOrder(new OperationsContext() {
             @Override
             public ServicesInstallationSorter getServicesInstallationSorter() {
-                ServicesInstallationSorter sis = new ServicesInstallationSorter();
-                sis.setServicesDefinition(servicesDefinition);
-                sis.setConfigurationService(configurationServiceTest);
-                return sis;
+                return servicesInstallationSorter;
             }
 
             @Override

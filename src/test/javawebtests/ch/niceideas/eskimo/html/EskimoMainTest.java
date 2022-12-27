@@ -100,6 +100,7 @@ public class EskimoMainTest extends AbstractWebTest {
         js("eskimo.FileManagers = function(){ this.initialize = function(){} ;};");
         js("eskimo.Setup = function(){ this.initialize = function(){} ;};");
         js("eskimo.About = function(){ this.initialize = function(){}; };");
+        js("eskimo.EditUser = function(){ this.initialize = function(){}; };");
 
         // Don0t let jquery load real eskimoMain
         js("$.fn.ready = function () {};");

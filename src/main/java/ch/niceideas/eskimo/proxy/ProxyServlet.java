@@ -624,6 +624,11 @@ public class ProxyServlet extends HttpServlet {
         String pathInfo = rewritePathInfoFromRequest(servletRequest);
         if (pathInfo != null) {//ex: /my/path.html
             // getPathInfo() returns decoded string, so we need encodeUriQuery to encode "%" characters
+
+            if (pathInfo.startsWith("/") && uri.toString().endsWith("/")) {
+                pathInfo = pathInfo.substring(1);
+            }
+
             uri.append(encodeUriQuery(pathInfo, true));
         }
 

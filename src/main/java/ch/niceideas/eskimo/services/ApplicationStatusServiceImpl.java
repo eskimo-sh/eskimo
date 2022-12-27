@@ -88,7 +88,8 @@ public class ApplicationStatusServiceImpl implements ApplicationStatusService {
     @Value("${eskimo.enableKubernetesSubsystem}")
     private String enableKubernetes = "true";
 
-    private final ThreadLocal<SimpleDateFormat> localDateFormatter = new ThreadLocal<>();
+    private final ThreadLocal<SimpleDateFormat> localDateFormatter
+            = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
     private final ReentrantLock statusUpdateLock = new ReentrantLock();
     private final Timer timer;
@@ -125,7 +126,12 @@ public class ApplicationStatusServiceImpl implements ApplicationStatusService {
             updateStatus();
         }
 
-        return lastStatus.get();
+        JsonWrapper systemStatus = lastStatus.get();
+
+        // this is thread local, cannot be done in timer
+        feedInSecurityContextInfo(systemStatus);
+
+        return systemStatus;
     }
 
     @Override
@@ -169,35 +175,31 @@ public class ApplicationStatusServiceImpl implements ApplicationStatusService {
             }
 
             // Get JVM's thread system bean
-            RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
-            long startTime = bean.getStartTime();
+            RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+            long startTime = runtimeMXBean.getStartTime();
             Date startDate = new Date(startTime);
 
-            SimpleDateFormat df = localDateFormatter.get();
-            if (df == null) {
-                df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                localDateFormatter.set(df);
-            }
-
-            systemStatus.setValueForPath("startTimestamp", df.format(startDate));
-
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-            if (auth != null) {
-                systemStatus.setValueForPath("username", auth.getName());
-
-                @SuppressWarnings({"unchecked"})
-                Collection<SimpleGrantedAuthority> authorities = (Collection<SimpleGrantedAuthority>) auth.getAuthorities();
-
-                systemStatus.setValueForPath("roles", authorities.stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .collect(Collectors.joining(",")));
-            }
+            systemStatus.setValueForPath("startTimestamp", localDateFormatter.get().format(startDate));
 
             lastStatus.set (systemStatus);
 
         } finally {
             statusUpdateLock.unlock();
+        }
+    }
+
+    private void feedInSecurityContextInfo(JsonWrapper systemStatus) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth != null) {
+            systemStatus.setValueForPath("username", auth.getName());
+
+            @SuppressWarnings({"unchecked"})
+            Collection<SimpleGrantedAuthority> authorities = (Collection<SimpleGrantedAuthority>) auth.getAuthorities();
+
+            systemStatus.setValueForPath("roles", authorities.stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.joining(",")));
         }
     }
 }
