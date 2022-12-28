@@ -258,8 +258,10 @@ public class SystemServiceTest {
 
         SystemStatusWrapper systemStatus = systemService.getStatus();
 
-
         JSONObject actual = systemStatus.getJSONObject();
+
+        System.err.println (actual.toString(2));
+
         assertTrue(new JSONObject(expectedFullStatus).similar(actual), actual.toString(2));
     }
 

@@ -196,11 +196,13 @@ eskimo.FileManagers = function() {
         });
 
         // Hide all file managers
+        //$.hideElement($(".file-manager-view"));
         let fileManagerView = $(".file-manager-view");
         fileManagerView.css("visibility", "hidden");
         fileManagerView.css("display", "none");
 
         // Show selected one
+        //$.showElement($("#file-managers-file-manager-" + nodeName));
         let fileManagerNode = $("#file-managers-file-manager-" + nodeName);
         fileManagerNode.css("visibility", "inherit");
         fileManagerNode.css("display", "inherit");

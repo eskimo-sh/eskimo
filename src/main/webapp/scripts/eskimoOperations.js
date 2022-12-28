@@ -138,8 +138,9 @@ eskimo.Operations = function() {
     function updateGlobalMessages (globalMessages) {
         globalLastLine = globalMessages.lastLine;
         if (globalMessages.lines && globalMessages.lines != "") {
-            $("#operations-global-messages").css("display", "block");
-            let previous = $("#operations-global-messages").html().trim();
+            $operationsGlobalMessages = $("#operations-global-messages");
+            $operationsGlobalMessages.css("display", "block");
+            let previous = $operationsGlobalMessages.html().trim();
             if (previous == null || previous == "") {
                 $("#operations-global-messages").html(atob(globalMessages.lines));
             } else {
@@ -317,11 +318,6 @@ eskimo.Operations = function() {
     this.fetchOperationStatus = fetchOperationStatus;
 
     function startOperationInProgress() {
-        /*
-        let pendingBarWrapper = $("#progress-bar-pending-wrapper");
-        pendingBarWrapper.css("visibility", "inherit");
-        pendingBarWrapper.css("display", "block");
-        */
 
         $("#operations-table-body").html("");
         $("#operations-global-messages").html("");

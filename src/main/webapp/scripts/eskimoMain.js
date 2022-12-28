@@ -391,15 +391,13 @@ eskimo.Main = function() {
 
                 if (menuKubernetesConfig.hasClass("visually-hidden")) {
 
-                    menuKubernetesConfig.css("visibility", "visible");
-                    menuKubernetesConfig.css("display", "inherit");
+                    $.hideElement(menuKubernetesConfig);
                     menuKubernetesConfig.removeClass("visually-hidden")
                 }
             }
         } else {
             if (!menuKubernetesConfig.hasClass("visually-hidden")) {
-                menuKubernetesConfig.css("visibility", "hidden");
-                menuKubernetesConfig.css("display", "none");
+                $.hideElement(menuKubernetesConfig);
                 menuKubernetesConfig.addClass("visually-hidden")
             }
         }
@@ -461,15 +459,11 @@ eskimo.Main = function() {
     this.serviceMenuClear = serviceMenuClear;
 
     this.showProgressbar = function () {
-        let contentProgressBar = $(".inner-content-show");
-        contentProgressBar.css("visibility", "visible");
-        contentProgressBar.css("display", "flex");
+        $.showElement($(".inner-content-show"));
     };
 
     function hideProgressbar () {
-        let contentProgressBar = $(".inner-content-show");
-        contentProgressBar.css("visibility", "hidden");
-        contentProgressBar.css("display", "none");
+        $.hideElement($(".inner-content-show"));
     }
     this.hideProgressbar = hideProgressbar;
 

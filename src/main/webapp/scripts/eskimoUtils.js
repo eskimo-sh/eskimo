@@ -109,6 +109,20 @@ function isFunction(functionToCheck) {
     return {}.toString.call(functionToCheck) === '[object Function]';
 }
 
+$.showElement = function (element) {
+    if (element) {
+        element.css("visibility", "inherit");
+        element.css("display", "inherit");
+    }
+}
+
+$.hideElement = function (element) {
+    if (element) {
+        element.css("visibility", "hidden");
+        element.css("display", "none");
+    }
+}
+
 $.ajaxDelete = function (reqObject) {
     $._ajaxSendContent ("DELETE", reqObject);
 };

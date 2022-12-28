@@ -92,7 +92,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
         if (error) {
             throw new JSONException("Test error");
         }
-        return getAllServicesString();
+        return super.getAllServicesString();
     }
 
     @Override

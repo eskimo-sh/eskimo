@@ -210,16 +210,14 @@ eskimo.Setup = function() {
 
     function showSetupMessage(message, success) {
         let setupWarning = $("#setup-warning");
-        setupWarning.css("display", "inherit");
-        setupWarning.css("visibility", "inherit");
+        $.showElement(setupWarning);
 
         let setupWarningMessage = $("#setup-warning-message");
         setupWarningMessage.attr("class", "alert alert-" + (success ? "info" : "danger"));
         setupWarningMessage.html(message);
 
         setTimeout(function() {
-            setupWarning.css("display", "none");
-            setupWarning.css("visibility", "hidden");
+            $.hideElement(setupWarning);
         }, MESSAGE_SHOW_DURATION);
     }
     this.showSetupMessage = showSetupMessage;

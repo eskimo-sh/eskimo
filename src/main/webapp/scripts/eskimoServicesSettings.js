@@ -139,16 +139,14 @@ eskimo.ServicesSettings = function () {
 
     function showServicesSettingsMessage(message, success) {
         let servicesSettingsWarning = $("#services-settings-warning");
-        servicesSettingsWarning.css("display", "inherit");
-        servicesSettingsWarning.css("visibility", "inherit");
+        $.showElement(servicesSettingsWarning);
 
         let servicesSettingsWarningMessage = $("#services-settings-warning-message");
         servicesSettingsWarningMessage.attr("class", "alert alert-" + (success ? "info" : "danger"));
         servicesSettingsWarningMessage.html(message);
 
         setTimeout(function() {
-            servicesSettingsWarning.css("display", "none");
-            servicesSettingsWarning.css("visibility", "hidden");
+            $.hideElement(servicesSettingsWarning);
         }, 5000);
     }
     this.showServicesSettingsMessage = showServicesSettingsMessage;

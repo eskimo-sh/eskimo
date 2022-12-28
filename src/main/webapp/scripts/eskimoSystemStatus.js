@@ -359,8 +359,7 @@ eskimo.SystemStatus = function() {
         }
 
         let serviceStatusWarning = $("#service-status-warning");
-        serviceStatusWarning.css("display", "inherit");
-        serviceStatusWarning.css("visibility", "inherit");
+        $.showElement(serviceStatusWarning);
 
         let serviceStatusWarningMessage = $("#service-status-warning-message");
         serviceStatusWarningMessage.html(message);
@@ -372,8 +371,7 @@ eskimo.SystemStatus = function() {
         }
 
         prevHidingMessageTimeout = setTimeout(function () {
-            serviceStatusWarning.css("display", "none");
-            serviceStatusWarning.css("visibility", "hidden");
+            $.hideElement(serviceStatusWarning);
         }, 10000);
 
     }
@@ -536,9 +534,7 @@ eskimo.SystemStatus = function() {
 
         $("#status-monitoring-info-container").attr("class", "col-xs-12 col-sm-12 col-md-12");
 
-        let statusMonitoringGrafana = $('#status-monitoring-grafana');
-        statusMonitoringGrafana.css("display", "none");
-        statusMonitoringGrafana.css("visibility", "hidden");
+        $.hideElement($('#status-monitoring-grafana'));
     }
     this.hideGrafanaDashboard = hideGrafanaDashboard;
 
@@ -777,14 +773,8 @@ eskimo.SystemStatus = function() {
     };
 
     this.renderNodesStatusEmpty = function() {
-
-        let statusRenderOptions = $(".status-render-options");
-        statusRenderOptions.css("visibility", "hidden");
-        statusRenderOptions.css("display", "none");
-
-        let statusContainerEmpty = $("#status-node-container-empty");
-        statusContainerEmpty.css("visibility", "inherit");
-        statusContainerEmpty.css("display", "inherit");
+        $.hideElement($(".status-render-options"));
+        $.showElement($("#status-node-container-empty"));
     };
 
     function showTerminal(node, nodeName) {
@@ -924,13 +914,8 @@ eskimo.SystemStatus = function() {
 
     this.renderNodesStatusTable = function (data, blocking, availableNodes, nodeNamesByNbr) {
 
-        let statusRenderOptions = $(".status-render-options");
-        statusRenderOptions.css("visibility", "hidden");
-        statusRenderOptions.css("display", "none");
-
-        let statucContainerTable = $("#status-node-container-table");
-        statucContainerTable.css("visibility", "inherit");
-        statucContainerTable.css("display", "inherit");
+        $.hideElement($(".status-render-options"));
+        $.showElement($("#status-node-container-table"));
 
         // clear table
         $("#status-node-table-head").html(this.generateTableHeader());
@@ -1105,12 +1090,6 @@ eskimo.SystemStatus = function() {
             success: function (data, status, jqXHR) {
 
                 disconnectedFlag = false;
-
-                /*
-                let serviceStatusWarning = $("#service-status-warning");
-                serviceStatusWarning.css("display", "none");
-                serviceStatusWarning.css("visibility", "hidden");
-                */
 
                 that.eskimoMain.serviceMenuClear(data.nodeServicesStatus);
 

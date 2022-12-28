@@ -54,7 +54,10 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         dirContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoFileManagersTest/dirContentTest.json"), StandardCharsets.UTF_8);
 
+        loadScript ("eskimoUtils.js");
         loadScript ("eskimoFileManagers.js");
+
+        js("$.ajaxGet = function(object) { object.success( { 'message': 'OK'}); }");
 
         js("function errorHandler() {};");
 
