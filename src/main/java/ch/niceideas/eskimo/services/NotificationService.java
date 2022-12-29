@@ -84,6 +84,7 @@ public class NotificationService extends AbstractInformationHolder<JSONObject, L
 
         JSONObject newEvent = new JSONObject(new HashMap<String, Object>() {{
             put("type", type);
+            put("timestamp", "" + System.currentTimeMillis());
             put("message", message);
         }});
 

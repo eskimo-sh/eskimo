@@ -306,9 +306,9 @@
         "icon": "fa-file"
       },
       {
-        "id" : "show_remote_log",
-        "name" : "Show Remote Server Logs",
-        "command": "cat /var/log/gluster/gluster_remote-log",
+        "id" : "show_egmi_log",
+        "name" : "Show EGMI Backend Logs",
+        "command": "sudo cat /var/log/gluster/egmi/egmi.log",
         "icon": "fa-file"
       }
     ]

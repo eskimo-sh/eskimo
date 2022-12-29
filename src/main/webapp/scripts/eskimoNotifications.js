@@ -47,11 +47,23 @@ eskimo.Notifications = function() {
 
     this.initialize = function () {
 
-        $("#notifications-clear").click(function () {
-            clearNotifications();
-        });
+        // Initialize HTML Div from Template
+        $("#notification-placeholder").load("html/eskimoNotifications.html", function (responseTxt, statusTxt, jqXHR) {
 
-        loadLastLine();
+            if (statusTxt == "success") {
+
+                $("#notifications-clear").click(function () {
+                    clearNotifications();
+                });
+
+                $("#show-notifications-link").click(notificationsShown);
+
+                loadLastLine();
+
+            } else if (statusTxt == "error") {
+                alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
+            }
+        });
     };
 
     // get last line of notifications
@@ -106,17 +118,32 @@ eskimo.Notifications = function() {
     }
     this.fetchNotifications = fetchNotifications;
 
+    function renderTimestamp (timestamp) {
+        const date = new Date (parseInt (timestamp));
+
+        const year    = date.getFullYear();
+        const month   = date.getMonth();
+        const day     = date.getDay();
+        const hour    = date.getHours();
+        const minute  = date.getMinutes();
+        const seconds = date.getSeconds();
+
+        return "" + year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + seconds;
+    }
+    this.renderTimestamp = renderTimestamp;
+
     function addNotification(notification) {
 
-        let today = new Date();
-        notification.tstamp = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        notification.tstamp = renderTimestamp (notification.timestamp);
 
         notifications.push(notification);
-        newNotificationsCount++;
 
         renderNotifications();
 
-        $("#new-notifications-count").html("" + newNotificationsCount);
+        newNotificationsCount++;
+        $newNotificationsCount = $("#new-notifications-count");
+        $.showElement($newNotificationsCount);
+        $newNotificationsCount.html("" + newNotificationsCount);
     }
     this.addNotification = addNotification;
 
@@ -132,7 +159,9 @@ eskimo.Notifications = function() {
 
                 renderNotifications();
 
-                $("#new-notifications-count").html("");
+                $newNotificationsCount = $("#new-notifications-count");
+                $.hideElement($newNotificationsCount);
+                $newNotificationsCount.html("");
             },
             error: errorHandler
         });
@@ -251,7 +280,10 @@ eskimo.Notifications = function() {
     function notificationsShown() {
 
         newNotificationsCount = 0;
-        $("#new-notifications-count").html("");
+
+        $newNotificationsCount = $("#new-notifications-count");
+        $.hideElement($newNotificationsCount);
+        $newNotificationsCount.html("");
     }
     this.notificationsShown = notificationsShown;
 

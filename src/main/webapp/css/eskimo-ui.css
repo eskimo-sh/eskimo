@@ -874,3 +874,44 @@ html[data-sidenav-size=condensed]:not(.authentication-bg) .inner-content-inner-f
         transform: rotate(360deg);
     }
 }
+
+.notification-list .noti-icon-badge {
+    display: inline-block;
+    position: absolute;
+    top: 20px;
+    right: -7px;
+    border-radius: 5px;
+    height: 18px;
+    width: 22px;
+    border-color: #fa5c7c;
+    font-size: 8pt;
+    border-width: 2px;
+    border-style: solid;
+    color: var(--ct-gray-200);
+    font-weight: bold;
+    background-color: #fa5c7c;
+    /* text-decoration: blink; */
+}
+
+.logo-topbar .logo-lg img,
+.logo-dark .logo-lg img,
+.logo-light .logo-lg img{
+    width: 25px;
+    height: 25px;
+}
+.logo-topbar .logo-sm img,
+.logo-dark .logo-sm img,
+.logo-light .logo-sm img{
+    width: 22px;
+    height: 22px;
+}
+
+@media (min-width: 576px) {
+    .dropdown-lg {
+        width: 360px;
+    }
+}
+
+#notification-placeholder {
+    display: initial;
+}

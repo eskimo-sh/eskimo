@@ -205,11 +205,6 @@ eskimo.Main = function() {
 
         $(window).resize (this.windowResize);
 
-
-        // notifications
-        $("#main-show-notifications-link").click(eskimoNotifications.notificationsShown);
-        $("#main-clear-notifications-link").click(eskimoNotifications.clearNotifications);
-
         // about
         $("#main-show-about-link").click(eskimoAbout.showAbout);
 
