@@ -104,21 +104,11 @@ public class SystemOperationServiceTest {
         Pair<Integer, List<JSONObject>> notifications = notificationService.fetchElements(0);
         assertNotNull (notifications);
         assertEquals(Integer.valueOf(2), notifications.getKey());
-        assertEquals("{\n" +
-                "  \"type\": \"Doing\",\n" +
-                "  \"message\": \"Executing test on test on test\"\n" +
-                "}\n" +
-                "{\n" +
-                "  \"type\": \"Info\",\n" +
-                "  \"message\": \"Executing test on test on test succeeded\"\n" +
-                "}", notifications.getValue().stream()
-                .map(object -> {
-                    try {
-                        return object.toString(2);
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .collect(Collectors.joining("\n")));
+
+        assertEquals("Doing", notifications.getValue().get(0).getString("type"));
+        assertEquals("Executing test on test on test", notifications.getValue().get(0).getString("message"));
+
+        assertEquals("Info", notifications.getValue().get(1).getString("type"));
+        assertEquals("Executing test on test on test succeeded", notifications.getValue().get(1).getString("message"));
     }
 }

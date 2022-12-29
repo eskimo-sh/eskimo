@@ -327,9 +327,11 @@ public class SystemServiceTest {
 
         assertEquals(2, notifications.getKey().intValue());
 
-        assertEquals("{\"type\":\"Error\",\"message\":\"Service cerebro on 192.168.10.11 got into problem\"}", notifications.getValue().get(0).toString());
+        assertEquals("Error", notifications.getValue().get(0).getString("type"));
+        assertEquals("Service cerebro on 192.168.10.11 got into problem", notifications.getValue().get(0).getString("message"));
 
-        assertEquals("{\"type\":\"Error\",\"message\":\"Service kibana on 192.168.10.11 got into problem\"}", notifications.getValue().get(1).toString());
+        assertEquals("Error", notifications.getValue().get(1).getString("type"));
+        assertEquals("Service kibana on 192.168.10.11 got into problem", notifications.getValue().get(1).getString("message"));
     }
 
     @Test
@@ -359,9 +361,11 @@ public class SystemServiceTest {
 
         assertEquals(2, notifications.getKey().intValue());
 
-        assertEquals("{\"type\":\"Error\",\"message\":\"Service cerebro on 192.168.10.11 got into problem\"}", notifications.getValue().get(0).toString());
+        assertEquals("Error", notifications.getValue().get(0).getString("type"));
+        assertEquals("Service cerebro on 192.168.10.11 got into problem", notifications.getValue().get(0).getString("message"));
 
-        assertEquals("{\"type\":\"Error\",\"message\":\"Service kibana on 192.168.10.11 got into problem\"}", notifications.getValue().get(1).toString());
+        assertEquals("Error", notifications.getValue().get(1).getString("type"));
+        assertEquals("Service kibana on 192.168.10.11 got into problem", notifications.getValue().get(1).getString("message"));
     }
 
     @Test
@@ -389,7 +393,8 @@ public class SystemServiceTest {
 
         assertEquals(1, notifications.getKey().intValue());
 
-        assertEquals("{\"type\":\"Error\",\"message\":\"Service Node Alive on 192.168.10.13 got into problem\"}", notifications.getValue().get(0).toString());
+        assertEquals("Error", notifications.getValue().get(0).getString("type"));
+        assertEquals("Service Node Alive on 192.168.10.13 got into problem", notifications.getValue().get(0).getString("message"));
     }
 
     @Test
@@ -710,11 +715,13 @@ public class SystemServiceTest {
 
         assertTrue (called.get());
 
-        assertEquals("[" +
-                        "{\"type\":\"Doing\",\"message\":\"test op ntp on 192.168.10.11\"}, " +
-                        "{\"type\":\"Info\",\"message\":\"test op ntp succeeded on 192.168.10.11\"}" +
-                        "]",
-                ""+notificationService.getSubList(0));
+        List<JSONObject> result = notificationService.getSubList(0);
+
+        assertEquals("Doing", result.get(0).getString("type"));
+        assertEquals("test op ntp on 192.168.10.11", result.get(0).getString("message"));
+
+        assertEquals("Info", result.get(1).getString("type"));
+        assertEquals("test op ntp succeeded on 192.168.10.11", result.get(1).getString("message"));
 
         SimpleOperationCommand.SimpleOperationId operationId = new SimpleOperationCommand.SimpleOperationId("test op", "ntp", "192.168.10.11");
 

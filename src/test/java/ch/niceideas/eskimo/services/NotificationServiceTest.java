@@ -71,8 +71,12 @@ public class NotificationServiceTest {
         Pair<Integer,List<JSONObject>> result = notificationService.fetchElements(0);
 
         assertEquals(2, (int) result.getKey());
-        assertEquals("{\"type\":\"Error\",\"message\":\"Test\"}", result.getValue().get(0).toString());
-        assertEquals("{\"type\":\"Info\",\"message\":\"Test2\"}", result.getValue().get(1).toString());
+
+        assertEquals("Error", result.getValue().get(0).getString("type"));
+        assertEquals("Test", result.getValue().get(0).getString("message"));
+
+        assertEquals("Info", result.getValue().get(1).getString("type"));
+        assertEquals("Test2", result.getValue().get(1).getString("message"));
 
         Pair<Integer,List<JSONObject>> result2 = notificationService.fetchElements(2);
 
@@ -86,8 +90,12 @@ public class NotificationServiceTest {
         Pair<Integer, List<JSONObject>> result = notificationService.fetchElements(20);
 
         assertEquals(2, (int) result.getKey());
-        assertEquals("{\"type\":\"Error\",\"message\":\"Test\"}", result.getValue().get(0).toString());
-        assertEquals("{\"type\":\"Info\",\"message\":\"Test2\"}", result.getValue().get(1).toString());
+
+        assertEquals("Error", result.getValue().get(0).getString("type"));
+        assertEquals("Test", result.getValue().get(0).getString("message"));
+
+        assertEquals("Info", result.getValue().get(1).getString("type"));
+        assertEquals("Test2", result.getValue().get(1).getString("message"));
     }
 
     @Test
@@ -127,8 +135,11 @@ public class NotificationServiceTest {
         assertEquals(1004, (int) result4.getKey());
         assertEquals(2, result4.getValue().size());
 
-        assertEquals("{\"type\":\"Error\",\"message\":\"TestX\"}", result4.getValue().get(0).toString());
-        assertEquals("{\"type\":\"Info\",\"message\":\"TestY\"}", result4.getValue().get(1).toString());
+        assertEquals("Error", result4.getValue().get(0).getString("type"));
+        assertEquals("TestX", result4.getValue().get(0).getString("message"));
+
+        assertEquals("Info", result4.getValue().get(1).getString("type"));
+        assertEquals("TestY", result4.getValue().get(1).getString("message"));
 
         Pair<Integer,List<JSONObject>> result5 = notificationService.fetchElements(1004);
 

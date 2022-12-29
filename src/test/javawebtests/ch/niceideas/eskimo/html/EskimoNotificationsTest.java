@@ -59,6 +59,7 @@ public class EskimoNotificationsTest extends AbstractWebTest {
     public void testAddNotifications() throws Exception {
         js("eskimoNotifications.addNotification({\n" +
                 "      \"type\": \"Info\",\n" +
+                "      \"timestamp\": \"1672340848266\",\n" +
                 "      \"message\": \"Installation of Topology and settings on 192.168.10.11 succeeded\"\n" +
                 "    });");
 
@@ -71,6 +72,47 @@ public class EskimoNotificationsTest extends AbstractWebTest {
         assertJavascriptEquals("1", "$('#notifications-container .card-body .d-flex .flex-grow-1 .noti-item-title').length");
         assertJavascriptEquals("Installation of Topology and settings on 192.168.10.11 succeeded",
                 "$('#notifications-container .card-body .d-flex .flex-grow-1 .noti-item-subtitle').text()");
+    }
+
+    @Test
+    public void testFetchNotifications() throws Exception {
+
+        js("$.ajaxGet = function(object) {" +
+                "    object.success({\n" +
+                "  \"lastLine\": \"3\",\n" +
+                "  \"notifications\": [\n" +
+                "    {\n" +
+                "      \"type\": \"Doing\",\n" +
+                "      \"message\": \"Check / Install of Base System on 192.168.56.21\",\n" +
+                "      \"timestamp\": \"1672340848266\"\n" +
+                "    },    \n" +
+                "    {\n" +
+                "      \"type\": \"Info\",\n" +
+                "      \"message\": \"Check / Install of Base System on 192.168.56.24 succeeded\",\n" +
+                "      \"timestamp\": \"1672340848660\"\n" +
+                "    },   \n" +
+                "    {\n" +
+                "      \"type\": \"Doing\",\n" +
+                "      \"message\": \"installation of logstash-cli on 192.168.56.21\",\n" +
+                "      \"timestamp\": \"1672340848942\"\n" +
+                "    }   \n" +
+                "  ],\n" +
+                "  \"status\": \"OK\"\n" +
+                "}, 'OK');" +
+                "}");
+
+        js("eskimoNotifications.fetchNotifications();");
+
+        assertJavascriptEquals("3", "$('#notifications-container .card-body .d-flex .flex-grow-1 .noti-item-title').length");
+
+        assertTrue(js("return $('#notifications-container .card-body .d-flex .flex-grow-1 .noti-item-subtitle').text()")
+                .toString().contains("Check / Install of Base System on 192.168.56.21"));
+
+        assertTrue(js("return $('#notifications-container .card-body .d-flex .flex-grow-1 .noti-item-subtitle').text()")
+                .toString().contains("Check / Install of Base System on 192.168.56.24 succeeded"));
+
+        assertTrue(js("return $('#notifications-container .card-body .d-flex .flex-grow-1 .noti-item-subtitle').text()")
+                .toString().contains("installation of logstash-cli on 192.168.56.21"));
     }
 
     @Test

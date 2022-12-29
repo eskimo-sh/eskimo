@@ -160,7 +160,6 @@ public class ConnectionManagerServiceTestImpl extends ConnectionManagerServiceIm
             }
             @Override
             public synchronized void sendIgnorePacket() throws IOException {
-                // NO-OP
                 if (isClosed) {
                     throw new IOException("channel is closed");
                 }

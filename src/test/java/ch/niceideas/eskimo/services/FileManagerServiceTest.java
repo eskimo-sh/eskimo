@@ -101,7 +101,11 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
         fms.setConnectionManagerService(connectionManagerServiceTest);
         fms.setSshCommandService(sshCommandServiceTest);
 
+        configurationServiceTest.reset();
+
         configurationServiceTest.saveSetupConfig("{ \"ssh_username\" : \"test\" }");
+
+        connectionManagerServiceTest.reset();
 
         connectionManagerServiceTest.setPrivateSShKeyContent(privateKeyRaw);
         connectionManagerServiceTest.setSShPort(getSShPort());

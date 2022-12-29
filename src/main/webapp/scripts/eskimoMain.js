@@ -368,11 +368,8 @@ eskimo.Main = function() {
 
         } else {
 
-            $(".inner-content").css("visibility", "hidden");
-            $(".inner-content").css("display", "none");
-
-            $("#inner-content-" + content).css("visibility", "visible");
-            $("#inner-content-" + content).css("display", "block");
+            $.hideElement($(".inner-content"));
+            $.showElement($("#inner-content-" + content));
         }
     };
 
@@ -386,7 +383,7 @@ eskimo.Main = function() {
 
                 if (menuKubernetesConfig.hasClass("visually-hidden")) {
 
-                    $.hideElement(menuKubernetesConfig);
+                    $.showElement(menuKubernetesConfig);
                     menuKubernetesConfig.removeClass("visually-hidden")
                 }
             }
