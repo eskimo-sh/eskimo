@@ -331,7 +331,7 @@ eskimo.Consoles = function() {
             let consoleContent = '<div class="col-md-12 ajaxterminal" id="consoles-console-' + nodeName + '">\n' +
                 '    <div id="term_' + nodeName + '" class="ajaxterm" tabindex="0"></div>\n' +
                 '    <div id="console-actions-' + nodeName + '">\n' +
-                '        <button id="console-close-' + nodeName + '" name="console-close-1" class="btn btn-primary">\n' +
+                '        <button id="console-close-' + nodeName + '" name="console-close-1" class="btn btn-secondary">\n' +
                 '            Close\n' +
                 '        </button>\n' +
                 '    </div>';
