@@ -34,12 +34,8 @@
 
 package ch.niceideas.eskimo.model;
 
-import ch.niceideas.eskimo.services.*;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -53,12 +49,12 @@ public class NodesConfigWrapperTest {
             "    \"node_id1\": \"192.168.56.21\",\n" +
             "    \"node_id3\": \"192.168.56.23\",\n" +
             "    \"node_id2\": \"192.168.56.22\",\n" +
-            "    \"kafka3\": \"on\",\n" +
+            "    \"kafka-cli3\": \"on\",\n" +
             "    \"logstash1\": \"on\",\n" +
-            "    \"kafka2\": \"on\",\n" +
+            "    \"kafka-cli2\": \"on\",\n" +
             "    \"logstash2\": \"on\",\n" +
             "    \"logstash3\": \"on\",\n" +
-            "    \"kafka1\": \"on\",\n" +
+            "    \"kafka-cli1\": \"on\",\n" +
             "    \"gluster1\": \"on\",\n" +
             "    \"gluster3\": \"on\",\n" +
             "    \"gluster2\": \"on\",\n" +
@@ -79,6 +75,8 @@ public class NodesConfigWrapperTest {
     public void testHasServiceConfigured() {
         assertTrue(ncw.hasServiceConfigured("kube-master"));
         assertTrue(ncw.hasServiceConfigured("ntp"));
+        assertTrue(ncw.hasServiceConfigured("kafka-cli"));
+        assertFalse(ncw.hasServiceConfigured("kafka"));
         assertFalse(ncw.hasServiceConfigured("blablabla"));
     }
 
@@ -98,7 +96,7 @@ public class NodesConfigWrapperTest {
 
     @Test
     public void testGetServiceKeys() {
-        assertEquals ("elasticsearch1,elasticsearch2,elasticsearch3,gluster1,gluster2,gluster3,k8s-slave1,k8s-slave2,k8s-slave3,kafka1,kafka2,kafka3,kube-master,logstash1,logstash2,logstash3,ntp1,ntp2,ntp3,prometheus1,prometheus2,prometheus3,zookeeper", String.join(",", ncw.getServiceKeys()));
+        assertEquals ("elasticsearch1,elasticsearch2,elasticsearch3,gluster1,gluster2,gluster3,k8s-slave1,k8s-slave2,k8s-slave3,kafka-cli1,kafka-cli2,kafka-cli3,kube-master,logstash1,logstash2,logstash3,ntp1,ntp2,ntp3,prometheus1,prometheus2,prometheus3,zookeeper", String.join(",", ncw.getServiceKeys()));
     }
 
     @Test
@@ -123,8 +121,8 @@ public class NodesConfigWrapperTest {
 
     @Test
     public void testGetServicesForNode() throws Exception {
-        assertEquals ("elasticsearch,gluster,k8s-slave,kafka,kube-master,logstash,ntp,prometheus,zookeeper", String.join(",", ncw.getServicesForNode("192.168.56.21")));
-        assertEquals ("elasticsearch,gluster,k8s-slave,kafka,kube-master,logstash,ntp,prometheus,zookeeper", String.join(",", ncw.getServicesForNode(1)));
+        assertEquals ("elasticsearch,gluster,k8s-slave,kafka-cli,kube-master,logstash,ntp,prometheus,zookeeper", String.join(",", ncw.getServicesForNode("192.168.56.21")));
+        assertEquals ("elasticsearch,gluster,k8s-slave,kafka-cli,kube-master,logstash,ntp,prometheus,zookeeper", String.join(",", ncw.getServicesForNode(1)));
     }
 
     @Test

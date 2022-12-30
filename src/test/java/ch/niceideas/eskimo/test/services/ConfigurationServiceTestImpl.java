@@ -196,13 +196,13 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
 
     @Override
     public NodesConfigWrapper loadNodesConfig() throws SystemException, SetupException {
+        if (nodesConfig != null) {
+            return nodesConfig;
+        }
         if (standard2NodesSetup) {
             return StandardSetupHelpers.getStandard2NodesSetup();
         } else if (nodesConfigError) {
             throw new SystemException("Test Error");
-        }
-        if (nodesConfig != null) {
-            return nodesConfig;
         }
         return NodesConfigWrapper.empty();
     }

@@ -91,7 +91,10 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
     public boolean hasServiceConfigured(String serviceName) {
         try {
             return this.keySet().stream()
-                    .anyMatch(key -> key.startsWith (serviceName));
+                    .map(NodesConfigWrapper::parseProperty)
+                    .filter(Objects::nonNull)
+                    .map (ParsedNodesConfigProperty::getServiceName)
+                    .anyMatch(propertyServiceName -> propertyServiceName.equals (serviceName));
         } catch (JSONException e) {
             logger.debug (e, e);
             return false;

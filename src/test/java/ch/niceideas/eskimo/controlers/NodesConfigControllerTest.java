@@ -1,8 +1,11 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.eskimo.EskimoApplication;
+import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.SimpleOperationCommand;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
@@ -56,6 +59,7 @@ public class NodesConfigControllerTest {
             operationsMonitoringService.endCommand(true);
         }
 
+        configurationServiceTest.reset();
         configurationServiceTest.setStandard2NodesSetup();
         configurationServiceTest.setStandard2NodesInstallStatus();
 
@@ -117,6 +121,50 @@ public class NodesConfigControllerTest {
                 "  \"error\": \"Test Error\",\n" +
                 "  \"status\": \"KO\"\n" +
                 "}", ncc.loadNodesConfig());
+    }
+
+    /*
+     * This tese a problem we've been having where a force reinstall of kafka-cli for instance was removing kafka
+     * from being considered install in install status.
+     */
+    @Test
+    public void testReinstallNodesConfig_kafkaCliProblem() throws Exception {
+
+        Map<String, Object> sessionContent = new HashMap<>();
+
+        HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
+
+        ServicesInstallStatusWrapper serviceInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+        serviceInstallStatus.setInstallationFlag("kafka-cli", "192-168-10-11", "OK");
+        serviceInstallStatus.setInstallationFlag("kafka-cli", "192-168-10-13", "OK");
+        configurationServiceTest.saveServicesInstallationStatus(serviceInstallStatus);
+
+        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+        nodesConfig.setValueForPath("kafka-cli1", "on");
+        nodesConfig.setValueForPath("kafka-cli2", "on");
+        configurationServiceTest.saveNodesConfig(nodesConfig);
+
+        assertEquals ("{\n" +
+                "  \"command\": {\n" +
+                "    \"restarts\": [],\n" +
+                "    \"uninstallations\": [],\n" +
+                "    \"installations\": [\n" +
+                "      {\"kafka-cli\": \"192.168.10.11\"},\n" +
+                "      {\"kafka-cli\": \"192.168.10.13\"}\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", ncc.reinstallNodesConfig("{\"kafka-cli\":\"on\"}", session));
+
+        // now we're expecting that only kafka-cli was removed from the one stored in session
+
+        serviceInstallStatus.removeInstallationFlag("kafka-cli", "192-168-10-11");
+        serviceInstallStatus.removeInstallationFlag("kafka-cli", "192-168-10-13");
+
+        //assertEquals(serviceInstallStatus.getFormattedValue(), ((ServicesInstallStatusWrapper)session.getAttribute(NodesConfigController.PENDING_OPERATIONS_STATUS_OVERRIDE)).getFormattedValue());
+
+        assertTrue (serviceInstallStatus.getJSONObject().similar(
+                ((ServicesInstallStatusWrapper)session.getAttribute(NodesConfigController.PENDING_OPERATIONS_STATUS_OVERRIDE)).getJSONObject()));
     }
 
     @Test
