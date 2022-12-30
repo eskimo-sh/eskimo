@@ -213,7 +213,12 @@ eskimo.Setup = function() {
         $.showElement(setupWarning);
 
         let setupWarningMessage = $("#setup-warning-message");
-        setupWarningMessage.attr("class", "alert alert-" + (success ? "info" : "danger"));
+        if (success) {
+            setupWarningMessage.attr('class', "alert alert-info bg-info text-white border-0");
+        } else {
+            setupWarningMessage.attr('class', "alert alert-danger bg-danger text-white border-0");
+        }
+
         setupWarningMessage.html(message);
 
         setTimeout(function() {

@@ -138,13 +138,13 @@ public class EskimoSetupTest extends AbstractWebTest {
         assertCssValue("#setup-warning", "display", "block");
         assertCssValue("#setup-warning", "visibility", "visible");
 
-        assertAttrValue("#setup-warning-message", "class", "alert alert-danger");
+        assertAttrContains("#setup-warning-message", "class", "danger");
 
         assertJavascriptEquals("test", "$('#setup-warning-message').html()");
 
         js("eskimoSetup.showSetupMessage ('test', true);");
 
-        assertAttrValue("#setup-warning-message", "class", "alert alert-info");
+        assertAttrContains("#setup-warning-message", "class", "info");
     }
 
     @Test

@@ -374,13 +374,13 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         assertCssValue("#service-status-warning", "display", "block");
         assertCssValue("#service-status-warning", "visibility", "visible");
 
-        assertAttrValue("#service-status-warning-message", "class", "alert alert-warning");
+        assertAttrContains("#service-status-warning-message", "class", "warning");
 
         assertJavascriptEquals("test", "$('#service-status-warning-message').html()");
 
         js("eskimoSystemStatus.showStatusMessage ('test', true);");
 
-        assertAttrValue("#service-status-warning-message", "class", "alert alert-danger");
+        assertAttrContains("#service-status-warning-message", "class", "danger");
     }
 
     @Test

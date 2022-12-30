@@ -115,13 +115,13 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
         assertCssValue("#services-settings-warning", "display", "block");
         assertCssValue("#services-settings-warning", "visibility", "visible");
 
-        assertAttrValue("#services-settings-warning-message", "class", "alert alert-danger");
+        assertAttrContains("#services-settings-warning-message", "class", "danger");
 
         assertJavascriptEquals("test", "$('#services-settings-warning-message').html()");
 
         js("eskimoServicesSettings.showServicesSettingsMessage ('test', true);");
 
-        assertAttrValue("#services-settings-warning-message", "class", "alert alert-info");
+        assertAttrContains("#services-settings-warning-message", "class", "info");
     }
 
 }

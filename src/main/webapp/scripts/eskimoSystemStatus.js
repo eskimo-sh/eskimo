@@ -365,9 +365,9 @@ eskimo.SystemStatus = function() {
         serviceStatusWarningMessage.html(message);
 
         if (error) {
-            serviceStatusWarningMessage.attr('class', "alert alert-danger");
+            serviceStatusWarningMessage.attr('class', "alert alert-danger bg-danger text-white border-0");
         } else {
-            serviceStatusWarningMessage.attr('class', "alert alert-warning");
+            serviceStatusWarningMessage.attr('class', "alert alert-warning bg-warning text-white border-0");
         }
 
         prevHidingMessageTimeout = setTimeout(function () {

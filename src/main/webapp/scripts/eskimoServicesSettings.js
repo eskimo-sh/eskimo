@@ -142,7 +142,12 @@ eskimo.ServicesSettings = function () {
         $.showElement(servicesSettingsWarning);
 
         let servicesSettingsWarningMessage = $("#services-settings-warning-message");
-        servicesSettingsWarningMessage.attr("class", "alert alert-" + (success ? "info" : "danger"));
+        if (success) {
+            servicesSettingsWarningMessage.attr('class', "alert alert-info bg-info text-white border-0");
+        } else {
+            servicesSettingsWarningMessage.attr('class', "alert alert-danger bg-danger text-white border-0");
+        }
+
         servicesSettingsWarningMessage.html(message);
 
         setTimeout(function() {

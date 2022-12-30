@@ -52,8 +52,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.io.File;
 import java.time.Duration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class AbstractWebTest {
 
@@ -321,6 +320,11 @@ public abstract class AbstractWebTest {
         } catch (InterruptedException e) {
             logger.debug(e, e);
         }
+    }
+
+    protected void assertAttrContains(String selector, String attribute, String value) {
+        String cssValue = js("return $('"+selector+"').attr('"+attribute+"')").toString();
+        assertTrue (cssValue.contains(value));
     }
 
     protected void assertAttrValue(String selector, String attribute, String value) {

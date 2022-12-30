@@ -105,7 +105,7 @@ eskimo.KubernetesOperationsCommand = function() {
 
             commandDescription = commandDescription +
                 '<div class="col-xs-12 col-md-12">' +
-                '<div class="alert alert-warning" role="alert">' +
+                '<div class="alert alert-warning bg-warning text-white border-0" role="alert">' +
                 command.warnings +
                 '</div>' +
                 '</div>';
