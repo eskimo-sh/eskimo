@@ -46,7 +46,7 @@ eskimo.KubernetesOperationsCommand = function() {
 
     this.initialize = function() {
         // Initialize HTML Div from Template
-        $("#kubernetes-operations-command-modal-wrapper").load("html/eskimoKubernetesOperationsCommand.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#kubernetes-operations-command-modal-wrapper").load("html/eskimoKubernetesOperationsCommand.html", (responseTxt, statusTxt, jqXHR) => {
 
             if (statusTxt == "success") {
 
@@ -139,7 +139,7 @@ eskimo.KubernetesOperationsCommand = function() {
             $.ajaxPost({
                 timeout: 1000 * 3600,
                 url: "apply-kubernetes-services-config",
-                success: function (data, status, jqXHR) {
+                success: (data, status, jqXHR) => {
 
                     // OK
                     console.log(data);
@@ -152,7 +152,7 @@ eskimo.KubernetesOperationsCommand = function() {
                     }
                 },
 
-                error: function (jqXHR, status) {
+                error: (jqXHR, status) => {
                     errorHandler(jqXHR, status);
                     that.eskimoMain.scheduleStopOperationInProgress(false);
                 }

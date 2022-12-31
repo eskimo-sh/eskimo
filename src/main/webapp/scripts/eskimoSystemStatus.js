@@ -108,27 +108,27 @@ eskimo.SystemStatus = function() {
 
                 loadUIStatusServicesConfig();
 
-                $('#show-all-nodes-btn').click($.proxy (function () {
+                $('#show-all-nodes-btn').click($.proxy (() => {
                     $(".filter-btn").attr("class", "btn btn-secondary ms-2 filter-btn");
                     setNodeFilter (null);
                     showStatus(true);
                 }, this));
 
-                $('#show-master-services-btn').click($.proxy (function () {
+                $('#show-master-services-btn').click($.proxy (() => {
                     $(".filter-btn").attr("class", "btn btn-secondary ms-2 filter-btn");
                     $("#show-master-services-btn").attr("class", "btn filter-btn btn-success ms-2");
                     setNodeFilter ("master");
                     showStatus(true);
                 }, this));
 
-                $('#show-issues-btn').click($.proxy (function () {
+                $('#show-issues-btn').click($.proxy (() => {
                     $(".filter-btn").attr("class", "btn btn-secondary ms-2 filter-btn");
                     $("#show-issues-btn").attr("class", "btn filter-btn btn-success ms-2");
                     setNodeFilter ("issues");
                     showStatus(true);
                 }, this));
 
-                $('#empty-nodes-configure').click(function () {
+                $('#empty-nodes-configure').click(() => {
                     that.eskimoNodesConfig.showNodesConfig();
                 });
 
@@ -175,9 +175,7 @@ eskimo.SystemStatus = function() {
                 });
 
                 //make sure menu closes on any click
-                $('body').click(function () {
-                    $("#nodeContextMenu").hide();
-                });
+                $('body').click(() => { $("#nodeContextMenu").hide(); });
             });
         };
 
@@ -245,9 +243,7 @@ eskimo.SystemStatus = function() {
                 });
 
                 //make sure menu closes on any click
-                $('body').click(function () {
-                    $("#serviceContextMenu").hide();
-                });
+                $('body').click(() => { $("#serviceContextMenu").hide(); });
             });
         };
     };
@@ -272,7 +268,7 @@ eskimo.SystemStatus = function() {
     function loadUIStatusServicesConfig() {
         $.ajaxGet({
             url: "get-ui-services-status-config",
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 if (data.status == "OK") {
 
@@ -291,7 +287,7 @@ eskimo.SystemStatus = function() {
     function loadListServices () {
         $.ajaxGet({
             url: "list-services",
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 if (data.status == "OK") {
 
@@ -327,7 +323,7 @@ eskimo.SystemStatus = function() {
             that.eskimoSetup.loadSetup();
 
             // retry after a ŵhile
-            setTimeout (function() {
+            setTimeout (() => {
                 showStatus(blocking);
             }, 100);
 
@@ -370,9 +366,7 @@ eskimo.SystemStatus = function() {
             serviceStatusWarningMessage.attr('class', "alert alert-warning bg-warning text-white border-0");
         }
 
-        prevHidingMessageTimeout = setTimeout(function () {
-            $.hideElement(serviceStatusWarning);
-        }, 10000);
+        prevHidingMessageTimeout = setTimeout(() => { $.hideElement(serviceStatusWarning); }, 10000);
 
     }
     this.showStatusMessage = showStatusMessage;
@@ -402,7 +396,7 @@ eskimo.SystemStatus = function() {
             url: (custom ?
                 "service-custom-action?action=" + action + "&service=" + service + "&nodeAddress=" + node :
                 action + "?service=" + service + "&nodeAddress=" + node),
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 // OK
                 console.log(data);
@@ -419,7 +413,7 @@ eskimo.SystemStatus = function() {
                 }
             },
 
-            error: function (jqXHR, status) {
+            error: (jqXHR, status) => {
                 errorHandler (jqXHR, status);
                 that.eskimoMain.scheduleStopOperationInProgress (false);
             }
@@ -488,13 +482,13 @@ eskimo.SystemStatus = function() {
         $.ajax({
             type: "GET",
             url: "grafana/api/dashboards/uid/" +monitoringDashboardId,
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 let forceRefresh = false;
                 if ($("#status-monitoring-dashboard-frame").css("display") == "none") {
 
 
-                    setTimeout (function() {
+                    setTimeout (() => {
                         $("#status-monitoring-dashboard-frame").css("display", "inherit");
                         $("#status-monitoring-no-dashboard").css("display", "none");
                     }, 500);
@@ -512,7 +506,8 @@ eskimo.SystemStatus = function() {
                     setTimeout(that.monitoringDashboardFrameTamper, 4000);
                 }
             },
-            error: function (jqXHR, status) {
+
+            error: (jqXHR, status) => {
 
                 // ignore
                 console.debug("error : could not fetch dashboard " + monitoringDashboardId);
@@ -595,7 +590,7 @@ eskimo.SystemStatus = function() {
 
                 let refreshPeriod = systemStatus.monitoringDashboardRefreshPeriod;
 
-                setTimeout(function () {
+                setTimeout(() => {
                     that.displayMonitoringDashboard(monitoringDashboardId, refreshPeriod);
                 }, blocking ? 0 : STATUS_REFRESH_PERIOD_MS);
             }
@@ -681,12 +676,13 @@ eskimo.SystemStatus = function() {
         // remove widgets menus from iframe DOM
 
         // grafana 5.x
-        $("#status-monitoring-dashboard-frame").contents().find(".panel-menu").remove();
+        const $statusMonitoringDashboardFrameContents = $("#status-monitoring-dashboard-frame").contents();
+        $statusMonitoringDashboardFrameContents.find(".panel-menu").remove();
 
         // grafana 6.x
-        $("#status-monitoring-dashboard-frame").contents().find(".panel-menu-toggle").remove();
+        $statusMonitoringDashboardFrameContents.find(".panel-menu-toggle").remove();
 
-        $("#status-monitoring-dashboard-frame").contents().find(".panel-title").on('click', function(e) {
+        $statusMonitoringDashboardFrameContents.find(".panel-title").on('click', e => {
             e.preventDefault();
             e.stopPropagation();
             return false;
@@ -790,7 +786,7 @@ eskimo.SystemStatus = function() {
     function registerNodeMenu(selector, dataSelector) {
         // register menu
         $(selector).nodeContextMenu({
-            menuSelected: function (invokedOn, selectedMenu) {
+            menuSelected: (invokedOn, selectedMenu) => {
 
                 let action = selectedMenu.attr('id');
                 let node = $(invokedOn).closest("td."+dataSelector).data('eskimo-node');
@@ -813,7 +809,7 @@ eskimo.SystemStatus = function() {
     function registerServiceMenu(selector, dataSelector) {
         // register menu
         $(selector).serviceContextMenu({
-            menuSelected: function (invokedOn, selectedMenu) {
+            menuSelected: (invokedOn, selectedMenu) => {
 
                 let action = selectedMenu.attr('id');
                 let node = $(invokedOn).closest("td."+dataSelector).data('eskimo-node');
@@ -1055,7 +1051,7 @@ eskimo.SystemStatus = function() {
     this.fetchOperationResult = function() {
         $.ajaxGet({
             url: "get-last-operation-result",
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 if (data.status == "OK") {
                     that.eskimoMain.scheduleStopOperationInProgress (data.success);
@@ -1087,7 +1083,7 @@ eskimo.SystemStatus = function() {
         $.ajaxGet({
             url: "get-status",
             timeout: 1000 * 35, // 35 secs
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 disconnectedFlag = false;
 
@@ -1138,7 +1134,7 @@ eskimo.SystemStatus = function() {
                 inUpdateStatus = false;
             },
 
-            error: function (jqXHR, status) {
+            error: (jqXHR, status) => {
                 // error handler
                 console.log(jqXHR);
                 console.log(status);

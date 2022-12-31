@@ -40,7 +40,7 @@ function checkKubernetesSetup (kubernetesSetupConfig, servicesDependencies, kube
 
     $.ajaxGet({
         url: "load-nodes-config",
-        success: function (data, status, jqXHR) {
+        success: (data, status, jqXHR) => {
 
             try {
                 doCheckKubernetesSetup (data, kubernetesSetupConfig, servicesDependencies, kubernetesServices);
@@ -48,7 +48,7 @@ function checkKubernetesSetup (kubernetesSetupConfig, servicesDependencies, kube
                 if(successCallback && successCallback instanceof Function) {
                     successCallback();
                 } else {
-                    throw "TECHNICAL ERROR : successCallback is not a function.";
+                    alert ("TECHNICAL ERROR : successCallback is not a function.");
                 }
 
             } catch (error) {

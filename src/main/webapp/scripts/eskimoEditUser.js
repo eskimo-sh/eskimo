@@ -41,21 +41,15 @@ eskimo.EditUser = function() {
 
     this.initialize = function() {
         // Initialize HTML Div from Template
-        $("#edit-user-modal-wrapper").load("html/eskimoEditUser.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#edit-user-modal-wrapper").load("html/eskimoEditUser.html", (responseTxt, statusTxt, jqXHR) => {
 
             if (statusTxt == "success") {
 
-                $("#edit-user-header-close").click(function (e) {
-                    cancelEditUser();
-                });
+                $("#edit-user-header-close").click(() => { cancelEditUser(); });
 
-                $("#edit-user-input-button-cancel").click(function (e) {
-                    cancelEditUser();
-                });
+                $("#edit-user-input-button-cancel").click(() => {cancelEditUser(); });
 
-                $("#edit-user-input-button-validate").click(function (e) {
-                    validateEditUser();
-                });
+                $("#edit-user-input-button-validate").click(() => { validateEditUser();  });
 
             } else if (statusTxt == "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
@@ -89,7 +83,7 @@ eskimo.EditUser = function() {
             timeout: 1000 * 10,
             url: "TODO",
             data: userJSON,
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 // TODO SIsplay error if any
 
@@ -99,7 +93,7 @@ eskimo.EditUser = function() {
                     $editUserAlert = $("#edit-user-alert");
                     $editUserAlert.css("display", "block");
                     $editUserAlert.html(data.error);
-                    setTimeout(function () {
+                    setTimeout(() => {
                         $editUserAlert.css("display", "none");
                     }, 5000);
 
@@ -115,7 +109,7 @@ eskimo.EditUser = function() {
                 $('#edit-user-overlay').css('display', 'none');
             },
 
-            error: function (jqXHR, status) {
+            error: (jqXHR, status) => {
                 $('#edit-user-input-button-validate').prop('disabled', false);
                 $('#edit-user-overlay').css('display', 'none');
                 errorHandler (jqXHR, status);

@@ -217,26 +217,20 @@ eskimo.Main = function() {
         $("#main-menu-show-nodes-config-link").click(eskimoNodesConfig.showNodesConfig);
         $("#main-menu-show-kubernetes-config-link").click(eskimoKubernetesServicesConfig.showKubernetesServicesConfig);
         $("#main-menu-show-operations-link").click(eskimoOperations.showOperations);
-        $("#user-logout").click(function() {
-            window.location = "logout";
-        });
+        $("#user-logout").click(() => { window.location = "logout"; });
 
         this.windowResize();
     };
 
     this.initialize = function() {
 
-        $(document).ready(function () {
+        $(document).ready(() => {
 
-            $("#hoeapp-wrapper").load("html/eskimoMain.html", function (responseTxt, statusTxt, jqXHR) {
+            $("#hoeapp-wrapper").load("html/eskimoMain.html", () => {
 
                 that.doInitializeInternal();
 
                 new ThemeCustomizer().init();
-
-                // This has to remain last
-                // FIXME theme
-                //initHoe();
             });
         });
     };
@@ -244,7 +238,7 @@ eskimo.Main = function() {
     function fetchContext  () {
         $.ajaxGet({
             url: "context",
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 if (data.status == "OK") {
 
@@ -333,7 +327,7 @@ eskimo.Main = function() {
 
     function scheduleStopOperationInProgress (success) {
         console.log ("eskimoMain - scheduleStopOperationInProgress");
-        eskimoOperations.stopOperationInProgress (success, function() {
+        eskimoOperations.stopOperationInProgress (success, () => {
             setOperationInProgress (false);
             hideProgressbar();
         });

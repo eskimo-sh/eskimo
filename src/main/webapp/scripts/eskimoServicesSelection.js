@@ -55,7 +55,7 @@ eskimo.ServicesSelection = function() {
 
     // Initialize HTML Div from Template
     this.initialize = function() {
-        $("#services-selection-modal-wrapper").load("html/eskimoServicesSelection.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#services-selection-modal-wrapper").load("html/eskimoServicesSelection.html", (responseTxt, statusTxt, jqXHR) => {
 
             if (statusTxt == "success") {
 
@@ -75,7 +75,7 @@ eskimo.ServicesSelection = function() {
     function loadServicesConfig() {
         $.ajaxGet({
             url: "get-services-config",
-            success: function (data, status, jqXHR2) {
+            success: (data, status, jqXHR2) => {
 
                 if (data.status == "OK") {
 
@@ -276,10 +276,9 @@ eskimo.ServicesSelection = function() {
         let value = (match[3] != null && match[3] != "") ? "choice" : match[2];
 
         if ($('form#services-selection-form input[name=' + radioName + (value == "choice" ? "-choice" : "") + ']:checked').val() == value) {
-            setTimeout(
-                function () {
-                    $('#' + radioName + (value == "choice" ? "-choice" : value)).get(0).checked = false;
-                }, 100);
+            setTimeout(() => {
+                $('#' + radioName + (value == "choice" ? "-choice" : value)).get(0).checked = false;
+            }, 100);
 
         }
     }

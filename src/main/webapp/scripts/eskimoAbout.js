@@ -45,13 +45,8 @@ eskimo.About = function() {
 
             if (statusTxt == "success") {
 
-                $("#about-modal-header-close").click(function (e) {
-                    cancelAbout();
-                });
-
-                $("#about-modal-button-close").click(function (e) {
-                    cancelAbout();
-                });
+                $("#about-modal-header-close").click(() => { cancelAbout(); });
+                $("#about-modal-button-close").click(() => { cancelAbout(); });
 
             } else if (statusTxt == "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);

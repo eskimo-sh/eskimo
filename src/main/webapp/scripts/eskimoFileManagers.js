@@ -52,7 +52,7 @@ eskimo.FileManagers = function() {
 
     this.initialize = function () {
         // Initialize HTML Div from Template
-        $("#inner-content-file-managers").load("html/eskimoFileManagers.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#inner-content-file-managers").load("html/eskimoFileManagers.html", (responseTxt, statusTxt, jqXHR) => {
 
             if (statusTxt == "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
@@ -283,8 +283,8 @@ eskimo.FileManagers = function() {
         for (let i = 0; i <  sortedFilesArray.length; i++) {
             let subFolderProps = content[sortedFilesArray[i]];
 
-            let isFolder = subFolderProps.permissions.substring(0, 1) == "d";
-            let isLink = subFolderProps.permissions.substring(0, 1) == "l";
+            let isFolder = subFolderProps.permissions.substring(0, 1) === "d";
+            let isLink = subFolderProps.permissions.substring(0, 1) === "l";
 
             let folderContentRow = ''+
                 '                <tr>\n' +
@@ -334,7 +334,7 @@ eskimo.FileManagers = function() {
 
         $.ajaxGet({
             url: "file-manager-open-file?nodeAddress=" + node + "&folder=" + currentFolder + "&file=" + file,
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 if (data.status == "OK") {
 
@@ -393,7 +393,7 @@ eskimo.FileManagers = function() {
             $.ajaxGet({
                 context: this,
                 url: "file-manager-delete?nodeAddress=" + node + "&folder=" + currentFolder + "&file=" + file,
-                success: function (data, status, jqXHR) {
+                success: (data, status, jqXHR) => {
 
                     if (data.status == "OK") {
 
@@ -422,7 +422,7 @@ eskimo.FileManagers = function() {
         // find location of last /
         let indexOfLastSlash = 0;
         for (let i = openedFileManager.current.length - 1; i >= 0; i--) {
-            if (openedFileManager.current.charAt(i) == "/") {
+            if (openedFileManager.current.charAt(i) === "/") {
                 indexOfLastSlash = i;
                 break;
             }
@@ -477,7 +477,7 @@ eskimo.FileManagers = function() {
 
         $.ajaxGet({
             url: "file-manager-create-file?nodeAddress=" + nodeAddress + "&folder=" + currentFolder + "&fileName=" + newFileName,
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 if (data.status == "OK") {
 
@@ -505,7 +505,7 @@ eskimo.FileManagers = function() {
         console.log ("Opening folder for " + nodeName + " - " + currentFolder + "/" + subFolder);
         $.ajaxGet({
             url: "file-manager-navigate?nodeAddress=" + node + "&folder=" + currentFolder + "&subFolder=" + subFolder ,
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 if (data.status == "OK") {
 
@@ -560,9 +560,9 @@ eskimo.FileManagers = function() {
             event.preventDefault();
             $.ajax({
                 url: "file-manager-upload?nodeAddress=" + node+ "&nodeName=" + nodeName,
-                xhr: function () {
+                xhr: () => {
                     let xhr = new window.XMLHttpRequest();
-                    xhr.upload.addEventListener("progress", function (evt) {
+                    xhr.upload.addEventListener("progress", evt => {
                         if (evt.lengthComputable) {
                             let percentComplete = evt.loaded / evt.total;
                             console.log(percentComplete);
@@ -580,7 +580,7 @@ eskimo.FileManagers = function() {
                 cache: false,
                 processData:false,
                 success: completeCallback,
-                error: function (jqXHR, status) {
+                error: (jqXHR, status) => {
                     errorHandler(jqXHR, status);
                     $('#file-upload-progress-modal').modal("hide");
                 }
@@ -594,6 +594,7 @@ eskimo.FileManagers = function() {
             url: "file-manager-connect?nodeAddress=" +node ,
             success: function (data, status, jqXHR) {
 
+                // noinspection JSPotentiallyInvalidUsageOfThis
                 if (data.status == "OK") {
 
                     openedFileManagers.push({"nodeName" : nodeName, "nodeAddress": node, "current": "/"});
@@ -637,10 +638,7 @@ eskimo.FileManagers = function() {
         } else {
             $.ajaxGet({
                 url: "file-manager-remove?nodeAddress=" + openedFileManager.nodeAddress,
-                success: function (data, status, jqXHR) {
-                    console.log(data);
-                    //alert(data);
-                },
+                success: (data, status, jqXHR) => { console.log(data); },
                 error: errorHandler
             });
         }
@@ -707,7 +705,7 @@ eskimo.FileManagers = function() {
 
             $("#file-managers-file-manager-content").append ($(fileManagerContent));
 
-            $(document).on('change', '#file-manager-hidden-file-'+ nodeName, function(e) {
+            $(document).on('change', '#file-manager-hidden-file-'+ nodeName, e => {
 
                 let fileName = e.target.files[0].name;
                 $("#file-manager-hidden-filename-"+nodeName).val(fileName);
@@ -716,9 +714,7 @@ eskimo.FileManagers = function() {
                 $("#file-manager-upload-form-"+nodeName).submit();
             });
 
-            $(document).ready(function (e) {
-                registerSubmitFormFileUpload (e, nodeName, node);
-            });
+            $(document).ready(e => { registerSubmitFormFileUpload (e, nodeName, node); });
 
             // $('input[type=file]').simpleUpload(url, options);
 

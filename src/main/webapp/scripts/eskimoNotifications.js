@@ -48,7 +48,7 @@ eskimo.Notifications = function() {
     this.initialize = function () {
 
         // Initialize HTML Div from Template
-        $("#notification-placeholder").load("html/eskimoNotifications.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#notification-placeholder").load("html/eskimoNotifications.html", (responseTxt, statusTxt, jqXHR) => {
 
             if (statusTxt == "success") {
 
@@ -70,7 +70,7 @@ eskimo.Notifications = function() {
     function loadLastLine() {
         $.ajaxGet({
             url: "get-lastline-notification",
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
                 if (data && data.status) {
                     lastLineNotifications = data.lastLine;
                 } else {
@@ -84,7 +84,7 @@ eskimo.Notifications = function() {
     function fetchNotifications() {
         $.ajaxGet({
             url: "fetch-notifications?last_line=" + lastLineNotifications,
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 // OK
                 //console.log(data);
@@ -101,7 +101,7 @@ eskimo.Notifications = function() {
                     console.error("No data received");
                 }
             },
-            error: function (jqXHR, status) {
+            error: (jqXHR, status) => {
                 // error handler
                 console.log(jqXHR);
                 console.log (status);
@@ -151,7 +151,7 @@ eskimo.Notifications = function() {
 
         $.ajaxGet({
             url: "clear-notifications",
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
                 lastLineNotifications = 0;
 
                 notifications = [];

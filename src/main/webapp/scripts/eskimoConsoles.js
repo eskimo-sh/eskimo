@@ -50,7 +50,7 @@ eskimo.Consoles = function() {
     this.initialize = function() {
 
         // Initialize HTML Div from Template
-        $("#inner-content-consoles").load("html/eskimoConsoles.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#inner-content-consoles").load("html/eskimoConsoles.html", (responseTxt, statusTxt, jqXHR) => {
 
             if (statusTxt == "success") {
 
@@ -268,11 +268,11 @@ eskimo.Consoles = function() {
             //console.log(openedConsole.terminal);
             $.ajaxGet({
                 url: "terminal-remove?session=" + openedConsole.terminal.getSessionId(),
-                success: function (data, status, jqXHR) {
+                success: (data, status, jqXHR) => {
                     //console.log(data);
                     //alert(data);
                 },
-                error: function(error) {
+                error: (error) => {
                     console.debug (error);
                 }
             });

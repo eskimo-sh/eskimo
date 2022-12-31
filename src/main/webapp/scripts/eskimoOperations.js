@@ -51,23 +51,23 @@ eskimo.Operations = function() {
 
     this.initialize = function () {
         // Initialize HTML Div from Template
-        $("#inner-content-operations").load("html/eskimoOperations.html", function(responseTxt, statusTxt, jqXHR){
+        $("#inner-content-operations").load("html/eskimoOperations.html", (responseTxt, statusTxt, jqXHR) => {
 
             if(statusTxt == "success"){
 
-                $("#operation-log-cancel").click(function(e) {
+                $("#operation-log-cancel").click(e => {
                     hideLogs();
                     e.preventDefault();
                     return false;
                 });
 
-                $("#operation-log-button-cancel").click(function(e) {
+                $("#operation-log-button-cancel").click(e => {
                     hideLogs();
                     e.preventDefault();
                     return false;
                 });
 
-                $("#interupt-operations-btn").click(function(e) {
+                $("#interupt-operations-btn").click(e => {
                     $("#operations-title").html("<h3>Operations pending .... <strong>(Interrupting ...)</strong></h3>");
                     $.ajaxGet({
                         url: "interupt-processing",
@@ -269,7 +269,7 @@ eskimo.Operations = function() {
     function fetchOperationStatus(callback) {
         $.ajaxGet({
             url: "fetch-operations-status?last-lines="  + JSON.stringify(getLastLines()),
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 // OK
                 //console.log(data);
@@ -299,7 +299,7 @@ eskimo.Operations = function() {
                         OPERATIONS_POLLING_DELAY);
                 }
             },
-            error: function (jqXHR, status) {
+            error: (jqXHR, status) => {
 
                 if (callback != null && typeof callback === "function") {
                     callback();
@@ -336,7 +336,7 @@ eskimo.Operations = function() {
         clearTimeout (operationsPollingHandle);
 
         // fetch messages one last time and close OperationInProgress in the end
-        that.fetchOperationStatus (function() {
+        that.fetchOperationStatus (() => {
 
             if (!success) {
                 $("#operations-title").html("<h3><span class='processing-error'>Operations completed in error !</span></h3>");

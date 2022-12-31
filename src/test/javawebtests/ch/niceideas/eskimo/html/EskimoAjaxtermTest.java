@@ -50,16 +50,6 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
 
         js("$('#main-content').html('<div id=\"test-term\" contenteditable=\"true\">&nbsp;</div>')");
 
-        js("" +
-                "var t = new ajaxterm.Terminal(\"test-term\", {\n" +
-                "                width: 80,\n" +
-                "                height: 40,\n" +
-                "                endpoint: \"./terminal?node=test\"\n" +
-                "            });\n" +
-                "            t.setShowNextTab(function() { window.showNextTabCalled = true;} );\n" +
-                "            t.setShowPrevTab(function() { window.showPrevTabCalled = true;} );" +
-                "");
-
         js("window.XMLHttpRequestBAK = window.XMLHttpRequest;");
 
         js("window.XMLHttpRequest = function() {" +
@@ -70,11 +60,23 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
                 "    this.setRequestHeader = function () { };" +
                 "    this.getResponseHeader = function () { };" +
                 "    this.send = function (data) {" +
+                "        this.readyState = 4;" +
                 "        let re = new RegExp('.*k=([a-zA-Z]+).*'); " +
                 "        let res = re.exec (data); "+
                 "        window.ajtData = data;" +
+                "        this.onreadystatechange();" +
                 "    };" +
                 "}");
+
+        js("" +
+                "var t = new ajaxterm.Terminal(\"test-term\", {\n" +
+                "                width: 80,\n" +
+                "                height: 40,\n" +
+                "                endpoint: \"./terminal?node=test\"\n" +
+                "            });\n" +
+                "            t.setShowNextTab(function() { window.showNextTabCalled = true;} );\n" +
+                "            t.setShowPrevTab(function() { window.showPrevTabCalled = true;} );" +
+                "");
     }
 
     @AfterEach
@@ -100,20 +102,20 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
                 "        console.log (data);" +
                 "        let re = new RegExp('.*k=([a-zA-Z]+).*'); " +
                 "        let res = re.exec (data); "+
+                "        this.responseText = \"<idem/>\";" +
                 "        if (res != null && res.length > 0) { " +
                 "            console.log (res[1]);" +
                 "            this.responseText = res[1]; " +
-                "            this.onreadystatechange();" +
                 "        } " +
+                "        this.onreadystatechange();" +
                 "    };" +
                 "}");
-
-        //Thread.sleep(100000);
 
         getElementById("test-term").sendKeys("a");
 
         //Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> js("window.xhrOpenedOn").getJavaScriptResult().equals("./terminal?node=test"));
         Thread.sleep (2000);
+
         assertJavascriptEquals("./terminal?node=test", "window.xhrOpenedOn");
 
         assertJavascriptEquals("a", "$('.screen div:first-child').html()");

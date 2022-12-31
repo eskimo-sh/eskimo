@@ -45,7 +45,7 @@ eskimo.KubernetesServicesSelection = function() {
 
     // Initialize HTML Div from Template
     this.initialize = function() {
-        $("#kubernetes-services-selection-modal-wrapper").load("html/eskimoKubernetesServicesSelection.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#kubernetes-services-selection-modal-wrapper").load("html/eskimoKubernetesServicesSelection.html", (responseTxt, statusTxt, jqXHR) => {
 
             if (statusTxt == "success") {
 

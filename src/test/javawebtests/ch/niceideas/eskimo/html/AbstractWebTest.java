@@ -89,6 +89,7 @@ public abstract class AbstractWebTest {
                 driver = WebDriverManager.chromedriver()
                         .capabilities(co)
                         .create();
+                break;
             } catch (WebDriverManagerException e) {
                 if (i < 2) {
                     logger.error (e, e);
@@ -336,12 +337,17 @@ public abstract class AbstractWebTest {
     }
 
     protected void assertJavascriptEquals(String value, String javascript) {
+        assertEquals (value, js("return " + javascript).toString());
+    }
+
+    /*
+    protected void assertJavascriptEquals(String value, String javascript) {
         Object result = js("return " + javascript);
         if (result == null) {
             throw new IllegalStateException("Result of script '" + javascript + "' is null");
         }
         assertEquals (value, result.toString());
-    }
+    }*/
 
     protected void assertJavascriptNull(String javascript) {
         assertNull (js("return " + javascript));

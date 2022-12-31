@@ -63,23 +63,23 @@ eskimo.NodesConfig = function() {
 
     this.initialize = function() {
         // Initialize HTML Div from Template
-        $("#inner-content-nodes").load("html/eskimoNodesConfig.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#inner-content-nodes").load("html/eskimoNodesConfig.html", (responseTxt, statusTxt, jqXHR) => {
 
             if (statusTxt == "success") {
 
-                $("#add-more-nodes").click(function (e) {
+                $("#add-more-nodes").click(e => {
                     addNode();
                     e.preventDefault();
                     return false;
                 });
 
-                $("#add-more-ranges").click(function (e) {
+                $("#add-more-ranges").click(e => {
                     addRange();
                     e.preventDefault();
                     return false;
                 });
 
-                $("#save-nodes-btn").click(function (e) {
+                $("#save-nodes-btn").click(e => {
 
                     let setupConfig = $("form#nodes-config").serializeObject();
 
@@ -96,13 +96,13 @@ eskimo.NodesConfig = function() {
                     return false;
                 });
 
-                $("#reinstall-nodes-btn").click(function (e) {
+                $("#reinstall-nodes-btn").click(e => {
                     that.eskimoServicesSelection.showServiceSelection('empty', onServicesSelectedForReinstallation)
                     e.preventDefault();
                     return false;
                 });
 
-                $("#reset-nodes-config").click(function (e) {
+                $("#reset-nodes-config").click(e => {
                     showNodesConfig()
                     e.preventDefault();
                     return false;
@@ -122,7 +122,7 @@ eskimo.NodesConfig = function() {
     function loadServiceDependencies() {
         $.ajaxGet({
             url: "get-services-dependencies",
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 if (data.status == "OK") {
 
@@ -139,7 +139,7 @@ eskimo.NodesConfig = function() {
     function loadConfigServices() {
         $.ajaxGet({
             url: "list-config-services",
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 if (data.status == "OK") {
 
@@ -271,7 +271,7 @@ eskimo.NodesConfig = function() {
                     let placeHolder = $("#field" + nbr).find(".configured-multiple-services-placeholder");
                     placeHolder.html(placeHolder.html() +
                         '<div class="nodes-config-entry">' +
-                        '<img class="nodes-config-logo" src="' + getServiceLogoPath(serviceName) + '" />' +
+                        '<img alt="nodes config logo" class="nodes-config-logo" src="' + getServiceLogoPath(serviceName) + '" />' +
                         serviceName +
                         '<br>' +
                         '</div>');
@@ -283,7 +283,7 @@ eskimo.NodesConfig = function() {
                     let placeHolder = $("#field" + nbr).find(".configured-unique-services-placeholder");
                     placeHolder.html(placeHolder.html() +
                         '<div class="nodes-config-entry">' +
-                        '<img class="nodes-config-logo" src="' + getServiceLogoPath(serviceName) + '" />' +
+                        '<img alt="nodes config logo" class="nodes-config-logo" src="' + getServiceLogoPath(serviceName) + '" />' +
                         serviceName +
                         '<br>' +
                         '</div>');
@@ -312,7 +312,7 @@ eskimo.NodesConfig = function() {
 
         $.ajaxGet({
             url: "load-nodes-config",
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 console.log (data);
 
@@ -590,7 +590,7 @@ eskimo.NodesConfig = function() {
             return false;
         });
 
-        $('#configure'+next).click(function(e){
+        $('#configure'+next).click(e => {
             showServiceSelection (e);
             e.stopPropagation();
             e.preventDefault();
@@ -607,7 +607,7 @@ eskimo.NodesConfig = function() {
             timeout: 1000 * 120,
             url: reinstall ? "reinstall-nodes-config" : "save-nodes-config",
             data: JSON.stringify(model),
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 that.eskimoMain.hideProgressbar();
 
@@ -626,7 +626,7 @@ eskimo.NodesConfig = function() {
                 }
             },
 
-            error: function (jqXHR, status) {
+            error: (jqXHR, status) => {
                 that.eskimoMain.hideProgressbar();
                 errorHandler (jqXHR, status);
             }

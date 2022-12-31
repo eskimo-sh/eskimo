@@ -46,7 +46,7 @@ eskimo.SettingsOperationsCommand = function() {
 
     this.initialize = function() {
         // Initialize HTML Div from Template
-        $("#settings-operations-command-modal-wrapper").load("html/eskimoSettingsOperationsCommand.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#settings-operations-command-modal-wrapper").load("html/eskimoSettingsOperationsCommand.html", (responseTxt, statusTxt, jqXHR) => {
 
             if (statusTxt == "success") {
 
@@ -148,7 +148,7 @@ eskimo.SettingsOperationsCommand = function() {
             $.ajaxPost({
                 timeout: 1000 * 3600,
                 url: "apply-services-settings",
-                success: function (data, status, jqXHR) {
+                success: (data, status, jqXHR) => {
 
                     // OK
                     console.log(data);
@@ -171,7 +171,7 @@ eskimo.SettingsOperationsCommand = function() {
                     }
                 },
 
-                error: function (jqXHR, status) {
+                error: (jqXHR, status) => {
                     errorHandler(jqXHR, status);
                     that.eskimoMain.scheduleStopOperationInProgress(false);
                 }

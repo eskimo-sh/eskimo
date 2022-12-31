@@ -53,9 +53,7 @@ function getHyphenSeparated (string) {
 }
 
 function getCamelCase(string) {
-    return string.replace(/-([a-zA-Z])/g, function (m, w) {
-        return w.toUpperCase();
-    });
+    return string.replace(/-([a-zA-Z])/g, (m, w) => w.toUpperCase());
 }
 
 function getUcfirst(string) {
@@ -135,14 +133,17 @@ $.ajaxPut = function (reqObject) {
     $._ajaxSendContent ("PUT", reqObject);
 };
 
+function defaultSuccess (data, status, jqXHR) {
+    if (!data || data.error) {
+        console.error(data.error);
+        alert(data.error);
+    }
+}
+
 $._ajaxSendContent = function(verb, reqObject) {
 
-    let success = function (data, status, jqXHR) {
-        if (!data || data.error) {
-            console.error(data.error);
-            alert(data.error);
-        }
-    };
+    let success = defaultSuccess;
+
     if (typeof reqObject.success !== 'undefined') {
         success = reqObject.success;
     }
@@ -168,12 +169,8 @@ $._ajaxSendContent = function(verb, reqObject) {
 
 $.ajaxGet = function(reqObject) {
 
-    let success = function (data, status, jqXHR) {
-        if (!data || data.error) {
-            console.error(data.error);
-            alert(data.error);
-        }
-    };
+    let success = defaultSuccess;
+
     if (typeof reqObject.success !== 'undefined') {
         success = reqObject.success;
     }

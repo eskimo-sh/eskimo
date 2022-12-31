@@ -49,7 +49,7 @@ eskimo.Setup = function() {
 
     // Initialize HTML Div from Template
     this.initialize = function() {
-        $("#inner-content-setup").load("html/eskimoSetup.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#inner-content-setup").load("html/eskimoSetup.html", (responseTxt, statusTxt, jqXHR) => {
 
             if (statusTxt == "success") {
 
@@ -68,14 +68,14 @@ eskimo.Setup = function() {
 
                 });
 
-                $("#save-setup-btn").click(function (e) {
+                $("#save-setup-btn").click(e => {
                     saveSetup();
 
                     e.preventDefault();
                     return false;
                 });
 
-                $("#reset-setup-btn").click(function(e) {
+                $("#reset-setup-btn").click(e => {
                     showSetup();
 
                     e.preventDefault();
@@ -92,9 +92,7 @@ eskimo.Setup = function() {
 
                     let reader = new FileReader();
 
-                    reader.onload = function () {
-                        $("#content-ssh-key").val(reader.result);
-                    };
+                    reader.onload = () => { $("#content-ssh-key").val(reader.result); };
 
                     // Read in the image file as a data URL.
                     reader.readAsText(files[0]);
@@ -184,7 +182,7 @@ eskimo.Setup = function() {
     function loadSetup(initializationTime) {
         $.ajaxGet({
             url: "load-setup",
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
                 handleSetup(data, initializationTime);
 
                 if (data.processingPending) {  // if backend says there is some provessing going on
@@ -221,7 +219,7 @@ eskimo.Setup = function() {
 
         setupWarningMessage.html(message);
 
-        setTimeout(function() {
+        setTimeout(() => {
             $.hideElement(setupWarning);
         }, MESSAGE_SHOW_DURATION);
     }
@@ -232,7 +230,7 @@ eskimo.Setup = function() {
             timeout: 1000 * 120,
             url: "save-setup",
             data: JSON.stringify(setupConfig),
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 that.eskimoMain.hideProgressbar();
 
@@ -261,7 +259,7 @@ eskimo.Setup = function() {
 
             },
 
-            error: function (jqXHR, status) {
+            error: (jqXHR, status) => {
                 that.eskimoMain.hideProgressbar();
                 errorHandler(jqXHR, status);
             }

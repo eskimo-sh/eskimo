@@ -46,7 +46,7 @@ eskimo.SetupCommand = function() {
 
     this.initialize = function() {
         // Initialize HTML Div from Template
-        $("#setup-command-modal-wrapper").load("html/eskimoSetupCommand.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#setup-command-modal-wrapper").load("html/eskimoSetupCommand.html", (responseTxt, statusTxt, jqXHR) => {
 
             if (statusTxt == "success") {
 
@@ -166,7 +166,7 @@ eskimo.SetupCommand = function() {
             $.ajaxPost({
                 timeout: 1000 * 3600 * 5,
                 url: "apply-setup",
-                success: function (data, status, jqXHR) {
+                success: (data, status, jqXHR) => {
 
                     console.log(data);
                     if (data && data.status) {
@@ -188,7 +188,7 @@ eskimo.SetupCommand = function() {
 
                 },
 
-                error: function (jqXHR, status) {
+                error: (jqXHR, status) => {
                     errorHandler(jqXHR, status);
                     that.eskimoMain.scheduleStopOperationInProgress(false);
                 }

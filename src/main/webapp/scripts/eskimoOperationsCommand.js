@@ -45,7 +45,7 @@ eskimo.OperationsCommand = function() {
 
     this.initialize = function() {
         // Initialize HTML Div from Template
-        $("#operations-command-modal-wrapper").load("html/eskimoOperationsCommand.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#operations-command-modal-wrapper").load("html/eskimoOperationsCommand.html", (responseTxt, statusTxt, jqXHR) => {
 
             if (statusTxt == "success") {
 
@@ -131,7 +131,7 @@ eskimo.OperationsCommand = function() {
             $.ajaxPost({
                 timeout: 1000 * 3600,
                 url: "apply-nodes-config",
-                success: function (data, status, jqXHR) {
+                success: (data, status, jqXHR) => {
 
                     //console.log(data);
 
@@ -143,7 +143,7 @@ eskimo.OperationsCommand = function() {
                     }
                 },
 
-                error: function (jqXHR, status) {
+                error: (jqXHR, status) => {
                     errorHandler(jqXHR, status);
                     that.eskimoMain.scheduleStopOperationInProgress(false);
                 }

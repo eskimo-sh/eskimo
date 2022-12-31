@@ -109,7 +109,7 @@ public class EskimoConsolesTest extends AbstractWebTest {
         assertJavascriptEquals("\n" +
                 "    <div id=\"term_192-168-10-11\" class=\"ajaxterm\" tabindex=\"0\"></div>\n" +
                 "    <div id=\"console-actions-192-168-10-11\">\n" +
-                "        <button id=\"console-close-192-168-10-11\" name=\"console-close-1\" class=\"btn btn-primary\">\n" +
+                "        <button id=\"console-close-192-168-10-11\" name=\"console-close-1\" class=\"btn btn-secondary\">\n" +
                 "            Close\n" +
                 "        </button>\n" +
                 "    </div>", "$('#consoles-console-192-168-10-11').html()");

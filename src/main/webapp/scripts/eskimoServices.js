@@ -68,7 +68,7 @@ eskimo.Services = function () {
     function loadUIServicesConfig() {
         $.ajaxGet({
             url: "get-ui-services-config",
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 if (data.status == "OK") {
 
@@ -86,7 +86,7 @@ eskimo.Services = function () {
     function loadUIServices() {
         $.ajaxGet({
             url: "list-ui-services",
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 if (data.status == "OK") {
 
@@ -210,22 +210,6 @@ eskimo.Services = function () {
         if (eskimoMain.hasRole (uiConfig.role)) {
 
             $("#iframe-content-" + service).attr('src', that.randomizeUrl (uiConfig.actualUrl));
-
-            /*
-            // reset to empty frame ...
-            $("#iframe-content-" + service).attr('src', EMPTY_FRAMETARGET);
-
-            $("#iframe-content-" + service).load(EMPTY_FRAMETARGET, function () {
-                $("#iframe-content-" + service).attr('src', uiConfig.actualUrl);
-            });
-            */
-
-            /*
-            // ... and back to URL
-            setTimeout(function () {
-                $("#iframe-content-" + service).attr('src', uiConfig.actualUrl);
-            }, 20);
-            */
         }
     };
 
@@ -286,7 +270,7 @@ eskimo.Services = function () {
 
     function disableFrameConsole (iFrameId) {
         if (!DEBUG) {
-            setTimeout(function () {
+            setTimeout(() => {
                 let iFrame = $(iFrameId).get(0);
                 if (iFrame) {
                     iFrame.contentWindow.console.log = function () {
@@ -315,7 +299,7 @@ eskimo.Services = function () {
         removeFromRetry (effUIConfig);
 
         // schedule usual refresh
-        setTimeout(function (otherUIConfig) {
+        setTimeout(otherUIConfig => {
 
             // iframe
             otherUIConfig.actualUrl = otherUIConfig.targetUrl;
@@ -341,19 +325,19 @@ eskimo.Services = function () {
 
             let uiConfig = uiConfigsToRetry[i];
 
-            setTimeout (function (effUIConfig) {
+            setTimeout (effUIConfig => {
                 $.ajax({
                     type: "GET",
                     timeout: 1000 * 10, // 10 secs. We don't want this call to hang !
                     url: effUIConfig.targetUrl,
-                    success: function (data, status, jqXHR) {
+                    success: (data, status, jqXHR) => {
 
                         console.log("FOUND : " + effUIConfig.service + " - " + effUIConfig.targetUrl + " - " + effUIConfig.targetWaitTime);
 
                         handleServiceIsUp(effUIConfig);
 
                     },
-                    error: function (jqXHR, status) {
+                    error: (jqXHR, status) => {
                         // ignore
                         //console.log("error : " + effUIConfig.service + " - " + effUIConfig.targetUrl);
                     }

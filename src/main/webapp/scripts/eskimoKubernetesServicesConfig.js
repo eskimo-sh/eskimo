@@ -54,11 +54,11 @@ eskimo.KubernetesServicesConfig = function() {
 
     this.initialize = function() {
         // Initialize HTML Div from Template
-        $("#inner-content-kubernetes-services-config").load("html/eskimoKubernetesServicesConfig.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#inner-content-kubernetes-services-config").load("html/eskimoKubernetesServicesConfig.html", (responseTxt, statusTxt, jqXHR) => {
 
             if (statusTxt == "success") {
 
-                $("#save-kubernetes-servicesbtn").click(function (e) {
+                $("#save-kubernetes-servicesbtn").click(e => {
 
                     let setupConfig = $("form#kubernetes-servicesconfig").serializeObject();
 
@@ -66,10 +66,7 @@ eskimo.KubernetesServicesConfig = function() {
 
                     try {
                         checkKubernetesSetup(setupConfig, that.eskimoNodesConfig.getServicesDependencies(), KUBERNETES_SERVICES_CONFIG,
-                            function () {
-                                // callback if setup is OK
-                                proceedWithKubernetesInstallation(setupConfig);
-                            });
+                            () => { proceedWithKubernetesInstallation(setupConfig); });
                     } catch (error) {
                         alert ("error : " + error);
                     }
@@ -78,19 +75,19 @@ eskimo.KubernetesServicesConfig = function() {
                     return false;
                 });
 
-                $("#reinstall-kubernetes-servicesbtn").click(function (e) {
+                $("#reinstall-kubernetes-servicesbtn").click(e => {
                     showReinstallSelection();
                     e.preventDefault();
                     return false;
                 });
 
-                $("#select-all-kubernetes-servicesconfig").click(function (e) {
+                $("#select-all-kubernetes-servicesconfig").click(e => {
                     selectAll();
                     e.preventDefault();
                     return false;
                 });
 
-                $("#reset-kubernetes-servicesconfig").click(function (e) {
+                $("#reset-kubernetes-servicesconfig").click(e => {
                     showKubernetesServicesConfig();
                     e.preventDefault();
                     return false;
@@ -109,7 +106,7 @@ eskimo.KubernetesServicesConfig = function() {
     function loadKubernetesServices() {
         $.ajaxGet({
             url: "get-kubernetes-services",
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 if (data.status == "OK") {
 
@@ -158,10 +155,10 @@ eskimo.KubernetesServicesConfig = function() {
     this.onKubernetesServiceSelected = function (serviceName, kubernetesConfig) {
 
         $('#' + serviceName + '_cpu_setting').html(
-            '    <input style="width: 80px;" type="text" class="form-control" pattern="[0-9\\.]+[m]{0,1}" name="' + serviceName +'_cpu" id="' + serviceName +'_cpu"></input>');
+            '    <input style="width: 80px;" type="text" class="form-control" pattern="[0-9\\.]+[m]{0,1}" name="' + serviceName +'_cpu" id="' + serviceName +'_cpu">');
 
         $('#' + serviceName + '_ram_setting').html(
-            '    <input style="width: 80px;" type="text" class="form-control" pattern="[0-9\\.]+[EPTGMk]{0,1}" name="' + serviceName +'_ram" id="' + serviceName +'_ram"></input>');
+            '    <input style="width: 80px;" type="text" class="form-control" pattern="[0-9\\.]+[EPTGMk]{0,1}" name="' + serviceName +'_ram" id="' + serviceName +'_ram">');
 
         let cpuSet = false;
         let ramSet = false;
@@ -241,7 +238,7 @@ eskimo.KubernetesServicesConfig = function() {
             kubernetesServiceRow += '<tr>';
             kubernetesServicesTableBody.append (kubernetesServiceRow);
 
-            $('#' + KUBERNETES_SERVICES[i] + INSTALL_FLAG).change (function() {
+            $('#' + KUBERNETES_SERVICES[i] + INSTALL_FLAG).change (() => {
                 //alert(KUBERNETES_SERVICES[i] + INSTALL_FLAG + " - " + $('#' + KUBERNETES_SERVICES[i] + INSTALL_FLAG).is(":checked"));
                 if ($('#' + KUBERNETES_SERVICES[i] + INSTALL_FLAG).is(":checked")) {
                     that.onKubernetesServiceSelected(KUBERNETES_SERVICES[i]);
@@ -305,7 +302,7 @@ eskimo.KubernetesServicesConfig = function() {
 
         $.ajaxGet({
             url: "load-kubernetes-services-config",
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 console.log (data);
 
@@ -361,7 +358,7 @@ eskimo.KubernetesServicesConfig = function() {
             timeout: 1000 * 120,
             url: reinstall ? "reinstall-kubernetes-services-config" : "save-kubernetes-services-config",
             data: JSON.stringify(model),
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 that.eskimoMain.hideProgressbar();
 
@@ -381,7 +378,7 @@ eskimo.KubernetesServicesConfig = function() {
                 }
             },
 
-            error: function (jqXHR, status) {
+            error: (jqXHR, status) => {
                 that.eskimoMain.hideProgressbar();
                 errorHandler (jqXHR, status);
             }

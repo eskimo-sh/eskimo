@@ -49,18 +49,18 @@ eskimo.ServicesSettings = function () {
 
     // Initialize HTML Div from Template
     this.initialize = function() {
-        $("#inner-content-services-settings").load("html/eskimoServicesSettings.html", function (responseTxt, statusTxt, jqXHR) {
+        $("#inner-content-services-settings").load("html/eskimoServicesSettings.html", (responseTxt, statusTxt, jqXHR) => {
 
             if (statusTxt == "success") {
 
-                $("#save-services-settings-btn").click(function (e) {
+                $("#save-services-settings-btn").click(e => {
                     saveServicesSettings();
 
                     e.preventDefault();
                     return false;
                 });
 
-                $("#reset-services-settings-btn").click(function (e) {
+                $("#reset-services-settings-btn").click(e => {
                     showServicesSettings();
 
                     e.preventDefault();
@@ -77,7 +77,7 @@ eskimo.ServicesSettings = function () {
     function loadServicesSettings() {
         $.ajaxGet({
             url: "load-services-settings",
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 if (data.status == "OK") {
 
@@ -106,7 +106,7 @@ eskimo.ServicesSettings = function () {
             timeout: 1000 * 7200,
             url: "save-services-settings",
             data: JSON.stringify(servicesConfigForm),
-            success: function (data, status, jqXHR) {
+            success: (data, status, jqXHR) => {
 
                 that.eskimoMain.hideProgressbar();
 
@@ -126,7 +126,7 @@ eskimo.ServicesSettings = function () {
                 }
             },
 
-            error: function (jqXHR, status) {
+            error: (jqXHR, status) => {
                 // error handler
                 console.log(jqXHR);
                 console.log(status);
@@ -150,7 +150,7 @@ eskimo.ServicesSettings = function () {
 
         servicesSettingsWarningMessage.html(message);
 
-        setTimeout(function() {
+        setTimeout(() => {
             $.hideElement(servicesSettingsWarning);
         }, 5000);
     }
@@ -186,7 +186,7 @@ eskimo.ServicesSettings = function () {
                 servicesSettingsContent = servicesSettingsContent +
                     '<a class="collapsed" data-bs-toggle="collapse" data-parent="#accordion" href="#collapse-'+serviceName+'" aria-expanded="false" aria-controls="collapse1">'+
                     '<div class="card-header" role="tab" id="heading-panel-'+serviceName+'"><table><tr>'+
-                    '<td><img class="nodes-config-logo" src="' + that.eskimoNodesConfig.getServiceLogoPath(serviceName) + '" /></td>'+
+                    '<td><img alt="nodes config logo" class="nodes-config-logo" src="' + that.eskimoNodesConfig.getServiceLogoPath(serviceName) + '"></td>'+
                     '<td><h5>' +
                     serviceName +
                     '</h5></td>' +
