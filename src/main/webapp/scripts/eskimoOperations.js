@@ -53,7 +53,7 @@ eskimo.Operations = function() {
         // Initialize HTML Div from Template
         $("#inner-content-operations").load("html/eskimoOperations.html", (responseTxt, statusTxt, jqXHR) => {
 
-            if(statusTxt == "success"){
+            if(statusTxt === "success"){
 
                 $("#operation-log-cancel").click(e => {
                     hideLogs();
@@ -81,7 +81,7 @@ eskimo.Operations = function() {
                 });
             }
 
-            if(statusTxt == "error"){
+            if(statusTxt === "error"){
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
         });

@@ -48,13 +48,13 @@ eskimo.KubernetesOperationsCommand = function() {
         // Initialize HTML Div from Template
         $("#kubernetes-operations-command-modal-wrapper").load("html/eskimoKubernetesOperationsCommand.html", (responseTxt, statusTxt, jqXHR) => {
 
-            if (statusTxt == "success") {
+            if (statusTxt === "success") {
 
                 $('#kubernetes-operations-command-header-cancel').click(cancelKubernetesOperationsCommand);
                 $('#kubernetes-operations-command-button-cancel').click(cancelKubernetesOperationsCommand);
                 $('#kubernetes-operations-command-button-validate').click(validateKubernetesOperationsCommand);
 
-            } else if (statusTxt == "error") {
+            } else if (statusTxt === "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
         });

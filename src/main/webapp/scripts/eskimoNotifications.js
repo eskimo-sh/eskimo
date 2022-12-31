@@ -50,7 +50,7 @@ eskimo.Notifications = function() {
         // Initialize HTML Div from Template
         $("#notification-placeholder").load("html/eskimoNotifications.html", (responseTxt, statusTxt, jqXHR) => {
 
-            if (statusTxt == "success") {
+            if (statusTxt === "success") {
 
                 $("#notifications-clear").click(function () {
                     clearNotifications();
@@ -60,7 +60,7 @@ eskimo.Notifications = function() {
 
                 loadLastLine();
 
-            } else if (statusTxt == "error") {
+            } else if (statusTxt === "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
         });

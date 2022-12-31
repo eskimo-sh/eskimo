@@ -56,7 +56,7 @@ eskimo.KubernetesServicesConfig = function() {
         // Initialize HTML Div from Template
         $("#inner-content-kubernetes-services-config").load("html/eskimoKubernetesServicesConfig.html", (responseTxt, statusTxt, jqXHR) => {
 
-            if (statusTxt == "success") {
+            if (statusTxt === "success") {
 
                 $("#save-kubernetes-servicesbtn").click(e => {
 
@@ -96,7 +96,7 @@ eskimo.KubernetesServicesConfig = function() {
                 loadKubernetesServices();
 
 
-            } else if (statusTxt == "error") {
+            } else if (statusTxt === "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
 

@@ -47,7 +47,7 @@ eskimo.KubernetesServicesSelection = function() {
     this.initialize = function() {
         $("#kubernetes-services-selection-modal-wrapper").load("html/eskimoKubernetesServicesSelection.html", (responseTxt, statusTxt, jqXHR) => {
 
-            if (statusTxt == "success") {
+            if (statusTxt === "success") {
 
                 $("#kubernetes-services-select-header-cancel").click(cancelKubernetesServicesSelection);
 
@@ -57,7 +57,7 @@ eskimo.KubernetesServicesSelection = function() {
 
                 $("#kubernetes-services-select-button-validate").click(validateKubernetesServicesSelection);
 
-            } else if (statusTxt == "error") {
+            } else if (statusTxt === "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
         });

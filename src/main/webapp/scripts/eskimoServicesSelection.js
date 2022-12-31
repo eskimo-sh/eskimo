@@ -57,7 +57,7 @@ eskimo.ServicesSelection = function() {
     this.initialize = function() {
         $("#services-selection-modal-wrapper").load("html/eskimoServicesSelection.html", (responseTxt, statusTxt, jqXHR) => {
 
-            if (statusTxt == "success") {
+            if (statusTxt === "success") {
 
                 loadServicesConfig();
 
@@ -66,7 +66,7 @@ eskimo.ServicesSelection = function() {
                 $('#services-selection-button-close').click(cancelServicesSelection);
                 $('#services-selection-header-validate').click(validateServicesSelection);
 
-            } else if (statusTxt == "error") {
+            } else if (statusTxt === "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
         });

@@ -43,12 +43,12 @@ eskimo.About = function() {
         // Initialize HTML Div from Template
         $("#about-modal-wrapper").load("html/eskimoAbout.html", function (responseTxt, statusTxt, jqXHR) {
 
-            if (statusTxt == "success") {
+            if (statusTxt === "success") {
 
                 $("#about-modal-header-close").click(() => { cancelAbout(); });
                 $("#about-modal-button-close").click(() => { cancelAbout(); });
 
-            } else if (statusTxt == "error") {
+            } else if (statusTxt === "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
         });

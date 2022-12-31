@@ -65,7 +65,7 @@ eskimo.NodesConfig = function() {
         // Initialize HTML Div from Template
         $("#inner-content-nodes").load("html/eskimoNodesConfig.html", (responseTxt, statusTxt, jqXHR) => {
 
-            if (statusTxt == "success") {
+            if (statusTxt === "success") {
 
                 $("#add-more-nodes").click(e => {
                     addNode();
@@ -112,7 +112,7 @@ eskimo.NodesConfig = function() {
 
                 loadServiceDependencies();
 
-            } else if (statusTxt == "error") {
+            } else if (statusTxt === "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
 

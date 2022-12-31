@@ -52,11 +52,11 @@ eskimo.Consoles = function() {
         // Initialize HTML Div from Template
         $("#inner-content-consoles").load("html/eskimoConsoles.html", (responseTxt, statusTxt, jqXHR) => {
 
-            if (statusTxt == "success") {
+            if (statusTxt === "success") {
 
                 //
 
-            } else if (statusTxt == "error") {
+            } else if (statusTxt === "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
 

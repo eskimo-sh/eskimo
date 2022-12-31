@@ -48,13 +48,13 @@ eskimo.SetupCommand = function() {
         // Initialize HTML Div from Template
         $("#setup-command-modal-wrapper").load("html/eskimoSetupCommand.html", (responseTxt, statusTxt, jqXHR) => {
 
-            if (statusTxt == "success") {
+            if (statusTxt === "success") {
 
                 $("#setup-command-header-close").click(cancelSetupCommand);
                 $("#setup-command-button-close").click(cancelSetupCommand);
                 $("#setup-command-button-validate").click(validateSetupCommand);
 
-            } else if (statusTxt == "error") {
+            } else if (statusTxt === "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
         });

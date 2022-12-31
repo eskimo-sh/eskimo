@@ -51,7 +51,7 @@ eskimo.ServicesSettings = function () {
     this.initialize = function() {
         $("#inner-content-services-settings").load("html/eskimoServicesSettings.html", (responseTxt, statusTxt, jqXHR) => {
 
-            if (statusTxt == "success") {
+            if (statusTxt === "success") {
 
                 $("#save-services-settings-btn").click(e => {
                     saveServicesSettings();
@@ -67,7 +67,7 @@ eskimo.ServicesSettings = function () {
                     return false;
                 });
 
-            } else if (statusTxt == "error") {
+            } else if (statusTxt === "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
 

@@ -43,7 +43,7 @@ eskimo.EditUser = function() {
         // Initialize HTML Div from Template
         $("#edit-user-modal-wrapper").load("html/eskimoEditUser.html", (responseTxt, statusTxt, jqXHR) => {
 
-            if (statusTxt == "success") {
+            if (statusTxt === "success") {
 
                 $("#edit-user-header-close").click(() => { cancelEditUser(); });
 
@@ -51,7 +51,7 @@ eskimo.EditUser = function() {
 
                 $("#edit-user-input-button-validate").click(() => { validateEditUser();  });
 
-            } else if (statusTxt == "error") {
+            } else if (statusTxt === "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
         });

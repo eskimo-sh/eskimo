@@ -51,7 +51,7 @@ eskimo.Setup = function() {
     this.initialize = function() {
         $("#inner-content-setup").load("html/eskimoSetup.html", (responseTxt, statusTxt, jqXHR) => {
 
-            if (statusTxt == "success") {
+            if (statusTxt === "success") {
 
                 $('#btn-file-ssh-key').on('fileselect', function (event, numFiles, label) {
 
@@ -99,7 +99,7 @@ eskimo.Setup = function() {
                 });
 
 
-            } else if (statusTxt == "error") {
+            } else if (statusTxt === "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
         });

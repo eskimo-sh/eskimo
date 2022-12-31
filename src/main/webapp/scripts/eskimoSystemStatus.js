@@ -104,7 +104,7 @@ eskimo.SystemStatus = function() {
         // Initialize HTML Div from Template
         $("#inner-content-status").load("html/eskimoSystemStatus.html", function (responseTxt, statusTxt, jqXHR) {
 
-            if (statusTxt == "success") {
+            if (statusTxt === "success") {
 
                 loadUIStatusServicesConfig();
 
@@ -134,7 +134,7 @@ eskimo.SystemStatus = function() {
 
                 initialized = true;
 
-            } else if (statusTxt == "error") {
+            } else if (statusTxt === "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
         });
@@ -253,8 +253,9 @@ eskimo.SystemStatus = function() {
     };
 
     function getMenuPosition(settings, mouse, direction, scrollDir, menu) {
-        let win = $("#main-content")[direction](),
-            scroll = $("#main-content")[scrollDir](),
+        const $mainContent = $("#main-content");
+        let win = $mainContent[direction](),
+            scroll = $mainContent[scrollDir](),
             menuTarget = $(menu)[direction](),
             position = mouse + scroll;
 
@@ -629,7 +630,7 @@ eskimo.SystemStatus = function() {
             }
         }
 
-        if (nodesWithproblem.length == 0) {
+        if (nodesWithproblem.length === 0) {
             $("#system-information-nodes-status").html("<span style='color: darkgreen;'>OK</span>");
         } else {
             $("#system-information-nodes-status").html(
@@ -654,8 +655,8 @@ eskimo.SystemStatus = function() {
             }
         }
 
-        if (servicesWithproblem.length == 0) {
-            if (nodesWithproblem.length == 0) {
+        if (servicesWithproblem.length === 0) {
+            if (nodesWithproblem.length === 0) {
                 $("#system-information-services-status").html("<span style='color: darkgreen;'>OK</span>");
             } else {
                 $("#system-information-services-status").html("<span style='color: darkred;'>-</span>");
@@ -756,7 +757,7 @@ eskimo.SystemStatus = function() {
             }
         }
 
-        if (nodeNamesByNbr.length == 0) {
+        if (nodeNamesByNbr.length === 0) {
 
             this.renderNodesStatusEmpty();
 
@@ -935,10 +936,10 @@ eskimo.SystemStatus = function() {
 
             if (nodeAlive == 'OK') {
                 arrayRow +=
-                    '        <img src="images/node-icon.png" class="status-node-image"></img>\n';
+                    '        <img alt="node icon" src="images/node-icon.png" class="status-node-image">\n';
             } else {
                 arrayRow +=
-                    '        <img src="images/node-icon-red.png" class="status-node-image"></img>\n';
+                    '        <img alt="node icon red" src="images/node-icon-red.png" class="status-node-image">\n';
                 nodeHasIssues = true;
             }
 

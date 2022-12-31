@@ -47,13 +47,13 @@ eskimo.OperationsCommand = function() {
         // Initialize HTML Div from Template
         $("#operations-command-modal-wrapper").load("html/eskimoOperationsCommand.html", (responseTxt, statusTxt, jqXHR) => {
 
-            if (statusTxt == "success") {
+            if (statusTxt === "success") {
 
                 $('#operations-command-header-cancel').click(cancelOperationsCommand);
                 $('#operations-command-button-cancel').click(cancelOperationsCommand);
                 $('#operations-command-button-validate').click(validateOperationsCommand);
 
-            } else if (statusTxt == "error") {
+            } else if (statusTxt === "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
         });
