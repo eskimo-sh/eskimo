@@ -70,9 +70,7 @@ eskimo.Main = function() {
     let operationInProgress = false;
     let operationInProgressOwner = false;
 
-    let menuHidingPos = 0;
-
-    let roles = [];
+    let userRoles = [];
 
     this.doInitializeInternal = function() {
         $("#eskimoTitle").html("Eskimo " + eskimoFlavour);
@@ -204,11 +202,9 @@ eskimo.Main = function() {
 
         eskimoAbout.initialize();
 
-        eskimoAlert.initialize();
-
         eskimoEditUser.initialize();
 
-        $(window).resize (this.windowResize);
+        eskimoAlert.initialize();
 
         // about
         $("#main-show-about-link").click(eskimoAbout.showAbout);
@@ -220,11 +216,9 @@ eskimo.Main = function() {
         $("#main-menu-show-setup-link").click(eskimoSetup.showSetup);
         $("#main-menu-show-services-settings-link").click(eskimoServicesSettings.showServicesSettings);
         $("#main-menu-show-nodes-config-link").click(eskimoNodesConfig.showNodesConfig);
-        $("#main-menu-show-kubernetes-config-link").click(eskimoKubernetesServicesConfig.showKubernetesServicesConfig);
+        $("#main-menu-show-kubernetes-services-config-link").click(eskimoKubernetesServicesConfig.showKubernetesServicesConfig);
         $("#main-menu-show-operations-link").click(eskimoOperations.showOperations);
         $("#user-logout").click(() => { window.location = "logout"; });
-
-        this.windowResize();
     };
 
     this.initialize = function() {
@@ -247,8 +241,8 @@ eskimo.Main = function() {
 
                 if (data.status == "OK") {
 
-                    roles = data.roles;
-                    disableAdminMenu();
+                    userRoles = data.roles;
+                    adaptMenuToUserRole();
 
                     that.version = data.version;
                     $("#eskimo-version").html(that.version);
@@ -280,7 +274,7 @@ eskimo.Main = function() {
         setupDone = true;
     };
 
-    function disableAdminMenu () {
+    function adaptMenuToUserRole () {
 
         $(".side-nav-item").each(function() {
             let menuRole = $(this).attr("data-menu-role");
@@ -293,14 +287,14 @@ eskimo.Main = function() {
             }
         });
     }
-    this.disableAdminMenu = disableAdminMenu;
+    this.adaptMenuToUserRole = adaptMenuToUserRole;
 
     this.hasRole = function (role) {
         if (role == "*") {
             return true;
         }
-        for (let i = 0; i < roles.length; i++) {
-            if (roles[i] == role) {
+        for (let i = 0; i < userRoles.length; i++) {
+            if (userRoles[i] == role) {
                 return true;
             }
         }
@@ -349,14 +343,43 @@ eskimo.Main = function() {
     }
     this.recoverOperationInProgress = recoverOperationInProgress;
 
+    this.enforceMenuConsisteny = function () {
+        // menu consistency checks (naming conventions)
+        const menuIdsToCheck = [];
+        $(".side-nav-link").each(function (target) {
+            if (this.id.indexOf("main-menu-show-") <= -1 || this.id.indexOf("link") <= -1) {
+                if (this.id.indexOf("services-menu_") <= -1) {
+                    eskimoAlert.showAlert(ESKIMO_ALERT_LEVEL.ERROR, "menu with id '" + this.id + "' is expected of having an id of form 'main-menu-show-XXX-link'. There will be inconsistencies down the line.");
+                }
+            } else {
+                menuIdsToCheck.push (this.id.substring("main-menu-show-".length, this.id.indexOf("link") - 1));
+            }
+        });
+        for (let i = 0; i < menuIdsToCheck.length; i++) {
+            if ($("#inner-content-" + menuIdsToCheck[i]).length === 0) {
+                eskimoAlert.showAlert(ESKIMO_ALERT_LEVEL.ERROR, "No target screen found with id 'inner-content-" + menuIdsToCheck[i] + "'");
+            }
+        }
+    }
+
     this.showOnlyContent = function (content, isServiceIFrame) {
 
         $("#main-content").scrollTop();
 
+        // reset current menu entry everywhwre
+        $(".side-nav-item").each(function (target) {
+            let classname = $(this).attr('class');
+            if (classname.indexOf('menuitem-active') > -1) {
+                $(this).removeClass('menuitem-active');
+            }
+        });
+
         if (isServiceIFrame) {
             $('#main-content').addClass("overflow-hidden");
+            $("#services-menu_" + content).parent().addClass("menuitem-active");
         } else {
             $('#main-content').removeClass("overflow-hidden");
+            $("#main-menu-show-" + content + "-link").parent().addClass("menuitem-active");
         }
 
         // if service iframe is already shown, clicking a second time on the link refreshed the iframe
@@ -394,20 +417,20 @@ eskimo.Main = function() {
         }
     };
 
-    function getDisplayedService () {
-        let displayService = null;
+    function getDisplayedScreen () {
+        let displayedScreen = null;
         $(".inner-content").each(function (nbr, innerContent) {
-            if ($(innerContent).css("visibility") == "visible") {
-                displayService = $(innerContent).attr('id').substring("inner-content-".length);
+            if ($(innerContent).css("visibility") === "visible") {
+                displayedScreen = $(innerContent).attr('id').substring("inner-content-".length);
             }
         });
-        return displayService;
+        return displayedScreen;
     }
 
-    this.isCurrentDisplayedService = function (service) {
-        let displayedService = getDisplayedService ();
+    this.isCurrentDisplayedScreen = function (screen) {
+        let displayedScreen = getDisplayedScreen ();
         //console.log ("displayedService is : " + service);
-        return displayedService == service;
+        return displayedScreen === screen;
     };
 
     function serviceMenuClear(nodeServicesStatus) {
@@ -458,24 +481,6 @@ eskimo.Main = function() {
     }
     this.hideProgressbar = hideProgressbar;
 
-    this.sidebarToggleClickedListener = function () {
-        dontMessWithSidebarSizeAnyMore = true;
-        that.menuResize();
-    };
-
-    this.setNavigationCompact = function () {
-        let hoeAppContainer = $('#hoeapp-container');
-        if (!dontMessWithSidebarSizeAnyMore && !hoeAppContainer.hasClass("hoe-minimized-lpanel")) {
-            if ($('#hoeapp-wrapper').attr("hoe-device-type") !== "phone") {
-                hoeAppContainer.toggleClass('hoe-minimized-lpanel');
-                $('#hoe-header').toggleClass('hoe-minimized-lpanel');
-                $('body').attr("hoe-navigation-type", "vertical-compact");
-            } else {
-                $('#hoeapp-wrapper').addClass('hoe-hide-lpanel');
-            }
-        }
-    };
-
     this.handleSetupCompleted = function () {
         setupDone = true;
 
@@ -484,7 +489,12 @@ eskimo.Main = function() {
                 && !($(this).hasClass("menu-static"))
                 && !($(this).hasClass("side-nav-title"))
                 && !($(this).hasClass("folder-menu-items"))) {
-                $(this).attr("class", "side-nav-item");
+
+                if ($(this).hasClass("menuitem-active")) {
+                    $(this).attr("class", "side-nav-item menuitem-active");
+                } else {
+                    $(this).attr("class", "side-nav-item");
+                }
             }
         });
     };
@@ -504,7 +514,7 @@ eskimo.Main = function() {
             }
         });
 
-        $("#menu-configure-setup").attr("class", "side-nav-item");
+        $("#menu-configure-setup").attr("class", "side-nav-item menuitem-active");
         $("#menu-operations").attr("class", "side-nav-item");
     };
 
@@ -582,18 +592,6 @@ eskimo.Main = function() {
     this.alert = function(level, message) {
         eskimoAlert.showAlert(level, message);
     }
-
-    this.windowResize = function() {
-
-        const body = $("body");
-        const viewPortHeight = body.innerHeight();
-        const viewPortWidth = body.innerWidth();
-
-        let headerHeight = $("#hoe-header").height();
-
-        $(".inner-content").css("height", (viewPortHeight - headerHeight) + "px");
-    };
-
 
     this.initialize();
 };

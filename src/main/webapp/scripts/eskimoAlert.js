@@ -55,6 +55,10 @@ eskimo.Alert = function() {
                 $('#alert-header-cancel').click(closeAlert);
                 $('#alert-button-validate').click(closeAlert);
 
+                if (isFunction (eskimoMain.enforceMenuConsisteny)) {
+                    eskimoMain.enforceMenuConsisteny();
+                }
+
             } else if (statusTxt === "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }

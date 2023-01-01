@@ -123,13 +123,13 @@ public class EskimoMainTest extends AbstractWebTest {
 
         assertCssValue("#inner-content-consoles", "visibility", "hidden");
         assertCssValue("#inner-content-setup", "visibility", "hidden");
-        assertCssValue("#inner-content-nodes", "visibility", "hidden");
+        assertCssValue("#inner-content-nodes-config", "visibility", "hidden");
         assertCssValue("#inner-content-services-settings", "visibility", "hidden");
         assertCssValue("#inner-content-file-managers", "visibility", "hidden");
 
         assertCssValue("#inner-content-operations", "visibility", "visible");
 
-        assertJavascriptEquals("true", "eskimoMain.isCurrentDisplayedService('operations')");
+        assertJavascriptEquals("true", "eskimoMain.isCurrentDisplayedScreen('operations')");
     }
 
     @Test
@@ -222,7 +222,7 @@ public class EskimoMainTest extends AbstractWebTest {
         assertJavascriptEquals("list-item", "$('#folderMenuConsoles').css('display')");
         assertJavascriptEquals("list-item", "$('#menu-configure-setup').css('display')");
 
-        js("eskimoMain.disableAdminMenu()");
+        js("eskimoMain.adaptMenuToUserRole()");
 
         assertJavascriptEquals("none", "$('#folderMenuConsoles').css('display')");
         assertJavascriptEquals("none", "$('#menu-configure-setup').css('display')");

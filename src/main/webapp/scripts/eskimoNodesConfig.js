@@ -63,7 +63,7 @@ eskimo.NodesConfig = function() {
 
     this.initialize = function() {
         // Initialize HTML Div from Template
-        $("#inner-content-nodes").load("html/eskimoNodesConfig.html", (responseTxt, statusTxt, jqXHR) => {
+        $("#inner-content-nodes-config").load("html/eskimoNodesConfig.html", (responseTxt, statusTxt, jqXHR) => {
 
             if (statusTxt === "success") {
 
@@ -338,7 +338,7 @@ eskimo.NodesConfig = function() {
             error: errorHandler
         });
 
-        that.eskimoMain.showOnlyContent("nodes");
+        that.eskimoMain.showOnlyContent("nodes-config");
     }
     this.showNodesConfig = showNodesConfig;
 

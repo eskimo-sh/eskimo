@@ -472,12 +472,12 @@ html[data-sidenav-color=default]{
 html[data-theme=dark][data-layout-mode=detached]{
     --ct-menu-item:#8391a2;
     --ct-menu-item-hover:#727cf5;
-    --ct-menu-item-active:#727cf5
+    --ct-menu-item-active:#ffffff
 }
 html[data-sidenav-color=light]{
     --ct-bg-leftbar:#fff;
     --ct-menu-item:#6c757d;
     --ct-menu-item-hover:#727cf5;
-    --ct-menu-item-active:#727cf5
+    --ct-menu-item-active:#ffffff
 }
 

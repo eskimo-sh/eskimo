@@ -136,8 +136,6 @@ eskimo.Services = function () {
                 // maybe Progress bar was shown previously
                 that.eskimoMain.hideProgressbar();
 
-                that.eskimoMain.setNavigationCompact();
-
                 that.eskimoMain.showOnlyContent(service, true);
 
             } else {
@@ -360,8 +358,6 @@ eskimo.Services = function () {
 
     this.handleServiceDisplay = function (service, uiConfig, node, immediate) {
 
-        //let serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(service)));
-
         let reinitialize = shouldReinitialize(service, node);
 
         /*
@@ -414,12 +410,6 @@ eskimo.Services = function () {
 
         //console.log ("Hiding " + service);
 
-        /*
-        // menu
-        let serviceMenu = $("#folderMenu" + getUcfirst(getCamelCase(service)));
-        serviceMenu.attr("class", "side-nav-item folder-menu-items disabled");
-        */
-
         // iframe
         if (serviceInitialized[service]) {
             $("#iframe-content-" + service).attr('src', EMPTY_FRAMETARGET);
@@ -438,7 +428,7 @@ eskimo.Services = function () {
         }
 
         // if service was displayed, show Status
-        if (that.eskimoMain.isCurrentDisplayedService(service)) {
+        if (that.eskimoMain.isCurrentDisplayedScreen(service)) {
             that.eskimoSystemStatus.showStatus();
         }
     };
@@ -516,8 +506,6 @@ eskimo.Services = function () {
 
             $("#main-content").append($(iframeWrapperString));
         }
-
-        that.eskimoMain.windowResize();
     }
     /** for tests */
     this.createServicesIFrames = createServicesIFrames;

@@ -703,9 +703,6 @@ eskimo.SystemStatus = function() {
     this.renderNodesStatus = function (nodeServicesStatus, masters, blocking) {
 
         let nodeNamesByNbr = [];
-
-        that.eskimoMain.handleSetupCompleted();
-
         let availableNodes = [];
 
         // loop on node nbrs and get Node Name + create table row
@@ -1094,6 +1091,8 @@ eskimo.SystemStatus = function() {
 
                 if (!data.clear) {
 
+                    that.eskimoMain.handleSetupCompleted();
+
                     that.handleSystemStatus(data.nodeServicesStatus, data.systemStatus, blocking);
 
                     that.renderNodesStatus (data.nodeServicesStatus, data.masters, blocking);
@@ -1102,8 +1101,8 @@ eskimo.SystemStatus = function() {
 
                     that.eskimoMain.handleSetupNotCompleted();
 
-                    if (   !that.eskimoMain.isCurrentDisplayedService("setup")
-                        && !that.eskimoMain.isCurrentDisplayedService("operations")) { // don't move to setup if operations are being shown !
+                    if (   !that.eskimoMain.isCurrentDisplayedScreen("setup")
+                        && !that.eskimoMain.isCurrentDisplayedScreen("operations")) { // don't move to setup if operations are being shown !
                         that.eskimoMain.showSetupNotDone();
                     }
 

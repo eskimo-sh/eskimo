@@ -123,7 +123,6 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         // 4. service initialized
         js("eskimoMain.hideProgressbar = function() { window.hideProgressbarCalled = true; }");
-        js("eskimoMain.setNavigationCompact = function() { window.setNavigationCompactCalled = true; }");
         js("eskimoMain.showOnlyContent = function (content) { window.onlyContentShown = content; }");
 
         js("eskimoServices.setServiceInitializedForTests ('cerebro');");
@@ -131,7 +130,6 @@ public class EskimoServicesTest extends AbstractWebTest {
         js("eskimoServices.showServiceIFrame('cerebro')");
 
         assertJavascriptEquals("true", "window.hideProgressbarCalled");
-        assertJavascriptEquals("true", "window.setNavigationCompactCalled");
         assertJavascriptEquals("cerebro", "window.onlyContentShown");
     }
 

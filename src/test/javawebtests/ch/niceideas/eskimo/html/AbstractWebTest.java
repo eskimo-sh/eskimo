@@ -222,7 +222,7 @@ public abstract class AbstractWebTest {
         js("eskimoMain.menuResize = function () {};");
         js("eskimoMain.isSetupDone = function () { return true; }");
         js("eskimoMain.hideProgressbar = function () { }");
-        js("eskimoMain.isCurrentDisplayedService = function () { return false; }");
+        js("eskimoMain.isCurrentDisplayedScreen = function () { return false; }");
         js("eskimoMain.setSetupLoaded = function () {}");
         js("eskimoMain.startOperationInProgress = function() {}");
         js("eskimoMain.scheduleStopOperationInProgress = function() {}");
