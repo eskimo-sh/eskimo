@@ -61,7 +61,7 @@ eskimo.Setup = function() {
                     if (input.length) {
                         input.val(content);
                     } else {
-                        if (content) alert(content);
+                        if (content) console.log(content);
                     }
 
                     // file is content
@@ -148,7 +148,7 @@ eskimo.Setup = function() {
         }
 
         if (data.version == null) {
-            alert ("Couldn't get Eskimo version");
+            eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "Couldn't get Eskimo version");
         }
 
         switchDownloadBuild ("kube", data);
@@ -239,12 +239,11 @@ eskimo.Setup = function() {
 
                 if (!data || data.error) {
                     console.error(atob(data.error));
-                    //alert(atob(data.error));
                     showSetupMessage(atob(data.error), false);
                 } else {
 
                     if (!data.command) {
-                        alert("Expected pending operations command but got none !");
+                        eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "Expected pending operations command but got none !");
                     } else {
 
                         if (!data.command.none) {

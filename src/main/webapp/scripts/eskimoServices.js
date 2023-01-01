@@ -76,7 +76,7 @@ eskimo.Services = function () {
                     loadUIServices();
 
                 } else {
-                    alert(data.error);
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
                 }
             },
             error: errorHandler
@@ -95,7 +95,7 @@ eskimo.Services = function () {
                     createServicesMenu();
 
                 } else {
-                    alert(data.error);
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
                 }
             },
             error: errorHandler

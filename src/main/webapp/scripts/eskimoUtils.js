@@ -90,10 +90,10 @@ function errorHandler (jqXHR, status) {
     }
 
     if (jqXHR && jqXHR.responseJSON  && jqXHR.responseJSON.message) {
-        alert('fail : ' + jqXHR.responseJSON.message);
+        eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, 'fail : ' + jqXHR.responseJSON.message);
 
     } else if (jqXHR && jqXHR.responseJSON  && jqXHR.responseJSON.error) {
-        alert('fail : ' + jqXHR.responseJSON.error);
+        eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, 'fail : ' + jqXHR.responseJSON.error);
 
     } else {
         console.error('fail : ' + status);
@@ -136,7 +136,7 @@ $.ajaxPut = function (reqObject) {
 function defaultSuccess (data, status, jqXHR) {
     if (!data || data.error) {
         console.error(data.error);
-        alert(data.error);
+        eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
     }
 }
 

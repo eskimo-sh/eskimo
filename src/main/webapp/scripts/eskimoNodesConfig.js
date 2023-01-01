@@ -89,7 +89,7 @@ eskimo.NodesConfig = function() {
                         checkNodesSetup(setupConfig, UNIQUE_SERVICES, MANDATORY_SERVICES, SERVICES_CONFIGURATION, SERVICES_DEPENDENCIES);
                         proceedWithInstallation(false, setupConfig);
                     } catch (error) {
-                        alert (error);
+                        eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, error);
                     }
 
                     e.preventDefault();
@@ -129,7 +129,7 @@ eskimo.NodesConfig = function() {
                     SERVICES_DEPENDENCIES = data.servicesDependencies;
 
                 } else {
-                    alert(data.error);
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
                 }
             },
             error: errorHandler
@@ -153,7 +153,7 @@ eskimo.NodesConfig = function() {
                     that.eskimoServices.initialize();
 
                 } else {
-                    alert(data.error);
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
                 }
             },
             error: errorHandler
@@ -334,8 +334,6 @@ eskimo.NodesConfig = function() {
                     that.eskimoMain.handleSetupNotCompleted();
 
                 }
-
-                //alert(data);
             },
             error: errorHandler
         });
@@ -615,11 +613,11 @@ eskimo.NodesConfig = function() {
 
                 if (!data || data.error) {
                     console.error(atob(data.error));
-                    alert(atob(data.error));
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, atob(data.error));
                 } else {
 
                     if (!data.command) {
-                        alert ("Expected pending operations command but got none !");
+                        eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "Expected pending operations command but got none !");
                     } else {
                         that.eskimoOperationsCommand.showCommand (data.command);
                     }

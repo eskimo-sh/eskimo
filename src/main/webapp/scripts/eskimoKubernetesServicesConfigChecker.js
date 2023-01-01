@@ -48,11 +48,11 @@ function checkKubernetesSetup (kubernetesSetupConfig, servicesDependencies, kube
                 if(successCallback && successCallback instanceof Function) {
                     successCallback();
                 } else {
-                    alert ("TECHNICAL ERROR : successCallback is not a function.");
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "TECHNICAL ERROR : successCallback is not a function.");
                 }
 
             } catch (error) {
-                alert(error);
+                eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, error);
             }
 
         },

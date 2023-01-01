@@ -344,7 +344,7 @@ eskimo.FileManagers = function() {
                         that.listFolder (node, nodeName, data.folder, data.content);
 
                     } else if (!data.accessible) {
-                        alert ("User used by eskimo has no read permission to this file");
+                        eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR,  "User used by eskimo has no read permission to this file");
 
                     } else {
 
@@ -374,7 +374,7 @@ eskimo.FileManagers = function() {
                         }
                     }
                 } else {
-                    alert(data.error);
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
 
                     // FIXME Close file-manager or make disabled
                 }
@@ -400,7 +400,7 @@ eskimo.FileManagers = function() {
                         that.openFolder(node, nodeName, currentFolder, ".");
 
                     } else {
-                        alert(data.error);
+                        eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
 
                         // FIXME Close File Manager or make disabled
                     }
@@ -484,7 +484,7 @@ eskimo.FileManagers = function() {
                     listFolder (nodeAddress, nodeName, data.folder, data.content);
 
                 } else {
-                    alert(data.error);
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
 
                     // FIXME Close File Manager or make disabled
                 }
@@ -512,7 +512,7 @@ eskimo.FileManagers = function() {
                     listFolder (node, nodeName, data.folder, data.content);
 
                 } else {
-                    alert(data.error);
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
 
                     // FIXME Close File Manager or make disabled
                 }
@@ -547,13 +547,13 @@ eskimo.FileManagers = function() {
                 if(data) {
 
                     if (data.status == "KO") {
-                        alert (data.error);
+                        eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
                     } else {
                         refreshFolder (node, nodeName);
                     }
 
                 } else {
-                    alert ("No result obtained from backend. This is an unexpected error.")
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "No result obtained from backend. This is an unexpected error.")
                 }
             };
 
@@ -602,7 +602,7 @@ eskimo.FileManagers = function() {
                     this.listFolder (node, nodeName, data.folder, data.content);
 
                 } else {
-                    alert(data.error);
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
 
                     // FIXME Close File Manager
                 }
@@ -634,7 +634,7 @@ eskimo.FileManagers = function() {
 
         // close session on backend
         if (openedFileManager == null) {
-            alert("File Manager " + terminalToClose + " not found");
+            eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "File Manager " + terminalToClose + " not found");
         } else {
             $.ajaxGet({
                 url: "file-manager-remove?nodeAddress=" + openedFileManager.nodeAddress,

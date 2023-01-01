@@ -276,7 +276,7 @@ eskimo.SystemStatus = function() {
                     SERVICES_STATUS_CONFIG = data.uiServicesStatusConfig;
 
                 } else {
-                    alert(data.error);
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
                 }
 
                 loadListServices();
@@ -297,7 +297,7 @@ eskimo.SystemStatus = function() {
                     that.eskimoSetup.loadSetup(true);
 
                 } else {
-                    alert(data.error);
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
                 }
             },
             error: errorHandler
@@ -800,7 +800,7 @@ eskimo.SystemStatus = function() {
                     showFileManager(node, nodeName);
 
                 } else {
-                    alert ("Unknown action : " + action);
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "Unknown action : " + action);
                 }
             }
         })
@@ -1057,7 +1057,7 @@ eskimo.SystemStatus = function() {
                 if (data.status == "OK") {
                     that.eskimoMain.scheduleStopOperationInProgress (data.success);
                 } else {
-                    alert (data.error);
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
                 }
             },
             error: errorHandler
@@ -1145,7 +1145,7 @@ eskimo.SystemStatus = function() {
                 }
 
                 if (blocking) {
-                    alert('fail : ' + status);
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, 'fail : ' + status);
 
                     that.eskimoMain.hideProgressbar();
 

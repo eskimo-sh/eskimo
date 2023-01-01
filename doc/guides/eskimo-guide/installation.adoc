@@ -98,9 +98,9 @@ the eskimo cluster.
 
 Eskimo is reached using a web browser (see startup logs). Supported web browsers are:
 
-* Microsoft Edge 12 or greater
-* Mozilla FireFox 36 or greater
-* Google Chrome 41 or greater
+* Microsoft Edge 14 or greater
+* Mozilla FireFox 54 or greater
+* Google Chrome 58 or greater
 
 Note: there may be other browsers / versions supported (Safari, Opera but they are not certified to work with Eskimo)
 

@@ -110,7 +110,7 @@ eskimo.Notifications = function() {
                     window.location = "login.html";
                 }
 
-                // Don't alerrt in case of an error here. it spams the browser with spurious alert
+                // Don't alert in case of an error here. it spams the browser with spurious alert
                 // messages all the time when the backend is down
                 //alert('fail : ' + status);
             }

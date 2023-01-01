@@ -263,14 +263,13 @@ eskimo.Consoles = function() {
 
         // close session on backend
         if (openedConsole == null) {
-            alert("Console " + terminalToClose + " not found");
+            eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "Console " + terminalToClose + " not found");
         } else {
             //console.log(openedConsole.terminal);
             $.ajaxGet({
                 url: "terminal-remove?session=" + openedConsole.terminal.getSessionId(),
                 success: (data, status, jqXHR) => {
-                    //console.log(data);
-                    //alert(data);
+                    console.log ("Terminal " + openedConsole.terminal.getSessionId() + " closed successfully");
                 },
                 error: (error) => {
                     console.debug (error);

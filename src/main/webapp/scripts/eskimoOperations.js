@@ -119,8 +119,6 @@ eskimo.Operations = function() {
     }
 
     function showLogs (operation) {
-        //alert (operation);
-
         if (!messagesStore[operation]) {
             $("#log-message-content").html("(no log received yet for operation)");
         } else {

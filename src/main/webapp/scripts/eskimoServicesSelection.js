@@ -84,7 +84,7 @@ eskimo.ServicesSelection = function() {
                     initModalServicesConfig();
 
                 } else {
-                    alert(data.error);
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
                 }
             },
             error: errorHandler
@@ -306,7 +306,6 @@ eskimo.ServicesSelection = function() {
             let oneFound = false;
             for (let col = 1; col <= 3; col++) {
                 let serviceConfig = getService(row, col);
-                //alert (serviceConfig.name + " - " + row + " - " + col);
                 if (serviceConfig != null) {
                     oneFound = true;
                 }

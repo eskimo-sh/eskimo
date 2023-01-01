@@ -53,6 +53,7 @@ public class EskimoMainTest extends AbstractWebTest {
         js("window.eskimoFlavour = \"CE\";");
 
         // redefine constructor
+        js("eskimo.Alert = function(){ this.initialize = function(){};  };");
         js("eskimo.Setup = function(){ this.initialize = function(){};  };");
         js("eskimo.NodesConfig = function(){ this.initialize = function(){};  };");
         js("eskimo.Notifications = function(){ this.initialize = function(){}; };");

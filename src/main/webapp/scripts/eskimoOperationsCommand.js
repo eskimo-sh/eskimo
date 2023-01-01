@@ -116,7 +116,7 @@ eskimo.OperationsCommand = function() {
     function validateOperationsCommand() {
 
         if (that.eskimoMain.isOperationInProgress()) {
-            alert ("There is already some operations in progress on backend. Skipping.");
+            eskimoMain.alert(ESKIMO_ALERT_LEVEL.WARNING, "There is already some operations in progress on backend. Skipping.");
 
         } else {
 

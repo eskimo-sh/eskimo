@@ -65,6 +65,7 @@ eskimo.Main = function() {
     let eskimoKubernetesOperationsCommand = null;
     let eskimoSettingsOperationsCommand = null;
     let eskimoAbout = null;
+    let eskimoAlert = null;
 
     let operationInProgress = false;
     let operationInProgressOwner = false;
@@ -95,6 +96,7 @@ eskimo.Main = function() {
         eskimoKubernetesServicesSelection = new eskimo.KubernetesServicesSelection();
         eskimoSystemStatus = new eskimo.SystemStatus();
         eskimoAbout = new eskimo.About();
+        eskimoAlert = new eskimo.Alert();
         eskimoEditUser = new eskimo.EditUser();
 
         // B. Inject dependencies
@@ -116,6 +118,7 @@ eskimo.Main = function() {
             eskimoKubernetesOperationsCommand: eskimoKubernetesOperationsCommand,
             eskimoSettingsOperationsCommand: eskimoSettingsOperationsCommand,
             eskimoAbout: eskimoAbout,
+            eskimoAlert: eskimoAlert,
             eskimoMain: this
         };
 
@@ -200,6 +203,8 @@ eskimo.Main = function() {
         //     + PROCESSING PENDING DETECTION LOGIC
 
         eskimoAbout.initialize();
+
+        eskimoAlert.initialize();
 
         eskimoEditUser.initialize();
 
@@ -567,8 +572,15 @@ eskimo.Main = function() {
     this.getAbout = function() {
         return eskimoAbout;
     };
+    this.getAlert = function() {
+        return eskimoAlert;
+    };
     this.getEditUser = function() {
         return eskimoEditUser;
+    }
+
+    this.alert = function(level, message) {
+        eskimoAlert.showAlert(level, message);
     }
 
     this.windowResize = function() {

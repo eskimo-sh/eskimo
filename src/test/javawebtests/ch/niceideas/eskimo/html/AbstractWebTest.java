@@ -173,6 +173,7 @@ public abstract class AbstractWebTest {
         js("eskimoSetup.setSnapshot = function () {};");
 
         js("window.eskimoSetupCommand = {}");
+        js("window.eskimoAlert = {}");
 
         js("window.eskimoFileManagers = {};");
         js("eskimoFileManagers.setAvailableNodes = function() {};");
@@ -231,6 +232,9 @@ public abstract class AbstractWebTest {
         js("eskimoMain.serviceMenuClear = function() { return true; }");
         js("eskimoMain.windowResize = function() {  }");
         js("eskimoMain.hasRole = function(role) { return true; }");
+        js("eskimoMain.alert = function(level, message) { alert(level + ' : ' + message); }");
+
+        js("window.ESKIMO_ALERT_LEVEL = {ERROR: 3, WARNING: 2, INFO: 1}");
 
         js("eskimoMain.getSystemStatus = function() { return eskimoSystemStatus; }");
 

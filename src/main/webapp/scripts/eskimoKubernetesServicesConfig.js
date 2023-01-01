@@ -68,7 +68,7 @@ eskimo.KubernetesServicesConfig = function() {
                         checkKubernetesSetup(setupConfig, that.eskimoNodesConfig.getServicesDependencies(), KUBERNETES_SERVICES_CONFIG,
                             () => { proceedWithKubernetesInstallation(setupConfig); });
                     } catch (error) {
-                        alert ("error : " + error);
+                        eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, error);
                     }
 
                     e.preventDefault();
@@ -116,7 +116,7 @@ eskimo.KubernetesServicesConfig = function() {
                     //console.log (KUBERNETES_SERVICES);
 
                 } else {
-                    alert(data.error);
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
                 }
             },
             error: errorHandler
@@ -311,7 +311,6 @@ eskimo.KubernetesServicesConfig = function() {
                 if (!data.clear) {
 
                     that.renderKubernetesConfig(data);
-                    //alert ("TODO");
 
                 } else if (data.clear == "missing") {
 
@@ -367,11 +366,11 @@ eskimo.KubernetesServicesConfig = function() {
 
                 if (!data || data.error) {
                     console.error(atob(data.error));
-                    alert(atob(data.error));
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, atob(data.error));
                 } else {
 
                     if (!data.command) {
-                        alert ("Expected pending operations command but got none !");
+                        eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "Expected pending operations command but got none !");
                     } else {
                         that.eskimoKubernetesOperationsCommand.showCommand (data.command);
                     }

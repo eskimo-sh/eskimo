@@ -86,7 +86,7 @@ eskimo.ServicesSettings = function () {
 
 
                 } else {
-                    alert(data.error);
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
                 }
             },
             error: errorHandler
@@ -115,11 +115,11 @@ eskimo.ServicesSettings = function () {
 
                 if (!data || data.error) {
                     console.error(atob(data.error));
-                    alert(atob(data.error));
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, atob(data.error));
                 } else {
 
                     if (!data.command) {
-                        alert ("Expected pending operations command but got none !");
+                        eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "Expected pending operations command but got none !");
                     } else {
                         that.eskimoSettingsOperationsCommand.showCommand (data.command);
                     }
