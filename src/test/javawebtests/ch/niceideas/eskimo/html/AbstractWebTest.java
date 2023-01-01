@@ -100,7 +100,7 @@ public abstract class AbstractWebTest {
             }
         }
 
-        driver.get("http://localhost:9001/src/test/resources/GenericTestPage.html");
+        driver.get("http://localhost:" + TestResourcesServer.LOCAL_TEST_SERVER_PORT + "/src/test/resources/GenericTestPage.html");
     }
 
     @AfterAll
@@ -318,9 +318,9 @@ public abstract class AbstractWebTest {
     }
 
     protected final void loadScript (String script) {
-        js("loadScript('http://localhost:9001/src/main/webapp/scripts/"+script+"')");
+        js("loadScript('http://localhost:" + TestResourcesServer.LOCAL_TEST_SERVER_PORT + "/src/main/webapp/scripts/"+script+"')");
         try {
-            waitForElementInDOM(By.cssSelector("script[src=\"http://localhost:9001/src/main/webapp/scripts/" + script + "\"]"));
+            waitForElementInDOM(By.cssSelector("script[src=\"http://localhost:" + TestResourcesServer.LOCAL_TEST_SERVER_PORT + "/src/main/webapp/scripts/" + script + "\"]"));
             Thread.sleep(20);
         } catch (InterruptedException e) {
             logger.debug(e, e);

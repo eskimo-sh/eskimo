@@ -34,8 +34,11 @@
 
 package ch.niceideas.eskimo.html;
 
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -51,12 +54,64 @@ public class EskimoAlertTest extends AbstractWebTest {
         js("eskimoAlert = new eskimo.Alert();");
         js("eskimoAlert.initialize()");
 
-        waitForElementIdInDOM("alert-modal-body");
+        waitForElementIdInDOM("alert-body");
+
+        // force hide it
+        js("$('#alert-modal').modal('show');");
+        Awaitility.await().atMost(10, TimeUnit.SECONDS).until(() -> js("return $('#alert-modal').css('display')").equals("block"));
+        assertCssValue("#alert-modal", "display", "block");
+
+        js("$('#alert-modal').modal('hide');");
+        Awaitility.await().atMost(10, TimeUnit.SECONDS).until(() -> js("return $('#alert-modal').css('display')").equals("none"));
+        assertCssValue("#alert-modal", "display", "none");
+    }
+
+    @Test
+    public void testUnsupportedLevels() throws Exception {
+
+        js("eskimoAlert.showAlert (0, 'unsuported level 0');");
+
+        Thread.sleep(500);
+        // shouldn't have worked
+        assertCssValue("#alert-modal", "display", "none");
+
+        js("eskimoAlert.showAlert (4, 'unsuported level 4');");
+
+        Thread.sleep(500);
+        // shouldn't have worked
+        assertCssValue("#alert-modal", "display", "none");
     }
 
     @Test
     public void testNominal() throws Exception {
-        fail ("To Be Implemented");
+
+        js("eskimoAlert.showAlert (1, 'test info');");
+
+        Awaitility.await().atMost(10, TimeUnit.SECONDS).until(() -> js("return $('#alert-modal').css('display')").equals("block"));
+        assertCssValue("#alert-modal", "display", "block");
+
+        assertJavascriptEquals("test info", "$('#alert-body').html()");
+        assertJavascriptEquals("modal-header", "$('#alert-header').attr('class')");
+
+        js("eskimoAlert.showAlert (2, 'test warning');");
+
+        assertJavascriptEquals("test info<br>test warning", "$('#alert-body').html()");
+        assertJavascriptEquals("modal-header bg-warning text-white", "$('#alert-header').attr('class')");
+
+        js("eskimoAlert.showAlert (3, 'test error');");
+
+        assertJavascriptEquals("test info<br>test warning<br>test error", "$('#alert-body').html()");
+        assertJavascriptEquals("modal-header bg-danger text-white", "$('#alert-header').attr('class')");
+
+        // lower level doesn't change header style
+
+        js("eskimoAlert.showAlert (2, 'other warning');");
+        assertJavascriptEquals("modal-header bg-danger text-white", "$('#alert-header').attr('class')");
+
+        js("eskimoAlert.closeAlert ();");
+        Awaitility.await().atMost(10, TimeUnit.SECONDS).until(() -> js("return $('#alert-modal').css('display')").equals("none"));
+        assertCssValue("#alert-modal", "display", "none");
+
     }
 
 }

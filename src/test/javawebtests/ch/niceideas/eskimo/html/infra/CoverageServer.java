@@ -54,11 +54,16 @@ public class CoverageServer implements TestResourcesServer {
 
     private String className = null;
 
-    private static String jsCoverReportDir = "target/jscov-report";
-    private static String[] jsCoverArgs = new String[]{
+    private final static String jsCoverReportDir = "target/jscov-report";
+
+    private final List<String> coverages = new ArrayList<>();
+
+    private final JSONDataMerger jsonDataMerger = new JSONDataMerger();
+
+    private final String[] jsCoverArgs = new String[]{
             "-ws",
             "--document-root=.",
-            "--port=9001",
+            "--port=" + TestResourcesServer.LOCAL_TEST_SERVER_PORT,
             //"--no-branch",
             //"--no-function",
             "--no-instrument=src/main/webapp/scripts/bootstrap-5.2.0.js",
@@ -66,30 +71,29 @@ public class CoverageServer implements TestResourcesServer {
             "--report-dir=" + jsCoverReportDir
     };
 
-    private List<String> coverages = new ArrayList<>();
-
-    private JSONDataMerger jsonDataMerger = new JSONDataMerger();
-
-    private Thread server;
-
     private Main main = null;
 
+    @Override
     public void startServer(String className) throws Exception {
         this.className = className;
 
         main = new Main();
-        server = new Thread(() -> main.runMain(jsCoverArgs));
+        Thread server = new Thread(() -> main.runMain(jsCoverArgs));
         server.start();
     }
 
+    @Override
     public void stopServer() throws Exception {
         main.stop();
 
         File targetFile = new File(jsCoverReportDir + "/" + className, "jscoverage.json");
-        targetFile.getParentFile().mkdirs();
+        if (!targetFile.getParentFile().mkdirs()) {
+            logger.error ("Directory creation for '" + targetFile  + "' returned false. Some further errors might me expected.");
+        }
         FileUtils.writeFile(targetFile, mergeJSON());
     }
 
+    @Override
     public void postTestMethodHook(JsRunner runner) throws Exception {
         runner.js("window.jscoverFinished = false;");
         runner.js("jscoverage_report('', function(){window.jscoverFinished=true;});");

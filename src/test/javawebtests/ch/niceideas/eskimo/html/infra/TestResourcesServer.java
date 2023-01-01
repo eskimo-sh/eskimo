@@ -37,6 +37,8 @@ package ch.niceideas.eskimo.html.infra;
 
 public interface TestResourcesServer {
 
+    int LOCAL_TEST_SERVER_PORT = 9001;
+
     interface JsRunner {
         Object js (String jsCode);
     }

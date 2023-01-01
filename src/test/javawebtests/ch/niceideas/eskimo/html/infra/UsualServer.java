@@ -43,14 +43,12 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
 
 public class UsualServer implements TestResourcesServer {
 
-    private String className = null;
-
     private Server jetty = null;
 
+    @Override
     public void startServer(String className) throws Exception {
-        this.className = className;
 
-        jetty = new Server(9001);
+        jetty = new Server(TestResourcesServer.LOCAL_TEST_SERVER_PORT);
 
         ResourceHandler resource_handler = new ResourceHandler();
         resource_handler.setDirectoriesListed(true);
@@ -70,12 +68,14 @@ public class UsualServer implements TestResourcesServer {
         jetty.start();
     }
 
+    @Override
     public void stopServer() throws Exception {
         if (jetty != null) {
             jetty.stop();
         }
     }
 
+    @Override
     public void postTestMethodHook(JsRunner runner) {
         // nothing to do
     }

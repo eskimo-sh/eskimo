@@ -165,8 +165,8 @@ ajaxterm.Terminal = function(id,options) {
 			r.onreadystatechange = function () {
 //				debug("xhr:"+((new Date).getTime())+" state:"+r.readyState+" status:"+r.status+" statusText:"+r.statusText);
 				console.log("xhr:"+((new Date).getTime())+" state:"+r.readyState+" status:"+r.status+" statusText:"+r.statusText);
-				if (r.readyState == 4) {
-					if(r.status == 200) {
+				if (r.readyState === 4) {
+					if(r.status === 200) {
 						window.clearTimeout(error_timeout);
 						if(r.responseText.trim() != "<idem/>") {
                             dterm.innerHTML = r.responseText;
@@ -220,7 +220,7 @@ ajaxterm.Terminal = function(id,options) {
             return;
         }
 		keybuf.unshift(s);
-		if (sending == 0) {
+		if (sending === 0) {
 			window.clearTimeout(timeout);
 			timeout=window.setTimeout(update,1);
 		}
@@ -251,14 +251,14 @@ ajaxterm.Terminal = function(id,options) {
 		if (!ev) {
 		    ev=window.event;
         }
-        if ((keyDownKeyCodes[ev.keyCode] && ev.charCode==0) || ev.ctrlKey || ev.altKey) {
+        if ((keyDownKeyCodes[ev.keyCode] && ev.charCode == 0) || ev.ctrlKey || ev.altKey) {
             // ev.charCode!=0 implies those are keys that produce ASCII codes
             return handleKey(ev,0);
         }
 	}
 
 	function keypress(ev) {
-        if ((keyDownKeyCodes[ev.keyCode] && ev.charCode==0) || ev.ctrlKey || ev.altKey) {
+        if ((keyDownKeyCodes[ev.keyCode] && ev.charCode == 0) || ev.ctrlKey || ev.altKey) {
             // we handled these in keydown
         } else {
             return handleKey(ev,ev.which)
