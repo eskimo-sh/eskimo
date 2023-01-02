@@ -37,6 +37,6 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 while (true); do
-    /usr/bin/python $SCRIPT_DIR/logstash_remote.py 2>&1 | tee /var/log/elasticsearch/logstash/logstash_remote.log
+    /usr/bin/python3 $SCRIPT_DIR/logstash_remote.py 2>&1 | tee /var/log/elasticsearch/logstash/logstash_remote.log
     sleep 5
 done

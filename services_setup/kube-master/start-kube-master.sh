@@ -116,8 +116,6 @@ echo "   + Starting kube-api server"
   --audit-log-path=$ESKIMO_KUBE_AUDIT_LOG_PATH \
   --audit-policy-file=$ESKIMO_KUBE_AUDIT_POLICY_FILE \
   --v=$ESKIMO_KUBE_LOG_LEVEL \
-  --logtostderr=$ESKIMO_KUBE_LOGTOSTDERR \
-  --enable-swagger-ui=$ESKIMO_KUBE_ENABLE_SWAGGER_UI \
   --allow-privileged=$ESKIMO_ALLOW_PRIVILEGED \
   --event-ttl=$ESKIMO_KUBE_EVENT_TTL > /var/log/kubernetes/kubeapi.log 2>&1' &
 kubeapi_pid=$!

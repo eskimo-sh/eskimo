@@ -142,6 +142,12 @@ for i in `ls -1 /usr/local/lib/k8s/kubernetes/server/bin/`; do
     fi
 done
 
+echo "   + Installing cri-dockerd"
+for i in `ls -1 /usr/local/lib/k8s/cri-dockerd/`; do
+    if [[ ! -f /usr/local/bin/$i ]]; then
+        sudo ln -s /usr/local/lib/k8s/cri-dockerd/$i /usr/local/bin/$i
+    fi
+done
 
 echo "   + Installing cni plugins"
 sudo mkdir -p /opt/cni/

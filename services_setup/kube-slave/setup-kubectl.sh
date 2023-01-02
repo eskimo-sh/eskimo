@@ -267,6 +267,21 @@ EOF
     sudo mv serviceaccount-$USER.yaml /etc/k8s/serviceaccount-$USER.yaml
 fi
 
+if [[ ! -f /etc/k8s/serviceaccount-$USER-secret.yaml  ]]; then
+    echo "   + Creating /etc/k8s/serviceaccount-$USER-secret.yaml"
+    cat > serviceaccount-$USER-secret.yaml <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: $USER-secret
+  annotations:
+    kubernetes.io/service-account.name: "$USER"
+type: kubernetes.io/service-account-token
+EOF
+
+    sudo mv serviceaccount-$USER-secret.yaml /etc/k8s/serviceaccount-$USER-secret.yaml
+fi
+
 
 if [[ ! -f /etc/k8s/clusterrolebinding-kubernetes-dashboard-$USER.yaml ]]; then
     echo "   + Creating /etc/k8s/clusterrolebinding-kubernetes-dashboard-$USER.yaml"

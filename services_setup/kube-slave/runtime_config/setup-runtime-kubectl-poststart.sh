@@ -94,10 +94,12 @@ fi
 export HOME=/root
 
 
-# Not recreating on slave
+# Not recreating systematically  on slave
 if [[ `kubectl get serviceaccount | grep $ADMIN_USER` == "" ]]; then
     echo "   + Creating serviceaccount-$ADMIN_USER"
     kubectl apply -f /etc/k8s/serviceaccount-$ADMIN_USER.yaml
+    echo "   + Creating serviceaccount-$ADMIN_USER-secret"
+    kubectl apply -f /etc/k8s/serviceaccount-$ADMIN_USER-secret.yaml
 fi
 
 if [[ `kubectl get ClusterRoleBinding | grep default-$ADMIN_USER` == "" ]]; then
@@ -110,29 +112,15 @@ if [[ `kubectl get ClusterRoleBinding | grep kubernetes-dashboard-$ADMIN_USER` =
     kubectl apply -f /etc/k8s/clusterrolebinding-kubernetes-dashboard-$ADMIN_USER.yaml
 fi
 
-echo "   + Getting secret"
-
-for i in `seq 1 20`; do
-    sleep 1
-    SECRET=`kubectl get sa/$ADMIN_USER -o jsonpath="{.secrets[0].name}"`
-    if [[ "$SECRET" != "" ]]; then
-        break
-    fi
-done
-
-if [[ "$SECRET" == "" ]]; then
-    echo "User $ADMIN_USER has no secret (trying 20 seconds without success)"
-    exit 60
-fi
-
-# TODO
-# XXX note : to get the token to inject in e.g. the dashboard login, use :
-#kubectl get secret $SECRET -o go-template="{{.data.token | base64decode}}"
-#or even
-# kubectl get secret `kubectl get sa/$ADMIN_USER -o jsonpath="{.secrets[0].name}"` -o go-template="{{.data.token | base64decode}}"
-
 echo "   + Getting token"
-NEW_TOKEN=`kubectl describe secret $SECRET | grep token: | sed 's/token: *\(.*\)/\1/'`
+sleep 4
+NEW_TOKEN=`kubectl describe secret $ADMIN_USER-secret | grep token: | sed 's/token: *\(.*\)/\1/'`
+if [[ "$NEW_TOKEN" == "" ]]; then
+    echo " !! Failed to get new token"
+    echo "  -> this is the output of  kubectl get secrets"
+    kubectl get secrets
+    exit 51
+fi
 
 echo "   + Installing new token"
 sudo sed -i s/'token: .*'/"token: $NEW_TOKEN"/ /home/$ADMIN_USER/.kube/config

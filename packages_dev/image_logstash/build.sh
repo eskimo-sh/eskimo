@@ -58,11 +58,15 @@ docker exec -i logstash_template apt-get install -y zip > /tmp/logstash_build_lo
 fail_if_error $? "/tmp/logstash_build_log" -11
 
 echo " - Installing python"
-docker exec -i logstash_template apt-get -y install  python-dev python-six python-virtualenv python-pip cython > /tmp/logstash_build_log 2>&1
+docker exec -i logstash_template apt-get -y install  python3-dev python3-six python3-virtualenv python3-pip cython3 > /tmp/logstash_build_log 2>&1
 fail_if_error $? "/tmp/logstash_build_log" -5
 
+echo " - Switching python default version to 3.x"
+docker exec -i logstash_template update-alternatives --force --install /usr/bin/python python /usr/bin/python3.9 2 > /tmp/flink_build_log 2>&1
+fail_if_error $? "/tmp/flink_build_log" -5
+
 echo " - Installing required python packages"
-docker exec -i logstash_template pip install filelock furl > /tmp/logstash_build_log 2>&1
+docker exec -i logstash_template pip3 install filelock furl > /tmp/logstash_build_log 2>&1
 fail_if_error $? "/tmp/logstash_build_log" -12
 
 echo " - Installing GlusterFS client"

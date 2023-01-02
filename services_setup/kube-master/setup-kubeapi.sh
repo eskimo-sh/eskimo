@@ -87,7 +87,7 @@ fi
 if [[ ! -f /etc/k8s/audit-policy.yaml ]]; then
 
     cat > audit-policy.yaml <<EOF
-apiVersion: audit.k8s.io/v1beta1 # This is required.
+apiVersion: audit.k8s.io/v1 # This is required.
 kind: Policy
 # Don't generate audit events for all requests in RequestReceived stage.
 omitStages:

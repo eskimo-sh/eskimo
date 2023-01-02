@@ -158,8 +158,8 @@ set +e
 echo " - Downloading cni-plugins v$K8S_CNI_PLUGINS_VERSION"
 wget https://github.com/containernetworking/plugins/releases/download/v$K8S_CNI_PLUGINS_VERSION/cni-plugins-linux-amd64-v$K8S_CNI_PLUGINS_VERSION.tgz >> /tmp/k8s_install_log 2>&1
 if [[ $? != 0 ]]; then
-    echo " -> Failed to download kube-router v$K8S_ROUTER_VERSION from https://github.com/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/kube-router_"$K8S_ROUTER_VERSION"_linux_amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
+    echo " -> Failed to download cni-plugins v$K8S_ROUTER_VERSION from https://github.com/. Trying to download from niceideas.ch"
+    wget http://niceideas.ch/mes/cni-plugins-linux-amd64-v$K8S_CNI_PLUGINS_VERSION.tgz  >> /tmp/k8s_install_log 2>&1
     fail_if_error $? "/tmp/k8s_install_log" -1
 fi
 
@@ -173,6 +173,26 @@ mkdir /usr/local/lib/k8s/cni-plugins-v$K8S_CNI_PLUGINS_VERSION
 ln -s cni-plugins-v$K8S_CNI_PLUGINS_VERSION /usr/local/lib/k8s/cni-plugins
 rm -f cni-plugins-linux-amd64-v$K8S_CNI_PLUGINS_VERSION.tgz
 mv * /usr/local/lib/k8s/cni-plugins
+cd ..
+set +e
+
+
+echo " - Downloading cri-dockerd $CRI_DOCKER_VERSION"
+wget https://github.com/Mirantis/cri-dockerd/releases/download/v$CRI_DOCKER_VERSION/cri-dockerd-$CRI_DOCKER_VERSION.amd64.tgz >> /tmp/k8s_install_log 2>&1
+if [[ $? != 0 ]]; then
+    echo " -> Failed to download cri-dockerd-$CRI_DOCKER_VERSION from https://github.com/. Trying to download from niceideas.ch"
+    wget http://niceideas.ch/mes/cri-dockerd-$CRI_DOCKER_VERSION.amd64.tgz  >> /tmp/k8s_install_log 2>&1
+    fail_if_error $? "/tmp/k8s_install_log" -1
+fi
+
+echo " - Installing cri-dockerd $CRI_DOCKER_VERSION"
+set -e
+tar xvfz cri-dockerd-$CRI_DOCKER_VERSION.amd64.tgz  >> /tmp/k8s_install_log 2>&1
+mkdir -p /usr/local/lib/k8s/cri-dockerd-$CRI_DOCKER_VERSION
+cd cri-dockerd
+mv cri-dockerd /usr/local/lib/k8s/cri-dockerd-$CRI_DOCKER_VERSION/
+chmod +x /usr/local/lib/k8s/cri-dockerd-$CRI_DOCKER_VERSION/cri-dockerd
+ln -s cri-dockerd-$CRI_DOCKER_VERSION /usr/local/lib/k8s/cri-dockerd
 cd ..
 set +e
 

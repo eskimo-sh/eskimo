@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
@@ -34,59 +34,35 @@
 # Software.
 #
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-. $SCRIPT_DIR/common.sh "$@"
 
-echo "-- INSTALLING OPENJDK 8 FOR FLINK INTERPRETER  --------------------------------"
-
-if [ -z "$ZEPPELIN_VERSION" ]; then
-    echo "Need to set ZEPPELIN_VERSION environment variable before calling this script !"
+if [[ ! -f /etc/k8s/env.sh ]]; then
+    echo "Could not find /etc/k8s/env.sh"
     exit 1
 fi
 
-saved_dir=`pwd`
-function returned_to_saved_dir() {
-     cd $saved_dir
-}
-trap returned_to_saved_dir 15
-trap returned_to_saved_dir EXIT
-trap returned_to_saved_dir ERR
-
-
-echo " - Changing to temp directory"
-mkdir -p /tmp/zeppelin_setup_java8/
-cd /tmp/zeppelin_setup_java8/
-
-
-wget https://builds.openlogic.com/downloadJDK/openlogic-openjdk/${OPENLOGIC_JDK_8_VERSION}/openlogic-openjdk-${OPENLOGIC_JDK_8_VERSION}-linux-x64.tar.gz  > /tmp/zeppelin_install_log 2>&1
-if [[ $? != 0 ]]; then
-   echo " -> Failed to downolad openlogic-openjdk-${OPENLOGIC_JDK_8_VERSION}-linux-x64 from apache. Trying to download from niceideas.ch"
-   wget --no-check-certificate  https://www.niceideas.ch/mes/openlogic-openjdk-${OPENLOGIC_JDK_8_VERSION}-linux-x64.tar.gz >> /tmp/zeppelin_install_log 2>&1
-   fail_if_error $? "/tmp/zeppelin_install_log" -1
-fi
-
-echo " - Extracting openlogic-openjdk-${OPENLOGIC_JDK_8_VERSION}"
-tar -xvf openlogic-openjdk-${OPENLOGIC_JDK_8_VERSION}-linux-x64.tar.gz > /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log"
-
-echo " - Installing openlogic-openjdk-${OPENLOGIC_JDK_8_VERSION}"
-mkdir -p /usr/local/lib/jvm
-mv openlogic-openjdk-${OPENLOGIC_JDK_8_VERSION}-linux-64 /usr/local/lib/jvm/openjdk-8
-
-
-echo " - Cleaning up"
-rm -Rf /tmp/zeppelin_setup_java8/
-rm -Rf ~/.m2/
+. /etc/k8s/env.sh
 
 
 
 
+export ESKIMO_CRID_NETWORK_PLUGIN_DIR=/opt/cni/bin
+echo "   + Using ESKIMO_CRID_NETWORK_PLUGIN_DIR=$ESKIMO_CRID_NETWORK_PLUGIN_DIR"
 
-# Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container install SUCCESS"
+export ESKIMO_CRID_NETWORK_PLUGIN=cni
+echo "   + Using ESKIMO_CRID_NETWORK_PLUGIN=$ESKIMO_CRID_NETWORK_PLUGIN"
+
+export ESKIMO_CRID_CNI_CONF_DIR=/etc/cni/net.d/
+echo "   + Using ESKIMO_CRID_CNI_CONF_DIR=$ESKIMO_CRID_CNI_CONF_DIR"
 
 
 
 
+# from master env.sh
+echo "   + Using ESKIMO_CONTAINER_RUNTIME_ENDPOINT=$ESKIMO_CONTAINER_RUNTIME_ENDPOINT"
+#--container-runtime-endpoint unix:///var/run/cri-dockerd.sock
 
+echo "   + Using ESKIMO_POD_INFRA_CONTAINER_IMAGE=$ESKIMO_POD_INFRA_CONTAINER_IMAGE"
+#--pod-infra-container-image
 
+echo "   + Using ESKIMO_RUNTIME_REQUEST_TIMEOUT=$ESKIMO_RUNTIME_REQUEST_TIMEOUT"
+#--runtime-request-timeout

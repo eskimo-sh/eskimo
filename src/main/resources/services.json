@@ -448,7 +448,7 @@
       {
         "id" : "kubeDashboardLoginToken",
         "service": "kube-master",
-        "command": "/usr/local/bin/kubectl get secret `/usr/local/bin/kubectl get sa/eskimo -o jsonpath=\"{.secrets[0].name}\"` -o go-template=\"{{.data.token | base64decode}}\""
+        "command": "/usr/local/bin/kubectl get secret eskimo-secret -o go-template=\"{{.data.token | base64decode}}\""
       }
     ],
     "ui": {

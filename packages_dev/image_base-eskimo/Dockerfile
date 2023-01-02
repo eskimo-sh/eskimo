@@ -1,2 +1,2 @@
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 MAINTAINER Eskimo <eskimo@niceideas.ch>

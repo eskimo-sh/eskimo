@@ -55,16 +55,16 @@ rm -Rf /tmp/gluster_setup
 mkdir -p /tmp/gluster_setup
 cd /tmp/gluster_setup
 
-echo " - downgrading xfsprogs (last version is buggy)"
-
-echo "   + downloading xfsprogs_4.9.0+nmu1_amd64.deb from debian packages repository"
-
-wget http://ftp.us.debian.org/debian/pool/main/x/xfsprogs/xfsprogs_4.9.0+nmu1_amd64.deb> /tmp/gluster_install_log 2>&1
-fail_if_error $? "/tmp/gluster_install_log" -1
-
-echo "   + Installing xfsprogs"
-dpkg -i xfsprogs_4.9.0+nmu1_amd64.deb > /tmp/gluster_install_log 2>&1
-fail_if_error $? "/tmp/flink_install_log" -2
+#echo " - downgrading xfsprogs (last version is buggy)"
+#
+#echo "   + downloading xfsprogs_4.9.0+nmu1_amd64.deb from debian packages repository"
+#
+#wget http://ftp.us.debian.org/debian/pool/main/x/xfsprogs/xfsprogs_4.9.0+nmu1_amd64.deb> /tmp/gluster_install_log 2>&1
+#fail_if_error $? "/tmp/gluster_install_log" -1
+#
+#echo "   + Installing xfsprogs"
+#dpkg -i xfsprogs_4.9.0+nmu1_amd64.deb > /tmp/gluster_install_log 2>&1
+#fail_if_error $? "/tmp/flink_install_log" -2
 
 sudo rm -Rf /tmp/gluster_setup
 returned_to_saved_dir

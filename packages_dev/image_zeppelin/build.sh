@@ -71,9 +71,7 @@ docker exec -i zeppelin_template apt-get -y install  python3-dev python3-six pyt
 fail_if_error $? "/tmp/zeppelin_build_log" -5
 
 echo " - Switching python default version to 3.x"
-docker exec -i zeppelin_template update-alternatives --force --install /usr/bin/python python /usr/bin/python2.7 1 > /tmp/zeppelin_build_log 2>&1
-fail_if_error $? "/tmp/flink_build_log" -5
-docker exec -i zeppelin_template update-alternatives --force --install /usr/bin/python python /usr/bin/python3.7 2 > /tmp/zeppelin_build_log 2>&1
+docker exec -i zeppelin_template update-alternatives --force --install /usr/bin/python python /usr/bin/python3.9 2 > /tmp/zeppelin_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -5
 
 

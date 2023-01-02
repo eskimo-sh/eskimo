@@ -38,7 +38,7 @@ echoerr() { echo "$@" 1>&2; }
 
 echo " - Stopping K8s Eskimo Slave"
 
-SERVICE_TO_STOP=kubelet,kube-proxy
+SERVICE_TO_STOP=kube-proxy,kubelet,cri-dockerd
 
 for i in ${SERVICE_TO_STOP//,/ }; do
     PID_TO_KILL=`ps -e | grep $i | sed 's/ *\([0-9]*\).*/\1/'`

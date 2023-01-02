@@ -100,17 +100,12 @@ if [[ `kubectl get serviceaccount | grep $ADMIN_USER` != "" ]]; then
     sleep 3
 fi
 
-# It might have been recreated by a slave startup in the meantime (sleep 3 above)
-if [[ `kubectl get serviceaccount | grep $ADMIN_USER` == "" ]]; then
-    # XXX I might still have a race condition here, like the serviceaccount being recreated in between the check on the
-    # previous line and the recreation on the following line by a kube-slave restarting at the same time. I am living
-    # with it for now.
-    # FIXME eventually solve this (take a lock in gluster share ? The problem is the cleaning up when platform restarts
-    # a potential solution to this would be to check othe creaton timestamp and ignore lock files older than a few dozen
-    # of minutes)
-    echo "   + (Re-)Creating serviceaccount-$ADMIN_USER"
-    kubectl apply -f /etc/k8s/serviceaccount-$ADMIN_USER.yaml
-fi
+echo "   + (Re-)Creating serviceaccount-$ADMIN_USER"
+kubectl apply -f /etc/k8s/serviceaccount-$ADMIN_USER.yaml
+
+echo "   + (Re-)Creating serviceaccount-$ADMIN_USER-secret"
+kubectl apply -f /etc/k8s/serviceaccount-$ADMIN_USER-secret.yaml
+
 
 if [[ `kubectl get ClusterRoleBinding | grep default-$ADMIN_USER` == "" ]]; then
     echo "   + Creating ClusterRoleBinding default-$ADMIN_USER"
@@ -122,29 +117,16 @@ if [[ `kubectl get ClusterRoleBinding | grep kubernetes-dashboard-$ADMIN_USER` =
     kubectl apply -f /etc/k8s/clusterrolebinding-kubernetes-dashboard-$ADMIN_USER.yaml
 fi
 
-echo "   + Getting secret"
-
-for i in `seq 1 20`; do
-    sleep 1
-    SECRET=`kubectl get sa/$ADMIN_USER -o jsonpath="{.secrets[0].name}"`
-    if [[ "$SECRET" != "" ]]; then
-        break
-    fi
-done
-
-if [[ "$SECRET" == "" ]]; then
-    echo "User $ADMIN_USER has no secret (trying 20 seconds without success)"
-    exit 60
-fi
-
-# TODO
-# XXX note : to get the token to inject in e.g. the dashboard login, use :
-#kubectl get secret $SECRET -o go-template="{{.data.token | base64decode}}"
-#or even
-# kubectl get secret `kubectl get sa/$ADMIN_USER -o jsonpath="{.secrets[0].name}"` -o go-template="{{.data.token | base64decode}}"
 
 echo "   + Getting token"
-NEW_TOKEN=`kubectl describe secret $SECRET | grep token: | sed 's/token: *\(.*\)/\1/'`
+sleep 4
+NEW_TOKEN=`kubectl describe secret $ADMIN_USER-secret | grep token: | sed 's/token: *\(.*\)/\1/'`
+if [[ "$NEW_TOKEN" == "" ]]; then
+    echo " !! Failed to get new token"
+    echo "  -> this is the output of  kubectl get secrets"
+    kubectl get secrets
+    exit 51
+fi
 
 echo "   + Installing new token"
 sudo sed -i s/'token: .*'/"token: $NEW_TOKEN"/ /home/$ADMIN_USER/.kube/config

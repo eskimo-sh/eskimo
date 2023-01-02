@@ -95,9 +95,6 @@ export ESKIMO_KUBE_APISERVER="https://${MASTER_URL}:6443"
 # journal message level, 0 is debug, 2 is INFO
 export ESKIMO_KUBE_LOG_LEVEL="2"
 
-# logging to stderr means we get it in the systemd journal
-export ESKIMO_KUBE_LOGTOSTDERR="true"
-
 export ESKIMO_ALLOW_PRIVILEGED="true"
 
 # The certificates used by API server
@@ -111,3 +108,9 @@ export ESKIMO_KUBE_CLIENT_CA_FILE=/etc/k8s/shared/ssl/ca.pem
 export ESKIMO_KUBE_MASTER="$ESKIMO_KUBE_APISERVER"
 
 export ESKIMO_CLUSTER_NAME=eskimo
+
+export ESKIMO_CONTAINER_RUNTIME_ENDPOINT="unix:///var/run/cri-dockerd.sock"
+
+export ESKIMO_POD_INFRA_CONTAINER_IMAGE="kubernetes.registry:5000/k8s.gcr.io/pause"
+
+export ESKIMO_RUNTIME_REQUEST_TIMEOUT="5m"

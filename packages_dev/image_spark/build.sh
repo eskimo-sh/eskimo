@@ -57,16 +57,20 @@ docker exec -i spark_template bash -c ". /common/common.sh && install_scala"  > 
 fail_if_error $? "/tmp/spark_build_log" -4
 
 echo " - Installing python"
-docker exec -i spark_template apt-get -y install  python-dev python-six python-virtualenv python-pip > /tmp/spark_build_log 2>&1
+docker exec -i spark_template apt-get -y install  python3-dev python3-six python3-virtualenv python3-pip > /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -5
 
 echo " - Installing python elasticsearch and kafka clients and other utilities"
-docker exec -i spark_template pip install elasticsearch kafka-python > /tmp/spark_build_log 2>&1
+docker exec -i spark_template pip3 install elasticsearch kafka-python > /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -6
 
 echo " - Installing other python packages"
-docker exec -i spark_template pip install requests filelock > /tmp/spark_build_log 2>&1
+docker exec -i spark_template pip3 install requests filelock > /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -11
+
+echo " - Switching python default version to 3.x"
+docker exec -i spark_template update-alternatives --force --install /usr/bin/python python /usr/bin/python3.9 2 > /tmp/flink_build_log 2>&1
+fail_if_error $? "/tmp/flink_build_log" -5
 
 echo " - Installing GlusterFS client"
 docker exec -i spark_template apt-get -y install  glusterfs-client > /tmp/spark_build_log 2>&1

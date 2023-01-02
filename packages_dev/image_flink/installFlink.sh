@@ -136,13 +136,13 @@ echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
     <dependencies>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-kafka_$SCALA_VERSION</artifactId>
+            <artifactId>flink-connector-kafka</artifactId>
             <version>$FLINK_VERSION</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-              <artifactId>flink-connector-elasticsearch"$ES_VERSION_MAJOR_FOR_FLINK"_$SCALA_VERSION</artifactId>
+              <artifactId>flink-connector-elasticsearch"$ES_VERSION_MAJOR_FOR_FLINK"</artifactId>
             <version>$FLINK_VERSION</version>
             <scope>test</scope>
         </dependency>
@@ -153,17 +153,17 @@ echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-ml-core_2.12</artifactId>
+            <artifactId>flink-ml-core_$SCALA_VERSION</artifactId>
             <version>$FLINK_ML_VERSION</version>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-ml-iteration_2.12</artifactId>
+            <artifactId>flink-ml-iteration_$SCALA_VERSION</artifactId>
             <version>$FLINK_ML_VERSION</version>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-ml-lib_2.12</artifactId>
+            <artifactId>flink-ml-lib_$SCALA_VERSION</artifactId>
             <version>$FLINK_ML_VERSION</version>
           </dependency>
     </dependencies>

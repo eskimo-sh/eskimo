@@ -101,13 +101,31 @@ if [[ $? != 0 ]]; then
     exit 45
 fi
 
+
+echo "   + Starting cri-dockerd"
+/bin/bash -c '. /etc/k8s/cri-dockerd.env.sh && /usr/local/bin/cri-dockerd \
+  --cni-bin-dir $ESKIMO_CRID_NETWORK_PLUGIN_DIR \
+  --cni-conf-dir $ESKIMO_CRID_CNI_CONF_DIR \
+  --container-runtime-endpoint $ESKIMO_CONTAINER_RUNTIME_ENDPOINT \
+  --network-plugin $ESKIMO_CRID_NETWORK_PLUGIN \
+  --pod-infra-container-image $ESKIMO_POD_INFRA_CONTAINER_IMAGE \
+  --runtime-request-timeout $ESKIMO_RUNTIME_REQUEST_TIMEOUT > /var/log/kubernetes/cri-dockerd.log 2>&1' &
+cri_dockerd_pid=$!
+
+sleep 4
+if [[ `ps -e | grep $cri_dockerd_pid ` == "" ]]; then
+    echo "   + Failed to start cri-dockerd"
+    cat /var/log/kubernetes/cri-dockerd.log 2>&1
+    exit 61
+fi
+
+
 echo "   + Starting Kubelet"
 /bin/bash -c '. /etc/k8s/kubelet.env.sh && /usr/local/bin/kubelet \
   --address=$ESKIMO_KUBELET_ADDRESS \
   --hostname-override=$ESKIMO_KUBELET_HOSTNAME \
   --cluster-dns=$ESKIMO_CLUSTER_DNS \
   --cluster-domain=$ESKIMO_CLUSTER_DNS_DOMAIN \
-  --logtostderr=$ESKIMO_KUBE_LOGTOSTDERR \
   --tls-cert-file=$ESKIMO_KUBE_TLS_CERT_FILE \
   --tls-private-key-file=$ESKIMO_KUBE_TLS_PRIVATE_KEY \
   --client-ca-file=$ESKIMO_KUBE_CLIENT_CA_FILE \
@@ -115,11 +133,9 @@ echo "   + Starting Kubelet"
   --cgroup-driver $ESKIMO_KUBELET_CGROUP_DRIVER \
   --fail-swap-on=$ESKIMO_KUBELET_FAIL_SWAP_ON \
   --bootstrap-kubeconfig=$ESKIMO_BOOTSTRAP_KUBECONFIG \
-  --cni-bin-dir=$ESKIMO_KUBELET_NETWORK_PLUGIN_DIR \
-  --network-plugin=$ESKIMO_KUBELET_NETWORK_PLUGIN \
-  --cni-conf-dir=$ESKIMO_KUBELET_CNI_CONF_DIR \
-  --pod-infra-container-image $ESKIMO_KUBELET_POD_INFRA_CONTAINER_IMAGE \
-  --runtime-request-timeout $ESKIMO_KUBELET_RUNTIME_REQUEST_TIMEOUT \
+  --pod-infra-container-image $ESKIMO_POD_INFRA_CONTAINER_IMAGE \
+  --runtime-request-timeout $ESKIMO_RUNTIME_REQUEST_TIMEOUT \
+  --container-runtime-endpoint $ESKIMO_CONTAINER_RUNTIME_ENDPOINT \
   --kubeconfig=$ESKIMO_KUBELET_KUBECONFIG > /var/log/kubernetes/kubelet.log 2>&1' &
 kubelet_pid=$!
 
@@ -178,6 +194,12 @@ delete_k8s_slave_lock_file
 
 echo "   + Entering monitoring loop"
 while : ; do
+
+  if [[ `ps -e | grep $cri_dockerd_pid ` == "" ]]; then
+        echo "   + Failed to run cri-dockerd"
+        tail -n 50 /var/log/kubernetes/cri-dockerd.log 2>&1
+        exit 62
+    fi
 
     if [[ `ps -e | grep $kubelet_pid ` == "" ]]; then
         echo "   + Failed to run Kubernetes Kubelet"
