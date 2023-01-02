@@ -34,8 +34,6 @@
 # Software.
 #
 
-export K8S_VERSION=1.23.5
-
 . /etc/eskimo_topology.sh
 
 function fail_if_error(){
@@ -47,11 +45,6 @@ function fail_if_error(){
 }
 
 echo "-- INSTALLING KUBERNETES ------------------------------------------------------"
-
-if [ -z "$K8S_VERSION" ]; then
-    echo "Need to set K8S_VERSION environment variable before calling this script !"
-    exit 1
-fi
 
 saved_dir=`pwd`
 function returned_to_saved_dir() {
@@ -65,6 +58,17 @@ trap returned_to_saved_dir ERR
 echo " - Changing to temp directory"
 sudo rm -Rf /tmp/kube_setup > /tmp/kube_install_log 2>&1
 mkdir -p /tmp/kube_setup
+
+echo " - Getting eskimo Kube package version"
+export ESKIMO_KUBE_PACKAGE=`ls -1 eskimo_kube_*.tar.gz`
+export K8S_VERSION=`basename -s .tar.gz $ESKIMO_KUBE_PACKAGE  | awk -F"_" '{ print $3 }'`
+
+if [[ "$K8S_VERSION" == "" ]]; then
+    echo "Failed to get Eskimo Kube package version"
+    exit 101
+else
+    echo "  + Eskimo Kube package version is $K8S_VERSION"
+fi
 
 mv eskimo_kube_$K8S_VERSION*.tar.gz /tmp/kube_setup/eskimo_kube_$K8S_VERSION.tar.gz
 
@@ -123,14 +127,6 @@ for i in `ls -1 /usr/local/lib/k8s/kubernetes/client/bin/`; do
         sudo ln -s /usr/local/lib/k8s/kubernetes/client/bin/$i /usr/local/bin/$i
     fi
 done
-
-# Deprecated
-#echo "   + Flannel"
-#for i in `ls -1 /usr/local/lib/k8s/flannel/bin/`; do
-#    if [[ ! -f /usr/local/bin/$i ]]; then
-#        sudo ln -s /usr/local/lib/k8s/flannel/bin/$i /usr/local/bin/$i
-#    fi
-#done
 
 echo "   + Kube-router"
 for i in `ls -1 /usr/local/lib/k8s/kube-router/bin/`; do
