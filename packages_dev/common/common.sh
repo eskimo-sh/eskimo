@@ -49,7 +49,7 @@ export HADOOP_MAJOR_VERSION=3.2
 export SPARK_VERSION=3.2.3
 export SPARK_VERSION_MAJOR=3.2
 
-export K8S_VERSION=1.26.0
+export K8S_VERSION=1.25.5
 export CFSSL_VERSION=1.6.3
 # KEEPING OLD VERSION OF ETCD since later ones have the problem of initial-cluster repeating last node for all keys
 # instead of taking the actual keys

@@ -85,10 +85,10 @@ public class ProxyConfiguration implements WebSocketConfigurer {
     private int maxConnections = 50;
 
     @Value ("${proxy.readTimeout:30000}")
-    private int readTimeout = 30000;
+    private int readTimeout = 60000;
 
     @Value ("${proxy.connectTimeout:10000}")
-    private int connectTimeout = 10000;
+    private int connectTimeout = 12000;
 
     @Value ("${proxy.connectionRequestTimeout:20000}")
     private int connectionRequestTimeout = 20000;

@@ -326,7 +326,7 @@ public class ProxyServlet extends HttpServlet {
 
         setXForwardedForHeader(servletRequest, proxyRequest);
 
-        HttpResponse proxyResponse = null;
+        ClassicHttpResponse proxyResponse = null;
         try {
             // Execute the request
             proxyResponse = doExecute(servletRequest, proxyRequest);
@@ -359,9 +359,8 @@ public class ProxyServlet extends HttpServlet {
         } finally {
             // make sure the entire entity was consumed, so the connection is released
             if (proxyResponse != null) {
-                if (proxyResponse instanceof HttpEntityContainer) {
-                    EntityUtils.consumeQuietly(((HttpEntityContainer)proxyResponse).getEntity());
-                }
+                EntityUtils.consumeQuietly(proxyResponse.getEntity());
+                proxyResponse.close();
             }
             //Note: Don't need to close servlet outputStream:
             // http://stackoverflow.com/questions/1159168/should-one-call-close-on-httpservletresponse-getoutputstream-getwriter
@@ -394,7 +393,7 @@ public class ProxyServlet extends HttpServlet {
         }
     }
 
-    protected HttpResponse doExecute(HttpServletRequest servletRequest, ClassicHttpRequest proxyRequest) throws IOException {
+    protected ClassicHttpResponse doExecute(HttpServletRequest servletRequest, ClassicHttpRequest proxyRequest) throws IOException {
         if (doLog) {
             log("proxy " + servletRequest.getMethod() + " uri: " + servletRequest.getRequestURI() + " -- " +
                     proxyRequest.getRequestUri());
