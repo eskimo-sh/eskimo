@@ -57,6 +57,10 @@ echo " - Installing scala"
 docker exec -i kafka_template bash -c ". /common/common.sh && install_scala" > /tmp/kafka_build_log 2>&1
 fail_if_error $? "/tmp/kafka_build_log" -4
 
+echo " - Installing GlusterFS client"
+docker exec -i kafka_template apt-get -y install  glusterfs-client > /tmp/kafka_build_log 2>&1
+fail_if_error $? "/tmp/kafka_build_log" -10
+
 #echo " - Installing python"
 #docker exec -i kafka_template apt-get -y install  python-dev python-six python-virtualenv python-pip >> /tmp/kafka_build_log 2>&1
 #fail_if_error $? "/tmp/kafka_build_log" -5

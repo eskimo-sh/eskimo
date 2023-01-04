@@ -118,6 +118,10 @@ if [[ `tail -n 1 kafka_install_log` != " - In container config SUCCESS" ]]; then
     exit 103
 fi
 
+echo " - Copying inContainerMountGluster.sh script"
+docker_cp_script inContainerMountGluster.sh sbin kafka kafka_install_log
+
+
 #echo " - TODO"
 #docker exec -it kafka TODO
 

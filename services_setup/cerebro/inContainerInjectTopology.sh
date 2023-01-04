@@ -39,7 +39,7 @@ set -e
 echo " - Loading Topology"
 . /etc/eskimo_topology.sh
 
-echo " - Configuring ElasticSearc target"
+echo " - Configuring Cerebro target"
 sed -i -n '1h;1!H;${;g;s/'\
 '  #{\n'\
 '  #  host = \"http:\/\/localhost:9200\"\n'\
@@ -55,10 +55,10 @@ sed -i -n '1h;1!H;${;g;s/'\
 
 
 echo " - Preparing JVM Opts configuration file"
-if [[ $MEMORY_ELASTICSEARCH != "" ]]; then
+if [[ $MEMORY_CEREBRO != "" ]]; then
     bash -c "echo \"# JVM Memory options\" > /usr/local/lib/cerebro/conf/JVM_OPTS.sh"
-    bash -c "echo \"export JAVA_OPTS='-Xmx"$MEMORY_CEREBRO"m -Xms"$MEMORY_CEREBRO"m'\" > /usr/local/lib/cerebro/conf/JVM_OPTS.sh"
+    bash -c "echo \"export JAVA_OPTS='-Xmx"$MEMORY_CEREBRO"m'\" > /usr/local/lib/cerebro/conf/JVM_OPTS.sh"
 else
     bash -c "echo \"# JVM Memory options\" > /usr/local/lib/cerebro/conf/JVM_OPTS.sh"
-    bash -c "echo \"export JAVA_OPTS='-Xmx256m -Xms256m'\" > /usr/local/lib/cerebro/conf/JVM_OPTS.sh"
+    bash -c "echo \"export JAVA_OPTS='-Xmx256m'\" > /usr/local/lib/cerebro/conf/JVM_OPTS.sh"
 fi

@@ -53,6 +53,12 @@ if [[ -f /usr/local/lib/kafka/config/eskimo-memory.opts && `cat /usr/local/lib/k
     echo " - Using overriden memory settings : $KAFKA_HEAP_OPTS"
 fi
 
+echo " - Mounting logstash gluster shares"
+sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh kafka_data /var/lib/kafka
+
+echo " - Creating kafka data directory /var/lib/kafka/$ESKIMO_POD_NAME"
+sudo /bin/mkdir -p /var/lib/kafka/$ESKIMO_POD_NAME
+
 echo " - Changing rights of folder /var/lib/kafka"
 sudo /bin/chown -R kafka /var/lib/kafka
 sudo /bin/chmod 755 /var/lib/kafka
@@ -87,7 +93,7 @@ for i in `seq 1 20`; do
 
     if [[ `tail -800 /var/log/kafka/server.log  | grep -E "doesn't match stored clusterId"` != "" ]]; then
         echo " - Detected cluster mismatch. Wiping out kafka folder !!!"
-        rm -Rf /var/lib/kafka/*
+        rm -Rf /var/lib/kafka/$ESKIMO_POD_NAME/*
         mv /var/log/kafka/server.log /var/log/kafka/server.log.backup-post-wipeout
 
         sleep 1

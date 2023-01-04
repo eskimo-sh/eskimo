@@ -56,6 +56,9 @@ if [[ $2 == "" ]]; then
 fi
 export OWNER=$3
 
+# making sure mount point doesn't end with slash
+export MOUNT_POINT=${MOUNT_POINT%/}
+
 echo " - inContainerMountGluster.sh - will now mount $VOLUME to $MOUNT_POINT"
 
 echo "   + Loading topology"
@@ -107,7 +110,9 @@ if [[ `cat /etc/mtab | grep $MOUNT_POINT | grep gluster` == "" ]]; then
         sleep 1
         let cnt=cnt+1
         if [[ $cnt -gt 5 ]]; then
-            echo "Couldn't find $MOUNT_POINT in /etc/mtab in 5 seconds. Crashing !"
+            echo "!! Couldn't find $MOUNT_POINT in /etc/mtab in 5 seconds. Crashing !"
+            echo "-> dump of /etc/mtab is :"
+            cat /etc/mtab
             exit 8
         fi
     done
