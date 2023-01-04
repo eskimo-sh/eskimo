@@ -115,6 +115,14 @@ if [[ `kubectl get serviceaccount | grep $ADMIN_USER` == "" ]]; then
 fi
 
 
+# recreating on master
+if [[ `kubectl get secret | grep $ADMIN_USER` != "" ]]; then
+    echo "   + Deleting secret-$ADMIN_USER"
+    kubectl delete secret $ADMIN_USER
+    sleep 3
+fi
+
+
 echo "   + (Re-)Creating serviceaccount-$ADMIN_USER-secret"
 kubectl apply -f /etc/k8s/serviceaccount-$ADMIN_USER-secret.yaml
 # checking creation for 10 seconds

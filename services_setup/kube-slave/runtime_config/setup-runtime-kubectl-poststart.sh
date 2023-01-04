@@ -98,6 +98,10 @@ export HOME=/root
 if [[ `kubectl get serviceaccount | grep $ADMIN_USER` == "" ]]; then
     echo "   + Creating serviceaccount-$ADMIN_USER"
     kubectl apply -f /etc/k8s/serviceaccount-$ADMIN_USER.yaml
+    sleep 2
+fi
+
+if [[ `kubectl get secret | grep $ADMIN_USER` == "" ]]; then
     echo "   + Creating serviceaccount-$ADMIN_USER-secret"
     kubectl apply -f /etc/k8s/serviceaccount-$ADMIN_USER-secret.yaml
 fi
