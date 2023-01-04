@@ -1201,7 +1201,7 @@
     "ui": {
       "kubeProxy": true,
       "__comment_urlTemplate": "Going through Kubectl proxy.",
-      "urlTemplate": "cerebro/api/v1/namespaces/default/services/cerebro:31900/proxy/#/overview?host=http:%2F%2Felasticsearch.default.svc.cluster.eskimo:9200",
+      "urlTemplate": "cerebro/api/v1/namespaces/default/services/cerebro:31900/proxy/#!/overview?host=Eskimo",
       "__comment_proxyTargetPort": "Kubectl proxy target port",
       "proxyTargetPort" : 8001,
       "waitTime": 5000,
@@ -1225,11 +1225,6 @@
         "commentPrefix": "#",
         "filesystemService": "cerebro",
         "properties": [
-          {
-            "name": "Xms",
-            "comment": "Startup Heap Size for Cerebro java process\n[ESKIMO_DEFAULT] means memory allocator will decide of Cerebro memory share.",
-            "defaultValue": "[ESKIMO_DEFAULT]"
-          },
           {
             "name": "Xmx",
             "comment": "Maximum Heap Size for Cerebro java process\n[ESKIMO_DEFAULT] means memory allocator will decide of Cerebro memory share.",
