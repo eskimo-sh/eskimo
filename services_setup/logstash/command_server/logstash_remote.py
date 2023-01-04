@@ -34,10 +34,9 @@
 
 # requires :
 # apt-get install python-pip
-# pip install furl
 
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-import SocketServer
+from http.server import BaseHTTPRequestHandler,HTTPServer
+import socketserver
 import logging
 import sys
 import signal
@@ -79,12 +78,14 @@ class RequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         LOG.info('- Got POST request: %s', self.path)
 
-        f = furl(self.path)
         fullArgs = self.rfile.read(int(self.headers['Content-Length']))
+        # FIXME remove me
+        LOG.info('- fullArgs raw: %s', fullArgs)
+        LOG.info('- fullArgs raw: %s', fullArgs.decode('utf-8'))
 
         if 'stdin_file' in self.headers:
             stdin_file = self.headers['stdin_file']
-            command_line = "/usr/local/sbin/call_logstash.sh --std_in {0} {1} ".format(stdin_file, fullArgs)
+            command_line = "/usr/local/sbin/call_logstash.sh --std_in {0} {1} ".format(stdin_file, fullArgs.decode('utf-8'))
         else:
             stdin_file = None
             command_line = "/usr/local/sbin/call_logstash.sh {0} ".format(fullArgs)
@@ -135,8 +136,8 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         return
 
-SocketServer.TCPServer.allow_reuse_address = True
-#httpd = SocketServer.TCPServer(("", PORT), RequestHandler)
+socketserver.TCPServer.allow_reuse_address = True
+#httpd = socketserver.TCPServer(("", PORT), RequestHandler)
 httpd = HTTPServer(('', PORT), RequestHandler)
 
 def signal_handler(sig, frame):
