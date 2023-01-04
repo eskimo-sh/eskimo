@@ -181,8 +181,18 @@
         },
         {
           "type" : "PLAIN",
-          "source" : "this._websocket(this._url)",
-          "target" : "this._websocket(this._url.replace(\"{APP_ROOT_NO_CONTEXT}/grafana\", \"{APP_ROOT}/ws/grafana\").replace(\"{APP_ROOT}/grafana\", \"{APP_ROOT}/ws/grafana\"))"
+          "source" : "appUrl: `${window.location.origin}${config.appSubUrl}`",
+          "target" : "appUrl: `${window.location.origin}${config.appSubUrl}`.replace(\"{APP_ROOT_NO_CONTEXT}/grafana\", \"{APP_ROOT}/ws/grafana\").replace(\"{APP_ROOT}/grafana\", \"{APP_ROOT}/ws/grafana\")"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "appUrl: `${window.location.origin}${s.v.appSubUrl}`",
+          "target" : "appUrl: `${window.location.origin}${s.v.appSubUrl}`.replace(\"{APP_ROOT_NO_CONTEXT}/grafana\", \"{APP_ROOT}/ws/grafana\").replace(\"{APP_ROOT}/grafana\", \"{APP_ROOT}/ws/grafana\")"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "appUrl:`${window.location.origin}${s.v.appSubUrl}`",
+          "target" : "appUrl:`${window.location.origin}${s.v.appSubUrl}`.replace(\"{APP_ROOT_NO_CONTEXT}/grafana\", \"{APP_ROOT}/ws/grafana\").replace(\"{APP_ROOT}/grafana\", \"{APP_ROOT}/ws/grafana\")"
         },
         {
           "type" : "PLAIN",
