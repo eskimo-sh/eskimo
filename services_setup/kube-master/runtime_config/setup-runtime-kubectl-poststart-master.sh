@@ -134,6 +134,8 @@ for i in `seq 1 10`; do
 done
 if [[ `kubectl get secret | grep $ADMIN_USER` == "" ]]; then
     echo "Could not successfully find secret for $ADMIN_USER after 10 seconds"
+    echo "Result of 'kubectl get secret' is :"
+    kubectl get secret
     exit 61
 fi
 

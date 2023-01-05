@@ -65,14 +65,6 @@ if [ -z "$ES_VERSION_MAJOR_FOR_FLINK" ]; then
     exit 1
 fi
 
-saved_dir=`pwd`
-function returned_to_saved_dir() {
-     cd $saved_dir
-}
-trap returned_to_saved_dir 15
-trap returned_to_saved_dir EXIT
-trap returned_to_saved_dir ERR
-
 echo " - Changing to temp directory"
 rm -Rf /tmp/flink_setup
 mkdir -p /tmp/flink_setup
@@ -87,9 +79,13 @@ fail_if_error $? "/tmp/flink_install_log" -2
 echo " - Downloading flink-$FLINK_VERSION"
 wget https://www-eu.apache.org/dist/flink/flink-$FLINK_VERSION/flink-$FLINK_VERSION-bin-scala_$SCALA_VERSION.tgz > /tmp/flink_install_log 2>&1
 if [[ $? != 0 ]]; then
-    echo " -> Failed to downolad flink-$FLINK_VERSION from http://www.apache.org/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/flink-$FLINK_VERSION-bin-scala_$SCALA_VERSION.tgz > /tmp/flink_install_log 2>&1
-    fail_if_error $? "/tmp/flink_install_log" -1
+    echo " -> Failed to downolad flink-$FLINK_VERSION from http://www.apache.org/. Trying archive site"
+    wget https://archive.apache.org/dist/flink/flink-$FLINK_VERSION/flink-$FLINK_VERSION-bin-scala_$SCALA_VERSION.tgz > /tmp/flink_install_log 2>&1
+    if [[ $? != 0 ]]; then
+        echo " -> Failed to downolad flink-$FLINK_VERSION from http://www.apache.org/. Trying to download from niceideas.ch"
+        wget http://niceideas.ch/mes/flink-$FLINK_VERSION-bin-scala_$SCALA_VERSION.tgz > /tmp/flink_install_log 2>&1
+        fail_if_error $? "/tmp/flink_install_log" -1
+    fi
 fi
 
 echo " - Extracting flink-$FLINK_VERSION"
@@ -115,7 +111,11 @@ mv flink-csv-$FLINK_VERSION.jar flink-$FLINK_VERSION/lib/
 mv flink-json-$FLINK_VERSION.jar flink-$FLINK_VERSION/lib/
 mv flink-shaded-hadoop-2-uber-$FLINK_HADOOP_VERSION.jar flink-$FLINK_VERSION/lib/
 
+#echo " - HACK - fixing flink dist for zeppelin"
+#mv flink-$FLINK_VERSION/lib/flink-dist-$FLINK_VERSION.jar flink-$FLINK_VERSION/lib/flink-dist_$SCALA_VERSION-$FLINK_VERSION.jar
+
 echo " - Creating a dummy pom.xml to proceed with downloading kafka, elasticsearch and kubernetes connectors"
+rm -Rf /tmp/flink_download_connectors
 mkdir /tmp/flink_download_connectors
 cd /tmp/flink_download_connectors
 echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
@@ -136,13 +136,15 @@ echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
     <dependencies>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-kafka</artifactId>
+            <!--<artifactId>flink-connector-kafka</artifactId>-->
+            <artifactId>flink-connector-kafka_$SCALA_VERSION</artifactId>
             <version>$FLINK_VERSION</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-              <artifactId>flink-connector-elasticsearch"$ES_VERSION_MAJOR_FOR_FLINK"</artifactId>
+              <!--<artifactId>flink-connector-elasticsearch"$ES_VERSION_MAJOR_FOR_FLINK"</artifactId>-->
+              <artifactId>flink-connector-elasticsearch"$ES_VERSION_MAJOR_FOR_FLINK"_$SCALA_VERSION</artifactId>
             <version>$FLINK_VERSION</version>
             <scope>test</scope>
         </dependency>
@@ -208,7 +210,6 @@ fi
 
 sudo rm -Rf /tmp/flink_download_connectors
 sudo rm -Rf /tmp/flink_setup
-returned_to_saved_dir
 
 echo " - Cleaning up maven repository"
 sudo rm -Rf $HOME/.m2/repository

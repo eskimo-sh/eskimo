@@ -155,7 +155,7 @@ sudo sed -i -n '1h;1!H;${;g;s/'\
 '          \"value\": \"python\",'\
 '/'\
 '          \"name\": \"PYSPARK_PYTHON\",\n'\
-'          \"value\": \"python3.7\",'\
+'          \"value\": \"python3.9\",'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
 sudo sed -i -n '1h;1!H;${;g;s/'\
@@ -163,7 +163,7 @@ sudo sed -i -n '1h;1!H;${;g;s/'\
 '          \"value\": \"python\",'\
 '/'\
 '          \"name\": \"PYSPARK_DRIVER_PYTHON\",\n'\
-'          \"value\": \"python3.7\",'\
+'          \"value\": \"python3.9\",'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
 sudo sed -i -n '1h;1!H;${;g;s/'\

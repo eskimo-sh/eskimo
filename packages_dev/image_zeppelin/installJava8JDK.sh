@@ -71,7 +71,7 @@ fail_if_error $? "/tmp/zeppelin_install_log"
 
 echo " - Installing openlogic-openjdk-${OPENLOGIC_JDK_8_VERSION}"
 mkdir -p /usr/local/lib/jvm
-mv openlogic-openjdk-${OPENLOGIC_JDK_8_VERSION}-linux-64 /usr/local/lib/jvm/openjdk-8
+mv openlogic-openjdk-${OPENLOGIC_JDK_8_VERSION}-linux-x64 /usr/local/lib/jvm/openjdk-8
 
 
 echo " - Cleaning up"
