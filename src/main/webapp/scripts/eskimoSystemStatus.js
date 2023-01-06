@@ -689,6 +689,9 @@ eskimo.SystemStatus = function() {
             return false;
         })
 
+        // avoid horizontal scrollbar
+        $statusMonitoringDashboardFrameContents.find(".scrollbar-view").css("overflow-x", "hidden");
+
         setTimeout (that.monitoringDashboardFrameTamper, STATUS_REFRESH_PERIOD_MS);
     };
 

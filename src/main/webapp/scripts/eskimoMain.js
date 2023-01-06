@@ -464,6 +464,8 @@ eskimo.Main = function() {
                 if (!serviceUp || !that.getServices().isServiceAvailable(service)) {
                     $(this).attr("class", "side-nav-item folder-menu-items disabled");
                     that.getServices().handleServiceHiding(service);
+                } else if ($(this).hasClass("menuitem-active")) {
+                    $(this).attr("class", "side-nav-item folder-menu-items menuitem-active");
                 } else {
                     $(this).attr("class", "side-nav-item folder-menu-items");
                 }
