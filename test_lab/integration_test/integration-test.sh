@@ -1101,13 +1101,13 @@ create_kafka_topics() {
 
     echo_date " - Creating topic berka-payments"
     vagrant ssh -c \
-        "/usr/local/bin/kafka-topics.sh --create --replication-factor 1 --partitions $NBR_PARTITIONS --zookeeper localhost:2181 --topic berka-payments" \
+        "/usr/local/bin/kafka-topics.sh --create --if-not-exists --replication-factor 1 --partitions $NBR_PARTITIONS --zookeeper localhost:2181 --topic berka-payments" \
         $TARGET_MASTER_VM \
         >> /tmp/integration-test.log 2>&1
 
     echo_date " - Creating topic berka-payments-aggregate"
     vagrant ssh -c \
-        "/usr/local/bin/kafka-topics.sh --create --replication-factor 1 --partitions $NBR_PARTITIONS --zookeeper localhost:2181 --topic berka-payments-aggregate" \
+        "/usr/local/bin/kafka-topics.sh --create --if-not-exists --replication-factor 1 --partitions $NBR_PARTITIONS --zookeeper localhost:2181 --topic berka-payments-aggregate" \
         $TARGET_MASTER_VM \
         >> /tmp/integration-test.log 2>&1
 }
@@ -1346,6 +1346,23 @@ run_zeppelin_flink_kafka() {
     run_zeppelin_pararaph "/Flink Integration Kafka" 6
 }
 
+get_ES_stack_version() {
+
+    if [[ -f ../../packages_dev/common/common.sh ]]; then
+        eval `cat ../../packages_dev/common/common.sh | grep "ES_VERSION="`
+    fi
+
+    if [[ "$ES_VERSION" != "" ]]; then
+        echo_date " - Using ES Stack version from packages_dev/common/common.sh : $ES_VERSION"
+
+    else
+
+        export ES_VERSION=8.5.3
+        echo_date " ! Could not get ES Stack version from packages_dev/common/common.sh, Using hardcoded $ES_VERSION"
+
+    fi
+}
+
 run_zeppelin_other_notes() {
 
     # Run all paragraphs from all other notebooks
@@ -1501,7 +1518,7 @@ load_kibana_flight_data() {
     curl  \
             -b $SCRIPT_DIR/cookies \
             -m 3600 \
-            -H "kbn-version: 8.1.2" \
+            -H "kbn-version: $ES_VERSION" \
             -H "Content-Length: 0" \
             -H "Content-Type: application/json" \
             -H "Host: $BOX_IP" \
@@ -1532,7 +1549,7 @@ prepare_demo() {
     curl  \
             -b $SCRIPT_DIR/cookies \
             -m 3600 \
-            -H "kbn-version: 8.1.2" \
+            -H "kbn-version: $ES_VERSION" \
             -H "Content-Length: 0" \
             -H "Content-Type: application/json" \
             -H "Host: $BOX_IP" \
@@ -1554,7 +1571,7 @@ prepare_demo() {
     curl  \
             -b $SCRIPT_DIR/cookies \
             -m 3600 \
-            -H "kbn-version: 8.1.2" \
+            -H "kbn-version: $ES_VERSION" \
             -H "Content-Length: 0" \
             -H "Content-Type: application/json" \
             -H "Host: $BOX_IP" \
@@ -1578,7 +1595,7 @@ prepare_demo() {
     curl  \
             -b $SCRIPT_DIR/cookies \
             -m 3600 \
-            -H "kbn-version: 8.1.2" \
+            -H "kbn-version: $ES_VERSION" \
             -H "Content-Length: 0" \
             -H "Content-Type: application/json" \
             -H "Host: $BOX_IP" \
@@ -1829,6 +1846,10 @@ wait_all_services_up
 
 if [[ "$RUN_DATA_LOAD" != "" ]]; then
     run_zeppelin_data_load
+fi
+
+if [[ "$RUN_NOTEBOOK_TESTS" != "" || "$RUN_OTHER_TESTS" != "" ]]; then
+    get_ES_stack_version
 fi
 
 if [[ "$RUN_NOTEBOOK_TESTS" != "" ]]; then
