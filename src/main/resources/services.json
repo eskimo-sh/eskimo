@@ -499,6 +499,11 @@
         },
         {
           "type" : "PLAIN",
+          "source" : "isAuthenticationEnabled(x){return x.httpsMode}",
+          "target" : "isAuthenticationEnabled(x){return true}"
+        },
+        {
+          "type" : "PLAIN",
           "source" : "isAuthenticationEnabled(S){return S.httpsMode}",
           "target" : "isAuthenticationEnabled(S){return true}"
         },
@@ -520,6 +525,11 @@
         {
           "type" : "PLAIN",
           "source" : ",S.secure&&(v+=\"secure;\"),S.sameSite||(S.sameSite=\"Lax\"),v+=\"sameSite=\"+S.sameSite+\";\"",
+          "target" : ""
+        },
+        {
+          "type" : "PLAIN",
+          "source" : ",x.secure&&(g+=\"secure;\"),x.sameSite||(x.sameSite=\"Lax\"),g+=\"sameSite=\"+x.sameSite+\";\"",
           "target" : ""
         }
 
