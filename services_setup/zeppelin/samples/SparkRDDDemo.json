@@ -60,7 +60,7 @@
       "$$hashKey": "object:75142"
     },
     {
-      "text": "%sh\n\n#remove existing copies of dataset from HDFS\nhadoop fs -rm  /tmp/kddcup.data_10_percent.gz\n\n#Download the data and place it into the /tmp folder of Hortonworks Sandbox\nwget http://kdd.ics.uci.edu/databases/kddcup99/kddcup.data_10_percent.gz -O /tmp/kddcup.data_10_percent.gz\n\n# Copying it to gluster shared /var/lib/spark/data\nmkdir /var/lib/spark/data/tmp\nmv /tmp/kddcup.data_10_percent.gz /var/lib/spark/data/tmp/\n\n\n",
+      "text": "%sh\n\n#remove existing copies of dataset from HDFS\n#hadoop fs -rm  /tmp/kddcup.data_10_percent.gz\n\n#Download the data and place it into the /tmp folder of Hortonworks Sandbox\nwget https://github.com/IndexFziQ/ML-ATIC/raw/master/kddcup.data_10_percent.gz -O /tmp/kddcup.data_10_percent.gz\n\n# Copying it to gluster shared /var/lib/spark/data\nmkdir -p /var/lib/spark/data/tmp\nmv /tmp/kddcup.data_10_percent.gz /var/lib/spark/data/tmp/\n\n\n",
       "user": "anonymous",
       "dateUpdated": "2022-06-07T21:36:58+0000",
       "progress": 0,
