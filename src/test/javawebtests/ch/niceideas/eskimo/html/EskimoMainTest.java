@@ -54,6 +54,11 @@ public class EskimoMainTest extends AbstractWebTest {
 
         // redefine constructor
         js("eskimo.Alert = function(){ this.initialize = function(){};  };");
+        js("eskimo.Menu = function(){ " +
+                "    this.initialize = function(){};" +
+                "    this.adaptMenuToUserRole = function(){};" +
+                "    this.setActiveMenuEntry = function(){};" +
+                "};");
         js("eskimo.Setup = function(){ this.initialize = function(){};  };");
         js("eskimo.NodesConfig = function(){ this.initialize = function(){};  };");
         js("eskimo.Notifications = function(){ this.initialize = function(){}; };");
@@ -163,69 +168,6 @@ public class EskimoMainTest extends AbstractWebTest {
         js("eskimoMain.scheduleStopOperationInProgress();");
 
         assertEquals(false, js("return eskimoMain.isOperationInProgress()"));
-    }
-
-    @Test
-    public void testHandleSetupCompletedAndNotCompleted() throws Exception {
-
-        //Thread.sleep(100000);
-
-        js("document.getElementById('hoe-left-panel').remove(); ");
-        // the test stuff messes with the page loading below (twice in dom)
-        js("$('#hoeapp-wrapper').load('html/eskimoMain.html');");
-
-        waitForElementIdInDOM("leftside-menu-container");
-
-        js("eskimoMain.handleSetupCompleted()");
-
-        js("window.allDisabled = true;");
-        js("window.allEnabled = true;");
-
-        js("" +
-                " $('.side-nav-item').each(function() {\n" +
-                "     if ($(this).attr('class') == 'side-nav-item') {\n" +
-                "         allDisabled=false;\n" +
-                "     }\n" +
-                "     if ($(this).attr('class') == 'side-nav-item disabled') {\n" +
-                "         allEnabled=false;\n" +
-                "     }\n" +
-                "});");
-
-        //Thread.sleep(100000);
-
-        assertJavascriptEquals("false", "allDisabled");
-        assertJavascriptEquals("true", "allEnabled");
-
-        js("eskimoMain.handleSetupNotCompleted()");
-
-        js("allEnabled = true;");
-
-        js("" +
-                " $('.side-nav-item').each(function() {\n" +
-                "     if ($(this).attr('class') == 'side-nav-item disabled') {\n" +
-                "         allEnabled=false;\n" +
-                "     }\n" +
-                "});");
-
-        assertJavascriptEquals("false", "allEnabled");
-    }
-
-    @Test
-    public void testMenuHidingNonAdmin() throws Exception {
-
-        js("document.getElementById('hoe-left-panel').remove(); ");
-        // the test stuff messes with the page loading below (twice in dom)
-        js("$('#hoeapp-wrapper').load('html/eskimoMain.html');");
-
-        waitForElementIdInDOM("leftside-menu-container");
-
-        assertJavascriptEquals("list-item", "$('#folderMenuConsoles').css('display')");
-        assertJavascriptEquals("list-item", "$('#menu-configure-setup').css('display')");
-
-        js("eskimoMain.adaptMenuToUserRole()");
-
-        assertJavascriptEquals("none", "$('#folderMenuConsoles').css('display')");
-        assertJavascriptEquals("none", "$('#menu-configure-setup').css('display')");
     }
 
     @Test

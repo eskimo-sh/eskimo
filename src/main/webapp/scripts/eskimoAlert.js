@@ -40,6 +40,7 @@ eskimo.Alert = function() {
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
     this.eskimoOperations = null;
+    this.eskimoMenu = null;
 
     const that = this;
 
@@ -55,8 +56,9 @@ eskimo.Alert = function() {
                 $('#alert-header-cancel').click(closeAlert);
                 $('#alert-button-validate').click(closeAlert);
 
-                if (isFunction (eskimoMain.enforceMenuConsisteny)) {
-                    eskimoMain.enforceMenuConsisteny();
+                // this is done is EskimoAlert to be sure it's done last in the init process
+                if (isFunction (that.eskimoMenu.enforceMenuConsisteny)) {
+                    that.eskimoMenu.enforceMenuConsisteny();
                 }
 
             } else if (statusTxt === "error") {

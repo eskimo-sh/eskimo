@@ -49,6 +49,7 @@ eskimo.SystemStatus = function() {
     this.eskimoMain = null;
     this.eskimoConsoles = null;
     this.eskimoFileManagers = null;
+    this.eskimoMenu = null;
 
     const that = this;
 
@@ -1088,7 +1089,7 @@ eskimo.SystemStatus = function() {
 
                 disconnectedFlag = false;
 
-                that.eskimoMain.serviceMenuClear(data.nodeServicesStatus);
+                that.eskimoMenu.serviceMenuClear(data.nodeServicesStatus);
 
                 //console.log (data);
 

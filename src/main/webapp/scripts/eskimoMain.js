@@ -54,6 +54,7 @@ eskimo.Main = function() {
     let eskimoServices = null;
     let eskimoServicesSelection = null;
     let eskimoEditUser = null;
+    let eskimoMenu = null;
 
     let eskimoKubernetesServicesSelection = null;
     let eskimoKubernetesServicesConfig = null;
@@ -96,6 +97,7 @@ eskimo.Main = function() {
         eskimoAbout = new eskimo.About();
         eskimoAlert = new eskimo.Alert();
         eskimoEditUser = new eskimo.EditUser();
+        eskimoMenu = new eskimo.Menu();
 
         // B. Inject dependencies
         let initObject = {
@@ -117,6 +119,7 @@ eskimo.Main = function() {
             eskimoSettingsOperationsCommand: eskimoSettingsOperationsCommand,
             eskimoAbout: eskimoAbout,
             eskimoAlert: eskimoAlert,
+            eskimoMenu: eskimoMenu,
             eskimoMain: this
         };
 
@@ -131,7 +134,8 @@ eskimo.Main = function() {
         // fetch context
         fetchContext();
 
-        // C. Initialize services
+        // C. Initialize components
+        eskimoMenu.initialize();
 
         eskimoSetup.initialize();
         //  -> No specific backend loading
@@ -209,16 +213,6 @@ eskimo.Main = function() {
         // about
         $("#main-show-about-link").click(eskimoAbout.showAbout);
 
-        // menu entries
-        $("#main-menu-show-consoles-link").click(eskimoConsoles.showConsoles);
-        $("#main-menu-show-file-managers-link").click(eskimoFileManagers.showFileManagers);
-        $("#main-menu-show-status-link").click(eskimoSystemStatus.showStatus);
-        $("#main-menu-show-setup-link").click(eskimoSetup.showSetup);
-        $("#main-menu-show-services-settings-link").click(eskimoServicesSettings.showServicesSettings);
-        $("#main-menu-show-nodes-config-link").click(eskimoNodesConfig.showNodesConfig);
-        $("#main-menu-show-kubernetes-services-config-link").click(eskimoKubernetesServicesConfig.showKubernetesServicesConfig);
-        $("#main-menu-show-operations-link").click(eskimoOperations.showOperations);
-        $("#user-logout").click(() => { window.location = "logout"; });
     };
 
     this.initialize = function() {
@@ -242,7 +236,7 @@ eskimo.Main = function() {
                 if (data.status == "OK") {
 
                     userRoles = data.roles;
-                    adaptMenuToUserRole();
+                    eskimoMenu.adaptMenuToUserRole();
 
                     that.version = data.version;
                     $("#eskimo-version").html(that.version);
@@ -273,21 +267,6 @@ eskimo.Main = function() {
     this.setSetupDone = function() {
         setupDone = true;
     };
-
-    function adaptMenuToUserRole () {
-
-        $(".side-nav-item").each(function() {
-            let menuRole = $(this).attr("data-menu-role");
-            //console.log (this.id, menuRole, that.hasRole(menuRole), $(this).hasClass("visually-hidden"));
-            if (menuRole != null && menuRole != "") {
-                if (!that.hasRole(menuRole) && !$(this).hasClass("visually-hidden")) {
-                    $(this).addClass ("visually-hidden");
-                    $(this).css ("display", "none");
-                }
-            }
-        });
-    }
-    this.adaptMenuToUserRole = adaptMenuToUserRole;
 
     this.hasRole = function (role) {
         if (role == "*") {
@@ -343,44 +322,17 @@ eskimo.Main = function() {
     }
     this.recoverOperationInProgress = recoverOperationInProgress;
 
-    this.enforceMenuConsisteny = function () {
-        // menu consistency checks (naming conventions)
-        const menuIdsToCheck = [];
-        $(".side-nav-link").each(function (target) {
-            if (this.id.indexOf("main-menu-show-") <= -1 || this.id.indexOf("link") <= -1) {
-                if (this.id.indexOf("services-menu_") <= -1) {
-                    eskimoAlert.showAlert(ESKIMO_ALERT_LEVEL.ERROR, "menu with id '" + this.id + "' is expected of having an id of form 'main-menu-show-XXX-link'. There will be inconsistencies down the line.");
-                }
-            } else {
-                menuIdsToCheck.push (this.id.substring("main-menu-show-".length, this.id.indexOf("link") - 1));
-            }
-        });
-        for (let i = 0; i < menuIdsToCheck.length; i++) {
-            if ($("#inner-content-" + menuIdsToCheck[i]).length === 0) {
-                eskimoAlert.showAlert(ESKIMO_ALERT_LEVEL.ERROR, "No target screen found with id 'inner-content-" + menuIdsToCheck[i] + "'");
-            }
-        }
-    }
-
     this.showOnlyContent = function (content, isServiceIFrame) {
 
         $("#main-content").scrollTop();
 
-        // reset current menu entry everywhwre
-        $(".side-nav-item").each(function (target) {
-            let classname = $(this).attr('class');
-            if (classname.indexOf('menuitem-active') > -1) {
-                $(this).removeClass('menuitem-active');
-            }
-        });
-
         if (isServiceIFrame) {
             $('#main-content').addClass("overflow-hidden");
-            $("#services-menu_" + content).parent().addClass("menuitem-active");
         } else {
             $('#main-content').removeClass("overflow-hidden");
-            $("#main-menu-show-" + content + "-link").parent().addClass("menuitem-active");
         }
+
+        eskimoMenu.setActiveMenuEntry (content, isServiceIFrame);
 
         // if service iframe is already shown, clicking a second time on the link refreshed the iframe
 
@@ -396,25 +348,7 @@ eskimo.Main = function() {
     };
 
     this.handleKubernetesSubsystem = function (enableKubernetes) {
-        let menuKubernetesConfig = $("#menu-kubernetes-configuration");
-        if (enableKubernetes) {
-
-            let menuRole = menuKubernetesConfig.data("menu-role");
-
-            if (menuRole == null || menuRole == "" || that.hasRole(menuRole)) {
-
-                if (menuKubernetesConfig.hasClass("visually-hidden")) {
-
-                    $.showElement(menuKubernetesConfig);
-                    menuKubernetesConfig.removeClass("visually-hidden")
-                }
-            }
-        } else {
-            if (!menuKubernetesConfig.hasClass("visually-hidden")) {
-                $.hideElement(menuKubernetesConfig);
-                menuKubernetesConfig.addClass("visually-hidden")
-            }
-        }
+        eskimoMenu.handleKubeMenuDisplay (enableKubernetes);
     };
 
     function getDisplayedScreen () {
@@ -433,47 +367,6 @@ eskimo.Main = function() {
         return displayedScreen === screen;
     };
 
-    function serviceMenuClear(nodeServicesStatus) {
-
-        // remove all menu entries (cannot find out which service is here :-(
-        if (!nodeServicesStatus) {
-
-            $(".folder-menu-items").each(function () {
-
-                let menuService = this.id.substring('folderMenu'.length);
-
-                let service = getHyphenSeparated(menuService);
-
-                $(this).attr("class", "side-nav-item folder-menu-items disabled");
-
-                that.getServices().handleServiceHiding(service);
-            });
-
-        }
-        // else check with system status and nodeServiceStatus
-        else {
-
-            $(".folder-menu-items").each(function () {
-
-                let menuService = this.id.substring('folderMenu'.length);
-
-                let service = getHyphenSeparated(menuService);
-
-                let serviceUp = that.getSystemStatus().serviceIsUp(nodeServicesStatus, service);
-
-                if (!serviceUp || !that.getServices().isServiceAvailable(service)) {
-                    $(this).attr("class", "side-nav-item folder-menu-items disabled");
-                    that.getServices().handleServiceHiding(service);
-                } else if ($(this).hasClass("menuitem-active")) {
-                    $(this).attr("class", "side-nav-item folder-menu-items menuitem-active");
-                } else {
-                    $(this).attr("class", "side-nav-item folder-menu-items");
-                }
-            });
-        }
-    }
-    this.serviceMenuClear = serviceMenuClear;
-
     this.showProgressbar = function () {
         $.showElement($(".inner-content-show"));
     };
@@ -486,38 +379,16 @@ eskimo.Main = function() {
     this.handleSetupCompleted = function () {
         setupDone = true;
 
-        $(".side-nav-item").each(function() {
-            if (!$(this).hasClass("visually-hidden")
-                && !($(this).hasClass("menu-static"))
-                && !($(this).hasClass("side-nav-title"))
-                && !($(this).hasClass("folder-menu-items"))) {
-
-                if ($(this).hasClass("menuitem-active")) {
-                    $(this).attr("class", "side-nav-item menuitem-active");
-                } else {
-                    $(this).attr("class", "side-nav-item");
-                }
-            }
-        });
+        eskimoMenu.handleSetupCompleted();
     };
 
     this.handleSetupNotCompleted = function () {
 
         setupDone = false;
 
-        serviceMenuClear();
+        eskimoMenu.serviceMenuClear();
 
-        $(".side-nav-item").each(function() {
-            if (!$(this).hasClass("visually-hidden")
-                && !($(this).hasClass("menu-static"))
-                && !($(this).hasClass("side-nav-title"))
-                && !($(this).hasClass("folder-menu-items"))) {
-                $(this).attr("class", "side-nav-item disabled");
-            }
-        });
-
-        $("#menu-configure-setup").attr("class", "side-nav-item menuitem-active");
-        $("#menu-operations").attr("class", "side-nav-item");
+        eskimoMenu.handleSetupNotCompleted();
     };
 
     this.showSetupNotDone = function (message) {
@@ -589,6 +460,9 @@ eskimo.Main = function() {
     };
     this.getEditUser = function() {
         return eskimoEditUser;
+    }
+    this.getMenu = function() {
+        return eskimoMenu;
     }
 
     this.alert = function(level, message) {

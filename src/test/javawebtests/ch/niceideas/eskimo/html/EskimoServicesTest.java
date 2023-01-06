@@ -175,23 +175,6 @@ public class EskimoServicesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testCreateMenu() throws Exception {
-
-        // add services menu
-        js("eskimoServices.createServicesMenu()");
-
-        // make sure they're created
-        assertJavascriptEquals ("1", "$('#folderMenuCerebro').length");
-        assertJavascriptEquals ("1", "$('#folderMenuKibana').length");
-        assertJavascriptEquals ("1", "$('#folderMenuSparkConsole').length");
-        assertJavascriptEquals ("1", "$('#folderMenuZeppelin').length");
-
-        // test zeppelin menu entry
-        assertJavascriptEquals ("zeppelin-icon.png", "$('#folderMenuZeppelin').find('a > i > img').attr('src')");
-        assertJavascriptEquals ("zeppelin", "$('#folderMenuZeppelin').find('a > span').html()");
-    }
-
-    @Test
     public void testShouldReinitialize() throws Exception {
 
         js("eskimoServices.setUiServicesConfig( {" +

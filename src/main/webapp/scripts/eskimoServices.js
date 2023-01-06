@@ -41,6 +41,7 @@ eskimo.Services = function () {
     this.eskimoMain = null;
     this.eskimoSystemStatus = null;
     this.eskimoNodesConfig = null;
+    this.eskimoMenu = null;
 
     const PERIODIC_RETRY_SERVICE_MS = 5000;
 
@@ -92,7 +93,7 @@ eskimo.Services = function () {
 
                     UI_SERVICES = data.uiServices;
                     createServicesIFrames();
-                    createServicesMenu();
+                    that.eskimoMenu.createServicesMenu(UI_SERVICES, UI_SERVICES_CONFIG);
 
                 } else {
                     eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
@@ -454,36 +455,6 @@ eskimo.Services = function () {
         }
     }
     this.serviceMenuServiceFoundHook = serviceMenuServiceFoundHook;
-
-    function createServicesMenu() {
-
-        for (let i = UI_SERVICES.length - 1; i >= 0; i--) {
-
-            let service = UI_SERVICES[i];
-
-            let uiConfig = UI_SERVICES_CONFIG[service];
-
-            if (eskimoMain.hasRole(uiConfig.role)) {
-
-                let menuEntry = '' +
-                    '<li class="side-nav-item folder-menu-items disabled" id="folderMenu' + getUcfirst(getCamelCase(service)) + '">\n' +
-                    '    <a id="services-menu_' + service + '" href="#" class="side-nav-link">\n' +
-                    '        <i><img src="' + that.eskimoNodesConfig.getServiceIconPath(service) + '"></img></i>\n' +
-                    '        <span class="menu-text">' + uiConfig.title + '</span>\n' +
-                    '    </a>\n' +
-                    '</li>';
-
-                $("#mainFolderMenuAnchor").after(menuEntry);
-
-                $("#services-menu_" + service).click(function () {
-                    let serviceName = this.id.substring("services-menu_".length);
-                    showServiceIFrame(serviceName);
-                });
-            }
-        }
-    }
-    /** for tests */
-    this.createServicesMenu = createServicesMenu;
 
     function createServicesIFrames() {
 

@@ -912,6 +912,6 @@ html[data-sidenav-size=condensed]:not(.authentication-bg) .inner-content-inner-f
     }
 }
 
-#notification-placeholder {
+#notification-placeholder, #left-menu-placeholder {
     display: initial;
 }

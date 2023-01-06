@@ -174,6 +174,7 @@ public abstract class AbstractWebTest {
 
         js("window.eskimoSetupCommand = {}");
         js("window.eskimoAlert = {}");
+        js("window.eskimoMenu = {}");
 
         js("window.eskimoFileManagers = {};");
         js("eskimoFileManagers.setAvailableNodes = function() {};");
@@ -209,30 +210,32 @@ public abstract class AbstractWebTest {
 
         js("window.eskimoSettingsOperationsCommand = {}");
 
-        js("window.eskimoMain = {};");
-        js("eskimoMain.handleSetupCompleted = function (){};");
-        js("eskimoMain.getServices = function (){ return eskimoServices; };");
-        js("eskimoMain.getMessaging = function (){ return eskimoMessaging; };");
-        js("eskimoMain.getOperations = function (){ return eskimoOperations; };");
-        js("eskimoMain.getFileManagers = function (){ return eskimoFileManagers; };");
-        js("eskimoMain.getConsoles = function (){ return eskimoConsoles; };");
-        js("eskimoMain.getNodesConfig = function () { return eskimoNodesConfig; };");
-        js("eskimoMain.isOperationInProgress = function() { return false; };");
-        js("eskimoMain.setAvailableNodes = function () {};");
-        js("eskimoMain.menuResize = function () {};");
-        js("eskimoMain.isSetupDone = function () { return true; }");
-        js("eskimoMain.hideProgressbar = function () { }");
-        js("eskimoMain.isCurrentDisplayedScreen = function () { return false; }");
-        js("eskimoMain.setSetupLoaded = function () {}");
-        js("eskimoMain.startOperationInProgress = function() {}");
-        js("eskimoMain.scheduleStopOperationInProgress = function() {}");
-        js("eskimoMain.handleKubernetesSubsystem = function() {}");
-        js("eskimoMain.showProgressbar = function() {}");
-        js("eskimoMain.isSetupLoaded = function() { return true; }");
-        js("eskimoMain.serviceMenuClear = function() { return true; }");
-        js("eskimoMain.windowResize = function() {  }");
-        js("eskimoMain.hasRole = function(role) { return true; }");
-        js("eskimoMain.alert = function(level, message) { alert(level + ' : ' + message); }");
+        js("window.eskimoMain = {\n"+
+                "    adaptMenuToUserRole : function (){},\n"+
+                "    handleSetupCompleted : function (){},\n"+
+                "    getServices : function (){ return eskimoServices; },\n"+
+                "    getMessaging : function (){ return eskimoMessaging; },\n"+
+                "    getOperations : function (){ return eskimoOperations; },\n"+
+                "    getFileManagers : function (){ return eskimoFileManagers; },\n"+
+                "    getConsoles : function (){ return eskimoConsoles; },\n"+
+                "    getNodesConfig : function () { return eskimoNodesConfig; },\n"+
+                "    isOperationInProgress : function() { return false; },\n"+
+                "    setAvailableNodes : function () {},\n"+
+                "    menuResize : function () {},\n"+
+                "    isSetupDone : function () { return true; },\n"+
+                "    hideProgressbar : function () { },\n"+
+                "    isCurrentDisplayedScreen : function () { return false; },\n"+
+                "    setSetupLoaded : function () {},\n"+
+                "    startOperationInProgress : function() {},\n"+
+                "    scheduleStopOperationInProgress : function() {},\n"+
+                "    handleKubernetesSubsystem : function() {},\n"+
+                "    showProgressbar : function() {},\n"+
+                "    isSetupLoaded : function() { return true; },\n"+
+                "    serviceMenuClear : function() { return true; },\n"+
+                "    windowResize : function() {  },\n"+
+                "    hasRole : function(role) { return true; },\n"+
+                "    alert : function(level, message) { alert(level + ' : ' + message); }\n"+
+                "}");
 
         js("window.ESKIMO_ALERT_LEVEL = {ERROR: 3, WARNING: 2, INFO: 1}");
 
