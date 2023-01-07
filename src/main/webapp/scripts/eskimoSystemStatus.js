@@ -487,7 +487,8 @@ eskimo.SystemStatus = function() {
             success: (data, status, jqXHR) => {
 
                 let forceRefresh = false;
-                if ($("#status-monitoring-dashboard-frame").css("display") == "none") {
+                const $statusMonitoringDashboardFrame = $("#status-monitoring-dashboard-frame");
+                if ($statusMonitoringDashboardFrame.css("display") == "none") {
 
 
                     setTimeout (() => {
@@ -501,7 +502,7 @@ eskimo.SystemStatus = function() {
                 let url = "grafana/d/" + monitoringDashboardId + "/monitoring?orgId=1&&kiosk&refresh="
                     + (refreshPeriod == null || refreshPeriod == "" ? "30s" : refreshPeriod);
 
-                let prevUrl = $("#status-monitoring-dashboard-frame").attr('src');
+                let prevUrl = $statusMonitoringDashboardFrame.attr('src');
                 if (prevUrl == null || prevUrl == "" || prevUrl != url || forceRefresh) {
                     $("#status-monitoring-dashboard-frame").attr('src', url);
 
@@ -936,11 +937,9 @@ eskimo.SystemStatus = function() {
                 '    <td class="status-node-cell-intro">\n';
 
             if (nodeAlive == 'OK') {
-                arrayRow +=
-                    '        <img alt="node icon" src="images/node-icon.png" class="status-node-image">\n';
+                arrayRow += '        <img alt="node icon" src="images/node-icon.png" class="status-node-image">\n';
             } else {
-                arrayRow +=
-                    '        <img alt="node icon red" src="images/node-icon-red.png" class="status-node-image">\n';
+                arrayRow += '        <img alt="node icon red" src="images/node-icon-red.png" class="status-node-image">\n';
                 nodeHasIssues = true;
             }
 

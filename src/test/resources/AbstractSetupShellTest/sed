@@ -26,6 +26,8 @@ if [[ -f testFile.conf ]]; then
 
     if [[ `echo $1 | grep n` != "" || $1 == "-n" || $2 == "-n" ]]; then
         /bin/sed -i -n  "$rule" testFile.conf
+    elif [[ `echo $1 | grep E` != "" || $1 == "-E" || $2 == "-E" ]]; then
+        /bin/sed -i -E "$rule" testFile.conf
     else
         /bin/sed -i "$rule" testFile.conf
     fi

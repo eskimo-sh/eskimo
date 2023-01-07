@@ -174,7 +174,7 @@ public abstract class AbstractWebTest {
 
         js("window.eskimoSetupCommand = {}");
         js("window.eskimoAlert = {}");
-        js("window.eskimoMenu = {}");
+        js("window.eskimoMenu = { serviceMenuClear: function(){} }");
 
         js("window.eskimoFileManagers = {};");
         js("eskimoFileManagers.setAvailableNodes = function() {};");

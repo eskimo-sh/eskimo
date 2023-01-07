@@ -161,6 +161,9 @@ public abstract class AbstractSetupShellTest {
                     "\n" +
                     "# Avoid sleeps everywhere\n" +
                     "export NO_SLEEP=true\n" +
+                    "\n" +
+                    "# Hacky hack for kafka test\n" +
+                    "export ESKIMO_POD_NAME=\"test-1\"\n" +
                     "\n"+
                     "# Set test mode\n" +
                     "export TEST_MODE=true\n" +

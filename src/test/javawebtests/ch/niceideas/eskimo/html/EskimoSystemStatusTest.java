@@ -74,6 +74,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         js("eskimoSystemStatus = new eskimo.SystemStatus()");
         js("eskimoSystemStatus.eskimoNotifications = eskimoNotifications");
         js("eskimoSystemStatus.eskimoOperations = eskimoOperations");
+        js("eskimoSystemStatus.eskimoMenu = eskimoMenu");
         js("eskimoSystemStatus.eskimoNodesConfig = eskimoNodesConfig");
         js("eskimoSystemStatus.eskimoSetup = eskimoSetup");
         js("eskimoSystemStatus.eskimoServices = eskimoServices");

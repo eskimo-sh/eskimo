@@ -162,7 +162,22 @@ public class EskimoMenuTest extends AbstractWebTest {
     }
 
     @Test
-    public void testOthers() throws Exception {
+    public void testServiceMenuClearKeepsActiveMenu() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testHandleSetupNotCompletedKeepsActiveMenu() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testHandleSetupCompletedKeepsActiveMenu() throws Exception {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testEnforceMenuConsisteny() throws Exception {
         fail ("To Be Implemented");
     }
 

@@ -1,4 +1,4 @@
-log.dirs=/var/lib/kafka
+log.dirs=/var/lib/kafka/test-1
 
 zookeeper.connection.timeout.ms=22000
 
@@ -9,6 +9,6 @@ KAFKA_JMX_OPTS="-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremo
 export JMX_PORT=${JMX_PORT:-9999}
 COMMAND=$1
 
-broker.id=0
+broker.id=1
 
 zookeeper.connect=192.168.10.13:2181
