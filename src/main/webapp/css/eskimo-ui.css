@@ -915,3 +915,17 @@ html[data-sidenav-size=condensed]:not(.authentication-bg) .inner-content-inner-f
 #notification-placeholder, #left-menu-placeholder {
     display: initial;
 }
+
+span.status-node-cell-span-ok {
+    color: darkgreen;
+}
+span.status-node-cell-span-todo {
+    color: violet;
+}
+span.status-node-cell-span-restart {
+    color: #CB4335;
+}
+
+#kubernetes-services-table-body tr td {
+    height: 43px;
+}

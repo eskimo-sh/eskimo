@@ -122,8 +122,8 @@ eskimo.Notifications = function() {
         const date = new Date (parseInt (timestamp));
 
         const year    = date.getFullYear();
-        const month   = date.getMonth();
-        const day     = date.getDay();
+        const month   = date.getMonth() + 1;
+        const day     = date.getDate();
         const hour    = date.getHours();
         const minute  = date.getMinutes();
         const seconds = date.getSeconds();

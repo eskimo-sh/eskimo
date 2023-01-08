@@ -116,6 +116,12 @@ public class EskimoNotificationsTest extends AbstractWebTest {
     }
 
     @Test
+    public void testRenderTimestamp() throws Exception {
+        assertJavascriptEquals("2022-12-29 20:7:28", "eskimoNotifications.renderTimestamp('1672340848942')");
+        assertJavascriptEquals("2023-1-8 14:40:14", "eskimoNotifications.renderTimestamp('1673185214678')");
+    }
+
+    @Test
     public void testClearNotificationsWithLink() throws Exception {
 
         testAddNotifications();

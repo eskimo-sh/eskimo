@@ -344,9 +344,9 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         assertCssValue("#status-monitoring-dashboard-frame", "display", "inherit");
         */
 
-        assertJavascriptEquals("<span style=\"color: darkgreen;\">OK</span>", "$('#system-information-nodes-status').html()");
+        assertJavascriptEquals("<span class=\"status-node-cell-span-ok\">OK</span>", "$('#system-information-nodes-status').html()");
 
-        assertJavascriptEquals("<span style=\"color: darkgreen;\">OK</span>", "$('#system-information-services-status').html()");
+        assertJavascriptEquals("<span class=\"status-node-cell-span-ok\">OK</span>", "$('#system-information-services-status').html()");
 
         // ruin a service and a node
         SystemStatusWrapper ssw = new SystemStatusWrapper(jsonFullStatus);
@@ -358,12 +358,12 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         js("eskimoSystemStatus.handleSystemStatus (jsonFullStatus.nodeServicesStatus, jsonFullStatus.systemStatus, true)");
 
         await().atMost(15, TimeUnit.SECONDS).until(() -> js("return $('#system-information-nodes-status').html()").toString()
-                .equals("Following nodes are reporting problems : <span style=\"color: darkred;\">192.168.10.13</span>"));
+                .equals("Following nodes are reporting problems : <span class=\"status-node-cell-span-restart\">192.168.10.13</span>"));
 
-        assertJavascriptEquals("Following nodes are reporting problems : <span style=\"color: darkred;\">192.168.10.13</span>",
+        assertJavascriptEquals("Following nodes are reporting problems : <span class=\"status-node-cell-span-restart\">192.168.10.13</span>",
                 "$('#system-information-nodes-status').html()");
 
-        assertJavascriptEquals("Following services are reporting problems : <span style=\"color: darkred;\">mesos-agent</span>",
+        assertJavascriptEquals("Following services are reporting problems : <span class=\"status-node-cell-span-restart\">mesos-agent</span>",
                 "$('#system-information-services-status').html()");
     }
 

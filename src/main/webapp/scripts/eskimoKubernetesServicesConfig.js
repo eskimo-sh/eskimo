@@ -138,17 +138,24 @@ eskimo.KubernetesServicesConfig = function() {
 
         let allSelected = true;
 
-        // are they all selected already
+        // gind out if are they all selected already
         for (let i = 0; i < KUBERNETES_SERVICES.length; i++) {
             if (!$('#' + KUBERNETES_SERVICES[i] + INSTALL_FLAG).get(0).checked) {
                 allSelected = false;
             }
         }
 
-        // select all boxes
+        // select / deselect all boxes
         for (let i = 0; i < KUBERNETES_SERVICES.length; i++) {
             $('#' + KUBERNETES_SERVICES[i] + INSTALL_FLAG).get(0).checked = !allSelected;
+
+            if (!allSelected) {
+                that.onKubernetesServiceSelected(KUBERNETES_SERVICES[i]);
+            } else {
+                that.onKubernetesServiceUnselected(KUBERNETES_SERVICES[i]);
+            }
         }
+
     }
     this.selectAll = selectAll;
 

@@ -633,10 +633,10 @@ eskimo.SystemStatus = function() {
         }
 
         if (nodesWithproblem.length === 0) {
-            $("#system-information-nodes-status").html("<span style='color: darkgreen;'>OK</span>");
+            $("#system-information-nodes-status").html("<span class='status-node-cell-span-ok'>OK</span>");
         } else {
             $("#system-information-nodes-status").html(
-                "Following nodes are reporting problems : <span style='color: darkred;'>" +
+                "Following nodes are reporting problems : <span class='status-node-cell-span-restart'>" +
                 nodesWithproblem.join(", ") +
                 "</span>");
         }
@@ -659,13 +659,13 @@ eskimo.SystemStatus = function() {
 
         if (servicesWithproblem.length === 0) {
             if (nodesWithproblem.length === 0) {
-                $("#system-information-services-status").html("<span style='color: darkgreen;'>OK</span>");
+                $("#system-information-services-status").html("<span class='status-node-cell-span-ok'>OK</span>");
             } else {
-                $("#system-information-services-status").html("<span style='color: darkred;'>-</span>");
+                $("#system-information-services-status").html("<span class='status-node-cell-span-restart'>-</span>");
             }
         } else {
             $("#system-information-services-status").html("Following services are reporting problems : " +
-                "<span style='color: darkred;'>" +
+                "<span class='status-node-cell-span-restart'>" +
                 servicesWithproblem.join(", ") +
                 "</span>");
         }
@@ -1004,22 +1004,22 @@ eskimo.SystemStatus = function() {
                             nodeHasMasters = true;
                         }
 
-                        let color = "darkgreen";
+                        let spanStyle = "status-node-cell-span-ok";
                         if (serviceStatus == "TD") {
-                            color = "violet";
+                            spanStyle = "status-node-cell-span-todo";
                         } else if (serviceStatus == "restart") {
-                            color = "#CB4335";
+                            spanStyle = "status-node-cell-span-restart";
                             nodeHasIssues = true;
                         }
 
                         arrayRow +=
                             '    <td class="status-node-cell'+(that.eskimoMain.isOperationInProgress() ? "-empty": "")+'"' +
                             '         data-eskimo-node="'+node+'" data-eskimo-service="'+service+'">\n' +
-                            '<span style="color: '+color+';">\n' +
+                            '<span class="' + spanStyle + '">\n' +
                             '<table class="node-status-table">\n' +
                             '    <tbody><tr>\n' +
                             '        <td colspan="5" class="nodes-status-status"><span class="font-weight-bold '+
-                            '        '+(that.eskimoMain.isOperationInProgress() && color == "violet" ? 'blinking-status' : '') +
+                            '        '+(that.eskimoMain.isOperationInProgress() && spanStyle === "status-node-cell-span-todo" ? 'blinking-status' : '') +
                             '        "><i class="fa fa-check"></i></span></td>\n' +
                             '    </tr>\n' +
                             '</tbody></table>\n' +
