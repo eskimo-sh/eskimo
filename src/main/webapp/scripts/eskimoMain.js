@@ -72,6 +72,7 @@ eskimo.Main = function() {
     let operationInProgressOwner = false;
 
     let userRoles = [];
+    let userId = "";
 
     this.doInitializeInternal = function() {
         $("#eskimoTitle").html("Eskimo " + eskimoFlavour);
@@ -236,6 +237,7 @@ eskimo.Main = function() {
                 if (data.status == "OK") {
 
                     userRoles = data.roles;
+                    userId = data.user;
                     eskimoMenu.adaptMenuToUserRole();
 
                     that.version = data.version;
@@ -279,6 +281,10 @@ eskimo.Main = function() {
         }
         return false;
     };
+
+    this.getUserId = function() {
+        return userId;
+    }
 
     function isOperationInProgress() {
         return operationInProgress;
@@ -465,8 +471,8 @@ eskimo.Main = function() {
         return eskimoMenu;
     }
 
-    this.alert = function(level, message) {
-        eskimoAlert.showAlert(level, message);
+    this.alert = function(level, message, callback) {
+        eskimoAlert.showAlert(level, message, callback);
     }
 
     this.initialize();

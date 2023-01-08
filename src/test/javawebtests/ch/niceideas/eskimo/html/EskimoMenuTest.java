@@ -54,11 +54,15 @@ public class EskimoMenuTest extends AbstractWebTest {
         // redefine constructor
         js("eskimo.Setup = function(){ this.initialize = function(){};  };");
         js("eskimo.NodesConfig = function(){ this.initialize = function(){};  };");
-        js("eskimo.SystemStatus = function(){ this.initialize = function(){};  };");
+        js("eskimo.SystemStatus = function(){ " +
+                "   this.initialize = function(){};\n" +
+                "   this.serviceIsUp = function() {return true;} " +
+                "};");
         js("eskimo.Consoles = function(){ this.initialize = function(){}; };");
         js("eskimo.Services = function(){" +
                 "   this.handleServiceHiding = function() {};" +
                 "   this.initialize =  function() {}; " +
+                "   this.isServiceAvailable = function() { return true; }" +
                 "};");
         js("eskimo.ServicesSelection = function(){ this.initialize = function(){}; };");
         js("eskimo.ServicesSettings = function(){ this.initialize = function(){}; };");
@@ -68,6 +72,9 @@ public class EskimoMenuTest extends AbstractWebTest {
         js("eskimo.Setup = function(){ this.initialize = function(){} ;};");
         js("eskimo.About = function(){ this.initialize = function(){}; };");
         js("eskimo.EditUser = function(){ this.initialize = function(){}; };");
+
+        js("window.eskimoSystemStatus = new eskimo.SystemStatus();");
+        js("window.eskimoServices = new eskimo.Services();");
 
         // Don0t let jquery load real eskimoMain
         js("$.fn.ready = function () {};");
@@ -84,11 +91,42 @@ public class EskimoMenuTest extends AbstractWebTest {
                 "\"zeppelin\" : {'urlTemplate': './zeppelin/{NODE_ADDRESS}:9999/zeppelin', 'title' : 'zeppelin', 'waitTime': 30 }" +
                 "};");
 
+        js("window.nodeServiceStatus = {" +
+                "    \"service_spark-runtime_192-168-56-31\": \"OK\",\n" +
+                "    \"node_nbr_192-168-56-31\": \"1\",\n" +
+                "    \"service_logstash_192-168-56-31\": \"OK\",\n" +
+                "    \"service_zeppelin_192-168-56-31\": \"OK\",\n" +
+                "    \"service_flink-cli_192-168-56-31\": \"OK\",\n" +
+                "    \"service_flink-runtime_192-168-56-31\": \"OK\",\n" +
+                "    \"node_address_192-168-56-31\": \"192.168.56.31\",\n" +
+                "    \"service_kibana_192-168-56-31\": \"OK\",\n" +
+                "    \"node_alive_192-168-56-31\": \"OK\",\n" +
+                "    \"service_gluster_192-168-56-31\": \"OK\",\n" +
+                "    \"service_grafana_192-168-56-31\": \"OK\",\n" +
+                "    \"service_prometheus_192-168-56-31\": \"OK\",\n" +
+                "    \"service_ntp_192-168-56-31\": \"OK\",\n" +
+                "    \"service_kube-master_192-168-56-31\": \"OK\",\n" +
+                "    \"service_cerebro_192-168-56-31\": \"OK\",\n" +
+                "    \"service_kafka-cli_192-168-56-31\": \"OK\",\n" +
+                "    \"service_kafka-manager_192-168-56-31\": \"OK\",\n" +
+                "    \"service_spark-console_192-168-56-31\": \"OK\",\n" +
+                "    \"service_logstash-cli_192-168-56-31\": \"OK\",\n" +
+                "    \"service_spark-cli_192-168-56-31\": \"OK\",\n" +
+                "    \"service_kafka_192-168-56-31\": \"OK\",\n" +
+                "    \"service_kubernetes-dashboard_192-168-56-31\": \"OK\",\n" +
+                "    \"service_zookeeper_192-168-56-31\": \"OK\",\n" +
+                "    \"service_etcd_192-168-56-31\": \"OK\",\n" +
+                "    \"service_elasticsearch_192-168-56-31\": \"OK\",\n" +
+                "    \"service_kube-slave_192-168-56-31\": \"OK\"\n" +
+                "}");
+
         // instantiate test object
         js("eskimoMenu = new eskimo.Menu();");
         js("eskimoMenu.initialize();");
 
         js("eskimoMenu.eskimoNodesConfig = eskimoNodesConfig;");
+        js("eskimoMenu.eskimoSystemStatus = eskimoSystemStatus;");
+        js("eskimoMenu.eskimoServices = eskimoServices;");
 
         waitForElementIdInDOM("main-menu-show-operations-link");
     }
@@ -163,17 +201,48 @@ public class EskimoMenuTest extends AbstractWebTest {
 
     @Test
     public void testServiceMenuClearKeepsActiveMenu() throws Exception {
-        fail ("To Be Implemented");
+        testCreateServicesMenu();
+
+        js ("$('#folderMenuKibana').removeClass('disabled')");
+
+        js("eskimoMenu.setActiveMenuEntry('kibana', true)");
+        assertJavascriptEquals ("side-nav-item folder-menu-items menuitem-active", "$('#folderMenuKibana').attr('class')");
+
+        js("eskimoMenu.serviceMenuClear(nodeServiceStatus);");
+
+        assertJavascriptEquals ("side-nav-item folder-menu-items menuitem-active", "$('#folderMenuKibana').attr('class')");
     }
 
     @Test
-    public void testHandleSetupNotCompletedKeepsActiveMenu() throws Exception {
-        fail ("To Be Implemented");
+    public void testHandleSetupNotCompletedChangesActiveMenu() throws Exception {
+        testCreateServicesMenu();
+
+        js ("$('#folderMenuKibana').removeClass('disabled')");
+
+        js("eskimoMenu.setActiveMenuEntry('kibana', true)");
+        assertJavascriptEquals ("side-nav-item folder-menu-items menuitem-active", "$('#folderMenuKibana').attr('class')");
+
+        js("eskimoMenu.handleSetupNotCompleted();");
+
+        assertJavascriptEquals ("side-nav-item folder-menu-items", "$('#folderMenuKibana').attr('class')");
+
+        assertJavascriptEquals ("side-nav-item menuitem-active", "$('#menu-configure-setup').attr('class')");
     }
 
     @Test
     public void testHandleSetupCompletedKeepsActiveMenu() throws Exception {
-        fail ("To Be Implemented");
+        testCreateServicesMenu();
+
+        js ("$('#folderMenuKibana').removeClass('disabled')");
+
+        js("eskimoMenu.setActiveMenuEntry('kibana', true)");
+        assertJavascriptEquals ("side-nav-item folder-menu-items menuitem-active", "$('#folderMenuKibana').attr('class')");
+
+        js("eskimoMenu.handleSetupCompleted();");
+
+        assertJavascriptEquals ("side-nav-item folder-menu-items menuitem-active", "$('#folderMenuKibana').attr('class')");
+
+        assertJavascriptEquals ("side-nav-item", "$('#menu-configure-setup').attr('class')");
     }
 
     @Test

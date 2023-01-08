@@ -929,3 +929,7 @@ span.status-node-cell-span-restart {
 #kubernetes-services-table-body tr td {
     height: 43px;
 }
+
+#edit-user-form div.row {
+    margin-bottom: 5px;
+}

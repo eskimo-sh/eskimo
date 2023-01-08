@@ -45,6 +45,8 @@ eskimo.EditUser = function() {
 
             if (statusTxt === "success") {
 
+                $("#edit-user-link").click(() => { showEditUser(); });
+
                 $("#edit-user-header-close").click(() => { cancelEditUser(); });
 
                 $("#edit-user-input-button-cancel").click(() => {cancelEditUser(); });
@@ -58,9 +60,10 @@ eskimo.EditUser = function() {
     };
 
     function showEditUser () {
-
-        // TODO Feed in form current user information
-        
+        $("#edit-user-user-id").val(eskimoMain.getUserId());
+        $("#edit-user-current-password").val("");
+        $("#edit-user-new-password").val("");
+        $("#edit-user-repeat-password").val("");
         $('#edit-user-modal').modal("show");
     }
     this.showEditUser = showEditUser;
@@ -71,38 +74,35 @@ eskimo.EditUser = function() {
     this.cancelEditUser = cancelEditUser;
 
     function validateEditUser() {
-        alert ("To Be Implemented");
 
         let newUser = $("form#edit-user-form").serializeObject();
         let userJSON =  JSON.stringify(newUser);
+
+        if (newUser["edit-user-new-password"] !== newUser["edit-user-repeat-password"]) {
+            eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "both passwords don't match!");
+        }
 
         $('#edit-user-input-button-validate').prop('disabled', true);
         $('#edit-user-overlay').css('display', 'block');
 
         $.ajaxPost({
             timeout: 1000 * 10,
-            url: "TODO",
+            url: "edit-user",
             data: userJSON,
             success: (data, status, jqXHR) => {
-
-                // TODO SIsplay error if any
 
                 if (!data || data.error) {
                     console.error(data.error);
 
-                    $editUserAlert = $("#edit-user-alert");
-                    $editUserAlert.css("display", "block");
-                    $editUserAlert.html(data.error);
-                    setTimeout(() => {
-                        $editUserAlert.css("display", "none");
-                    }, 5000);
+                    $('#edit-user-modal').modal("hide");
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error, () => {
+                        $('#edit-user-modal').modal("show");
+                    });
 
                 } else {
 
-                    // TODO update local save state about user (role / etc.)
-
-                    // TODO close modal
-
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.INFO, data.message);
+                    $('#edit-user-modal').modal("hide");
                 }
 
                 $('#edit-user-input-button-validate').prop('disabled', false);

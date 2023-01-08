@@ -39,7 +39,7 @@ Software.
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="edit-user-title">Edit USer Information </h4>
+                <h4 class="modal-title" id="edit-user-title">Edit User Information </h4>
                 <button type="button" class="btn-close" id="edit-user-header-close"></button>
             </div>
             <div class="modal-body">
@@ -48,44 +48,42 @@ Software.
                     <div class="spinner"></div>
                 </div>
 
-                <div style="display:none" id="edit-user-alert" class="alert alert-danger bg-danger text-white border-0 col-sm-12"></div>
-
                 <div class="col-md-12 col-sd-12">
 
                     <form id="edit-user-form">
 
                         <div class="row">
-                            <div class="col-md-3"></div>
-                            <label class="col-md-3 control-label" id="label_user_id">User ID</label>
-                            <div class="col-md-6">
+                            <div class="col-md-1"></div>
+                            <label class="col-md-4 align-self-center control-label" id="label_user_id">User ID</label>
+                            <div class="col-md-7">
                                 <input id="edit-user-user-id" name="edit-user-user-id" type="text"
+                                       class="form-control" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-1"></div>
+                            <label class="col-md-4 align-self-center control-label" id="label_cur_password">Current Password</label>
+                            <div class="col-md-7">
+                                <input id="edit-user-current-password" name="edit-user-current-password" type="password"
                                        class="form-control">
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-3"></div>
-                            <label class="col-md-3 control-label" id="label_cur_password">Current Password</label>
-                            <div class="col-md-6">
-                                <input id="edit-user-current-password" name="edit-user-current-password" type="text"
+                            <div class="col-md-1"></div>
+                            <label class="col-md-4 align-self-center control-label" id="label_new_password">New Password</label>
+                            <div class="col-md-7">
+                                <input id="edit-user-new-password" name="edit-user-new-password" type="password"
                                        class="form-control">
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-3"></div>
-                            <label class="col-md-3 control-label" id="label_new_password">New Password</label>
-                            <div class="col-md-6">
-                                <input id="edit-user-new-password" name="edit-user-new-password" type="text"
-                                       class="form-control">
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-3"></div>
-                            <label class="col-md-3 control-label" id="label_repeaat_password">Repeat Password</label>
-                            <div class="col-md-6">
-                                <input id="edit-user-repeat-password" name="edit-user-repeat-password" type="text"
+                            <div class="col-md-1"></div>
+                            <label class="col-md-4 align-self-center control-label" id="label_repeaat_password">Repeat Password</label>
+                            <div class="col-md-7">
+                                <input id="edit-user-repeat-password" name="edit-user-repeat-password" type="password"
                                        class="form-control">
                             </div>
                         </div>

@@ -47,6 +47,8 @@ eskimo.Alert = function() {
     let currentLevel = 0;
     let currentMessage = null;
 
+    let callback = null;
+
     this.initialize = function() {
         // Initialize HTML Div from Template
         $("#alert-modal-wrapper").load("html/eskimoAlert.html", (responseTxt, statusTxt, jqXHR) => {
@@ -79,7 +81,9 @@ eskimo.Alert = function() {
     }
 
 
-    function showAlert (level, message) {
+    function showAlert (level, message, closeCallback) {
+
+        callback = closeCallback;
 
         if (!Number.isInteger(level) || level < 1 || level > 3) {
             alert("eskimoAlert : expected level as an integer between 1 and 3. Use window.ESKIMO_ALERT_LEVEL.[ERROR, WARNING, INFO]");
@@ -107,6 +111,10 @@ eskimo.Alert = function() {
         currentMessage = null;
 
         $('#alert-modal').modal("hide");
+
+        if (isFunction (callback)) {
+            callback();
+        }
     }
     this.closeAlert = closeAlert;
 

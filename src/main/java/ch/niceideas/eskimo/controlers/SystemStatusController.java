@@ -92,6 +92,7 @@ public class SystemStatusController {
             JsonWrapper retObject = new JsonWrapper(new JSONObject(new HashMap<>() {{
                 put("status", "OK");
                 put("version", buildVersion);
+                put("user", SecurityHelper.getUserId());
                 put("roles", new JSONArray(SecurityHelper.getuserRoles().stream()
                         .map(Enum::name)
                         .collect(Collectors.toList())

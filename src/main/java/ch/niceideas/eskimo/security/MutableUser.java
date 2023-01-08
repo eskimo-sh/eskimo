@@ -49,7 +49,7 @@ public class MutableUser implements UserDetails {
     private String password;
     private final UserDetails delegate;
 
-    MutableUser(UserDetails user) {
+    public MutableUser(UserDetails user) {
         this.delegate = user;
         this.password = user.getPassword();
     }

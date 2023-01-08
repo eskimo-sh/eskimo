@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-app-status", "test-master", "test-operations", "test-system"})
+@ActiveProfiles({"no-web-stack", "test-app-status", "test-master", "test-operations", "test-system", "test-setup"})
 public class SystemStatusControllerTest {
 
     @Autowired

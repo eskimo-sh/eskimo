@@ -197,6 +197,11 @@ eskimo.Menu = function() {
                 && !($(this).hasClass("folder-menu-items"))) {
                 $(this).attr("class", "side-nav-item disabled");
             }
+            // force unselecting menu (this is done already by eskimoMain.showOnlyContent, but I do it here as well for
+            // consistency
+            if ($(this).hasClass("folder-menu-items") && $(this).hasClass("menuitem-active")) {
+                $(this).removeClass("menuitem-active");
+            }
         });
 
         $("#menu-configure-setup").attr("class", "side-nav-item menuitem-active");
