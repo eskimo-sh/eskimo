@@ -104,16 +104,18 @@ public final class Session extends Thread {
 
         try {
             try {
-                while((len=in.read(buf))>=0) {
+                while ((len = in.read(buf)) >= 0) {
                     terminal.write(new String(buf,0,len));
                     String reply = terminal.read();
-                    if(reply!=null)
+                    if (reply != null) {
                         out.write(reply);
+                    }
                 }
             } catch (IOException e) {
                 // fd created by forkpty seems to cause I/O error when the other side is closed via kill -9
-                if (!hasChildProcessFinished())
-                    logger.warn ("Session pump thread is dead", e);
+                if (!hasChildProcessFinished()) {
+                    logger.warn("Session pump thread is dead", e);
+                }
             } finally {
                 closeQuietly(in);
                 closeQuietly(out);
@@ -135,7 +137,9 @@ public final class Session extends Thread {
 
     private void closeQuietly(Closeable c) {
         try {
-            if (c!=null)    c.close();
+            if (c != null)  {
+                c.close();
+            }
         } catch (IOException e) {
             // silently ignore
             logger.debug (e, e);

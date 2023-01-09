@@ -279,9 +279,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
     @Override
     public void installEskimoBaseSystem(MessageLogger ml, String node) throws SSHCommandException {
-        SSHConnection connection = null;
-        try {
-            connection = connectionManagerService.getPrivateConnection(node);
+        try (SSHConnection connection = connectionManagerService.getPrivateConnection(node)) {
 
             ml.addInfo(" - Calling install-eskimo-base-system.sh");
             ml.addInfo(sshCommandService.runSSHScriptPath(connection, servicesSetupPath + "/base-eskimo/install-eskimo-base-system.sh"));
@@ -297,11 +295,6 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
         } catch (ConnectionManagerException e) {
             throw new SSHCommandException(e);
-
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
     }
 
@@ -336,10 +329,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             MemoryModel memoryModel, String node)
             throws SystemException, SSHCommandException, IOException {
 
-        SSHConnection connection = null;
-        try {
-
-            connection = connectionManagerService.getPrivateConnection(node);
+        try (SSHConnection connection = connectionManagerService.getPrivateConnection(node)) {
 
             File tempTopologyFile = systemService.createTempFile("eskimo_topology", node, ".sh");
             try {
@@ -382,11 +372,6 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
         } catch (ConnectionManagerException e) {
             throw new SystemException(e);
-
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
     }
 
@@ -400,9 +385,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
     }
 
     private void uploadKubernetes(String node) throws SSHCommandException, SystemException {
-        SSHConnection connection = null;
-        try {
-            connection = connectionManagerService.getPrivateConnection(node);
+        try (SSHConnection connection = connectionManagerService.getPrivateConnection(node)) {
 
             File packageDistributionDir = new File (packageDistributionPath);
 
@@ -413,11 +396,6 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
         } catch (ConnectionManagerException e) {
             throw new SystemException(e);
-
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
     }
 
@@ -472,10 +450,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
     private void proceedWithServiceUninstallation(MessageLogger ml, String node, String service)
             throws SSHCommandException, SystemException {
-
-        SSHConnection connection = null;
-        try {
-            connection = connectionManagerService.getPrivateConnection(node);
+        try (SSHConnection connection = connectionManagerService.getPrivateConnection(node)) {
 
             // 1. Calling uninstall.sh script if it exists
             systemService.callUninstallScript(ml, connection, service);
@@ -509,11 +484,6 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
         } catch (ConnectionManagerException e) {
             throw new SSHCommandException(e);
-
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
     }
 
@@ -522,9 +492,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
         String imageName = servicesDefinition.getService(service).getImageName();
 
-        SSHConnection connection = null;
-        try {
-            connection = connectionManagerService.getPrivateConnection(node);
+        try (SSHConnection connection = connectionManagerService.getPrivateConnection(node)) {
 
             ml.addInfo(" - Creating archive and copying it over");
             File tmpArchiveFile = systemService.createRemotePackageFolder(ml, connection, node, service, imageName);
@@ -539,11 +507,6 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
         } catch (ConnectionManagerException e) {
             throw new SSHCommandException(e);
-
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
     }
 

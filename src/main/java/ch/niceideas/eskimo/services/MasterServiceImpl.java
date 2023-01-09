@@ -66,6 +66,8 @@ public class MasterServiceImpl implements MasterService {
 
     private static final Logger logger = Logger.getLogger(MasterServiceImpl.class);
 
+    private static final long TEN_YEARS_AGO_IN_MILLIS = (1000L * 60L * 60L * 24L * 365L * 10L);
+
     @Autowired
     private NotificationService notificationService;
 
@@ -215,7 +217,7 @@ public class MasterServiceImpl implements MasterService {
                     if (serviceNodes.size() == 1) {
 
                         serviceMasterTimestamps.put(service.getName(),
-                                new Date(System.currentTimeMillis() - (1000L * 60L * 60L * 24L * 365L * 10L))); // 10 years ago
+                                new Date(System.currentTimeMillis() - TEN_YEARS_AGO_IN_MILLIS)); // 10 years ago
                         serviceMasterNodes.put(service.getName(), serviceNodes.get(0));
 
                     } else {
@@ -224,12 +226,9 @@ public class MasterServiceImpl implements MasterService {
                         MdStrategy strategy = masterDetection.getDetectionStrategy().getStrategy();
 
                         // 3. If service is installed on multiple node, attempt to detect master
-                        List < String > nodes;
-                        if (service.isKubernetes()) {
-                            nodes = nodesConfig.getNodeAddresses();
-                        } else {
-                            nodes = nodesConfig.getAllNodeAddressesWithService(service.getName());
-                        }
+                        List<String> nodes = service.isKubernetes() ?
+                                nodesConfig.getNodeAddresses() :
+                                nodesConfig.getAllNodeAddressesWithService(service.getName());
 
                         for (String node : nodes) {
 

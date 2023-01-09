@@ -251,19 +251,10 @@ public class KubernetesServiceImpl implements KubernetesService {
             throws SSHCommandException, KubernetesException {
         Service service = servicesDefinition.getService(serviceName);
 
-        SSHConnection connection = null;
-        try {
-            connection = connectionManagerService.getPrivateConnection(kubeMasterNode);
-
+        try (SSHConnection connection = connectionManagerService.getPrivateConnection(kubeMasterNode)){
             sshCommandService.runSSHCommand(connection, "eskimo-kubectl uninstall " + service.getName() + " " + kubeMasterNode);
-
         } catch (ConnectionManagerException e) {
             throw new SSHCommandException(e);
-
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
     }
 
@@ -491,9 +482,7 @@ public class KubernetesServiceImpl implements KubernetesService {
     private void proceedWithKubernetesServiceInstallation(MessageLogger ml, String kubeMasterNode, String service)
             throws IOException, SystemException, SSHCommandException {
 
-        SSHConnection connection = null;
-        try {
-            connection = connectionManagerService.getPrivateConnection(kubeMasterNode);
+        try (SSHConnection connection = connectionManagerService.getPrivateConnection(kubeMasterNode)){
 
             String imageName = servicesDefinition.getService(service).getImageName();
 
@@ -510,10 +499,6 @@ public class KubernetesServiceImpl implements KubernetesService {
 
         } catch (ConnectionManagerException e) {
             throw new SSHCommandException (e);
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
     }
 
