@@ -34,30 +34,9 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.terminal.ScreenImage;
-import ch.niceideas.eskimo.terminal.Session;
-import ch.niceideas.eskimo.terminal.SshProcessWithPty;
-import com.trilead.ssh2.Connection;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.stereotype.Component;
-import org.springframework.web.context.WebApplicationContext;
 
-import javax.annotation.PreDestroy;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 public interface TerminalService {

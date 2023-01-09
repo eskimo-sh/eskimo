@@ -34,26 +34,14 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.FileException;
-import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.SSHConnection;
-import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import com.trilead.ssh2.LocalPortForwarder;
 import org.apache.log4j.Logger;
-import org.json.JSONException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.net.BindException;
-import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 
 public interface ConnectionManagerService {

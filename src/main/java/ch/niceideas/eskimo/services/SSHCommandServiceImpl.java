@@ -76,8 +76,7 @@ public class SSHCommandServiceImpl implements SSHCommandService {
     public String runSSHCommand(SSHConnection connection, String[] command) throws SSHCommandException {
         StringBuilder sb = new StringBuilder();
         for (String cmd : command) {
-            sb.append (cmd);
-            sb.append (" ");
+            sb.append (cmd).append (" ");
         }
         return runSSHCommand(connection, sb.toString());
     }
@@ -104,8 +103,7 @@ public class SSHCommandServiceImpl implements SSHCommandService {
             StringBuilder scriptBuilder = new StringBuilder();
 
             while ((line = reader.readLine()) != null) {
-                scriptBuilder.append(line);
-                scriptBuilder.append("\n");
+                scriptBuilder.append(line).append("\n");
             }
 
             scriptContent = scriptBuilder.toString();
@@ -120,14 +118,12 @@ public class SSHCommandServiceImpl implements SSHCommandService {
     public String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException {
         try {
             SSHConnection connection = connectionManagerService.getSharedConnection(node);
-
             return runSSHScript(connection, script, throwsException);
 
         } catch (ConnectionManagerException e) {
             logger.error(e.getMessage());
             logger.debug(e, e);
             throw new SSHCommandException(e);
-
         }
     }
 
@@ -239,7 +235,6 @@ public class SSHCommandServiceImpl implements SSHCommandService {
     public void copySCPFile(SSHConnection connection, String filePath) throws SSHCommandException {
 
         try {
-
             JsonWrapper systemConfig = new JsonWrapper(configurationService.loadSetupConfig());
 
             //SCPClient scp = new SCPClient(connection);

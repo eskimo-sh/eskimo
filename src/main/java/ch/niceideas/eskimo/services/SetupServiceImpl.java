@@ -40,7 +40,6 @@ import ch.niceideas.eskimo.model.MessageLogger;
 import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
-import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -349,7 +348,7 @@ public class SetupServiceImpl implements SetupService {
             Set<String> downloadPackages, Set<String> buildPackage, Set<String> downloadKube, Set<String> buildKube, Set<String> packageUpdate)
             throws SetupException {
 
-        File packagesDistribFolder = null;
+        File packagesDistribFolder;
         try {
             packagesDistribFolder = new File(packageDistributionPath).getCanonicalFile();
         } catch (IOException e) {
@@ -390,7 +389,6 @@ public class SetupServiceImpl implements SetupService {
             findMissingPackages(packagesDistribFolder, missingServices);
 
             fillInPackages(downloadPackages, packagesVersion, missingServices);
-
         }
 
         // 2. Find out about missing Kube distrib
@@ -437,9 +435,9 @@ public class SetupServiceImpl implements SetupService {
                     }
                 }
             }
+
             fillInPackages(packageUpdate, packagesVersion, updates);
         }
-
     }
 
     protected void fillInPackages(Set<String> downloadPackages, JsonWrapper packagesVersion, Set<String> missingServices) {
@@ -473,6 +471,7 @@ public class SetupServiceImpl implements SetupService {
             JsonWrapper packagesVersion = new JsonWrapper(FileUtils.readFile(tempPackagesVersionFile));
             Files.delete(tempPackagesVersionFile.toPath());
             return packagesVersion;
+
         } catch (IOException | FileException e) {
             logger.error (e, e);
             throw new SetupException(e);
@@ -481,7 +480,7 @@ public class SetupServiceImpl implements SetupService {
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
-    public String applySetup(SetupCommand setupCommand) {
+    public void applySetup(SetupCommand setupCommand) throws SetupException {
 
         boolean success = false;
         try {
@@ -607,11 +606,10 @@ public class SetupServiceImpl implements SetupService {
             }
 
             success = true;
-            return "{\"status\": \"OK\"}";
 
         } catch (JSONException | SetupException | ServiceDefinitionException | NodesConfigurationException | SystemException e) {
             logger.error(e, e);
-            return ReturnStatusHelper.createErrorStatus (e);
+            throw new SetupException(e);
 
         } finally {
             operationsMonitoringService.endCommand(success);

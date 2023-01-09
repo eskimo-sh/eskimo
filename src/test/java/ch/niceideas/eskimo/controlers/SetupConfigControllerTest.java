@@ -166,7 +166,7 @@ public class SetupConfigControllerTest {
                     "\"setup-kube-origin\":\"download\"," +
                     "\"setup-services-origin\":\"download\"}", session));
 
-        assertEquals ("OK", scc.applySetup(session));
+        assertEquals ("{\"status\": \"OK\"}", scc.applySetup(session));
 
         assertTrue(sessionContent.isEmpty());
     }

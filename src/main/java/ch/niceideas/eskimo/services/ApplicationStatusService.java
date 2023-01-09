@@ -35,30 +35,6 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.service.UIConfig;
-import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PreDestroy;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 public interface ApplicationStatusService {
 

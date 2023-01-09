@@ -460,12 +460,9 @@ public class SetupServiceTest {
 
         setupService.saveAndPrepareSetup(setupConfig);
 
-        String errorResult = setupService.applySetup(command);
-
-        assertEquals("{\n" +
-                "  \"error\": \"Downloading packages is not supported on development version (SNAPSHOT)\",\n" +
-                "  \"status\": \"KO\"\n" +
-                "}", errorResult);
+        assertThrows(SetupException.class,
+                () -> { setupService.applySetup(command); },
+                "Downloading packages is not supported on development version (SNAPSHOT)");
     }
 
     @Test

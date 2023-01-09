@@ -35,11 +35,6 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.eskimo.model.SSHConnection;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 public interface SSHCommandService {
 

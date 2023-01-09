@@ -34,26 +34,7 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.model.service.MasterDetection;
-import ch.niceideas.eskimo.model.service.Service;
-import ch.niceideas.eskimo.services.mdStrategy.MdStrategy;
-import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PreDestroy;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
+import ch.niceideas.eskimo.model.MasterStatusWrapper;
 
 public interface MasterService {
 

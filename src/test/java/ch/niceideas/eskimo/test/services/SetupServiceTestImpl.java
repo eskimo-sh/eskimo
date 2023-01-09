@@ -199,8 +199,8 @@ public class SetupServiceTestImpl extends SetupServiceImpl implements SetupServi
     }
 
     @Override
-    public String applySetup(SetupCommand setupCommand) {
-        return "OK";
+    public void applySetup(SetupCommand setupCommand) {
+        // No-Op
     }
 
     @Override

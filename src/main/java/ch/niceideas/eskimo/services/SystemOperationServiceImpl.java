@@ -73,7 +73,6 @@ public class SystemOperationServiceImpl implements SystemOperationService {
                 notificationService.addDoing(message);
                 logOperationMessage(operationId, message);
 
-
                 operation.call(new MessageLogger () {
 
                     @Override
@@ -113,7 +112,6 @@ public class SystemOperationServiceImpl implements SystemOperationService {
                 throw new SystemException(e);
 
             } finally {
-
                 operationsMonitoringService.endOperation(operationId);
             }
         }

@@ -35,33 +35,10 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.*;
-import ch.niceideas.eskimo.model.MessageLogger;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.SetupCommand;
-import ch.niceideas.eskimo.utils.ReturnStatusHelper;
-import org.apache.log4j.Logger;
-import org.json.JSONException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.file.Files;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 
 public interface SetupService {
@@ -88,7 +65,7 @@ public interface SetupService {
             Set<String> downloadPackages, Set<String> buildPackage, Set<String> downloadKube, Set<String> buildKube, Set<String> packageUpdate)
             throws SetupException;
 
-    String applySetup(SetupCommand setupCommand);
+    void applySetup(SetupCommand setupCommand) throws SetupException;
 
     int compareVersion(Pair<String, String> first, Pair<String, String> second);
 

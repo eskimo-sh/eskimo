@@ -142,15 +142,23 @@ public class SetupConfigController extends AbstractOperationController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public String applySetup(HttpSession session) {
 
-        JSONObject checkObject = checkOperations("Unfortunately, changing setup configuration is not possible in DEMO mode.");
-        if (checkObject != null) {
-            return checkObject.toString(2);
+        try {
+            JSONObject checkObject = checkOperations("Unfortunately, changing setup configuration is not possible in DEMO mode.");
+            if (checkObject != null) {
+                return checkObject.toString(2);
+            }
+
+            SetupCommand command = (SetupCommand) session.getAttribute(PENDING_SETUP_COMMAND);
+            session.removeAttribute(PENDING_SETUP_COMMAND);
+
+            setupService.applySetup(command);
+
+            return ReturnStatusHelper.createOKStatus();
+
+        } catch (SetupException e) {
+            logger.error(e, e);
+            return ReturnStatusHelper.createErrorStatus (e);
         }
-
-        SetupCommand command = (SetupCommand) session.getAttribute(PENDING_SETUP_COMMAND);
-        session.removeAttribute(PENDING_SETUP_COMMAND);
-
-        return setupService.applySetup(command);
     }
 
 }
