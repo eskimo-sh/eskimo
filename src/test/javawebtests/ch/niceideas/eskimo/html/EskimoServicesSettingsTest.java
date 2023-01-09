@@ -70,7 +70,7 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
     }
 
     @Test
-    public void testSaveServicesSettingsWithButton() throws Exception {
+    public void testSaveServicesSettingsWithButton() {
 
         js("$.ajaxGet = function(callback) { console.log(callback); }");
 
@@ -88,7 +88,7 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
     }
 
     @Test
-    public void testLayoutServicesSettings() throws Exception {
+    public void testLayoutServicesSettings() {
 
         js("eskimoServicesSettings.layoutServicesSettings();");
 
@@ -105,23 +105,6 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
         assertJavascriptEquals ("", "$('#spark-runtime-spark---rpc---numRetries').val()");
 
         assertJavascriptEquals ("", "$('#spark-runtime-spark---dynamicAllocation---cachedExecutorIdleTimeout').val()");
-    }
-
-    @Test
-    public void testShowServicesSettingsMessage() throws Exception {
-
-        js("eskimoServicesSettings.showServicesSettingsMessage ('test');");
-
-        assertCssValue("#services-settings-warning", "display", "block");
-        assertCssValue("#services-settings-warning", "visibility", "visible");
-
-        assertAttrContains("#services-settings-warning-message", "class", "danger");
-
-        assertJavascriptEquals("test", "$('#services-settings-warning-message').html()");
-
-        js("eskimoServicesSettings.showServicesSettingsMessage ('test', true);");
-
-        assertAttrContains("#services-settings-warning-message", "class", "info");
     }
 
 }

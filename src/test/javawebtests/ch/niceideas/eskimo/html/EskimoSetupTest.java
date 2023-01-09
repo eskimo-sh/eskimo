@@ -62,7 +62,7 @@ public class EskimoSetupTest extends AbstractWebTest {
         js("eskimoSetup.eskimoSetupCommand = eskimoSetupCommand;");
         js("eskimoSetup.initialize()");
 
-        waitForElementIdInDOM("setup-warning");
+        waitForElementIdInDOM("reset-setup-btn");
     }
 
     @Test
@@ -74,22 +74,19 @@ public class EskimoSetupTest extends AbstractWebTest {
         //System.out.println (page.asXml());
 
         // should have displayed the error
-        assertCssValue ("#setup-warning", "display", "block");
-        assertJavascriptEquals ("Configuration Storage path should be set", "$('#setup-warning-message').html()");
+        assertJavascriptEquals ("3 : Configuration Storage path should be set", "window.lastAlert");
 
         js("$('#setup_storage').val('/tmp/test')");
 
         js("eskimoSetup.saveSetup()");
 
-        assertJavascriptEquals ("SSH Username to use to reach cluster nodes should be set",
-                "$('#setup-warning-message').html()");
+        assertJavascriptEquals ("3 : SSH Username to use to reach cluster nodes should be set", "window.lastAlert");
 
         js("$('#ssh_username').val('eskimo')");
 
         js("eskimoSetup.saveSetup()");
 
-        assertJavascriptEquals ("SSH Identity Private Key to use to reach cluster nodes should be set",
-                "$('#setup-warning-message').html()");
+        assertJavascriptEquals ("3 : SSH Identity Private Key to use to reach cluster nodes should be set", "window.lastAlert");
     }
 
     @Test
@@ -124,27 +121,6 @@ public class EskimoSetupTest extends AbstractWebTest {
 
         assertJavascriptEquals("radio-inline", "$('#setup-kube-origin-download-label').attr('class')");
         assertJavascriptEquals("radio-inline", "$('#setup-services-origin-download-label').attr('class')");
-    }
-
-    @Test
-    public void testShowSetupMessage() throws Exception {
-
-        js("$.ajaxGet = function(callback) { console.log(callback); }");
-
-        js("eskimoSetup.showSetup()");
-
-        js("eskimoSetup.showSetupMessage ('test');");
-
-        assertCssValue("#setup-warning", "display", "block");
-        assertCssValue("#setup-warning", "visibility", "visible");
-
-        assertAttrContains("#setup-warning-message", "class", "danger");
-
-        assertJavascriptEquals("test", "$('#setup-warning-message').html()");
-
-        js("eskimoSetup.showSetupMessage ('test', true);");
-
-        assertAttrContains("#setup-warning-message", "class", "info");
     }
 
     @Test

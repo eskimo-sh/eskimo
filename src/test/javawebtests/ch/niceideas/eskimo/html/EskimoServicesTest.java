@@ -36,7 +36,6 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import org.json.JSONArray;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -44,7 +43,7 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EskimoServicesTest extends AbstractWebTest {
 
@@ -80,7 +79,7 @@ public class EskimoServicesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRandomizeUrl() throws Exception {
+    public void testRandomizeUrl() {
 
         js("Math.random = function () {return 0.111; };");
 
@@ -94,7 +93,7 @@ public class EskimoServicesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testShowServiceIFrame() throws Exception {
+    public void testShowServiceIFrame() {
 
         // 1. setup not done
         js("eskimoMain.showSetupNotDone = function(message) { window.setupNotDoneMessage = message; }");
@@ -134,7 +133,7 @@ public class EskimoServicesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testIsServiceAvailable() throws Exception {
+    public void testIsServiceAvailable() {
 
         assertJavascriptEquals("false", "eskimoServices.isServiceAvailable('non-existent');");
 
@@ -154,7 +153,7 @@ public class EskimoServicesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testPeriodicRetryServices() throws Exception {
+    public void testPeriodicRetryServices() {
 
         js("eskimoServices.handleServiceDisplay('cerebro', UI_SERVICES_CONFIG['cerebro'], '192-168-10-11', false);");
         js("eskimoServices.handleServiceDisplay('kibana', UI_SERVICES_CONFIG['kibana'], '192-168-10.11', false);");
@@ -175,7 +174,7 @@ public class EskimoServicesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testShouldReinitialize() throws Exception {
+    public void testShouldReinitialize() {
 
         js("eskimoServices.setUiServicesConfig( {" +
                 "\"zeppelin\" : {'urlTemplate': 'http://{NODE_ADDRESS}:9999/zeppelin', 'icon' : 'testIcon', 'title' : 'zeppelin' }});");
@@ -196,7 +195,7 @@ public class EskimoServicesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testCreateIFrames() throws Exception {
+    public void testCreateIFrames() {
 
         // add iframe nodes
         js("eskimoServices.createServicesIFrames()");
@@ -211,7 +210,7 @@ public class EskimoServicesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testBuildUrl() throws Exception {
+    public void testBuildUrl() {
 
         js("window.uiConfig = {'urlTemplate': './test/{NODE_ADDRESS}:9999/test'}"); // proxyContext
         assertJavascriptEquals("./test/192-168-10-11:9999/test", "eskimoServices.buildUrl(uiConfig, '192.168.10.11')");
@@ -224,7 +223,7 @@ public class EskimoServicesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testHandleServiceDisplay() throws Exception {
+    public void testHandleServiceDisplay() {
 
         assertJavascriptEquals("undefined", "typeof UI_SERVICES_CONFIG['cerebro'].targetUrl");
         assertJavascriptEquals("undefined", "typeof UI_SERVICES_CONFIG['cerebro'].service");
@@ -257,7 +256,7 @@ public class EskimoServicesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testHandleServiceHiding() throws Exception {
+    public void testHandleServiceHiding() {
 
         testHandleServiceDisplay();
 
@@ -267,7 +266,7 @@ public class EskimoServicesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRetryPolicyNominal() throws Exception {
+    public void testRetryPolicyNominal() {
 
         js("eskimoServices.periodicRetryServices = function () { " +
                 "    window.uiConfigsToRetry = eskimoServices.getUIConfigsToRetryForTests();" +
@@ -291,7 +290,7 @@ public class EskimoServicesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRetryPolicyStoppedWhenServiceVanishes() throws Exception {
+    public void testRetryPolicyStoppedWhenServiceVanishes() {
 
         testRetryPolicyNominal();
 
@@ -308,7 +307,7 @@ public class EskimoServicesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRetryPolicyNominalThenServiceUp() throws Exception {
+    public void testRetryPolicyNominalThenServiceUp() {
 
         testRetryPolicyNominal();
 
@@ -326,7 +325,7 @@ public class EskimoServicesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRetryPolicyServiceClearDoesntStopRetry() throws Exception {
+    public void testRetryPolicyServiceClearDoesntStopRetry() {
 
         testRetryPolicyNominal();
 
@@ -335,7 +334,7 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         js("eskimoServices.periodicRetryServices()");
 
-        System.err.println(js("return JSON.stringify (window.uiConfigsToRetry)"));
+        //System.err.println(js("return JSON.stringify (window.uiConfigsToRetry)"));
 
         assertTrue (
                 new JSONArray("[{" +

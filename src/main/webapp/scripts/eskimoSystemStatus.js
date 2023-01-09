@@ -117,14 +117,14 @@ eskimo.SystemStatus = function() {
 
                 $('#show-master-services-btn').click($.proxy (() => {
                     $(".filter-btn").attr("class", "btn btn-secondary ms-2 filter-btn");
-                    $("#show-master-services-btn").attr("class", "btn filter-btn btn-success ms-2");
+                    $("#show-master-services-btn").attr("class", "btn filter-btn btn-info ms-2");
                     setNodeFilter ("master");
                     showStatus(true);
                 }, this));
 
                 $('#show-issues-btn').click($.proxy (() => {
                     $(".filter-btn").attr("class", "btn btn-secondary ms-2 filter-btn");
-                    $("#show-issues-btn").attr("class", "btn filter-btn btn-success ms-2");
+                    $("#show-issues-btn").attr("class", "btn filter-btn btn-info ms-2");
                     setNodeFilter ("issues");
                     showStatus(true);
                 }, this));

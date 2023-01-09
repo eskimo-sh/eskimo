@@ -173,7 +173,7 @@ eskimo.Setup = function() {
             }
 
             if (data.message) {
-                showSetupMessage(data.message, true);
+                eskimoMain.alert(ESKIMO_ALERT_LEVEL.INFO, data.message);
             }
         }
     }
@@ -206,25 +206,6 @@ eskimo.Setup = function() {
     }
     this.showSetup = showSetup;
 
-    function showSetupMessage(message, success) {
-        let setupWarning = $("#setup-warning");
-        $.showElement(setupWarning);
-
-        let setupWarningMessage = $("#setup-warning-message");
-        if (success) {
-            setupWarningMessage.attr('class', "alert alert-info bg-info text-white border-0");
-        } else {
-            setupWarningMessage.attr('class', "alert alert-danger bg-danger text-white border-0");
-        }
-
-        setupWarningMessage.html(message);
-
-        setTimeout(() => {
-            $.hideElement(setupWarning);
-        }, MESSAGE_SHOW_DURATION);
-    }
-    this.showSetupMessage = showSetupMessage;
-
     function doSaveSetup (setupConfig) {
         $.ajaxPost({
             timeout: 1000 * 120,
@@ -239,7 +220,7 @@ eskimo.Setup = function() {
 
                 if (!data || data.error) {
                     console.error(atob(data.error));
-                    showSetupMessage(atob(data.error), false);
+                    eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, atob(data.error));
                 } else {
 
                     if (!data.command) {
@@ -250,7 +231,7 @@ eskimo.Setup = function() {
                             that.eskimoSetupCommand.showCommand(data.command);
 
                         } else {
-                            showSetupMessage("Configuration applied successfully", true);
+                            eskimoMain.alert(ESKIMO_ALERT_LEVEL.INFO, "Configuration applied successfully");
                             that.eskimoMain.handleSetupCompleted();
                         }
                     }
@@ -271,19 +252,19 @@ eskimo.Setup = function() {
         // coherence checks
         let setupStorage = $("#setup_storage");
         if (setupStorage.val() == null || setupStorage.val() == "") {
-            showSetupMessage("Configuration Storage path should be set", false);
+            eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "Configuration Storage path should be set");
             return false;
         }
 
         let sshUserName = $("#ssh_username");
         if (sshUserName.val() == null || sshUserName.val() == "") {
-            showSetupMessage("SSH Username to use to reach cluster nodes should be set", false);
+            eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "SSH Username to use to reach cluster nodes should be set");
             return false;
         }
 
         let contentSShKey = $("#content-ssh-key");
         if (contentSShKey.val() == null || contentSShKey.val() == "") {
-            showSetupMessage("SSH Identity Private Key to use to reach cluster nodes should be set", false);
+            eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "SSH Identity Private Key to use to reach cluster nodes should be set");
             return false;
         }
 

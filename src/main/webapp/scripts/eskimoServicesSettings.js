@@ -130,31 +130,12 @@ eskimo.ServicesSettings = function () {
                 // error handler
                 console.log(jqXHR);
                 console.log(status);
-                showServicesSettingsMessage('fail : ' + status, false);
+                eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, 'fail : ' + status);
 
                 that.eskimoMain.hideProgressbar();
             }
         });
     }
-
-    function showServicesSettingsMessage(message, success) {
-        let servicesSettingsWarning = $("#services-settings-warning");
-        $.showElement(servicesSettingsWarning);
-
-        let servicesSettingsWarningMessage = $("#services-settings-warning-message");
-        if (success) {
-            servicesSettingsWarningMessage.attr('class', "alert alert-info bg-info text-white border-0");
-        } else {
-            servicesSettingsWarningMessage.attr('class', "alert alert-danger bg-danger text-white border-0");
-        }
-
-        servicesSettingsWarningMessage.html(message);
-
-        setTimeout(() => {
-            $.hideElement(servicesSettingsWarning);
-        }, 5000);
-    }
-    this.showServicesSettingsMessage = showServicesSettingsMessage;
 
     function showServicesSettings () {
 

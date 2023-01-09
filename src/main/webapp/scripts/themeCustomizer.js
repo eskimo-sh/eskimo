@@ -178,7 +178,6 @@ class ThemeCustomizer {
 
         const menuToggleBtn = document.querySelector('.button-toggle-menu');
         if (menuToggleBtn) {
-
             menuToggleBtn.addEventListener('click', () => {
                 let configSize = self.config.sidenav.size;
                 let size = self.html.getAttribute('data-sidenav-size', configSize);
@@ -191,40 +190,15 @@ class ThemeCustomizer {
                         $(".simplebar-content-wrapper").css("width", "");
                         $(".simplebar-offset").css("width", "");
                     }
+                    self.html.classList.remove('sidebar-enable');
                 } else {
                     $(".simplebar-content-wrapper").css("width", "");
                     $(".simplebar-offset").css("width", "");
                     self.showBackdrop();
-                }
-
-                // Todo: old implementation
-                self.html.classList.toggle('sidebar-enable');
-
-            });
-
-            /* Eskimo new */
-            /*
-            menuToggleBtn.addEventListener('click', function () {
-                let configSize = self.config.sidenav.size;
-                let size = self.html.getAttribute('data-sidenav-size', configSize);
-
-                console.log (configSize + " - " + size);
-
-                if (size !== 'full') {
-                    self.changeLeftbarSize('full', false);
-                    self.html.classList.remove('sidebar-enable');
-                } else {
-
-                    if (window.innerWidth <= 1140) {
-                        self.showBackdrop();
-                    } else {
-                        self.changeLeftbarSize('default', false);
-                    }
 
                     self.html.classList.toggle('sidebar-enable');
                 }
             });
-            */
         }
 
         const hoverBtn = document.querySelectorAll('.button-sm-hover');
@@ -295,26 +269,6 @@ class ThemeCustomizer {
             self.changeLayoutMode(self.config.layout.mode);
         }
     }
-
-    /* New Eskimo */
-    /*
-    _adjustLayout() {
-        const self = this;
-
-        if (window.innerWidth <= 1140) {
-            self.changeLeftbarSize('full', false);
-
-            if (self.html.classList.contains('sidebar-enable')) {
-                self.showBackdrop();
-            }
-
-
-        } else {
-            self.changeLeftbarSize(self.config.sidenav.size);
-            self.changeLayoutMode(self.config.layout.mode);
-        }
-    }
-    */
 
     setSwitchFromConfig() {
 

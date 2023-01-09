@@ -687,10 +687,18 @@ td.operation-title{
     color: black;
 }
 
-.side-nav-link img {
+.side-nav-item .side-nav-link img {
     width: 20px;
     height: 20px;
+    filter: brightness(0.80);
+}
+
+.side-nav-item.disabled .side-nav-link img {
     filter: brightness(0.60);
+}
+
+.side-nav-item.menuitem-active .side-nav-link img {
+    filter: brightness(0.95);
 }
 
 .side-nav .side-nav-link img:first-child{

@@ -235,7 +235,7 @@ public abstract class AbstractWebTest {
                 "    serviceMenuClear : function() { return true; },\n"+
                 "    windowResize : function() {  },\n"+
                 "    hasRole : function(role) { return true; },\n"+
-                "    alert : function(level, message) { alert(level + ' : ' + message); }\n"+
+                "    alert : function(level, message) { alert(level + ' : ' + message); window.lastAlert = level + ' : ' + message; }\n"+
                 "}");
 
         js("window.ESKIMO_ALERT_LEVEL = {ERROR: 3, WARNING: 2, INFO: 1}");

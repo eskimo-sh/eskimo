@@ -71,26 +71,37 @@ eskimo.Menu = function() {
                 $(".simplebar-wrapper").mouseover(function(e) {
                     let x = e.pageX - this.offsetLeft;
                     let y = e.pageY - this.offsetTop;
-                    /*
-                    console.log (x + " - " + y);
-                    console.log (this.id);
-                    */
 
                     const html = document.getElementsByTagName('html')[0]
 
                     let size = html.getAttribute('data-sidenav-size');
+
+                    const $simplebarContentWrapper = $(".simplebar-content-wrapper");
+                    const $simplebarOffset = $(".simplebar-offset");
+
                     if (size !== 'full') {
                         if (size === 'condensed') {
                             if (x > 70) {
-                                $(".simplebar-content-wrapper").css("width", "");
-                                $(".simplebar-offset").css("width", "");
+                                $simplebarContentWrapper.css("width", "");
+                                $simplebarOffset.css("width", "");
                             } else {
-                                $(".simplebar-content-wrapper").css("width", "260px");
-                                $(".simplebar-offset").css("width", "260px");
+                                $simplebarContentWrapper.css("width", "260px");
+                                $simplebarOffset.css("width", "260px");
                             }
                         } else {
-                            $(".simplebar-content-wrapper").css("width", "");
-                            $(".simplebar-offset").css("width", "");
+                            if ($simplebarContentWrapper.get(0).style.width === "260px") { // don't use $().css
+                                $simplebarContentWrapper.css("width", "");
+                            }
+                            if ($simplebarOffset.get(0).style.width === "260px") { // don't use $().css
+                                $simplebarOffset.css("width", "");
+                            }
+                        }
+                    } else {
+                        if ($simplebarContentWrapper.get(0).style.width === "260px") { // don't use $().css
+                            $simplebarContentWrapper.css("width", "");
+                        }
+                        if ($simplebarOffset.get(0).style.width === "260px") { // don't use $().css
+                            $simplebarOffset.css("width", "");
                         }
                     }
                     if (x > 70) {

@@ -660,7 +660,8 @@ html[data-sidenav-color=dark][data-sidenav-size=condensed] .side-nav .side-nav-i
 
 /* EDIT-ESKIMO-2023-01-09-SIMPLEBAR-CONDENSED */
 html[data-sidenav-color=dark][data-sidenav-size=condensed] .side-nav .side-nav-item:not(.nohover):hover .side-nav-link{
-    background:#727cf5;
+    /*background:#727cf5;*/
+    background:#39afd1;
     color:#fff!important;
     -webkit-transition:none;
     transition:none
