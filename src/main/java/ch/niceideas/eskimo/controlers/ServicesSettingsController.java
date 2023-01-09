@@ -89,8 +89,6 @@ public class ServicesSettingsController extends AbstractOperationController{
 
         try {
 
-            // first of all check nodes config
-
             // Create OperationsCommand
             SettingsOperationsCommand command = SettingsOperationsCommand.create(settingsFormAsString, servicesSettingsService);
 

@@ -66,7 +66,7 @@ public class NotificationController extends AbstractInformationController<JSONOb
             Pair<Integer, List<JSONObject>> newLines = notificationService.fetchElements (lastLine);
 
             return ReturnStatusHelper.createOKStatus(map -> {
-                map.put("lastLine", ""+newLines.getKey());
+                map.put("lastLine", "" + newLines.getKey());
                 map.put("notifications", new JSONArray(newLines.getValue().toArray()));
             });
 

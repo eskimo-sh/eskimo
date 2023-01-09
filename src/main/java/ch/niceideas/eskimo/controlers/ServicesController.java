@@ -94,10 +94,10 @@ public class ServicesController {
     public String getUIServicesStatusConfig() {
         return ReturnStatusHelper.createOKStatus(map -> {
             Map<String, Object> uiServicesStatusConfig = new HashMap<>();
+
             Arrays.stream(servicesDefinition.listAllServices())
                     .map(name -> servicesDefinition.getService(name))
                     .forEach(service -> uiServicesStatusConfig.put (service.getName(), service.toUiStatusConfigJSON()));
-
 
             map.put("uiServicesStatusConfig", new JSONObject(uiServicesStatusConfig));
         });
@@ -155,15 +155,15 @@ public class ServicesController {
     public String getKubernetesServices() {
         return ReturnStatusHelper.createOKStatus(map -> {
 
-            Map<String, Object> servicesConfigurations = new HashMap<>();
+            Map<String, Object> kubeServicesConfig = new HashMap<>();
 
             Arrays.stream(servicesDefinition.listAllServices())
                     .map(name -> servicesDefinition.getService(name))
                     .filter(Service::isKubernetes)
-                    .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));
+                    .forEach(service -> kubeServicesConfig.put (service.getName(), service.toConfigJSON()));
 
             map.put("kubernetesServices", new JSONArray(servicesDefinition.listKubernetesServices()));
-            map.put("kubernetesServicesConfigurations", new JSONObject(servicesConfigurations));
+            map.put("kubernetesServicesConfigurations", new JSONObject(kubeServicesConfig));
         });
     }
 
