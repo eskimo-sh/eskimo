@@ -67,57 +67,56 @@ eskimo.Menu = function() {
                 $("#main-menu-show-operations-link").click(that.eskimoOperations.showOperations);
                 $("#user-logout").click(() => { window.location = "logout"; });
 
-                /* ESKIMO-2023-01-08 - adapt left menu in condensed mode */
-                $(".simplebar-wrapper").mouseover(function(e) {
-                    let x = e.pageX - this.offsetLeft;
-                    let y = e.pageY - this.offsetTop;
-
-                    const html = document.getElementsByTagName('html')[0]
-
-                    let size = html.getAttribute('data-sidenav-size');
-
-                    const $simplebarContentWrapper = $(".simplebar-content-wrapper");
-                    const $simplebarOffset = $(".simplebar-offset");
-
-                    if (size !== 'full') {
-                        if (size === 'condensed') {
-                            if (x > 70) {
-                                $simplebarContentWrapper.css("width", "");
-                                $simplebarOffset.css("width", "");
-                            } else {
-                                $simplebarContentWrapper.css("width", "260px");
-                                $simplebarOffset.css("width", "260px");
-                            }
-                        } else {
-                            if ($simplebarContentWrapper.get(0).style.width === "260px") { // don't use $().css
-                                $simplebarContentWrapper.css("width", "");
-                            }
-                            if ($simplebarOffset.get(0).style.width === "260px") { // don't use $().css
-                                $simplebarOffset.css("width", "");
-                            }
-                        }
-                    } else {
-                        if ($simplebarContentWrapper.get(0).style.width === "260px") { // don't use $().css
-                            $simplebarContentWrapper.css("width", "");
-                        }
-                        if ($simplebarOffset.get(0).style.width === "260px") { // don't use $().css
-                            $simplebarOffset.css("width", "");
-                        }
-                    }
-                    if (x > 70) {
-                        $(".side-nav-item").addClass("nohover");
-                    } else {
-                        $(".side-nav-item").removeClass("nohover");
-                    }
-                });
-
-                // TODO
+                $(".simplebar-wrapper").mouseover(sidebarMouseover);
 
             } else if (statusTxt === "error") {
                 alert("Error: " + jqXHR.status + " " + jqXHR.statusText);
             }
         });
     };
+
+    function sidebarMouseover(e) {
+        let x = e.pageX - this.offsetLeft;
+        let y = e.pageY - this.offsetTop;
+
+        const html = document.getElementsByTagName('html')[0]
+
+        let size = html.getAttribute('data-sidenav-size');
+
+        const $simplebarContentWrapper = $(".simplebar-content-wrapper");
+        const $simplebarOffset = $(".simplebar-offset");
+
+        if (size !== 'full') {
+            if (size === 'condensed') {
+                if (x > 70) {
+                    $simplebarContentWrapper.css("width", "");
+                    $simplebarOffset.css("width", "");
+                } else {
+                    $simplebarContentWrapper.css("width", "260px");
+                    $simplebarOffset.css("width", "260px");
+                }
+            } else {
+                if ($simplebarContentWrapper.get(0).style.width === "260px") { // don't use $().css
+                    $simplebarContentWrapper.css("width", "");
+                }
+                if ($simplebarOffset.get(0).style.width === "260px") { // don't use $().css
+                    $simplebarOffset.css("width", "");
+                }
+            }
+        } else {
+            if ($simplebarContentWrapper.get(0).style.width === "260px") { // don't use $().css
+                $simplebarContentWrapper.css("width", "");
+            }
+            if ($simplebarOffset.get(0).style.width === "260px") { // don't use $().css
+                $simplebarOffset.css("width", "");
+            }
+        }
+        if (x > 70) {
+            $(".side-nav-item").addClass("nohover");
+        } else {
+            $(".side-nav-item").removeClass("nohover");
+        }
+    }
 
     this.adaptMenuToUserRole = function () {
 

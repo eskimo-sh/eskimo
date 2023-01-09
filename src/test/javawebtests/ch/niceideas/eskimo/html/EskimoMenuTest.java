@@ -72,9 +72,11 @@ public class EskimoMenuTest extends AbstractWebTest {
         js("eskimo.Setup = function(){ this.initialize = function(){} ;};");
         js("eskimo.About = function(){ this.initialize = function(){}; };");
         js("eskimo.EditUser = function(){ this.initialize = function(){}; };");
+        js("eskimo.Alert = function(){ this.showAlert = function (level, message) {window.lastAlert = level + \" : \" + message} };");
 
         js("window.eskimoSystemStatus = new eskimo.SystemStatus();");
         js("window.eskimoServices = new eskimo.Services();");
+        js("window.eskimoAlert = new eskimo.Alert();");
 
         // Don0t let jquery load real eskimoMain
         js("$.fn.ready = function () {};");
@@ -127,6 +129,7 @@ public class EskimoMenuTest extends AbstractWebTest {
         js("eskimoMenu.eskimoNodesConfig = eskimoNodesConfig;");
         js("eskimoMenu.eskimoSystemStatus = eskimoSystemStatus;");
         js("eskimoMenu.eskimoServices = eskimoServices;");
+        js("eskimoMenu.eskimoAlert = eskimoAlert;");
 
         waitForElementIdInDOM("main-menu-show-operations-link");
     }
@@ -247,8 +250,32 @@ public class EskimoMenuTest extends AbstractWebTest {
 
     @Test
     public void testEnforceMenuConsisteny() {
-        fail ("To Be Implemented");
-    }
 
+        js("$(\"#left-menu-placeholder\").html('<a class=\"side-nav-link\" id=\"tagada\"></a>')");
+
+        js("eskimoMenu.enforceMenuConsisteny();");
+        assertJavascriptEquals("3 : menu with id 'tagada' is expected of having an id of form 'main-menu-show-XXX-link'. There will be inconsistencies down the line.", "window.lastAlert");
+
+        js("$(\"#left-menu-placeholder\").html('<a class=\"side-nav-link\" id=\"main-menu-show-grafana-link\"></a>" +
+                "<a class=\"side-nav-link\" id=\"main-menu-show-zeppelin-link\"></a>" +
+                "<a class=\"side-nav-link\" id=\"main-menu-show-cerebro-link\"></a>" +
+                "<div id=\"inner-content-grafana\"></div>" +
+                "<div id=\"inner-content-zeppelin\"></div>')");
+
+        js("eskimoMenu.enforceMenuConsisteny();");
+        assertJavascriptEquals("3 : No target screen found with id 'inner-content-cerebro'", "window.lastAlert");
+
+        js("$(\"#left-menu-placeholder\").html('<a class=\"side-nav-link\" id=\"main-menu-show-grafana-link\"></a>" +
+                "<a class=\"side-nav-link\" id=\"main-menu-show-zeppelin-link\"></a>" +
+                "<a class=\"side-nav-link\" id=\"main-menu-show-cerebro-link\"></a>" +
+                "<div id=\"inner-content-grafana\"></div>" +
+                "<div id=\"inner-content-zeppelin\"></div>" +
+                "<div id=\"inner-content-cerebro\"></div>')");
+
+        js ("window.lastAlert = '';");
+
+        js("eskimoMenu.enforceMenuConsisteny();");
+        assertJavascriptEquals("", "window.lastAlert");
+    }
 
 }
