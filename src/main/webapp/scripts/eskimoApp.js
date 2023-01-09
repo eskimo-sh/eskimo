@@ -1,7 +1,42 @@
+/*
+This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
+well to this individual file than to the Eskimo Project as a whole.
 
-(function ($) {
+Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+Author : eskimo.sh / https://www.eskimo.sh
 
-    'use strict';
+Eskimo is available under a dual licensing model : commercial and GNU AGPL.
+If you did not acquire a commercial licence for Eskimo, you can still use it and consider it free software under the
+terms of the GNU Affero Public License. You can redistribute it and/or modify it under the terms of the GNU Affero
+Public License  as published by the Free Software Foundation, either version 3 of the License, or (at your option)
+any later version.
+Compliance to each and every aspect of the GNU Affero Public License is mandatory for users who did no acquire a
+commercial license.
+
+Eskimo is distributed as a free software under GNU AGPL in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+Affero Public License for more details.
+
+You should have received a copy of the GNU Affero Public License along with Eskimo. If not,
+see <https://www.gnu.org/licenses/> or write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA, 02110-1301 USA.
+
+You can be released from the requirements of the license by purchasing a commercial license. Buying such a
+commercial license is mandatory as soon as :
+- you develop activities involving Eskimo without disclosing the source code of your own product, software,
+  platform, use cases or scripts.
+- you deploy eskimo as part of a commercial product, platform or software.
+For more information, please contact eskimo.sh at https://www.eskimo.sh
+
+The above copyright notice and this licensing notice shall be included in all copies or substantial portions of the
+Software.
+*/
+
+
+if (typeof eskimo === "undefined" || eskimo == null) {
+    window.eskimo = {}
+}
+eskimo.App = function() {
 
     // Bootstrap Components
     function initComponents() {
@@ -36,9 +71,7 @@
         }
 
         let toastElList = [].slice.call(document.querySelectorAll('.toast'))
-        let toastList = toastElList.map(function (toastEl) {
-            return new bootstrap.Toast(toastEl)
-        })
+        let toastList = toastElList.map(toastEl => new bootstrap.Toast(toastEl))
 
         // Bootstrap Alert Live Example
         const alertPlaceholder = document.getElementById('liveAlertPlaceholder')
@@ -62,12 +95,15 @@
         }
 
         // RTL Layout
-        if (document.getElementById('app-style').href.includes('rtl.min.css')) {
+        if (document.getElementById('app-style') &&
+            document.getElementById('app-style').href &&
+            document.getElementById('app-style').href.includes('rtl.min.css')) {
             document.getElementsByTagName('html')[0].dir = "rtl";
         }
     }
 
     // Portlet Widget (Card Reload, Collapse, and Delete)
+    /*
     function initPortletCard() {
 
         let portletIdentifier = ".card"
@@ -100,6 +136,7 @@
             }, 500 + 300 * (Math.random() * 5));
         });
     }
+    */
 
     //  Multi Dropdown
     function initMultiDropdown() {
@@ -119,19 +156,18 @@
         if ($(".side-nav").length) {
             let navCollapse = $('.side-nav li .collapse');
             let navToggle = $(".side-nav li [data-bs-toggle='collapse']");
-            navToggle.on('click', function (e) {
-                return false;
-            });
+            navToggle.on('click', () => false);
 
             // open one menu at a time only
             navCollapse.on({
-                'show.bs.collapse': function (event) {
+                'show.bs.collapse': event => {
                     let parent = $(event.target).parents('.collapse.show');
                     $('.side-nav .collapse.show').not(event.target).not(parent).collapse('hide');
                 }
             });
 
             // activate the menu in left side bar (Vertical Menu) based on url
+            /*
             $(".side-nav a").each(function () {
                 let pageUrl = window.location.href.split(/[?#]/)[0];
                 if (this.href == pageUrl) {
@@ -152,8 +188,9 @@
                     if (!upperLevelParent.is('body')) upperLevelParent.addClass("menuitem-active");
                 }
             });
+            */
 
-
+            /*
             setTimeout(function () {
                 let activatedItem = document.querySelector('li.menuitem-active .active');
                 if (activatedItem != null) {
@@ -184,7 +221,9 @@
                 };
                 animateScroll();
             }
+                        */
         }
+
     }
 
     // Topbar Menu (HOrizontal Menu)
@@ -208,45 +247,15 @@
         }
     }
 
-    // Topbar Search Form
-    function initSearch() {
-        // Serach Toggle
-        let navDropdowns = $('.navbar-custom .dropdown:not(.app-search)');
-
-        // hide on other click
-        $(document).on('click', function (e) {
-            if (e.target.id == "top-search" || e.target.closest('#search-dropdown')) {
-                $('#search-dropdown').addClass('d-block');
-            } else {
-                $('#search-dropdown').removeClass('d-block');
-            }
-            return true;
-        });
-
-        // Serach Toggle
-        $('#top-search').on('focus', function (e) {
-            e.preventDefault();
-            navDropdowns.children('.dropdown-menu.show').removeClass('show');
-            $('#search-dropdown').addClass('d-block');
-            return false;
-        });
-
-        // hide search on opening other dropdown
-        navDropdowns.on('show.bs.dropdown', function () {
-            $('#search-dropdown').removeClass('d-block');
-        });
-    }
-
     // Topbar Fullscreen Button
     function initfullScreenListener() {
         const self = this;
         let fullScreenBtn = document.querySelector('[data-toggle="fullscreen"]');
-
         if (fullScreenBtn) {
-            fullScreenBtn.addEventListener('click', function (e) {
+            fullScreenBtn.addEventListener('click', e => {
                 e.preventDefault();
                 document.body.classList.toggle('fullscreen-enable')
-                if (!document.fullscreenElement && /* alternative standard method */ !document.mozFullScreenElement && !document.webkitFullscreenElement) {  // current working methods
+                if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement) {  // current working methods
                     if (document.documentElement.requestFullscreen) {
                         document.documentElement.requestFullscreen();
                     } else if (document.documentElement.mozRequestFullScreen) {
@@ -308,7 +317,7 @@
 
         // Input Mask
         if (jQuery().mask) {
-            $('[data-toggle="input-mask"]').each(function (idx, obj) {
+            $('[data-toggle="input-mask"]').each((idx, obj) => {
                 let maskFormat = $(obj).data("maskFormat");
                 let reverse = $(obj).data("reverse");
                 if (reverse != null)
@@ -336,11 +345,11 @@
                 }
             };
 
-            $('[data-toggle="date-picker-range"]').each(function (idx, obj) {
+            $('[data-toggle="date-picker-range"]').each((idx, obj) => {
                 let objOptions = $.extend({}, defaultRangeOptions, $(obj).data());
                 let target = objOptions["targetDisplay"];
                 //rendering
-                $(obj).daterangepicker(objOptions, function (start, end) {
+                $(obj).daterangepicker(objOptions, (start, end) => {
                     if (target)
                         $(target).html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
                 });
@@ -352,8 +361,8 @@
                 "applyButtonClasses": "btn-success"
             };
 
-            $('[data-toggle="date-picker"]').each(function (idx, obj) {
-                var objOptions = $.extend({}, defaultOptions, $(obj).data());
+            $('[data-toggle="date-picker"]').each((idx, obj) => {
+                const objOptions = $.extend({}, defaultOptions, $(obj).data());
                 $(obj).daterangepicker(objOptions);
             });
         }
@@ -368,7 +377,7 @@
                 }
             };
 
-            $('[data-toggle="timepicker"]').each(function (idx, obj) {
+            $('[data-toggle="timepicker"]').each((idx, obj) => {
                 let objOptions = $.extend({}, defaultOptions, $(obj).data());
                 $(obj).timepicker(objOptions);
             });
@@ -380,7 +389,7 @@
 
             };
 
-            $('[data-toggle="touchspin"]').each(function (idx, obj) {
+            $('[data-toggle="touchspin"]').each((idx, obj) => {
                 let objOptions = $.extend({}, defaultOptions, $(obj).data());
                 $(obj).TouchSpin(objOptions);
             });
@@ -397,321 +406,26 @@
                 placement: 'bottom',
             };
 
-            $('[data-toggle="maxlength"]').each(function (idx, obj) {
+            $('[data-toggle="maxlength"]').each((idx, obj) => {
                 let objOptions = $.extend({}, defaultOptions, $(obj).data());
                 $(obj).maxlength(objOptions);
             });
         }
     }
 
-    function init() {
+    this.initialize = function (){
         initComponents();
-        initPortletCard();
+        //initPortletCard();
         initMultiDropdown();
         initLeftSidebar()
         initTopbarMenu();
-        initSearch();
         initfullScreenListener();
         initShowHidePassword();
         initFormValidation();
         initFormAdvance();
     }
 
-    init();
-
-})(jQuery)
+};
 
 
-
-class ThemeCustomizer {
-
-    constructor() {
-        this.html = document.getElementsByTagName('html')[0]
-        this.config = {};
-        this.defaultConfig = window.config;
-    }
-
-    initConfig() {
-        this.defaultConfig = JSON.parse(JSON.stringify(window.defaultConfig));
-        this.config = JSON.parse(JSON.stringify(window.config));
-        this.setSwitchFromConfig();
-    }
-
-    changeLeftbarColor(color) {
-        this.config.sidenav.color = color;
-        this.html.setAttribute('data-sidenav-color', color);
-        this.setSwitchFromConfig();
-    }
-
-    changeLeftbarSize(size, save = true) {
-        this.html.setAttribute('data-sidenav-size', size);
-        if (save) {
-            this.config.sidenav.size = size;
-            this.setSwitchFromConfig();
-        }
-    }
-
-    changeLayoutMode(mode, save = true) {
-        this.html.setAttribute('data-layout-mode', mode);
-        if (save) {
-            this.config.layout.mode = mode;
-            this.setSwitchFromConfig();
-        }
-    }
-
-    changeLayoutPosition(position) {
-        this.config.layout.position = position;
-        this.html.setAttribute('data-layout-position', position);
-        this.setSwitchFromConfig();
-    }
-
-    changeLayoutColor(color) {
-        this.config.theme = color;
-        this.html.setAttribute('data-theme', color);
-        this.setSwitchFromConfig();
-    }
-
-    changeTopbarColor(color) {
-        this.config.topbar.color = color;
-        this.html.setAttribute('data-topbar-color', color);
-        this.setSwitchFromConfig();
-    }
-
-    changeSidebarUser(showUser) {
-
-        this.config.sidenav.user = showUser;
-        if (showUser) {
-            this.html.setAttribute('data-sidenav-user', showUser);
-        } else {
-            this.html.removeAttribute('data-sidenav-user');
-        }
-        this.setSwitchFromConfig();
-    }
-
-    resetTheme() {
-        this.config = JSON.parse(JSON.stringify(window.defaultConfig));
-        this.changeLeftbarColor(this.config.sidenav.color);
-        this.changeLeftbarSize(this.config.sidenav.size);
-        this.changeLayoutColor(this.config.theme);
-        this.changeLayoutMode(this.config.layout.mode);
-        this.changeLayoutPosition(this.config.layout.position);
-        this.changeTopbarColor(this.config.topbar.color);
-        this.changeSidebarUser(this.config.sidenav.user);
-        this._adjustLayout();
-    }
-
-    initSwitchListener() {
-        var self = this;
-        document.querySelectorAll('input[name=data-sidenav-color]').forEach(function (element) {
-            element.addEventListener('change', function (e) {
-                self.changeLeftbarColor(element.value);
-            })
-        });
-        document.querySelectorAll('input[name=data-sidenav-size]').forEach(function (element) {
-            element.addEventListener('change', function (e) {
-                self.changeLeftbarSize(element.value);
-            })
-        });
-
-        document.querySelectorAll('input[name=data-theme]').forEach(function (element) {
-            element.addEventListener('change', function (e) {
-                self.changeLayoutColor(element.value);
-            })
-        });
-        document.querySelectorAll('input[name=data-layout-mode]').forEach(function (element) {
-            element.addEventListener('change', function (e) {
-                self.changeLayoutMode(element.value);
-            })
-        });
-
-        document.querySelectorAll('input[name=data-layout-position]').forEach(function (element) {
-            element.addEventListener('change', function (e) {
-                self.changeLayoutPosition(element.value);
-            })
-        });
-        document.querySelectorAll('input[name=data-layout]').forEach(function (element) {
-            element.addEventListener('change', function (e) {
-                window.location = element.value === 'horizontal' ? 'layouts-horizontal.html' : 'index.html'
-            })
-        });
-        document.querySelectorAll('input[name=data-topbar-color]').forEach(function (element) {
-            element.addEventListener('change', function (e) {
-                self.changeTopbarColor(element.value);
-            })
-        });
-        document.querySelectorAll('input[name=sidebar-user]').forEach(function (element) {
-            element.addEventListener('change', function (e) {
-                self.changeSidebarUser(element.checked);
-            })
-        });
-
-        //TopBar Light Dark
-        var themeColorToggle = document.getElementById('light-dark-mode');
-        if (themeColorToggle) {
-            themeColorToggle.addEventListener('click', function (e) {
-
-                if (self.config.theme === 'light') {
-                    self.changeLayoutColor('dark');
-                } else {
-                    self.changeLayoutColor('light');
-                }
-            });
-        }
-
-        var resetBtn = document.querySelector('#reset-layout')
-        if (resetBtn) {
-            resetBtn.addEventListener('click', function (e) {
-                self.resetTheme();
-            });
-        }
-
-        var menuToggleBtn = document.querySelector('.button-toggle-menu');
-        if (menuToggleBtn) {
-            menuToggleBtn.addEventListener('click', function () {
-                var configSize = self.config.sidenav.size;
-                var size = self.html.getAttribute('data-sidenav-size', configSize);
-
-                console.log (configSize + " - " + size);
-
-                if (size !== 'full') {
-                    /*
-                    if (size === 'condensed') {
-                        self.changeLeftbarSize(configSize == 'condensed' ? 'default' : configSize, false);
-                    } else {
-                        self.changeLeftbarSize('condensed', false);
-                    }
-                    */
-                    self.changeLeftbarSize('full', false);
-                    self.html.classList.remove('sidebar-enable');
-                } else {
-
-                    if (window.innerWidth <= 1140) {
-                        self.showBackdrop();
-                    } else {
-                        self.changeLeftbarSize('default', false);
-                    }
-
-                    self.html.classList.toggle('sidebar-enable');
-                }
-
-            });
-        }
-
-        var hoverBtn = document.querySelectorAll('.button-sm-hover');
-        hoverBtn.forEach(function (element) {
-            element.addEventListener('click', function () {
-                var configSize = self.config.sidenav.size;
-                var size = self.html.getAttribute('data-sidenav-size', configSize);
-
-                if (configSize === 'sm-hover') {
-                    if (size === 'sm-hover-active') {
-                        self.changeLeftbarSize('sm-hover', false);
-                    } else {
-                        self.changeLeftbarSize('sm-hover-active', false);
-                    }
-                }
-            });
-        })
-    }
-
-    showBackdrop() {
-        if (document.getElementById("sidebar-backdrop")) {
-            return;
-        }
-        const backdrop = document.createElement('div');
-        backdrop.id = "sidebar-backdrop"
-        backdrop.classList = 'offcanvas-backdrop fade show';
-        document.body.appendChild(backdrop);
-        document.body.style.overflow = "hidden";
-        if (window.innerWidth > 750) {
-            // document.body.style.paddingRight = "15px";
-        }
-        const self = this
-        backdrop.addEventListener('click', function (e) {
-            self.html.classList.remove('sidebar-enable');
-            document.body.removeChild(backdrop);
-            document.body.style.overflow = null;
-            // document.body.style.paddingRight = null;
-        })
-    }
-
-    initWindowSize() {
-        var self = this;
-        window.addEventListener('resize', function (e) {
-            self._adjustLayout();
-        })
-    }
-
-    _adjustLayout() {
-        var self = this;
-
-        if (window.innerWidth <= 1140) {
-            self.changeLeftbarSize('full', false);
-
-            if (self.html.classList.contains('sidebar-enable')) {
-                self.showBackdrop();
-            }
-
-
-        }
-        /*
-        else if (window.innerWidth >= 750 && window.innerWidth <= 1140) {
-            if (self.config.sidenav.size !== 'full') {
-                if (self.config.sidenav.size === 'sm-hover') {
-                    self.changeLeftbarSize('condensed');
-                } else {
-                    self.changeLeftbarSize('condensed', false);
-                }
-            }
-            if (self.config.layout.mode === 'boxed') {
-                self.changeLayoutMode('fluid', false)
-            }
-
-        }
-        */
-        else {
-            self.changeLeftbarSize(self.config.sidenav.size);
-            self.changeLayoutMode(self.config.layout.mode);
-        }
-    }
-
-    setSwitchFromConfig() {
-
-        sessionStorage.setItem('__HYPER_CONFIG__', JSON.stringify(this.config));
-        // localStorage.setItem('__HYPER_CONFIG__', JSON.stringify(this.config));
-
-        document.querySelectorAll('.right-bar input[type=checkbox]').forEach(function (checkbox) {
-            checkbox.checked = false;
-        })
-
-        var config = this.config;
-        if (config) {
-            var layoutNavSwitch = document.querySelector('input[type=radio][name=data-layout][value=' + config.nav + ']');
-            var layoutColorSwitch = document.querySelector('input[type=radio][name=data-theme][value=' + config.theme + ']');
-            var layoutModeSwitch = document.querySelector('input[type=radio][name=data-layout-mode][value=' + config.layout.mode + ']');
-            var topbarColorSwitch = document.querySelector('input[type=radio][name=data-topbar-color][value=' + config.topbar.color + ']');
-            var leftbarColorSwitch = document.querySelector('input[type=radio][name=data-sidenav-color][value=' + config.sidenav.color + ']');
-            var leftbarSizeSwitch = document.querySelector('input[type=radio][name=data-sidenav-size][value=' + config.sidenav.size + ']');
-            var layoutSizeSwitch = document.querySelector('input[type=radio][name=data-layout-position][value=' + config.layout.position + ']');
-            var sidebarUserSwitch = document.querySelector('input[type=checkbox][name=sidebar-user]');
-
-            if (layoutNavSwitch) layoutNavSwitch.checked = true;
-            if (layoutColorSwitch) layoutColorSwitch.checked = true;
-            if (layoutModeSwitch) layoutModeSwitch.checked = true;
-            if (topbarColorSwitch) topbarColorSwitch.checked = true;
-            if (leftbarColorSwitch) leftbarColorSwitch.checked = true;
-            if (leftbarSizeSwitch) leftbarSizeSwitch.checked = true;
-            if (layoutSizeSwitch) layoutSizeSwitch.checked = true;
-            if (sidebarUserSwitch && config.sidenav.user.toString() === "true") sidebarUserSwitch.checked = true;
-        }
-    }
-
-    init() {
-        this.initConfig();
-        this.initSwitchListener();
-        this.initWindowSize();
-        this._adjustLayout();
-        this.setSwitchFromConfig();
-    }
-}
 

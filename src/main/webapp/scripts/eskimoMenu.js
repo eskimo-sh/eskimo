@@ -67,6 +67,39 @@ eskimo.Menu = function() {
                 $("#main-menu-show-operations-link").click(that.eskimoOperations.showOperations);
                 $("#user-logout").click(() => { window.location = "logout"; });
 
+                /* ESKIMO-2023-01-08 - adapt left menu in condensed mode */
+                $(".simplebar-wrapper").mouseover(function(e) {
+                    let x = e.pageX - this.offsetLeft;
+                    let y = e.pageY - this.offsetTop;
+                    /*
+                    console.log (x + " - " + y);
+                    console.log (this.id);
+                    */
+
+                    const html = document.getElementsByTagName('html')[0]
+
+                    let size = html.getAttribute('data-sidenav-size');
+                    if (size !== 'full') {
+                        if (size === 'condensed') {
+                            if (x > 70) {
+                                $(".simplebar-content-wrapper").css("width", "");
+                                $(".simplebar-offset").css("width", "");
+                            } else {
+                                $(".simplebar-content-wrapper").css("width", "260px");
+                                $(".simplebar-offset").css("width", "260px");
+                            }
+                        } else {
+                            $(".simplebar-content-wrapper").css("width", "");
+                            $(".simplebar-offset").css("width", "");
+                        }
+                    }
+                    if (x > 70) {
+                        $(".side-nav-item").addClass("nohover");
+                    } else {
+                        $(".side-nav-item").removeClass("nohover");
+                    }
+                });
+
                 // TODO
 
             } else if (statusTxt === "error") {

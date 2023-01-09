@@ -45,7 +45,7 @@ public class EskimoMenuTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript("app.js");
+        loadScript("eskimoApp.js");
         loadScript("eskimoMenu.js");
         loadScript("eskimoUtils.js");
 

@@ -55,6 +55,7 @@ eskimo.Main = function() {
     let eskimoServicesSelection = null;
     let eskimoEditUser = null;
     let eskimoMenu = null;
+    let eskimoApp = null;
 
     let eskimoKubernetesServicesSelection = null;
     let eskimoKubernetesServicesConfig = null;
@@ -99,6 +100,7 @@ eskimo.Main = function() {
         eskimoAlert = new eskimo.Alert();
         eskimoEditUser = new eskimo.EditUser();
         eskimoMenu = new eskimo.Menu();
+        eskimoApp = new eskimo.App();
 
         // B. Inject dependencies
         let initObject = {
@@ -121,6 +123,7 @@ eskimo.Main = function() {
             eskimoAbout: eskimoAbout,
             eskimoAlert: eskimoAlert,
             eskimoMenu: eskimoMenu,
+            eskimoApp: eskimoApp,
             eskimoMain: this
         };
 
@@ -210,6 +213,8 @@ eskimo.Main = function() {
         eskimoEditUser.initialize();
 
         eskimoAlert.initialize();
+
+        eskimoApp.initialize();
 
         // about
         $("#main-show-about-link").click(eskimoAbout.showAbout);

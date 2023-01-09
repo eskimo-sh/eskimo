@@ -46,7 +46,7 @@ public class EskimoMainTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript("app.js");
+        loadScript("eskimoApp.js");
         loadScript("eskimoMain.js");
         loadScript("eskimoUtils.js");
 
