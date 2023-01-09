@@ -37,7 +37,6 @@ package ch.niceideas.eskimo.html;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -80,7 +79,7 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
     }
 
     @AfterEach
-    public void tearDown() throws Exception {
+    public void tearDown() {
         // need to restore this for further code which require it
         // it's impossible for me to figure, but without this the github build completes in ... multiple jours.
         js("window.XMLHttpRequest = window.XMLHttpRequestBAK;");

@@ -1,6 +1,5 @@
 package ch.niceideas.eskimo.terminal;
 
-import ch.niceideas.common.utils.FileException;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +41,7 @@ public class SessionTest {
     }
 
 
-    private ProcessWithPty getTestProcessWithPty() throws IOException, FileException {
+    private ProcessWithPty getTestProcessWithPty() throws IOException {
 
         ProcessBuilder pb = new ProcessBuilder();
         pb.redirectErrorStream(true);

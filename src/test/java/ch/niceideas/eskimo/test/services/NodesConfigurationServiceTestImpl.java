@@ -5,7 +5,6 @@ import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.services.NodesConfigurationService;
 import ch.niceideas.eskimo.services.SSHCommandException;
 import ch.niceideas.eskimo.services.SystemException;
-import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
@@ -30,7 +29,7 @@ public class NodesConfigurationServiceTestImpl implements NodesConfigurationServ
     }
 
     @Override
-    public void applyNodesConfig(ServiceOperationsCommand command) throws NodesConfigurationException {
+    public void applyNodesConfig(ServiceOperationsCommand command) {
         this.appliedCommand = command;
     }
 
@@ -40,27 +39,27 @@ public class NodesConfigurationServiceTestImpl implements NodesConfigurationServ
     }
 
     @Override
-    public void restartServiceForSystem(SimpleOperationCommand.SimpleOperationId operationId) throws SystemException {
+    public void restartServiceForSystem(SimpleOperationCommand.SimpleOperationId operationId) {
         // No-Op
     }
 
     @Override
-    public void installEskimoBaseSystem(MessageLogger ml, String node) throws SSHCommandException {
+    public void installEskimoBaseSystem(MessageLogger ml, String node) {
 
     }
 
     @Override
-    public String getNodeFlavour(SSHConnection connection) throws SSHCommandException, SystemException {
+    public String getNodeFlavour(SSHConnection connection) {
         return "debian";
     }
 
     @Override
-    public void copyCommand (String source, String target, SSHConnection connection) throws SSHCommandException {
+    public void copyCommand (String source, String target, SSHConnection connection) {
 
     }
 
     @Override
-    public void uninstallService(ServiceOperationsCommand.ServiceOperationId operationId) throws SystemException {
+    public void uninstallService(ServiceOperationsCommand.ServiceOperationId operationId) {
 
     }
 

@@ -93,7 +93,7 @@ public class ServicesDefinitionTest {
     }
 
     @Test
-    public void testAfterPropertiesSet() throws Exception {
+    public void testAfterPropertiesSet() {
         assertEquals (14, servicesDefinition.listAllServices().length);
     }
 
@@ -523,6 +523,5 @@ public class ServicesDefinitionTest {
         }});
 
         nodesConfigurationChecker.checkNodesSetup(nodesConfig3);
-
     }
 }

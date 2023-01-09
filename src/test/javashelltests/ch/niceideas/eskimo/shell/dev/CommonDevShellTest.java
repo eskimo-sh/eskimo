@@ -37,8 +37,10 @@ package ch.niceideas.eskimo.shell.dev;
 
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.shell.setup.AbstractSetupShellTest;
-import org.junit.Assume;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;

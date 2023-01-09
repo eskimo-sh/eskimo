@@ -34,17 +34,13 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.model.SSHConnection;
-import ch.niceideas.eskimo.proxy.ProxyManagerService;
-import ch.niceideas.eskimo.proxy.ProxyManagerServiceImpl;
+import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
 import ch.niceideas.eskimo.test.services.ProxyManagerServiceTestImpl;
-import com.trilead.ssh2.LocalPortForwarder;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,10 +55,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
-import java.io.File;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.apache.logging.log4j.core.config.Configurator.setLevel;
 import static org.junit.jupiter.api.Assertions.*;

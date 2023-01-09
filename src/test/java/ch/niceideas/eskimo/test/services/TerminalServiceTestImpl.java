@@ -70,7 +70,7 @@ public class TerminalServiceTestImpl implements TerminalService {
     }
 
     @Override
-    public ScreenImage postUpdate(String terminalBody) throws IOException {
+    public ScreenImage postUpdate(String terminalBody) {
         Terminal t = new Terminal(60, 24);
         return t.dumpHtml(true, 30);
     }

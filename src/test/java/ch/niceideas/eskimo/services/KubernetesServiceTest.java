@@ -211,7 +211,7 @@ public class KubernetesServiceTest {
         KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("KubernetesServiceTest/kubernetes-services-config.json"), StandardCharsets.UTF_8));
         kubeServicesConfig.setValueForPath("cerebro_install", "off");
 
-        KubernetesOperationsCommand command = KubernetesOperationsCommand.create (
+        KubernetesOperationsCommand.create (
                 servicesDefinition,
                 systemServiceTest,
                 StandardSetupHelpers.getStandardKubernetesConfig(),

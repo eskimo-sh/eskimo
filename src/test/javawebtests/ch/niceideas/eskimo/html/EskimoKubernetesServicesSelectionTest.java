@@ -113,7 +113,7 @@ public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
     }
 
     @Test
-    public void testSelectAll() throws Exception {
+    public void testSelectAll() {
 
         js("eskimoKubernetesServicesSelection.kubernetesServicesSelectionSelectAll();");
 

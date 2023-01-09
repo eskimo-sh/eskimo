@@ -35,7 +35,6 @@
 
 package ch.niceideas.eskimo.shell.setup;
 
-import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.StringUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -44,6 +43,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class KubernetesDashboardSetupTest extends AbstractSetupShellTest {
 
@@ -86,8 +87,8 @@ public class KubernetesDashboardSetupTest extends AbstractSetupShellTest {
         // setup.sh and common.sh are automatic
         copyFile(jailPath, "kubernetes-dashboard.k8s.yaml");
 
-        new File (jailPath + "/kubernetesui_dashboard.tar.gz").createNewFile();
-        new File (jailPath + "/kubernetesui_metrics-scraper.tar.gz").createNewFile();
+        assertTrue (new File (jailPath + "/kubernetesui_dashboard.tar.gz").createNewFile());
+        assertTrue (new File (jailPath + "/kubernetesui_metrics-scraper.tar.gz").createNewFile());
     }
 
     @Override

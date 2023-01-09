@@ -101,7 +101,9 @@ public class WebSocketProxyTest {
                 clientSessionReference.set(session);
             }
             protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-                clientBlockingQueue.offer(message.getPayload());
+                if (!clientBlockingQueue.offer(message.getPayload())) {
+                    logger.warn("AbstractWebSocketHandler - clientBlockingQueue.offer returned false");
+                }
             }
         }, server.getWsBaseUrl() + "ws/cerebro/application");
 
@@ -146,7 +148,9 @@ public class WebSocketProxyTest {
                 clientSessionReference.set(session);
             }
             protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-                clientBlockingQueue.offer(message.getPayload());
+                if (!clientBlockingQueue.offer(message.getPayload())) {
+                    logger.warn("AbstractWebSocketHandler - clientBlockingQueue.offer returned false");
+                }
             }
         }, server.getWsBaseUrl() + "ws/zeppelin/application");
 
@@ -191,7 +195,9 @@ public class WebSocketProxyTest {
                             String msg = message.getPayload();
                             if (!msg.equals("CONNECT")) {
                                 // store it
-                                serverBlockingQueue.offer(msg);
+                                if (!serverBlockingQueue.offer(msg)) {
+                                    logger.warn("AbstractWebSocketHandler - serverBlockingQueue.offer returned false");
+                                }
                                 // and send it back
                                 session.sendMessage(new TextMessage("PONG : " + message.getPayload()));
                             }

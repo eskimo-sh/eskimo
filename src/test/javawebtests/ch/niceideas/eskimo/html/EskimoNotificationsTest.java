@@ -37,7 +37,6 @@ package ch.niceideas.eskimo.html;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EskimoNotificationsTest extends AbstractWebTest {
@@ -56,7 +55,7 @@ public class EskimoNotificationsTest extends AbstractWebTest {
     }
 
     @Test
-    public void testAddNotifications() throws Exception {
+    public void testAddNotifications() {
         js("eskimoNotifications.addNotification({\n" +
                 "      \"type\": \"Info\",\n" +
                 "      \"timestamp\": \"1672340848266\",\n" +
@@ -75,7 +74,7 @@ public class EskimoNotificationsTest extends AbstractWebTest {
     }
 
     @Test
-    public void testFetchNotifications() throws Exception {
+    public void testFetchNotifications() {
 
         js("$.ajaxGet = function(object) {" +
                 "    object.success({\n" +
@@ -116,13 +115,13 @@ public class EskimoNotificationsTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRenderTimestamp() throws Exception {
+    public void testRenderTimestamp() {
         assertJavascriptEquals("2022-12-29 20:7:28", "eskimoNotifications.renderTimestamp('1672340848942')");
         assertJavascriptEquals("2023-1-8 14:40:14", "eskimoNotifications.renderTimestamp('1673185214678')");
     }
 
     @Test
-    public void testClearNotificationsWithLink() throws Exception {
+    public void testClearNotificationsWithLink() {
 
         testAddNotifications();
 

@@ -34,8 +34,6 @@
 
 package ch.niceideas.eskimo.html;
 
-import ch.niceideas.common.utils.ResourceUtils;
-import ch.niceideas.common.utils.StreamUtils;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -100,7 +98,7 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
     }
 
     @Test
-    public void testSaveKubernetesServicesButtonClick() throws Exception {
+    public void testSaveKubernetesServicesButtonClick() {
 
         testRenderKubernetesConfig();
 
@@ -136,7 +134,7 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
     }
 
     @Test
-    public void testSelectAll() throws Exception {
+    public void testSelectAll() {
 
         testRenderKubernetesConfig();
 
@@ -164,7 +162,7 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRenderKubernetesConfig() throws Exception {
+    public void testRenderKubernetesConfig() {
         js("eskimoKubernetesServicesConfig.renderKubernetesConfig({\n" +
                 "    \"cerebro_install\": \"on\",\n" +
                 "    \"zeppelin_install\": \"on\",\n" +
@@ -193,7 +191,7 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
     }
 
     @Test
-    public void testShowReinstallSelection() throws Exception {
+    public void testShowReinstallSelection() {
 
         testRenderKubernetesConfig();
 
@@ -212,7 +210,7 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
     }
 
     @Test
-    public void testShowKubernetesServicesConfig() throws Exception {
+    public void testShowKubernetesServicesConfig() {
 
         // 1. setup not OK
         js("eskimoMain.isSetupDone = function () { return false; }");
@@ -271,7 +269,7 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
     }
 
     @Test
-    public void testProceedWithKubernetesInstallation() throws Exception  {
+    public void testProceedWithKubernetesInstallation() {
 
         testRenderKubernetesConfig();
 

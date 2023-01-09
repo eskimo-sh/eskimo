@@ -37,7 +37,6 @@ package ch.niceideas.eskimo.html;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.controlers.ServicesController;
-import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
@@ -86,7 +85,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRangeOfIps() throws Exception {
+    public void testRangeOfIps() {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
             put("node_id1", "192.168.10.11-192.168.10.15");
@@ -100,11 +99,11 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             put("prometheus2", "on");
         }});
 
-        js ("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        js ("callCheckNodeSetup(" + nodesConfig + ")");
     }
 
     @Test
-    public void testNotAnIpAddress() throws Exception {
+    public void testNotAnIpAddress() {
 
         Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
@@ -113,7 +112,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("prometheus1", "on");
             }});
 
-            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig + ")");
         });
 
         logger.debug (exception.getMessage());
@@ -121,7 +120,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
     }
 
     @Test
-    public void testCheckNodesSetupMultipleOK() throws Exception {
+    public void testCheckNodesSetupMultipleOK() {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
@@ -140,11 +139,11 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             put("zookeeper", "1");
         }});
 
-        js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        js("callCheckNodeSetup(" + nodesConfig + ")");
     }
 
     @Test
-    public void testCheckNodesSetupMultipleOKWithRange() throws Exception {
+    public void testCheckNodesSetupMultipleOKWithRange() {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
@@ -163,11 +162,11 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("zookeeper", "1");
         }});
 
-        js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        js("callCheckNodeSetup(" + nodesConfig + ")");
     }
 
     @Test
-    public void testCheckNodesSetupSingleOK() throws Exception {
+    public void testCheckNodesSetupSingleOK() {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
@@ -180,11 +179,11 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             put("zookeeper", "1");
         }});
 
-        js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        js("callCheckNodeSetup(" + nodesConfig + ")");
     }
 
     @Test
-    public void testUniqueServiceOnRange() throws Exception {
+    public void testUniqueServiceOnRange() {
 
         Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
@@ -206,15 +205,16 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("zookeeper", "2");
             }});
 
-            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig + ")");
         });
 
-        logger.debug (exception.getMessage());
+        //logger.debug (exception.getMessage());
+
         assertTrue(exception.getMessage().contains("Node 2 is a range an declares service zookeeper which is a unique service, hence forbidden on a range."));
     }
 
     @Test
-    public void testMissingGluster() throws Exception {
+    public void testMissingGluster() {
 
         Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
@@ -230,45 +230,47 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("zookeeper", "1");
             }});
 
-            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig + ")");
         });
 
-        logger.debug (exception.getMessage());
+        //logger.debug (exception.getMessage());
+
         assertTrue(exception.getMessage().contains("Inconsistency found : service gluster is mandatory on all nodes but some nodes are lacking i"));
     }
 
     @Test
-    public void testNoIPConfigured() throws Exception {
+    public void testNoIPConfigured() {
 
         Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "");
             }});
 
-            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig + ")");
         });
 
-        logger.debug (exception.getMessage());
-        assertTrue(exception.getMessage().contains("Node 1 has no IP configured."));
+        //logger.debug (exception.getMessage());
 
+        assertTrue(exception.getMessage().contains("Node 1 has no IP configured."));
     }
 
     @Test
-    public void testKeyGreaterThanNodeNumber() throws Exception {
+    public void testKeyGreaterThanNodeNumber()  {
         Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id2", "192.168.10.11");
             }});
 
-            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig + ")");
         });
 
-        logger.debug (exception.getMessage());
+        //logger.debug (exception.getMessage());
+
         assertTrue(exception.getMessage().contains("Inconsistency found : got key node_id2 which is greater than node number 1"));
     }
 
     @Test
-    public void testGlusterNoMoreDisabledOnSingleNode() throws Exception {
+    public void testGlusterNoMoreDisabledOnSingleNode() {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
@@ -281,11 +283,11 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             put("zookeeper", "1");
         }});
 
-        js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+        js("callCheckNodeSetup(" + nodesConfig + ")");
     }
 
     @Test
-    public void testNoGlusterOnSingleNode() throws Exception {
+    public void testNoGlusterOnSingleNode() {
 
         Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
@@ -298,16 +300,16 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("zookeeper", "1");
             }});
 
-            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig + ")");
         });
 
-        logger.debug (exception.getMessage());
+        //logger.debug (exception.getMessage());
 
         assertTrue(exception.getMessage().contains("Inconsistency found : service gluster is mandatory on all nodes but some nodes are lacking it."));
     }
 
     @Test
-    public void testKubeSlaveButNoKubeMaster() throws Exception {
+    public void testKubeSlaveButNoKubeMaster() {
 
         Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
@@ -321,15 +323,16 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("prometheus1", "on");
             }});
 
-            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig + ")");
         });
 
-        logger.debug (exception.getMessage());
+        //logger.debug (exception.getMessage());
+
         assertTrue(exception.getMessage().contains("Inconsistency found : Service kube-slave expects 1 kube-master instance(s). But only 0 has been found !"));
     }
 
     @Test
-    public void testGlusterButNoZookeeper() throws Exception {
+    public void testGlusterButNoZookeeper() {
 
         Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
@@ -343,15 +346,16 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 //put("zookeeper", "1");
             }});
 
-            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig + ")");
         });
 
-        logger.debug (exception.getMessage());
+        //logger.debug (exception.getMessage());
+
         assertTrue(exception.getMessage().contains("Inconsistency found : Service gluster expects 1 zookeeper instance(s). But only 0 has been found !"));
     }
 
     @Test
-    public void testNoKubernetesServiceCanBeSelected() throws Exception {
+    public void testNoKubernetesServiceCanBeSelected() {
 
         Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
@@ -372,12 +376,12 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("cerebro", "2");
             }});
 
-            js("callCheckNodeSetup(" + nodesConfig.toString() + ")");
+            js("callCheckNodeSetup(" + nodesConfig + ")");
         });
 
-        logger.debug (exception.getMessage());
+        //logger.debug (exception.getMessage());
+
         assertTrue(exception.getMessage().contains("Inconsistency found : service cerebro is either undefined or a kubernetes service which should not be selectable here."));
     }
-
 
 }

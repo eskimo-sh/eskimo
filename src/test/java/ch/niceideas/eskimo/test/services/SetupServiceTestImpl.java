@@ -124,7 +124,7 @@ public class SetupServiceTestImpl extends SetupServiceImpl implements SetupServi
     }
 
     @Override
-    public String getConfigStoragePath() throws SetupException {
+    public String getConfigStoragePath() {
         return configStoragePath.getAbsolutePath();
     }
 

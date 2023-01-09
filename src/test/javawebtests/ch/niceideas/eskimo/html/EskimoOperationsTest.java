@@ -62,7 +62,7 @@ public class EskimoOperationsTest extends AbstractWebTest {
     }
 
     @Test
-    public void testInteruptOperations() throws Exception {
+    public void testInteruptOperations() {
 
         js("$.ajaxGet = function(obj) { window.objUrl = obj.url }");
 
@@ -135,7 +135,7 @@ public class EskimoOperationsTest extends AbstractWebTest {
     }
 
     @Test
-    public void testStartStopOperationInprogress() throws Exception {
+    public void testStartStopOperationInprogress() {
 
         js("eskimoOperations.fetchOperationStatus = function(callback) {" +
                 "    if (callback != null) {callback(); }" +

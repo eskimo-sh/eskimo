@@ -132,7 +132,7 @@ public class EskimoMenuTest extends AbstractWebTest {
     }
 
     @Test
-    public void testCreateServicesMenu() throws Exception {
+    public void testCreateServicesMenu() {
 
         // add services menu
         js("eskimoMenu.createServicesMenu(UI_SERVICES, UI_SERVICES_CONFIG)");
@@ -149,7 +149,7 @@ public class EskimoMenuTest extends AbstractWebTest {
     }
 
     @Test
-    public void testMenuHidingNonAdmin() throws Exception {
+    public void testMenuHidingNonAdmin() {
 
         js("eskimoMain.hasRole = function(role) { return false; }");
 
@@ -163,7 +163,7 @@ public class EskimoMenuTest extends AbstractWebTest {
     }
 
     @Test
-    public void testHandleSetupCompletedAndNotCompleted() throws Exception {
+    public void testHandleSetupCompletedAndNotCompleted() {
 
         js("eskimoMenu.handleSetupCompleted()");
 
@@ -200,7 +200,7 @@ public class EskimoMenuTest extends AbstractWebTest {
     }
 
     @Test
-    public void testServiceMenuClearKeepsActiveMenu() throws Exception {
+    public void testServiceMenuClearKeepsActiveMenu() {
         testCreateServicesMenu();
 
         js ("$('#folderMenuKibana').removeClass('disabled')");
@@ -214,7 +214,7 @@ public class EskimoMenuTest extends AbstractWebTest {
     }
 
     @Test
-    public void testHandleSetupNotCompletedChangesActiveMenu() throws Exception {
+    public void testHandleSetupNotCompletedChangesActiveMenu() {
         testCreateServicesMenu();
 
         js ("$('#folderMenuKibana').removeClass('disabled')");
@@ -230,7 +230,7 @@ public class EskimoMenuTest extends AbstractWebTest {
     }
 
     @Test
-    public void testHandleSetupCompletedKeepsActiveMenu() throws Exception {
+    public void testHandleSetupCompletedKeepsActiveMenu() {
         testCreateServicesMenu();
 
         js ("$('#folderMenuKibana').removeClass('disabled')");
@@ -246,7 +246,7 @@ public class EskimoMenuTest extends AbstractWebTest {
     }
 
     @Test
-    public void testEnforceMenuConsisteny() throws Exception {
+    public void testEnforceMenuConsisteny() {
         fail ("To Be Implemented");
     }
 

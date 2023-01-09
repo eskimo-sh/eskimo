@@ -57,9 +57,10 @@ public class ApplicationStatusServiceTestImpl implements ApplicationStatusServic
 
     @Override
     public void updateStatus() {
-
+        // No-Op
     }
 
     public void setSnapshot(boolean b) {
+        // No-Op
     }
 }

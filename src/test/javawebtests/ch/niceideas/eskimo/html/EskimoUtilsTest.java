@@ -51,7 +51,7 @@ public class EskimoUtilsTest extends AbstractWebTest {
     }
 
     @Test
-    public void testGetHyphenSeparated() throws Exception {
+    public void testGetHyphenSeparated() {
 
         assertJavascriptEquals("test-a-string", "getHyphenSeparated('testAString')");
 
@@ -59,7 +59,7 @@ public class EskimoUtilsTest extends AbstractWebTest {
     }
 
     @Test
-    public void testGetCamelCase() throws Exception {
+    public void testGetCamelCase() {
 
         assertJavascriptEquals("testAString", "getCamelCase('test-a-string')");
 
@@ -77,7 +77,7 @@ public class EskimoUtilsTest extends AbstractWebTest {
     }
 
     @Test
-    public void testIsFunction() throws Exception {
+    public void testIsFunction() {
         assertJavascriptEquals("false", "isFunction(new Array())");
         assertJavascriptEquals("false", "isFunction(null)");
         assertJavascriptEquals("false", "isFunction(0)");

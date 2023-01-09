@@ -55,13 +55,13 @@ public class EskimoEditUserTest extends AbstractWebTest {
     }
 
     @Test
-    public void testShowUser() throws Exception {
+    public void testShowUser() {
 
        fail ("To Be Implemented");
     }
 
     @Test
-    public void testEditUser() throws Exception {
+    public void testEditUser() {
 
         fail ("To Be Implemented");
     }

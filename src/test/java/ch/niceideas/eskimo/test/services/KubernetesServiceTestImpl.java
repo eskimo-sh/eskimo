@@ -39,9 +39,7 @@ import ch.niceideas.eskimo.model.KubernetesOperationsCommand;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.service.Service;
-import ch.niceideas.eskimo.services.KubernetesException;
 import ch.niceideas.eskimo.services.KubernetesService;
-import ch.niceideas.eskimo.services.SSHCommandException;
 import ch.niceideas.eskimo.services.SystemException;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
@@ -57,37 +55,37 @@ import java.util.Map;
 public class KubernetesServiceTestImpl implements KubernetesService {
 
     @Override
-    public void showJournal(Service service, String node) throws SystemException {
-
+    public void showJournal(Service service, String node) {
+        // No-Op
     }
 
     @Override
     public void startService(Service service, String node) throws SystemException {
-
+        // No-Op
     }
 
     @Override
-    public void stopService(Service service, String node) throws SystemException {
-
+    public void stopService(Service service, String node) {
+        // No-Op
     }
 
     @Override
-    public void restartService(Service service, String node) throws SystemException {
-
+    public void restartService(Service service, String node) {
+        // No-Op
     }
 
     @Override
-    public String restartServiceInternal(Service service, String node) throws KubernetesException, SSHCommandException {
+    public String restartServiceInternal(Service service, String node) {
         return null;
     }
 
     @Override
-    public void fetchKubernetesServicesStatus(Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus) throws KubernetesException {
+    public void fetchKubernetesServicesStatus(Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus) {
 
     }
 
     @Override
-    public void applyServicesConfig(KubernetesOperationsCommand command) throws KubernetesException {
+    public void applyServicesConfig(KubernetesOperationsCommand command) {
 
     }
 
@@ -97,7 +95,7 @@ public class KubernetesServiceTestImpl implements KubernetesService {
     }
 
     @Override
-    public void uninstallService(KubernetesOperationsCommand.KubernetesOperationId operation, String kubeMasterNode) throws SystemException {
+    public void uninstallService(KubernetesOperationsCommand.KubernetesOperationId operation, String kubeMasterNode) {
 
     }
 

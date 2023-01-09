@@ -40,7 +40,6 @@ import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
-import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -52,7 +52,6 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
     private String jsonFullStatus = null;
     private String jsonNodesStatus = null;
-    private String jsonStatusConfig = null;
     private String jsonMastersStatus = null;
 
     @BeforeEach
@@ -60,8 +59,9 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         jsonFullStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testFullStatus.json"), StandardCharsets.UTF_8);
         jsonNodesStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testNodeStatus.json"), StandardCharsets.UTF_8);
-        jsonStatusConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testStatusConfig.json"), StandardCharsets.UTF_8);
         jsonMastersStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testMastersStatus.json"), StandardCharsets.UTF_8);
+
+        String jsonStatusConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testStatusConfig.json"), StandardCharsets.UTF_8);
 
         loadScript("eskimoUtils.js");
         loadScript("eskimoSystemStatus.js");
@@ -97,7 +97,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRenderNodesStatusEmpty() throws Exception {
+    public void testRenderNodesStatusEmpty() {
 
         js("eskimoSystemStatus.renderNodesStatusEmpty()");
 
@@ -106,7 +106,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRegisterServiceMenu() throws Exception {
+    public void testRegisterServiceMenu() {
 
         testRenderNodesStatusTable();
 
@@ -120,7 +120,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRegisterNodeMenu() throws Exception {
+    public void testRegisterNodeMenu() {
 
         testRenderNodesStatusTable();
 
@@ -162,7 +162,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testClickServiceMenu() throws Exception {
+    public void testClickServiceMenu() {
 
         testRenderNodesStatusTable();
 
@@ -184,7 +184,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testClickNodeMenu() throws Exception {
+    public void testClickNodeMenu() {
 
         testRenderNodesStatusTable();
 
@@ -203,7 +203,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRenderNodesStatusTable() throws Exception {
+    public void testRenderNodesStatusTable() {
 
         js("eskimoSystemStatus.renderNodesStatus(" + jsonNodesStatus + ", null, false)");
 
@@ -216,7 +216,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testShowStatus() throws Exception {
+    public void testShowStatus() {
 
         js("$.ajaxGet = function (options) {" +
                 "    options.success(" + jsonFullStatus + ")" +
@@ -234,7 +234,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testStatusTableNodeFilteringWithButtons() throws Exception {
+    public void testStatusTableNodeFilteringWithButtons() {
 
         testShowStatus();
 
@@ -256,7 +256,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testDisplayMonitoringDashboard() throws Exception {
+    public void testDisplayMonitoringDashboard() {
 
         js("$.ajax = function (options) {" +
                 "    options.error()" +
@@ -281,7 +281,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRenderNodesStatusTableFiltering() throws Exception {
+    public void testRenderNodesStatusTableFiltering() {
 
         JsonWrapper statusWrapper = new JsonWrapper(jsonNodesStatus);
         statusWrapper.setValueForPath("service_kafka_192-168-10-13", "NA");
@@ -368,7 +368,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testShowStatusMessage() throws Exception {
+    public void testShowStatusMessage() {
 
         js("eskimoSystemStatus.showStatusMessage ('test');");
 
@@ -385,7 +385,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRenderNodesStatusCallsServiceMenuServiceFoundHook() throws Exception {
+    public void testRenderNodesStatusCallsServiceMenuServiceFoundHook() {
 
         js("window.serviceMenuServiceFoundHookCalls = '';");
 

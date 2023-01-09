@@ -38,7 +38,6 @@ import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
 
 import java.nio.charset.StandardCharsets;
 
@@ -109,7 +108,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
     }
 
     @Test
-    public void testNodeVanish() throws Exception {
+    public void testNodeVanish() {
 
         testClickOpenFileManagers();
 
@@ -167,7 +166,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
     }
 
     @Test
-    public void testShowParent() throws Exception {
+    public void testShowParent() {
 
         js("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
 
@@ -179,7 +178,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
     }
 
     @Test
-    public void testShowPrevious() throws Exception {
+    public void testShowPrevious() {
 
         testShowParent();
 
@@ -220,7 +219,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
     }
 
     @Test
-    public void testClickOpenFileManagers() throws Exception {
+    public void testClickOpenFileManagers() {
 
         testShowFileManagers();
 

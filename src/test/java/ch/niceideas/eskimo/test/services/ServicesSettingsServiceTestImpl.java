@@ -35,13 +35,11 @@
 
 package ch.niceideas.eskimo.test.services;
 
-import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.model.SettingsOperationsCommand;
 import ch.niceideas.eskimo.services.ServicesSettingsService;
 import ch.niceideas.eskimo.services.ServicesSettingsServiceImpl;
 import ch.niceideas.eskimo.services.SetupException;
-import ch.niceideas.eskimo.services.SystemException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
@@ -69,18 +67,24 @@ public class ServicesSettingsServiceTestImpl extends ServicesSettingsServiceImpl
     }
 
     @Override
-    public void applyServicesSettings(SettingsOperationsCommand command) throws FileException, SetupException, SystemException {
+    public void applyServicesSettings(SettingsOperationsCommand command) throws SetupException {
         if (applyServicesSettingsError) {
             throw new SetupException("Test Error");
         }
     }
 
     @Override
-    public ServicesSettingsWrapper prepareSaveSettings(String settingsFormAsString, Map<String, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings, List<String> restartedServices) throws FileException, SetupException {
+    public ServicesSettingsWrapper prepareSaveSettings(
+            String settingsFormAsString,
+            Map<String, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
+            List<String> restartedServices){
 
         ServicesSettingsWrapper servicesSettings = new ServicesSettingsWrapper ("{settings: []}");
 
-        String[] dirtyServices = fillInEditedConfigs(changedSettings, new JSONObject(settingsFormAsString), servicesSettings.getSubJSONArray("settings"));
+        String[] dirtyServices = fillInEditedConfigs(
+                changedSettings,
+                new JSONObject(settingsFormAsString),
+                servicesSettings.getSubJSONArray("settings"));
 
         restartedServices.addAll(Arrays.asList(dirtyServices));
 

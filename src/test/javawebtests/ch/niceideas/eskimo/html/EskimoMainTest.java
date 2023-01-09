@@ -36,10 +36,8 @@ package ch.niceideas.eskimo.html;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.Dimension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class EskimoMainTest extends AbstractWebTest {
 
@@ -120,7 +118,7 @@ public class EskimoMainTest extends AbstractWebTest {
     }
 
     @Test
-    public void testShowOnlyContent() throws Exception {
+    public void testShowOnlyContent() {
 
         js("eskimoMain.showOnlyContent('operations')");
 
@@ -157,7 +155,7 @@ public class EskimoMainTest extends AbstractWebTest {
     }
 
     @Test
-    public void testStartStopOperationInprogress() throws Exception {
+    public void testStartStopOperationInprogress() {
 
         assertEquals(false, js("return eskimoMain.isOperationInProgress()"));
 
@@ -171,7 +169,7 @@ public class EskimoMainTest extends AbstractWebTest {
     }
 
     @Test
-    public void testFetchContext() throws Exception {
+    public void testFetchContext() {
 
         js("$.ajaxGet = $.ajaxGetSaved");
 

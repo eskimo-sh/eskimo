@@ -154,7 +154,7 @@ public class ProxyServletTest {
         //TODO test with url parameters (i.e. a=b); but HttpUnit is faulty so we can't
         final PostMethodWebRequest request = new PostMethodWebRequest(
                 rewriteMakeMethodUrl("http://localhost/proxyMe"), true);//true: mime encoded
-        InputStream data = new ByteArrayInputStream("testFileData".getBytes("UTF-8"));
+        InputStream data = new ByteArrayInputStream("testFileData".getBytes(StandardCharsets.UTF_8));
         request.selectFile("fileNameParam", "fileName", data, "text/plain");
         WebResponse rsp = execAndAssert(request);
         assertTrue(rsp.getText().contains("Content-Type: multipart/form-data; boundary="));

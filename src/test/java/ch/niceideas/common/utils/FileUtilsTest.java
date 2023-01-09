@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FileUtilsTest {
 
     @Test
-    public void testPathManip() throws Exception {
+    public void testPathManip() {
         assertEquals("test/", FileUtils.slashEnd("test"));
         assertEquals("test/", FileUtils.slashEnd("test/"));
 

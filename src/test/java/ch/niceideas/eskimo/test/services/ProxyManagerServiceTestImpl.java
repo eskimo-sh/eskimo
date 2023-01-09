@@ -54,7 +54,7 @@ public class ProxyManagerServiceTestImpl implements ProxyManagerService {
 
     private int tomcatServerLocalPort;
 
-    private Map<String, List<ProxyTunnelConfig>> forwarderConfigForHosts = new HashMap<>();
+    private final Map<String, List<ProxyTunnelConfig>> forwarderConfigForHosts = new HashMap<>();
 
     public void setForwarderConfigForHosts (String host, List<ProxyTunnelConfig> forwardersConfig) {
         forwarderConfigForHosts.put (host, forwardersConfig);
@@ -90,7 +90,7 @@ public class ProxyManagerServiceTestImpl implements ProxyManagerService {
     }
 
     @Override
-    public void updateServerForService(String serviceName, String runtimeNode) throws ConnectionManagerException {
+    public void updateServerForService(String serviceName, String runtimeNode) {
 
     }
 

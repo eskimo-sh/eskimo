@@ -37,11 +37,14 @@ package ch.niceideas.eskimo.shell.setup;
 
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
-import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.Topology;
-import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.model.service.MemoryModel;
+import ch.niceideas.eskimo.services.ConfigurationService;
+import ch.niceideas.eskimo.services.ConfigurationServiceImpl;
+import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
+import ch.niceideas.eskimo.services.SystemServiceTest;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.testwrappers.SetupServiceUnderTest;
 import org.apache.log4j.Logger;
@@ -106,13 +109,6 @@ public abstract class AbstractSetupShellTest {
         setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
         def.setSetupService(setupService);
         def.afterPropertiesSet();
-
-        ConfigurationService configurationService = new ConfigurationServiceImpl() {
-            @Override
-            public ServicesInstallStatusWrapper loadServicesInstallationStatus() {
-                return StandardSetupHelpers.getStandard2NodesInstallStatus();
-            }
-        };
 
         Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
 

@@ -84,7 +84,7 @@ public abstract class AbstractWebTest {
         co.addArguments("--headless");
         co.addArguments("--disable-gpu");
 
-        for (int i = 0; i < 3; i++) { // 3 attempts
+        for (int i = 0; ; i++) { // 3 attempts
             try {
                 driver = WebDriverManager.chromedriver()
                         .capabilities(co)
@@ -375,14 +375,6 @@ public abstract class AbstractWebTest {
 
         int attempt = 0;
         while (getElementBy(by) == null && attempt < MAX_WAIT_RETRIES) {
-
-            /*
-            if (attempt > 20) {
-                System.err.println (page.asXml());
-                System.exit(-1);
-            }
-            */
-
             Thread.sleep(INCREMENTAL_WAIT_MS);
             attempt++;
         }
@@ -398,14 +390,6 @@ public abstract class AbstractWebTest {
 
         int attempt = 0;
         while (getElementById(elementId) == null && attempt < MAX_WAIT_RETRIES) {
-
-            /*
-            if (attempt > 20) {
-                System.err.println (page.asXml());
-                System.exit(-1);
-            }
-            */
-
             Thread.sleep(INCREMENTAL_WAIT_MS);
             attempt++;
         }

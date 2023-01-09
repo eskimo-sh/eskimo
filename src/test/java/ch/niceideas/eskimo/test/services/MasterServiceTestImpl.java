@@ -49,12 +49,12 @@ import org.springframework.stereotype.Component;
 public class MasterServiceTestImpl implements MasterService {
 
     @Override
-    public MasterStatusWrapper getMasterStatus() throws MasterExceptionWrapperException {
+    public MasterStatusWrapper getMasterStatus() {
         return MasterStatusWrapper.empty();
     }
 
     @Override
     public void updateStatus() {
-
+        // No-Op
     }
 }

@@ -66,7 +66,7 @@ public class EskimoSetupTest extends AbstractWebTest {
     }
 
     @Test
-    public void testSaveSetupMessages() throws Exception {
+    public void testSaveSetupMessages() {
 
         // add services menu
         js("eskimoSetup.saveSetup()");

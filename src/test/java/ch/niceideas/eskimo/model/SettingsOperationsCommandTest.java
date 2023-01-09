@@ -36,8 +36,6 @@ public class SettingsOperationsCommandTest {
 
     private String expectedJson = null;
 
-
-
     @BeforeEach
     public void setUp() throws Exception {
 

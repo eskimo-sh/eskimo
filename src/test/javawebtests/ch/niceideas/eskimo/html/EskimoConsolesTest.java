@@ -93,7 +93,7 @@ public class EskimoConsolesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testNodeVanish() throws Exception {
+    public void testNodeVanish() {
 
         testClickOpenConsle();
 
@@ -127,7 +127,7 @@ public class EskimoConsolesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testClickOpenConsle() throws Exception {
+    public void testClickOpenConsle() {
 
         testShowConsoles();
 
@@ -147,7 +147,7 @@ public class EskimoConsolesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testShowPrevTab() throws Exception {
+    public void testShowPrevTab() {
         js("eskimoConsoles.openConsole('192.168.10.11', '192-168-10-11')");
         js("eskimoConsoles.openConsole('192.168.10.13', '192-168-10-13')");
 
@@ -167,7 +167,7 @@ public class EskimoConsolesTest extends AbstractWebTest {
     }
 
     @Test
-    public void testShowNextTab() throws Exception {
+    public void testShowNextTab() {
 
         // reinitiate the situation as testShowPrevTab
         testShowPrevTab();

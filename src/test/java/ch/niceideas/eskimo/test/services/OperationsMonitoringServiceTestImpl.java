@@ -183,7 +183,7 @@ public class OperationsMonitoringServiceTestImpl implements OperationsMonitoring
     }
 
     @Override
-    public NodesConfigWrapper getNodesConfig() throws NodesConfigurationException {
+    public NodesConfigWrapper getNodesConfig() {
         return null;
     }
 }

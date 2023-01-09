@@ -6,7 +6,6 @@ import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SSHCommandServiceTestImpl;
 import org.apache.catalina.ssi.ByteArrayServletOutputStream;
-import org.apache.log4j.Logger;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,8 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestPropertySource("classpath:application-test.properties")
 @ActiveProfiles({"no-web-stack", "test-web-socket", "test-conf", "test-ssh"})
 public class WebCommandServletTest {
-
-    private static final Logger logger = Logger.getLogger(WebCommandServletTest.class);
 
     @Autowired
     private ConfigurationServiceTestImpl configurationServiceTest;

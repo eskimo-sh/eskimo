@@ -36,7 +36,6 @@
 package ch.niceideas.eskimo.test.services;
 
 import ch.niceideas.eskimo.model.SSHConnection;
-import ch.niceideas.eskimo.services.SSHCommandException;
 import ch.niceideas.eskimo.services.SSHCommandService;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
@@ -93,7 +92,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHScript(SSHConnection connection, String script) throws SSHCommandException {
+    public String runSSHScript(SSHConnection connection, String script) {
         executedCommands.append(script);
         executedCommands.append("\n");
         if (connectionResultBuilder != null) {
@@ -103,7 +102,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHScript(String node, String script) throws SSHCommandException {
+    public String runSSHScript(String node, String script) {
         executedCommands.append(script);
         executedCommands.append("\n");
         if (nodeResultBuilder != null) {
@@ -113,7 +112,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHCommand(SSHConnection connection, String[] command) throws SSHCommandException {
+    public String runSSHCommand(SSHConnection connection, String[] command) {
         executedCommands.append(String.join(" ", command));
         executedCommands.append("\n");
         if (connectionResultBuilder != null) {
@@ -123,7 +122,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHScriptPath(SSHConnection connection, String scriptName) throws SSHCommandException {
+    public String runSSHScriptPath(SSHConnection connection, String scriptName) {
         executedCommands.append(scriptName);
         executedCommands.append("\n");
         if (connectionResultBuilder != null) {
@@ -133,7 +132,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHScriptPath(String node, String scriptName) throws SSHCommandException {
+    public String runSSHScriptPath(String node, String scriptName) {
         executedCommands.append(scriptName);
         executedCommands.append("\n");
         if (nodeResultBuilder != null) {
@@ -143,7 +142,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException {
+    public String runSSHScript(String node, String script, boolean throwsException) {
         executedCommands.append(script);
         executedCommands.append("\n");
         if (nodeResultBuilder != null) {
@@ -153,7 +152,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHScript(SSHConnection connection, String script, boolean throwsException) throws SSHCommandException {
+    public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
         executedCommands.append(script);
         executedCommands.append("\n");
         if (connectionResultBuilder != null) {
@@ -163,7 +162,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHCommand(String node, String command) throws SSHCommandException {
+    public String runSSHCommand(String node, String command) {
         executedCommands.append(command);
         executedCommands.append("\n");
         if (nodeResultBuilder != null) {
@@ -173,7 +172,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHCommand(SSHConnection connection, String command) throws SSHCommandException {
+    public String runSSHCommand(SSHConnection connection, String command) {
         executedCommands.append(command);
         executedCommands.append("\n");
         if (connectionResultBuilder != null) {
@@ -183,12 +182,12 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public void copySCPFile(String node, String filePath) throws SSHCommandException {
+    public void copySCPFile(String node, String filePath) {
         this.executedScpCommands.append(node).append(":").append(filePath).append("\n");
     }
 
     @Override
-    public void copySCPFile(SSHConnection connection, String filePath) throws SSHCommandException {
+    public void copySCPFile(SSHConnection connection, String filePath) {
         this.executedScpCommands.append(connection != null ? connection.getHostname() : "null").append(":").append(filePath).append("\n");
     }
 

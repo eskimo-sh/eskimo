@@ -42,7 +42,6 @@ import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
-import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,9 +69,6 @@ public class ServiceOperationsCommandTest {
 
     @Autowired
     private NodeRangeResolver nodeRangeResolver;
-
-    @Autowired
-    private ConfigurationServiceTestImpl configurationServiceTest;
 
     @Autowired
     private ServicesInstallationSorter servicesInstallationSorter;

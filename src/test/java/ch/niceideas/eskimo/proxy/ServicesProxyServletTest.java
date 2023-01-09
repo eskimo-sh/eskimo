@@ -178,7 +178,7 @@ public class ServicesProxyServletTest {
     }
 
     @Test
-    public void testZeppelinReplacements() throws Exception {
+    public void testZeppelinReplacements() {
 
         Service zeppelinService = servicesDefinition.getService("zeppelin");
 

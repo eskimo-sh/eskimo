@@ -35,13 +35,13 @@
 
 package ch.niceideas.eskimo.test.services;
 
-import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.Service;
-import ch.niceideas.eskimo.services.*;
-import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import ch.niceideas.eskimo.services.SSHCommandException;
+import ch.niceideas.eskimo.services.SystemException;
+import ch.niceideas.eskimo.services.SystemService;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
@@ -114,12 +114,12 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public void delegateApplyNodesConfig(ServiceOperationsCommand command) throws NodesConfigurationException {
+    public void delegateApplyNodesConfig(ServiceOperationsCommand command) {
 
     }
 
     @Override
-    public void showJournal(Service service, String node) throws SystemException {
+    public void showJournal(Service service, String node) {
         executedActions.add ("Show Journal - " + service + " - " + node);
     }
 
@@ -132,22 +132,22 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public void stopService(Service service, String node) throws SystemException {
+    public void stopService(Service service, String node) {
         executedActions.add ("Stop service - " + service + " - " + node);
     }
 
     @Override
-    public void restartService(Service service, String node) throws SystemException {
+    public void restartService(Service service, String node) {
         executedActions.add ("restart service - " + service + " - " + node);
     }
 
     @Override
-    public void callCommand(String commandId, String serviceName, String node) throws SystemException {
+    public void callCommand(String commandId, String serviceName, String node) {
         executedActions.add ("Call command  - " + commandId + " - " + serviceName + " - " + node);
     }
 
     @Override
-    public SystemStatusWrapper getStatus() throws StatusExceptionWrapperException {
+    public SystemStatusWrapper getStatus() {
         if (returnEmptySystemStatus) {
             return SystemStatusWrapper.empty();
         } else  if (returnOKSystemStatus) {
@@ -160,7 +160,7 @@ public class SystemServiceTestImpl implements SystemService {
 
     @Override
     public void updateStatus() {
-
+        // No-Op
     }
 
     public List<Pair<? extends Serializable, PooledOperation<? extends Serializable>>> getAppliedOperations() {
@@ -168,8 +168,8 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public void handleStatusChanges(ServicesInstallStatusWrapper servicesInstallationStatus, SystemStatusWrapper systemStatus, Set<String> configuredNodesAndOtherLiveNodes) throws FileException, SetupException {
-
+    public void handleStatusChanges(ServicesInstallStatusWrapper servicesInstallationStatus, SystemStatusWrapper systemStatus, Set<String> configuredNodesAndOtherLiveNodes) {
+        // No-Op
     }
 
     @Override
@@ -190,7 +190,7 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public <T extends Serializable> void performPooledOperation(List<T> operations, int parallelism, long operationWaitTimout, PooledOperation<T> operation) throws SystemException {
+    public <T extends Serializable> void performPooledOperation(List<T> operations, int parallelism, long operationWaitTimout, PooledOperation<T> operation) {
         operations.forEach(op ->  {
             appliedOperations.add(new Pair<>(op, operation));
             if (!this.mockCalls) {
@@ -217,32 +217,32 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public void callUninstallScript(MessageLogger ml, SSHConnection connection, String service) throws SystemException {
+    public void callUninstallScript(MessageLogger ml, SSHConnection connection, String service){
         executedActions.add ("call Uninstall script  - " + service + " - " + connection.getHostname());
     }
 
     @Override
-    public File createRemotePackageFolder(MessageLogger ml, SSHConnection connection, String node, String service, String imageName) throws SystemException, IOException, SSHCommandException {
+    public File createRemotePackageFolder(MessageLogger ml, SSHConnection connection, String node, String service, String imageName) {
         return null;
     }
 
     @Override
-    public void installationSetup(MessageLogger ml, SSHConnection connection, String node, String service) throws SystemException {
+    public void installationSetup(MessageLogger ml, SSHConnection connection, String node, String service) {
         executedActions.add ("Installation setup  - " + service + " - " + node + " - " + connection.getHostname());
     }
 
     @Override
-    public void installationCleanup(MessageLogger ml, SSHConnection connection, String service, String imageName, File tmpArchiveFile) throws SSHCommandException, SystemException {
+    public void installationCleanup(MessageLogger ml, SSHConnection connection, String service, String imageName, File tmpArchiveFile) {
         executedActions.add ("Installation cleanup  - " + service + " - " + imageName + " - " + connection.getHostname());
     }
 
     @Override
-    public void applyServiceOperation(String service, String node, String opLabel, ServiceOperation<String> operation) throws SystemException {
+    public void applyServiceOperation(String service, String node, String opLabel, ServiceOperation<String> operation) {
         executedActions.add ("Apply service operation  - " + service + " - " + node + " - " + opLabel);
     }
 
     @Override
-    public void feedInServiceStatus(Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus, String node, String nodeName, String referenceNodeName, String service, boolean shall, boolean installed, boolean running) throws ConnectionManagerException {
+    public void feedInServiceStatus(Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus, String node, String nodeName, String referenceNodeName, String service, boolean shall, boolean installed, boolean running) {
         if (StringUtils.isBlank(nodeName)) {
             throw new IllegalArgumentException("nodeName can't be null");
         }

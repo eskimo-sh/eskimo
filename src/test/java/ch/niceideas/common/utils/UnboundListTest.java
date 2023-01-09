@@ -70,12 +70,12 @@ public class UnboundListTest {
     public void testGetIndexOutOfBounds() {
         addElementsFirst();
 
-        testList.get(4);
+        assertNotNull (testList.get(4));
         IndexOutOfBoundsException exception = assertThrows(IndexOutOfBoundsException.class, () -> testList.get(5));
         assertEquals("Index: 5, Size: 5", exception.getMessage());
 
         addElementsSecond();
-        testList.get(10);
+        assertNotNull (testList.get(10));
         exception = assertThrows(IndexOutOfBoundsException.class, () -> testList.get(11));
         assertEquals("11 is beyond last element index 10", exception.getMessage());
     }

@@ -89,23 +89,20 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
     }
 
     @Test
-    public void testGetService() throws Exception {
-
+    public void testGetService() {
         assertJavascriptEquals("ntp", "eskimoServicesSelection.getService(1, 1).name");
         assertJavascriptEquals("spark-runtime", "eskimoServicesSelection.getService(3, 3).name");
-
     }
 
     @Test
-    public void testInitModalServicesConfig() throws Exception {
-
+    public void testInitModalServicesConfig() {
         assertJavascriptEquals("1", "$('#etcd-choice').length");
         assertJavascriptEquals("1", "$('#kube-master-choice').length");
         assertJavascriptEquals("1", "$('#zookeeper-choice').length");
     }
 
     @Test
-    public void testServicesSelectionRadioMouseDown() throws Exception {
+    public void testServicesSelectionRadioMouseDown() {
         getElementById("zookeeper-choice").click();
 
         assertJavascriptEquals("true", "$('#zookeeper-choice').get(0).checked");
@@ -145,7 +142,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
     }
 
     @Test
-    public void testSelectAll() throws Exception {
+    public void testSelectAll() {
 
         js("window.result = null;");
 

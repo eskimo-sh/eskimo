@@ -89,7 +89,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     }
 
     @Test
-    public void testServicesConfigMethods() throws Exception {
+    public void testServicesConfigMethods() {
 
         assertJavascriptEquals("images/kube-slave-logo.png", "eskimoNodesConfig.getServiceLogoPath('kube-slave')");
         assertJavascriptEquals("images/kube-slave-icon.png", "eskimoNodesConfig.getServiceIconPath('kube-slave')");
@@ -101,7 +101,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     }
 
     @Test
-    public void testRenderNodesConfig() throws Exception {
+    public void testRenderNodesConfig() {
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
 
@@ -124,7 +124,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     }
 
     @Test
-    public void testSaveNodesButton() throws Exception {
+    public void testSaveNodesButton() {
         testRenderNodesConfig();
 
         js("window.checkNodesSetup = function (nodeSetup) {" +
@@ -151,12 +151,13 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         JSONObject actualResult = new JSONObject((String)js("return JSON.stringify (window.nodeSetup)"));
 
-        System.err.println (actualResult);
+        //System.err.println (actualResult);
+
         assertTrue(expectedResult.similar(actualResult));
     }
 
     @Test
-    public void testShowNodesConfigWithResetButton() throws Exception {
+    public void testShowNodesConfigWithResetButton() {
 
         js("eskimoMain.isSetupDone = function () { return true; }");
 
@@ -193,7 +194,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     }
 
     @Test
-    public void testOnServiceSelectedForNode() throws Exception {
+    public void testOnServiceSelectedForNode() {
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
 
@@ -215,7 +216,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
 
         @Test
-    public void testRemoveNode() throws Exception {
+    public void testRemoveNode() {
 
         // add two nodes
         js("eskimoNodesConfig.addNode()");
@@ -237,7 +238,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     }
 
     @Test
-    public void testAddNode() throws Exception {
+    public void testAddNode() {
 
         js("eskimoNodesConfig.addNode()");
 

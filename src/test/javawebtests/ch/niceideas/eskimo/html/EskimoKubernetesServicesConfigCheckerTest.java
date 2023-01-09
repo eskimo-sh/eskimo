@@ -36,7 +36,6 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.eskimo.controlers.ServicesController;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
-import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
@@ -124,7 +123,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
     }
 
     @Test
-    public void testWithKubeConfigRequest() throws Exception {
+    public void testWithKubeConfigRequest() {
 
         Exception error = null;
         try {
@@ -137,58 +136,62 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
     }
 
     @Test
-    public void testWithKubeConfigRequest_BuggyCPU() throws Exception {
+    public void testWithKubeConfigRequest_BuggyCPU() {
 
         kubernetesConfig.removeRootKey("flink-runtime_install");
 
-        Exception exception = assertThrows(Exception.class, () -> {
-                js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")");
-        });
-        logger.debug (exception.getMessage());
+        Exception exception = assertThrows(Exception.class,
+                () -> js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")"));
+
+        //logger.debug (exception.getMessage());
+
         assertTrue(exception.getMessage().contains("Inconsistency found : Found a CPU definition for flink-runtime_cpu. But corresponding service installation is not enabled"));
     }
 
     @Test
-    public void testWithKubeConfigRequest_BuggyRAM() throws Exception {
+    public void testWithKubeConfigRequest_BuggyRAM() {
 
         kubernetesConfig.removeRootKey("flink-runtime_install");
         kubernetesConfig.removeRootKey("flink-runtime_cpu");
 
-        Exception exception = assertThrows(Exception.class, () -> {
-            js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")");
-        });
-        logger.debug (exception.getMessage());
+        Exception exception = assertThrows(Exception.class,
+                () -> js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")"));
+
+        //logger.debug (exception.getMessage());
+
         assertTrue(exception.getMessage().contains("Inconsistency found : Found a RAM definition for flink-runtime_ram. But corresponding service installation is not enabled"));
     }
 
     @Test
-    public void testWithKubeConfigRequest_wrongCPU() throws Exception {
+    public void testWithKubeConfigRequest_wrongCPU() {
 
         kubernetesConfig.setValueForPath("flink-runtime_cpu", "0.5z");
 
-        Exception exception = assertThrows(Exception.class, () -> {
-            js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")");
-        });
-        logger.debug (exception.getMessage());
+        Exception exception = assertThrows(Exception.class,
+                () -> js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")"));
+
+        //logger.debug (exception.getMessage());
+
         assertTrue(exception.getMessage().contains("CPU definition for flink-runtime_cpu doesn't match expected REGEX - [0-9\\\\.]+[m]{0,1}"));
     }
 
     @Test
-    public void testWithKubeConfigRequest_wrongRAM() throws Exception {
+    public void testWithKubeConfigRequest_wrongRAM() {
 
         kubernetesConfig.setValueForPath("flink-runtime_ram", "500Gb");
 
-        Exception exception = assertThrows(Exception.class, () -> {
-            js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")");
-        });
-        logger.debug (exception.getMessage());
+        Exception exception = assertThrows(Exception.class,
+                () -> js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")"));
+
+        //logger.debug (exception.getMessage());
+
         assertTrue(exception.getMessage().contains("RAM definition for flink-runtime_ram doesn't match expected REGEX - [0-9\\.]+[EPTGMk]{0,1}"));
     }
 
     @Test
-    public void testCheckKubernetesSetupOK() throws Exception {
+    public void testCheckKubernetesSetupOK() {
 
-        JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+        JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("kube-master", "1");
             put("kube-slave", "1");
@@ -196,7 +199,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
             put("prometheus1", "on");
         }});
 
-        JSONObject kubernetesConfig = new JSONObject(new HashMap<String, Object>() {{
+        JSONObject kubernetesConfig = new JSONObject(new HashMap<>() {{
             put("elasticsearch_install", "on");
             put("cerebro_install", "on");
             put("kibana_install", "on");
@@ -205,7 +208,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
 
         Exception error = null;
         try {
-            js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.toString() + ")");
+            js("callCheckKubernetesSetup(" + nodesConfig + "," + kubernetesConfig + ")");
         } catch (Exception e) {
             error = e;
             logger.error (e, e);
@@ -215,52 +218,54 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
 
 
     @Test
-    public void testOneCerebroButNoES() throws Exception {
+    public void testOneCerebroButNoES() {
 
         Exception exception = assertThrows(Exception.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("kubernetes", "1");
                 put("ntp1", "on");
                 put("prometheus1", "on");
             }});
 
-            JSONObject kubernetesConfig = new JSONObject(new HashMap<String, Object>() {{
+            JSONObject kubernetesConfig = new JSONObject(new HashMap<>() {{
                 put("cerebro_install", "on");
             }});
 
-            js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.toString() + ")");
+            js("callCheckKubernetesSetup(" + nodesConfig + "," + kubernetesConfig + ")");
         });
 
-        logger.debug (exception.getMessage());
+        //logger.debug (exception.getMessage());
+
         assertTrue(exception.getMessage().contains("Inconsistency found : Service cerebro expects a installaton of  elasticsearch. But it's not going to be installed"));
     }
 
     @Test
-    public void testSparkButNoKube() throws Exception {
+    public void testSparkButNoKube() {
 
         Exception exception = assertThrows(Exception.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("ntp1", "on");
             }});
 
-            JSONObject kubernetesConfig = new JSONObject(new HashMap<String, Object>() {{
+            JSONObject kubernetesConfig = new JSONObject(new HashMap<>() {{
                 put("spark-runtime_install", "on");
             }});
 
-            js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.toString() + ")");
+            js("callCheckKubernetesSetup(" + nodesConfig + "," + kubernetesConfig + ")");
         });
 
-        logger.debug (exception.getMessage());
+        //logger.debug (exception.getMessage());
+
         assertTrue(exception.getMessage().contains("Inconsistency found : Service spark-runtime expects 1 kube-master instance(s). But only 0 has been found !"));
     }
 
     @Test
-    public void testZeppelinButNoZookeeper() throws Exception {
+    public void testZeppelinButNoZookeeper() {
 
         Exception exception = assertThrows(Exception.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
+            JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("ntp1", "on");
                 put("prometheus1", "on");
@@ -268,15 +273,16 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
                 put("kube-slave1", "on");
             }});
 
-            JSONObject kubernetesConfig = new JSONObject(new HashMap<String, Object>() {{
+            JSONObject kubernetesConfig = new JSONObject(new HashMap<>() {{
                 put("elasticsearch_install", "on");
                 put("zeppelin_install", "on");
             }});
 
-            js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.toString() + ")");
+            js("callCheckKubernetesSetup(" + nodesConfig + "," + kubernetesConfig + ")");
         });
 
-        logger.debug (exception.getMessage());
+        //logger.debug (exception.getMessage());
+
         assertTrue(exception.getMessage().contains("Inconsistency found : Service zeppelin expects 1 zookeeper instance(s). But only 0 has been found !"));
     }
 

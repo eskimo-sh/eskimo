@@ -157,7 +157,7 @@ public class ProxyManagerServiceTest {
     }
 
     @Test
-    public void testExtractHostFromPathInfo() throws Exception {
+    public void testExtractHostFromPathInfo() {
         assertEquals("192-168-10-11", proxyManagerService.extractHostFromPathInfo("192-168-10-11//slave(1)/monitor/statistics"));
         assertEquals("192-168-10-11", proxyManagerService.extractHostFromPathInfo("/192-168-10-11//slave(1)/monitor/statistics"));
         assertEquals("192-168-10-11", proxyManagerService.extractHostFromPathInfo("/192-168-10-11"));

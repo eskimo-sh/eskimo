@@ -140,7 +140,7 @@ public class SystemStatusParserTest {
         }
 
         BufferedReader reader = new BufferedReader( new InputStreamReader(scriptIs, StandardCharsets.UTF_8));
-        String line = null;
+        String line;
         StringBuilder sb = new StringBuilder();
         while ( (line = reader.readLine()) != null) {
             sb.append (line);

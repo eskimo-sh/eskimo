@@ -2,10 +2,7 @@ package ch.niceideas.eskimo.utils;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.service.Service;
-
-import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -58,7 +55,7 @@ public class KubeStatusParserTest {
     }
 
     @Test
-    public void testPodNameRexp() throws Exception {
+    public void testPodNameRexp() {
         assertTrue(KubeStatusParser.POD_NAME_REXP.matcher("elasticsearch-0").matches());
         assertTrue (KubeStatusParser.POD_NAME_REXP.matcher("kafka-2").matches());
         assertTrue (KubeStatusParser.POD_NAME_REXP.matcher("kubernetes-dashboard-7db6bbdf55-vhgcc").matches());
@@ -107,7 +104,7 @@ public class KubeStatusParserTest {
 
 
     @Test
-    public void testGetPodNodes_kafkaCase() throws Exception {
+    public void testGetPodNodes_kafkaCase() {
 
         KubeStatusParser parser = new KubeStatusParser(allPodStatus, allServicesStatus, registryServices, sd);
 
@@ -129,7 +126,7 @@ public class KubeStatusParserTest {
     }
 
     @Test
-    public void testGetServiceRuntimeNode() throws Exception {
+    public void testGetServiceRuntimeNode() {
 
         KubeStatusParser parser = new KubeStatusParser(allPodStatus, allServicesStatus, registryServices, sd);
 
@@ -168,7 +165,7 @@ public class KubeStatusParserTest {
 
 
     @Test
-    public void testGetServiceRuntimeNodes() throws Exception {
+    public void testGetServiceRuntimeNodes() {
 
         KubeStatusParser parser = new KubeStatusParser(allPodStatus, allServicesStatus, registryServices, sd);
 

@@ -37,8 +37,6 @@ package ch.niceideas.eskimo.test.services;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
@@ -146,12 +144,12 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
     }
 
     @Override
-    public void saveServicesSettings(ServicesSettingsWrapper settings) throws FileException, SetupException {
+    public void saveServicesSettings(ServicesSettingsWrapper settings) {
         this.serviceSettings = settings;
     }
 
     @Override
-    public ServicesSettingsWrapper loadServicesSettings() throws FileException, SetupException {
+    public ServicesSettingsWrapper loadServicesSettings() throws SetupException {
         if (serviceSettingsError) {
             throw new SetupException("Test Error");
         }
@@ -162,7 +160,7 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
     }
 
     @Override
-    public ServicesSettingsWrapper loadServicesConfigNoLock() throws FileException, SetupException {
+    public ServicesSettingsWrapper loadServicesConfigNoLock() throws SetupException {
         return loadServicesSettings ();
     }
 
@@ -172,14 +170,14 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
     }
 
     @Override
-    public void updateAndSaveServicesInstallationStatus(SystemService.StatusUpdater statusUpdater) throws FileException, SetupException {
+    public void updateAndSaveServicesInstallationStatus(SystemService.StatusUpdater statusUpdater)  {
         if (this.installStatus != null) {
             statusUpdater.updateStatus(this.installStatus);
         }
     }
 
     @Override
-    public ServicesInstallStatusWrapper loadServicesInstallationStatus() throws FileException, SetupException {
+    public ServicesInstallStatusWrapper loadServicesInstallationStatus() {
         if (this.installStatus != null) {
             return this.installStatus;
         }
@@ -190,12 +188,12 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
     }
 
     @Override
-    public void saveNodesConfig(NodesConfigWrapper nodesConfig) throws FileException, SetupException {
+    public void saveNodesConfig(NodesConfigWrapper nodesConfig) {
         this.nodesConfig = nodesConfig;
     }
 
     @Override
-    public NodesConfigWrapper loadNodesConfig() throws SystemException, SetupException {
+    public NodesConfigWrapper loadNodesConfig() throws SystemException {
         if (nodesConfig != null) {
             return nodesConfig;
         }
@@ -208,7 +206,7 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
     }
 
     @Override
-    public JsonWrapper createSetupConfigAndSaveStoragePath(String configAsString) throws SetupException, FileException {
+    public JsonWrapper createSetupConfigAndSaveStoragePath(String configAsString) throws SetupException {
 
         JsonWrapper setupConfigJSON = new JsonWrapper(configAsString);
 
@@ -235,13 +233,13 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
     }
 
     @Override
-    public void saveSetupConfig(String configAsString) throws SetupException, FileException {
+    public void saveSetupConfig(String configAsString) {
         this.setupConfigNotCompletedError = false;
         this.setupConfigAsString = configAsString;
     }
 
     @Override
-    public String loadSetupConfig() throws FileException, SetupException {
+    public String loadSetupConfig() throws SetupException {
         if (setupConfigNotCompletedError) {
             throw new SetupException ("Application is not initialized properly. Missing file 'config.conf' system configuration");
         }
@@ -262,7 +260,7 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
     }
 
     @Override
-    public void saveKubernetesServicesConfig(KubernetesServicesConfigWrapper kubeServicesConfig) throws FileException, SetupException {
+    public void saveKubernetesServicesConfig(KubernetesServicesConfigWrapper kubeServicesConfig) {
         this.kubeServicesConfig = kubeServicesConfig;
     }
 

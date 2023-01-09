@@ -125,7 +125,7 @@ public class SetupServiceTest {
 
 
     @Test
-    public void testParseVersion() throws Exception {
+    public void testParseVersion() {
 
         Pair<String, String> version = setupService.parseVersion("docker_template_base-eskimo_0.2_1.tar.gz");
         assertNotNull(version);
@@ -319,7 +319,7 @@ public class SetupServiceTest {
     }
 
     @Test
-    public void testFillInPackages() throws Exception {
+    public void testFillInPackages() {
 
         JsonWrapper packagesVersion = new JsonWrapper(new JSONObject(new HashMap<String, Object>(){{
             put ("cerebro", new JSONObject(new HashMap<String, Object>(){{
@@ -461,7 +461,7 @@ public class SetupServiceTest {
         setupService.saveAndPrepareSetup(setupConfig);
 
         assertThrows(SetupException.class,
-                () -> { setupService.applySetup(command); },
+                () -> setupService.applySetup(command),
                 "Downloading packages is not supported on development version (SNAPSHOT)");
     }
 
