@@ -9,6 +9,21 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FileUtilsTest {
 
     @Test
+    public void testPathManip() throws Exception {
+        assertEquals("test/", FileUtils.slashEnd("test"));
+        assertEquals("test/", FileUtils.slashEnd("test/"));
+
+        assertEquals("/test", FileUtils.slashStart("test"));
+        assertEquals("/test", FileUtils.slashStart("/test"));
+
+        assertEquals("test", FileUtils.noSlashStart("test"));
+        assertEquals("test", FileUtils.noSlashStart("/test"));
+
+        assertEquals("test", FileUtils.noSlashEnd("test"));
+        assertEquals("test", FileUtils.noSlashEnd("test/"));
+    }
+
+    @Test
     public void testDeleteFile() throws Exception {
 
         File fileToDelete = File.createTempFile("test", "delete");

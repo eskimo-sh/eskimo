@@ -226,21 +226,17 @@ public class WebSocketProxyTest {
 
         private final Tomcat tomcatServer;
 
-        private final AnnotationConfigWebApplicationContext serverContext;
-
         private final Context webContext;
 
-        public TomcatWebSocketTestServer(AnnotationConfigWebApplicationContext appContext) throws LifecycleException {
+        public TomcatWebSocketTestServer(AnnotationConfigWebApplicationContext appContext) {
             tomcatServer = new Tomcat();
             tomcatServer.setPort(ProxyManagerService.generateLocalPort());
             tomcatServer.setBaseDir(createTempDir());
             tomcatServer.setSilent(true);
 
-            serverContext = appContext;
-
             webContext = this.tomcatServer.addContext("", System.getProperty("java.io.tmpdir"));
             webContext.addApplicationListener(WsContextListener.class.getName());
-            Tomcat.addServlet(webContext, "dispatcherServlet", new DispatcherServlet(this.serverContext))
+            Tomcat.addServlet(webContext, "dispatcherServlet", new DispatcherServlet(appContext))
                     .setAsyncSupported(true);
             webContext.addServletMappingDecoded("/", "dispatcherServlet");
 
@@ -249,8 +245,8 @@ public class WebSocketProxyTest {
         private String createTempDir() {
             try {
                 File tempFolder = File.createTempFile("tomcat.", ".workDir");
-                tempFolder.delete();
-                tempFolder.mkdir();
+                assertTrue (tempFolder.delete());
+                assertTrue (tempFolder.mkdir());
                 tempFolder.deleteOnExit();
                 return tempFolder.getAbsolutePath();
             }

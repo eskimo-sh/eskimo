@@ -74,7 +74,7 @@ public class EskimoKubeCtlTest {
         ProcessHelper.exec(new String[]{"bash", "-c", "chmod 777 " + jailPath + "/kubectl"}, true);
 
         // I need the real sed
-        new File (jailPath + "/sed").delete();
+        assertTrue (new File (jailPath + "/sed").delete());
 
     }
 

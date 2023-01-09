@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.configurations;
 
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.security.JSONBackedUserDetailsManager;
 import org.apache.log4j.Logger;
@@ -124,7 +125,7 @@ public class WebSecurityConfiguration {
         if (StringUtils.isBlank(configuredContextPath)) {
             return "";
         } else {
-            return (configuredContextPath.startsWith("/") ? "" : "/") + configuredContextPath;
+            return (FileUtils.slashStart(configuredContextPath));
         }
     }
 

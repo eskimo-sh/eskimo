@@ -228,8 +228,8 @@ public abstract class AbstractSetupShellTest {
      */
     public static String createJail() throws Exception {
         File tempFile = File.createTempFile("eskimoshell_", "_test");
-        tempFile.delete();
-        tempFile.mkdir();
+        assertTrue (tempFile.delete());
+        assertTrue (tempFile.mkdir());
 
         // copy bash and everything bash requires to jail bin
         createLoggingExecutable("cp", tempFile.getAbsolutePath());
@@ -257,10 +257,14 @@ public abstract class AbstractSetupShellTest {
         createDummyExecutable("sed", tempFile.getAbsolutePath());
         createDummyExecutable("sudo", tempFile.getAbsolutePath());
 
-        File var = new File (tempFile, "var"); var.mkdirs();
-        File lib = new File (var, "lib"); var.mkdirs();
-        File eskimo = new File (lib, "eskimo"); var.mkdirs();
-        new File (eskimo, "kube-services"); var.mkdirs();
+        File var = new File (tempFile, "var");
+        assertTrue (var.mkdirs());
+        File lib = new File (var, "lib");
+        assertTrue (lib.mkdirs());
+        File eskimo = new File (lib, "eskimo");
+        assertTrue (eskimo.mkdirs());
+        File kubeServices = new File (eskimo, "kube-services");
+        assertTrue (kubeServices.mkdirs());
 
         return tempFile.getAbsolutePath();
     }

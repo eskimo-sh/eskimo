@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.proxy;
 
+import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.service.Service;
@@ -181,9 +182,7 @@ public class ServicesProxyServlet extends ProxyServlet {
         String pathInfo = rewritePathInfoFromRequest(servletRequest);
         if (pathInfo != null) {//ex: /my/path.html
 
-            if (pathInfo.startsWith("/")) {
-                pathInfo = pathInfo.substring(1);
-            }
+            pathInfo = FileUtils.noSlashStart(pathInfo);
 
             // Need to remove host from pathInfo
             if (!service.isUnique()) {

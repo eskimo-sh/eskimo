@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.NodesConfigWrapper.ParsedNodesConfigProperty;
@@ -216,11 +217,7 @@ public class Topology {
                 if (StringUtils.isNotBlank(contextPath)) {
 
                     // remove leading and trailing slashes if any
-                    String contextPathVar = contextPath.startsWith("/") ? contextPath.substring(1) : contextPath;
-                    if (contextPathVar.endsWith("/")) {
-                        contextPathVar = contextPathVar.substring(0, contextPathVar.length() - 1);
-                    }
-
+                    String contextPathVar = FileUtils.noSlashEnd(FileUtils.noSlashStart(contextPath));
                     addEnvForService.put (addEnv, contextPathVar);
                 }
             }

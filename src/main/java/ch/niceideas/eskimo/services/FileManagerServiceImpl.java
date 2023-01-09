@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
@@ -118,7 +119,6 @@ public class FileManagerServiceImpl implements FileManagerService {
 
         client.close();
         sftpClients.remove(node);
-
     }
 
     @Override
@@ -128,7 +128,7 @@ public class FileManagerServiceImpl implements FileManagerService {
 
             SFTPv3Client client = getClient(node);
 
-            String newPath = client.canonicalPath(folder + (folder.endsWith("/") ? "" : "/") + subFolder);
+            String newPath = client.canonicalPath(FileUtils.slashEnd(folder) + subFolder);
 
             @SuppressWarnings("unchecked")
             List<SFTPv3DirectoryEntry> listing = client.ls(newPath);
@@ -152,7 +152,7 @@ public class FileManagerServiceImpl implements FileManagerService {
 
             SFTPv3Client client = getClient(node);
 
-            String newFilePath = client.canonicalPath(folder + (folder.endsWith("/") ? "" : "/") + fileName);
+            String newFilePath = client.canonicalPath(FileUtils.slashEnd(folder) + fileName);
 
             client.createFile(newFilePath);
 
@@ -171,7 +171,7 @@ public class FileManagerServiceImpl implements FileManagerService {
 
             SFTPv3Client client = getClient(node);
 
-            String newPath = client.canonicalPath(folder + (folder.endsWith("/") ? "" : "/") + file);
+            String newPath = client.canonicalPath(FileUtils.slashEnd(folder) + file);
 
             // test file type
             String fileMimeType = getFileMimeType(node, newPath);
@@ -245,7 +245,7 @@ public class FileManagerServiceImpl implements FileManagerService {
 
             SFTPv3Client client = getClient(node);
 
-            String fullPath = client.canonicalPath(folder + (folder.endsWith("/") ? "" : "/") + file);
+            String fullPath = client.canonicalPath(FileUtils.slashEnd(folder) + file);
 
             // test file type
             String fileMimeType = getFileMimeType(node, fullPath).trim();
@@ -273,7 +273,7 @@ public class FileManagerServiceImpl implements FileManagerService {
         try {
             SFTPv3Client client = getClient(node);
 
-            String fullPath = client.canonicalPath(folder + (folder.endsWith("/") ? "" : "/") + file);
+            String fullPath = client.canonicalPath(FileUtils.slashEnd(folder) + file);
 
             client.rm(fullPath);
 
@@ -295,7 +295,7 @@ public class FileManagerServiceImpl implements FileManagerService {
             SSHConnection con = connectionManagerService.getSharedConnection(node);
             client = new SFTPv3Client (con.getUnder());
 
-            String fullPath = client.canonicalPath(folder + (folder.endsWith("/") ? "" : "/") + name);
+            String fullPath = client.canonicalPath(FileUtils.slashEnd(folder) + name);
 
             writeFile(node, fullPath, fileContent);
 

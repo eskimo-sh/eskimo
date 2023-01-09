@@ -52,6 +52,50 @@ public class FileUtils {
 
     private FileUtils() {}
 
+    public static String slashEnd (String path) {
+        if (path == null) {
+            throw new IllegalArgumentException("Given path is null");
+        }
+        if (path.endsWith("/")) {
+            return path;
+        } else {
+            return path + "/";
+        }
+    }
+
+    public static String slashStart (String path) {
+        if (path == null) {
+            throw new IllegalArgumentException("Given path is null");
+        }
+        if (path.startsWith("/")) {
+            return path;
+        } else {
+            return "/" + path;
+        }
+    }
+
+    public static String noSlashStart (String path) {
+        if (path == null) {
+            throw new IllegalArgumentException("Given path is null");
+        }
+        if (path.startsWith("/")) {
+            return path.substring(1);
+        } else {
+            return path;
+        }
+    }
+
+    public static String noSlashEnd (String path) {
+        if (path == null) {
+            throw new IllegalArgumentException("Given path is null");
+        }
+        if (path.endsWith("/")) {
+            return path.substring(0, path.length() - 1);
+        } else {
+            return path;
+        }
+    }
+
     /**
      * Supports recursive deletion of directories
      * 
