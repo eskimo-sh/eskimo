@@ -75,9 +75,6 @@ docker run \
         -t eskimo:cerebro bash >> cerebro_install_log 2>&1
 fail_if_error $? "cerebro_install_log" -2
 
-# connect to container
-#docker exec -it cerebro bash
-
 echo " - Configuring cerebro container (common part)"
 docker exec cerebro bash /scripts/inContainerSetupESCommon.sh $elasticsearch_user_id | tee cerebro_install_log 2>&1
 if [[ `tail -n 1 cerebro_install_log` != " - In container config SUCCESS" ]]; then
@@ -97,13 +94,8 @@ fi
 echo " - Handling topology and setting injection"
 handle_topology_settings cerebro cerebro_install_log
 
-
-#echo " - TODO"
-#docker exec -it cerebro TODO
-
 echo " - Committing changes to local template and exiting container cerebro"
 commit_container cerebro cerebro_install_log
-
 
 echo " - Starting Kubernetes deployment"
 deploy_kubernetes cerebro cerebro_install_log

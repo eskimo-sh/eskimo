@@ -89,9 +89,6 @@ docker run \
         -t eskimo:elasticsearch bash >> es_install_log 2>&1
 fail_if_error $? es_install_log -2
 
-# connect to container
-#docker exec -it elasticsearch bash
-
 echo " - Configuring elasticsearch container (common part)"
 docker exec elasticsearch bash /scripts/inContainerSetupESCommon.sh $elasticsearch_user_id | tee es_install_log 2>&1
 if [[ `tail -n 1 es_install_log` != " - In container config SUCCESS" ]]; then
@@ -113,9 +110,6 @@ handle_topology_settings elasticsearch cerebro_install_log
 
 echo " - Copying inContainerInjectIndexSettings.sh Script"
 docker_cp_script inContainerInjectIndexSettings.sh sbin elasticsearch es_install_log
-
-#echo " - TODO"
-#docker exec -it elasticsearch TODO
 
 echo " - Committing changes to local template and exiting container elasticsearch"
 commit_container elasticsearch es_install_log

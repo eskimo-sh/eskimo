@@ -35,10 +35,6 @@
 #
 
 
-# ----------------------------------------------------------------------------------------------------------------------
-# CAUTION : UNFORTUNATELY THIS FILE IS MIANTAINED OVER MULTIPLE LOCATIONS : IN FLINK AND IN ZEPPELIN !!!
-# ----------------------------------------------------------------------------------------------------------------------
-
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 

@@ -91,9 +91,6 @@ docker run \
         -t eskimo:gluster bash >> gluster_install_log 2>&1
 fail_if_error $? "gluster_install_log" -2
 
-# connect to container
-#docker exec -it gluster bash
-
 echo " - Copying containerWatchDog.sh script to container"
 docker_cp_script containerWatchDog.sh sbin gluster gluster_install_log
 
@@ -112,10 +109,6 @@ if [[ `tail -n 1 gluster_install_log` != " - In container config SUCCESS" ]]; th
     cat gluster_install_log
     exit 101
 fi
-
-#echo " - TODO"
-#docker exec -it gluster TODO
-
 
 echo " - Handling topology and setting injection"
 handle_topology_settings gluster gluster_install_log

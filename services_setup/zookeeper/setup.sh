@@ -49,18 +49,18 @@ loadTopology
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
     echo " - No Self Node Number found in topology"
-    exit -1
+    exit 1
 fi
 
 if [[ $SELF_IP_ADDRESS == "" ]]; then
     echo " - No Self IP address found in topology for node $SELF_NODE_NUMBER"
-    exit -2
+    exit 2
 fi
 
 export MASTER_IP_ADDRESS=$MASTER_ZOOKEEPER_1
 if [[ $MASTER_IP_ADDRESS == "" ]]; then
     echo " - No zookeeper master found in topology"
-    exit -3
+    exit 3
 fi
 
 # reinitializing log
@@ -101,7 +101,7 @@ docker exec zookeeper bash /scripts/inContainerSetupZookeeper.sh | tee -a zk_ins
 if [[ `tail -n 1 zk_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat zk_install_log
-    exit -100
+    exit 100
 fi
 
 #echo " - TODO"

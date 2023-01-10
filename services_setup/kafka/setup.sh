@@ -121,10 +121,6 @@ fi
 echo " - Copying inContainerMountGluster.sh script"
 docker_cp_script inContainerMountGluster.sh sbin kafka kafka_install_log
 
-
-#echo " - TODO"
-#docker exec -it kafka TODO
-
 echo " - Handling topology and setting injection"
 handle_topology_settings kafka kafka_install_log
 

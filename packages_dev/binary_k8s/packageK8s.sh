@@ -197,7 +197,6 @@ cd ..
 set +e
 
 
-
 echo " - Downloading kubernetes-server-linux-amd64 v$K8S_VERSION"
 
 wget https://dl.k8s.io/v$K8S_VERSION/kubernetes-server-linux-amd64.tar.gz >> /tmp/k8s_install_log 2>&1
@@ -214,7 +213,6 @@ tar xvfz kubernetes-server-linux-amd64.tar.gz >> /tmp/k8s_install_log 2>&1
 mkdir -p /usr/local/lib/k8s/kubernetes/server/bin
 mv kubernetes/server/bin/* /usr/local/lib/k8s/kubernetes/server/bin/
 set +e
-
 
 
 echo " - Installing required infrastructure containers "

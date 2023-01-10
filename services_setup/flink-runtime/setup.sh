@@ -99,9 +99,6 @@ docker run \
         -t eskimo:flink bash >> flink_install_log 2>&1
 fail_if_error $? "flink_install_log" -2
 
-# connect to container
-#docker exec -it flink bash
-
 echo " - Configuring flink container (config script)"
 docker exec flink bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id \
         | tee -a flink_install_log 2>&1
@@ -110,10 +107,6 @@ if [[ `tail -n 1 flink_install_log` != " - In container config SUCCESS" ]]; then
     cat flink_install_log
     exit 100
 fi
-
-#echo " - TODO"
-#docker exec -it flink TODO/tmp/logstash_install_log
-
 
 echo " - Copying Flink entrypoint script"
 docker_cp_script eskimo-flink-entrypoint.sh sbin flink flink_install_log

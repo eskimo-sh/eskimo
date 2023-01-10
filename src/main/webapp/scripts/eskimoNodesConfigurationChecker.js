@@ -43,10 +43,10 @@ function parseProperty (key) {
 
     let matcher = key.match(nodesConfigPropertyRE);
 
-    if (matcher != null && matcher[2] != null && matcher[2] != "") {
+    if (matcher != null && matcher[2] != null && matcher[2] !== "") {
         return { "serviceName" : matcher[1], "nodeNumber" : parseInt (matcher[2]) };
 
-    } else if (matcher != null && matcher[1] != null && matcher[1] != "") {
+    } else if (matcher != null && matcher[1] != null && matcher[1] !== "") {
         return { "serviceName" : matcher[1] };
 
     } else {

@@ -56,7 +56,7 @@ echo " - Configuring host elasticsearch config part"
 . ./setupESCommon.sh
 if [[ $? != 0 ]]; then
     echo "Common configuration part failed !"
-    exit -20
+    exit 20
 fi
 
 
@@ -81,7 +81,7 @@ docker exec kibana bash /scripts/inContainerSetupESCommon.sh $elasticsearch_user
 if [[ `tail -n 1 /tmp/kibana_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script (common part) ended up in error"
     cat /tmp/kibana_install_log
-    exit -102
+    exit 102
 fi
 
 echo " - Configuring kibana container"
@@ -89,18 +89,14 @@ docker exec kibana bash /scripts/inContainerSetupKibana.sh | tee -a /tmp/kibana_
 if [[ `tail -n 1 /tmp/kibana_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat /tmp/kibana_install_log
-    exit -100
+    exit 100
 fi
-
-#echo " - TODO"
-#docker exec -it kibana TODO
 
 echo " - Handling topology and setting injection"
 handle_topology_settings kibana /tmp/kibana_install_log
 
 echo " - Committing changes to local template and exiting container kibana"
 commit_container kibana /tmp/kibana_install_log
-
 
 echo " - Starting Kubernetes deployment"
 deploy_kubernetes kibana /tmp/kibana_install_log

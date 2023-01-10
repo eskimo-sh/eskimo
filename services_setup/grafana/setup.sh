@@ -83,9 +83,6 @@ if [[ `tail -n 1 grafana_install_log` != " - In container config SUCCESS" ]]; th
     exit 100
 fi
 
-#echo " - TODO"
-#docker exec -it grafana TODO
-
 echo " - Handling topology and setting injection"
 handle_topology_settings grafana grafana_install_log
 

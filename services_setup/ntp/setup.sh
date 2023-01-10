@@ -75,19 +75,13 @@ docker run \
         -t eskimo:ntp bash >> ntp_install_log 2>&1
 fail_if_error $? "ntp_install_log" -2
 
-# connect to container
-#docker exec -it ntp bash
-
 echo " - Configuring ntp container"
 docker exec ntp bash /scripts/inContainerSetupNtp.sh | tee -a ntp_install_log 2>&1
 if [[ `tail -n 1 ntp_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat ntp_install_log
-    exit -100
+    exit 100
 fi
-
-#echo " - TODO"
-#docker exec -it ntp TODO
 
 echo " - Handling topology and setting injection"
 handle_topology_settings ntp ntp_install_log

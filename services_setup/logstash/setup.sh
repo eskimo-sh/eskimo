@@ -81,9 +81,6 @@ docker run \
         -t eskimo:logstash bash >> logstash_install_log 2>&1
 fail_if_error $? "logstash_install_log" -2
 
-# connect to container
-#docker exec -it logstash bash
-
 echo " - Logstash Remote Server Scripts"
 for i in `find ./command_server`; do
     if [[ -f $SCRIPT_DIR/$i ]]; then
@@ -113,10 +110,6 @@ fi
 
 echo " - Copying inContainerMountGluster.sh script"
 docker_cp_script inContainerMountGluster.sh sbin logstash logstash_install_log
-
-#echo " - TODO"
-#docker exec -it logstash TODO
-
 
 echo " - Handling topology and setting injection"
 handle_topology_settings logstash logstash_install_log

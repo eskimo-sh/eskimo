@@ -93,9 +93,6 @@ docker run \
         -t eskimo:spark-console bash >> spark_console_install_log 2>&1
 fail_if_error $? "spark_console_install_log" -2
 
-# connect to container
-#docker exec -it spark bash
-
 echo " - Configuring spark-console container (config script)"
 docker exec spark-console bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id \
         | tee -a spark_console_install_log 2>&1
@@ -114,10 +111,6 @@ if [[ `tail -n 1 spark_console_install_log` != " - In container config SUCCESS" 
     exit 101
 fi
 
-#echo " - TODO"
-#docker exec -it spark TODO
-
-
 echo " - Handling topology and setting injection"
 handle_topology_settings spark-console spark_console_install_log
 
@@ -135,7 +128,6 @@ docker_cp_script containerWatchDog.sh sbin spark-console spark_console_install_l
 
 echo " - Committing changes to local template and exiting container spark"
 commit_container spark-console spark_console_install_log
-
 
 echo " - Starting Kubernetes deployment"
 deploy_kubernetes spark-console spark_console_install_log

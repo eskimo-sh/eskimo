@@ -95,9 +95,6 @@ docker run \
         -t eskimo:spark bash >> spark_executor_install_log 2>&1
 fail_if_error $? "spark_executor_install_log" -2
 
-# connect to container
-#docker exec -it spark bash
-
 echo " - Configuring spark container (config script)"
 docker exec spark bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id $SELF_IP_ADDRESS \
         | tee -a spark_executor_install_log 2>&1
@@ -114,9 +111,6 @@ if [[ `tail -n 1 spark_executor_install_log` != " - In container config SUCCESS"
     cat spark_executor_install_log
     exit 101
 fi
-
-#echo " - TODO"
-#docker exec -it spark TODO/tmp/logstash_install_log
 
 echo " - Copying Spark entrypoint script"
 docker_cp_script eskimo-spark-entrypoint.sh sbin spark spark_executor_install_log
@@ -151,9 +145,6 @@ if [[ $? != 0 ]]; then
     echo "Image push in docker registry failed !"
     exit 5
 fi
-
-
-
 
 
 # spark executor part

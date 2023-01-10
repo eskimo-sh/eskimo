@@ -66,9 +66,6 @@ docker run \
         -t eskimo:prometheus bash >> prometheus_install_log 2>&1
 fail_if_error $? "prometheus_install_log" -2
 
-# connect to container
-#docker exec -it prometheus bash
-
 echo " - Copying containerWatchDog.sh script to container"
 docker_cp_script containerWatchDog.sh sbin prometheus prometheus_install_log
 
@@ -77,11 +74,8 @@ docker exec prometheus bash /scripts/inContainerSetupPrometheus.sh | tee -a prom
 if [[ `tail -n 1 prometheus_install_log` != " - In container config SUCCESS" ]]; then
     echo " - In container setup script ended up in error"
     cat prometheus_install_log
-    exit -100
+    exit 100
 fi
-
-#echo " - TODO"
-#docker exec -it prometheus TODO
 
 echo " - Handling topology and setting injection"
 handle_topology_settings prometheus prometheus_install_log

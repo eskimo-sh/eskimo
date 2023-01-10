@@ -127,10 +127,6 @@ fail_if_error $? "zeppelin_install_log" -2
 #        -v /var/lib/zeppelin:/var/lib/zeppelin \
 #        -v /usr/local/etc/zeppelin:/usr/local/etc/zeppelin \
 
-# connect to container
-#docker exec -it zeppelin bash
-
-
 echo " - Configuring zeppelin container - spark common part"
 docker exec zeppelin bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id \
         | tee zeppelin_install_log 2>&1
@@ -174,10 +170,6 @@ if [[ `tail -n 1 zeppelin_install_log` != " - In container config SUCCESS" ]]; t
     cat zeppelin_install_log
     exit 35
 fi
-
-#echo " - TODO"
-#docker exec -it zeppelin TODO
-
 
 echo " - Copying Topology Injection Script (Spark)"
 docker_cp_script inContainerInjectTopologySpark.sh sbin zeppelin zeppelin_install_log

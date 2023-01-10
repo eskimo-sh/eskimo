@@ -83,20 +83,6 @@ set +e
 export NO_BASE_IMAGE=true
 build_image package_k8s /tmp/package-k8s-log
 
-
-#echo " - Destroying any previously existing VM"
-#vagrant destroy --force deb-build-node > /tmp/package-k8s-log 2>&1
-
-#echo " - Bringing Build VM up"
-#if [[ $USE_VIRTUALBOX == 1 ]]; then
-#    vagrant up deb-build-node > /tmp/package-k8s-log 2>&1
-#else
-#    vagrant up deb-build-node --provider=libvirt > /tmp/package-k8s-log 2>&1
-#fi
-
-#deb http://httpredir.debian.org/debian/ jessie main
-#deb http://httpredir.debian.org/debian/ jessie main contrib non-free
-
 echo " - Updating the appliance"
 docker exec -i package_k8s bash -c "DEBIAN_FRONTEND=noninteractive apt-get -yq update" > /tmp/package-k8s-log 2>&1
 fail_if_error $? "package-k8s-log" -3
@@ -105,26 +91,9 @@ echo " - Upgrading the appliance"
 docker exec -i package_k8s bash -c "DEBIAN_FRONTEND=noninteractive apt-get -yq upgrade" > /tmp/package-k8s-log 2>&1
 fail_if_error $? "package-k8s-log" -4
 
-#echo " - Installing OpenJDK 11"
-#docker exec -i package_k8s bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-11-jdk" > /tmp/package-k8s-log 2>&1
-fail_if_error $? "package-k8s-log" -5
-
 echo " - Installing a few utility tools"
 docker exec -i package_k8s bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y tar wget git unzip curl moreutils sudo procps" > /tmp/package-k8s-log 2>&1
 fail_if_error $? "package-k8s-log" -6
-
-#echo " - Installing build tools"
-#docker exec -i package_k8s bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential autoconf libtool" > /tmp/package-k8s-log 2>&1
-fail_if_error $? "package-k8s-log" -7
-
-#echo " - Installing swapspace"
-#docker exec -i package_k8s bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y swapspace" > /tmp/package-k8s-log 2>&1
-fail_if_error $? "package-k8s-log" -8
-
-#echo " - Installing python"
-#docker exec -i package_k8s bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y python-dev python-six python-virtualenv python-pip" > /tmp/package-k8s-log 2>&1
-fail_if_error $? "package-k8s-log" -9
-
 
 echo " - Downloading required infrastructure containers for Kubernetes"
 
