@@ -55,12 +55,12 @@ public class EskimoAlertTest extends AbstractWebTest {
 
         // force hide it
         js("$('#alert-modal').modal('show');");
-        Thread.sleep(200);
+        Thread.sleep(200); // unfortunately need this one
         ActiveWaiter.wait(() -> js("return $('#alert-modal').css('display')").equals("block"));
         assertCssValue("#alert-modal", "display", "block");
 
         js("$('#alert-modal').modal('hide');");
-        Thread.sleep(200);
+        Thread.sleep(200); // unfortunately need this one
         ActiveWaiter.wait(() -> js("return $('#alert-modal').css('display')").equals("none"));
         assertCssValue("#alert-modal", "display", "none");
     }

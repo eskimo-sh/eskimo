@@ -37,6 +37,8 @@ if (typeof eskimo === "undefined" || eskimo == null) {
 }
 eskimo.EditUser = function() {
 
+    this.eskimoMain = null;
+
     const that = this;
 
     this.initialize = function() {
@@ -60,7 +62,7 @@ eskimo.EditUser = function() {
     };
 
     function showEditUser () {
-        $("#edit-user-user-id").val(eskimoMain.getUserId());
+        $("#edit-user-user-id").val(that.eskimoMain.getUserId());
         $("#edit-user-current-password").val("");
         $("#edit-user-new-password").val("");
         $("#edit-user-repeat-password").val("");
@@ -80,6 +82,7 @@ eskimo.EditUser = function() {
 
         if (newUser["edit-user-new-password"] !== newUser["edit-user-repeat-password"]) {
             eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "both passwords don't match!");
+            return;
         }
 
         $('#edit-user-input-button-validate').prop('disabled', true);
@@ -116,4 +119,5 @@ eskimo.EditUser = function() {
             }
         });
     }
+    this.validateEditUser = validateEditUser;
 };

@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.html;
 
+import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -46,24 +47,86 @@ public class EskimoEditUserTest extends AbstractWebTest {
 
         loadScript("bootstrap-5.2.0.js");
 
+        loadScript("eskimoUtils.js");
         loadScript("eskimoEditUser.js");
 
         js("eskimoEditUser = new eskimo.EditUser();");
         js("eskimoEditUser.initialize()");
 
+        js("eskimoEditUser.eskimoMain = {" +
+                "    getUserId: function() { return 'testUser'; }," +
+                "    alert: function (level, message) { window.lastAlert = level + ' : ' + message; }" +
+                "}");
+
         waitForElementIdInDOM("edit-user-input-button-validate");
+
+        assertCssValue("#edit-user-modal", "display", "block");
     }
 
     @Test
-    public void testShowUser() {
+    public void testNominal() {
 
-       fail ("To Be Implemented");
+        js("eskimoEditUser.showEditUser()");
+
+        ActiveWaiter.wait(() -> {
+            Object display = js("return $('#edit-user-modal').css('display')");
+            return display != null && display.equals("block");
+        });
+        assertCssValue("#edit-user-modal", "display", "block");
+
+        assertJavascriptEquals("testUser", "$('#edit-user-user-id').val()");
+
+        assertJavascriptEquals("", "$('#edit-user-current-password').val()");
+        assertJavascriptEquals("", "$('#edit-user-new-password').val()");
+        assertJavascriptEquals("", "$('#edit-user-repeat-password').val()");
+
+        js("eskimoEditUser.cancelEditUser()");
+
+        ActiveWaiter.wait(() -> {
+            Object display = js("return $('#edit-user-modal').css('display')");
+            return display != null && display.equals("none");
+        });
+        assertCssValue("#edit-user-modal", "display", "none");
     }
 
     @Test
-    public void testEditUser() {
+    public void testValidate() {
 
-        fail ("To Be Implemented");
+        js("eskimoEditUser.showEditUser()");
+
+        ActiveWaiter.wait(() -> {
+            Object display = js("return $('#edit-user-modal').css('display')");
+            return display != null && display.equals("block");
+        });
+        assertCssValue("#edit-user-modal", "display", "block");
+
+        js("$('#edit-user-current-password').val('testOld')");
+        js("$('#edit-user-new-password').val('testNew')");
+        js("$('#edit-user-repeat-password').val('testWrong')");
+
+        js("eskimoEditUser.validateEditUser()");
+
+        assertJavascriptEquals("3 : both passwords don't match!", "window.lastAlert");
+
+        js("window.lastAlert = null;");
+
+        js("$('#edit-user-repeat-password').val('testNew')");
+
+        js("$.ajaxPost = function (dataObj) {" +
+                "    dataObj.success({" +
+                "        'message' : 'OK'" +
+                "    });" +
+                "}");
+
+        js("eskimoEditUser.validateEditUser()");
+
+        assertJavascriptEquals("1 : OK", "window.lastAlert");
+
+        ActiveWaiter.wait(() -> {
+            Object display = js("return $('#edit-user-modal').css('display')");
+            return display != null && display.equals("none");
+        });
+        assertCssValue("#edit-user-modal", "display", "none");
     }
 }
 
