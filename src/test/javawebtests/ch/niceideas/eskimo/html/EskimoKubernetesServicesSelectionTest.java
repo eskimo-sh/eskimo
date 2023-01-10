@@ -36,14 +36,13 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.TimeUnit;
 
-import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
@@ -82,7 +81,7 @@ public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
 
         js("eskimoKubernetesServicesSelection.showKubernetesServiceSelection()");
 
-        await().atMost(1, TimeUnit.SECONDS).until(() -> js("return $('#kubernetes-services-selection-modal').css('display')").toString().equals ("block"));
+        ActiveWaiter.wait(() -> js("return $('#kubernetes-services-selection-modal').css('display')").toString().equals ("block"));
 
         assertCssValue("#kubernetes-services-selection-modal", "display", "block");
         assertCssValue("#kubernetes-services-selection-modal", "visibility", "visible");

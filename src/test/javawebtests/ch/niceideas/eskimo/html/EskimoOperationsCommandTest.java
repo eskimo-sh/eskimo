@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -80,6 +81,7 @@ public class EskimoOperationsCommandTest extends AbstractWebTest {
 
         testShowCommand();
 
+        // FIXME this condition doesn't work
         //waitForElementCss ("operations-command-button-validate", "display", "block");
         Thread.sleep(2000);
 

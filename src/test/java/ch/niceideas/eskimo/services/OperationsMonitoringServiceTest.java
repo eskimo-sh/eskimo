@@ -43,8 +43,8 @@ import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.*;
+import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.apache.log4j.Logger;
-import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +56,6 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -170,6 +169,7 @@ public class OperationsMonitoringServiceTest {
 
         nodesConfigurationService.applyNodesConfig(command);
 
+        // FIXME How can I do this one with ActiveWaiter.wait() ?
         Thread.sleep (1000);
 
         OperationsMonitoringStatusWrapper operationsMonitoringStatus = operationsMonitoringService.getOperationsMonitoringStatus(new HashMap<>());
@@ -245,10 +245,8 @@ public class OperationsMonitoringServiceTest {
         });
         t.start();
 
-        //Thread.sleep (1000);
-
         AtomicInteger previousCount = new AtomicInteger();
-        Awaitility.await().atMost(10, TimeUnit.SECONDS).until(() -> {
+        ActiveWaiter.wait(() -> {
             if (waitCount.get() <= 0) {
                 return false;
             }
@@ -257,11 +255,14 @@ public class OperationsMonitoringServiceTest {
             }
             previousCount.set(waitCount.get());
             return false;
+
         });
 
         operationsMonitoringService.interruptProcessing();
 
         doWait.set(false);
+
+        // FIXME How can I do this one with ActiveWaiter.wait() ?
         Thread.sleep(1000);
         synchronized (monitor) {
 

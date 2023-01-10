@@ -36,13 +36,11 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.TimeUnit;
-
-import static org.awaitility.Awaitility.await;
 
 public class EskimoServicesSelectionTest extends AbstractWebTest {
 
@@ -108,9 +106,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
         assertJavascriptEquals("true", "$('#zookeeper-choice').get(0).checked");
 
         getElementById("zookeeper-choice").click();
-
-        await().atMost(10, TimeUnit.SECONDS).until(() -> js("return $('#zookeeper-choice').get(0).checked").toString().equals ("false"));
-
+        ActiveWaiter.wait(() -> js("return $('#zookeeper-choice').get(0).checked").toString().equals ("false"));
         assertJavascriptEquals("false", "$('#zookeeper-choice').get(0).checked");
     }
 

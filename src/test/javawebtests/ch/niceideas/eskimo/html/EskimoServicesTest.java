@@ -35,14 +35,13 @@
 package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.net.URL;
-import java.util.concurrent.TimeUnit;
 
-import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EskimoServicesTest extends AbstractWebTest {
@@ -169,7 +168,7 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         js("eskimoServices.periodicRetryServices();");
 
-        await().atMost(10, TimeUnit.SECONDS).until(() -> ((Long)js("return eskimoServices.getUIConfigsToRetryForTests().length")) == 0);
+        ActiveWaiter.wait(() -> ((Long)js("return eskimoServices.getUIConfigsToRetryForTests().length")) == 0);
         assertJavascriptEquals("0", "eskimoServices.getUIConfigsToRetryForTests().length");
     }
 
@@ -249,7 +248,7 @@ public class EskimoServicesTest extends AbstractWebTest {
 
         js("eskimoServices.handleServiceIsUp(UI_SERVICES_CONFIG['cerebro'])");
 
-        await().atMost(5, TimeUnit.SECONDS).until(() -> js("return UI_SERVICES_CONFIG['cerebro'].refreshWaiting").toString().equals ("false"));
+        ActiveWaiter.wait(() -> js("return UI_SERVICES_CONFIG['cerebro'].refreshWaiting").toString().equals ("false"));
 
         assertJavascriptEquals("false", "UI_SERVICES_CONFIG['cerebro'].refreshWaiting");
         assertJavascriptEquals("./cerebro/192-168-10-11:9999/cerebro", "UI_SERVICES_CONFIG['cerebro'].actualUrl");

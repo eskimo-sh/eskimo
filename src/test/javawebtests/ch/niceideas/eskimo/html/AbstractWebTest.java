@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.exceptions.CommonBusinessException;
 import ch.niceideas.eskimo.html.infra.TestResourcesServer;
+import ch.niceideas.eskimo.utils.ActiveWaiter;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.github.bonigarcia.wdm.config.WebDriverManagerException;
 import org.apache.log4j.Logger;
@@ -60,8 +61,9 @@ public abstract class AbstractWebTest {
 
     private static final File jsCoverageFlagFile = new File("target/jsCoverageFlag");
 
-    private static final int INCREMENTAL_WAIT_MS = 500;
-    private static final int MAX_WAIT_RETRIES = 50;
+    private static final int INCREMENTAL_WAIT_MS = 200;
+    private static final int MAX_WAIT_RETRIES = 100;
+    private static final int MAX_WAIT_TIME_SECS = 20;
 
     private static String className = null;
 
@@ -84,16 +86,17 @@ public abstract class AbstractWebTest {
         co.addArguments("--headless");
         co.addArguments("--disable-gpu");
 
-        for (int i = 0; ; i++) { // 3 attempts
+        for (int i = 0; ; i++) { // 10 attempts
             try {
                 driver = WebDriverManager.chromedriver()
                         .capabilities(co)
                         .create();
                 break;
             } catch (WebDriverManagerException e) {
-                if (i < 2) {
+                if (i < 10) {
                     logger.error (e, e);
-                    Thread.sleep (500);
+                    //noinspection BusyWait
+                    Thread.sleep (200);
                 } else {
                     throw new CommonBusinessException(e);
                 }
@@ -101,6 +104,15 @@ public abstract class AbstractWebTest {
         }
 
         driver.get("http://localhost:" + TestResourcesServer.LOCAL_TEST_SERVER_PORT + "/src/test/resources/GenericTestPage.html");
+    }
+
+    private static boolean hasQuit(WebDriver driver) {
+        try {
+            driver.getTitle();
+            return false;
+        } catch (WebDriverException e) {
+            return true;
+        }
     }
 
     @AfterAll
@@ -111,7 +123,9 @@ public abstract class AbstractWebTest {
             driver.quit();
         }
 
-        Thread.sleep(1000); // give some time to selenium driver to really shutdown before running next test
+        // give some time to selenium driver to really shutdown before running next test
+        ActiveWaiter.wait(() ->hasQuit(driver), 2000);
+        Thread.sleep(100); // give it even a little more time
     }
 
     @BeforeEach
@@ -325,7 +339,7 @@ public abstract class AbstractWebTest {
         js("loadScript('http://localhost:" + TestResourcesServer.LOCAL_TEST_SERVER_PORT + "/src/main/webapp/scripts/"+script+"')");
         try {
             waitForElementInDOM(By.cssSelector("script[src=\"http://localhost:" + TestResourcesServer.LOCAL_TEST_SERVER_PORT + "/src/main/webapp/scripts/" + script + "\"]"));
-            Thread.sleep(20);
+            Thread.sleep(20); // give it some more time to actually load script elements
         } catch (InterruptedException e) {
             logger.debug(e, e);
         }
@@ -365,48 +379,15 @@ public abstract class AbstractWebTest {
         assertEquals (tagName, getElementById(elementId).getTagName());
     }
 
-    protected void waitForElementInDOM(By by) throws InterruptedException{
-
-        // FIXME I have failing tests with Awaitility !?!
-        /*
-        await().atMost(MAX_WAIT_TIME_SECS * (isCoverageRun() ? 2 : 1) , TimeUnit.SECONDS).until(
-                () -> page.getElementById(elementId) != null);
-        */
-
-        int attempt = 0;
-        while (getElementBy(by) == null && attempt < MAX_WAIT_RETRIES) {
-            Thread.sleep(INCREMENTAL_WAIT_MS);
-            attempt++;
-        }
+    protected void waitForElementInDOM(By by) {
+        ActiveWaiter.wait(() -> getElementBy(by) != null);
     }
 
-    protected void waitForElementIdInDOM(String elementId) throws InterruptedException {
-
-        // FIXME I have failing tests with Awaitility !?!
-        /*
-        await().atMost(MAX_WAIT_TIME_SECS * (isCoverageRun() ? 2 : 1) , TimeUnit.SECONDS).until(
-                () -> page.getElementById(elementId) != null);
-        */
-
-        int attempt = 0;
-        while (getElementById(elementId) == null && attempt < MAX_WAIT_RETRIES) {
-            Thread.sleep(INCREMENTAL_WAIT_MS);
-            attempt++;
-        }
+    protected void waitForElementIdInDOM(String elementId) {
+        ActiveWaiter.wait(() -> getElementById(elementId) != null);
     }
 
-    protected void waitForDefinition(String varName) throws InterruptedException {
-
-        // FIXME I have failing tests with Awaitility !?!
-        /*
-        await().atMost(MAX_WAIT_TIME_SECS * (isCoverageRun() ? 2 : 1) , TimeUnit.SECONDS).until(
-                () -> !js("typeof " + varName).getJavaScriptResult().toString().equals ("undefined"));
-        */
-
-        int attempt = 0;
-        while (js("return typeof " + varName).toString().equals ("undefined") && attempt < MAX_WAIT_RETRIES) {
-            Thread.sleep(INCREMENTAL_WAIT_MS);
-            attempt++;
-        }
+    protected void waitForDefinition(String varName) {
+        ActiveWaiter.wait(() -> !js("return typeof " + varName).toString().equals ("undefined"));
     }
 }

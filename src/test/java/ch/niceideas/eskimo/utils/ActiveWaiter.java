@@ -32,45 +32,39 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.html;
 
-import ch.niceideas.eskimo.utils.ActiveWaiter;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+package ch.niceideas.eskimo.utils;
 
-public class EskimoAboutTest extends AbstractWebTest {
+import ch.niceideas.common.exceptions.CommonRTException;
 
-    @BeforeEach
-    public void setUp() throws Exception {
+public class ActiveWaiter {
 
-        loadScript("bootstrap-5.2.0.js");
+    private static final int INCREMENTAL_WAIT_MS = 200;
+    private static final int MAX_WAIT_RETRIES = 100;
 
-        loadScript("eskimoAbout.js");
-
-        js("eskimoAbout = new eskimo.About();");
-        js("eskimoAbout.initialize()");
-
-        waitForElementIdInDOM("about-modal-body");
+    public static void wait (ConditionChecker condition, long maxWaitTimeMs) {
+        wait (condition, maxWaitTimeMs / INCREMENTAL_WAIT_MS, MAX_WAIT_RETRIES);
     }
 
-    @Test
-    public void testNominal() throws Exception {
-
-        js("eskimoAbout.showAbout()");
-        ActiveWaiter.wait(() -> js("return $('#about-modal').css('display')").equals("block"));
-
-        assertCssValue("#about-modal", "display", "block");
-        assertCssValue("#about-modal", "visibility", "visible");
-
-        js("eskimoAbout.cancelAbout()");
-        ActiveWaiter.wait(() -> {
-            Object display = js("$('#about-modal').css('display')");
-            return display == null || display.equals("none");
-        });
-
-        //assertCssValue("#about-modal", "visibility", "hidden");
-        assertCssValue("#about-modal", "display", "none");
+    public static void wait (ConditionChecker condition) {
+        wait (condition, MAX_WAIT_RETRIES, INCREMENTAL_WAIT_MS);
     }
 
+    private static void wait (ConditionChecker condition, long retries, long pollTime) {
+        int attempt = 0;
+        while (!condition.stopCondition() && attempt < retries) {
+            try {
+                //noinspection BusyWait
+                Thread.sleep(pollTime);
+            } catch (InterruptedException e) {
+                throw new CommonRTException(e);
+            }
+            attempt++;
+        }
+    }
+
+
+    public interface ConditionChecker {
+        boolean stopCondition();
+    }
 }
-

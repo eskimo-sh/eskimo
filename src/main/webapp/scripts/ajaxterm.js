@@ -141,7 +141,7 @@ ajaxterm.Terminal = function(id,options) {
         }
 
 //		debug("ts: "+((new Date).getTime())+" rmax:"+rmax);
-		console.log("ts: "+((new Date).getTime())+" rmax:"+rmax);
+//		console.log("ts: "+((new Date).getTime())+" rmax:"+rmax);
 		if(sending==0) {
 			sending=1;
 			sled.className='on';
@@ -164,7 +164,7 @@ ajaxterm.Terminal = function(id,options) {
 			r.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
 			r.onreadystatechange = function () {
 //				debug("xhr:"+((new Date).getTime())+" state:"+r.readyState+" status:"+r.status+" statusText:"+r.statusText);
-				console.log("xhr:"+((new Date).getTime())+" state:"+r.readyState+" status:"+r.status+" statusText:"+r.statusText);
+//				console.log("xhr:"+((new Date).getTime())+" state:"+r.readyState+" status:"+r.status+" statusText:"+r.statusText);
 				if (r.readyState === 4) {
 					if(r.status === 200) {
 						window.clearTimeout(error_timeout);
@@ -197,7 +197,7 @@ ajaxterm.Terminal = function(id,options) {
 						sled.className='off';
 						timeout=window.setTimeout(update,rmax);
                         screenTimestamp = r.getResponseHeader("Screen-Timestamp");
-						console.log("done - "+r.status);
+//						console.log("done - "+r.status);
 					} else {
 						//debug("Connection error status:"+r.status);
 						console.log("Connection error status:"+r.status);
@@ -270,7 +270,7 @@ ajaxterm.Terminal = function(id,options) {
 		if (!ev) {
             ev=window.event;
         }
-        console.log ("kp keyCode="+ev.keyCode+" which="+which+" shiftKey="+ev.shiftKey+" ctrlKey="+ev.ctrlKey+" altKey="+ev.altKey);
+//        console.log ("kp keyCode="+ev.keyCode+" which="+which+" shiftKey="+ev.shiftKey+" ctrlKey="+ev.ctrlKey+" altKey="+ev.altKey);
 //		debug(s);
 //		return false;
 //		else { if (!ev.ctrlKey || ev.keyCode==17) { return; }

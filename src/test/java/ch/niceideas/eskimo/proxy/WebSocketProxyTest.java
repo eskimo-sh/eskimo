@@ -2,10 +2,9 @@ package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
-import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
+import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.apache.catalina.Context;
-import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.websocket.server.WsContextListener;
@@ -36,7 +35,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class WebSocketProxyTest {
@@ -163,7 +161,7 @@ public class WebSocketProxyTest {
     }
 
     WebSocketSession waitAndGetSession(AtomicReference<WebSocketSession> atomicSessionRef) throws InterruptedException {
-        await().atMost(10, TimeUnit.SECONDS).until(() -> atomicSessionRef.get() != null);
+        ActiveWaiter.wait(() -> atomicSessionRef.get() != null);
         assertNotNull(atomicSessionRef.get());
         return atomicSessionRef.get();
     }

@@ -1,5 +1,6 @@
 package ch.niceideas.eskimo.terminal;
 
+import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,7 @@ public class SessionTest {
         assertTrue(s.isAlive());
         s.write("export PS1=:\n");
         s.write("echo hello world\n");
+        // FIXME How can I do this one with ActiveWaiter.wait() ?
         Thread.sleep(1000);
         String dump = s.getTerminal().dumpLatin1();
         assertTrue(dump.contains("hello world"));
@@ -36,7 +38,7 @@ public class SessionTest {
         s.write("exit 3\n");
         s.join(2000);
         assertFalse(s.isAlive());
-        Thread.sleep(1000);
+        ActiveWaiter.wait(() -> s.getChildProcess().exitValue() == 3);
         assertEquals(3, s.getChildProcess().exitValue());
     }
 

@@ -261,12 +261,6 @@ Software.
             <version>1.70</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.awaitility</groupId>
-            <artifactId>awaitility</artifactId>
-            <version>4.2.0</version>
-            <scope>test</scope>
-        </dependency>
 
         <!-- Web testing -->
         <dependency>

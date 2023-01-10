@@ -38,14 +38,13 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
+import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.TimeUnit;
 
-import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class EskimoSystemStatusTest extends AbstractWebTest {
@@ -274,7 +273,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         js("eskimoSystemStatus.displayMonitoringDashboard('abcd', '50');");
         assertJavascriptEquals("grafana/d/abcd/monitoring?orgId=1&&kiosk&refresh=50", "$('#status-monitoring-dashboard-frame').attr('src')");
 
-        await().atMost(15, TimeUnit.SECONDS).until(() -> js("return $('#status-monitoring-no-dashboard').css('display')").toString().equals("none"));
+        ActiveWaiter.wait(() -> js("return $('#status-monitoring-no-dashboard').css('display')").toString().equals("none"));
 
         assertCssValue("#status-monitoring-dashboard-frame", "display", "block");
         assertCssValue("#status-monitoring-no-dashboard", "display", "none");
@@ -357,7 +356,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         js("eskimoSystemStatus.handleSystemStatus (jsonFullStatus.nodeServicesStatus, jsonFullStatus.systemStatus, true)");
 
-        await().atMost(15, TimeUnit.SECONDS).until(() -> js("return $('#system-information-nodes-status').html()").toString()
+        ActiveWaiter.wait(() -> js("return $('#system-information-nodes-status').html()").toString()
                 .equals("Following nodes are reporting problems : <span class=\"status-node-cell-span-restart\">192.168.10.13</span>"));
 
         assertJavascriptEquals("Following nodes are reporting problems : <span class=\"status-node-cell-span-restart\">192.168.10.13</span>",

@@ -183,8 +183,6 @@ public class EskimoMenuTest extends AbstractWebTest {
                 "     }\n" +
                 "});");
 
-        //Thread.sleep(100000);
-
         assertJavascriptEquals("false", "allDisabled");
         assertJavascriptEquals("true", "allEnabled");
 
