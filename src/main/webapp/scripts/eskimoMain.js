@@ -40,6 +40,8 @@ eskimo.Main = function() {
 
     const that = this;
 
+    let mainContentsimpleBar = null;
+
     let setupLoaded = false;
     let setupDone = false;
 
@@ -124,6 +126,7 @@ eskimo.Main = function() {
             eskimoAlert: eskimoAlert,
             eskimoMenu: eskimoMenu,
             eskimoApp: eskimoApp,
+            eskimoEditUser: eskimoEditUser,
             eskimoMain: this
         };
 
@@ -335,26 +338,29 @@ eskimo.Main = function() {
 
     this.showOnlyContent = function (content, isServiceIFrame) {
 
-        $("#main-content").scrollTop();
+        const $mainContent = $("#main-content");
 
-        if (isServiceIFrame) {
-            $('#main-content').addClass("overflow-hidden");
-        } else {
-            $('#main-content').removeClass("overflow-hidden");
-        }
+        $mainContent.scrollTop();
 
         eskimoMenu.setActiveMenuEntry (content, isServiceIFrame);
 
         // if service iframe is already shown, clicking a second time on the link refreshed the iframe
 
-        if (isServiceIFrame && $("#inner-content-" + content).css("visibility") == "visible") {
+        const $selectedInnerContent = $("#inner-content-" + content);
+        if (isServiceIFrame && $selectedInnerContent.css("visibility") === "visible") {
 
             eskimoServices.refreshIframe (content);
 
         } else {
 
             $.hideElement($(".inner-content"));
-            $.showElement($("#inner-content-" + content));
+            $.showElement($selectedInnerContent);
+        }
+
+        if (isServiceIFrame) {
+            $mainContent.addClass("overflow-hidden");
+        } else {
+            $mainContent.removeClass("overflow-hidden");
         }
     };
 

@@ -65,6 +65,11 @@ eskimo.FileManagers = function() {
                 $("#file-manager-input-header-close").click(closeFilenameInput);
                 $("#file-manager-input-button-cancel").click(closeFilenameInput);
                 $("#file-manager-input-button-validate").click(validateCreateFile);
+
+                // reattach modals to content-page
+                $("#file-viewer-modal").detach().appendTo("#content-page");
+                $("#filename-input-modal").detach().appendTo("#content-page");
+                $("#file-upload-progress-modal").detach().appendTo("#content-page");
             }
 
         });

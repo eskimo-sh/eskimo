@@ -133,6 +133,11 @@ public class EskimoMainTest extends AbstractWebTest {
         assertCssValue("#inner-content-operations", "visibility", "visible");
 
         assertJavascriptEquals("true", "eskimoMain.isCurrentDisplayedScreen('operations')");
+
+        js("eskimoMain.showOnlyContent('kibana', true)");
+
+        assertCssValue("#inner-content-operations", "visibility", "hidden");
+
     }
 
     @Test

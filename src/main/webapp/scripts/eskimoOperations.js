@@ -79,6 +79,8 @@ eskimo.Operations = function() {
                     e.preventDefault();
                     return false;
                 });
+
+                $("#operation-log-modal").detach().appendTo("#content-page");
             }
 
             if(statusTxt === "error"){
