@@ -118,7 +118,7 @@ fi
 # recreating on master
 if [[ `kubectl get secret | grep $ADMIN_USER` != "" ]]; then
     echo "   + Deleting secret-$ADMIN_USER"
-    kubectl delete secret $ADMIN_USER
+    kubectl delete secret $ADMIN_USER-secret
     sleep 3
 fi
 
@@ -152,12 +152,14 @@ fi
 
 
 echo "   + Getting token"
-sleep 4
+sleep 5
 NEW_TOKEN=`kubectl describe secret $ADMIN_USER-secret | grep token: | sed 's/token: *\(.*\)/\1/'`
 if [[ "$NEW_TOKEN" == "" ]]; then
     echo " !! Failed to get new token"
-    echo "  -> this is the output of  kubectl get secrets"
+    echo "  -> this is the output of 'kubectl get secrets'"
     kubectl get secrets
+    echo "  -> this is the output of 'kubectl describe secret $ADMIN_USER-secret'"
+    kubectl describe secret $ADMIN_USER-secret
     exit 51
 fi
 
