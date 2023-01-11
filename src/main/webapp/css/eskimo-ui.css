@@ -941,3 +941,8 @@ span.status-node-cell-span-restart {
 #edit-user-form div.row {
     margin-bottom: 5px;
 }
+
+#last-status-update-info {
+    text-transform: initial;
+    font-weight: 200;
+}

@@ -1096,9 +1096,17 @@ eskimo.SystemStatus = function() {
 
                     that.eskimoMain.handleSetupCompleted();
 
-                    that.handleSystemStatus(data.nodeServicesStatus, data.systemStatus, blocking);
+                    if (data.error && data.error != null && data.error != "") {
+                        showStatusMessage(data.error);
 
-                    that.renderNodesStatus (data.nodeServicesStatus, data.masters, blocking);
+                    } else {
+
+                        that.handleSystemStatus(data.nodeServicesStatus, data.systemStatus, blocking);
+
+                        that.renderNodesStatus(data.nodeServicesStatus, data.masters, blocking);
+
+                        $("#last-status-update-info").html("(last updated on " + getStatusUpdateTimestamp() + ")")
+                    }
 
                 } else if (data.clear == "setup"){
 
@@ -1174,4 +1182,16 @@ eskimo.SystemStatus = function() {
     }
     this.updateStatus = updateStatus;
 
+    function getStatusUpdateTimestamp () {
+        const date = new Date ();
+
+        const year    = date.getFullYear();
+        const month   = date.getMonth() + 1;
+        const day     = date.getDate();
+        const hour    = date.getHours();
+        const minute  = date.getMinutes();
+        const seconds = date.getSeconds();
+
+        return "" + year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + seconds;
+    }
 };
