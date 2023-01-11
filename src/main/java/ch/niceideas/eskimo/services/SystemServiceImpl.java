@@ -407,7 +407,7 @@ public class SystemServiceImpl implements SystemService {
             logger.error (e, e);
 
             lastStatusException.set (e);
-            lastStatus.set (null);
+            // Keeping previous status - last known status
 
         } finally {
             statusUpdateLock.unlock();
