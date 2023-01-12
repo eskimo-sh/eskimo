@@ -155,8 +155,8 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     public void testNodeMenuTemplate() {
         js("eskimoSystemStatus.initializeStatusTableMenus()");
         assertJavascriptEquals("" +
-                        "    <li><a id=\"terminal\" tabindex=\"-1\" href=\"#\" title=\"Start Service\"><i class=\"fa fa-terminal\"></i> SSH Terminal</a></li>\n" +
-                        "    <li><a id=\"file_manager\" tabindex=\"-1\" href=\"#\" title=\"Stop Service\"><i class=\"fa fa-folder\"></i> SFTP File Manager</a></li>\n",
+                        "    <li><a id=\"terminal\" tabindex=\"-1\" href=\"#\" title=\"Launch SSH Terminal\"><i class=\"fa fa-terminal\"></i> SSH Terminal</a></li>\n" +
+                        "    <li><a id=\"file_manager\" tabindex=\"-1\" href=\"#\" title=\"Launch SFTP File Manager\"><i class=\"fa fa-folder\"></i> SFTP File Manager</a></li>\n",
                 "$('#nodeContextMenuTemplate').html()");
     }
 
@@ -194,8 +194,8 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         driver.findElement(By.cssSelector("#status-node-table-body td.status-node-cell-intro")).click();
 
         assertJavascriptEquals("" +
-                        "    <li><a id=\"terminal\" tabindex=\"-1\" href=\"#\" title=\"Start Service\"><i class=\"fa fa-terminal\"></i> SSH Terminal</a></li>\n" +
-                        "    <li><a id=\"file_manager\" tabindex=\"-1\" href=\"#\" title=\"Stop Service\"><i class=\"fa fa-folder\"></i> SFTP File Manager</a></li>\n",
+                        "    <li><a id=\"terminal\" tabindex=\"-1\" href=\"#\" title=\"Launch SSH Terminal\"><i class=\"fa fa-terminal\"></i> SSH Terminal</a></li>\n" +
+                        "    <li><a id=\"file_manager\" tabindex=\"-1\" href=\"#\" title=\"Launch SFTP File Manager\"><i class=\"fa fa-folder\"></i> SFTP File Manager</a></li>\n",
                 "$('#nodeContextMenu').html()");
 
         assertCssValue("#nodeContextMenu", "position", "absolute");
@@ -330,6 +330,16 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         assertCssValue("#status-monitoring-dashboard-frame", "display", "none");
 
         assertAttrValue("#status-monitoring-dashboard-frame", "src", "html/emptyPage.html");
+
+        assertJavascriptEquals("CE", "$('#eskimo-flavour').html()");
+        assertJavascriptEquals("0.5-SNAPSHOT", "$('#system-information-version').html()");
+        assertJavascriptEquals("2023-01-12T09:54:15Z", "$('#system-information-timestamp').html()");
+        assertJavascriptEquals("eskimo", "$('#system-information-user').html()");
+        assertJavascriptEquals("admin", "$('#logged-user').html()");
+        assertJavascriptEquals("ADMIN", "$('#logged-role').html()");
+        assertJavascriptEquals("4", "$('#system-number-nodes').html()");
+        assertJavascriptEquals("11 / 11", "$('#system-native-services').html()");
+        assertJavascriptEquals("12 / 12", "$('#system-kube-services').html()");
 
         // grafana available
         js("eskimoServices.isServiceAvailable = function () { return true; }");

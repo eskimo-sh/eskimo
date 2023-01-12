@@ -61,6 +61,8 @@ public interface ServicesDefinition {
 
     String[] listAllNodesServices();
 
+    long countAllNodesServices();
+
     String[] listMultipleServicesNonKubernetes();
 
     String[] listMultipleServices();
@@ -70,6 +72,8 @@ public interface ServicesDefinition {
     String[] listUniqueServices();
 
     String[] listKubernetesServices();
+
+    long countKubernetesServices();
 
     String[] listProxiedServices();
 

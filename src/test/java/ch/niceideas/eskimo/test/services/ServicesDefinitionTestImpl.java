@@ -128,6 +128,14 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
+    public long countAllNodesServices() {
+        if (error) {
+            throw new JSONException("Test error");
+        }
+        return super.countAllNodesServices();
+    }
+
+    @Override
     public String[] listMultipleServicesNonKubernetes() {
         if (error) {
             throw new JSONException("Test error");
@@ -165,6 +173,14 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
             throw new JSONException("Test error");
         }
         return super.listKubernetesServices();
+    }
+
+    @Override
+    public long countKubernetesServices() {
+        if (error) {
+            throw new JSONException("Test error");
+        }
+        return super.countKubernetesServices();
     }
 
     @Override

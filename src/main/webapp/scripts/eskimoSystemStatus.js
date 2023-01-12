@@ -94,9 +94,9 @@ eskimo.SystemStatus = function() {
 
         let nodeMenuContent = '' +
             (eskimoMain.hasRole("ADMIN") ? '' +
-                '    <li><a id="terminal" tabindex="-1" href="#" title="Start Service"><i class="fa fa-terminal"></i> SSH Terminal</a></li>\n'
+                '    <li><a id="terminal" tabindex="-1" href="#" title="Launch SSH Terminal"><i class="fa fa-terminal"></i> SSH Terminal</a></li>\n'
                 : '') +
-            '    <li><a id="file_manager" tabindex="-1" href="#" title="Stop Service"><i class="fa fa-folder"></i> SFTP File Manager</a></li>\n';
+            '    <li><a id="file_manager" tabindex="-1" href="#" title="Launch SFTP File Manager"><i class="fa fa-folder"></i> SFTP File Manager</a></li>\n';
 
         $('#nodeContextMenuTemplate').html(nodeMenuContent);
     };
@@ -615,6 +615,11 @@ eskimo.SystemStatus = function() {
         $("#logged-role").html(systemStatus.roles);
         $("#account-position").html(systemStatus.roles);
 
+        $("#system-number-nodes").html(systemStatus.nodesCount);
+
+        $("#system-native-services").html(systemStatus.installedNodeServices + " / " + systemStatus.availableNodeServices);
+        $("#system-kube-services").html(systemStatus.installedKubeServices + " / " + systemStatus.availableKubeServices);
+
 
         $("#system-information-start-timestamp").html (systemStatus.startTimestamp);
 
@@ -795,6 +800,8 @@ eskimo.SystemStatus = function() {
                 let node = $(invokedOn).closest("td."+dataSelector).data('eskimo-node');
                 let nodeName = $(invokedOn).closest("td."+dataSelector).data('eskimo-node-name');
 
+                console.log ("Node menu : " + action + " - " + node + " - " + nodeName);
+
                 if (action == "terminal") {
                     showTerminal(node, nodeName);
 
@@ -934,7 +941,9 @@ eskimo.SystemStatus = function() {
 
             let arrayRow = ' ' +
                 '<tr id="' + nodeName + '">\n' +
-                '    <td class="status-node-cell-intro">\n';
+                '    <td class="status-node-cell-intro"' +
+                '        data-eskimo-node="' + node + '"' +
+                '        data-eskimo-node-name="' + nodeName + '">\n';
 
             if (nodeAlive == 'OK') {
                 arrayRow += '        <img alt="node icon" src="images/node-icon.png" class="status-node-image">\n';

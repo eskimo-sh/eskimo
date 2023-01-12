@@ -172,7 +172,8 @@ eskimo.ServicesSelection = function() {
 
             $('#ntp-choice').get(0).checked = true;
 
-            $("#services-selection-button-select-all").css("visibility", "hidden");
+            // TODO
+            //$("#services-selection-button-select-all").css("visibility", "hidden");
 
             // enabling node ntp to nake it selectaBLE
             let setupConfig = that.getCurrentNodesConfig();
@@ -200,7 +201,8 @@ eskimo.ServicesSelection = function() {
 
         } else {
 
-            $("#services-selection-button-select-all").css("visibility", "visible");
+            // TODO
+            //$("#services-selection-button-select-all").css("visibility", "visible");
         }
 
         $('#services-selection-modal').modal("show");
@@ -209,20 +211,31 @@ eskimo.ServicesSelection = function() {
 
     function servicesSelectionSelectAll() {
 
-        let allSelected = true;
+        let shouldSelectAll = false;
 
         let configuredServices = that.eskimoNodesConfig.getConfiguredServices();
 
-        // are they all selected already
+        // are they all selected already ?
         for (let i = 0; i < configuredServices.length; i++) {
             if (!$('#' + configuredServices[i] + "-choice").get(0).checked) {
-                allSelected = false;
+                // Nope. Lets select them all then
+                shouldSelectAll = true;
             }
         }
 
         // select all boxes
         for (let i = 0; i < configuredServices.length; i++) {
-            $('#' + configuredServices[i] + "-choice").get(0).checked = !allSelected;
+            $('#' + configuredServices[i] + "-choice").get(0).checked = shouldSelectAll;
+        }
+
+        // if we unselect, then of we are on a node conf we hould keep the mandatory ones
+        if (!shouldSelectAll && nodeNbrInConfiguration != null && nodeNbrInConfiguration != "empty") {
+            for (let serviceName in SERVICES_CONFIGURATION) {
+                let serviceConfig = SERVICES_CONFIGURATION[serviceName];
+                if (serviceConfig.mandatory) {
+                    $('#' + serviceName + "-choice").get(0).checked = true;
+                }
+            }
         }
     }
     this.servicesSelectionSelectAll = servicesSelectionSelectAll;

@@ -107,6 +107,21 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
                 .collect(Collectors.toList());
     }
 
+    public long countNodes() {
+        return getRootKeys().stream()
+                .filter(key -> key.startsWith(NODE_ID_FIELD))
+                .count();
+    }
+
+    public long countServices() {
+        return getRootKeys().stream()
+                .filter(key -> !key.contains(NODE_ID_FIELD))
+                .map(NodesConfigWrapper::parseProperty)
+                .filter(Objects::nonNull)
+                .map (ParsedNodesConfigProperty::getServiceName)
+                .distinct().count();
+    }
+
     public List<String> getServiceKeys() {
         return getRootKeys().stream()
                 .filter(key -> !key.contains(NODE_ID_FIELD))

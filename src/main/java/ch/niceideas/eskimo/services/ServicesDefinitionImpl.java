@@ -666,6 +666,13 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
     }
 
     @Override
+    public long countAllNodesServices() {
+        return services.values().stream()
+                .filter(service -> !service.isKubernetes())
+                .count();
+    }
+
+    @Override
     public String[] listMultipleServicesNonKubernetes() {
         return services.values().stream()
                 .filter(it -> !it.isUnique() && !it.isKubernetes())
@@ -707,6 +714,13 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 .map(Service::getName)
                 .sorted()
                 .toArray(String[]::new);
+    }
+
+    @Override
+    public long countKubernetesServices() {
+        return services.values().stream()
+                .filter(Service::isKubernetes)
+                .count();
     }
 
     @Override

@@ -24,45 +24,20 @@
   "processingPending": false,
   "systemStatus": {
     "monitoringDashboardId": "OMwJrHAWk",
+    "installedNodeServices": 11,
+    "buildVersion": "0.5-SNAPSHOT",
+    "availableNodeServices": 11,
+    "buildTimestamp": "2023-01-12T09:54:15Z",
+    "enableKubernetes": true,
+    "roles": "ADMIN",
+    "installedKubeServices": 12,
     "monitoringDashboardRefreshPeriod": "30s",
-    "buildVersion": "0.2-SNAPSHOT",
-    "buildTimestamp": "2019-12-12T17:14:31Z",
+    "availableKubeServices": 12,
     "sshUsername": "eskimo",
-    "links": [
-      {
-        "title": "Access all monitoring dashboards in Grafana",
-        "service": "grafana"
-      },
-      {
-        "title": "Monitor Flink and Spark processes in Mesos",
-        "service": "mesos-master"
-      },
-      {
-        "title": "Administer your kafka topics",
-        "service": "kafka-manager"
-      },
-      {
-        "title": "Monitor your Spark jobs",
-        "service": "spark-console"
-      },
-      {
-        "title": "Monitor your Flink jobs",
-        "service": "flink-app-master"
-      },
-      {
-        "title": "Administer your data in Elasticsearch",
-        "service": "cerebro"
-      },
-      {
-        "title": "Visualize your data in Elasticsearch",
-        "service": "kibana"
-      },
-      {
-        "title": "Use Zeppelin for your Data Science projects",
-        "service": "zeppelin"
-      }
-    ],
-    "startTimestamp": "2019-12-15 11:02:14"
+    "nodesCount": 4,
+    "isSnapshot": true,
+    "startTimestamp": "2023-01-12 13:26:20",
+    "username": "admin"
   },
   "status": "OK"
 }

@@ -80,6 +80,14 @@ public class KubernetesServicesConfigWrapper extends JsonWrapper implements Seri
                 .collect(Collectors.toList());
     }
 
+    public long countServices() {
+        return getRootKeys().stream()
+                .filter(key -> key.contains(INSTALL_FLAG))
+                .filter(key -> getValueForPath(key).equals("on"))
+                .map(key -> key.substring(0, key.indexOf(INSTALL_FLAG)))
+                .count();
+    }
+
     public String getCpuSetting(String service) {
         return getValueForPathAsString(service + CPU_FLAG);
     }
