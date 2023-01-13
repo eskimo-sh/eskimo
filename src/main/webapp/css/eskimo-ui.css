@@ -946,3 +946,8 @@ span.status-node-cell-span-restart {
     text-transform: initial;
     font-weight: 200;
 }
+
+/* adapt a little the margin on images in menu when in condensed mode */
+html[data-sidenav-size=condensed]:not(.authentication-bg) .side-nav .side-nav-link img:first-child  {
+    margin-left: 5px;
+}
