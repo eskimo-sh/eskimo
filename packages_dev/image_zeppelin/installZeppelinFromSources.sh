@@ -47,18 +47,18 @@ export USER_TO_USE=$1
 
 if [ -z "$2" ]; then
    echo "Expecting local user ID to use for build as argument"
-   exit 1
+   exit 2
 fi
 export UID_TO_USE=$2
 
 if [ -z "$ZEPPELIN_VERSION" ]; then
     echo "Need to set ZEPPELIN_VERSION environment variable before calling this script !"
-    exit 1
+    exit 3
 fi
 
 if [ -z "$SPARK_VERSION_MAJOR" ]; then
     echo "Need to set SPARK_VERSION_MAJOR environment variable before calling this script !"
-    exit 1
+    exit 4
 fi
 
 if [ -z "$SCALA_VERSION" ]; then
@@ -105,14 +105,17 @@ chmod -R 777 .
 
 echo " - Downloading Zeppelin git repository archive"
 rm -Rf zeppelin
-wget https://github.com/apache/zeppelin/archive/branch-$ZEPPELIN_VERSION.zip  > /tmp/zeppelin_install_log 2>&1
+wget https://github.com/apache/zeppelin/archive/refs/heads/master.zip   > /tmp/zeppelin_install_log 2>&1
+#wget https://github.com/apache/zeppelin/archive/branch-$ZEPPELIN_VERSION.zip  > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -2
 
 echo " - Extracting Zeppelin source code"
-unzip branch-$ZEPPELIN_VERSION.zip   > /tmp/zeppelin_install_log 2>&1
+unzip master.zip   > /tmp/zeppelin_install_log 2>&1
+#unzip branch-$ZEPPELIN_VERSION.zip   > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -2
 
-mv zeppelin-branch-$ZEPPELIN_VERSION zeppelin
+mv zeppelin-master zeppelin
+#mv zeppelin-branch-$ZEPPELIN_VERSION zeppelin
 
 echo " - Changing build folder owner"
 chown -R $USER_TO_USE zeppelin
@@ -120,14 +123,14 @@ fail_if_error $? "/tmp/zeppelin_install_log" -1
 
 echo " - update all pom.xml to use scala $SCALA_VERSION"
 cd zeppelin/
-su $USER_TO_USE -c "./dev/change_scala_version.sh $SCALA_VERSION"  > /tmp/zeppelin_install_log 2>&1
+sudo -u $USER_TO_USE bash $PWD/dev/change_scala_version.sh $SCALA_VERSION > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -2
 
 #echo " - HACK - Fixing ElasticSearch interpreter"
 #sed -i s/"hits\/total"/"hits\/total\/value"/g /tmp/zeppelin_build/zeppelin/elasticsearch/src/main/java/org/apache/zeppelin/elasticsearch/client/HttpBasedClient.java
 
 #echo " - Setting JAVA_HOME to java-1.8.0-openjdk-amd64"
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export JAVA_HOME=/usr/local/lib/jvm/openjdk-8/
 export PATH=$JAVA_HOME/bin:$PATH
 
 #echo " - Fixing Java interpreter"
@@ -137,14 +140,14 @@ export PATH=$JAVA_HOME/bin:$PATH
 echo " - build zeppelin with all interpreters"
 for i in `seq 1 2`; do  # 2 attempts since sometimes download of packages fails
     echo "   + attempt $i"
-    su -p $USER_TO_USE -c "mvn clean package -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr"  > /tmp/zeppelin_install_log 2>&1
+    sudo -u $USER_TO_USE mvn clean package -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr  > /tmp/zeppelin_install_log 2>&1
     if [[ $? == 0 ]]; then
         echo "   + succeeded !"
         break
     else
         if [[ $i == 2 ]]; then
-            cat "/tmp/zeppelin_install_log"
-            exit -10
+            echo "Connecto to container and do a 'cat /tmp/zeppelin_install_log' to get logs"
+            exit 10
         fi
     fi
 done
@@ -222,7 +225,7 @@ echo " - Checking Zeppelin startup"
 sleep 30
 if [[ `ps -e | grep $ZEPPELIN_PROC_ID` == "" ]]; then
     echo " !! Failed to start Zeppelin !!"
-    exit -8
+    exit 8
 fi
 
 echo " - Stopping Zeppelin"
@@ -239,7 +242,7 @@ returned_to_saved_dir
 
 if [[ ! -f /usr/local/lib/zeppelin/conf/interpreter.json ]]; then
    echo "PROBLEM : interpreter.json was not created !"
-   exit -50
+   exit 50
 fi
 
 

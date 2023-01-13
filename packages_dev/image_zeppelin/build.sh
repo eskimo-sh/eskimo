@@ -114,6 +114,15 @@ rm -f __installKafkaEff.sh
 #docker exec -it zeppelin_template bash
 
 
+echo " - Installing JDK 8 for flink interpreter"
+docker exec -i zeppelin_template bash /scripts/installJava8JDK.sh | tee /tmp/zeppelin_build_log 2>&1
+if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
+    echo " - In container install script ended up in error"
+    cat /tmp/zeppelin_build_log
+    exit 105
+fi
+
+
 echo " - Installing zeppelin"
 if [[ $ZEPPELIN_IS_SNAPSHOT == "true" ]]; then
 
@@ -146,14 +155,6 @@ fi
 
 echo " - Installing zeppelin Interpreters Java dependencies"
 docker exec -i zeppelin_template bash /scripts/installZeppelinInterpreterDependencies.sh | tee /tmp/zeppelin_build_log 2>&1
-if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/zeppelin_build_log
-    exit 105
-fi
-
-echo " - Installing JDK 8 for flink interpreter"
-docker exec -i zeppelin_template bash /scripts/installJava8JDK.sh | tee /tmp/zeppelin_build_log 2>&1
 if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/zeppelin_build_log
