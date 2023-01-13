@@ -123,6 +123,9 @@ docker_cp_script inContainerMountGluster.sh sbin flink flink_install_log
 echo " - Copying glusterMountChecker.sh Script"
 docker_cp_script glusterMountChecker.sh sbin flink flink_install_log
 
+echo " - Copying glusterMountCheckerPeriodic.sh Script"
+docker_cp_script glusterMountCheckerPeriodic.sh sbin flink flink_install_log
+
 echo " - Copying containerWatchDog.sh script to container"
 docker_cp_script containerWatchDog.sh sbin flink flink_install_log
 

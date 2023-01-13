@@ -83,19 +83,6 @@ echo " - Simlinking logstash working directory to /var/lib/elasticsearch/logstas
 sudo rm -Rf /usr/local/lib/logstash/data/
 sudo ln -s /var/lib/elasticsearch/logstash /usr/local/lib/logstash/data
 
-
-echo " - Creating glusterMountCheckerPeriodic.sh script"
-cat > /tmp/glusterMountCheckerPeriodic.sh <<- "EOF"
-#!/usr/bin/env bash
-while true; do
-     sleep 10
-     sudo /bin/bash /usr/local/sbin/glusterMountChecker.sh
-done
-EOF
-sudo /bin/chown root /tmp/glusterMountCheckerPeriodic.sh
-sudo /bin/mv /tmp/glusterMountCheckerPeriodic.sh /usr/local/sbin/glusterMountCheckerPeriodic.sh
-sudo /bin/chmod 755 /usr/local/sbin/glusterMountCheckerPeriodic.sh
-
 echo " - Creating gluster infrastructure directories"
 sudo mkdir -p /var/log/gluster/
 sudo mkdir -p /var/lib/gluster/

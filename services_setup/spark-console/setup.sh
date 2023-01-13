@@ -123,6 +123,9 @@ docker_cp_script inContainerMountGluster.sh sbin spark-console spark_console_ins
 echo " - Copying glusterMountChecker.sh Script (Spark Console)"
 docker_cp_script glusterMountChecker.sh sbin spark-console spark_console_install_log
 
+echo " - Copying glusterMountCheckerPeriodic.sh Script (Spark Console)"
+docker_cp_script glusterMountCheckerPeriodic.sh sbin spark-console spark_console_install_log
+
 echo " - Copying containerWatchDog.sh script to container"
 docker_cp_script containerWatchDog.sh sbin spark-console spark_console_install_log
 

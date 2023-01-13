@@ -283,18 +283,6 @@ chown -R spark. "/usr/local/lib/zeppelin/conf/"
 echo " - HACK to enable spark to change flink config as well"
 chmod -R 777 "/usr/local/lib/flink/conf/"
 
-echo " - Creating glusterMountCheckerPeriodic.sh script"
-cat > /tmp/glusterMountCheckerPeriodic.sh <<- "EOF"
-#!/usr/bin/env bash
-while true; do
-     sleep 10
-     sudo /bin/bash /usr/local/sbin/glusterMountChecker.sh
-done
-EOF
-sudo /bin/chown root /tmp/glusterMountCheckerPeriodic.sh
-sudo /bin/mv /tmp/glusterMountCheckerPeriodic.sh /usr/local/sbin/glusterMountCheckerPeriodic.sh
-sudo /bin/chmod 755 /usr/local/sbin/glusterMountCheckerPeriodic.sh
-
 echo " - [HACK] tampering with interpreter.sh to force JDK 8 for flink interpreter"
 
 sudo sed -i -n '1h;1!H;${;g;s/'\

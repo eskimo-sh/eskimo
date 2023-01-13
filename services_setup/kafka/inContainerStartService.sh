@@ -68,6 +68,10 @@ if [[ -f /var/log/kafka/server.log ]]; then
     mv /var/log/kafka/server.log /var/log/kafka/server.log.previous
 fi
 
+echo " - Start glusterMountCheckerPeriodic.sh script"
+/bin/bash /usr/local/sbin/glusterMountCheckerPeriodic.sh &
+export GLUSTER_MOUNT_CHECKER_PID=$!
+
 echo " - Starting service"
 /usr/local/lib/kafka/bin/kafka-server-start.sh /usr/local/etc/kafka/server.properties &
 KAFKA_PID=$!
@@ -111,5 +115,8 @@ for i in `seq 1 20`; do
 
 done
 
+echo " - Launching Watch Dog on glusterMountCheckerPeriodic remote server"
+/usr/local/sbin/containerWatchDog.sh $GLUSTER_MOUNT_CHECKER_PID $KAFKA_PID /var/log/kafka/gluster-mount-checker-periodic-watchdog.log &
 
+echo " - Now waiting on main process to exit"
 wait $KAFKA_PID

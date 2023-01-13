@@ -121,6 +121,12 @@ fi
 echo " - Copying inContainerMountGluster.sh script"
 docker_cp_script inContainerMountGluster.sh sbin kafka kafka_install_log
 
+echo " - Copying glusterMountChecker.sh Script"
+docker_cp_script glusterMountChecker.sh sbin kafka kafka_install_log
+
+echo " - Copying glusterMountCheckerPeriodic.sh Script"
+docker_cp_script glusterMountCheckerPeriodic.sh sbin kafka kafka_install_log
+
 echo " - Handling topology and setting injection"
 handle_topology_settings kafka kafka_install_log
 

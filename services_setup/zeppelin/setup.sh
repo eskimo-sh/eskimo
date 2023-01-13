@@ -189,6 +189,9 @@ docker_cp_script inContainerInjectTopologyZeppelin.sh sbin zeppelin zeppelin_ins
 echo " - Copying glusterMountChecker.sh Script"
 docker_cp_script glusterMountChecker.sh sbin zeppelin zeppelin_install_log
 
+echo " - Copying glusterMountCheckerPeriodic.sh Script"
+docker_cp_script glusterMountCheckerPeriodic.sh sbin zeppelin zeppelin_install_log
+
 echo " - Copying containerWatchDog.sh script to container"
 docker_cp_script containerWatchDog.sh sbin zeppelin zeppelin_install_log
 
