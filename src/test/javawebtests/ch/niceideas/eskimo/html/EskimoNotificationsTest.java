@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.html;
 
+import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -65,6 +66,7 @@ public class EskimoNotificationsTest extends AbstractWebTest {
                 "      \"message\": \"Installation of Topology and settings on 192.168.10.11 succeeded\"\n" +
                 "    });");
 
+        ActiveWaiter.wait(() -> js("return $('#new-notifications-count').html() || ''").toString().equals("1"));
         assertJavascriptEquals("1", "$('#new-notifications-count').html()");
 
         // debugging
