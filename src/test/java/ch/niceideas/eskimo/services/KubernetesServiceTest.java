@@ -104,7 +104,7 @@ public class KubernetesServiceTest {
         systemServiceTest.reset();
         systemOperationServiceTest.reset();
         configurationServiceTest.reset();
-        configurationServiceTest.saveSetupConfig("{ \"ssh_username\" : \"test\" }");
+        configurationServiceTest.saveSetupConfig("{ \"" + SetupService.SSH_USERNAME_FIELD + "\" : \"test\" }");
 
         proxyManagerServiceTest.setForwarderConfigForHosts("localhost", new ArrayList<>(){{
             add (new ProxyTunnelConfig("dummyService", 12345, "192.178.10.11", 5050));

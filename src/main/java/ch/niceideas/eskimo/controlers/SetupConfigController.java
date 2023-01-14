@@ -75,9 +75,9 @@ public class SetupConfigController extends AbstractOperationController {
     public String loadSetupConfig() {
 
         try {
-            String config = configurationService.loadSetupConfig();
+            JsonWrapper setupConfig = configurationService.loadSetupConfig();
 
-            JsonWrapper configWrapper = new JsonWrapper(config);
+            JsonWrapper configWrapper = new JsonWrapper(setupConfig.getFormattedValue());
 
             try {
                 setupService.ensureSetupCompleted();

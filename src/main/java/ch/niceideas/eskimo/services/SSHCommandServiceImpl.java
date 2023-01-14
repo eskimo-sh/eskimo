@@ -235,12 +235,12 @@ public class SSHCommandServiceImpl implements SSHCommandService {
     public void copySCPFile(SSHConnection connection, String filePath) throws SSHCommandException {
 
         try {
-            JsonWrapper systemConfig = new JsonWrapper(configurationService.loadSetupConfig());
+            JsonWrapper systemConfig = configurationService.loadSetupConfig();
 
             //SCPClient scp = new SCPClient(connection);
             SCPClient scp = connection.createSCPClient();
 
-            scp.put(filePath, "/home/" + systemConfig.getValueForPath("ssh_username"), "0755");
+            scp.put(filePath, "/home/" + systemConfig.getValueForPath(SetupService.SSH_USERNAME_FIELD), "0755");
 
             // scp is stateless and doesn't nee to be closed
 

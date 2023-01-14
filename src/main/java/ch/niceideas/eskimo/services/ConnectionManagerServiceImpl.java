@@ -265,14 +265,14 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
         connection.setTCPNoDelay(true);
         connection.connect(null, tcpConnectionTimeout, sshKeyExchangeTimeout); // TCP timeout, Key exchange timeout
 
-        JsonWrapper systemConfig = new JsonWrapper(configurationService.loadSetupConfig());
+        JsonWrapper systemConfig = configurationService.loadSetupConfig();
 
         if (privateSShKeyContent == null) {
             privateSShKeyContent = (String)systemConfig.getValueForPath("content-ssh-key");
         }
 
         connection.authenticateWithPublicKey(
-                (String)systemConfig.getValueForPath("ssh_username"),
+                (String)systemConfig.getValueForPath(SetupService.SSH_USERNAME_FIELD),
                 privateSShKeyContent.toCharArray(),
                 null);
 

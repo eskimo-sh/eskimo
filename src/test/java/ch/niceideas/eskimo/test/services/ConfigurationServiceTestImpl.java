@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.test.services;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
@@ -239,11 +240,11 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
     }
 
     @Override
-    public String loadSetupConfig() throws SetupException {
+    public JsonWrapper loadSetupConfig() throws SetupException {
         if (setupConfigNotCompletedError) {
             throw new SetupException ("Application is not initialized properly. Missing file 'config.conf' system configuration");
         }
-        return setupConfigAsString;
+        return StringUtils.isNotBlank(setupConfigAsString) ? new JsonWrapper (setupConfigAsString) : null;
     }
 
     @Override

@@ -88,7 +88,7 @@ public class ConfigurationServiceTest {
 
         SetupException exception = assertThrows(SetupException.class, () -> configurationService.loadSetupConfig());
 
-        assertEquals("Application is not initialized properly. Missing file 'config.conf' system configuration", exception.getMessage());
+        assertEquals("Application is not initialized properly. Missing file '/config.json' with system configuration", exception.getMessage());
 
         final JsonWrapper sc = new JsonWrapper("{\"test\": \"OK\"}");
         exception = assertThrows(SetupException.class, () -> configurationService.createSetupConfigAndSaveStoragePath(sc.getFormattedValue()));
@@ -100,9 +100,8 @@ public class ConfigurationServiceTest {
             JsonWrapper sc2 = configurationService.createSetupConfigAndSaveStoragePath("{\"test\": \"OK\", \"setup_storage\": \"" + tmpFile.getAbsolutePath() + "\"}");
             configurationService.saveSetupConfig(sc2.getFormattedValue());
 
-            JsonWrapper sc3 = new JsonWrapper(configurationService.loadSetupConfig());
+            JsonWrapper sc3 = configurationService.loadSetupConfig();
             assertTrue(sc2.getJSONObject().similar(sc3.getJSONObject()));
-
         }
     }
 

@@ -157,10 +157,10 @@ public class SetupServiceTest {
 
         SetupCommand command = setupService.saveAndPrepareSetup(setupConfig);
 
-        JsonWrapper setupConfigWrapper = new JsonWrapper(configurationServiceTest.loadSetupConfig());
+        JsonWrapper setupConfigWrapper = configurationServiceTest.loadSetupConfig();
 
         assertEquals("/tmp/setupConfigTest", setupConfigWrapper.getValueForPathAsString("setup_storage"));
-        assertEquals("eskimo", setupConfigWrapper.getValueForPathAsString("ssh_username"));
+        assertEquals("eskimo", setupConfigWrapper.getValueForPathAsString(SetupService.SSH_USERNAME_FIELD));
         assertEquals("ssh_key", setupConfigWrapper.getValueForPathAsString("filename-ssh-key"));
         assertEquals("build", setupConfigWrapper.getValueForPathAsString("setup-kube-origin"));
         assertEquals("build", setupConfigWrapper.getValueForPathAsString("setup-services-origin"));
@@ -188,10 +188,10 @@ public class SetupServiceTest {
 
         SetupCommand command = setupService.saveAndPrepareSetup(initConfig.getFormattedValue());
 
-        JsonWrapper setupConfigWrapper = new JsonWrapper(configurationServiceTest.loadSetupConfig());
+        JsonWrapper setupConfigWrapper = configurationServiceTest.loadSetupConfig();
 
         assertEquals("/tmp/setupConfigTest", setupConfigWrapper.getValueForPathAsString("setup_storage"));
-        assertEquals("eskimo", setupConfigWrapper.getValueForPathAsString("ssh_username"));
+        assertEquals("eskimo", setupConfigWrapper.getValueForPathAsString(SetupService.SSH_USERNAME_FIELD));
         assertEquals("ssh_key", setupConfigWrapper.getValueForPathAsString("filename-ssh-key"));
         assertEquals("download", setupConfigWrapper.getValueForPathAsString("setup-kube-origin"));
         assertEquals("download", setupConfigWrapper.getValueForPathAsString("setup-services-origin"));

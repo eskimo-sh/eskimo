@@ -45,6 +45,7 @@ public interface SetupService {
 
     String DOCKER_TEMPLATE_PREFIX = "docker_template_";
     String KUBE_PREFIX = "eskimo_";
+    String SSH_USERNAME_FIELD = "ssh_username";
 
     String getPackagesToBuild();
 

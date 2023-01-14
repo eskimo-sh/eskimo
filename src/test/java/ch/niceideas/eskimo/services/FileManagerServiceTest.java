@@ -103,7 +103,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
 
         configurationServiceTest.reset();
 
-        configurationServiceTest.saveSetupConfig("{ \"ssh_username\" : \"test\" }");
+        configurationServiceTest.saveSetupConfig("{ \"" + SetupService.SSH_USERNAME_FIELD + "\" : \"test\" }");
 
         connectionManagerServiceTest.reset();
 

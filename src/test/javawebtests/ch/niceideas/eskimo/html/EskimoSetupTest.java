@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.html;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.services.SetupService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -82,7 +83,7 @@ public class EskimoSetupTest extends AbstractWebTest {
 
         assertJavascriptEquals ("3 : SSH Username to use to reach cluster nodes should be set", "window.lastAlert");
 
-        js("$('#ssh_username').val('eskimo')");
+        js("$('#" + SetupService.SSH_USERNAME_FIELD + "').val('eskimo')");
 
         js("eskimoSetup.saveSetup()");
 
@@ -131,7 +132,7 @@ public class EskimoSetupTest extends AbstractWebTest {
         js("eskimoSetup.handleSetup("+setupConfig+")");
 
         assertJavascriptEquals("/tmp/setupConfigTest", "$('#setup_storage').val()");
-        assertJavascriptEquals("eskimo", "$('#ssh_username').val()");
+        assertJavascriptEquals("eskimo", "$('#" + SetupService.SSH_USERNAME_FIELD + "').val()");
         assertJavascriptEquals("ssh_key", "$('#filename-ssh-key').val()");
     }
 

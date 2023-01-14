@@ -89,14 +89,14 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
 
         String tempPath = SystemServiceTest.createTempStoragePath();
         setupService.setConfigStoragePathInternal(tempPath);
-        FileUtils.writeFile(new File(tempPath + "/config.json"), "{ \"ssh_username\" : \"test\" }");
+        FileUtils.writeFile(new File(tempPath + "/config.json"), "{ \"" + SetupService.SSH_USERNAME_FIELD + "\" : \"test\" }");
 
         connectionManagerServiceTest.reset();
 
         connectionManagerServiceTest.setPrivateSShKeyContent(privateKeyRaw);
         connectionManagerServiceTest.setSShPort(getSShPort());
 
-        configurationServiceTest.saveSetupConfig("{ \"ssh_username\" : \"test\" }");
+        configurationServiceTest.saveSetupConfig("{ \"" + SetupService.SSH_USERNAME_FIELD + "\" : \"test\" }");
     }
 
     @Test

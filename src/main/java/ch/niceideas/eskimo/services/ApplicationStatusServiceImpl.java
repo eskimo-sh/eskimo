@@ -225,10 +225,9 @@ public class ApplicationStatusServiceImpl implements ApplicationStatusService {
 
     private void feedInSetupConfigInfo(JsonWrapper systemStatus) {
         try {
-            String setupConfig = configurationService != null ? configurationService.loadSetupConfig() : null;
-            if (StringUtils.isNotBlank(setupConfig)) {
-                JsonWrapper systemConfig = new JsonWrapper(setupConfig);
-                systemStatus.setValueForPath(SSH_USERNAME_FIELD, systemConfig.getValueForPath("ssh_username"));
+            JsonWrapper setupConfig = configurationService != null ? configurationService.loadSetupConfig() : null;
+            if (setupConfig != null && !setupConfig.isEmpty()) {
+                systemStatus.setValueForPath(SSH_USERNAME_FIELD, setupConfig.getValueForPath(SetupService.SSH_USERNAME_FIELD));
             } else {
                 systemStatus.setValueForPath(SSH_USERNAME_FIELD, "(Setup incomplete)");
             }

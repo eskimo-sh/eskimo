@@ -114,6 +114,9 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
     @Autowired
     private OperationsMonitoringService operationsMonitoringService;
 
+    @Value("${eskimo.enableKubernetesSubsystem}")
+    private String enableKubernetes = "true";
+
     @Value("${system.parallelismInstallThreadCount}")
     private int parallelismInstallThreadCount = 10;
 
@@ -190,12 +193,14 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
                                             installTopologyAndSettings(nodesConfig, kubeServicesConfig, servicesInstallStatus, memoryModel, node);
                                         }
 
-                                        if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
-                                            operationsMonitoringService.addInfo(operation, "Checking / Installing Kubernetes");
-                                            if (isMissingOnNode("k8s", node)) {
-                                                uploadKubernetes(node);
-                                                ml.addInfo(installK8s(node));
-                                                flagInstalledOnNode("k8s", node);
+                                        if (StringUtils.isNotBlank(enableKubernetes) && enableKubernetes.equals("true")) {
+                                            if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
+                                                operationsMonitoringService.addInfo(operation, "Checking / Installing Kubernetes");
+                                                if (isMissingOnNode("k8s", node)) {
+                                                    uploadKubernetes(node);
+                                                    ml.addInfo(installK8s(node));
+                                                    flagInstalledOnNode("k8s", node);
+                                                }
                                             }
                                         }
 
@@ -290,8 +295,10 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             ml.addInfo(" - Copying gluster-mount script");
             copyCommand("gluster_mount.sh", USR_LOCAL_SBIN_GLUSTER_MOUNT_SH, connection);
 
-            ml.addInfo(" - Copying eskimo-kubectl script");
-            copyCommand("eskimo-kubectl", USR_LOCAL_BIN_ESKIMO_KUBECTL, connection);
+            if (StringUtils.isNotBlank(enableKubernetes) && enableKubernetes.equals("true")) {
+                ml.addInfo(" - Copying eskimo-kubectl script");
+                copyCommand("eskimo-kubectl", USR_LOCAL_BIN_ESKIMO_KUBECTL, connection);
+            }
 
         } catch (ConnectionManagerException e) {
             throw new SSHCommandException(e);

@@ -83,7 +83,7 @@ public class TerminalServiceTest extends AbstractBaseSSHTest {
 
         connectionManagerServiceTest.reset();
 
-        configurationServiceTest.saveSetupConfig("{ \"ssh_username\" : \"test\" }");
+        configurationServiceTest.saveSetupConfig("{ \"" + SetupService.SSH_USERNAME_FIELD + "\" : \"test\" }");
 
         connectionManagerServiceTest.setPrivateSShKeyContent(privateKeyRaw);
         connectionManagerServiceTest.setSShPort(getSShPort());

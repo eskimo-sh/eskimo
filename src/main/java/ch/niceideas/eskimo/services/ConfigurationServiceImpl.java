@@ -227,13 +227,13 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     }
 
     @Override
-    public String loadSetupConfig() throws FileException, SetupException {
+    public JsonWrapper loadSetupConfig() throws FileException, SetupException {
         File configFile = new File(setupService.getConfigStoragePath() + CONFIG_JSON);
         if (!configFile.exists()) {
-            throw new SetupException ("Application is not initialized properly. Missing file 'config.conf' system configuration");
+            throw new SetupException ("Application is not initialized properly. Missing file '" + CONFIG_JSON + "' with system configuration");
         }
 
-        return FileUtils.readFile(configFile);
+        return new JsonWrapper (FileUtils.readFile(configFile));
     }
 
     @Override

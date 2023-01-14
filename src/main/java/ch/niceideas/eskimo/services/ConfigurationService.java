@@ -65,7 +65,7 @@ public interface ConfigurationService {
 
     void saveSetupConfig(String configAsString) throws SetupException, FileException;
 
-    String loadSetupConfig() throws FileException, SetupException;
+    JsonWrapper loadSetupConfig() throws FileException, SetupException;
 
     KubernetesServicesConfigWrapper loadKubernetesServicesConfig() throws SystemException;
 
