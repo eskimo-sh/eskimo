@@ -51,6 +51,9 @@ public class EskimoOperationsTest extends AbstractWebTest {
         loadScript("bootstrap-5.2.0.js");
         loadScript("eskimoOperations.js");
 
+        waitForDefinition("window.eskimo");
+        waitForDefinition("window.eskimo.Operations");
+
         js("window.errorHandler = function () {};");
 
         // instantiate test object

@@ -49,6 +49,9 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
         loadScript("eskimoUtils.js");
         loadScript("eskimoServicesSettings.js");
 
+        waitForDefinition("window.eskimo");
+        waitForDefinition("window.eskimo.ServicesSettings");
+
         // instantiate test object
         js("eskimoServicesSettings = new eskimo.ServicesSettings()");
         js("eskimoServicesSettings.eskimoMain = eskimoMain");

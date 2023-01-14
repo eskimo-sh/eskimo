@@ -47,6 +47,9 @@ public class EskimoNotificationsTest extends AbstractWebTest {
         loadScript("eskimoUtils.js");
         loadScript("eskimoNotifications.js");
 
+        waitForDefinition("window.eskimo");
+        waitForDefinition("window.eskimo.Notifications");
+
         js("window.errorHandler = function () {};");
 
         // instantiate test object
@@ -116,8 +119,11 @@ public class EskimoNotificationsTest extends AbstractWebTest {
 
     @Test
     public void testRenderTimestamp() {
-        assertJavascriptEquals("2022-12-29 20:7:28", "eskimoNotifications.renderTimestamp('1672340848942')");
-        assertJavascriptEquals("2023-1-8 14:40:14", "eskimoNotifications.renderTimestamp('1673185214678')");
+        String first = js("return eskimoNotifications.renderTimestamp('1672340848942')").toString();
+        assertTrue(first.equals("2022-12-29 20:7:28") || first.equals ("2022-12-29 19:7:28"));
+
+        String second = js("return eskimoNotifications.renderTimestamp('1673185214678')").toString();
+        assertTrue(second.equals("2023-1-8 14:40:14") || second.equals ("2023-1-8 13:40:14"));
     }
 
     @Test

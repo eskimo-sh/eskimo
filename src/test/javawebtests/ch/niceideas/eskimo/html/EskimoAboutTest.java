@@ -47,6 +47,9 @@ public class EskimoAboutTest extends AbstractWebTest {
 
         loadScript("eskimoAbout.js");
 
+        waitForDefinition("window.eskimo");
+        waitForDefinition("window.eskimo.About");
+
         js("eskimoAbout = new eskimo.About();");
         js("eskimoAbout.initialize()");
 

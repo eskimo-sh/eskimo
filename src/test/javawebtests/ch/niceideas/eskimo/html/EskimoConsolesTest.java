@@ -47,6 +47,9 @@ public class EskimoConsolesTest extends AbstractWebTest {
         loadScript ("eskimoUtils.js");
         loadScript ("eskimoConsoles.js");
 
+        waitForDefinition("window.eskimo");
+        waitForDefinition("window.eskimo.Consoles");
+
         js("$.ajaxGet = function(object) { object.success( { 'message': 'OK'}); }");
 
         // mock ajax term

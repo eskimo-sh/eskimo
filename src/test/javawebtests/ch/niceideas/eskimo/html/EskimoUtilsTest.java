@@ -48,6 +48,8 @@ public class EskimoUtilsTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
         loadScript("eskimoUtils.js");
+
+        waitForDefinition("window.defaultSuccess");
     }
 
     @Test

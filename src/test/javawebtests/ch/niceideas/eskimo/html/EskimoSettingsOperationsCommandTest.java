@@ -50,6 +50,9 @@ public class EskimoSettingsOperationsCommandTest extends AbstractWebTest {
 
         loadScript("eskimoSettingsOperationsCommand.js");
 
+        waitForDefinition("window.eskimo");
+        waitForDefinition("window.eskimo.SettingsOperationsCommand");
+
         // instantiate test object
         js("eskimoSettingsOperationsCommand = new eskimo.SettingsOperationsCommand();");
         js("eskimoSettingsOperationsCommand.eskimoMain = eskimoMain;");

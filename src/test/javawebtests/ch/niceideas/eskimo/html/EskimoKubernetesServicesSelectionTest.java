@@ -54,6 +54,9 @@ public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
         loadScript("eskimoUtils.js");
         loadScript("eskimoKubernetesServicesSelection.js");
 
+        waitForDefinition("window.eskimo");
+        waitForDefinition("window.eskimo.KubernetesServicesSelection");
+
         js("eskimoKubernetesServicesConfig = {};");
 
         // leaving zeppelin out intentionally

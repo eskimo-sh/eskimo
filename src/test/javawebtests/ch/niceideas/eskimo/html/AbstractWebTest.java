@@ -45,7 +45,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.devtools.DevTools;
+import org.openqa.selenium.devtools.v106.emulation.Emulation;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -102,6 +105,10 @@ public abstract class AbstractWebTest {
                 }
             }
         }
+
+        DevTools devTools = ((ChromeDriver) driver).getDevTools();
+        devTools.createSession();
+        devTools.send(Emulation.setTimezoneOverride("Europe/Zurich"));
 
         driver.get("http://localhost:" + TestResourcesServer.LOCAL_TEST_SERVER_PORT + "/src/test/resources/GenericTestPage.html");
     }

@@ -54,6 +54,9 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
         loadScript("eskimoUtils.js");
         loadScript("eskimoServicesSelection.js");
 
+        waitForDefinition("window.eskimo");
+        waitForDefinition("window.eskimo.ServicesSelection");
+
         // instantiate test object
         js("eskimoServicesSelection = new eskimo.ServicesSelection();");
         js("eskimoServicesSelection.eskimoMain = eskimoMain");

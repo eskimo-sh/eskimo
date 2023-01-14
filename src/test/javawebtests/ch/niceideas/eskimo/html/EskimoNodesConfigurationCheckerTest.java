@@ -60,6 +60,8 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
 
         loadScript("eskimoNodesConfigurationChecker.js");
 
+        waitForDefinition("window.checkIPAddressesAndRanges");
+
         ServicesController sc = new ServicesController();
 
         ServicesDefinitionImpl sd = new ServicesDefinitionImpl();

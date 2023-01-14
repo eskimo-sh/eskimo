@@ -48,6 +48,9 @@ public class EskimoAjaxtermTest extends AbstractWebTest {
 
         loadScript ("ajaxterm.js");
 
+        waitForDefinition("window.ajaxterm");
+        waitForDefinition("window.ajaxterm.Terminal");
+
         js("$('#main-content').html('<div id=\"test-term\" contenteditable=\"true\">&nbsp;</div>')");
 
         js("window.XMLHttpRequestBAK = window.XMLHttpRequest;");

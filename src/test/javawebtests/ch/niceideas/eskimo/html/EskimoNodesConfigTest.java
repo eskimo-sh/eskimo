@@ -58,6 +58,9 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         loadScript("eskimoNodesConfigurationChecker.js");
         loadScript("eskimoNodesConfig.js");
 
+        waitForDefinition("window.eskimo");
+        waitForDefinition("window.eskimo.NodesConfig");
+
         js("window.UNIQUE_SERVICES = [\"zookeeper\", \"kube-master\", ];");
         js("window.MULTIPLE_SERVICES = [\"ntp\", \"prometheus\", \"etcd\", \"kube-slave\", \"gluster\" ];");
         js("window.MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");

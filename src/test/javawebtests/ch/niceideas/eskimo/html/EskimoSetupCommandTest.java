@@ -50,6 +50,9 @@ public class EskimoSetupCommandTest extends AbstractWebTest {
 
         loadScript("eskimoSetupCommand.js");
 
+        waitForDefinition("window.eskimo");
+        waitForDefinition("window.eskimo.SetupCommand");
+
         // instantiate test object
         js("eskimoSetupCommand = new eskimo.SetupCommand();");
         js("eskimoSetupCommand.eskimoMain = eskimoMain;");

@@ -32,7 +32,9 @@ The above copyright notice and this licensing notice shall be included in all co
 Software.
 */
 
-let ajaxterm={};
+if (typeof ajaxterm === "undefined" || ajaxterm == null) {
+	window.ajaxterm = {}
+}
 
 ajaxterm.Terminal = function(id,options) {
 

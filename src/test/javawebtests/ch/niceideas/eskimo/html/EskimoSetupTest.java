@@ -51,6 +51,9 @@ public class EskimoSetupTest extends AbstractWebTest {
         loadScript("eskimoUtils.js");
         loadScript("eskimoSetup.js");
 
+        waitForDefinition("window.eskimo");
+        waitForDefinition("window.eskimo.Setup");
+
         js("window.errorHandler = function () {};");
 
         String currentDir = System.getProperty("user.dir");

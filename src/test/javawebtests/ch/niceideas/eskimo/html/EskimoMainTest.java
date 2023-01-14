@@ -48,6 +48,9 @@ public class EskimoMainTest extends AbstractWebTest {
         loadScript("eskimoMain.js");
         loadScript("eskimoUtils.js");
 
+        waitForDefinition("window.eskimo");
+        waitForDefinition("window.eskimo.Main");
+
         js("window.eskimoFlavour = \"CE\";");
 
         // redefine constructor

@@ -103,6 +103,8 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
         loadScript("eskimoNodesConfigurationChecker.js");
         loadScript("eskimoKubernetesServicesConfigChecker.js");
 
+        waitForDefinition("window.doCheckKubernetesSetup");
+
         ServicesController sc = new ServicesController();
 
         ServicesDefinitionImpl sd = new ServicesDefinitionImpl();

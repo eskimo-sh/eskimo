@@ -62,7 +62,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-services"})
+@ActiveProfiles({"no-web-stack", "test-services", "test-setup"})
 public class ServicesDefinitionTest {
 
     @Autowired
@@ -171,7 +171,7 @@ public class ServicesDefinitionTest {
                         "export ESKIMO_INSTALLED_broker_manager_KUBERNETES_NODE=OK\n" +
                         "\n" +
                         "#Additional Environment\n" +
-                        "export NODE_NBR_CLUSTER_MANAGER_1921681011=2\n" +
+                        "export NODE_NBR_CLUSTER_MANAGER_1921681011=1\n" +
                         "export ALL_NODES_LIST_cluster_slave=192.168.10.11,192.168.10.12,192.168.10.13\n" +
                         "export NODE_NBR_CLUSTER_SLAVE_1921681011=1\n" +
                         "export NODE_NBR_CLUSTER_SLAVE_1921681013=3\n" +
@@ -239,7 +239,7 @@ public class ServicesDefinitionTest {
                         "export ESKIMO_INSTALLED_broker_manager_KUBERNETES_NODE=OK\n" +
                         "\n" +
                         "#Additional Environment\n" +
-                        "export NODE_NBR_CLUSTER_MANAGER_1921681011=2\n" +
+                        "export NODE_NBR_CLUSTER_MANAGER_1921681011=1\n" +
                         "export ALL_NODES_LIST_cluster_slave=192.168.10.11\n" +
                         "export NODE_NBR_CLUSTER_SLAVE_1921681011=1\n" +
                         "\n" +
@@ -404,7 +404,7 @@ public class ServicesDefinitionTest {
                         "export MASTER_DISTRIBUTED_TIME_1=192.168.10.11\n" +
                         "\n" +
                         "#Additional Environment\n" +
-                        "export NODE_NBR_CLUSTER_MANAGER_1921681011=2\n" +
+                        "export NODE_NBR_CLUSTER_MANAGER_1921681011=1\n" +
                         "export ALL_NODES_LIST_distributed_filesystem=192.168.10.11,192.168.10.13,192.168.10.14\n" +
                         "\n" +
                         "#Self identification\n" +

@@ -56,6 +56,9 @@ public class EskimoFileManagersTest extends AbstractWebTest {
         loadScript ("eskimoUtils.js");
         loadScript ("eskimoFileManagers.js");
 
+        waitForDefinition("window.eskimo");
+        waitForDefinition("window.eskimo.FileManagers");
+
         js("$.ajaxGet = function(object) { object.success( { 'message': 'OK'}); }");
 
         js("function errorHandler() {};");

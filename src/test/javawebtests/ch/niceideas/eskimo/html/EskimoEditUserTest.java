@@ -50,6 +50,9 @@ public class EskimoEditUserTest extends AbstractWebTest {
         loadScript("eskimoUtils.js");
         loadScript("eskimoEditUser.js");
 
+        waitForDefinition("window.eskimo");
+        waitForDefinition("window.eskimo.EditUser");
+
         js("eskimoEditUser = new eskimo.EditUser();");
         js("eskimoEditUser.initialize()");
 

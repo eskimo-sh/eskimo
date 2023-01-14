@@ -51,6 +51,9 @@ public class EskimoOperationsCommandTest extends AbstractWebTest {
 
         loadScript("eskimoOperationsCommand.js");
 
+        waitForDefinition("window.eskimo");
+        waitForDefinition("window.eskimo.OperationsCommand");
+
         // instantiate test object
         js("eskimoOperationsCommand = new eskimo.OperationsCommand();");
         js("eskimoOperationsCommand.eskimoMain = eskimoMain;");

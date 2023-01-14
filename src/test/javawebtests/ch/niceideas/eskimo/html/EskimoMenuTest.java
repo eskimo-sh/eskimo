@@ -49,6 +49,9 @@ public class EskimoMenuTest extends AbstractWebTest {
         loadScript("eskimoMenu.js");
         loadScript("eskimoUtils.js");
 
+        waitForDefinition("window.eskimo");
+        waitForDefinition("window.eskimo.Menu");
+
         js("window.eskimoFlavour = \"CE\";");
 
         // redefine constructor

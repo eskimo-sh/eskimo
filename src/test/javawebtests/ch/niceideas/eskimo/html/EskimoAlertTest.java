@@ -48,6 +48,9 @@ public class EskimoAlertTest extends AbstractWebTest {
         loadScript("eskimoUtils.js");
         loadScript("eskimoAlert.js");
 
+        waitForDefinition("window.eskimo");
+        waitForDefinition("window.eskimo.Alert");
+
         js("eskimoAlert = new eskimo.Alert();");
         js("eskimoAlert.initialize()");
 

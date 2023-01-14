@@ -37,6 +37,9 @@ package ch.niceideas.eskimo.html;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -57,6 +60,9 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
         js("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
         */
+
+        waitForDefinition("window.eskimo");
+        waitForDefinition("window.eskimo.KubernetesServicesConfig");
 
         // instantiate test object
         js("window.eskimoKubernetesServicesConfig = new eskimo.KubernetesServicesConfig();");
