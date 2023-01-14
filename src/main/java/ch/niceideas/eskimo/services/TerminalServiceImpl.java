@@ -104,7 +104,7 @@ public class TerminalServiceImpl implements TerminalService {
                         }
                     }
                 }
-            }, idleTimeoutSeconds / (long) 10 * 1000, idleTimeoutSeconds / (long) 10 * 1000);
+            }, idleTimeoutSeconds / 10 * 1000, idleTimeoutSeconds / 10 * 1000);
     }
 
     @PreDestroy

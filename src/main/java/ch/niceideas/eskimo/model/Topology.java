@@ -43,7 +43,10 @@ import ch.niceideas.eskimo.model.service.Dependency;
 import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
 import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.model.service.Service;
-import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.ServiceDefinitionException;
+import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.services.SetupException;
+import ch.niceideas.eskimo.services.SystemException;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -62,6 +65,7 @@ public class Topology {
     public static final String SERVICE_NUMBER_0_BASED = "SERVICE_NUMBER_0_BASED";
     public static final String SERVICE_NUMBER_1_BASED = "SERVICE_NUMBER_1_BASED";
     public static final String CONTEXT_PATH = "CONTEXT_PATH";
+    public static final String SERVICE = "Service";
 
     private final Map<String, String> definedMasters = new HashMap<>();
     private final Map<String, Map<String, String>> additionalEnvironment = new HashMap<>();
@@ -233,12 +237,12 @@ public class Topology {
             if (masterService.isKubernetes()) {
 
                 if (!service.isKubernetes()) {
-                    throw new ServiceDefinitionException ("Service " + service.getName()
+                    throw new ServiceDefinitionException (SERVICE + " " + service.getName()
                             + " defines a dependency on a kube service " + masterService.getName() + " which is not supported.");
                 }
 
                 if (kubeServicesConfig == null || !kubeServicesConfig.isServiceInstallRequired(masterService.getName())) {
-                    throw new ServiceDefinitionException ("Service " + service.getName()
+                    throw new ServiceDefinitionException (SERVICE + " " + service.getName()
                             + " defines a dependency on another kube service " + masterService.getName() + " but that service is not going to be installed.");
                 }
                 // XXX Dependeny on Kube-master is enforced already, we're left with checking that the dependency definition is not crazy
@@ -247,7 +251,7 @@ public class Topology {
                     case RANDOM_NODE_AFTER:
                     case RANDOM_NODE_AFTER_OR_SAME:
                     case SAME_NODE:
-                        throw new ServiceDefinitionException ("Service " + service.getName()
+                        throw new ServiceDefinitionException (SERVICE + " " + service.getName()
                                 + " defines a dependency on another kube service " + masterService.getName() + " if type " + dep.getMes() + " which is not suppored");
                     default:
                         break;
@@ -280,7 +284,7 @@ public class Topology {
 
             case SAME_NODE_OR_RANDOM:
                 if ( dep.getNumberOfMasters() > 1) {
-                    throw new ServiceDefinitionException ("Service " + service.getName() + " defined several master required. This is unsupported for SAME_NODE_OR_RANDOM");
+                    throw new ServiceDefinitionException (SERVICE + " " + service.getName() + " defined several master required. This is unsupported for SAME_NODE_OR_RANDOM");
                 }
 
                 String multiServiceValue = (String) nodesConfig.getValueForPath(dep.getMasterService() + nodeNbr);
@@ -314,11 +318,11 @@ public class Topology {
             case RANDOM_NODE_AFTER:
             case RANDOM_NODE_AFTER_OR_SAME:
                 if (service.isKubernetes()) {
-                    throw new ServiceDefinitionException ("Service " + service.getName()
+                    throw new ServiceDefinitionException (SERVICE + " " + service.getName()
                             + " defines a " + dep.getMes() + " dependency on " + dep.getMasterService()+ ", which is not supported for kubernetes services");
                 }
                 if (dep.getNumberOfMasters() > 1) {
-                    throw new ServiceDefinitionException ("Service " + service.getName() + " defined several master required. This is unsupported for RANDOM_NODE_AFTER");
+                    throw new ServiceDefinitionException (SERVICE + " " + service.getName() + " defined several master required. This is unsupported for RANDOM_NODE_AFTER");
                 }
 
                 String masterIp = findRandomServiceNodeAfter(nodesConfig, dep.getMasterService(), nodeNbr);
@@ -334,7 +338,7 @@ public class Topology {
 
             case SAME_NODE:
                 if (service.isKubernetes()) {
-                    throw new ServiceDefinitionException ("Service " + service.getName() + " defines a SAME_NODE dependency on "
+                    throw new ServiceDefinitionException (SERVICE + " " + service.getName() + " defines a SAME_NODE dependency on "
                             + dep.getMasterService() + ", which is not supported for kubernetes services");
                 }
                 break;
@@ -555,7 +559,7 @@ public class Topology {
         appendExport(sb, "ESKIMO_NODE_COUNT", ""+nodesConfig.getNodeAddresses().size());
 
         if (StringUtils.isNotBlank(contextPath)) {
-            appendExport(sb, "CONTEXT_PATH", ""+contextPath);
+            appendExport(sb, CONTEXT_PATH, ""+contextPath);
         }
 
         List<String> allNodeList = new ArrayList<>(nodesConfig.getNodeAddresses());

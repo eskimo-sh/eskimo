@@ -63,7 +63,7 @@ import java.util.stream.Collectors;
 @Profile("!test-services-settings")
 public class ServicesSettingsServiceImpl implements ServicesSettingsService {
 
-    public static String OPERATION_SETTINGS = "Settings";
+    public static final String OPERATION_SETTINGS = "Settings";
 
     private static final Logger logger = Logger.getLogger(ServicesSettingsServiceImpl.class);
 
@@ -128,7 +128,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                 ServicesInstallStatusWrapper servicesInstallStatus = configurationService.loadServicesInstallationStatus();
 
                 ServiceRestartOperationsCommand restartCommand = ServiceRestartOperationsCommand.create(
-                        servicesInstallationSorter, servicesDefinition, nodesConfig, dirtyServices);
+                        servicesDefinition, nodesConfig, dirtyServices);
 
                 boolean success = false;
                 operationsMonitoringService.startCommand(restartCommand);
@@ -297,22 +297,17 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
 
     private static class ServiceRestartOperationsCommand extends JSONInstallOpCommand<SimpleOperationCommand.SimpleOperationId> {
 
-        private final ServicesInstallationSorter servicesInstallationSorter;
-
         public static ServiceRestartOperationsCommand create (
-                ServicesInstallationSorter servicesInstallationSorter,
                 ServicesDefinition servicesDefinition,
                 NodesConfigWrapper nodesConfig,
                 List<String> dirtyServices) {
-            return new ServiceRestartOperationsCommand(servicesInstallationSorter, servicesDefinition, nodesConfig, dirtyServices);
+            return new ServiceRestartOperationsCommand(servicesDefinition, nodesConfig, dirtyServices);
         }
 
         public ServiceRestartOperationsCommand (
-                ServicesInstallationSorter servicesInstallationSorter,
                 ServicesDefinition servicesDefinition,
                 NodesConfigWrapper nodesConfig,
                 List<String> dirtyServices) {
-            this.servicesInstallationSorter = servicesInstallationSorter;
             dirtyServices.stream()
                     .map (servicesDefinition::getService)
                     .forEach(service -> {

@@ -98,7 +98,7 @@ public class SetupCommand implements JSONOpCommand {
                 .collect(Collectors.toList());
 
         List<String> sortedServices = Arrays.stream(servicesDefinition.listAllServices())
-                .map(serviceName -> servicesDefinition.getService(serviceName))
+                .map(servicesDefinition::getService)
                 .filter(service -> missingServices.contains(service.getImageName()))
                 .sorted(servicesDefinition::compareServices)
                 .map(Service::getImageName)

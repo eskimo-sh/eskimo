@@ -153,8 +153,8 @@ public class ConnectionManagerServiceTestImpl extends ConnectionManagerServiceIm
         SSHConnection connection = new SSHConnection(node, sshPort, operationTimeout) {
             private boolean isClosed = false;
             @Override
-            public synchronized LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect) {
-                createCalledFor.add(""+port_to_connect);
+            public synchronized LocalPortForwarder createLocalPortForwarder(int localPort, String hostToConnect, int portToConnect) {
+                createCalledFor.add(""+ portToConnect);
                 return null;
             }
             @Override

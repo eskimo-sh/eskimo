@@ -60,6 +60,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @Profile("!test-operations")
 public class OperationsMonitoringServiceImpl implements OperationsContext, OperationsMonitoringService {
 
+    public static final String NO_OPERATION_GROUP_ERROR_MESSAGE = "Need to start an Operations group first.";
     @Autowired
     private NotificationService notificationService;
 
@@ -105,18 +106,18 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
             }}));
 
             put ("globalMessages", new JSONObject(new HashMap<>() {{
-                Pair<Integer, String> newLines = globalMessages.fetchElements(lastLinePerOp.computeIfAbsent("global", (op) -> 0));
+                Pair<Integer, String> newLines = globalMessages.fetchElements(lastLinePerOp.computeIfAbsent("global", op -> 0));
                 put("lastLine", newLines.getKey());
                 put("lines", Base64.getEncoder().encodeToString(newLines.getValue().getBytes()));
             }}));
 
             put("messages", new JSONObject(new HashMap<>() {{
                     for (OperationId opId : operationLogs.keySet()) {
-                        MessagingManager mgr = operationLogs.computeIfAbsent(opId, (op) -> {
+                        MessagingManager mgr = operationLogs.computeIfAbsent(opId, op -> {
                             throw new IllegalStateException();
                         });
 
-                        Pair<Integer, String> newLines = mgr.fetchElements(lastLinePerOp.computeIfAbsent(opId.toString(), (op) -> 0));
+                        Pair<Integer, String> newLines = mgr.fetchElements(lastLinePerOp.computeIfAbsent(opId.toString(), op -> 0));
 
                         put(opId.toString(), new JSONObject(new TreeMap<>() {{
                             put("lastLine", newLines.getKey());
@@ -127,7 +128,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
 
             put("status", new JSONObject(new HashMap<>() {{
                 for (OperationId opId : operationLogs.keySet()) {
-                    put(opId.toString(), operationStatus.computeIfAbsent(opId, (op) -> OperationStatus.INIT).toString());
+                    put(opId.toString(), operationStatus.computeIfAbsent(opId, op -> OperationStatus.INIT).toString());
                 }
             }}));
         }}));
@@ -216,9 +217,9 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
     public void addInfo(OperationId operation, String message) {
         if (StringUtils.isNotBlank(message)) {
             if (!isProcessingPending()) {
-                throw new IllegalStateException("Need to start an Operations group first.");
+                throw new IllegalStateException(NO_OPERATION_GROUP_ERROR_MESSAGE);
             }
-            MessagingManager msgMgr = operationLogs.computeIfAbsent(operation, (op) -> {
+            MessagingManager msgMgr = operationLogs.computeIfAbsent(operation, op -> {
                 throw new IllegalStateException("No operation " + operation + " is know.");
             });
             msgMgr.addLines(message);
@@ -229,9 +230,9 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
     public void addInfo(OperationId operation, String[] messages) {
         if (messages != null && messages.length > 0) {
             if (!isProcessingPending()) {
-                throw new IllegalStateException("Need to start an Operations group first.");
+                throw new IllegalStateException(NO_OPERATION_GROUP_ERROR_MESSAGE);
             }
-            MessagingManager msgMgr = operationLogs.computeIfAbsent(operation, (op) -> {
+            MessagingManager msgMgr = operationLogs.computeIfAbsent(operation, op -> {
                 throw new IllegalStateException("No operation " + operation + " is know.");
             });
             msgMgr.addLines(messages);
@@ -259,7 +260,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
     @Override
     public void startOperation(OperationId operationId) {
         if (!isProcessingPending()) {
-            throw new IllegalStateException("Need to start an Operations group first.");
+            throw new IllegalStateException(NO_OPERATION_GROUP_ERROR_MESSAGE);
         }
         operationStatus.put(operationId, OperationStatus.RUNNING);
     }
@@ -267,7 +268,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
     @Override
     public void endOperationError(OperationId operationId) {
         if (!isProcessingPending()) {
-            throw new IllegalStateException("Need to start an Operations group first.");
+            throw new IllegalStateException(NO_OPERATION_GROUP_ERROR_MESSAGE);
         }
         operationStatus.put(operationId, OperationStatus.ERROR);
     }
@@ -275,7 +276,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
     @Override
     public void endOperation(OperationId operationId) {
         if (!isProcessingPending()) {
-            throw new IllegalStateException("Need to start an Operations group first.");
+            throw new IllegalStateException(NO_OPERATION_GROUP_ERROR_MESSAGE);
         }
         if (!operationStatus.get(operationId).equals(OperationStatus.ERROR)) {
             operationStatus.put(operationId, OperationStatus.COMPLETE);

@@ -36,12 +36,13 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.services.KubernetesService;
+import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.services.SystemService;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -54,8 +55,6 @@ import java.util.stream.Collectors;
 import static ch.niceideas.eskimo.model.SimpleOperationCommand.standardizeOperationMember;
 
 public class KubernetesOperationsCommand extends JSONInstallOpCommand<KubernetesOperationsCommand.KubernetesOperationId> implements Serializable {
-
-    private static final Logger logger = Logger.getLogger(KubernetesOperationsCommand.class);
 
     private final KubernetesServicesConfigWrapper rawKubeServiceConfig;
 

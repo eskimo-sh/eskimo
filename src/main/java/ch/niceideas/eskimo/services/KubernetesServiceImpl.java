@@ -381,16 +381,14 @@ public class KubernetesServiceImpl implements KubernetesService {
                 try {
                     SystemStatusWrapper lastStatus = systemService.getStatus();
                     String kubeMasterNodeName = lastStatus.getFirstNodeName(servicesDefinition.getKubeMasterService().getName());
-                    if (StringUtils.isBlank(kubeMasterNodeName)) {
-
-                        if (!command.getUninstallations().isEmpty()) {
-                            logger.warn("Uninstalled Kubernetes services will be flagged as uninstalled even though no operation can be performed in kubernetes.");
-                            configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
-                                for (KubernetesOperationsCommand.KubernetesOperationId uninstalledKubeService : command.getUninstallations()) {
-                                    servicesInstallationStatus.removeInstallationFlag(uninstalledKubeService.getService(), ServicesInstallStatusWrapper.KUBERNETES_NODE);
-                                }
-                            });
-                        }
+                    if (StringUtils.isBlank(kubeMasterNodeName)
+                            && !command.getUninstallations().isEmpty()) {
+                        logger.warn("Uninstalled Kubernetes services will be flagged as uninstalled even though no operation can be performed in kubernetes.");
+                        configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
+                            for (KubernetesOperationsCommand.KubernetesOperationId uninstalledKubeService : command.getUninstallations()) {
+                                servicesInstallationStatus.removeInstallationFlag(uninstalledKubeService.getService(), ServicesInstallStatusWrapper.KUBERNETES_NODE);
+                            }
+                        });
                     }
 
                 } catch (SystemService.StatusExceptionWrapperException e1) {
@@ -436,22 +434,20 @@ public class KubernetesServiceImpl implements KubernetesService {
 
             // Nodes re-setup (topology)
             systemOperationService.applySystemOperation(new KubernetesOperationsCommand.KubernetesOperationId("Installation", TOPOLOGY_ALL_NODES),
-                    ml -> {
-                        systemService.performPooledOperation (new ArrayList<>(liveIps), parallelismInstallThreadCount, baseInstallWaitTimout,
-                                (operation, error) -> {
-                                    // topology
-                                    if (error.get() == null) {
-                                        try {
-                                            nodesConfigurationService.installTopologyAndSettings(
-                                                    nodesConfig, command.getRawConfig(), servicesInstallStatus, memoryModel, operation);
-                                        } catch (SSHCommandException | IOException e) {
-                                            logger.error (e, e);
-                                            ml.addInfo(e.getMessage());
-                                            throw new SystemException(e);
-                                        }
+                    ml -> systemService.performPooledOperation (new ArrayList<>(liveIps), parallelismInstallThreadCount, baseInstallWaitTimout,
+                            (operation, error) -> {
+                                // topology
+                                if (error.get() == null) {
+                                    try {
+                                        nodesConfigurationService.installTopologyAndSettings(
+                                                nodesConfig, command.getRawConfig(), servicesInstallStatus, memoryModel, operation);
+                                    } catch (SSHCommandException | IOException e) {
+                                        logger.error (e, e);
+                                        ml.addInfo(e.getMessage());
+                                        throw new SystemException(e);
                                     }
-                                });
-                    }, null);
+                                }
+                            }), null);
 
 
 

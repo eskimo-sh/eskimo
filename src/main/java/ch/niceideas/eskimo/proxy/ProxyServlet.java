@@ -133,8 +133,8 @@ public class ProxyServlet extends HttpServlet {
      * From the configured parameter "targetUri".
      */
     protected String targetUri;
-    protected URI targetUriObj;//new URI(targetUri)
-    protected HttpHost targetHost;//URIUtils.extractHost(targetUriObj);
+    protected URI targetUriObj;
+    protected HttpHost targetHost;
 
     protected String getTargetUri(HttpServletRequest servletRequest) {
         return (String) servletRequest.getAttribute(ATTR_TARGET_URI);
@@ -212,10 +212,9 @@ public class ProxyServlet extends HttpServlet {
         return RequestConfig.custom()
                 .setRedirectsEnabled(doHandleRedirects)
                 .setCookieSpec(StandardCookieSpec.IGNORE) // we handle them in the servlet instead
-                //.setConnectTimeout(Timeout.ofMilliseconds(connectTimeout))
                 .setConnectTimeout(Timeout.defaultsToDisabled(connectTimeout == -1 ? null : Timeout.ofMilliseconds(connectTimeout)))
                 .setResponseTimeout(Timeout.defaultsToDisabled(readTimeout == -1 ? null : Timeout.ofMilliseconds(readTimeout)))
-                //.setCircularRedirectsAllowed(true)
+                .setCircularRedirectsAllowed(true)
                 .setConnectionRequestTimeout(Timeout.defaultsToDisabled(connectionRequestTimeout == -1 ? null : Timeout.ofMilliseconds(connectionRequestTimeout)))
                 .build();
     }
@@ -697,13 +696,12 @@ public class ProxyServlet extends HttpServlet {
             StringBuffer curUrl = servletRequest.getRequestURL();//no query
             int pos;
             // Skip the protocol part
-            if ((pos = curUrl.indexOf("://")) >= 0) {
-                // Skip the authority part
-                // + 3 to skip the separator between protocol and authority
-                if ((pos = curUrl.indexOf("/", pos + 3)) >= 0) {
-                    // Trim everything after the authority part.
-                    curUrl.setLength(pos);
-                }
+            if ((pos = curUrl.indexOf("://")) >= 0
+                    // Skip the authority part
+                    // + 3 to skip the separator between protocol and authority
+                    && (pos = curUrl.indexOf("/", pos + 3)) >= 0) {
+                // Trim everything after the authority part.
+                curUrl.setLength(pos);
             }
             // Context path starts with a / if it is not blank
             curUrl.append(servletRequest.getContextPath());

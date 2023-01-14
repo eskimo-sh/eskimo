@@ -77,11 +77,6 @@ public class SSHConnection implements Closeable {
         return readTimeout;
     }
 
-    @Deprecated
-    public boolean authenticateWithDSA(String user, String pem, String password) throws IOException {
-        return under.authenticateWithDSA(user, pem, password);
-    }
-
     public boolean authenticateWithKeyboardInteractive(String user, InteractiveCallback cb) throws IOException {
         return under.authenticateWithKeyboardInteractive(user, cb);
     }
@@ -134,16 +129,16 @@ public class SSHConnection implements Closeable {
         return under.connect(verifier, connectTimeout, readTimeout, kexTimeout);
     }
 
-    public LocalPortForwarder createLocalPortForwarder(int local_port, String host_to_connect, int port_to_connect) throws IOException {
-        return under.createLocalPortForwarder(local_port, host_to_connect, port_to_connect);
+    public LocalPortForwarder createLocalPortForwarder(int localPort, String hostToConnect, int portToConnect) throws IOException {
+        return under.createLocalPortForwarder(localPort, hostToConnect, portToConnect);
     }
 
-    public LocalPortForwarder createLocalPortForwarder(InetSocketAddress addr, String host_to_connect, int port_to_connect) throws IOException {
-        return under.createLocalPortForwarder(addr, host_to_connect, port_to_connect);
+    public LocalPortForwarder createLocalPortForwarder(InetSocketAddress addr, String hostToConnect, int portToConnect) throws IOException {
+        return under.createLocalPortForwarder(addr, hostToConnect, portToConnect);
     }
 
-    public LocalStreamForwarder createLocalStreamForwarder(String host_to_connect, int port_to_connect) throws IOException {
-        return under.createLocalStreamForwarder(host_to_connect, port_to_connect);
+    public LocalStreamForwarder createLocalStreamForwarder(String hostToConnect, int portToConnect) throws IOException {
+        return under.createLocalStreamForwarder(hostToConnect, portToConnect);
     }
 
     public SCPClient createSCPClient() throws IOException {
@@ -240,11 +235,6 @@ public class SSHConnection implements Closeable {
 
     public void setSecureRandom(SecureRandom rnd) {
         under.setSecureRandom(rnd);
-    }
-
-    @Deprecated
-    public void enableDebugging(boolean enable, DebugLogger logger) {
-        under.enableDebugging(enable, logger);
     }
 
     public void ping() throws IOException {

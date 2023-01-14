@@ -45,7 +45,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This is a wrapper around a JSON string which enables one to get the value at a specific node, change it, test if

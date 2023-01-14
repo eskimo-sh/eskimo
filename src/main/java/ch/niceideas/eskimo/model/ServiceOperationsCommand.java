@@ -131,38 +131,35 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         changedServices.addAll (retCommand.getUninstallations().stream().map(ServiceOperationId::getService).collect(Collectors.toList()));
 
         //Set<String> restartedServices = new HashSet<>();
-        changedServices.forEach(service -> {
-                servicesDefinition.getDependentServices(service).stream()
-                        .filter(dependent -> {
+        changedServices.forEach(service -> servicesDefinition.getDependentServices(service).stream()
+                .filter(dependent -> {
+                    Service masterService = servicesDefinition.getService(service);
+                    Dependency dep = servicesDefinition.getService(dependent).getDependency(masterService).orElseThrow(IllegalStateException::new);
+                    return dep.isRestart();
+                })
+                .forEach(dependent -> {
+
+                    if (servicesDefinition.getService(dependent).isKubernetes()) {
+                        if (servicesInstallStatus.isServiceInstalledAnywhere(dependent)) {
+                            retCommand.addRestartIfNotInstalled(dependent, KUBERNETES_FLAG);
+                        }
+
+                    } else {
+
+                        for (int nodeNumber : nodesConfig.getNodeNumbers(dependent)) {
+
+                            String node = nodesConfig.getNodeAddress(nodeNumber);
+
                             Service masterService = servicesDefinition.getService(service);
                             Dependency dep = servicesDefinition.getService(dependent).getDependency(masterService).orElseThrow(IllegalStateException::new);
-                            return dep.isRestart();
-                        })
-                        .forEach(dependent -> {
 
-                            if (servicesDefinition.getService(dependent).isKubernetes()) {
-                                if (servicesInstallStatus.isServiceInstalledAnywhere(dependent)) {
-                                    retCommand.addRestartIfNotInstalled(dependent, KUBERNETES_FLAG);
-                                }
-
-                            } else {
-
-                                for (int nodeNumber : nodesConfig.getNodeNumbers(dependent)) {
-
-                                    String node = nodesConfig.getNodeAddress(nodeNumber);
-
-                                    Service masterService = servicesDefinition.getService(service);
-                                    Dependency dep = servicesDefinition.getService(dependent).getDependency(masterService).orElseThrow(IllegalStateException::new);
-
-                                    // if dependency is same node, only restart if service on same node is impacted
-                                    if (!dep.getMes().equals(MasterElectionStrategy.SAME_NODE) || isServiceImpactedOnSameNode(retCommand, masterService, node)) {
-                                        retCommand.addRestartIfNotInstalled(dependent, node);
-                                    }
-                                }
+                            // if dependency is same node, only restart if service on same node is impacted
+                            if (!dep.getMes().equals(MasterElectionStrategy.SAME_NODE) || isServiceImpactedOnSameNode(retCommand, masterService, node)) {
+                                retCommand.addRestartIfNotInstalled(dependent, node);
                             }
-
-                        });
-        });
+                        }
+                    }
+                }));
 
         // also add services simply flagged as needed restart previously
         servicesInstallStatus.getRootKeys().forEach(installStatusFlag -> {

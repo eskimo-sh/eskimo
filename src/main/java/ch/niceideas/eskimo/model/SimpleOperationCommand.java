@@ -13,7 +13,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SimpleOperationCommand implements JSONOpCommand {
 
-    private final String operation, service, node;
+    private final String operation;
+    private final String service;
+    private final String node;
 
     @Override
     public JSONObject toJSON() {

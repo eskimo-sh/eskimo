@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class KubeStatusParser {
 
-    final static Pattern POD_NAME_REXP = Pattern.compile("[a-zA-Z]+(-[a-zA-Z]+){0,1}(\\-[a-zA-Z0-9]+){1,2}");
+    static final Pattern POD_NAME_REXP = Pattern.compile("[a-zA-Z]+(-[a-zA-Z]+){0,1}(\\-[a-zA-Z0-9]+){1,2}");
 
     private final String allPodStatus;
     private final String allServicesStatus;
@@ -146,7 +146,7 @@ public class KubeStatusParser {
         // 1. if at east one POD is running and service is OK, return running on kubeIp
         if (serviceFound
                 && (StringUtils.isNotBlank(serviceIp) || !service.isUnique())
-                && podNodesAndStatus.size() > 0
+                && !podNodesAndStatus.isEmpty()
                 && podNodesAndStatus.stream()
                     .map(Pair::getValue)
                     .anyMatch(status -> status.equalsIgnoreCase(KubernetesService.STATUS_RUNNING)
@@ -156,7 +156,7 @@ public class KubeStatusParser {
         }
 
         // 2. If neither any POD nor the service cannot be found, return new Pair<>(null, "NA");
-        if (!serviceFound && podNodesAndStatus.size() <= 0) {
+        if (!serviceFound && podNodesAndStatus.isEmpty()) {
             return new Pair<>(null, "NA");
         }
 

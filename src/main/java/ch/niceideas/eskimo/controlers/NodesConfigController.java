@@ -210,7 +210,7 @@ public class NodesConfigController extends AbstractOperationController {
 
         } catch (JSONException | SetupException | FileException | NodesConfigurationException  e) {
             logger.error(e, e);
-            if (e.getCause() == null || !(e.getCause() instanceof SystemException)) {
+            if (!(e.getCause() instanceof SystemException)) { // instanceof checks for null as well
                 notificationService.addError("Nodes installation failed !");
             }
             return ReturnStatusHelper.createEncodedErrorStatus(e);

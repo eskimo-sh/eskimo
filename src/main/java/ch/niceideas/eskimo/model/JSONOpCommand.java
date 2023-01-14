@@ -34,9 +34,9 @@
 
 package ch.niceideas.eskimo.model;
 
-import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.services.ServiceDefinitionException;
 import ch.niceideas.eskimo.services.SystemException;
+import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import org.json.JSONObject;
 
 import java.io.Serializable;

@@ -101,7 +101,7 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
     }
 
     public Boolean isNodeAlive(String nodeName) {
-        String nodeAliveFlag = null;
+        String nodeAliveFlag;
         try {
             nodeAliveFlag = (String) getValueForPath(NODE_ALIVE_FLAG + nodeName);
         } catch (JSONException e) {
@@ -130,7 +130,7 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
     public List<String> getAllNodesForServiceRegardlessStatus (String service) {
         return getRootKeys().stream()
                 .filter(key -> key.contains(SERVICE_PREFIX + service + "_"))
-                .map(key -> getNodeName(key))
+                .map(SystemStatusWrapper::getNodeName)
                 .collect(Collectors.toList());
     }
 

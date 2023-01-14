@@ -52,13 +52,4 @@ public class CommonRTException extends RuntimeException {
         super(cause);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public synchronized Throwable initCause(Throwable cause) {
-        return super.initCause(cause);
-    }
-
-
 }

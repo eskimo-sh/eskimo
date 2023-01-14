@@ -38,7 +38,6 @@ import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Various utility methods aimed at helping with stream handling.
