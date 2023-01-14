@@ -56,6 +56,8 @@ public class EskimoNotificationsTest extends AbstractWebTest {
         // instantiate test object
         js("eskimoNotifications = new eskimo.Notifications();");
         js("eskimoNotifications.initialize()");
+
+        waitForElementIdInDOM("new-notifications-count");
     }
 
     @Test
