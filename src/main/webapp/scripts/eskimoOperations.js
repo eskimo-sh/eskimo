@@ -138,7 +138,7 @@ eskimo.Operations = function() {
     function updateGlobalMessages (globalMessages) {
         globalLastLine = globalMessages.lastLine;
         if (globalMessages.lines && globalMessages.lines != "") {
-            $operationsGlobalMessages = $("#operations-global-messages");
+            const $operationsGlobalMessages = $("#operations-global-messages");
             $operationsGlobalMessages.css("display", "block");
             let previous = $operationsGlobalMessages.html().trim();
             if (previous == null || previous == "") {

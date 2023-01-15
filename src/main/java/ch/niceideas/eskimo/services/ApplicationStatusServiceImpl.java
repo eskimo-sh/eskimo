@@ -73,6 +73,14 @@ public class ApplicationStatusServiceImpl implements ApplicationStatusService {
     private static final Logger logger = Logger.getLogger(ApplicationStatusServiceImpl.class);
 
     public static final String SSH_USERNAME_FIELD = "sshUsername";
+    public static final String AVAILABLE_KUBE_SERVICES = "availableKubeServices";
+    public static final String INSTALLED_KUBE_SERVICES = "installedKubeServices";
+    public static final String AVAILABLE_NODE_SERVICES = "availableNodeServices";
+    public static final String NODES_COUNT = "nodesCount";
+    public static final String INSTALLED_NODE_SERVICES = "installedNodeServices";
+    public static final String UNKNOWN = "(unknown)";
+    public static final String ERROR = "(ERROR)";
+    public static final String SETUP_INCOMPLETE = "(Setup incomplete)";
 
     @Autowired
     private ConfigurationService configurationService;
@@ -186,40 +194,40 @@ public class ApplicationStatusServiceImpl implements ApplicationStatusService {
     }
 
     private void feedInKubeConfigInfo(JsonWrapper systemStatus) {
-        systemStatus.setValueForPath("availableKubeServices", servicesDefinition.countKubernetesServices());
+        systemStatus.setValueForPath(AVAILABLE_KUBE_SERVICES, servicesDefinition.countKubernetesServices());
         try {
             KubernetesServicesConfigWrapper kubeConfig = configurationService != null ? configurationService.loadKubernetesServicesConfig() : null;
             if (kubeConfig != null) {
-                systemStatus.setValueForPath("installedKubeServices", kubeConfig.countServices());
+                systemStatus.setValueForPath(INSTALLED_KUBE_SERVICES, kubeConfig.countServices());
             } else {
-                systemStatus.setValueForPath("installedKubeServices", "(unknown)");
+                systemStatus.setValueForPath(INSTALLED_KUBE_SERVICES, UNKNOWN);
             }
 
         } catch (SystemException e) {
             logger.warn (e.getMessage());
             logger.debug (e, e);
-            systemStatus.setValueForPath("installedKubeServices", "(ERROR)");
+            systemStatus.setValueForPath(INSTALLED_KUBE_SERVICES, ERROR);
         }
     }
 
     private void feedInNodesConfigInfo(JsonWrapper systemStatus) {
-        systemStatus.setValueForPath("availableNodeServices", servicesDefinition.countAllNodesServices());
+        systemStatus.setValueForPath(AVAILABLE_NODE_SERVICES, servicesDefinition.countAllNodesServices());
         try {
             NodesConfigWrapper rawNodesConfig = configurationService != null ? configurationService.loadNodesConfig() : null;
             if (rawNodesConfig != null) {
                 NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
-                systemStatus.setValueForPath("nodesCount", nodesConfig.countNodes());
-                systemStatus.setValueForPath("installedNodeServices", nodesConfig.countServices());
+                systemStatus.setValueForPath(NODES_COUNT, nodesConfig.countNodes());
+                systemStatus.setValueForPath(INSTALLED_NODE_SERVICES, nodesConfig.countServices());
             } else {
-                systemStatus.setValueForPath("nodesCount", "(unknown)");
-                systemStatus.setValueForPath("installedNodeServices", "(unknown)");
+                systemStatus.setValueForPath(NODES_COUNT, UNKNOWN);
+                systemStatus.setValueForPath(INSTALLED_NODE_SERVICES, UNKNOWN);
             }
 
         } catch (SetupException | SystemException | NodesConfigurationException e) {
             logger.warn (e.getMessage());
             logger.debug (e, e);
-            systemStatus.setValueForPath("nodesCount", "(ERROR)");
-            systemStatus.setValueForPath("installedNodeServices", "(ERROR)");
+            systemStatus.setValueForPath(NODES_COUNT, ERROR);
+            systemStatus.setValueForPath(INSTALLED_NODE_SERVICES, ERROR);
         }
     }
 
@@ -229,17 +237,17 @@ public class ApplicationStatusServiceImpl implements ApplicationStatusService {
             if (setupConfig != null && !setupConfig.isEmpty()) {
                 systemStatus.setValueForPath(SSH_USERNAME_FIELD, setupConfig.getValueForPath(SetupService.SSH_USERNAME_FIELD));
             } else {
-                systemStatus.setValueForPath(SSH_USERNAME_FIELD, "(Setup incomplete)");
+                systemStatus.setValueForPath(SSH_USERNAME_FIELD, SETUP_INCOMPLETE);
             }
         } catch (FileException e) {
 
             logger.error (e, e);
-            systemStatus.setValueForPath(SSH_USERNAME_FIELD, "(ERROR)");
+            systemStatus.setValueForPath(SSH_USERNAME_FIELD, ERROR);
         } catch (SetupException e) {
 
             logger.warn (e.getMessage());
             logger.debug (e, e);
-            systemStatus.setValueForPath(SSH_USERNAME_FIELD, "(Setup incomplete)");
+            systemStatus.setValueForPath(SSH_USERNAME_FIELD, SETUP_INCOMPLETE);
         }
     }
 

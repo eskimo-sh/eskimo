@@ -77,6 +77,9 @@ public class SetupServiceImpl implements SetupService {
     public static final String BUILD_FLAG = "build";
     public static final String TAR_GZ_EXTENSION = ".tar.gz";
     public static final String NO_DOWNLOAD_IN_SNAPSHOT_ERROR = "Downloading packages is not supported on development version (SNAPSHOT)";
+    public static final String DOT_SOFTWARE = ".software";
+    public static final String DOT_DISTRIBUTION = ".distribution";
+
 
     private static final Pattern imageFileNamePattern = Pattern.compile("("+DOCKER_TEMPLATE_PREFIX+"|eskimo_)[a-zA-Z0-9\\-]+_([a-zA-Z0-9_\\.]+)_([0-9]+)\\.tar\\.gz");
 
@@ -426,8 +429,8 @@ public class SetupServiceImpl implements SetupService {
 
                 if (lastVersionValues != null) {
 
-                    String newSoftwareVersion = (String) packagesVersion.getValueForPath(imageName + ".software");
-                    String newDistributionVersion = (String) packagesVersion.getValueForPath(imageName + ".distribution");
+                    String newSoftwareVersion = (String) packagesVersion.getValueForPath(imageName + DOT_SOFTWARE);
+                    String newDistributionVersion = (String) packagesVersion.getValueForPath(imageName + DOT_DISTRIBUTION);
 
                     if (compareVersion (new Pair<> (newSoftwareVersion, newDistributionVersion),
                             lastVersionValues) > 0) {
@@ -443,8 +446,8 @@ public class SetupServiceImpl implements SetupService {
     protected void fillInPackages(Set<String> downloadPackages, JsonWrapper packagesVersion, Set<String> missingServices) {
         for (String packageName : missingServices) {
 
-            String softwareVersion = (String) packagesVersion.getValueForPath(packageName+".software");
-            String distributionVersion = (String) packagesVersion.getValueForPath(packageName+".distribution");
+            String softwareVersion = (String) packagesVersion.getValueForPath(packageName+ DOT_SOFTWARE);
+            String distributionVersion = (String) packagesVersion.getValueForPath(packageName+ DOT_DISTRIBUTION);
 
             downloadPackages.add(packageName+"_"+softwareVersion+"_"+distributionVersion);
         }
@@ -530,8 +533,8 @@ public class SetupServiceImpl implements SetupService {
 
                     for (String packageName : sortedServices) {
 
-                        String softwareVersion = (String) packagesVersion.getValueForPath(packageName + ".software");
-                        String distributionVersion = (String) packagesVersion.getValueForPath(packageName + ".distribution");
+                        String softwareVersion = (String) packagesVersion.getValueForPath(packageName + DOT_SOFTWARE);
+                        String distributionVersion = (String) packagesVersion.getValueForPath(packageName + DOT_DISTRIBUTION);
 
                         downloadPackage(
                                 packageName + "_" + softwareVersion + "_" + distributionVersion,
@@ -561,8 +564,8 @@ public class SetupServiceImpl implements SetupService {
 
                     for (String kubePackageName : missingKubePackages) {
 
-                        String softwareVersion = (String) packagesVersion.getValueForPath(kubePackageName + ".software");
-                        String distributionVersion = (String) packagesVersion.getValueForPath(kubePackageName + ".distribution");
+                        String softwareVersion = (String) packagesVersion.getValueForPath(kubePackageName + DOT_SOFTWARE);
+                        String distributionVersion = (String) packagesVersion.getValueForPath(kubePackageName + DOT_DISTRIBUTION);
 
                         downloadPackage(
                                 kubePackageName + "_" + softwareVersion + "_" + distributionVersion,
@@ -594,8 +597,8 @@ public class SetupServiceImpl implements SetupService {
                             packagesVersion = loadRemotePackagesVersionFile();
                         }
 
-                        String newSoftwareVersion = (String) packagesVersion.getValueForPath(imageName + ".software");
-                        String newDistributionVersion = (String) packagesVersion.getValueForPath(imageName + ".distribution");
+                        String newSoftwareVersion = (String) packagesVersion.getValueForPath(imageName + DOT_SOFTWARE);
+                        String newDistributionVersion = (String) packagesVersion.getValueForPath(imageName + DOT_DISTRIBUTION);
 
                         if (compareVersion (new Pair<> (newSoftwareVersion, newDistributionVersion),
                                 lastVersionValues) > 0) {

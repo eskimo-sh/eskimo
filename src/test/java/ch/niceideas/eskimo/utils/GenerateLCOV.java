@@ -51,32 +51,34 @@ import static java.lang.String.format;
 
 public class GenerateLCOV {
 
-    public static final String SOURCE_DIRECTORY = "src/main/webapp";
+
     private static final Logger logger = Logger.getLogger(GenerateLCOV.class);
 
-    private static final String jsCoverReportDir = "target/jscov-report";
+    private static final String TARGET_JSCOV_REPORT_FOLDER = "target/jscov-report";
+    private static final String TARGET_JSCOV_REPORT_MERGED_FOLDER = "target/jscov-report-merged";
+    private static final String TARGET_JSCOV_LCOV_FOLDER = "target/jscov-lcov";
+    public static final String SOURCE_FOLDER = "";//""src/main/webapp"; // not required anymore, the resources are located in the proper folder already
 
-    private static final String mergedJsCoverReportDir = "target/jscov-report-merged";
-
-    private static final String lcovReportDir = "target/jscov-lcov";
+    public static final String INDIVIDUAL_COVERAGE_FILE = "jscoverage.json";
 
     private static final JSONDataMerger jsonDataMerger = new JSONDataMerger();
 
     private static final LCovGenerator lCovGenerator = new LCovGenerator();
+    public static final String FINAL_COVERAGE_REPORT_FILE = "jscover.lcov";
 
     public static void main (String[] args) {
 
         try {
 
-            File reportDir = new File (jsCoverReportDir);
+            File reportDir = new File (TARGET_JSCOV_REPORT_FOLDER);
             if (!reportDir.exists()) {
-                logger.warn(jsCoverReportDir + " doesn't exist");
+                logger.warn(TARGET_JSCOV_REPORT_FOLDER + " doesn't exist");
                 System.exit (-1);
             }
 
             SortedMap<String, FileData> total = new TreeMap<>();
             for (File reportSubdir : Objects.requireNonNull(reportDir.listFiles())) {
-                File reportFile = new File (reportSubdir, "jscoverage.json");
+                File reportFile = new File (reportSubdir, INDIVIDUAL_COVERAGE_FILE);
                 if (!reportFile.exists()) {
                     logger.warn(reportFile + " doesn't exist");
                 } else {
@@ -88,16 +90,18 @@ public class GenerateLCOV {
             }
 
             String merged = GenerateLCOV.toJSON(total);
-            File targetFile = new File (mergedJsCoverReportDir, "jscoverage.json");
-            targetFile.getParentFile().mkdirs();
+            File targetFile = new File (TARGET_JSCOV_REPORT_MERGED_FOLDER, INDIVIDUAL_COVERAGE_FILE);
+            if (!targetFile.getParentFile().mkdirs()) {
+                logger.warn("Creation (mkdirs) of folder " + targetFile.getParentFile().getAbsolutePath() + " returned false");
+            }
             FileUtils.writeFile(targetFile, merged);
 
-
-            File lcovFile = new File(lcovReportDir, "jscover.lcov");
-            lCovGenerator.saveData(jsonDataMerger.jsonToMap(merged).values(), SOURCE_DIRECTORY, lcovFile);
+            File lcovFile = new File(TARGET_JSCOV_LCOV_FOLDER, FINAL_COVERAGE_REPORT_FILE);
+            lCovGenerator.saveData(jsonDataMerger.jsonToMap(merged).values(), SOURCE_FOLDER, lcovFile);
 
         } catch (Exception e) {
             logger.error(e, e);
+            System.exit(1);
         }
 
     }
@@ -110,16 +114,18 @@ public class GenerateLCOV {
             StringBuilder branchData = new StringBuilder();
             FileData coverageData = map.get(scriptURI);
             for (int i = 0; i < coverageData.getLines().size(); i++) {
-                if (i > 0)
+                if (i > 0) {
                     coverage.append(",");
+                }
                 coverage.append(coverageData.getLines().get(i));
             }
 
             // Function Coverage (HA-CA)
             StringBuilder functions = new StringBuilder();
             for (int i = 0; i < coverageData.getFunctions().size(); i++) {
-                if (i > 0)
+                if (i > 0) {
                     functions.append(",");
+                }
                 functions.append(coverageData.getFunctions().get(i));
             }
 
@@ -130,10 +136,12 @@ public class GenerateLCOV {
 
             StringBuilder scriptJSON = new StringBuilder(format("\"%s\":{", scriptURI));
             scriptJSON.append(format("\"lineData\":[%s]", coverage));
-            if (functions.length() > 0)
+            if (functions.length() > 0) {
                 scriptJSON.append(format(",\"functionData\":[%s]", functions));
-            if (branchData.length() > 0)
+            }
+            if (branchData.length() > 0) {
                 scriptJSON.append(format(",\"branchData\":{%s}", branchData));
+            }
             scriptJSON.append("}");
             json.append(scriptJSON);
         }
@@ -145,8 +153,9 @@ public class GenerateLCOV {
         int count = 0;
         for (Integer i: coverageData.getBranchData().keySet()) {
             List<BranchData> conditions = coverageData.getBranchData().get(i);
-            if (count++ > 0)
+            if (count++ > 0) {
                 branchData.append(",");
+            }
             branchData.append(format("\"%s\":[",i));
             addBranchConditions(branchData, conditions);
             branchData.append("]");
@@ -155,8 +164,9 @@ public class GenerateLCOV {
 
     static void addBranchConditions(StringBuilder branchData, List<BranchData> conditions) {
         for (int j = 0; j < conditions.size();  j++) {
-            if (j > 0)
+            if (j > 0) {
                 branchData.append(",");
+            }
             BranchData branchObj = conditions.get(j);
             if (branchObj == null) {
                 branchData.append("null");
