@@ -616,13 +616,9 @@ table.system-information tr td.info-label {
     min-width: 220px;
 }
 
-.progress-operation-bar{
-}
-
 td.operation-title{
     text-align: left;
 }
-
 
 .operations-log-modal-dialog {
     height: 90%;
@@ -727,18 +723,9 @@ td.operation-title{
     color: white;
 }
 
-.content-page {
-    height: 100vh;
-    overflow: auto;
-}
-
 html[data-sidenav-size=condensed] .content-page {
     height: 100%;
     overflow: visible;
-}
-
-.content-page {
-    padding-bottom: 0px;
 }
 
 .content {
@@ -747,7 +734,7 @@ html[data-sidenav-size=condensed] .content-page {
 
 table.node-status-table tbody,
 .table.table-bordered table.node-status-table  tbody{
-    border: 0px none;
+    border: 0 none;
 }
 
 .menu-icon {
@@ -757,10 +744,10 @@ table.node-status-table tbody,
 }
 
 .content-page {
-    padding-left: 0px;
-    padding-right: 0px;
-    padding-bottom: 0px;
-    margin-bottom: 0px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
     height: calc(100vh);
     min-height: calc(100vh);
     max-height: calc(100vh);

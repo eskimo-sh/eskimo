@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.utils;
 
+import ch.niceideas.common.exceptions.CommonRTException;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
@@ -116,14 +117,12 @@ public class PackageVersionGenerator {
             resultJSON.setValueForPath(packageName + ".distribution", version.getValue());
         }
 
-        //System.err.println (resultJSON.getFormattedValue());
-
         File resultFile = new File (workingDirectory, "eskimo_packages_versions.json");
         try {
             FileUtils.writeFile(resultFile, resultJSON.getFormattedValue());
         } catch (FileException e) {
             logger.error (e, e);
-            throw new RuntimeException(e);
+            throw new CommonRTException(e);
         }
 
     }

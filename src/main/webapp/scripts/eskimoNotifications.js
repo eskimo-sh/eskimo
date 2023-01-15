@@ -159,7 +159,7 @@ eskimo.Notifications = function() {
 
                 renderNotifications();
 
-                $newNotificationsCount = $("#new-notifications-count");
+                const $newNotificationsCount = $("#new-notifications-count");
                 $.hideElement($newNotificationsCount);
                 $newNotificationsCount.html("");
             },

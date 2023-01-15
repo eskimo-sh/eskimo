@@ -51,6 +51,7 @@ import java.util.TreeMap;
 public class CoverageServer implements TestResourcesServer {
 
     private static final Logger logger = Logger.getLogger(CoverageServer.class);
+    public static final String SOURCES_FOLDER = "src/main/webapp/";
 
     private String className = null;
 
@@ -113,6 +114,9 @@ public class CoverageServer implements TestResourcesServer {
         }
 
         String json = (String) (runner.js("return jscoverage_serializeCoverageToJSON();"));
+
+        // hacky hack to remove leading slashes from file names
+        json = json.replace("/" + SOURCES_FOLDER, SOURCES_FOLDER);
         coverages.add(json);
     }
 
