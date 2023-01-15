@@ -57,16 +57,8 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
 
     public static final String NODE_ALIVE_FLAG = "node_alive_";
 
-    public SystemStatusWrapper(File statusFile) throws FileException {
-        super(FileUtils.readFile(statusFile));
-    }
-
     public static SystemStatusWrapper empty() {
         return new SystemStatusWrapper("{}");
-    }
-
-    public SystemStatusWrapper(JSONObject json) {
-        super(json);
     }
 
     public SystemStatusWrapper(Map<String, Object> map) {

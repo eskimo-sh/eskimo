@@ -45,20 +45,8 @@ import java.util.Map;
 
 public class MasterStatusWrapper extends JsonWrapper implements Serializable {
 
-    public MasterStatusWrapper(File statusFile) throws FileException {
-        super(FileUtils.readFile(statusFile));
-    }
-
     public static MasterStatusWrapper empty() {
         return new MasterStatusWrapper("{}");
-    }
-
-    public MasterStatusWrapper(JSONObject json) {
-        super(json);
-    }
-
-    public MasterStatusWrapper(Map<String, Object> map) {
-        super(new JSONObject(map));
     }
 
     public MasterStatusWrapper(String jsonString) {

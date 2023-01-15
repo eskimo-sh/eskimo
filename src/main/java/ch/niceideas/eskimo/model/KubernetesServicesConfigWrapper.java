@@ -52,16 +52,8 @@ public class KubernetesServicesConfigWrapper extends JsonWrapper implements Seri
     public static final String CPU_FLAG = "_cpu";
     public static final String RAM_FLAG = "_ram";
 
-    public KubernetesServicesConfigWrapper(File statusFile) throws FileException {
-        super(FileUtils.readFile(statusFile));
-    }
-
     public static KubernetesServicesConfigWrapper empty() {
         return new KubernetesServicesConfigWrapper("{}");
-    }
-
-    public KubernetesServicesConfigWrapper(JSONObject json) {
-        super(json);
     }
 
     public KubernetesServicesConfigWrapper(Map<String, Object> map) {

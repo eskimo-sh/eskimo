@@ -38,6 +38,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 @Component
@@ -54,7 +55,7 @@ public class MessagingManager extends AbstractInformationHolder<String, String> 
     @Override
     protected String buildFetchedData(int lastLine) {
         StringBuilder ret = new StringBuilder();
-        for (String line : getSubList(lastLine)) {
+        for (String line : new ArrayList<>(getSubList(lastLine))) { // need to copy the list to avoid ConcurrentModifications Exception
             ret.append (line);
             ret.append ("\n");
         }

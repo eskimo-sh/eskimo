@@ -40,9 +40,6 @@ public class ConnectionManagerException extends CommonBusinessException {
 
     static final long serialVersionUID = -3387512111124229248L;
 
-    public ConnectionManagerException() {
-    }
-
     public ConnectionManagerException(String message) {
         super(message);
     }

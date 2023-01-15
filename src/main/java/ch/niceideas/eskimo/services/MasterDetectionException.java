@@ -40,15 +40,8 @@ public class MasterDetectionException extends CommonBusinessException {
 
     static final long serialVersionUID = -3317512211124219248L;
 
-    public MasterDetectionException() {
-    }
-
     public MasterDetectionException(String message) {
         super(message);
-    }
-
-    public MasterDetectionException(String message, Throwable cause) {
-        super(message, cause);
     }
 
     public MasterDetectionException(Throwable cause) {

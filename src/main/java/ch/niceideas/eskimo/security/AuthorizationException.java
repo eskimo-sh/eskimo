@@ -40,18 +40,8 @@ public class AuthorizationException extends CommonBusinessException {
 
     static final long serialVersionUID = -3123512211124219248L;
 
-    public AuthorizationException() {
-    }
-
     public AuthorizationException(String message) {
         super(message);
     }
 
-    public AuthorizationException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public AuthorizationException(Throwable cause) {
-        super(cause);
-    }
 }

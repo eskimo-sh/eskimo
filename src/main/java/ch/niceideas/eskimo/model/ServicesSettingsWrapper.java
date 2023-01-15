@@ -74,10 +74,6 @@ public class ServicesSettingsWrapper extends JsonWrapper implements Serializable
         super(json);
     }
 
-    public ServicesSettingsWrapper(Map<String, Object> map) {
-        super(new JSONObject(map));
-    }
-
     public ServicesSettingsWrapper(String jsonString) {
         super(jsonString);
     }

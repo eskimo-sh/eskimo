@@ -40,9 +40,6 @@ public class SystemException extends CommonBusinessException {
 
     static final long serialVersionUID = -3387516993124229248L;
 
-    public SystemException() {
-    }
-
     public SystemException(String message) {
         super(message);
     }

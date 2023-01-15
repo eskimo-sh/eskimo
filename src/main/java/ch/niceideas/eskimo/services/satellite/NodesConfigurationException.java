@@ -40,9 +40,6 @@ public class NodesConfigurationException extends CommonBusinessException {
 
     static final long serialVersionUID = -3387512211124229248L;
 
-    public NodesConfigurationException() {
-    }
-
     public NodesConfigurationException(String message) {
         super(message);
     }

@@ -40,9 +40,6 @@ public class SetupException extends CommonBusinessException {
 
     static final long serialVersionUID = -3217516911124229248L;
 
-    public SetupException() {
-    }
-
     public SetupException(String message) {
         super(message);
     }

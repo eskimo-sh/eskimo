@@ -45,20 +45,12 @@ import java.util.Map;
 
 public class OperationsMonitoringStatusWrapper extends JsonWrapper implements Serializable {
 
-    public OperationsMonitoringStatusWrapper(File statusFile) throws FileException {
-        super(FileUtils.readFile(statusFile));
-    }
-
     public static OperationsMonitoringStatusWrapper empty() {
         return new OperationsMonitoringStatusWrapper("{}");
     }
 
     public OperationsMonitoringStatusWrapper(JSONObject json) {
         super(json);
-    }
-
-    public OperationsMonitoringStatusWrapper(Map<String, Object> map) {
-        super(new JSONObject(map));
     }
 
     public OperationsMonitoringStatusWrapper(String jsonString) {

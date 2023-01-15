@@ -43,8 +43,6 @@ eskimo.Setup = function() {
     this.eskimoSystemStatus = null;
     this.eskimoSetupCommand = null;
 
-    const MESSAGE_SHOW_DURATION = 10000;
-
     const that = this;
 
     // Initialize HTML Div from Template

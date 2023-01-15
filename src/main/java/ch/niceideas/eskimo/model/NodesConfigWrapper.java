@@ -64,16 +64,8 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
 
     public static final String NODE_ID_FIELD = "node_id";
 
-    public NodesConfigWrapper(File statusFile) throws FileException {
-        super(FileUtils.readFile(statusFile));
-    }
-
     public static NodesConfigWrapper empty() {
         return new NodesConfigWrapper("{}");
-    }
-
-    public NodesConfigWrapper(JSONObject json) {
-        super(json);
     }
 
     public NodesConfigWrapper(Map<String, Object> map) {

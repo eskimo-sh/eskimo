@@ -40,15 +40,8 @@ public class SSHCommandException extends CommonBusinessException {
 
     static final long serialVersionUID = -2287516911124229248L;
 
-    public SSHCommandException() {
-    }
-
     public SSHCommandException(String message) {
         super(message);
-    }
-
-    public SSHCommandException(String message, Throwable cause) {
-        super(message, cause);
     }
 
     public SSHCommandException(Throwable cause) {

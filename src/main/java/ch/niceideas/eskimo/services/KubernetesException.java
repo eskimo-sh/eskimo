@@ -40,9 +40,6 @@ public class KubernetesException extends CommonBusinessException {
 
     static final long serialVersionUID = -3875122119212229248L;
 
-    public KubernetesException() {
-    }
-
     public KubernetesException(String message) {
         super(message);
     }

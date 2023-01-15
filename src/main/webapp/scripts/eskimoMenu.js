@@ -77,7 +77,6 @@ eskimo.Menu = function() {
 
     function sidebarMouseover(e) {
         let x = e.pageX - this.offsetLeft;
-        let y = e.pageY - this.offsetTop;
 
         const html = document.getElementsByTagName('html')[0]
 

@@ -38,18 +38,8 @@ public class FileException extends Exception {
 
     static final long serialVersionUID = -3387516993124229248L;
 
-    public FileException() {
-    }
-
-    public FileException(String message) {
-        super(message);
-    }
-
     public FileException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public FileException(Throwable cause) {
-        super(cause);
-    }
 }
