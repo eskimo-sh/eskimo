@@ -11844,10 +11844,10 @@ textarea.form-control-lg{
     top:0;
     text-align:center
 }
-.logo span.logo-lg{
+.logo div.logo-lg{
     display:block
 }
-.logo span.logo-sm{
+.logo div.logo-sm{
     display:none
 }
 .logo.logo-light{

@@ -61,7 +61,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
@@ -167,14 +167,36 @@ public class ServicesProxyServletTest {
     public void testNominalReplacements() {
 
         Service kafkaManagerService = servicesDefinition.getService("kafka-manager");
+        assertNotNull(kafkaManagerService);
 
         String toReplace  = "\n <a href='/toto.txt'>\na/a>";
-        //String contextPath, String prefixPath
         ReplacementContext ctx = new ReplacementContext("", "test/test", "", "", "", "");
         String result = servlet.performReplacements(kafkaManagerService, "", ctx, toReplace );
         assertEquals("\n" +
                 " <a href='/test/test/toto.txt'>\n" +
                 "a/a>", result);
+    }
+
+    @Test
+    public void testPageScripterInjection() {
+        Service kubeDashboardService = servicesDefinition.getService("kubernetes-dashboard");
+        assertNotNull(kubeDashboardService);
+
+        String toReplace  = ""+"" +
+                "<html>" +
+                "<head>" +
+                "<title>one title</title>" +
+                "</head>" +
+                "<body>" +
+                "<div id=\"a\"></div>" +
+                "</body>" +
+                "</html>";
+
+        ReplacementContext ctx = new ReplacementContext("", "test/test", "", "", "", "");
+        String result = servlet.performReplacements(kubeDashboardService, "api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/", ctx, toReplace );
+
+        assertTrue(result.contains ("<html><head><title>one title</title></head><body><div id=\"a\"></div><script>function triggerLogin () {"));
+        assertTrue(result.contains ("eskimoLoginChecker();</script></body></html>"));
     }
 
     @Test

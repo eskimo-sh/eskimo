@@ -63,7 +63,7 @@ Software.
 
         <!-- Sidebar Menu Toggle Button -->
         <button class="button-toggle-menu">
-            <i class="mdi mdi-menu"></i>
+            <span class="mdi mdi-menu"></span>
         </button>
 
         <!-- Horizontal Menu Toggle Button -->
@@ -77,47 +77,46 @@ Software.
 
         <ul class="list-unstyled topbar-menu float-end mb-0">
 
-            <div id="notification-placeholder">
-
-            </div>
+            <li class="dropdown notification-list" id="notification-placeholder">
+            </li>
 
             <li class="dropdown notification-list d-none d-sm-inline-block">
                 <a class="nav-link" href="docs/eskimo-guide.html"
                    id="main-show-user-guide"
-                   target="_blank" class="icon-circle"
+                   target="_blank"
                    title="Show User Guide"
                    role="button" aria-haspopup="false" aria-expanded="false">
-                    <i class="menu-icon fa fa-file-o"></i>
+                    <span class="menu-icon fa fa-file-o"></span>
                 </a>
             </li>
 
             <li class="dropdown notification-list d-none d-sm-inline-block">
                 <a class="nav-link "
                    href="docs/service-dev-guide.html" id="main-show-service-guide"
-                   target="_blank" class="icon-circle"
+                   target="_blank"
                    title="Show Service Development Guide"
                    role="button" aria-haspopup="false" aria-expanded="false">
-                    <i class="menu-icon fa fa-file-o"></i>
+                    <span class="menu-icon fa fa-file-o"></span>
                 </a>
             </li>
             <li class="dropdown notification-list d-none d-sm-inline-block">
                 <a class="nav-link arrow-none" href="#"
-                   id="main-show-about-link" class="icon-circle"
+                   id="main-show-about-link"
                    title="Show Eskimo About Information"
                    role="button" aria-haspopup="false" aria-expanded="false">
-                    <i class="menu-icon top-menu-small fa fa-question"></i>
+                    <span class="menu-icon top-menu-small fa fa-question"></span>
                 </a>
             </li>
 
             <li class="notification-list d-none d-md-inline-block">
-                <a class="nav-link" href="index.html" data-toggle="fullscreen">
-                    <i class="ri-fullscreen-line noti-icon"></i>
+                <a class="nav-link" href="#" data-toggle="fullscreen">
+                    <span class="ri-fullscreen-line noti-icon"></span>
                 </a>
             </li>
 
             <li class="dropdown notification-list">
                 <a class="nav-link dropdown-toggle nav-user arrow-none me-0" data-bs-toggle="dropdown"
-                   href="index.html#" role="button" aria-haspopup="false"
+                   href="#" role="button" aria-haspopup="false"
                    aria-expanded="false">
                     <span class="account-user-avatar">
                         <img src="images/user.png" alt="user-image" class="rounded-circle">
@@ -135,13 +134,13 @@ Software.
 
                     <!-- item-->
                     <a id="edit-user-link" href="javascript:void(0);" class="dropdown-item notify-item">
-                        <i class="mdi mdi-account-circle me-1"></i>
+                        <span class="mdi mdi-account-circle me-1"></span>
                         <span>My Account</span>
                     </a>
 
                     <!-- item-->
                     <a href="javascript:void(0);" id="user-logout" class="dropdown-item notify-item">
-                        <i class="mdi mdi-logout me-1"></i>
+                        <span class="mdi mdi-logout me-1"></span>
                         <span>Logout</span>
                     </a>
                 </div>
@@ -159,44 +158,44 @@ Software.
 
     <!-- Logo Light -->
     <a href="index.html" class="logo logo-light">
-        <span class="logo-lg">
+        <div class="logo-lg">
             <img src="images/eskimo-icon.png" alt="logo">
             <span id="eskimoTitle" class="logo-title">Eskimo Console</span>
             <div class="eskimo-version" id="eskimo-version">
                 (version)
             </div>
-        </span>
-        <span class="logo-sm">
+        </div>
+        <div class="logo-sm">
             <img src="images/eskimo-icon.png" alt="small logo">
-        </span>
+        </div>
     </a>
 
     <!-- Logo Dark -->
     <a href="index.html" class="logo logo-dark">
-        <span class="logo-lg">
+        <div class="logo-lg">
             <img src="images/eskimo-icon-black.png" alt="dark logo" height="22">
             <span id="eskimoTitle-dark" class="logo-title">Eskimo Console</span>
             <div class="eskimo-version" id="eskimo-version-dark">
                 (version)
             </div>
-        </span>
-        <span class="logo-sm">
+        </div>
+        <div class="logo-sm">
             <img src="images/eskimo-icon-black.png" alt="small logo" height="22">
-        </span>
+        </div>
     </a>
 
     <!-- Sidebar Hover Menu Toggle Button -->
     <button type="button" class="btn button-sm-hover p-0" data-bs-toggle="tooltip" data-bs-placement="right"
             title="Show Full Sidebar">
-        <i class="ri-checkbox-blank-circle-line align-middle"></i>
+        <span class="ri-checkbox-blank-circle-line align-middle"></span>
     </button>
 
     <!-- Sidebar -left -->
     <div class="h-100" id="leftside-menu-container" data-simplebar>
         <!-- Leftbar User -->
         <div class="leftbar-user">
-            <a href="pages-profile.html">
-                <img src="assets/images/users/avatar-1.jpg" alt="user-image" height="42"
+            <a href="#">
+                <img src="images/user.png" alt="user-image" height="42"
                      class="rounded-circle shadow-sm">
                 <span class="leftbar-user-name">(User)</span>
             </a>
@@ -283,11 +282,15 @@ Software.
     <!-- modal dialog for settings operation confirmation -->
     <div id="settings-operations-command-modal-wrapper"></div>
 
+    <!-- modal dialog for about box -->
     <div id="about-modal-wrapper"></div>
 
+    <!-- modal dialog for user edition -->
     <div id="edit-user-modal-wrapper"></div>
 
+    <!-- modal dialog for message (alert) window -->
     <div id="alert-modal-wrapper"></div>
+
 </div>
 
 

@@ -366,7 +366,11 @@ public abstract class AbstractWebTest {
     }
 
     protected void assertJavascriptEquals(String value, String javascript) {
-        assertEquals (value, js("return " + javascript).toString());
+        Object jsResult = js("return " + javascript);
+        if (jsResult == null) {
+            throw new NullPointerException("javascript execution returned null value.");
+        }
+        assertEquals (value, jsResult.toString());
     }
 
     /*

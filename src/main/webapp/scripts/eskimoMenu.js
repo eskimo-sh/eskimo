@@ -279,7 +279,7 @@ eskimo.Menu = function() {
                 let menuEntry = '' +
                     '<li class="side-nav-item folder-menu-items disabled" id="folderMenu' + getUcfirst(getCamelCase(service)) + '">\n' +
                     '    <a id="services-menu_' + service + '" href="#" class="side-nav-link">\n' +
-                    '        <i><img src="' + that.eskimoNodesConfig.getServiceIconPath(service) + '"></img></i>\n' +
+                    '        <em><img src="' + that.eskimoNodesConfig.getServiceIconPath(service) + '"></em>\n' +
                     '        <span class="menu-text">' + uiConfig.title + '</span>\n' +
                     '    </a>\n' +
                     '</li>';

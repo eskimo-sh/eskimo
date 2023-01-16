@@ -215,6 +215,7 @@ public class SSHCommandServiceImpl implements SSHCommandService {
 
         } catch (InterruptedException | IOException e) {
             logger.error (e, e);
+            Thread.currentThread().interrupt();
             throw new SSHCommandException(e);
         }
     }

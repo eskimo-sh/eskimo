@@ -93,7 +93,8 @@ Software.
 .side-nav .side-nav-link span{
     vertical-align:middle
 }
-.side-nav .side-nav-link i{
+.side-nav .side-nav-link i,
+.side-nav .side-nav-link em {
     display:inline-block;
     line-height:1.0625rem;
     margin:0 10px 0 0;
@@ -208,7 +209,8 @@ html[data-sidenav-size=compact]:not(.authentication-bg) .side-nav .side-nav-link
     padding:15px 10px;
     text-align:center
 }
-html[data-sidenav-size=compact]:not(.authentication-bg) .side-nav .side-nav-link i{
+html[data-sidenav-size=compact]:not(.authentication-bg) .side-nav .side-nav-link i,
+html[data-sidenav-size=compact]:not(.authentication-bg) .side-nav .side-nav-link em{
     display:block;
     text-align:center;
     margin:0 0 5px;
@@ -333,7 +335,8 @@ html[data-sidenav-size=condensed]:not(.authentication-bg) .side-nav .side-nav-it
 html[data-sidenav-size=condensed]:not(.authentication-bg) .side-nav .side-nav-item .side-nav-link:hover{
     color:var(--ct-menu-item-hover)
 }
-html[data-sidenav-size=condensed]:not(.authentication-bg) .side-nav .side-nav-item .side-nav-link i{
+html[data-sidenav-size=condensed]:not(.authentication-bg) .side-nav .side-nav-item .side-nav-link i,
+html[data-sidenav-size=condensed]:not(.authentication-bg) .side-nav .side-nav-item .side-nav-link em{
     font-size:1.25rem;
     margin:0;
     text-align:center;
@@ -418,10 +421,10 @@ html[data-sidenav-size=condensed]:not(.authentication-bg) .side-nav .side-nav-it
     position:absolute;
     width:calc(260px - 70px)
 }
-html[data-sidenav-size=condensed]:not(.authentication-bg) .logo span.logo-lg{
+html[data-sidenav-size=condensed]:not(.authentication-bg) .logo div.logo-lg{
     display:none
 }
-html[data-sidenav-size=condensed]:not(.authentication-bg) .logo span.logo-sm{
+html[data-sidenav-size=condensed]:not(.authentication-bg) .logo div.logo-sm{
     display:block;
     line-height:70px;
     color:#727cf5
@@ -462,7 +465,8 @@ html[data-sidenav-size=sm-hover]:not([data-layout=topnav]) .leftside-menu:not(:h
 html[data-sidenav-size=sm-hover]:not([data-layout=topnav]) .leftside-menu:not(:hover) .side-nav-item .side-nav-link span{
     display:none
 }
-html[data-sidenav-size=sm-hover]:not([data-layout=topnav]) .leftside-menu:not(:hover) .side-nav-item .side-nav-link i{
+html[data-sidenav-size=sm-hover]:not([data-layout=topnav]) .leftside-menu:not(:hover) .side-nav-item .side-nav-link i,
+html[data-sidenav-size=sm-hover]:not([data-layout=topnav]) .leftside-menu:not(:hover) .side-nav-item .side-nav-link em{
     font-size:1.25rem;
     margin-right:0
 }
@@ -747,10 +751,10 @@ html[data-sidenav-color=dark][data-sidenav-size=condensed] .side-nav .side-nav-i
     html[data-sidenav-size=condensed] .leftside-menu{
         margin-left:0
     }
-    .logo span.logo-lg{
+    .logo div.logo-lg{
         display:block
     }
-    .logo span.logo-sm{
+    .logo div.logo-sm{
         display:none
     }
     html[data-layout-mode=detached]:not([data-layout=topnav]) .content-page{
@@ -800,7 +804,8 @@ html[data-sidenav-color=dark][data-sidenav-size=condensed] .side-nav .side-nav-i
 .navbar-custom .topbar-left .logo{
     line-height:70px
 }
-.navbar-custom .topbar-left .logo i{
+.navbar-custom .topbar-left .logo i,
+.navbar-custom .topbar-left .logo em{
     display:none
 }
 .navbar-custom .topbar-menu{
@@ -1100,10 +1105,10 @@ html[data-topbar-color=dark] .navbar-custom .logo-topbar .logo-dark{
         padding-left:15px!important;
         padding-right:15px!important
     }
-    .logo-topbar span.logo-lg{
+    .logo-topbar div.logo-lg{
         display:none!important
     }
-    .logo-topbar span.logo-sm{
+    .logo-topbar div.logo-sm{
         display:block!important
     }
 }
@@ -2373,7 +2378,8 @@ html[data-theme=dark] .btn-dark{
 .dropdown-menu-animated.show{
     top:100%!important
 }
-.dropdown-menu-animated i{
+.dropdown-menu-animated i,
+.dropdown-menu-animated em{
     display:inline-block
 }
 .dropdown-menu-animated.dropdown-menu[data-popper-placement^=left],.dropdown-menu-animated.dropdown-menu[data-popper-placement^=right],.dropdown-menu-animated.dropdown-menu[data-popper-placement^=top]{
@@ -3342,13 +3348,15 @@ html[data-theme=dark] .text-secondary{
     right:5px;
     top:10px
 }
-.tilebox-one i{
+.tilebox-one i,
+.tilebox-one em{
     position:absolute;
     right:1.5rem;
     font-size:2rem;
     opacity:.3
 }
-.toll-free-box i{
+.toll-free-box i,
+.toll-free-box em{
     position:absolute;
     left:0;
     bottom:-15px;
@@ -3388,7 +3396,8 @@ html[data-theme=dark] .text-secondary{
     border-radius:100%;
     width:100%
 }
-.conversation-list .chat-avatar i{
+.conversation-list .chat-avatar i,
+.conversation-list .chat-avatar em{
     font-size:12px;
     font-style:normal
 }
@@ -3399,7 +3408,8 @@ html[data-theme=dark] .text-secondary{
     padding:12px;
     position:relative
 }
-.conversation-list .ctext-wrap i{
+.conversation-list .ctext-wrap i,
+.conversation-list .ctext-wrap em{
     display:block;
     font-size:12px;
     font-style:normal;
@@ -3847,10 +3857,12 @@ html[data-theme=dark] .auth-brand .logo-light{
     margin-bottom:0;
     line-height:inherit
 }
-.icons-list-demo div:hover,.icons-list-demo div:hover i{
+.icons-list-demo div:hover,.icons-list-demo div:hover i,
+.icons-list-demo div:hover,.icons-list-demo div:hover em{
     color:#727cf5
 }
-.icons-list-demo i{
+.icons-list-demo i,
+.icons-list-demo em{
     text-align:center;
     vertical-align:middle;
     font-size:24px;
@@ -4208,7 +4220,8 @@ html[data-theme=dark] .auth-brand .logo-light{
         top:50%;
         width:24px
     }
-    .timeline .timeline-icon i{
+    .timeline .timeline-icon i,
+    .timeline .timeline-icon em{
         color:var(--ct-gray-600);
         font-size:1rem;
         vertical-align:middle

@@ -150,7 +150,7 @@ public class EskimoMenuTest extends AbstractWebTest {
         assertJavascriptEquals ("1", "$('#folderMenuZeppelin').length");
 
         // test zeppelin menu entry
-        assertJavascriptEquals ("zeppelin-icon.png", "$('#folderMenuZeppelin').find('a > i > img').attr('src')");
+        assertJavascriptEquals ("zeppelin-icon.png", "$('#folderMenuZeppelin').find('a > em > img').attr('src')");
         assertJavascriptEquals ("zeppelin", "$('#folderMenuZeppelin').find('a > span').html()");
     }
 
