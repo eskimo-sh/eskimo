@@ -113,12 +113,6 @@ public class TerminalServiceImpl implements TerminalService {
         timer.cancel();
     }
 
-    /** For tests */
-    @Deprecated
-    void setConnectionManagerService(ConnectionManagerService connectionManagerService) {
-        this.connectionManagerService = connectionManagerService;
-    }
-
     @Override
     public void removeTerminal (String sessionId) throws IOException {
         logger.debug(sessionId);
@@ -171,7 +165,6 @@ public class TerminalServiceImpl implements TerminalService {
        } catch (IOException | InterruptedException | ConnectionManagerException e) {
            logger.error (e, e);
            throw new IOException(e.getMessage(), e);
-
        }
     }
 

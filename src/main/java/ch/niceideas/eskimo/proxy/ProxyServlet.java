@@ -791,7 +791,7 @@ public class ProxyServlet extends HttpServlet {
                     formatter = new Formatter(outBuf);
                 }
                 //leading %, 0 padded, width 2, capital hex
-                formatter.format("%%%02X", (int) c);//TODO
+                formatter.format("%%%02X", (int) c);
             }
         }
         return outBuf != null ? outBuf : in;
