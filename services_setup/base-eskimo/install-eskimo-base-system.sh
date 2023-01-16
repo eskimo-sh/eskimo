@@ -462,32 +462,34 @@ fi
 
 echo " - Disabling IPv6"
 
-sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1  >> /tmp/setup_log 2>&1
-fail_if_error $? "/tmp/setup_log" -1
+if [[ -d "/proc/sys/net/ipv6" ]]; then
 
-sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1  >> /tmp/setup_log 2>&1
-fail_if_error $? "/tmp/setup_log" -1
-
-for i in `/sbin/ip -o -4 address | awk '{print $2}'`; do
-    sudo sysctl -w net.ipv6.conf.$i.disable_ipv6=1  >> /tmp/setup_log 2>&1
+    sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1  >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
-done
 
+    sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1  >> /tmp/setup_log 2>&1
+    fail_if_error $? "/tmp/setup_log" -1
 
+    for i in `/sbin/ip -o -4 address | awk '{print $2}'`; do
+        sudo sysctl -w net.ipv6.conf.$i.disable_ipv6=1  >> /tmp/setup_log 2>&1
+        fail_if_error $? "/tmp/setup_log" -1
+    done
 
-if [[ `grep net.ipv6.conf.all.disable_ipv6=1 /etc/sysctl.conf` == "" ]]; then
-    sudo bash -c 'echo -e "\nnet.ipv6.conf.all.disable_ipv6=1" >>  /etc/sysctl.conf'
-fi
-
-if [[ `grep net.ipv6.conf.default.disable_ipv6=1 /etc/sysctl.conf` == "" ]]; then
-    sudo bash -c 'echo -e "net.ipv6.conf.default.disable_ipv6=1" >>  /etc/sysctl.conf'
-fi
-
-for i in `/sbin/ip -o -4 address | awk '{print $2}'`; do
-    if [[ `grep net.ipv6.conf.$i.disable_ipv6=1 /etc/sysctl.conf` == "" ]]; then
-        sudo bash -c "echo -e \"net.ipv6.conf.$i.disable_ipv6=1\" >>  /etc/sysctl.conf"
+    if [[ `grep net.ipv6.conf.all.disable_ipv6=1 /etc/sysctl.conf` == "" ]]; then
+        sudo bash -c 'echo -e "\nnet.ipv6.conf.all.disable_ipv6=1" >>  /etc/sysctl.conf'
     fi
-done
+
+    if [[ `grep net.ipv6.conf.default.disable_ipv6=1 /etc/sysctl.conf` == "" ]]; then
+        sudo bash -c 'echo -e "net.ipv6.conf.default.disable_ipv6=1" >>  /etc/sysctl.conf'
+    fi
+
+    for i in `/sbin/ip -o -4 address | awk '{print $2}'`; do
+        if [[ `grep net.ipv6.conf.$i.disable_ipv6=1 /etc/sysctl.conf` == "" ]]; then
+            sudo bash -c "echo -e \"net.ipv6.conf.$i.disable_ipv6=1\" >>  /etc/sysctl.conf"
+        fi
+    done
+fi
+
 
 echo " - Increasing system vm.max_map_count setting"
 sudo bash -c 'echo -e "\nvm.max_map_count=262144" >>  /etc/sysctl.conf'

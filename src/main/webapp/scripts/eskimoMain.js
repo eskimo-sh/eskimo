@@ -40,12 +40,8 @@ eskimo.Main = function() {
 
     const that = this;
 
-    let mainContentsimpleBar = null;
-
     let setupLoaded = false;
     let setupDone = false;
-
-    let dontMessWithSidebarSizeAnyMore = false;
 
     let eskimoSetup = null;
     let eskimoNodesConfig = null;

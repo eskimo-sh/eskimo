@@ -79,6 +79,12 @@ public abstract class AbstractWebTest {
         server = TestResourcesServer.getServer(isCoverageRun());
         server.startServer(className);
 
+        driver = buildSeleniumDriver();
+
+        driver.get("http://localhost:" + TestResourcesServer.LOCAL_TEST_SERVER_PORT + "/src/test/resources/GenericTestPage.html");
+    }
+
+    public static WebDriver buildSeleniumDriver() throws InterruptedException, CommonBusinessException {
         ChromeOptions co = new ChromeOptions();
 
         co.setCapability(CapabilityType.UNHANDLED_PROMPT_BEHAVIOUR, "ignore");
@@ -89,6 +95,7 @@ public abstract class AbstractWebTest {
         co.addArguments("--headless");
         co.addArguments("--disable-gpu");
 
+        WebDriver driver;
         for (int i = 0; ; i++) { // 10 attempts
             try {
                 driver = WebDriverManager.chromedriver()
@@ -110,7 +117,7 @@ public abstract class AbstractWebTest {
         devTools.createSession();
         devTools.send(Emulation.setTimezoneOverride("Europe/Zurich"));
 
-        driver.get("http://localhost:" + TestResourcesServer.LOCAL_TEST_SERVER_PORT + "/src/test/resources/GenericTestPage.html");
+        return driver;
     }
 
     private static boolean hasQuit(WebDriver driver) {
