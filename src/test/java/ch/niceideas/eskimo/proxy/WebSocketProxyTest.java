@@ -1,6 +1,7 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.configurations.ProxyConfiguration;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
 import ch.niceideas.eskimo.utils.ActiveWaiter;
@@ -220,7 +221,7 @@ public class WebSocketProxyTest {
                         sd),
                         Arrays.stream(sd.listProxiedServices())
                         .map(sd::getService)
-                        .map(service -> "/ws/" + service.getName() + "/**/*")
+                        .map(service -> ProxyConfiguration.ESKIMO_WEB_SOCKET_URL_PREFIX + "/" + service.getName() + "/**/*")
                         .toArray(String[]::new))
                     .setHandshakeHandler(new DefaultHandshakeHandler(upgradeStrategy));
         }

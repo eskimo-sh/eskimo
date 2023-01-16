@@ -60,6 +60,8 @@ import java.util.Arrays;
 @EnableWebSocket
 public class ProxyConfiguration implements WebSocketConfigurer {
 
+    public static String ESKIMO_WEB_SOCKET_URL_PREFIX = "/ws";
+
     @Autowired
     private ProxyManagerService proxyManagerService;
 
@@ -172,7 +174,7 @@ public class ProxyConfiguration implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         String[] allWsUrls = Arrays.stream(servicesDefinition.listProxiedServices())
                 .map(serviceName -> servicesDefinition.getService(serviceName))
-                .map(service -> "/ws/" + service.getName() + "/**")
+                .map(service -> ESKIMO_WEB_SOCKET_URL_PREFIX + "/" + service.getName() + "/**")
                 .toArray(String[]::new);
         registry.addHandler(webSocketProxyServer, allWsUrls);
     }

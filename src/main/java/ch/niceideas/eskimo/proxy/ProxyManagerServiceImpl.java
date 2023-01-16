@@ -76,21 +76,6 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
 
     private final Map<String, ProxyTunnelConfig> proxyTunnelConfigs = new ConcurrentHashMap<>();
 
-    /** For tests */
-    @Deprecated
-    public void setServicesDefinition (ServicesDefinition servicesDefinition) {
-        this.servicesDefinition = servicesDefinition;
-    }
-    public void setConnectionManagerService (ConnectionManagerService connectionManagerService) {
-        this.connectionManagerService = connectionManagerService;
-    }
-    public void setWebSocketProxyServer(WebSocketProxyServer webSocketProxyServer) {
-        this.webSocketProxyServer = webSocketProxyServer;
-    }
-    public void setConfigurationService(ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-
     private void __dumpProxyTunnelConfig() {
         proxyTunnelConfigs.keySet().forEach(key -> logger.debug(" - " + key + " -> " + proxyTunnelConfigs.get(key)));
         logger.debug("");

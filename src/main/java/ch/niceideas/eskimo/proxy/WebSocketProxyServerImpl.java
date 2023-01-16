@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.proxy;
 
+import ch.niceideas.eskimo.configurations.ProxyConfiguration;
 import ch.niceideas.eskimo.model.service.Service;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.apache.log4j.Logger;
@@ -89,7 +90,7 @@ public class WebSocketProxyServerImpl extends AbstractWebSocketHandler implement
 
         String uri = Objects.requireNonNull(webSocketServerSession.getUri()).toString();
 
-        int indexOfWs = uri.indexOf("/ws");
+        int indexOfWs = uri.indexOf(ProxyConfiguration.ESKIMO_WEB_SOCKET_URL_PREFIX);
         int indexOfSlash = uri.indexOf('/', indexOfWs + 4);
 
         String serviceName = uri.substring(indexOfWs + 4, indexOfSlash > -1 ? indexOfSlash : uri.length());
@@ -163,17 +164,5 @@ public class WebSocketProxyServerImpl extends AbstractWebSocketHandler implement
                 });
 
         forwarders.remove(serviceId);
-
-        /*
-        Map<String, Map<String, WebSocketProxyForwarder>> forwardersForService = forwarders.get(serviceId);
-        if (forwardersForService != null) {
-            for (Map<String, WebSocketProxyForwarder> forwardersForSession : forwardersForService.values()) {
-                for (WebSocketProxyForwarder forwarder : forwardersForSession.values()) {
-                    forwarder.close();
-                }
-            }
-            forwardersForService.clear();
-        }
-        */
     }
 }

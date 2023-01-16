@@ -1,6 +1,7 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.eskimo.EskimoApplication;
+import ch.niceideas.eskimo.configurations.ProxyConfiguration;
 import ch.niceideas.eskimo.test.services.WebSocketProxyServerTestImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,14 +39,14 @@ public class WebSocketProxyServerTest {
         wss1 = new StandardWebSocketSession(null, null, null, null) {
             @Override
             public URI getUri() {
-                return URI.create("/ws/cerebro/test");
+                return URI.create(ProxyConfiguration.ESKIMO_WEB_SOCKET_URL_PREFIX + "/cerebro/test");
             }
         };
 
         wss2 = new StandardWebSocketSession(null, null, null, null) {
             @Override
             public URI getUri() {
-                return URI.create("/ws/cerebro/test");
+                return URI.create(ProxyConfiguration.ESKIMO_WEB_SOCKET_URL_PREFIX + "/cerebro/test");
             }
         };
 
