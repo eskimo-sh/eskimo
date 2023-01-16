@@ -36,7 +36,6 @@
 
 package ch.niceideas.eskimo.model.service;
 
-import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.services.ServiceDefinitionException;
 import lombok.Data;
 import org.json.JSONObject;

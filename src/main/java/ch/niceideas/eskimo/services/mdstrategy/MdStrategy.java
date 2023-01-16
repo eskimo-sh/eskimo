@@ -1,4 +1,4 @@
-package ch.niceideas.eskimo.services.mdStrategy;
+package ch.niceideas.eskimo.services.mdstrategy;
 
 import ch.niceideas.eskimo.model.service.MasterDetection;
 import ch.niceideas.eskimo.model.service.Service;

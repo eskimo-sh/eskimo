@@ -39,7 +39,7 @@ import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import ch.niceideas.eskimo.model.service.MasterDetection;
 import ch.niceideas.eskimo.model.service.Service;
-import ch.niceideas.eskimo.services.mdStrategy.MdStrategy;
+import ch.niceideas.eskimo.services.mdstrategy.MdStrategy;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import org.apache.log4j.Logger;

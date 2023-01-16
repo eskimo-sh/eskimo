@@ -35,7 +35,6 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.eskimo.services.TerminalService;
-import ch.niceideas.eskimo.terminal.ScreenImage;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

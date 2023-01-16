@@ -35,13 +35,9 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.FileUtils;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.Serializable;
-import java.util.Map;
 
 public class OperationsMonitoringStatusWrapper extends JsonWrapper implements Serializable {
 

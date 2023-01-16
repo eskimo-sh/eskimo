@@ -80,9 +80,10 @@ public class KubeStatusParser {
     }
 
     private void appendStatuses(Map<String, Map<String, String>> statuses, StringBuilder sb) {
-        for (String podName : statuses.keySet()) {
-            sb.append(podName).append(" : ");
-            statuses.get(podName).keySet().forEach(key -> sb.append(key).append("=").append(statuses.get(podName).get(key)).append(", "));
+        for (Map.Entry<String, Map<String, String>> podAndStatus : statuses.entrySet()) {
+            sb.append(podAndStatus.getKey()).append(" : ");
+            podAndStatus.getValue().keySet().forEach(
+                    key -> sb.append(key).append("=").append(podAndStatus.getValue().get(key)).append(", "));
             sb.append ("\n");
         }
     }

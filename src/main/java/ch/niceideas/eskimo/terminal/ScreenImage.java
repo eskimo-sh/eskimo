@@ -74,7 +74,7 @@ public final class ScreenImage implements Serializable {
         this.screenY = t.height;
     }
 
-    public String renderResponse(HttpServletResponse resp) throws IOException {
+    public String renderResponse(HttpServletResponse resp) {
         resp.setContentType("application/xml;charset=UTF-8");
         if (cursorX != -1 || cursorY != -1) {
             resp.addHeader("Cursor-X", String.valueOf(cursorX));
