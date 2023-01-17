@@ -109,9 +109,8 @@ public class KubernetesServicesConfigWrapper extends JsonWrapper implements Seri
                 return true;
             }
         } else {
-            if (StringUtils.isBlank(prevCpu)) {
-                return true;
-            } else if (!prevCpu.equals(curCpu)) {
+            if (StringUtils.isBlank(prevCpu)
+                    || !prevCpu.equals(curCpu)) {
                 return true;
             }
         }

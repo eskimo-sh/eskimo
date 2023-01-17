@@ -35,7 +35,6 @@
 package ch.niceideas.eskimo.terminal;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.Serializable;
 
 /**

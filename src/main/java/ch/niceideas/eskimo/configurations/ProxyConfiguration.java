@@ -36,7 +36,6 @@ package ch.niceideas.eskimo.configurations;
 
 import ch.niceideas.eskimo.proxy.*;
 import ch.niceideas.eskimo.services.ConfigurationService;
-import ch.niceideas.eskimo.services.ConnectionManagerService;
 import ch.niceideas.eskimo.services.SSHCommandService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +59,7 @@ import java.util.Arrays;
 @EnableWebSocket
 public class ProxyConfiguration implements WebSocketConfigurer {
 
-    public static String ESKIMO_WEB_SOCKET_URL_PREFIX = "/ws";
+    public static final String ESKIMO_WEB_SOCKET_URL_PREFIX = "/ws";
 
     @Autowired
     private ProxyManagerService proxyManagerService;

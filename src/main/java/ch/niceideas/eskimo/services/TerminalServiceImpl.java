@@ -162,8 +162,16 @@ public class TerminalServiceImpl implements TerminalService {
 
            return session.handleUpdate(k, StringUtils.isNotBlank(c), t);
 
-       } catch (IOException | InterruptedException | ConnectionManagerException e) {
+       } catch (IOException | ConnectionManagerException e) {
            logger.error (e, e);
+           throw new IOException(e.getMessage(), e);
+
+       } catch (InterruptedException e) {
+           logger.error (e, e);
+
+           // Restore interrupted state...
+           Thread.currentThread().interrupt();
+
            throw new IOException(e.getMessage(), e);
        }
     }

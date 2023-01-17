@@ -38,6 +38,7 @@ package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.common.utils.StringUtils;
 import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.cookie.StandardCookieSpec;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
@@ -247,7 +248,6 @@ public class ProxyServlet extends HttpServlet {
         return RequestConfig.custom()
                 .setRedirectsEnabled(doHandleRedirects)
                 .setCookieSpec(StandardCookieSpec.IGNORE) // we handle them in the servlet instead
-                .setConnectTimeout(Timeout.defaultsToDisabled(connectTimeout == -1 ? null : Timeout.ofMilliseconds(connectTimeout)))
                 .setResponseTimeout(Timeout.defaultsToDisabled(readTimeout == -1 ? null : Timeout.ofMilliseconds(readTimeout)))
                 .setCircularRedirectsAllowed(true)
                 .setConnectionRequestTimeout(Timeout.defaultsToDisabled(connectionRequestTimeout == -1 ? null : Timeout.ofMilliseconds(connectionRequestTimeout)))
@@ -265,23 +265,16 @@ public class ProxyServlet extends HttpServlet {
                 .build();
     }
 
-    protected void initTarget() throws ServletException {
-        targetUri = getConfigParam(P_TARGET_URI);
-        if (targetUri == null)
-            throw new ServletException(P_TARGET_URI + " is required.");
-        //test it's valid
-        try {
-            targetUriObj = new URI(targetUri);
-        } catch (Exception e) {
-            throw new ServletException("Trying to process targetUri init parameter: " + e, e);
-        }
-        targetHost = URIUtils.extractHost(targetUriObj);
-    }
-
     protected HttpClient createHttpClient() {
+
+        ConnectionConfig connectionConfig = ConnectionConfig.custom()
+                .setConnectTimeout(Timeout.defaultsToDisabled(connectTimeout == -1 ? null : Timeout.ofMilliseconds(connectTimeout)))
+                .setSocketTimeout(Timeout.defaultsToDisabled(readTimeout == -1 ? null : Timeout.ofMilliseconds(readTimeout)))
+                .build();
 
         PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
                 .setDefaultSocketConfig(buildSocketConfig())
+                .setDefaultConnectionConfig(connectionConfig)
                 .setMaxConnPerRoute(MAX_CONNECTION_PER_ROUTE)
                 .setMaxConnTotal(maxConnections)
                 .setPoolConcurrencyPolicy(PoolConcurrencyPolicy.LAX)
@@ -307,6 +300,19 @@ public class ProxyServlet extends HttpServlet {
         }
 
         return proxyClient;
+    }
+
+    protected void initTarget() throws ServletException {
+        targetUri = getConfigParam(P_TARGET_URI);
+        if (targetUri == null)
+            throw new ServletException(P_TARGET_URI + " is required.");
+        //test it's valid
+        try {
+            targetUriObj = new URI(targetUri);
+        } catch (Exception e) {
+            throw new ServletException("Trying to process targetUri init parameter: " + e, e);
+        }
+        targetHost = URIUtils.extractHost(targetUriObj);
     }
 
     public static class ProxySessionListener implements HttpSessionListener {
@@ -367,10 +373,10 @@ public class ProxyServlet extends HttpServlet {
 
             // Process the response:
 
-            // Pass the response code. This method with the "reason phrase" is deprecated but it's the
-            //   only way to pass the reason along too.
             int statusCode = proxyResponse.getCode();
 
+            // Pass the response code. This method with the "reason phrase" is deprecated but it's the
+            //  only way to pass the reason along too.
             servletResponse.setStatus(statusCode, proxyResponse.getReasonPhrase());
 
             // Copying response headers to make sure SESSIONID or other Cookie which comes from the remote
@@ -402,13 +408,6 @@ public class ProxyServlet extends HttpServlet {
     }
 
     protected void handleRequestException(HttpRequest proxyRequest, Exception e) throws ServletException, IOException {
-        //abort request, according to best practice with HttpClient
-        /*
-        if (proxyRequest instanceof AbortableHttpRequest) {
-            AbortableHttpRequest abortableHttpRequest = (AbortableHttpRequest) proxyRequest;
-            abortableHttpRequest.abort();
-        }
-        */
         if (e instanceof RuntimeException) {
             throw (RuntimeException) e;
         }

@@ -42,7 +42,6 @@ public class AbstractOperationController {
 
             String message = "Some backend operations are currently running. Please retry after they are completed.";
 
-            //messagingService.addLines (message);
             notificationService.addError("Operation In Progress");
 
             checkObject = new JSONObject(new HashMap<String, Object>() {{
@@ -53,7 +52,6 @@ public class AbstractOperationController {
 
         if (demoMode) {
 
-            //messagingService.addLines (demoMessage);
             notificationService.addError("Demo Mode");
 
             checkObject = new JSONObject(new HashMap<String, Object>() {{

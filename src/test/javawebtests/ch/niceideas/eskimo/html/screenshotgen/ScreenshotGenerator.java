@@ -38,7 +38,8 @@ package ch.niceideas.eskimo.html.screenshotgen;
 import ch.niceideas.common.exceptions.CommonBusinessException;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.html.AbstractWebTest;
-import org.apache.commons.io.FileUtils;
+import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -47,6 +48,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Arrays;
 
 public class ScreenshotGenerator {
 
@@ -56,15 +58,21 @@ public class ScreenshotGenerator {
 
         // FIXME shiuld take folder where to put the screenshots in argument
 
-        if (args.length != 1) {
-            logger.error ("Expecting target Eskimo URL as argument");
+        if (args.length != 2) {
+            logger.error ("Expecting 'target Eskimo URL' as first argument and 'destination folder for screenshots' as second argument");
             System.exit (1);
         }
 
         String targetEskimoUrl = args[0];
         if (StringUtils.isBlank(targetEskimoUrl)) {
-            logger.error ("Expecting target Eskimo URL as argument");
-            System.exit (1);
+            logger.error ("Expecting 'target Eskimo URL' as argument");
+            System.exit (2);
+        }
+
+        String targetScreenshotFolder = args[1];
+        if (StringUtils.isBlank(targetScreenshotFolder)) {
+            logger.error ("Expecting 'target screenshot folder' as argument");
+            System.exit (3);
         }
 
         WebDriver driver = null;
@@ -73,18 +81,37 @@ public class ScreenshotGenerator {
 
             driver.get(targetEskimoUrl);
 
-            logger.info (" - Login");
             login(driver);
 
-            logger.info (" - Grafana");
-            screenshotsGrafana(driver);
+            /*
+            screenshotsGrafana(driver, targetScreenshotFolder);
+
+            screenshotsGluster(driver, targetScreenshotFolder);
+
+            screenshotsKubeDashboard(driver, targetScreenshotFolder);
+
+            screenshotsKafkaManager(driver, targetScreenshotFolder);
+
+            screenshotsSparkConsole(driver, targetScreenshotFolder);
+
+            screenshotsFlinkDashboard(driver, targetScreenshotFolder);
+
+            screenshotsCerebro(driver, targetScreenshotFolder);
+
+            screenshotsKibana(driver, targetScreenshotFolder);
+
+            screenshotsZeppelin(driver, targetScreenshotFolder);
+
+            screenshotsConsole(driver, targetScreenshotFolder);
+            */
+
+            screenshotsFileManager(driver, targetScreenshotFolder);
 
 
-
-            logger.info ("- TEMP HACK : waiting");
+            logger.info (" - TEMP HACK : waiting");
             Thread.sleep (100000);
 
-        } catch (InterruptedException| CommonBusinessException | IOException e) {
+        } catch (InterruptedException| CommonBusinessException | IOException | FileUtils.FileDeleteFailedException e) {
             logger.error (e, e);
             System.exit (2);
         } finally {
@@ -92,40 +119,311 @@ public class ScreenshotGenerator {
                 driver.quit();
             }
         }
-
     }
 
-    private static void screenshotsGrafana(WebDriver driver) throws IOException {
+    private static void screenshotsFileManager(WebDriver driver, String targetScreenshotFolder)
+            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
 
-        // reach proper place
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(20000));
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("services-menu_grafana")));
+        logger.info (" - File Manager");
 
-        wait.until(ExpectedConditions.not (ExpectedConditions.attributeContains(By.id("folderMenuGrafana"), "class", "disabled")));
+        reachService(driver, "main-menu-show-file-managers-link", "folderMenuFileManagers", "inner-content-file-managers");
 
-        driver.findElement(By.id("services-menu_grafana")).click();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#file-managers-management div.btn-group button.dropdown-toggle")));
+        driver.findElement(By.cssSelector("#file-managers-management div.btn-group button.dropdown-toggle")).click();
 
         wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("iframe-content-grafana")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("file_manager_open_192-168-56-51")));
+
+        driver.findElement(By.id("file_manager_open_192-168-56-51")).click();
+
+        wait = new WebDriverWait(driver, Duration.ofMillis(10000));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("file-manager-close-192-168-56-51")));
+
+        handleScreenshots(driver, targetScreenshotFolder, "file-manager");
+    }
+
+    private static void screenshotsConsole(WebDriver driver, String targetScreenshotFolder)
+            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
+
+        logger.info (" - Console");
+
+        reachService(driver, "main-menu-show-consoles-link", "folderMenuConsoles", "inner-content-consoles");
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#consoles-management div.btn-group button.dropdown-toggle")));
+        driver.findElement(By.cssSelector("#consoles-management div.btn-group button.dropdown-toggle")).click();
+
+        wait = new WebDriverWait(driver, Duration.ofMillis(10000));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("console_open_192-168-56-51")));
+
+        driver.findElement(By.id("console_open_192-168-56-51")).click();
+
+        wait = new WebDriverWait(driver, Duration.ofMillis(10000));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("console-close-192-168-56-51")));
+
+        handleScreenshots(driver, targetScreenshotFolder, "console");
+    }
+
+    private static void screenshotsZeppelin(WebDriver driver, String targetScreenshotFolder)
+            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
+
+        logger.info (" - Zeppelin");
+
+        // reach proper place
+        reachService(driver, "services-menu_zeppelin", "folderMenuZeppelin", "iframe-content-zeppelin");
+
+        driver.switchTo().frame("iframe-content-zeppelin");
+
+        // Show Spark SQL notebook
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a[href=\"#/notebook/2HS3PQPV6\"]")));
+        driver.findElement(By.cssSelector("a[href=\"#/notebook/2HS3PQPV6\"]")).click();
+
+        Thread.sleep(5000);
+
+        JavascriptExecutor jsExec = (JavascriptExecutor) driver;
+        jsExec.executeScript("window.scrollBy(0, 670)");
+
+        // selecting proper chart types
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+        String chartSelectDivs = js.executeScript("window.eskCharts = ''; $('.result-chart-selector').each(function(cnt, el) {window.eskCharts += ($(el).attr('id') + ' '); }); return window.eskCharts").toString();
+        //logger.info(chartSelectDivs);
+        String[] divIds = chartSelectDivs.split(" ");
+
+        driver.findElement(By.id(divIds[0])).findElement(By.cssSelector("button.btn-default[uib-tooltip=\"Pie Chart\"]")).click();
+
+        driver.findElement(By.id(divIds[1])).findElement(By.cssSelector("button.btn-default[uib-tooltip=\"Bar Chart\"]")).click();
+
+        driver.findElement(By.id(divIds[2])).findElement(By.cssSelector("button.btn-default[uib-tooltip=\"Line Chart\"]")).click();
+
+        Thread.sleep(2000);
+
+        handleScreenshots(driver, targetScreenshotFolder, "zeppelin");
+
+        driver.switchTo().parentFrame();
+    }
+
+    private static void screenshotsKibana(WebDriver driver, String targetScreenshotFolder)
+            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
+
+        logger.info (" - Kibana");
+
+        // reach proper place
+        reachService(driver, "services-menu_kibana", "folderMenuKibana", "iframe-content-kibana");
+
+        driver.switchTo().frame("iframe-content-kibana");
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.header__toggleNavButtonSection")));
+
+        // dismiss alerts
+        try {
+            driver.findElement(By.cssSelector("button[data-test-subj=\"dismissAlertButton\"]")).click();
+        } catch (NoSuchElementException e) {
+            logger.debug (e.getMessage());
+        }
+
+        try {
+            driver.findElement(By.cssSelector("button#mute.euiButton")).click();
+        } catch (NoSuchElementException e) {
+            logger.debug (e.getMessage());
+        }
+
+        // click on menu toggle
+        driver.findElement(By.cssSelector("div.header__toggleNavButtonSection button.euiHeaderSectionItemButton")).click();
+
+        // CLick on Dashboard
+        wait = new WebDriverWait(driver, Duration.ofMillis(10000));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span.euiListGroupItem__label[title=\"Dashboard\"]")));
+        driver.findElement(By.cssSelector("span.euiListGroupItem__label[title=\"Dashboard\"]")).click();
+
+        wait = new WebDriverWait(driver, Duration.ofMillis(10000));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a[data-test-subj=\"dashboardListingTitleLink-berka-transactions\"]")));
+
+        // Open berka dashboard
+        driver.findElement(By.cssSelector("a[data-test-subj=\"dashboardListingTitleLink-berka-transactions\"]")).click();
+
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+        ActiveWaiter.wait(() -> js.executeScript("return $(\"div.legacyMtrVis__value:contains('1,056,320')\").length").toString().equals("1"), 6000);
+
+        Thread.sleep(4000);
+
+        handleScreenshots(driver, targetScreenshotFolder, "kibana");
+
+        driver.switchTo().parentFrame();
+    }
+
+    private static void screenshotsCerebro(WebDriver driver, String targetScreenshotFolder)
+            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
+
+        logger.info (" - Cerebro");
+
+        // reach proper place
+        reachService(driver, "services-menu_cerebro", "folderMenuCerebro", "iframe-content-cerebro");
+
+        driver.switchTo().frame("iframe-content-cerebro");
+
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+        ActiveWaiter.wait(() -> js.executeScript("return $(\"span.stat-value:contains('eskimo')\").length").toString().equals("1"), 6000);
+
+        handleScreenshots(driver, targetScreenshotFolder, "cerebro");
+
+        driver.switchTo().parentFrame();
+    }
+
+    private static void screenshotsFlinkDashboard(WebDriver driver, String targetScreenshotFolder)
+            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
+
+        logger.info (" - Flink Runtime");
+
+        // reach proper place
+        reachService(driver, "services-menu_flink-runtime", "folderMenuFlinkRuntime", "iframe-content-flink-runtime");
+
+        driver.switchTo().frame("iframe-content-flink-runtime");
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("nz-divider.ant-divider-vertical")));
+
+        handleScreenshots(driver, targetScreenshotFolder, "flink-runtime");
+
+        driver.switchTo().parentFrame();
+    }
+
+    private static void screenshotsSparkConsole(WebDriver driver, String targetScreenshotFolder)
+            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
+
+        logger.info (" - Spark Console");
+
+        // reach proper place
+        reachService(driver, "services-menu_spark-console", "folderMenuSparkConsole", "iframe-content-spark-console");
+
+        driver.switchTo().frame("iframe-content-spark-console");
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("history-summary-table_wrapper")));
+
+        handleScreenshots(driver, targetScreenshotFolder, "spark-console");
+
+        driver.switchTo().parentFrame();
+    }
+
+    private static void screenshotsKafkaManager(WebDriver driver, String targetScreenshotFolder)
+            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
+
+        logger.info (" - Kafka Manager");
+
+        // reach proper place
+        reachService(driver, "services-menu_kafka-manager", "folderMenuKafkaManager", "iframe-content-kafka-manager");
+
+        driver.switchTo().frame("iframe-content-kafka-manager");
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("li.breadcrumb-item")));
+
+        driver.findElement(By.cssSelector("a[href='clusters/Eskimo']")).click();
+
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+        ActiveWaiter.wait(() -> js.executeScript("return $(\"td b:contains('Version')\").length").toString().equals("1"), 6000);
+
+        handleScreenshots(driver, targetScreenshotFolder, "kafka-manager");
+
+        driver.switchTo().parentFrame();
+    }
+
+    private static void screenshotsKubeDashboard(WebDriver driver, String targetScreenshotFolder)
+            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
+
+        logger.info (" - Kube Dashboard");
+
+        // reach proper place
+        reachService(driver, "services-menu_kubernetes-dashboard", "folderMenuKubernetesDashboard", "iframe-content-kubernetes-dashboard");
+
+        driver.switchTo().frame("iframe-content-kubernetes-dashboard");
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("kubernetes-logo-white")));
+
+        handleScreenshots(driver, targetScreenshotFolder, "kubernetes-dashboard");
+
+        driver.switchTo().parentFrame();
+    }
+
+    private static void screenshotsGluster(WebDriver driver, String targetScreenshotFolder)
+            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
+
+        logger.info (" - Gluster");
+
+        // reach proper place
+        reachService(driver, "services-menu_gluster", "folderMenuGluster", "iframe-content-gluster");
+
+        driver.switchTo().frame("iframe-content-gluster");
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("status-volume-container-table")));
+
+        handleScreenshots(driver, targetScreenshotFolder, "gluster");
+
+        driver.switchTo().parentFrame();
+    }
+
+    private static void screenshotsGrafana(WebDriver driver, String targetScreenshotFolder)
+            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
+
+        logger.info (" - Grafana");
+
+        // reach proper place
+        reachService(driver, "services-menu_grafana", "folderMenuGrafana", "iframe-content-grafana");
 
         driver.switchTo().frame("iframe-content-grafana");
 
         JavascriptExecutor js = (JavascriptExecutor)driver;
-        Object result = js.executeScript ("window.location.href = '/grafana/d/C9M0YVnWk/eskimo-nodes-system-monitoring?orgId=1'");
+        js.executeScript ("window.location.href = '/grafana/d/C9M0YVnWk/eskimo-nodes-system-monitoring?orgId=1'");
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button.dashboard-row__title")));
+
+        handleScreenshots(driver, targetScreenshotFolder, "grafana");
+
+        driver.switchTo().parentFrame();
+    }
+
+    private static void reachService(WebDriver driver, String menuLinkId, String menuLinkWrapperId, String contentId) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(20000));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id(menuLinkId)));
+
+        wait.until(ExpectedConditions.not (ExpectedConditions.attributeContains(By.id(menuLinkWrapperId), "class", "disabled")));
+
+        driver.findElement(By.id(menuLinkId)).click();
 
         wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button.dashboard-row__title pointer")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(contentId)));
+    }
 
-        /*
-        // screenshots
-        File file = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-        File destFile = new File(fileWithPath);
-//Copy file at destination
-        FileUtils.copyFile (file, destFile);
-        */
+    private static void handleScreenshots(WebDriver driver, String targetScreenshotFolder, String system) throws InterruptedException, IOException, FileUtils.FileDeleteFailedException {
+        driver.manage().window().setSize(new Dimension(1900,1024));
+        Thread.sleep (200);
+
+        takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, system + "-wide.png");
+
+        driver.manage().window().setSize(new Dimension(960,600));
+        Thread.sleep (2000);
+
+        takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, system + "-small.png");
+
+        driver.manage().window().setSize(new Dimension(1900,1024));
+    }
+
+    private static void takeScreenshot(TakesScreenshot driver, String targetScreenshotFolder, String filename) throws IOException, FileUtils.FileDeleteFailedException {
+        File file = driver.getScreenshotAs(OutputType.FILE);
+        File destFile = new File(targetScreenshotFolder + "/" + filename);
+
+        FileUtils.copy (file, destFile);
+        FileUtils.delete(file);
     }
 
     private static void login(WebDriver driver) {
+        logger.info (" - Login");
 
         driver.findElement(By.id("eskimo-username")).sendKeys("admin");
         driver.findElement(By.id("eskimo-password")).sendKeys("password");

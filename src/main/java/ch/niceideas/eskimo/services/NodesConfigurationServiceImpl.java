@@ -193,14 +193,13 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
                                             installTopologyAndSettings(nodesConfig, kubeServicesConfig, servicesInstallStatus, memoryModel, node);
                                         }
 
-                                        if (StringUtils.isNotBlank(enableKubernetes) && enableKubernetes.equals("true")) {
-                                            if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
+                                        if (StringUtils.isNotBlank(enableKubernetes) && enableKubernetes.equals("true")
+                                            && !operationsMonitoringService.isInterrupted() && (error.get() == null)) {
                                                 operationsMonitoringService.addInfo(operation, "Checking / Installing Kubernetes");
-                                                if (isMissingOnNode("k8s", node)) {
-                                                    uploadKubernetes(node);
-                                                    ml.addInfo(installK8s(node));
-                                                    flagInstalledOnNode("k8s", node);
-                                                }
+                                            if (isMissingOnNode("k8s", node)) {
+                                                uploadKubernetes(node);
+                                                ml.addInfo(installK8s(node));
+                                                flagInstalledOnNode("k8s", node);
                                             }
                                         }
 

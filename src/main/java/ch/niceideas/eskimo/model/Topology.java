@@ -514,8 +514,8 @@ public class Topology {
             KubernetesServicesConfigWrapper kubeConfig,
             ServicesInstallStatusWrapper serviceInstallStatus,
             ServicesDefinition servicesDefinition,
-            MemoryModel memoryModel, int nodeNbr)
-                    throws NodesConfigurationException, SetupException, FileException {
+            MemoryModel memoryModel, int nodeNbr) throws NodesConfigurationException {
+
         StringBuilder sb = new StringBuilder();
         sb.append(getTopologyScript(serviceInstallStatus));
 

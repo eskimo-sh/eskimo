@@ -193,7 +193,9 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
     void notifyInterruption() {
         if (interruption.get() && !interruptionNotified.get()) {
             notificationService.addError("Processing has been interrupted");
+            /* FIXME : wherever this  is used, this should be returned to the UI as a warning either at the end of
             //messagingService.addLine("Processing has been interrupted");
+            */
             interruptionNotified.set(true);
         }
     }

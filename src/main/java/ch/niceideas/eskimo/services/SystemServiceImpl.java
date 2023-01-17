@@ -361,9 +361,8 @@ public class SystemServiceImpl implements SystemService {
                 }
 
                 // fill in systemStatus
-                for (String key : statusMap.keySet()) {
-                    String value = statusMap.get(key);
-                    systemStatus.setValueForPath(key, value);
+                for (Map.Entry<String, String> entry : statusMap.entrySet()) {
+                    systemStatus.setValueForPath(entry.getKey(), entry.getValue());
                 }
             }
 
@@ -848,7 +847,8 @@ public class SystemServiceImpl implements SystemService {
             }
         }
 
-        /*
+        /* FIXME : wherever buildDeadIps is used, this should be returned to the UI as a warning either at the end of
+            the operation or during.
         if (!deadIps.isEmpty()) {
             messagingService.addLines("\n");
         }
@@ -870,13 +870,18 @@ public class SystemServiceImpl implements SystemService {
     }
 
     void handleNodeDead(Set<String> deadIps, String node) {
+        /* FIXME : wherever this  is used, this should be returned to the UI as a warning either at the end of
+        the operation or during.
         //messagingService.addLines("\nNode seems dead " + node);
+        */
         notificationService.addError("Node " + node + " is dead.");
         deadIps.add(node);
     }
 
     void handleSSHFails(Set<String> deadIps, String node) {
+        /* FIXME : wherever this  is used, this should be returned to the UI as a warning either at the end of
         //messagingService.addLines("\nNode " + node + " couldn't be joined through SSH\nIs the user to be used by eskimo properly created and the public key properly added to SSH authorized keys ? (See User Guide)");
+        */
         notificationService.addError("Node " + node + " not reachable.");
         deadIps.add(node);
     }
