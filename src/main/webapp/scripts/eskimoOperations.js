@@ -176,39 +176,29 @@ eskimo.Operations = function() {
             
             let progress = $("#" + operation + "-progress");
             
-            if (opStatus == "INIT") {
-
+            if (opStatus === "INIT") {
                 progress.html("0%");
                 progress.css("width", "0%");
 
-            } else if (opStatus == "RUNNING") {
-
+            } else if (opStatus === "RUNNING") {
                 progress.html("30% (Running)");
                 progress.css("width", "30%");
 
-            } else if (opStatus == "ERROR") {
-
+            } else if (opStatus === "ERROR") {
                 progress.html("Error!");
-                progress.css("width", "100%");
-                progress.addClass("bg-danger");
                 progress.removeClass("bg-info");
-                progress.removeClass("progress-bar-striped");
-                progress.removeClass("progress-bar-animated");
 
-            } else if (opStatus == "CANCELLED") {
-
+            } else if (opStatus === "CANCELLED") {
                 progress.html("Cancelled!");
-                progress.css("width", "100%");
                 progress.addClass("bg-warning");
-                progress.removeClass("bg-info");
-                progress.removeClass("progress-bar-striped");
-                progress.removeClass("progress-bar-animated");
 
-            } else if (opStatus == "COMPLETE") {
-
+            } else if (opStatus === "COMPLETE") {
                 progress.html("100% (Complete)");
-                progress.css("width", "100%");
                 progress.addClass("bg-success");
+            }
+
+            if (opStatus === "ERROR" || opStatus === "CANCELLED" || opStatus === "COMPLETE") {
+                progress.css("width", "100%");
                 progress.removeClass("bg-info");
                 progress.removeClass("progress-bar-striped");
                 progress.removeClass("progress-bar-animated");

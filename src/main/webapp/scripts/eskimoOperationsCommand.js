@@ -73,38 +73,7 @@ eskimo.OperationsCommand = function() {
 
     function showCommand (command) {
 
-        //console.log (command);
-
-        let commandDescription = "<strong>Following Operations are about to be applied</strong><br><br>";
-
-        // installations
-        commandDescription += "<strong>Services Installation</strong><br><br>";
-
-        for (let i = 0; i < command.installations.length; i++) {
-            commandDescription = renderOperation(command.installations[i], commandDescription);
-        }
-
-        commandDescription += "<br>";
-
-        // uninstallations
-        commandDescription += "<strong>Services Uninstallation</strong><br><br>";
-
-        for (let i = 0; i < command.uninstallations.length; i++) {
-            commandDescription = renderOperation(command.uninstallations[i], commandDescription);
-        }
-
-        commandDescription += "<br>";
-
-        // reinstallations
-        commandDescription += "<strong>Services Restart</strong><br><br>";
-
-        for (let i = 0; i < command.restarts.length; i++) {
-            commandDescription = renderOperation(command.restarts[i], commandDescription);
-        }
-
-        commandDescription += "<br>";
-
-        $("#operations-command-body").html(commandDescription);
+        $("#operations-command-body").html(that.renderOperationsCommand ("Native", command, renderOperation));
 
         $('#operations-command-modal').modal("show");
 
@@ -158,5 +127,39 @@ eskimo.OperationsCommand = function() {
         $('#operations-command-modal').modal("hide");
     }
     this.cancelOperationsCommand = cancelOperationsCommand;
+
+    this.renderOperationsCommand = function(type, command, renderOperationFunc) {
+
+        let commandDescription = "<strong>Following Operations are about to be applied</strong><br><br>";
+
+        // installations
+        commandDescription += ("<strong>" + type + " Services Installation</strong><br><br>");
+
+        for (let i = 0; i < command.installations.length; i++) {
+            commandDescription = renderOperationFunc(command.installations[i], commandDescription);
+        }
+
+        commandDescription += "<br>";
+
+        // uninstallations
+        commandDescription += ("<strong>" + type + " Services Uninstallation</strong><br><br>");
+
+        for (let i = 0; i < command.uninstallations.length; i++) {
+            commandDescription = renderOperationFunc(command.uninstallations[i], commandDescription);
+        }
+
+        commandDescription += "<br>";
+
+        // restarts
+        commandDescription += "<strong>Services Restart</strong><br><br>";
+
+        for (let i = 0; i < command.restarts.length; i++) {
+            commandDescription = renderOperationFunc(command.restarts[i], commandDescription);
+        }
+
+        commandDescription += "<br>";
+
+        return commandDescription;
+    }
 
 };

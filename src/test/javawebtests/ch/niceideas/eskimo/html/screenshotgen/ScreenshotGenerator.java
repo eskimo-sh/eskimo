@@ -36,9 +36,9 @@
 package ch.niceideas.eskimo.html.screenshotgen;
 
 import ch.niceideas.common.exceptions.CommonBusinessException;
+import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.html.AbstractWebTest;
-import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.*;
@@ -48,7 +48,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Arrays;
 
 public class ScreenshotGenerator {
 
@@ -85,10 +84,7 @@ public class ScreenshotGenerator {
 
             initInfrastructure (driver);
 
-
             screenshotsGrafana(driver, targetScreenshotFolder);
-
-            /*
 
             screenshotsGluster(driver, targetScreenshotFolder);
 
@@ -102,7 +98,6 @@ public class ScreenshotGenerator {
 
             screenshotsCerebro(driver, targetScreenshotFolder);
 
-
             screenshotsKibana(driver, targetScreenshotFolder);
 
             screenshotsZeppelin(driver, targetScreenshotFolder);
@@ -110,9 +105,6 @@ public class ScreenshotGenerator {
             screenshotsConsole(driver, targetScreenshotFolder);
 
             screenshotsFileManager(driver, targetScreenshotFolder);
-            */
-
-            Thread.sleep (10000);
 
             screenshotsStatus(driver, targetScreenshotFolder);
 
@@ -121,6 +113,8 @@ public class ScreenshotGenerator {
             screenshotsServicesConfig(driver, targetScreenshotFolder);
 
             screenshotsNodesConfig(driver, targetScreenshotFolder);
+
+            screenshotsKubeConfig(driver, targetScreenshotFolder);
 
 
             logger.info (" - TEMP HACK : waiting");
@@ -147,6 +141,19 @@ public class ScreenshotGenerator {
                 "        window.resizeDone = true;\n" +
                 "    }, 500);\n" +
                 "});");
+    }
+
+    //main-menu-show-operations-link
+    // inner-content-operations
+
+    private static void screenshotsKubeConfig(WebDriver driver, String targetScreenshotFolder)
+            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
+
+        logger.info (" - Kube Config");
+
+        reachService(driver, "main-menu-show-kubernetes-services-config-link", null, "inner-content-kubernetes-services-config");
+
+        handleScreenshots(driver, targetScreenshotFolder, "kube-config");
     }
 
     private static void screenshotsNodesConfig(WebDriver driver, String targetScreenshotFolder)

@@ -48,6 +48,7 @@ public class EskimoKubernetesOperationsCommandTest extends AbstractWebTest {
 
         loadScript("bootstrap-5.2.0.js");
 
+        loadScript("eskimoOperationsCommand.js");
         loadScript("eskimoKubernetesOperationsCommand.js");
 
         waitForDefinition("window.eskimo");
@@ -57,6 +58,7 @@ public class EskimoKubernetesOperationsCommandTest extends AbstractWebTest {
         js("eskimoKubernetesOperationsCommand = new eskimo.KubernetesOperationsCommand();");
         js("eskimoKubernetesOperationsCommand.eskimoMain = eskimoMain;");
         js("eskimoKubernetesOperationsCommand.eskimoOperations = eskimoOperations;");
+        js("eskimoKubernetesOperationsCommand.eskimoOperationsCommand = new eskimo.OperationsCommand();");
         js("eskimoKubernetesOperationsCommand.initialize()");
 
         waitForElementIdInDOM("kubernetes-operations-command-body");

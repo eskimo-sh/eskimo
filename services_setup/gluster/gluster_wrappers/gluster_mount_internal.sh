@@ -71,7 +71,7 @@ if [[ ! -f /etc/eskimo_topology.sh ]]; then
     exit 5
 fi
 
-rm -Rf /tmp/gluster_mount_$VOLUME_log
+rm -Rf /tmp/gluster_mount_"$VOLUME"_log
 
 . /etc/eskimo_topology.sh
 
@@ -122,10 +122,10 @@ if [[ $? != 0 ]]; then
          || `grep "Too many levels of symbolic links" /tmp/gluster_error_$VOLUME` != "" \
          || `grep "No such device" /tmp/gluster_error_$VOLUME` != "" ]]; then
         echo " - There is an issue with $MOUNT_POINT (Transport endpoint is not connected / too many levels of symbolic links), unmounting ..."
-        /bin/umount -f $MOUNT_POINT  >> /tmp/gluster_mount_$VOLUME_log 2>&1
+        /bin/umount -f $MOUNT_POINT  >> /tmp/gluster_mount_"$VOLUME"_log 2>&1
         if [[ $? != 0 ]]; then
             echo "Failed to unmount $MOUNT_POINT"
-            cat /tmp/gluster_mount_$VOLUME_log
+            cat /tmp/gluster_mount_"$VOLUME"_log
             exit 9
         fi
     fi
@@ -155,10 +155,10 @@ fi
 # Now we have everything ready to actually proceed with the mount
 if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
     echo " - Mounting $MOUNT_POINT"
-    /bin/systemctl restart $MOUNT_POINT_NAME.mount > /tmp/gluster_mount_$VOLUME_log 2>&1
+    /bin/systemctl restart $MOUNT_POINT_NAME.mount > /tmp/gluster_mount_"$VOLUME"_log 2>&1
     if [[ $? != 0 ]]; then
         echo "   + Failed to mount $MOUNT_POINT"
-        cat /tmp/gluster_mount_$VOLUME_log
+        cat /tmp/gluster_mount_"$VOLUME"_log
         exit 10
     fi
 
@@ -166,7 +166,7 @@ if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
 
     if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
         echo "   + Unsuccessfully attempted to mount $MOUNT_POINT"
-        cat /tmp/gluster_mount_$VOLUME_log
+        cat /tmp/gluster_mount_"$VOLUME"_log
         exit 11
     fi
 fi

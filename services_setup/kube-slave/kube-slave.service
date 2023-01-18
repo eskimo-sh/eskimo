@@ -43,7 +43,8 @@ After=gluster.service
 After=ntp.service
 Wants=etcd.service
 Requires=gluster.service
-
+StartLimitBurst=7
+StartLimitIntervalSec=1000
 
 [Service]
 Type=simple
@@ -54,10 +55,8 @@ ExecStartPre=-/bin/bash /usr/local/sbin/stop-kube-slave.sh
 ExecStart=/bin/bash /usr/local/sbin/start-kube-slave.sh
 ExecStop=/bin/bash /usr/local/sbin/stop-kube-slave.sh
 LimitNOFILE=65536
-RestartSec=5
+RestartSec=10
 Restart=always
-StartLimitBurst=6
-StartLimitInterval=900
 
 [Install]
 WantedBy=multi-user.target

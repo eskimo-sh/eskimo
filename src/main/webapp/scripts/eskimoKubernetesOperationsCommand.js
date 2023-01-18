@@ -41,6 +41,7 @@ eskimo.KubernetesOperationsCommand = function() {
     // will be injected eventually from constructorObject
     this.eskimoMain = null;
     this.eskimoOperations = null;
+    this.eskimoOperationsCommand = null;
 
     const that = this;
 
@@ -70,36 +71,8 @@ eskimo.KubernetesOperationsCommand = function() {
 
     function showCommand (command) {
 
-        console.log (command);
-
-        let commandDescription = "<strong>Following Operations are about to be applied</strong><br><br>";
-
-        // installations
-        commandDescription += "<strong>Kubernetes Services Installation</strong><br><br>";
-
-        for (let i = 0; i < command.installations.length; i++) {
-            commandDescription = renderOperation(command.installations[i], commandDescription);
-        }
-
-        commandDescription += "<br>";
-
-        // uninstallations
-        commandDescription += "<strong>Kubernetes Services Uninstallation</strong><br><br>";
-
-        for (let i = 0; i < command.uninstallations.length; i++) {
-            commandDescription = renderOperation(command.uninstallations[i], commandDescription);
-        }
-
-        commandDescription += "<br>";
-
-        // restarts
-        commandDescription += "<b>Services Restart</b><br><br>";
-
-        for (let i = 0; i < command.restarts.length; i++) {
-            commandDescription = renderOperation(command.restarts[i], commandDescription);
-        }
-
-        commandDescription += "<br>";
+        // renderOperationsCommand comes from eskimoOperationsCommand.js
+        let commandDescription = that.eskimoOperationsCommand.renderOperationsCommand ("Kubernetes", command, renderOperation)
 
         if (command.warnings && command.warnings.trim() != "") {
 
@@ -109,7 +82,6 @@ eskimo.KubernetesOperationsCommand = function() {
                 command.warnings +
                 '</div>' +
                 '</div>';
-
         }
 
         $("#kubernetes-operations-command-body").html(commandDescription);

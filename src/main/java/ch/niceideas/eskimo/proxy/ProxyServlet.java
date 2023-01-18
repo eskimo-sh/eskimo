@@ -285,8 +285,9 @@ public class ProxyServlet extends HttpServlet {
                 .setConnectionManager(connectionManager)
                 .setDefaultRequestConfig(buildRequestConfig());
 
-        if (useSystemProperties)
+        if (useSystemProperties) {
             clientBuilder.useSystemProperties();
+        }
 
         return clientBuilder.build();
     }
@@ -304,8 +305,9 @@ public class ProxyServlet extends HttpServlet {
 
     protected void initTarget() throws ServletException {
         targetUri = getConfigParam(P_TARGET_URI);
-        if (targetUri == null)
+        if (targetUri == null) {
             throw new ServletException(P_TARGET_URI + " is required.");
+        }
         //test it's valid
         try {
             targetUriObj = new URI(targetUri);
@@ -320,13 +322,11 @@ public class ProxyServlet extends HttpServlet {
         @Override
         public void sessionDestroyed(HttpSessionEvent se) {
             HttpClient proxyClient = (HttpClient) se.getSession().getAttribute(SESSION_HTTP_CLIENT);
-            if (proxyClient != null) {
-                if (proxyClient instanceof Closeable) {
-                    try {
-                        ((Closeable) proxyClient).close();
-                    } catch (IOException e) {
-                        logger.error("While destroying servlet, shutting down HttpClient: " + e, e);
-                    }
+            if (proxyClient instanceof Closeable) { // instance of checks for null
+                try {
+                    ((Closeable) proxyClient).close();
+                } catch (IOException e) {
+                    logger.error("While destroying servlet, shutting down HttpClient: " + e, e);
                 }
             }
         }

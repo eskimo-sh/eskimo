@@ -154,23 +154,7 @@ eskimo.SystemStatus = function() {
                     nodeMenu.html($("#nodeContextMenuTemplate").html());
 
                     //open menu
-                    let $menu = nodeMenu
-                        .data("invokedOn", target)
-                        .show()
-                        .css({
-                            position: "absolute",
-                            left: getMenuPosition(settings, e.clientX, 'width', 'scrollLeft', "#nodeContextMenu"),
-                            top: getMenuPosition(settings, e.clientY, 'height', 'scrollTop', "#nodeContextMenu")
-                        })
-                        .off('click')
-                        .on('click', 'a', function (evt) {
-                            $menu.hide();
-
-                            let $invokedOn = $menu.data("invokedOn");
-                            let $selectedMenu = $(evt.target);
-
-                            settings.menuSelected.call(this, $invokedOn, $selectedMenu);
-                        });
+                    showContextMenu (e, target, settings, "nodeContextMenu");
 
                     return false;
                 });
@@ -220,25 +204,8 @@ eskimo.SystemStatus = function() {
                     let serviceMenu = $("#serviceContextMenu");
                     serviceMenu.html($("#serviceContextMenuTemplate").html() + additionalCommandsHTML);
 
-
                     //open menu
-                    let $menu = serviceMenu
-                        .data("invokedOn", target)
-                        .show()
-                        .css({
-                            position: "absolute",
-                            left: getMenuPosition(settings, e.clientX, 'width', 'scrollLeft', "#serviceContextMenu"),
-                            top: getMenuPosition(settings, e.clientY, 'height', 'scrollTop', "#serviceContextMenu")
-                        })
-                        .off('click')
-                        .on('click', 'a', function (evt) {
-                            $menu.hide();
-
-                            let $invokedOn = $menu.data("invokedOn");
-                            let $selectedMenu = $(evt.target);
-
-                            settings.menuSelected.call(this, $invokedOn, $selectedMenu);
-                        });
+                    showContextMenu (e, target, settings, "serviceContextMenu");
 
                     return false;
                 });
@@ -248,6 +215,28 @@ eskimo.SystemStatus = function() {
             });
         };
     };
+
+    function showContextMenu (e, target, settings, menuId) {
+        let menu = $("#" + menuId);
+
+        let $menu = menu
+            .data("invokedOn", target)
+            .show()
+            .css({
+                position: "absolute",
+                left: getMenuPosition(settings, e.clientX, 'width', 'scrollLeft', "#" + menuId),
+                top: getMenuPosition(settings, e.clientY, 'height', 'scrollTop', "#" + menuId)
+            })
+            .off('click')
+            .on('click', 'a', function (evt) {
+                $menu.hide();
+
+                let $invokedOn = $menu.data("invokedOn");
+                let $selectedMenu = $(evt.target);
+
+                settings.menuSelected.call(this, $invokedOn, $selectedMenu);
+            });
+    }
 
     this.isDisconnected = function() {
         return disconnectedFlag;
