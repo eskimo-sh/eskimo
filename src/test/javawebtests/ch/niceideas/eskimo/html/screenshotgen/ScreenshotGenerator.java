@@ -53,9 +53,11 @@ public class ScreenshotGenerator {
 
     private static final Logger logger = Logger.getLogger(ScreenshotGenerator.class);
 
-    public static void main (String[] args) {
+    private static final Dimension SIZE_WIDE = new Dimension(1900, 1024);
+    private static final Dimension SIZE_SMALL = new Dimension(960, 600);
+    private static final Dimension SIZE_MEDIUM = new Dimension(1280, 720);
 
-        // FIXME shiuld take folder where to put the screenshots in argument
+    public static void main (String[] args) {
 
         if (args.length != 2) {
             logger.error ("Expecting 'target Eskimo URL' as first argument and 'destination folder for screenshots' as second argument");
@@ -116,9 +118,7 @@ public class ScreenshotGenerator {
 
             screenshotsKubeConfig(driver, targetScreenshotFolder);
 
-
-            logger.info (" - TEMP HACK : waiting");
-            Thread.sleep (100000);
+            screenshotsOperations(driver, targetScreenshotFolder);
 
         } catch (InterruptedException| CommonBusinessException | IOException | FileUtils.FileDeleteFailedException e) {
             logger.error (e, e);
@@ -139,12 +139,55 @@ public class ScreenshotGenerator {
                 "    clearTimeout(window.resizedFinished);\n" +
                 "    window.resizedFinished = setTimeout(function(){\n" +
                 "        window.resizeDone = true;\n" +
-                "    }, 500);\n" +
+                "    }, 2000);\n" +
                 "});");
     }
 
     //main-menu-show-operations-link
     // inner-content-operations
+
+    private static void screenshotsOperations(WebDriver driver, String targetScreenshotFolder)
+            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
+
+        logger.info (" - Operations");
+
+        reachService(driver, "main-menu-show-nodes-config-link", null, "inner-content-nodes-config");
+
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+        ActiveWaiter.wait(() -> {
+            Object result = js.executeScript("return $('#inner-content-progress').css('display')");
+            return result == null || result.equals("none");
+        }, 180000); // 180 seconds
+
+        wait(driver, 10000).until(ExpectedConditions.elementToBeClickable(By.id("reinstall-nodes-btn")));
+        driver.findElement(By.id("reinstall-nodes-btn")).click();
+
+        wait(driver, 10000).until(ExpectedConditions.elementToBeClickable(By.id("logstash-cli-choice")));
+        driver.findElement(By.id("logstash-cli-choice")).click();
+        driver.findElement(By.id("kafka-cli-choice")).click();
+        driver.findElement(By.id("spark-cli-choice")).click();
+        driver.findElement(By.id("flink-cli-choice")).click();
+
+        handleScreenshotsSimple(driver, targetScreenshotFolder, "node-services-choice");
+
+        driver.findElement(By.id("services-selection-header-validate")).click();
+
+        wait(driver, 10000).until(ExpectedConditions.elementToBeClickable(By.id("operations-command-button-validate")));
+
+        handleScreenshotsSimple(driver, targetScreenshotFolder, "pending-operations");
+
+        driver.findElement(By.id("operations-command-button-validate")).click();
+
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.id("installation_logstash-cli_192-168-56-54-progress-wrapper")));
+
+        handleScreenshotsSimple(driver, targetScreenshotFolder, "operations");
+
+        reachService(driver, "main-menu-show-nodes-config-link", null, "inner-content-nodes-config");
+        ActiveWaiter.wait(() -> {
+            Object result = js.executeScript("return $('#inner-content-progress').css('display')");
+            return result == null || result.equals("none");
+        }, 180000); // 180 seconds
+    }
 
     private static void screenshotsKubeConfig(WebDriver driver, String targetScreenshotFolder)
             throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
@@ -173,12 +216,10 @@ public class ScreenshotGenerator {
 
         reachService(driver, "main-menu-show-services-settings-link", null, "inner-content-services-settings");
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("a[href='#collapse-gluster']")));
+        wait(driver, 10000).until(ExpectedConditions.elementToBeClickable(By.cssSelector("a[href='#collapse-gluster']")));
         driver.findElement(By.cssSelector("a[href='#collapse-gluster']")).click();
 
-        wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("gluster-target---volumes")));
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.id("gluster-target---volumes")));
 
         handleScreenshots(driver, targetScreenshotFolder, "services-config");
     }
@@ -210,17 +251,14 @@ public class ScreenshotGenerator {
 
         reachService(driver, "main-menu-show-file-managers-link", "folderMenuFileManagers", "inner-content-file-managers");
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#file-managers-management div.btn-group button.dropdown-toggle")));
+        wait(driver, 10000).until(ExpectedConditions.elementToBeClickable(By.cssSelector("#file-managers-management div.btn-group button.dropdown-toggle")));
         driver.findElement(By.cssSelector("#file-managers-management div.btn-group button.dropdown-toggle")).click();
 
-        wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("file_manager_open_192-168-56-51")));
+        wait(driver, 10000).until(ExpectedConditions.elementToBeClickable(By.id("file_manager_open_192-168-56-51")));
 
         driver.findElement(By.id("file_manager_open_192-168-56-51")).click();
 
-        wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("file-manager-close-192-168-56-51")));
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.id("file-manager-close-192-168-56-51")));
 
         handleScreenshots(driver, targetScreenshotFolder, "file-manager");
     }
@@ -232,17 +270,14 @@ public class ScreenshotGenerator {
 
         reachService(driver, "main-menu-show-consoles-link", "folderMenuConsoles", "inner-content-consoles");
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#consoles-management div.btn-group button.dropdown-toggle")));
+        wait(driver, 10000).until(ExpectedConditions.elementToBeClickable(By.cssSelector("#consoles-management div.btn-group button.dropdown-toggle")));
         driver.findElement(By.cssSelector("#consoles-management div.btn-group button.dropdown-toggle")).click();
 
-        wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("console_open_192-168-56-51")));
+        wait(driver, 10000).until(ExpectedConditions.elementToBeClickable(By.id("console_open_192-168-56-51")));
 
         driver.findElement(By.id("console_open_192-168-56-51")).click();
 
-        wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("console-close-192-168-56-51")));
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.id("console-close-192-168-56-51")));
 
         handleScreenshots(driver, targetScreenshotFolder, "console");
     }
@@ -258,8 +293,7 @@ public class ScreenshotGenerator {
         driver.switchTo().frame("iframe-content-zeppelin");
 
         // Show Spark SQL notebook
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a[href=\"#/notebook/2HS3PQPV6\"]")));
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a[href=\"#/notebook/2HS3PQPV6\"]")));
         driver.findElement(By.cssSelector("a[href=\"#/notebook/2HS3PQPV6\"]")).click();
 
         Thread.sleep(5000);
@@ -296,8 +330,7 @@ public class ScreenshotGenerator {
 
         driver.switchTo().frame("iframe-content-kibana");
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.header__toggleNavButtonSection")));
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.header__toggleNavButtonSection")));
 
         // dismiss alerts
         try {
@@ -316,12 +349,10 @@ public class ScreenshotGenerator {
         driver.findElement(By.cssSelector("div.header__toggleNavButtonSection button.euiHeaderSectionItemButton")).click();
 
         // CLick on Dashboard
-        wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span.euiListGroupItem__label[title=\"Dashboard\"]")));
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span.euiListGroupItem__label[title=\"Dashboard\"]")));
         driver.findElement(By.cssSelector("span.euiListGroupItem__label[title=\"Dashboard\"]")).click();
 
-        wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a[data-test-subj=\"dashboardListingTitleLink-berka-transactions\"]")));
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a[data-test-subj=\"dashboardListingTitleLink-berka-transactions\"]")));
 
         // Open berka dashboard
         driver.findElement(By.cssSelector("a[data-test-subj=\"dashboardListingTitleLink-berka-transactions\"]")).click();
@@ -364,8 +395,7 @@ public class ScreenshotGenerator {
 
         driver.switchTo().frame("iframe-content-flink-runtime");
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("nz-divider.ant-divider-vertical")));
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("nz-divider.ant-divider-vertical")));
 
         driver.switchTo().parentFrame();
 
@@ -382,8 +412,7 @@ public class ScreenshotGenerator {
 
         driver.switchTo().frame("iframe-content-spark-console");
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("history-summary-table_wrapper")));
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.id("history-summary-table_wrapper")));
 
         driver.switchTo().parentFrame();
 
@@ -400,8 +429,7 @@ public class ScreenshotGenerator {
 
         driver.switchTo().frame("iframe-content-kafka-manager");
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("li.breadcrumb-item")));
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("li.breadcrumb-item")));
 
         driver.findElement(By.cssSelector("a[href='clusters/Eskimo']")).click();
 
@@ -423,8 +451,7 @@ public class ScreenshotGenerator {
 
         driver.switchTo().frame("iframe-content-kubernetes-dashboard");
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("kubernetes-logo-white")));
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.id("kubernetes-logo-white")));
 
         driver.switchTo().parentFrame();
 
@@ -441,8 +468,7 @@ public class ScreenshotGenerator {
 
         driver.switchTo().frame("iframe-content-gluster");
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("status-volume-container-table")));
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.id("status-volume-container-table")));
 
         driver.switchTo().parentFrame();
 
@@ -462,8 +488,7 @@ public class ScreenshotGenerator {
         JavascriptExecutor js = (JavascriptExecutor)driver;
         js.executeScript ("window.location.href = '/grafana/d/C9M0YVnWk/eskimo-nodes-system-monitoring?orgId=1'");
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button.dashboard-row__title")));
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button.dashboard-row__title")));
 
         driver.switchTo().parentFrame();
 
@@ -471,60 +496,81 @@ public class ScreenshotGenerator {
     }
 
     private static void reachService(WebDriver driver, String menuLinkId, String menuLinkWrapperId, String contentId) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(20000));
-        wait.until(ExpectedConditions.elementToBeClickable(By.id(menuLinkId)));
+        wait(driver, 10000).until(ExpectedConditions.elementToBeClickable(By.id(menuLinkId)));
 
         if (StringUtils.isNotBlank(menuLinkWrapperId)) {
-            wait.until(ExpectedConditions.not(ExpectedConditions.attributeContains(By.id(menuLinkWrapperId), "class", "disabled")));
+            wait(driver, 10000).until(ExpectedConditions.not(ExpectedConditions.attributeContains(By.id(menuLinkWrapperId), "class", "disabled")));
         }
 
         driver.findElement(By.id(menuLinkId)).click();
 
-        wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(contentId)));
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.id(contentId)));
+    }
+
+    private static WebDriverWait wait(WebDriver driver, int millis) {
+        return new WebDriverWait(driver, Duration.ofMillis(millis));
+    }
+
+    private static void handleScreenshotsSimple(WebDriver driver, String targetScreenshotFolder, String type) throws IOException, FileUtils.FileDeleteFailedException {
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+
+        driver.manage().window().setSize(SIZE_WIDE);
+        ActiveWaiter.wait(() -> js.executeScript("return window.resizeDone;").equals(true));
+        takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, type + "-wide.png");
+
+        driver.manage().window().setSize(SIZE_MEDIUM);
+        ActiveWaiter.wait(() -> js.executeScript("return window.resizeDone;").equals(true));
+        takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, type + "-medium.png");
+
+        driver.manage().window().setSize(SIZE_SMALL);
+        ActiveWaiter.wait(() -> js.executeScript("return window.resizeDone;").equals(true));
+        takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, type + "-small.png");
+
+        driver.manage().window().setSize(SIZE_WIDE);
+        ActiveWaiter.wait(() -> js.executeScript("return window.resizeDone;").equals(true));
     }
 
     private static void handleScreenshots(WebDriver driver, String targetScreenshotFolder, String system) throws InterruptedException, IOException, FileUtils.FileDeleteFailedException {
-        driver.manage().window().setSize(new Dimension(1900,1024));
+        driver.manage().window().setSize(SIZE_WIDE);
         Thread.sleep (200);
 
         takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, system + "-wide.png");
 
-        driver.manage().window().setSize(new Dimension(960,600));
+        driver.manage().window().setSize(SIZE_SMALL);
 
         JavascriptExecutor js = (JavascriptExecutor)driver;
         ActiveWaiter.wait(() -> js.executeScript("return window.resizeDone;").equals(true));
 
         takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, system + "-small.png");
 
-        driver.manage().window().setSize(new Dimension(1280,720));
+        driver.manage().window().setSize(SIZE_MEDIUM);
 
         ActiveWaiter.wait(() -> js.executeScript("return window.resizeDone;").equals(true));
 
         driver.findElement(By.cssSelector("button.button-toggle-menu")).click();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(20000));
-        wait.until(ExpectedConditions.attributeToBe(By.cssSelector("html"), "data-sidenav-size", "condensed"));
+
+        wait(driver, 10000).until(ExpectedConditions.attributeToBe(By.cssSelector("html"), "data-sidenav-size", "condensed"));
 
         takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, system + "-medium-condensed.png");
 
         driver.findElement(By.cssSelector("button.button-toggle-menu")).click();
-        wait = new WebDriverWait(driver, Duration.ofMillis(20000));
-        wait.until(ExpectedConditions.attributeToBe(By.cssSelector("html"), "data-sidenav-size", "default"));
+
+        wait(driver, 10000).until(ExpectedConditions.attributeToBe(By.cssSelector("html"), "data-sidenav-size", "default"));
 
         takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, system + "-medium.png");
 
-        driver.manage().window().setSize(new Dimension(1900,1024));
+        driver.manage().window().setSize(SIZE_WIDE);
         ActiveWaiter.wait(() -> js.executeScript("return window.resizeDone;").equals(true));
 
         driver.findElement(By.cssSelector("button.button-toggle-menu")).click();
-        wait = new WebDriverWait(driver, Duration.ofMillis(20000));
-        wait.until(ExpectedConditions.attributeToBe(By.cssSelector("html"), "data-sidenav-size", "condensed"));
+
+        wait(driver, 10000).until(ExpectedConditions.attributeToBe(By.cssSelector("html"), "data-sidenav-size", "condensed"));
 
         takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, system + "-wide-condensed.png");
 
         driver.findElement(By.cssSelector("button.button-toggle-menu")).click();
-        wait = new WebDriverWait(driver, Duration.ofMillis(20000));
-        wait.until(ExpectedConditions.attributeToBe(By.cssSelector("html"), "data-sidenav-size", "default"));
+
+        wait(driver, 10000).until(ExpectedConditions.attributeToBe(By.cssSelector("html"), "data-sidenav-size", "default"));
 
     }
 
@@ -544,7 +590,6 @@ public class ScreenshotGenerator {
 
         driver.findElement(By.cssSelector("button.btn-info")).click();
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(10000));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("show-all-nodes-btn")));
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.id("show-all-nodes-btn")));
     }
 }
