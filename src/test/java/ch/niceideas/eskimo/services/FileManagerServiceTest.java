@@ -2,7 +2,7 @@
  * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
  * well to this individual file than to the Eskimo Project as a whole.
  *
- * Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
  * Author : eskimo.sh / https://www.eskimo.sh
  *
  * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -211,6 +211,8 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
         String originalContent = FileUtils.readFile(tempFile);
 
         assertEquals (originalContent, downloadedContent);
+
+        FileUtils.delete(tempFile);
     }
 
     void getTestClient(String mimeType) {
@@ -301,6 +303,8 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
                 "  \"fileViewable\": false,\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", result.toString(2));
+
+        FileUtils.delete(tempFile);
     }
 
     @Test

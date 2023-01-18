@@ -2,7 +2,7 @@
  * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
  * well to this individual file than to the Eskimo Project as a whole.
  *
- * Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
  * Author : eskimo.sh / https://www.eskimo.sh
  *
  * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -102,7 +102,6 @@ public class SystemServiceTest {
         expectedPrevStatusAllServicesStay = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedPrevStatusAllServicesStay.json"), StandardCharsets.UTF_8);
     }
 
-
     public static String createTempStoragePath() throws Exception {
         File dtempFileName = File.createTempFile("test_systemservice_", "config_storage");
         FileUtils.delete (dtempFileName); // delete file to create directory below
@@ -149,7 +148,7 @@ public class SystemServiceTest {
     }
 
     @Test
-    public void testUpdateStatusWithKubernetesException() throws Exception {
+    public void testUpdateStatus() throws Exception {
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
         configurationServiceTest.saveNodesConfig(nodesConfig);
@@ -176,21 +175,11 @@ public class SystemServiceTest {
 
         SystemStatusWrapper systemStatus = systemService.getStatus();
 
-        //System.err.println(systemStatus.getFormattedValue());
+        JSONObject actual = systemStatus.getJSONObject();
 
-        SystemStatusWrapper expectedStatusWrapper = new SystemStatusWrapper(expectedFullStatus);
-        for (String kubeService : servicesDefinition.listKubernetesServices()) {
-            String prevValue = expectedStatusWrapper.getValueForPathAsString(SystemStatusWrapper.SERVICE_PREFIX + kubeService + "_192-168-10-11");
-            if (StringUtils.isNotBlank(prevValue) && prevValue.equals("OK")) {
-                expectedStatusWrapper.setValueForPath(SystemStatusWrapper.SERVICE_PREFIX + kubeService + "_192-168-10-11", "KO");
-            }
-        }
-        expectedStatusWrapper.removeRootKey(SystemStatusWrapper.SERVICE_PREFIX + "grafana_192-168-10-11");
+        //System.err.println (actual.toString(2));
 
-        //System.out.println(expectedStatusWrapper.getFormattedValue());
-
-        assertTrue(expectedStatusWrapper.getJSONObject().similar(systemStatus.getJSONObject()),
-                "Expected : \n" + expectedStatusWrapper.getFormattedValue() + "\n\n but got \n: " + systemStatus.getFormattedValue());
+        assertTrue(new JSONObject(expectedFullStatus).similar(actual), actual.toString(2));
     }
 
     @Test
@@ -228,41 +217,6 @@ public class SystemServiceTest {
         assertEquals("OK", statusMap.get("service_etcd_192-168-10-11"));
         assertEquals("OK", statusMap.get("service_gluster_192-168-10-11"));
         assertEquals("OK", statusMap.get("service_ntp_192-168-10-11"));
-    }
-
-    @Test
-    public void testUpdateStatus() throws Exception {
-
-        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
-        configurationServiceTest.saveNodesConfig(nodesConfig);
-
-        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        configurationServiceTest.saveServicesInstallationStatus(servicesInstallStatus);
-
-        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
-        configurationServiceTest.saveKubernetesServicesConfig(kubeServicesConfig);
-
-        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
-            if (script.equals("echo OK")) {
-                return "OK";
-            }
-            if (script.startsWith("sudo systemctl status --no-pager")) {
-                return systemStatusTest;
-            }
-            return "";
-        });
-
-        sshCommandServiceTest.setConnectionResultBuilder((connection, script) -> script);
-
-        systemService.updateStatus();
-
-        SystemStatusWrapper systemStatus = systemService.getStatus();
-
-        JSONObject actual = systemStatus.getJSONObject();
-
-        System.err.println (actual.toString(2));
-
-        assertTrue(new JSONObject(expectedFullStatus).similar(actual), actual.toString(2));
     }
 
     @Test

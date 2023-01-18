@@ -2,7 +2,7 @@
  * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
  * well to this individual file than to the Eskimo Project as a whole.
  *
- * Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
  * Author : eskimo.sh / https://www.eskimo.sh
  *
  * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -57,6 +57,13 @@ public class CommonDevShellTest {
         Assumptions.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
+    @AfterEach
+    public void tearDown() throws Exception {
+        if (StringUtils.isNotBlank(jailPath)) {
+            FileUtils.delete(new File(jailPath));
+        }
+    }
+
     @BeforeEach
     public void setUp() throws Exception {
         jailPath = AbstractSetupShellTest.createJail();
@@ -64,14 +71,6 @@ public class CommonDevShellTest {
         FileUtils.copy(
                 new File("./packages_dev/common/common.sh"),
                 new File (jailPath + "/common.sh"));
-
-    }
-
-    @AfterEach
-    public void tearDownClass() throws Exception {
-        if (StringUtils.isNotBlank(jailPath)) {
-            FileUtils.delete(new File(jailPath));
-        }
     }
 
     private void createTestScript(String scriptName, String command) throws FileException {

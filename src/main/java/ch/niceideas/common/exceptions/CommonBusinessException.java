@@ -14,9 +14,6 @@ public class CommonBusinessException extends Exception {
 
     static final long serialVersionUID = -3387112211112229248L;
 
-    public CommonBusinessException() {
-    }
-
     public CommonBusinessException(String message) {
         super(message);
     }

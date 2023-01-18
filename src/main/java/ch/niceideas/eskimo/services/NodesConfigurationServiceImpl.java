@@ -2,7 +2,7 @@
  * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
  * well to this individual file than to the Eskimo Project as a whole.
  *
- * Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
  * Author : eskimo.sh / https://www.eskimo.sh
  *
  * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -338,12 +338,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
         try (SSHConnection connection = connectionManagerService.getPrivateConnection(node)) {
 
             File tempTopologyFile = systemService.createTempFile("eskimo_topology", node, ".sh");
-            try {
-                FileUtils.delete(tempTopologyFile);
-            } catch (FileUtils.FileDeleteFailedException e) {
-                logger.error (e, e);
-                throw new SystemException(e);
-            }
+            deleteTempFile(tempTopologyFile);
             try {
                 FileUtils.writeFile(tempTopologyFile, servicesDefinition
                         .getTopology(nodesConfig, kubeServicesConfig, node)
@@ -356,15 +351,12 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             sshCommandService.runSSHCommand(connection, new String[]{"sudo", "mv", tempTopologyFile.getName(), ESKIMO_TOPOLOGY_SH});
             sshChmod755(connection, ESKIMO_TOPOLOGY_SH);
 
+            deleteTempFile(tempTopologyFile);
+
             ServicesSettingsWrapper servicesConfig = configurationService.loadServicesConfigNoLock();
 
             File tempServicesSettingsFile = systemService.createTempFile("eskimo_services-settings", node, ".json");
-            try {
-                FileUtils.delete(tempServicesSettingsFile);
-            } catch (FileUtils.FileDeleteFailedException e) {
-                logger.error (e, e);
-                throw new SystemException(e);
-            }
+            deleteTempFile(tempServicesSettingsFile);
 
             FileUtils.writeFile(tempServicesSettingsFile, servicesConfig.getFormattedValue());
 
@@ -372,11 +364,22 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             sshCommandService.runSSHCommand(connection, new String[]{"sudo", "mv", tempServicesSettingsFile.getName(), "/etc/eskimo_services-settings.json"});
             sshChmod755(connection, "/etc/eskimo_services-settings.json");
 
+            deleteTempFile(tempServicesSettingsFile);
+
         } catch (FileException | SetupException e) {
             logger.error (e, e);
             throw new SystemException(e);
 
         } catch (ConnectionManagerException e) {
+            throw new SystemException(e);
+        }
+    }
+
+    private void deleteTempFile(File tempServicesSettingsFile) throws SystemException {
+        try {
+            FileUtils.delete(tempServicesSettingsFile);
+        } catch (FileUtils.FileDeleteFailedException e) {
+            logger.error (e, e);
             throw new SystemException(e);
         }
     }

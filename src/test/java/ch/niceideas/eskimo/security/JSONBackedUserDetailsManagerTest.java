@@ -2,7 +2,7 @@
  * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
  * well to this individual file than to the Eskimo Project as a whole.
  *
- * Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
  * Author : eskimo.sh / https://www.eskimo.sh
  *
  * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -34,6 +34,8 @@
 
 package ch.niceideas.eskimo.security;
 
+import ch.niceideas.common.utils.FileUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -65,6 +67,11 @@ public class JSONBackedUserDetailsManagerTest {
         tmpUsersFile = File.createTempFile("users-config", ".json");
 
         mgr = new JSONBackedUserDetailsManager(tmpUsersFile.getAbsolutePath(), passwordEncoder);
+    }
+
+    @AfterEach
+    public void tearDown() throws FileUtils.FileDeleteFailedException {
+        FileUtils.delete(tmpUsersFile);
     }
 
     @Test
@@ -150,7 +157,5 @@ public class JSONBackedUserDetailsManagerTest {
 
         assertTrue (otherMgr.userExists("test_user"));
         assertTrue (passwordEncoder.matches("other-password", otherMgr.loadUserByUsername("test_user").getPassword()));
-
-
     }
 }

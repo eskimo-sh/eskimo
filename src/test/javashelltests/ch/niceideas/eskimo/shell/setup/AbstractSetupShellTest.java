@@ -2,7 +2,7 @@
  * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
  * well to this individual file than to the Eskimo Project as a whole.
  *
- * Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
  * Author : eskimo.sh / https://www.eskimo.sh
  *
  * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -38,16 +38,14 @@ package ch.niceideas.eskimo.shell.setup;
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.Topology;
 import ch.niceideas.eskimo.model.service.MemoryModel;
-import ch.niceideas.eskimo.services.ConfigurationService;
-import ch.niceideas.eskimo.services.ConfigurationServiceImpl;
 import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
 import ch.niceideas.eskimo.services.SystemServiceTest;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.testwrappers.SetupServiceUnderTest;
 import org.apache.log4j.Logger;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -106,7 +104,9 @@ public abstract class AbstractSetupShellTest {
 
         ServicesDefinitionImpl def = new ServicesDefinitionImpl();
         SetupServiceUnderTest setupService = new SetupServiceUnderTest();
-        setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
+        String tempConfigStorage = SystemServiceTest.createTempStoragePath();
+        setupService.setConfigStoragePathInternal(tempConfigStorage);
+        new File (tempConfigStorage).deleteOnExit();
         def.setSetupService(setupService);
         def.afterPropertiesSet();
 

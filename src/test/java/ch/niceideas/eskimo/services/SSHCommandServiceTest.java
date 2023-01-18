@@ -2,7 +2,7 @@
  * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
  * well to this individual file than to the Eskimo Project as a whole.
  *
- * Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
  * Author : eskimo.sh / https://www.eskimo.sh
  *
  * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -42,6 +42,7 @@ import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
 import ch.niceideas.eskimo.test.testwrappers.SetupServiceUnderTest;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -84,10 +85,12 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
     @Autowired
     private ConfigurationServiceTestImpl configurationServiceTest;
 
+    private String tempPath = null;
+
     @BeforeEach
     public void setUp() throws Exception {
 
-        String tempPath = SystemServiceTest.createTempStoragePath();
+        tempPath = SystemServiceTest.createTempStoragePath();
         setupService.setConfigStoragePathInternal(tempPath);
         FileUtils.writeFile(new File(tempPath + "/config.json"), "{ \"" + SetupService.SSH_USERNAME_FIELD + "\" : \"test\" }");
 
@@ -97,6 +100,11 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
         connectionManagerServiceTest.setSShPort(getSShPort());
 
         configurationServiceTest.saveSetupConfig("{ \"" + SetupService.SSH_USERNAME_FIELD + "\" : \"test\" }");
+    }
+
+    @AfterEach
+    public void tearDown() throws Exception {
+        FileUtils.delete(new File (tempPath));
     }
 
     @Test

@@ -2,7 +2,7 @@
  * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
  * well to this individual file than to the Eskimo Project as a whole.
  *
- * Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
  * Author : eskimo.sh / https://www.eskimo.sh
  *
  * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo;
 
+import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
@@ -149,7 +150,7 @@ public abstract class AbstractBaseSSHTest {
         publicKeyBytes = Base64.decodeBase64(publicKeyContent);
     }
 
-    JSch createjSchInstance() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, JSchException {
+    JSch createjSchInstance() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, JSchException, FileUtils.FileDeleteFailedException {
         JSch jsch = new JSch();
 
         //String privateKeyPath = ResourceUtils.getURL("classpath:AbstractBaseSSHTest/id_rsa").getPath();
@@ -167,6 +168,9 @@ public abstract class AbstractBaseSSHTest {
         pemWriter.close();
 
         jsch.addIdentity(tempFileForKey.getAbsolutePath(), publicKeyPath, new byte[]{});
+
+        // can delete the temp file once this is done
+        FileUtils.delete(tempFileForKey);
 
         Hashtable<String, String> config = new Hashtable<>();
         config.put("StrictHostKeyChecking", "no");

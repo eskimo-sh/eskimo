@@ -2,7 +2,7 @@
 This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 well to this individual file than to the Eskimo Project as a whole.
 
-Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
 Author : eskimo.sh / https://www.eskimo.sh
 
 Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -133,7 +133,7 @@ But it breaks  the menu entry title overlay
 
 #file-viewer-body pre {
     background: transparent;
-    border: 0px none;
+    border: 0 none;
     overflow: visible;
 }
 */
@@ -218,8 +218,8 @@ But it breaks  the menu entry title overlay
 }
 
 .no-padding {
-    margin-top: 0px;
-    margin-bottom: 0px;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 li.disabled a .menu-text {
@@ -327,7 +327,7 @@ table.system-information {
     border-spacing: 0;
     margin: 0;
     border-collapse: collapse;
-    border: 0px none;
+    border: 0 none;
 }
 
 table.system-information tr td {
@@ -335,7 +335,7 @@ table.system-information tr td {
     border-spacing: 0;
     margin: 0;
     border-collapse: collapse;
-    border: 0px none;
+    border: 0 none;
 }
 
 table.system-information tr td.info-label {
@@ -432,28 +432,37 @@ table.system-information tr td.info-label {
     min-height: 220px;
     overflow-y: auto;
 }
+.status-monitoring-info-no-grafana {
+    min-height: 220px;
+    height: 220px;
+}
+.status-monitoring-info-grafana-shown {
+    min-height: 420px;
+    height: 420px;
+    /* has to be the same as below */
+}
 .status-monitoring-dashboard-panel{
-    height: 413px;
-    min-height: 413px;
+    height: 420px;
+    min-height: 420px;
 }
 .status-monitoring-action-table {
     padding: 0;
     margin: 0;
-    border: 0px none;
+    border: 0 none;
     border-collapse: collapse;
 }
 .status-monitoring-action-table tr td{
     padding: 0;
     margin: 0;
-    border: 0px none;
+    border: 0 none;
     border-collapse: collapse;
     vertical-align: middle;
 }
 #status-monitoring-dashboard-frame {
     position: relative;
-    border: 0px none;
-    padding: 0px;
-    margin: 0px;
+    border: 0 none;
+    padding: 0;
+    margin: 0;
     width: 100%;
     height: 100%;
 }
@@ -493,8 +502,8 @@ table.system-information tr td.info-label {
 .inner-content-show {
     padding: 20px;
     position: absolute;
-    top: 0px;
-    bottom: 0px;
+    top: 0;
+    bottom: 0;
     width: 100%;
     height: 100%;
     overflow-y: auto;
@@ -612,7 +621,7 @@ table.system-information tr td.info-label {
 }
 
 .progress-operation-wrapper{
-    margin-bottom: 0px;
+    margin-bottom: 0;
     min-width: 220px;
 }
 
@@ -661,7 +670,7 @@ td.operation-title{
     position: relative;
     top: 2px;
     float: right;
-    right: 0px;
+    right: 0;
     color: white;
     font-size: x-small;
     width: 100px;
@@ -804,7 +813,7 @@ html[data-sidenav-size=condensed]:not(.authentication-bg) .inner-content-inner-f
 }
 
 #notifications-container .card {
-    border: 0px none;
+    border: 0 none;
 }
 
 .notification-list .notify-item .card-body .noti-item-subtitle,

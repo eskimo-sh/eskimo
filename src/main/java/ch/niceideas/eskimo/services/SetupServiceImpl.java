@@ -2,7 +2,7 @@
  * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
  * well to this individual file than to the Eskimo Project as a whole.
  *
- * Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
  * Author : eskimo.sh / https://www.eskimo.sh
  *
  * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -456,6 +456,7 @@ public class SetupServiceImpl implements SetupService {
     protected JsonWrapper loadRemotePackagesVersionFile() throws SetupException{
         try {
             File tempPackagesVersionFile = File.createTempFile(ESKIMO_PACKAGES_VERSIONS_JSON, "temp_download");
+            tempPackagesVersionFile.deleteOnExit();
 
             URL downloadUrl = new URL(packagesDownloadUrlRoot + "/" + ESKIMO_PACKAGES_VERSIONS_JSON);
 
@@ -740,6 +741,9 @@ public class SetupServiceImpl implements SetupService {
                                         "bash",
                                         tempScript.getAbsolutePath()
                                 }, true));
+
+                                FileUtils.delete(tempScript);
+
                             } catch (ProcessHelper.ProcessHelperException | FileException e) {
                                 logger.debug(e, e);
                                 ml.addInfo(e.getMessage());

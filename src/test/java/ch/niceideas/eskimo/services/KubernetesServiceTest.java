@@ -2,7 +2,7 @@
  * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
  * well to this individual file than to the Eskimo Project as a whole.
  *
- * Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
  * Author : eskimo.sh / https://www.eskimo.sh
  *
  * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -65,9 +65,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestPropertySource("classpath:application-test.properties")
 @ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-operations", "test-system", "test-operation", "test-proxy", "test-nodes-conf", "test-ssh", "test-connection-manager"})
 public class KubernetesServiceTest {
-
-    @Autowired
-    private SetupServiceTestImpl setupServiceTest;
 
     @Autowired
     private SystemOperationServiceTestImpl systemOperationServiceTest;

@@ -2,7 +2,7 @@
  * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
  * well to this individual file than to the Eskimo Project as a whole.
  *
- * Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
  * Author : eskimo.sh / https://www.eskimo.sh
  *
  * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -49,6 +49,8 @@ import ch.niceideas.eskimo.test.testwrappers.SetupServiceUnderTest;
 import ch.niceideas.eskimo.utils.OSDetector;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,7 +91,9 @@ public class SetupServiceTest {
 
     private String setupConfig = null;
 
+    private File tempConfigStoragePath = null;
     private File tempPackagesDistribPath = null;
+    private File tempPackagesDevPath = null;
 
     private static final String kubePackages = "kube";
 
@@ -106,7 +110,7 @@ public class SetupServiceTest {
 
         FileUtils.delete(new File ("/tmp/setupConfigTest"));
 
-        File tempConfigStoragePath = File.createTempFile("test_setup_service", "folder");
+        tempConfigStoragePath = File.createTempFile("test_setup_service", "folder");
         assertTrue (tempConfigStoragePath.delete());
 
         tempPackagesDistribPath = File.createTempFile("test_setup_service_distrib", "folder");
@@ -123,6 +127,12 @@ public class SetupServiceTest {
         setupService.reset();
     }
 
+    @AfterEach
+    public void tearDown() throws Exception {
+        FileUtils.delete(tempConfigStoragePath);
+        FileUtils.delete(tempPackagesDistribPath);
+        FileUtils.delete(tempPackagesDevPath);
+    }
 
     @Test
     public void testParseVersion() {
@@ -316,6 +326,8 @@ public class SetupServiceTest {
         FileUtils.writeFile(new File (storagePathTest, "storagePath.conf"), "/tmp/test");
 
         assertEquals ("/tmp/test", setupService.readConfigStoragePath());
+
+        FileUtils.delete(storagePathTest);
     }
 
     @Test

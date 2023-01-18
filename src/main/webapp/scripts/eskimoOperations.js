@@ -2,7 +2,7 @@
 This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 well to this individual file than to the Eskimo Project as a whole.
 
-Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
 Author : eskimo.sh / https://www.eskimo.sh
 
 Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -142,9 +142,9 @@ eskimo.Operations = function() {
             $operationsGlobalMessages.css("display", "block");
             let previous = $operationsGlobalMessages.html().trim();
             if (previous == null || previous == "") {
-                $("#operations-global-messages").html(atob(globalMessages.lines));
+                $operationsGlobalMessages.html(atob(globalMessages.lines));
             } else {
-                $("#operations-global-messages").html(previous + "<br>" + atob(globalMessages.lines));
+                $operationsGlobalMessages.html(previous + "<br>" + atob(globalMessages.lines));
             }
         }
     }
@@ -175,7 +175,6 @@ eskimo.Operations = function() {
             let opStatus = status[operation];
             
             let progress = $("#" + operation + "-progress");
-            let wrapper = $("#" + operation + "-progress-wrapper");
             
             if (opStatus == "INIT") {
 
@@ -256,7 +255,7 @@ eskimo.Operations = function() {
                     "          </div>\n" +
                     "      </td>\n" +
                     "      <td class=\"operations-cell\">\n" +
-                    "          <a onclick=\"javascript:eskimoMain.getOperations().showLogs('" + operation + "');\">View</a>\n" +
+                    "          <a onclick=\"eskimoMain.getOperations().showLogs('" + operation + "');\">View</a>\n" +
                     "      </td>\n" +
                     "      </tr>";
 
@@ -338,17 +337,11 @@ eskimo.Operations = function() {
         // fetch messages one last time and close OperationInProgress in the end
         that.fetchOperationStatus (() => {
 
-            if (!success) {
-                $("#operations-title").html("<h3><span class='processing-error'>Operations completed in error !</span></h3>");
-            } else {
+            if (success) {
                 $("#operations-title").html("<h3>Operations completed successfully.</h3>");
+            } else {
+                $("#operations-title").html("<h3><span class='processing-error'>Operations completed in error !</span></h3>");
             }
-
-            /*
-            let pendingBarWrapper = $("#progress-bar-pending-wrapper");
-            pendingBarWrapper.css("visibility", "hidden");
-            pendingBarWrapper.css("display", "none");
-            */
 
             if (callback != null && typeof callback === "function") {
                 callback();

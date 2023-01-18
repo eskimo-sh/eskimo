@@ -21,28 +21,13 @@ public class CommonRTException extends RuntimeException {
 
     /**
      * Create a new instance of CommonRTException
-     */
-    public CommonRTException() {}
-
-    /**
-     * Create a new instance of CommonRTException
      * 
      * @param message the initial error message to set
      */
     public CommonRTException(String message) {
         super(message);
     }
-    
-    /**
-     * Create a new instance of CommonRTException
-     * 
-     * @param message the initial error message to set
-     * @param cause the underlying cause of the error
-     */
-    public CommonRTException(String message, Throwable cause) {
-        super(message, cause);
-    }
-    
+
     /**
      * Create a new instance of CommonRTException
      * 

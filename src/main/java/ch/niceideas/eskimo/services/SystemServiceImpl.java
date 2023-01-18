@@ -2,7 +2,7 @@
  * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
  * well to this individual file than to the Eskimo Project as a whole.
  *
- * Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
  * Author : eskimo.sh / https://www.eskimo.sh
  *
  * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -898,24 +898,23 @@ public class SystemServiceImpl implements SystemService {
 
         // 1.2 Create archive
 
-        // Get the temporary directory and print it.
-        String tempDir = System.getProperty("java.io.tmpdir");
-        if (StringUtils.isBlank(tempDir)) {
-            throw new SystemException("Unable to get system temporary directory.");
-        }
         File tmpArchiveFile = createTempFile(service, node, ".tgz");
-        Files.delete(tmpArchiveFile.toPath());
+        try {
+            FileUtils.delete(tmpArchiveFile);
+        } catch (FileUtils.FileDeleteFailedException e) {
+            logger.error (e, e);
+            throw new SystemException(e);
+        }
 
-        File archive = new File(tempDir + "/" + tmpArchiveFile.getName());
-        FileUtils.createTarFile(servicesSetupPath + "/" + service, archive);
-        if (!archive.exists()) {
-            throw new SystemException("Could not create archive for service " + service + " : " + SystemServiceImpl.TMP_PATH_PREFIX +  tmpArchiveFile.getName());
+        FileUtils.createTarFile(servicesSetupPath + "/" + service, tmpArchiveFile);
+        if (!tmpArchiveFile.exists()) {
+            throw new SystemException("Could not create archive for service " + service + " : " + tmpArchiveFile.getAbsolutePath());
         }
 
         // 2. copy it over to target node and extract it
 
         // 2.1
-        sshCommandService.copySCPFile(connection, archive.getAbsolutePath());
+        sshCommandService.copySCPFile(connection, tmpArchiveFile.getAbsolutePath());
 
         exec(connection, ml, "rm -Rf " + SystemServiceImpl. TMP_PATH_PREFIX + service);
         exec(connection, ml, "rm -f " + SystemServiceImpl.TMP_PATH_PREFIX + service + ".tgz");
@@ -925,7 +924,7 @@ public class SystemServiceImpl implements SystemService {
 
         // 2.2 delete local archive
         try {
-            FileUtils.delete(archive);
+            FileUtils.delete(tmpArchiveFile);
         } catch (FileUtils.FileDeleteFailedException e) {
             logger.error(e, e);
             throw new SystemException("Could not delete archive /tmp/" + service + ".tgz");

@@ -2,7 +2,7 @@
  * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
  * well to this individual file than to the Eskimo Project as a whole.
  *
- * Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
  * Author : eskimo.sh / https://www.eskimo.sh
  *
  * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -39,6 +39,7 @@ import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
+import org.apache.log4j.Logger;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.junit.jupiter.api.Assertions;
@@ -50,6 +51,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 
 public class SSHTestInfrastructureTest extends AbstractBaseSSHTest {
+
+    private static final Logger logger = Logger.getLogger(SSHTestInfrastructureTest.class);
 
     @Override
     protected CommandFactory getSShSubsystemToUse() {
@@ -95,13 +98,12 @@ public class SSHTestInfrastructureTest extends AbstractBaseSSHTest {
 
         if (sftpChannel.isConnected()) {
             sftpChannel.exit();
-            System.out.println("Disconnected channel");
+            logger.info("Disconnected channel");
         }
 
         if (session.isConnected()) {
             session.disconnect();
-            System.out.println("Disconnected session");
+            logger.info("Disconnected session");
         }
-
     }
 }

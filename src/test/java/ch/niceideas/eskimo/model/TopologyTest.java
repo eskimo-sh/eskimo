@@ -2,7 +2,7 @@
  * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
  * well to this individual file than to the Eskimo Project as a whole.
  *
- * Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
  * Author : eskimo.sh / https://www.eskimo.sh
  *
  * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.model;
 
+import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.eskimo.model.service.*;
 import ch.niceideas.eskimo.services.ServiceDefinitionException;
 import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
@@ -42,9 +43,11 @@ import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.testwrappers.SetupServiceUnderTest;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -59,7 +62,7 @@ public class TopologyTest {
 
     protected ServicesDefinitionImpl def;
 
-    protected NodeRangeResolver nrr = new NodeRangeResolver();
+    private String tempStoragePath = null;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -67,7 +70,13 @@ public class TopologyTest {
         def.setSetupService (setupService);
         setupService.setServicesDefinition(def);
         def.afterPropertiesSet();
-        setupService.setConfigStoragePathInternal(SystemServiceTest.createTempStoragePath());
+        tempStoragePath = SystemServiceTest.createTempStoragePath();
+        setupService.setConfigStoragePathInternal(tempStoragePath);
+    }
+
+    @AfterEach
+    public void tearDown() throws Exception {
+        FileUtils.delete(new File(tempStoragePath));
     }
 
     public void initFirstNodeDependencies() {

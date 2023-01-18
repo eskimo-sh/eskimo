@@ -33,70 +33,69 @@
  */
 
 
-package ch.niceideas.eskimo.proxy;
+package ch.niceideas.common.utils;
 
-import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.web.socket.WebSocketMessage;
-import org.springframework.web.socket.WebSocketSession;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.util.Arrays;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class WebSocketProxyForwarderTest {
+public class FileUtilsTarFileTest {
 
-    private WebSocketSession clientSession = null;
-    private WebSocketSession serverSession = null;
-    private WebSocketProxyForwarder forwarder = null;
-
-    private List<Object> clientMessages = null;
-    private List<Object> serverMessages = null;
-    
+    /** Run Test on Linux only */
     @BeforeEach
-    public void setUp() throws Exception {
-
-        clientMessages = new ArrayList<>();
-        serverMessages = new ArrayList<>();
-
-        clientSession = HttpObjectsHelper.createWebSocketSession(clientMessages);
-
-        serverSession = HttpObjectsHelper.createWebSocketSession(serverMessages);
-
-        forwarder = new WebSocketProxyForwarder("zeppelin", "/zeppelin", null, serverSession) {
-            @Override
-            public WebSocketSession createWebSocketClientSession() {
-                return clientSession;
-            }
-        };
+    public void beforeMethod() {
+        Assumptions.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
     }
 
     @Test
-    public void testForwardMessage() throws Exception {
+    public void testNominal() throws Exception {
 
-        forwarder.forwardMessage(new WebSocketMessage<>() {
+        File tempFolder = File.createTempFile("eskimo-file-utils-tar-test", "folder");
+        FileUtils.delete(tempFolder);
+        assertTrue (tempFolder.mkdirs());
 
-            @Override
-            public Object getPayload() {
-                return "ABC";
+        FileUtils.writeFile(new File (tempFolder, "file1"), "file1");
+        FileUtils.writeFile(new File (tempFolder, "file2"), "file2");
+
+        File archive = File.createTempFile("eskimo-file-utils-tar-test", "archive");
+        FileUtils.delete( archive);
+
+        FileUtils.createTarFile(tempFolder.getAbsolutePath(), archive);
+
+        File tempDest = File.createTempFile("eskimo-file-utils-tar-test", "dest");
+        FileUtils.delete (tempDest);
+        assertTrue (tempDest.mkdirs());
+
+        ProcessHelper.exec("/usr/bin/tar xvfz " + archive.getAbsolutePath() + " -C " + tempDest.getAbsolutePath(), true);
+
+        assertNotNull(tempDest.listFiles());
+        assertEquals (1, Objects.requireNonNull(tempDest.listFiles()).length);
+
+        assertNotNull(Objects.requireNonNull(tempDest.listFiles())[0].listFiles());
+
+        File[] archiveFiles = Objects.requireNonNull(Objects.requireNonNull(tempDest.listFiles())[0].listFiles());
+        assertEquals (2, archiveFiles.length);
+
+        boolean file1Found = false;
+        boolean file2Found = false;
+        for (File file : archiveFiles) {
+            if (file.getName().equals("file1")) {
+                file1Found = true;
+                assertEquals ("file1", FileUtils.readFile(file));
             }
-
-            @Override
-            public int getPayloadLength() {
-                return "ABC".length();
+            if (file.getName().equals("file2")) {
+                file2Found = true;
+                assertEquals ("file2", FileUtils.readFile(file));
             }
+        }
 
-            @Override
-            public boolean isLast() {
-                return false;
-            }
-        });
-
-        assertTrue (serverMessages.isEmpty());
-        assertFalse (clientMessages.isEmpty());
-
-        assertEquals("ABC", ((WebSocketMessage<?>)clientMessages.get(0)).getPayload());
+        assertTrue (file1Found);
+        assertTrue (file2Found);
     }
 }

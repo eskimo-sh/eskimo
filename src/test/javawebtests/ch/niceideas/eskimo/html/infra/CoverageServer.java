@@ -2,7 +2,7 @@
  * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
  * well to this individual file than to the Eskimo Project as a whole.
  *
- * Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
  * Author : eskimo.sh / https://www.eskimo.sh
  *
  * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -36,6 +36,7 @@
 package ch.niceideas.eskimo.html.infra;
 
 import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.eskimo.utils.ActiveWaiter;
 import ch.niceideas.eskimo.utils.GenerateLCOV;
 import jscover.Main;
 import jscover.report.FileData;
@@ -99,19 +100,7 @@ public class CoverageServer implements TestResourcesServer {
         runner.js("window.jscoverFinished = false;");
         runner.js("jscoverage_report('', function(){window.jscoverFinished=true;});");
 
-        // FIXME I have failing tests with Awaitility !?!
-            /*
-            await().atMost(MAX_WAIT_TIME_SECS * (isCoverageRun() ? 2 : 1)  , TimeUnit.SECONDS).until(
-                    () -> (Boolean) js("window.jscoverFinished").getJavaScriptResult());
-
-            */
-
-        int attempt = 0;
-        while ((!(Boolean) (runner.js("return window.jscoverFinished"))) && attempt < 10) {
-            logger.debug("Waiting for coverage report to be written ...");
-            Thread.sleep(500);
-            attempt++;
-        }
+        ActiveWaiter.wait(() -> ((Boolean) (runner.js("return window.jscoverFinished"))));
 
         String json = (String) (runner.js("return jscoverage_serializeCoverageToJSON();"));
 

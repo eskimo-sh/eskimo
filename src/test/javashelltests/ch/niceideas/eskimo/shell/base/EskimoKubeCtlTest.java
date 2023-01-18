@@ -2,7 +2,7 @@
  * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
  * well to this individual file than to the Eskimo Project as a whole.
  *
- * Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
  * Author : eskimo.sh / https://www.eskimo.sh
  *
  * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -41,6 +41,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.StringUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -55,6 +56,13 @@ public class EskimoKubeCtlTest {
     @BeforeEach
     public void beforeMethod() {
         Assumptions.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
+    }
+
+    @AfterEach
+    public void tearDown() throws Exception {
+        if (StringUtils.isNotBlank(jailPath)) {
+            FileUtils.delete(new File(jailPath));
+        }
     }
 
     @BeforeEach
@@ -75,13 +83,6 @@ public class EskimoKubeCtlTest {
         // I need the real sed
         assertTrue (new File (jailPath + "/sed").delete());
 
-    }
-
-    @AfterEach
-    public void tearDownClass() throws Exception {
-        if (StringUtils.isNotBlank(jailPath)) {
-            FileUtils.delete(new File(jailPath));
-        }
     }
 
     private void createTestScript(String scriptName, String command) throws FileException, ProcessHelper.ProcessHelperException {

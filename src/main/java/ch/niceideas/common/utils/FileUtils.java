@@ -2,7 +2,7 @@
  * This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
  * well to this individual file than to the Eskimo Project as a whole.
  *
- * Copyright 2019 - 2022 eskimo.sh / https://www.eskimo.sh - All rights reserved.
+ * Copyright 2019 - 2023 eskimo.sh / https://www.eskimo.sh - All rights reserved.
  * Author : eskimo.sh / https://www.eskimo.sh
  *
  * Eskimo is available under a dual licensing model : commercial and GNU AGPL.
@@ -102,6 +102,10 @@ public class FileUtils {
      * @param file the file to be deleted
      */
     public static void delete(File file) throws FileDeleteFailedException {
+
+        if (file == null) {
+            return;
+        }
 
         if (!file.exists()) {
             return;
