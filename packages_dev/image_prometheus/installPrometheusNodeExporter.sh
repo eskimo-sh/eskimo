@@ -61,7 +61,7 @@ trap returned_to_saved_dir ERR
 echo " - Changing to temp directory"
 rm -Rf /tmp/prometheus_ne_setup
 mkdir -p /tmp/prometheus_ne_setup
-cd /tmp/prometheus_ne_setup
+cd /tmp/prometheus_ne_setup || (echo "Couldn't change to /tmp/prometheus_ne_setup" && exit 200)
 
 echo " - Downloading node_exporter-$PROMETHEUS_NODE_EXPORTER_VERSION"
 wget https://github.com/prometheus/node_exporter/releases/download/v$PROMETHEUS_NODE_EXPORTER_VERSION/node_exporter-$PROMETHEUS_NODE_EXPORTER_VERSION.linux-amd64.tar.gz > /tmp/prometheus_install_log 2>&1
@@ -133,4 +133,4 @@ returned_to_saved_dir
 
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container install SUCCESS"
+echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"

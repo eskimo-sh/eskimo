@@ -50,11 +50,7 @@ echo " - Building image kibana"
 build_image kibana_template /tmp/kibana_build_log
 
 docker exec -i kibana_template bash /scripts/installKibana.sh | tee -a /tmp/kibana_build_log 2>&1
-if [[ `tail -n 1 /tmp/kibana_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/kibana_build_log
-    exit 102
-fi
+check_in_container_install_success /tmp/kibana_build_log
 
 
 #echo " - TODO"

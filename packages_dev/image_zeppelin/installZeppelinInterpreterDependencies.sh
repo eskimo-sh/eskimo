@@ -55,7 +55,7 @@ trap returned_to_saved_dir ERR
 echo " - Changing to temp directory"
 rm -Rf /tmp/zeppelin_setup_dep/
 mkdir -p /tmp/zeppelin_setup_dep/
-cd /tmp/zeppelin_setup_dep/
+cd /tmp/zeppelin_setup_dep/ || (echo "Couldn't change to /tmp/zeppelin_setup_dep" && exit 200)
 
 
 echo " - Creating a dummy pom.xml to proceed with downloading kafka and elasticsearch connectors"
@@ -110,11 +110,8 @@ rm -Rf /tmp/zeppelin_setup_dep/
 rm -Rf ~/.m2/
 
 
-
-
-
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container install SUCCESS"
+echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"
 
 
 

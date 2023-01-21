@@ -55,11 +55,8 @@ fail_if_error $? "/tmp/grafana_build_log" -5
 
 echo " - Installing grafana"
 docker exec -i grafana_template bash /scripts/installGrafana.sh | tee -a /tmp/grafana_build_log 2>&1
-if [[ `tail -n 1 /tmp/grafana_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/grafana_build_log
-    exit 102
-fi
+check_in_container_install_success /tmp/grafana_build_log
+
 
 #echo " - TODO"
 #docker exec -it grafana_template bash

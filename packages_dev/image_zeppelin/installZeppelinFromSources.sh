@@ -78,7 +78,7 @@ trap returned_to_saved_dir ERR
 echo " - Changing to temp directory"
 rm -Rf /tmp/zeppelin_build/
 mkdir -p /tmp/zeppelin_build/
-cd /tmp/zeppelin_build/
+cd /tmp/zeppelin_build/ || (echo "Couldn't change to /tmp/zeppelin_build" && exit 200)
 
 echo " - Install missing dependencies to build zeppelin sources"
 sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install libfontconfig1 r-base-dev r-cran-evaluate apt-transport-https lsb-release > /tmp/zeppelin_install_log 2>&1
@@ -247,6 +247,6 @@ fi
 
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container install SUCCESS"
+echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"
 
 

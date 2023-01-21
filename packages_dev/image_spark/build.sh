@@ -83,28 +83,15 @@ fail_if_error $? "/tmp/spark_build_log" -10
 
 echo " - Installing spark"
 docker exec -i spark_template bash /scripts/installSpark.sh | tee /tmp/spark_build_log 2>&1
-if [[ `tail -n 1 /tmp/spark_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/spark_build_log
-    exit 102
-fi
+check_in_container_install_success /tmp/spark_build_log
 
 echo " - Installing ESHadoop connector"
 docker exec -i spark_template bash /scripts/installESHadoop.sh | tee  /tmp/spark_build_log 2>&1
-if [[ `tail -n 1 /tmp/spark_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/spark_build_log
-    exit 103
-fi
-
+check_in_container_install_success /tmp/spark_build_log
 
 echo " - Installing Spark-Kafka connector"
 docker exec -i spark_template bash /scripts/installSparkKafkaConnector.sh  | tee /tmp/spark_build_log 2>&1
-if [[ `tail -n 1 /tmp/spark_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/spark_build_log
-    exit 104
-fi
+check_in_container_install_success /tmp/spark_build_log
 
 
 #echo " - TODO"

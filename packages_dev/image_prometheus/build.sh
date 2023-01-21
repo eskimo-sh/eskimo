@@ -53,27 +53,15 @@ docker exec -i prometheus_template apt-get install -y golang > /tmp/ntp_build_lo
 
 echo " - Installing prometheus"
 docker exec -i prometheus_template bash /scripts/installPrometheus.sh | tee /tmp/prometheus_build_log 2>&1
-if [[ `tail -n 1 /tmp/prometheus_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/prometheus_build_log
-    exit 101
-fi
+check_in_container_install_success /tmp/prometheus_build_log
 
 echo " - Installing prometheus Node Exporter"
 docker exec -i prometheus_template bash /scripts/installPrometheusNodeExporter.sh | tee /tmp/prometheus_build_log 2>&1
-if [[ `tail -n 1 /tmp/prometheus_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/prometheus_build_log
-    exit 102
-fi
+check_in_container_install_success /tmp/prometheus_build_log
 
 echo " - Installing prometheus Push Gateway"
 docker exec -i prometheus_template bash /scripts/installPrometheusPushgateway.sh | tee /tmp/prometheus_build_log 2>&1
-if [[ `tail -n 1 /tmp/prometheus_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/prometheus_build_log
-    exit 103
-fi
+check_in_container_install_success /tmp/prometheus_build_log
 
 #echo " - TODO"
 #docker exec -i prometheus bash TODO

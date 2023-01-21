@@ -57,7 +57,7 @@ trap returned_to_saved_dir ERR
 echo " - Changing to temp directory"
 rm -Rf /tmp/grafana_setup
 mkdir -p /tmp/grafana_setup
-cd /tmp/grafana_setup
+cd /tmp/grafana_setup || (echo "Couldn't change to /tmp/grafana_setup" && exit 200)
 
 echo " - Downloading grafana-$GRAFANA_VERSION"
 wget https://dl.grafana.com/oss/release/grafana-$GRAFANA_VERSION.linux-amd64.tar.gz  > /tmp/grafana_install_log 2>&1
@@ -171,4 +171,4 @@ rm -Rf /tmp/grafana_setup
 
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container install SUCCESS"
+echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"

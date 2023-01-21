@@ -78,11 +78,7 @@ docker exec -i flink_template pip3 install requests filelock > /tmp/flink_build_
 
 echo " - Installing flink"
 docker exec -i flink_template bash /scripts/installFlink.sh | tee -a /tmp/flink_build_log 2>&1
-if [[ `tail -n 1 /tmp/flink_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/flink_build_log
-    exit 102
-fi
+check_in_container_install_success /tmp/flink_build_log
 
 
 #echo " - TODO"

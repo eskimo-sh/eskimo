@@ -54,11 +54,8 @@ docker exec -i kube-master_template apt-get install -y openjdk-11-jdk > /tmp/kub
 
 echo " - Installing Docker Registry"
 docker exec -i kube-master_template bash /scripts/installDockerRegistry.sh | tee /tmp/kube-master_build_log 2>&1
-if [[ `tail -n 1 /tmp/kube-master_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/kube-master_build_log
-    exit 102
-fi
+check_in_container_install_success /tmp/kube-master_build_log
+
 
 #echo " - TODO"
 #docker exec -it kube-master_template bash

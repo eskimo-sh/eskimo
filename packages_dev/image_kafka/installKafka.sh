@@ -60,7 +60,7 @@ trap returned_to_saved_dir ERR
 echo " - Changing to temp directory"
 rm -Rf /tmp/kafka_setup
 mkdir -p /tmp/kafka_setup
-cd /tmp/kafka_setup
+cd /tmp/kafka_setup || (echo "Couldn't change to /tmp/kafka_setup" && exit 11)
 
 echo " - Downloading kafka-$KAFKA_VERSION"
 wget https://archive.apache.org/dist/kafka/$KAFKA_VERSION/kafka_$SCALA_VERSION-$KAFKA_VERSION.tgz > /tmp/kafka_install_log 2>&1
@@ -108,9 +108,9 @@ fi
 
 
 echo " - Cleaning build directory"
-cd $saved_dir
+cd $saved_dir || (echo "Couldn't change to $saved_dir" && exit 12)
 rm -Rf /tmp/kafka_setup
 
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container install SUCCESS"
+echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"

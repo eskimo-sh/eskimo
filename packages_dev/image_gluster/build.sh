@@ -79,18 +79,11 @@ if [[ -d "$SCRIPT_DIR/../../../EGMI/target" ]]; then
 fi
 
 docker exec -i gluster_template bash /scripts/installGluster.sh | tee /tmp/gluster_build_log 2>&1
-if [[ `tail -n 1 /tmp/gluster_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/gluster_build_log
-    exit 102
-fi
+check_in_container_install_success /tmp/gluster_build_log
 
 docker exec -i gluster_template bash /scripts/installEgmi.sh | tee /tmp/gluster_build_log 2>&1
-if [[ `tail -n 1 /tmp/gluster_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/gluster_build_log
-    exit 102
-fi
+check_in_container_install_success /tmp/gluster_build_log
+
 
 #docker exec -i gluster_template bash
 

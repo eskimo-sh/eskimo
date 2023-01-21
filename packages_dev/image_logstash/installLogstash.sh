@@ -55,7 +55,7 @@ trap returned_to_saved_dir ERR
 echo " - Changing to temp directory"
 rm -Rf /tmp/ls_setup
 mkdir -p /tmp/ls_setup
-cd /tmp/ls_setup
+cd /tmp/ls_setup || (echo "Couldn't change to /tmp/ls_setup" && exit 200)
 
 echo " - Downloading logstash-$ES_VERSION"
 wget https://artifacts.elastic.co/downloads/logstash/logstash-$ES_VERSION-linux-x86_64.tar.gz > /tmp/ls_install_log 2>&1
@@ -103,6 +103,5 @@ sudo rm -Rf /tmp/ls_setup
 returned_to_saved_dir
 
 
-
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container install SUCCESS"
+echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"

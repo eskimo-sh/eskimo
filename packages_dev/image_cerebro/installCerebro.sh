@@ -61,7 +61,7 @@ trap returned_to_saved_dir ERR
 echo " - Changing to temp directory"
 sudo rm -Rf /tmp/cerebro_setup/
 mkdir -p /tmp/cerebro_setup/
-cd /tmp/cerebro_setup/
+cd /tmp/cerebro_setup || (echo "Couldn't change to /tmp/cerebro_setup" && exit 200)
 
 echo " - Downloading cerebro-$CEREBRO_VERSION"
 wget https://github.com/lmenezes/cerebro/releases/download/v$CEREBRO_VERSION/cerebro-$CEREBRO_VERSION.tgz > /tmp/cerebro_install_log 2>&1
@@ -143,4 +143,4 @@ sudo rm -Rf /tmp/cerebro_setup/
 
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container install SUCCESS"
+echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"

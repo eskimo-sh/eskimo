@@ -64,7 +64,7 @@ fi
 echo " - Changing to temp directory"
 rm -Rf /tmp/flink_setup
 mkdir -p /tmp/flink_setup
-cd /tmp/flink_setup
+cd /tmp/flink_setup || (echo "Couldn't change to /tmp/flink_setup" && exit 200)
 
 echo " - Updating dependencies for libmesos "
 sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
@@ -215,4 +215,4 @@ sudo rm -Rf /usr/share/doc/openjdk-11-jre-headless
 
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container install SUCCESS"
+echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"

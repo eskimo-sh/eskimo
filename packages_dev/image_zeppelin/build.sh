@@ -88,22 +88,14 @@ fail_if_error $? "/tmp/zeppelin_build_log" -10
 echo " - Installing flink"
 cp installFlink.sh __installFlinkEff.sh
 docker exec -i zeppelin_template bash /scripts/__installFlinkEff.sh | tee /tmp/zeppelin_build_log 2>&1
-if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/zeppelin_build_log
-    exit 102
-fi
+check_in_container_install_success /tmp/zeppelin_build_log
 rm -f __installFlinkEff.sh
 
 
 echo " - Installing kafka"
 cp installKafka.sh __installKafkaEff.sh
 docker exec -i zeppelin_template bash /scripts/__installKafkaEff.sh | tee /tmp/zeppelin_build_log 2>&1
-if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/zeppelin_build_log
-    exit 102
-fi
+check_in_container_install_success /tmp/zeppelin_build_log
 rm -f __installKafkaEff.sh
 
 #echo " - Re-Installing OpenJDK 8 to have compiler (Keeping JDK 8 for spark 2.x for compatibility)"
@@ -116,22 +108,13 @@ rm -f __installKafkaEff.sh
 
 echo " - Installing JDK 8 for flink interpreter"
 docker exec -i zeppelin_template bash /scripts/installJava8JDK.sh | tee /tmp/zeppelin_build_log 2>&1
-if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/zeppelin_build_log
-    exit 105
-fi
-
+check_in_container_install_success /tmp/zeppelin_build_log
 
 echo " - Installing zeppelin"
 if [[ $ZEPPELIN_IS_SNAPSHOT == "true" ]]; then
 
     docker exec -i zeppelin_template bash /scripts/installZeppelinFromSources.sh $USER $UID | tee /tmp/zeppelin_build_log 2>&1
-    if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-        echo " - In container install script ended up in error"
-        cat /tmp/zeppelin_build_log
-        exit 103
-    fi
+    check_in_container_install_success /tmp/zeppelin_build_log
 
     echo "   + downloading built archive to /tmp/zeppelin-$ZEPPELIN_VERSION_SNAPSHOT.tar.gz"
     docker cp zeppelin_template:/tmp/zeppelin_setup/zeppelin-$ZEPPELIN_VERSION_SNAPSHOT.tar.gz /tmp/zeppelin-$ZEPPELIN_VERSION_SNAPSHOT.tar.gz > /tmp/zeppelin_build_log 2>&1
@@ -146,11 +129,7 @@ else
     fi
 
     docker exec -i zeppelin_template bash /scripts/installZeppelin.sh | tee /tmp/zeppelin_build_log 2>&1
-    if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-        echo " - In container install script ended up in error"
-        cat /tmp/zeppelin_build_log
-        exit 104
-    fi
+    check_in_container_install_success /tmp/zeppelin_build_log
 fi
 
 echo " - Installing zeppelin Interpreters Java dependencies"

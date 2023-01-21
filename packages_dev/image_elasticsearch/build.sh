@@ -51,11 +51,7 @@ build_image elasticsearch_template /tmp/es_build_log
 
 echo " - Installing Elasticsearch"
 docker exec -i elasticsearch_template bash /scripts/installElasticSearch.sh | tee -a /tmp/es_build_log 2>&1
-if [[ `tail -n 1 /tmp/es_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/es_build_log
-    exit 102
-fi
+check_in_container_install_success /tmp/es_build_log
 
 #echo " - TODO"
 #docker exec -it elasticsearch_template bash

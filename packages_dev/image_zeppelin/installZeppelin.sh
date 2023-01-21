@@ -56,7 +56,7 @@ trap returned_to_saved_dir ERR
 echo " - Changing to temp directory"
 rm -Rf /tmp/zeppelin_setup/
 mkdir -p /tmp/zeppelin_setup/
-cd /tmp/zeppelin_setup/
+cd /tmp/zeppelin_setup/ || (echo "Couldn't change to /tmp/zeppelin_setup" && exit 200)
 
 echo " - Downloading zeppelin-$ZEPPELIN_VERSION"
 export FROM_COMPLETE="1"
@@ -172,7 +172,7 @@ fi
 
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container install SUCCESS"
+echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"
 
 
 

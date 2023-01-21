@@ -53,7 +53,7 @@ trap returned_to_saved_dir ERR
 echo " - Changing to temp directory"
 rm -Rf /tmp/gluster_setup
 mkdir -p /tmp/gluster_setup
-cd /tmp/gluster_setup
+cd /tmp/gluster_setup || (echo "Couldn't change to /tmp/gluster_setup" && exit 200)
 
 #echo " - downgrading xfsprogs (last version is buggy)"
 #
@@ -70,6 +70,5 @@ sudo rm -Rf /tmp/gluster_setup
 returned_to_saved_dir
 
 
-
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container install SUCCESS"
+echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"

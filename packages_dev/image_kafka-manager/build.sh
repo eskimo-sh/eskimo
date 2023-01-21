@@ -59,11 +59,8 @@ fail_if_error $? "/tmp/kafkamanager_build_log" -4
 
 echo " - Installing kafka manager"
 docker exec -i kafka-manager_template bash /scripts/installKafkaManagerFromSources.sh | tee /tmp/kafkamanager_build_log 2>&1
-if [[ `tail -n 1 /tmp/kafkamanager_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/kafkamanager_build_log
-    exit 102
-fi
+check_in_container_install_success /tmp/kafkamanager_build_log
+
 
 #echo " - TODO"
 #docker exec -it kafka-manager_template bash

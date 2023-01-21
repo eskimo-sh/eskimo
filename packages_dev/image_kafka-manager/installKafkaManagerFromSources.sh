@@ -59,7 +59,7 @@ rm -Rf /tmp/kafka_manager_source_setup
 mkdir -p /tmp/kafka_manager_source_setup
 rm -Rf /tmp/kafka_manager_setup
 mkdir -p /tmp/kafka_manager_setup
-cd /tmp/kafka_manager_source_setup
+cd /tmp/kafka_manager_source_setup || (echo "Couldn't change to /tmp/kafka_manager_source_setup" && exit 200)
 
 echo " - Downloading kafka-manager-$KAFKA_MANAGER_VERSION"
 wget https://github.com/yahoo/CMAK/archive/$KAFKA_MANAGER_VERSION.zip > /tmp/kafka_manager_install_log 2>&1
@@ -163,10 +163,8 @@ echo " - Cleaning coursier cache"
 sudo rm -Rf /root/.cache/coursier
 
 
-
-
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container install SUCCESS"
+echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"
 
 
 

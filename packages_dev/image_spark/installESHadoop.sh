@@ -65,7 +65,7 @@ trap returned_to_saved_dir ERR
 echo " - Changing to temp directory"
 sudo rm -Rf /tmp/eshadoop_setup
 mkdir -p /tmp/eshadoop_setup
-cd /tmp/eshadoop_setup
+cd /tmp/eshadoop_setup || (echo "Couldn't change to /tmp/eshadoop_setup" && exit 200)
 
 
 echo " - Creating a dummy pom.xml to proceed with downloading ES-Hadoop spark connector"
@@ -119,4 +119,4 @@ returned_to_saved_dir
 
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container install SUCCESS"
+echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"

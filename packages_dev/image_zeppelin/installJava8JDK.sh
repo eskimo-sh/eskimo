@@ -80,10 +80,8 @@ rm -Rf ~/.m2/
 
 
 
-
-
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container install SUCCESS"
+echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"
 
 
 

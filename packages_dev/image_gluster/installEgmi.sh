@@ -58,7 +58,7 @@ trap returned_to_saved_dir ERR
 echo " - Changing to temp directory"
 rm -Rf /tmp/egmi_setup
 mkdir -p /tmp/egmi_setup
-cd /tmp/egmi_setup
+cd /tmp/egmi_setup || (echo "Couldn't change to /tmp/egmi_setup" && exit 200)
 
 
 echo " - Testing if local EGMI is found "
@@ -136,4 +136,5 @@ returned_to_saved_dir
 
 # Caution : the in container setup script must mandatorily finish with this log"
 rm -Rf /tmp/egmi_setup
-echo " - In container install SUCCESS"
+
+echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"

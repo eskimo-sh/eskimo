@@ -42,7 +42,7 @@ echo "-- INSTALLING DOCKER REGISTRY --------------------------------------------
 
 
 echo " - Changing to temp directory"
-cd /tmp
+cd /tmp || (echo "Couldn't change to /tmp" && exit 200)
 
 echo " - Downloading docker-registry_$DOCKER_REGISTRY_VERSION.deb "
 wget http://ftp.debian.org/debian/pool/main/d/docker-registry/docker-registry_$DOCKER_REGISTRY_VERSION.deb > /tmp/docker_registry_install_log 2>&1
@@ -106,9 +106,8 @@ echo "   + stopping docker registry"
 killall docker-registry > /dev/null
 
 
-
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container install SUCCESS"
+echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"
 
 
 

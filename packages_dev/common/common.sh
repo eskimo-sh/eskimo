@@ -99,6 +99,27 @@ export ZEPPELIN_IS_SNAPSHOT="false" # set to "true" to build zeppelin from zeppe
 export OPENLOGIC_JDK_8_VERSION="8u352-b08"
 
 
+export IN_CONTAINER_INSTALL_SUCESS_MESSAGE=" - In container install SUCCESS"
+
+# This function checks the successful execution of the install script running in a container
+# by ensuring the expected message is find on the last line of the log file
+# Arguments:
+# - $1 the log file where to search for the expected message
+check_in_container_install_success() {
+
+    if [[ $1 == "" ]]; then
+        echo "expected log file to be checked as argument"
+        exit 1
+    fi
+    export LOG_FILE=$1
+
+    if [[ `tail -n 1 $LOG_FILE` != "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE" ]]; then
+        echo " - In container install script ended up in error"
+        cat $LOG_FILE
+        exit 100
+    fi
+}
+
 # This functions ensures that internet is available on host machine (the one running eskimo)
 # Internet is indeed required to download source packages for services.
 check_for_internet() {

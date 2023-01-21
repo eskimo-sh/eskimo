@@ -75,11 +75,8 @@ fail_if_error $? "/tmp/spark_build_log" -10
 
 echo " - Installing logstash"
 docker exec -i logstash_template bash /scripts/installLogstash.sh | tee /tmp/logstash_build_log 2>&1
-if [[ `tail -n 1 /tmp/logstash_build_log | grep " - In container install SUCCESS"` == "" ]]; then
-    echo " - In container install script ended up in error"
-    cat /tmp/logstash_build_log
-    exit 102
-fi
+check_in_container_install_success /tmp/logstash_build_log
+
 
 #echo " - TODO"
 #docker exec -it logstash_template bash

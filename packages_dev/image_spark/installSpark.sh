@@ -57,7 +57,7 @@ trap returned_to_saved_dir ERR
 echo " - Changing to temp directory"
 rm -Rf /tmp/spark_setup
 mkdir -p /tmp/spark_setup
-cd /tmp/spark_setup
+cd /tmp/spark_setup/ || (echo "Couldn't change to /tmp/spark_setup" && exit 200)
 
 echo " - Updating dependencies for libmesos "
 sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
@@ -103,4 +103,4 @@ returned_to_saved_dir
 
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container install SUCCESS"
+echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"

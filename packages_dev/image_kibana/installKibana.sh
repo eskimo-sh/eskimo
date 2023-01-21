@@ -57,7 +57,7 @@ trap returned_to_saved_dir ERR
 echo " - Changing to temp directory"
 rm -Rf /tmp/kb_setup
 mkdir -p /tmp/kb_setup
-cd /tmp/kb_setup
+cd /tmp/kb_setup || (echo "Couldn't change to /tmp/kb_setup" && exit 200)
 
 echo " - Downloading kibana-$ES_VERSION"
 wget https://artifacts.elastic.co/downloads/kibana/kibana-$ES_VERSION-linux-x86_64.tar.gz > /tmp/kb_install_log 2>&1
@@ -179,7 +179,5 @@ sudo rm -Rf /tmp/kb_setup
 returned_to_saved_dir
 
 
-
-
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container install SUCCESS"
+echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"
