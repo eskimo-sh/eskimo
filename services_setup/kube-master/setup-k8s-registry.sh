@@ -97,11 +97,7 @@ fail_if_error $? "k8s-registry_install_log" -2
 
 echo "   + Configuring Registry in container"
 docker exec k8s-registry bash /scripts/inContainerSetupRegistry.sh $kubernetes_user_id $SELF_IP_ADDRESS | tee -a k8s-registry_install_log 2>&1
-if [[ `tail -n 1 k8s-registry_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat k8s-registry_install_log
-    exit 101
-fi
+check_in_container_config_success k8s-registry_install_log
 
 #echo " - TODO"
 #docker exec -it kubernetes TODO

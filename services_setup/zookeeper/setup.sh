@@ -93,19 +93,9 @@ docker run \
         -t eskimo:zookeeper bash >> zk_install_log 2>&1
 fail_if_error $? "zk_install_log" -2
 
-# connect to container
-#docker exec -it zookeeper bash
-
 echo " - Configuring zookeeper container"
 docker exec zookeeper bash /scripts/inContainerSetupZookeeper.sh | tee -a zk_install_log 2>&1
-if [[ `tail -n 1 zk_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat zk_install_log
-    exit 100
-fi
-
-#echo " - TODO"
-#docker exec -it zookeeper TODO
+check_in_container_config_success zk_install_log
 
 echo " - Handling topology and setting injection"
 handle_topology_settings zookeeper zk_install_log

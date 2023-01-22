@@ -34,6 +34,8 @@
 # Software.
 #
 
+export IN_CONTAINER_CONFIG_SUCESS_MESSAGE=" - In container config SUCCESS"
+
 # Copy a script to the docker container
 # Arguments are:
 # - $1 : the script to be copied. Needs to be in the service setup directory
@@ -584,6 +586,26 @@ function create_binary_wrapper(){
     echo -e "__tmp_returned_to_saved_dir" >> $WRAPPER
     chmod 755 $WRAPPER
 }
+
+# This function checks the successful execution of the setup script running in a container
+# by ensuring the expected message is find on the last line of the log file
+# Arguments:
+# - $1 the log file where to search for the expected message
+check_in_container_config_success() {
+
+    if [[ $1 == "" ]]; then
+        echo "expected log file to be checked as argument"
+        exit 1
+    fi
+    export LOG_FILE=$1
+
+    if [[ `tail -n 1 $LOG_FILE` != "$IN_CONTAINER_CONFIG_SUCESS_MESSAGE" ]]; then
+        echo " - In container setup script ended up in error"
+        cat $LOG_FILE
+        exit 100
+    fi
+}
+
 
 # self explained
 function fail_if_error(){

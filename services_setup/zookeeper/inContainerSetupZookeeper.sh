@@ -96,4 +96,4 @@ echo " - Enabling user zookeeper to change config at runtime"
 chown -R zookeeper. /etc/zookeeper/conf/
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container config SUCCESS"
+echo "$IN_CONTAINER_CONFIG_SUCESS_MESSAGE"

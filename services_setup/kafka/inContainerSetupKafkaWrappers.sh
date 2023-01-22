@@ -76,4 +76,4 @@ create_binary_wrapper /usr/local/lib/kafka/bin/kafka-streams-application-reset.s
 
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container config SUCCESS"
+echo "$IN_CONTAINER_CONFIG_SUCESS_MESSAGE"

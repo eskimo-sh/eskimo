@@ -84,4 +84,4 @@ echo " - Changing owner of config directory to kafka"
 sudo chown -R kafka. /usr/local/lib/kafka-manager/conf
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container config SUCCESS"
+echo "$IN_CONTAINER_CONFIG_SUCESS_MESSAGE"

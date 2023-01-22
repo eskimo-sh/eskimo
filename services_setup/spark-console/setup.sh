@@ -94,22 +94,12 @@ docker run \
 fail_if_error $? "spark_console_install_log" -2
 
 echo " - Configuring spark-console container (config script)"
-docker exec spark-console bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id \
-        | tee -a spark_console_install_log 2>&1
-if [[ `tail -n 1 spark_console_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat spark_console_install_log
-    exit 100
-fi
+docker exec spark-console bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id | tee -a spark_console_install_log 2>&1
+check_in_container_config_success spark_console_install_log
 
 echo " - Configuring spark-console container"
-docker exec spark-console bash /scripts/inContainerSetupSparkHistoryServer.sh  \
-        | tee -a spark_console_install_log 2>&1
-if [[ `tail -n 1 spark_console_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat spark_console_install_log
-    exit 101
-fi
+docker exec spark-console bash /scripts/inContainerSetupSparkHistoryServer.sh | tee -a spark_console_install_log 2>&1
+check_in_container_config_success spark_console_install_log
 
 echo " - Handling topology and setting injection"
 handle_topology_settings spark-console spark_console_install_log

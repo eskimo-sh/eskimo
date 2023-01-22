@@ -60,8 +60,8 @@ sudo rm -Rf /tmp/kube_setup > /tmp/kube_install_log 2>&1
 mkdir -p /tmp/kube_setup
 
 echo " - Getting eskimo Kube package version"
-export ESKIMO_KUBE_PACKAGE=`ls -1 eskimo_kube_*.tar.gz`
-export K8S_VERSION=`basename -s .tar.gz $ESKIMO_KUBE_PACKAGE  | awk -F"_" '{ print $3 }'`
+export ESKIMO_KUBE_PACKAGE=$(ls -1 eskimo_kube_*.tar.gz)
+export K8S_VERSION=$(basename -s .tar.gz $ESKIMO_KUBE_PACKAGE  | awk -F"_" '{ print $3 }')
 
 if [[ "$K8S_VERSION" == "" ]]; then
     echo "Failed to get Eskimo Kube package version"
@@ -115,35 +115,35 @@ if [[ ! -f /usr/local/bin/cfssljson ]]; then
 fi
 
 echo "   + etcd"
-for i in `ls -1 /usr/local/lib/k8s/etcd/bin/`; do
+for i in $(ls -1 /usr/local/lib/k8s/etcd/bin/); do
     if [[ ! -f /usr/local/bin/$i ]]; then
         sudo ln -s /usr/local/lib/k8s/etcd/bin/$i /usr/local/bin/$i
     fi
 done
 
 echo "   + Kubernetes client"
-for i in `ls -1 /usr/local/lib/k8s/kubernetes/client/bin/`; do
+for i in $(ls -1 /usr/local/lib/k8s/kubernetes/client/bin/); do
     if [[ ! -f /usr/local/bin/$i ]]; then
         sudo ln -s /usr/local/lib/k8s/kubernetes/client/bin/$i /usr/local/bin/$i
     fi
 done
 
 echo "   + Kube-router"
-for i in `ls -1 /usr/local/lib/k8s/kube-router/bin/`; do
+for i in $(ls -1 /usr/local/lib/k8s/kube-router/bin/); do
     if [[ ! -f /usr/local/bin/$i ]]; then
         sudo ln -s /usr/local/lib/k8s/kube-router/bin/$i /usr/local/bin/$i
     fi
 done
 
 echo "   + Kubernetes server"
-for i in `ls -1 /usr/local/lib/k8s/kubernetes/server/bin/`; do
+for i in $(ls -1 /usr/local/lib/k8s/kubernetes/server/bin/); do
     if [[ ! -f /usr/local/bin/$i ]]; then
         sudo ln -s /usr/local/lib/k8s/kubernetes/server/bin/$i /usr/local/bin/$i
     fi
 done
 
 echo "   + Installing cri-dockerd"
-for i in `ls -1 /usr/local/lib/k8s/cri-dockerd/`; do
+for i in $(ls -1 /usr/local/lib/k8s/cri-dockerd/); do
     if [[ ! -f /usr/local/bin/$i ]]; then
         sudo ln -s /usr/local/lib/k8s/cri-dockerd/$i /usr/local/bin/$i
     fi

@@ -98,4 +98,4 @@ sed -i s/"# api.enabled: true"/"api.enabled: false"/g /usr/local/lib/logstash/co
 
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container config SUCCESS"
+echo "$IN_CONTAINER_CONFIG_SUCESS_MESSAGE"

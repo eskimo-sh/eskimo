@@ -96,19 +96,11 @@ docker_cp_script containerWatchDog.sh sbin gluster gluster_install_log
 
 echo " - Configuring gluster container"
 docker exec gluster bash /scripts/inContainerSetupGluster.sh | tee -a gluster_install_log 2>&1
-if [[ `tail -n 1 gluster_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat gluster_install_log
-    exit 100
-fi
+check_in_container_config_success gluster_install_log
 
 echo " - Configuring EGMI - Eskimo Gluster Management Infrastructure"
 docker exec gluster bash /scripts/inContainerSetupEgmi.sh | tee -a gluster_install_log 2>&1
-if [[ `tail -n 1 gluster_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat gluster_install_log
-    exit 101
-fi
+check_in_container_config_success gluster_install_log
 
 echo " - Handling topology and setting injection"
 handle_topology_settings gluster gluster_install_log

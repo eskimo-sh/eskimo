@@ -77,19 +77,11 @@ fail_if_error $? "cerebro_install_log" -2
 
 echo " - Configuring cerebro container (common part)"
 docker exec cerebro bash /scripts/inContainerSetupESCommon.sh $elasticsearch_user_id | tee cerebro_install_log 2>&1
-if [[ `tail -n 1 cerebro_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script (common part) ended up in error"
-    cat cerebro_install_log
-    exit 102
-fi
+check_in_container_config_success cerebro_install_log
 
 echo " - Configuring cerebro container"
 docker exec cerebro bash /scripts/inContainerSetupCerebro.sh | tee cerebro_install_log 2>&1
-if [[ `tail -n 1 cerebro_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat cerebro_install_log
-    exit 100
-fi
+check_in_container_config_success cerebro_install_log
 
 echo " - Handling topology and setting injection"
 handle_topology_settings cerebro cerebro_install_log

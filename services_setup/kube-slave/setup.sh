@@ -71,9 +71,6 @@ fail_if_error $? /dev/null 301
 bash /etc/k8s/runtime_config/setup-runtime-kubectl.sh
 fail_if_error $? /dev/null 302
 
-# TODO Not for now, let's see if I really need that
-#bash ./setup-flannel.sh
-
 bash ./setup-kubelet.sh
 fail_if_error $? /dev/null 304
 

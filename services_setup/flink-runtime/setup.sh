@@ -100,13 +100,8 @@ docker run \
 fail_if_error $? "flink_install_log" -2
 
 echo " - Configuring flink container (config script)"
-docker exec flink bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id \
-        | tee -a flink_install_log 2>&1
-if [[ `tail -n 1 flink_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat flink_install_log
-    exit 100
-fi
+docker exec flink bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id | tee -a flink_install_log 2>&1
+check_in_container_config_success flink_install_log
 
 echo " - Copying Flink entrypoint script"
 docker_cp_script eskimo-flink-entrypoint.sh sbin flink flink_install_log

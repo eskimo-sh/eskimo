@@ -74,9 +74,6 @@ for i in ${ALL_NODES_LIST_kube_slave//,/ }; do
 done
 #export ESKIMO_ETCD_ENDPOINTS="https://$ETCD1_IP:$EKIMO_ETCD_PORT,https://$ETCD2_IP:$EKIMO_ETCD_PORT,https://$ETCD3_IP:$EKIMO_ETCD_PORT"
 
-# flanneld etcd prefix
-export FLANNEL_ETCD_PREFIX="/eskimo/network"
-
 # kubernetes service IP (normally the first IP in SERVICE_CIDR)
 export CLUSTER_KUBERNETES_SVC_IP="10.254.0.1"
 

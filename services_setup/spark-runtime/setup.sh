@@ -98,19 +98,11 @@ fail_if_error $? "spark_executor_install_log" -2
 echo " - Configuring spark container (config script)"
 docker exec spark bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id $SELF_IP_ADDRESS \
         | tee -a spark_executor_install_log 2>&1
-if [[ `tail -n 1 spark_executor_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat spark_executor_install_log
-    exit 100
-fi
+check_in_container_config_success spark_executor_install_log
 
 echo " - Configuring spark container"
 docker exec spark bash /scripts/inContainerSetupSpark.sh | tee -a spark_executor_install_log 2>&1
-if [[ `tail -n 1 spark_executor_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat spark_executor_install_log
-    exit 101
-fi
+check_in_container_config_success spark_executor_install_log
 
 echo " - Copying Spark entrypoint script"
 docker_cp_script eskimo-spark-entrypoint.sh sbin spark spark_executor_install_log

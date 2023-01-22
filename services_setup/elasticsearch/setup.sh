@@ -91,19 +91,11 @@ fail_if_error $? es_install_log -2
 
 echo " - Configuring elasticsearch container (common part)"
 docker exec elasticsearch bash /scripts/inContainerSetupESCommon.sh $elasticsearch_user_id | tee es_install_log 2>&1
-if [[ `tail -n 1 es_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script (common part) ended up in error"
-    cat es_install_log
-    exit 4
-fi
+check_in_container_config_success es_install_log
 
 echo " - Configuring Elasticsearch container"
 docker exec elasticsearch bash /scripts/inContainerSetupElasticSearch.sh | tee es_install_log 2>&1
-if [[ `tail -n 1 es_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat es_install_log
-    exit 5
-fi
+check_in_container_config_success es_install_log
 
 echo " - Handling topology and setting injection"
 handle_topology_settings elasticsearch cerebro_install_log

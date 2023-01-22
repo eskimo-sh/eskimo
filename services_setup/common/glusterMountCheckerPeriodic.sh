@@ -34,6 +34,9 @@
 # Software.
 #
 
+# make sur process never exits because of an error
+set +e
+
 while true; do
      sleep 10
      sudo /bin/bash /usr/local/sbin/glusterMountChecker.sh

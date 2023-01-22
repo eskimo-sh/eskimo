@@ -94,12 +94,14 @@ sudo bash -c "echo \"kafka  ALL = NOPASSWD: /bin/bash /usr/local/sbin/glusterMou
 
 
 echo " - Adapting configuration in file server.properties"
+# shellcheck disable=SC2140
 sudo sed -i s/"zookeeper.connection.timeout.ms=6000"/"zookeeper.connection.timeout.ms=22000"/g /usr/local/etc/kafka/server.properties
 
 #sudo bash -c "echo -e \"\n\n#Using IP as host name \"  >> /usr/local/etc/kafka/server.properties"
 #sudo bash -c "echo -e \"host.name=$SELF_IP_ADDRESS\"  >> /usr/local/etc/kafka/server.properties"
 #sudo bash -c "echo -e \"advertised.host.name=$SELF_IP_ADDRESS\"  >> /usr/local/etc/kafka/server.properties"
 
+# shellcheck disable=SC2140
 sudo sed -i s/"#listeners=PLAINTEXT:\/\/:9092"/"listeners=PLAINTEXT:\/\/0.0.0.0:9092"/g /usr/local/etc/kafka/server.properties
 
 sudo bash -c "echo -e \"\n\n#Enabling topic deletion. \"  >> /usr/local/etc/kafka/server.properties"
@@ -120,4 +122,4 @@ sudo sed -i s/"COMMAND=\$1"/"export JMX_PORT=\${JMX_PORT:-9999}\nCOMMAND=\$1"/g 
 
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container config SUCCESS"
+echo "$IN_CONTAINER_CONFIG_SUCESS_MESSAGE"

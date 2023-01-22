@@ -76,26 +76,26 @@ export LOG_FILE=$3
 
 case $MAIN_PID in
     ''|*[!0-9]*)
-        echo `date +"%Y-%m-%d %H:%M:%S"`" - Passed MAIN_PID is a command, need to use it to find PID" >> $LOG_FILE
+        echo "$(date +'%Y-%m-%d %H:%M:%S') - Passed MAIN_PID is a command, need to use it to find PID" >> $LOG_FILE
         sleep 10 # need to give a chance to the target process to start
-        MAIN_PID=`eval $MAIN_PID`
+        MAIN_PID="$(eval $MAIN_PID)"
         case $MAIN_PID in
             ''|*[!0-9]*)
-                echo `date +"%Y-%m-%d %H:%M:%S"`" - Could not resolve MAIN_PID to a process ID ($MAIN_PID). Killing $BACKGROUND_PID and crashing..." >> $LOG_FILE
+                echo "$(date +'%Y-%m-%d %H:%M:%S') - Could not resolve MAIN_PID to a process ID ($MAIN_PID). Killing $BACKGROUND_PID and crashing..." >> $LOG_FILE
                 kill -15 $BACKGROUND_PID >> $LOG_FILE 2>&1
                 exit 4
             ;;
             *)
-                echo `date +"%Y-%m-%d %H:%M:%S"`" - Found MAIN_PID=$MAIN_PID" >> $LOG_FILE
+                echo "$(date +'%Y-%m-%d %H:%M:%S') - Found MAIN_PID=$MAIN_PID" >> $LOG_FILE
             ;;
         esac
     ;;
     *)
-        echo `date +"%Y-%m-%d %H:%M:%S"`"Passed MAIN_PID is a process ID, good to go..." >> $LOG_FILE
+        echo "$(date +'%Y-%m-%d %H:%M:%S') - Passed MAIN_PID is a process ID, good to go..." >> $LOG_FILE
     ;;
 esac
 
-# make sure this process never exist
+# make sure this process never exits because of an error
 set +e
 
 while true; do
@@ -104,7 +104,7 @@ while true; do
 
     if [[ `ps -o pid= -p $BACKGROUND_PID 2>>$LOG_FILE` == "" ]]; then
 
-        echo `date +"%Y-%m-%d %H:%M:%S"`" - Process with PID $BACKGROUND_PID could not be found Killing $MAIN_PID" \
+        echo "$(date +'%Y-%m-%d %H:%M:%S') - Process with PID $BACKGROUND_PID could not be found Killing $MAIN_PID" \
                 >> $LOG_FILE
 
         kill -15 $MAIN_PID >> $LOG_FILE 2>&1
@@ -114,7 +114,7 @@ while true; do
 
     if [[ `ps -o pid= -p $MAIN_PID 2>>$LOG_FILE` == "" ]]; then
 
-        echo `date +"%Y-%m-%d %H:%M:%S"`" - Process with PID $MAIN_PID could not be found Killing $BACKGROUND_PID" \
+        echo "$(date +'%Y-%m-%d %H:%M:%S') - Process with PID $MAIN_PID could not be found Killing $BACKGROUND_PID" \
                 >> $LOG_FILE
 
         kill -15 $BACKGROUND_PID >> $LOG_FILE 2>&1

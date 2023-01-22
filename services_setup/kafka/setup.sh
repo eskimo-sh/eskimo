@@ -96,27 +96,15 @@ fail_if_error $? "kafka_install_log" -2
 
 echo " - Configuring kafka container (common part)"
 docker exec kafka bash /scripts/inContainerSetupKafkaCommon.sh $kafka_user_id | tee kafka_install_log 2>&1
-if [[ `tail -n 1 kafka_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script (common part) ended up in error"
-    cat kafka_install_log
-    exit 100
-fi
+check_in_container_config_success kafka_install_log
 
 echo " - Configuring kafka container (wrappers part)"
 docker exec kafka bash /scripts/inContainerSetupKafkaWrappers.sh  | tee kafka_install_log 2>&1
-if [[ `tail -n 1 kafka_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat kafka_install_log
-    exit 101
-fi
+check_in_container_config_success kafka_install_log
 
 echo " - Configuring kafka container"
 docker exec kafka bash /scripts/inContainerSetupKafka.sh  | tee kafka_install_log 2>&1
-if [[ `tail -n 1 kafka_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat kafka_install_log
-    exit 103
-fi
+check_in_container_config_success kafka_install_log
 
 echo " - Copying inContainerMountGluster.sh script"
 docker_cp_script inContainerMountGluster.sh sbin kafka kafka_install_log

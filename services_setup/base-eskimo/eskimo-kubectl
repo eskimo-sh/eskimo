@@ -77,7 +77,7 @@ function call-kubectl () {
             return 0
         fi
 
-        if [[ `cat $tmpfile | grep "did you specify the right host or port"` != "" && $i -lt 4 ]]; then
+        if [[ $(cat $tmpfile | grep "did you specify the right host or port") != "" && $i -lt 4 ]]; then
             # kube-api is not answering, retry in 4 seconds
             sleep 4
         else
@@ -93,11 +93,10 @@ function call-kubectl () {
 }
 
 
-MULTIPLE_SERVICES_PODS=`call-kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z]\+-[0-9]\+$'`
-SINGLE_SERVICES_PODS=`call-kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z\-]\+-[a-z0-9]\+-[a-z0-9]\+$'`
+MULTIPLE_SERVICES_PODS=$(call-kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z]\+-[0-9]\+$')
+SINGLE_SERVICES_PODS=$(call-kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z\-]\+-[a-z0-9]\+-[a-z0-9]\+$')
 
-MULTIPLE_SERVICES_NAMES=`call-kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z]\+-[0-9]\+$' | sed 's/\([a-z]*\).*/\1/'`
-#SINGLE_SERVICES_NAMES=`call-kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z\-]\+-[a-z0-9]\+-[a-z0-9]\+$' | sed 's/\([a-z\-]\+\)-[a-z0-9]\+-[a-z0-9]\+/\1/'`
+MULTIPLE_SERVICES_NAMES=$(call-kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name | cut -d ' ' -f 1 | grep -e '^[a-z]\+-[0-9]\+$' | sed 's/\([a-z]*\).*/\1/')
 
 
 function get_multiple_service_pod() {
@@ -126,12 +125,12 @@ function get_multiple_service_pod() {
 
     CANDIDATES=`echo "$MULTIPLE_SERVICES_PODS" | grep $SERVICE`
     IFS=$'\n'
-    for pod in `call-kubectl get pods --all-namespaces -o custom-columns=NAME:metadata.name,NODE:status.hostIP`; do
-        for candidate in `echo "$CANDIDATES"`; do
-            if [[ `echo $pod | grep $candidate` != "" ]]; then
+    for pod in $(call-kubectl get pods --all-namespaces -o custom-columns=NAME:metadata.name,NODE:status.hostIP); do
+        for candidate in $(echo "$CANDIDATES"); do
+            if [[ "$(echo $pod | grep $candidate)" != "" ]]; then
                 #FOUND_NODE=`echo $pod | sed 's/ \+/ /' | cut -d ' ' -f 2`
-                if [[ `echo $pod | grep $NODE` != "" ]]; then
-                    FOUND_POD=`echo $pod | cut -d ' ' -f 1`
+                if [[ "$(echo $pod | grep $NODE)" != "" ]]; then
+                    FOUND_POD=$(echo $pod | cut -d ' ' -f 1)
                     break 2
                  fi
             fi
@@ -161,14 +160,14 @@ function get_pod() {
     NODE=$2
 
     IS_MULTIPLE=
-    if [[ `echo "$MULTIPLE_SERVICES_NAMES" | grep $SERVICE` ]]; then
+    if [[ $(echo "$MULTIPLE_SERVICES_NAMES" | grep $SERVICE) ]]; then
         IS_MULTIPLE=true
     fi
 
     if [[ $IS_MULTIPLE ]]; then
-        POD=`get_multiple_service_pod $SERVICE $NODE`
+        POD=$(get_multiple_service_pod $SERVICE $NODE)
     else
-        POD=`echo "$SINGLE_SERVICES_PODS" | grep $SERVICE`
+        POD=$(echo "$SINGLE_SERVICES_PODS" | grep $SERVICE)
     fi
 
     if [[ "$POD" == "" || `echo $POD | grep "ERROR"` != "" ]]; then
@@ -188,7 +187,7 @@ function get_namespace() {
     fi
     POD=$1
 
-    NAMESPACE=`call-kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name,NAMESPACE:metadata.namespace | grep $POD | sed 's/  \+/ /g' | cut -d ' ' -f 2`
+    NAMESPACE=$(call-kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name,NAMESPACE:metadata.namespace | grep $POD | sed 's/  \+/ /g' | cut -d ' ' -f 2)
     if [[ "$NAMESPACE" == "" ]]; then
         echo "ERROR: Couldn't get namespace for pod $POD"
         exit 2
@@ -215,7 +214,7 @@ function show_log() {
     echo " - Showing logs for Service $SERVICE on $NODE"
 
     POD=`get_pod $SERVICE $NODE`
-    if [[ $POD == "" || `echo $POD | grep "ERROR"` != "" ]]; then
+    if [[ $POD == "" || $(echo $POD | grep "ERROR") != "" ]]; then
         echo "ERROR: Couldn't get POD"
         echo "$POD"
         exit 2
@@ -224,7 +223,7 @@ function show_log() {
     echo "   + POD is $POD"
 
     NAMESPACE=`get_namespace $POD`
-    if [[ $NAMESPACE == "" || `echo $NAMESPACE | grep "ERROR"` != "" ]]; then
+    if [[ $NAMESPACE == "" || $(echo $NAMESPACE | grep "ERROR") != "" ]]; then
         echo "ERROR: Couldn't get NAMESPACE"
         echo "$NAMESPACE"
         exit 3
@@ -298,12 +297,12 @@ function stop_service() {
     echo " - Stopping Service $SERVICE"
 
     IS_MULTIPLE=
-    if [[ `echo "$MULTIPLE_SERVICES_NAMES" | grep $SERVICE` ]]; then
+    if [[ $(echo "$MULTIPLE_SERVICES_NAMES" | grep $SERVICE) ]]; then
         IS_MULTIPLE=true
     fi
 
     POD=`get_pod $SERVICE $NODE`
-    if [[ $POD == "" || `echo $POD | grep "ERROR"` != "" ]]; then
+    if [[ $POD == "" || $(echo $POD | grep "ERROR") != "" ]]; then
         echo "ERROR: Couldn't get POD"
         echo "$POD"
         exit 2
@@ -312,7 +311,7 @@ function stop_service() {
     echo "   + POD is $POD"
 
     NAMESPACE=`get_namespace $POD`
-    if [[ $NAMESPACE == "" || `echo $NAMESPACE | grep "ERROR"` != "" ]]; then
+    if [[ $NAMESPACE == "" || $(echo $NAMESPACE | grep "ERROR") != "" ]]; then
         echo "ERROR: Couldn't get NAMESPACE"
         echo "$NAMESPACE"
         exit 3

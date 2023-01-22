@@ -62,4 +62,4 @@ touch /var/lib/ntp/ntp.drift.TEMP
 rm /var/lib/ntp/ntp.drift.TEMP
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container config SUCCESS"
+echo "$IN_CONTAINER_CONFIG_SUCESS_MESSAGE"

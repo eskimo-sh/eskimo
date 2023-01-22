@@ -94,19 +94,11 @@ done
 
 echo " - Configuring logstash container (common part)"
 docker exec logstash bash /scripts/inContainerSetupESCommon.sh $elasticsearch_user_id | tee -a logstash_install_log 2>&1
-if [[ `tail -n 1 logstash_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script (common part) ended up in error"
-    cat logstash_install_log
-    exit 102
-fi
+check_in_container_config_success logstash_install_log
 
 echo " - Configuring logstash container"
 docker exec logstash bash /scripts/inContainerSetupLogstash.sh | tee -a logstash_install_log 2>&1
-if [[ `tail -n 1 logstash_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat logstash_install_log
-    exit 101
-fi
+check_in_container_config_success logstash_install_log
 
 echo " - Copying inContainerMountGluster.sh script"
 docker_cp_script inContainerMountGluster.sh sbin logstash logstash_install_log

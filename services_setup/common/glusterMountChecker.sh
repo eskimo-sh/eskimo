@@ -42,7 +42,7 @@ function delete_gluster_check_lock_file() {
 
 # From here we will be messing with gluster and hence we need to take a lock
 if [[ -f /var/lib/gluster/volume_management_lock_check ]] ; then
-    echo `date +"%Y-%m-%d %H:%M:%S"`" - glusterMountChecker.sh is in execution already. Skipping ..."
+    echo "$(date +'%Y-%m-%d %H:%M:%S') - glusterMountChecker.sh is in execution already. Skipping ..."
     exit 0
 fi
 
@@ -57,11 +57,11 @@ touch /var/lib/gluster/volume_management_lock_check
 # when running on host, checking that the gluster container is actually running before doing anything
 if command -v docker &> /dev/null ; then
 
-    echo `date +"%Y-%m-%d %H:%M:%S"`" - Checking whether gluster container is running" \
+    echo "$(date +'%Y-%m-%d %H:%M:%S') - Checking whether gluster container is running" \
         >> /var/log/gluster/gluster-mount-checker.log
 
     if [[ `docker ps --filter "name=gluster" | grep -v CREATED` == "" ]]; then
-        echo `date +"%Y-%m-%d %H:%M:%S"`" - gluster container is NOT running. Skipping ..."  \
+        echo "$(date +'%Y-%m-%d %H:%M:%S') - gluster container is NOT running. Skipping ..."  \
             >> /var/log/gluster/gluster-mount-checker.log
         exit 0
     fi
@@ -72,7 +72,7 @@ for MOUNT_POINT in `cat /etc/fstab | grep glusterfs | cut -d ' ' -f 2`; do
 
     VOLUME=`cat /etc/fstab | grep glusterfs | grep $MOUNT_POINT | cut -d ' ' -f 1 | cut -d '/' -f 2 `
         
-    echo `date +"%Y-%m-%d %H:%M:%S"`" - Handling $VOLUME"  \
+    echo "$(date +'%Y-%m-%d %H:%M:%S') - Handling $VOLUME"  \
         >> /var/log/gluster/gluster-mount-checker.log
 
 
@@ -91,18 +91,18 @@ for MOUNT_POINT in `cat /etc/fstab | grep glusterfs | cut -d ' ' -f 2`; do
                  || `grep "Too many levels of symbolic links" /tmp/gluster_mount_checker_error` != "" \
                  || `grep "No such device" /tmp/gluster_mount_checker_error` != "" ]]; then
 
-                echo `date +"%Y-%m-%d %H:%M:%S"`" - There is an issue with $MOUNT_POINT. Unmounting" \
+                echo "$(date +'%Y-%m-%d %H:%M:%S') - There is an issue with $MOUNT_POINT. Unmounting" \
                     >> /var/log/gluster/gluster-mount-checker.log
 
-                # 3 attempts
-                for i in 1 2 3; do
+                # 4 attempts
+                for i in 1 2 3 4; do
 
-                    echo `date +"%Y-%m-%d %H:%M:%S"`"   + Attempt $i" >> /var/log/gluster/gluster-mount-checker.log
+                    echo "$(date +'%Y-%m-%d %H:%M:%S')   + Attempt $i" >> /var/log/gluster/gluster-mount-checker.log
                     /bin/umount $MOUNT_POINT  >> /var/log/gluster/gluster-mount-checker.log 2>&1
 
                     if [[ $? != 0 ]]; then
 
-                        echo `date +"%Y-%m-%d %H:%M:%S"`"   + Unmount FAILED \!" >> /var/log/gluster/gluster-mount-checker.log
+                        echo "$(date +'%Y-%m-%d %H:%M:%S')   + Unmount FAILED \!" >> /var/log/gluster/gluster-mount-checker.log
 
                     else
 
@@ -122,17 +122,17 @@ for MOUNT_POINT in `cat /etc/fstab | grep glusterfs | cut -d ' ' -f 2`; do
     # try to mount / remount
     if [[ `grep $MOUNT_POINT /etc/mtab | grep glusterfs` == "" ]]; then
 
-        echo `date +"%Y-%m-%d %H:%M:%S"`" - $MOUNT_POINT is not mounted, remounting" \
+        echo "$(date +'%Y-%m-%d %H:%M:%S') - $MOUNT_POINT is not mounted, remounting" \
             >> /var/log/gluster/gluster-mount-checker.log
 
-         # 3 attempts
-        for i in 1 2 3; do
+         # 4 attempts
+        for i in 1 2 3 4; do
 
-            echo `date +"%Y-%m-%d %H:%M:%S"`"   + Attempt $i" >> /var/log/gluster/gluster-mount-checker.log
+            echo "$(date +'%Y-%m-%d %H:%M:%S')   + Attempt $i" >> /var/log/gluster/gluster-mount-checker.log
             /bin/mount $MOUNT_POINT  >> /var/log/gluster/gluster-mount-checker.log 2>&1
 
             if [[ $? != 0 ]]; then
-                echo `date +"%Y-%m-%d %H:%M:%S"`"   + Re-mount FAILED \!" >> /var/log/gluster/gluster-mount-checker.log
+                echo "$(date +'%Y-%m-%d %H:%M:%S')   + Re-mount FAILED \!" >> /var/log/gluster/gluster-mount-checker.log
 
             else
                 break;

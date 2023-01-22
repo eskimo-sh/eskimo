@@ -82,23 +82,24 @@ function injectRegexProperty () {
 
     echoDebug "injectRegexProperty $SERVICE $filename $propertyFormat $commentPrefix $name"
 
-    export sedName=`echo $name | sed -e 's/\[\]\/\-$*^/\\&/g'`
+    export sedName=$(echo $name | sed -e 's/\[\]\/\-$*^/\\&/g')
     echoDebug "sedName=$sedName"
 
-    export sedValue=`echo $value | sed -e 's/\[\]\/\-$*^/\\&/g'`
+    export sedValue=$(echo $value | sed -e 's/\[\]\/\-$*^/\\&/g')
     echoDebug "sedValue=$sedValue"
 
-    export sedPattern=`echo $propertyFormat | sed s/"{value}"/"[a-zA-Z0-9"'\\'"\-]*"/ | sed s/"{name}"/'\\'"\("$sedName'\\'"\)"/`
+    export sedPattern=$(echo $propertyFormat | sed s/"{value}"/"[a-zA-Z0-9"'\\'"\-]*"/ | sed s/"{name}"/'\\'"\("$sedName'\\'"\)"/)
     echoDebug "sedPattern=$sedPattern"
 
+    # XXX Dunno why $() notation doesn't work here
     export sedReplace=`echo $propertyFormat | sed s/"{value}"// | sed s/"{name}"/'\\''\1'/`
     echoDebug "sedReplace=$sedReplace"
 
-    export searchedResult=`echo $propertyFormat | sed "s/{value}/$value/g" | sed "s/{name}/$name/g"`
+    export searchedResult=$(echo $propertyFormat | sed "s/{value}/$value/g" | sed "s/{name}/$name/g")
     echoDebug "searchedResult=$searchedResult"
 
     # Search for $filename under /usr/local/lib/$SERVICE
-    for i in `find $SETTING_ROOT_FOLDER/$filesystemService/ -name $filename `; do
+    for i in $(find $SETTING_ROOT_FOLDER/$filesystemService/ -name $filename ); do
         echo "     == processing $i"
 
         echoDebug "replacing $name $value"
@@ -107,7 +108,7 @@ function injectRegexProperty () {
 
         # add variable if not found
         echoDebug "check if variable is found"
-        if [[ `grep "$searchedResult" $i` == "" ]]; then
+        if [[ $(grep "$searchedResult" $i) == "" ]]; then
 
             echoDebug "adding not found variable"
 
@@ -117,14 +118,14 @@ function injectRegexProperty () {
         else
 
             # remove comment prefix if found
-            if [[ `cat $i | grep -E "^$commentPrefix" | grep "$searchedResult"` != "" ]]; then
+            if [[ $(cat $i | grep -E "^$commentPrefix" | grep "$searchedResult") != "" ]]; then
 
                 echoDebug " removing comment"
 
                 echo sed -i s/"^$commentPrefix\(.*\)\($searchedResult\)"/"\1\2"/g $i
                 sed -i s/"^$commentPrefix\(.*\)\($searchedResult\)"/"\1\2"/g $i
 
-                if [[ `cat $i | grep -E "^$commentPrefix" | grep "$searchedResult"` != "" ]]; then
+                if [[ $(cat $i | grep -E "^$commentPrefix" | grep "$searchedResult") != "" ]]; then
                     echo "Unable to perform comment replacement for $SERVICE $filename $propertyFormat $commentPrefix $name"
                     exit 5
                 fi
@@ -132,13 +133,13 @@ function injectRegexProperty () {
 
         fi
 
-        export freeValue=`echo $searchedResult | sed -e 's/[]\/$*^[]/\\&/g'`
+        export freeValue=$(echo $searchedResult | sed -e 's/[]\/$*^[]/\\&/g')
         echoDebug "freeValue=$freeValue"
 
         # Assess it's found as expected (using propertyFormat)
-        if [[ `grep "$freeValue" $i` == "" ]]; then
+        if [[ $(grep "$freeValue" $i) == "" ]]; then
 
-cat $i
+            cat $i
 
             echo "Unable to perform replacement for $SERVICE $filename $propertyFormat $commentPrefix $name"
             exit 6
@@ -159,11 +160,11 @@ function injectVariableProperty () {
 
     echoDebug "injectVariableProperty $SERVICE $filename $propertyFormat $commentPrefix $name"
 
-    export sedValue=`echo $value | sed -e 's/[]\/$*^[]/\\&/g'`
+    export sedValue=$(echo $value | sed -e 's/[]\/$*^[]/\\&/g')
     echoDebug "sedValue=$sedValue"
 
     # Search for $filename under /usr/local/lib/$SERVICE
-    for i in `find $SETTING_ROOT_FOLDER/$filesystemService/ -name $filename `; do
+    for i in $(find $SETTING_ROOT_FOLDER/$filesystemService/ -name $filename ); do
         echo "     == processing $i"
 
         export searchedResult=""
@@ -206,7 +207,7 @@ function injectVariableProperty () {
 
         # add variable if not found
         echoDebug "check if variable is found"
-        if [[ `grep "$searchedResult" $i` == "" ]]; then
+        if [[ $(grep "$searchedResult" $i) == "" ]]; then
 
             echoDebug "adding not found variable"
 
@@ -216,14 +217,14 @@ function injectVariableProperty () {
         else
 
             # remove comment prefix if found
-            if [[ `cat $i | grep -E "^$commentPrefix" | grep "$searchedResult"` != "" ]]; then
+            if [[ $(cat $i | grep -E "^$commentPrefix" | grep "$searchedResult") != "" ]]; then
 
                 echoDebug " removing comment"
 
                 echo sed -i s/"^$commentPrefix\(.*\)\($searchedResult\)"/"\1\2"/g $i
                 sed -i s/"^$commentPrefix\(.*\)\($searchedResult\)"/"\1\2"/g $i
 
-                if [[ `cat $i | grep -E "^$commentPrefix" | grep "$searchedResult"` != "" ]]; then
+                if [[ $(cat $i | grep -E "^$commentPrefix" | grep "$searchedResult") != "" ]]; then
                     echo "Unable to perform comment replacement for $SERVICE $filename $propertyFormat $commentPrefix $name"
                     exit 5
                 fi
@@ -234,7 +235,7 @@ function injectVariableProperty () {
         export freeValue=`echo $searchedResult | sed -e 's/[]\/$*^[]/\\&/g'`
 
         # Assess it's found as expected (using propertyFormat)
-        if [[ `grep "^$freeValue" $i` == "" ]]; then
+        if [[ $(grep "^$freeValue" $i) == "" ]]; then
             echo "Unable to perform replacement for $SERVICE $filename $propertyFormat $commentPrefix $name"
             exit 5
         fi
@@ -246,23 +247,23 @@ echoDebug "finding filenames"
 
 
 IFS=$'\n'
-for settingsFile in `jq -c  ".settings | .[] | .settings | .[] | select (.service==\"$SERVICE\") | {filename,propertyType,propertyFormat,commentPrefix,filesystemService}" $SETTINGS_FILE`; do
+for settingsFile in $(jq -c  ".settings | .[] | .settings | .[] | select (.service==\"$SERVICE\") | {filename,propertyType,propertyFormat,commentPrefix,filesystemService}" $SETTINGS_FILE); do
 
     echoDebug "$settingsFile"
 
-    export filename=`echo $settingsFile | jq -r ' .filename'`
-    export propertyType=`echo $settingsFile | jq -r ' .propertyType'`
-    export propertyFormat=`echo $settingsFile | jq -r ' .propertyFormat'`
-    export commentPrefix=`echo $settingsFile | jq -r ' .commentPrefix'`
-    export filesystemService=`echo $settingsFile | jq -r ' .filesystemService'`
+    export filename=$(echo $settingsFile | jq -r ' .filename')
+    export propertyType=$(echo $settingsFile | jq -r ' .propertyType')
+    export propertyFormat=$(echo $settingsFile | jq -r ' .propertyFormat')
+    export commentPrefix=$(echo $settingsFile | jq -r ' .commentPrefix')
+    export filesystemService=$(echo $settingsFile | jq -r ' .filesystemService')
 
     echoDebug "Processing properties for \"$filename\""
 
     IFS=$'\n'
-    for property in `jq -c  ".settings | .[] | .settings | .[] | select (.service==\"$SERVICE\" and .filename==\"$filename\") | .properties | .[] | select (.value) " $SETTINGS_FILE`; do
+    for property in $(jq -c  ".settings | .[] | .settings | .[] | select (.service==\"$SERVICE\" and .filename==\"$filename\") | .properties | .[] | select (.value) " $SETTINGS_FILE); do
 
-        export name=`echo $property | jq -r ' .name'`
-        export value=`echo $property | jq -r ' .value'`
+        export name=$(echo $property | jq -r ' .name')
+        export value=$(echo $property | jq -r ' .value')
 
         # Don't overwrite values that need to be kept to default
         if [[ "$value" != "[ESKIMO_DEFAULT]" ]]; then

@@ -269,7 +269,7 @@ function install_debian_eskimo_dependencies() {
     fi
 
     # ubuntu fix glibc version
-    if [[ `uname -a | grep Ubuntu` != "" ]]; then
+    if [[ $(uname -a | grep Ubuntu) != "" ]]; then
         LIBSTDCPP=
         if [[ -f /usr/lib/x86_64-linux-gnu/libstdc++.so.6 ]]; then
             LIBSTDCPP=/usr/lib/x86_64-linux-gnu/libstdc++.so.6
@@ -281,7 +281,7 @@ function install_debian_eskimo_dependencies() {
         if [[ "$LIBSTDCPP" != "" ]]; then
             echo "  - Checking libstdc++"
 
-            if [[ `! strings $LIBSTDCPP | grep GLIBCXX | grep 3.4.22` == "" ]]; then
+            if [[ $(! strings $LIBSTDCPP | grep GLIBCXX | grep 3.4.22) == "" ]]; then
                 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test  >> /tmp/setup_log 2>&1
                 if [[ $? != 0 ]]; then cat /tmp/setup_log 1>&2; exit 101; fi
 
@@ -304,7 +304,7 @@ function install_debian_eskimo_dependencies() {
 rm -Rf /tmp/setup_log
 
 # Extract Linux distribution
-export LINUX_DISTRIBUTION=`cat /etc/os-release | grep -e "^ID="  | cut -d '=' -f 2 | sed s/'"'//g`
+export LINUX_DISTRIBUTION=$(cat /etc/os-release | grep -e "^ID="  | cut -d '=' -f 2 | sed s/'"'//g)
 echo "  - Linux distribution is $LINUX_DISTRIBUTION"
 
 if [[ "$LINUX_DISTRIBUTION" == "rhel" ]]; then
@@ -507,9 +507,6 @@ if [[ `mount | grep /sys/fs/cgroup/systemd` == "" ]]; then
     sudo mkdir /sys/fs/cgroup/systemd
     sudo mount -t cgroup -o none,name=systemd cgroup /sys/fs/cgroup/systemd
 fi
-
-# Make sur some required packages are installed
-#echo "  - checking some key packages"
 
 echo "  - Create group eskimoservices"
 sudo /usr/bin/getent group eskimoservices 2>&1 > /dev/null || sudo /usr/sbin/groupadd eskimoservices

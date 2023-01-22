@@ -91,14 +91,3 @@ set +e
 
 echo " - Installing and checking systemd service file"
 install_and_check_service_file etcd etcd_install_log
-
-
-
-#ACZUALLY IT?S MORE COMPLICATED THAT THAN
-#- I need to start etcd (create partial function of install_and_check_service_file above for this)
-#- then configure flannel witin etcd
-#- then start flannel
-#- and finall start k8s.slave
-#(same in master)
-
-# TODO setup flannel

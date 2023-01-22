@@ -111,7 +111,7 @@ bash -c "echo -e \"\n# Set the number of replicas (additional copies) of an inde
 bash -c "echo \"index.number_of_replicas=DEFAULT\" >> /usr/local/lib/elasticsearch/config/elasticsearch-index-defaults.properties"
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container config SUCCESS"
+echo "$IN_CONTAINER_CONFIG_SUCESS_MESSAGE"
 
 
 

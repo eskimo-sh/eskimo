@@ -71,11 +71,7 @@ docker_cp_script containerWatchDog.sh sbin prometheus prometheus_install_log
 
 echo " - Configuring prometheus container"
 docker exec prometheus bash /scripts/inContainerSetupPrometheus.sh | tee -a prometheus_install_log 2>&1
-if [[ `tail -n 1 prometheus_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat prometheus_install_log
-    exit 100
-fi
+check_in_container_config_success prometheus_install_log
 
 echo " - Handling topology and setting injection"
 handle_topology_settings prometheus prometheus_install_log

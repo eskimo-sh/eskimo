@@ -84,4 +84,4 @@ sudo bash -c "echo \"end-volume\" >> /var/lib/gluster/glusterfs.VOLUME_FILE"
 
 
 # Caution : the in container setup script must mandatorily finish with this log"
-echo " - In container config SUCCESS"
+echo "$IN_CONTAINER_CONFIG_SUCESS_MESSAGE"

@@ -77,11 +77,7 @@ fail_if_error $? "grafana_install_log" -2
 
 echo " - Configuring grafana container"
 docker exec grafana bash /scripts/inContainerSetupGrafana.sh $grafana_user_id $CONTEXT_PATH | tee -a grafana_install_log 2>&1
-if [[ `tail -n 1 grafana_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat grafana_install_log
-    exit 100
-fi
+check_in_container_config_success grafana_install_log
 
 echo " - Handling topology and setting injection"
 handle_topology_settings grafana grafana_install_log

@@ -128,48 +128,24 @@ fail_if_error $? "zeppelin_install_log" -2
 #        -v /usr/local/etc/zeppelin:/usr/local/etc/zeppelin \
 
 echo " - Configuring zeppelin container - spark common part"
-docker exec zeppelin bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id \
-        | tee zeppelin_install_log 2>&1
-if [[ `tail -n 1 zeppelin_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat zeppelin_install_log
-    exit 31
-fi
+docker exec zeppelin bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id | tee zeppelin_install_log 2>&1
+check_in_container_config_success zeppelin_install_log
 
 echo " - Configuring zeppelin container - flink common part"
-docker exec zeppelin bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id \
-        | tee zeppelin_install_log 2>&1
-if [[ `tail -n 1 zeppelin_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat zeppelin_install_log
-    exit 32
-fi
+docker exec zeppelin bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id | tee zeppelin_install_log 2>&1
+check_in_container_config_success zeppelin_install_log
 
 echo " - Configuring zeppelin container - kafka common part"
-docker exec zeppelin bash /scripts/inContainerSetupKafkaCommon.sh $kafka_user_id \
-        | tee zeppelin_install_log 2>&1
-if [[ `tail -n 1 zeppelin_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat zeppelin_install_log
-    exit 33
-fi
+docker exec zeppelin bash /scripts/inContainerSetupKafkaCommon.sh $kafka_user_id | tee zeppelin_install_log 2>&1
+check_in_container_config_success zeppelin_install_log
 
 echo " - Configuring zeppelin container - kafka wrappers"
-docker exec zeppelin bash /scripts/inContainerSetupKafkaWrappers.sh  \
-        | tee zeppelin_install_log 2>&1
-if [[ `tail -n 1 zeppelin_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat zeppelin_install_log
-    exit 33
-fi
+docker exec zeppelin bash /scripts/inContainerSetupKafkaWrappers.sh | tee zeppelin_install_log 2>&1
+check_in_container_config_success zeppelin_install_log
 
 echo " - Configuring zeppelin container"
 docker exec zeppelin bash /scripts/inContainerSetupZeppelin.sh | tee zeppelin_install_log 2>&1
-if [[ `tail -n 1 zeppelin_install_log` != " - In container config SUCCESS" ]]; then
-    echo " - In container setup script ended up in error"
-    cat zeppelin_install_log
-    exit 35
-fi
+check_in_container_config_success zeppelin_install_log
 
 echo " - Copying Topology Injection Script (Spark)"
 docker_cp_script inContainerInjectTopologySpark.sh sbin zeppelin zeppelin_install_log
