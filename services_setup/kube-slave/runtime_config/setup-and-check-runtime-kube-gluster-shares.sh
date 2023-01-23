@@ -49,7 +49,7 @@ export OWNER=kubernetes
 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # ALL OF WHAT FOLLOWS IS COPIED FROM gluster_mount_internal.sh from the eskimo gluster package
-# Don't do any modification here, make them in gluster_mount_internal.sh and then onl yreport them here
+# Don't do any modification here, make them in gluster_mount_internal.sh and then only report them here
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 export MOUNT_POINT_NAME=`echo $MOUNT_POINT | tr -s '/' '-'`

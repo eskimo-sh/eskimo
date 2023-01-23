@@ -43,8 +43,8 @@ After=gluster.service
 After=ntp.service
 Wants=etcd.service
 Requires=gluster.service
-StartLimitBurst=7
-StartLimitIntervalSec=1000
+StartLimitBurst=6
+StartLimitIntervalSec=1200
 
 [Service]
 Type=simple

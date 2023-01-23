@@ -67,6 +67,10 @@ if [[ $kafka_user_id == "" ]]; then
     exit 3
 fi
 
+echo " - Creating lo folder required for glusterMountChecker"
+sudo mkdir -p /var/log/gluster/
+sudo chown -R kafka /var/log/gluster/
+
 
 echo " - Simlinking kafka logs to /var/log/"
 sudo rm -Rf /usr/local/lib/kafka/logs

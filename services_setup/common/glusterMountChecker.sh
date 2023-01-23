@@ -54,7 +54,7 @@ trap delete_gluster_check_lock_file EXIT
 trap delete_gluster_check_lock_file ERR
 
 mkdir -p /var/lib/gluster/
-touch /var/lib/gluster/$VOLUME_MANAGEMENT_LOCK_FILE
+touch $VOLUME_MANAGEMENT_LOCK_FILE
 
 
 # when running on host, checking that the gluster container is actually running before doing anything
