@@ -98,11 +98,9 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
         if (previousConfig != null) {
             for (String service : servicesDefinition.listKubernetesServicesOrderedByDependencies()) {
                 if (rawKubeServicesConfig.isServiceInstallRequired(service)
-                        && !retCommand.getInstallations().contains(new KubernetesOperationId("installation", service))) {
-
-                    if (rawKubeServicesConfig.isDifferentConfig(previousConfig, service)) {
-                        retCommand.addRestart(new KubernetesOperationId("restart", service));
-                    }
+                        && !retCommand.getInstallations().contains(new KubernetesOperationId("installation", service))
+                        && rawKubeServicesConfig.isDifferentConfig(previousConfig, service)) {
+                    retCommand.addRestart(new KubernetesOperationId("restart", service));
                 }
             }
         }
