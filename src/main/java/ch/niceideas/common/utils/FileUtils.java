@@ -40,6 +40,9 @@ import org.apache.commons.compress.utils.IOUtils;
 import org.apache.log4j.Logger;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 import java.util.zip.GZIPOutputStream;
 
 
@@ -107,10 +110,6 @@ public class FileUtils {
             return;
         }
 
-        if (!file.exists()) {
-            return;
-        }
-
         if (file.isDirectory()) {
 
             // directory is empty, then delete it
@@ -144,11 +143,13 @@ public class FileUtils {
 
         } else {
             // if file, then delete it
-            if (file.delete()) {
-                logger.debug("File is deleted : " + file.getAbsolutePath());
-            } else {
-                throw new FileDeleteFailedException ( "Could not delete file " + file.getAbsolutePath());
-            }            
+            try {
+                Files.delete(Paths.get(file.getAbsolutePath()));
+            } catch (NoSuchFileException e) {
+                logger.debug(e, e);
+            } catch (IOException e) {
+                throw new FileDeleteFailedException (e);
+            }
         }
     }
     
@@ -158,6 +159,10 @@ public class FileUtils {
 
         FileDeleteFailedException(String message) {
             super(message);
+        }
+
+        FileDeleteFailedException(Exception e) {
+            super(e);
         }
         
     }
