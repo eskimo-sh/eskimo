@@ -49,6 +49,8 @@ fi
 
 . /etc/k8s/env.sh
 
+. /usr/local/sbin/eskimo-utils.sh
+
 sudo rm -Rf /tmp/kube_base_setup
 mkdir /tmp/kube_base_setup
 cd /tmp/kube_base_setup
@@ -96,29 +98,11 @@ fi
 
 echo " - Creating / checking eskimo kubernetes base config"
 
-
-function delete_ssl_lock_file() {
-     sudo rm -Rf /etc/k8s/shared/ssl_management_lock
-}
-
-# From here we will be messing with gluster and hence we need to take a lock
-counter=0
-while [[ -f /etc/k8s/shared/ssl_management_lock ]] ; do
-    echo "   + /etc/k8s/shared/ssl_management_lock exist. waiting 2 secs ... "
-    sleep 2
-    let counter=counter+1
-    if [[ $counter -ge 30 ]]; then
-        echo " !!! Couldn't get /etc/k8s/shared/ssl_management_lock in 60 seconds. crashing !"
-        exit 150
-    fi
-done
-
-sudo touch /etc/k8s/shared/ssl_management_lock
-
-trap delete_ssl_lock_file 15
-trap delete_ssl_lock_file EXIT
-trap delete_ssl_lock_file ERR
-
+take_global_lock ssl_management_lock /etc/k8s/shared/
+if [[ $? != 0 ]]; then
+    echo " !!! Couldn't get /etc/k8s/shared/ssl_management_lock in 60 seconds. crashing !"
+    exit 150
+fi
 
 
 if [[ ! -f /etc/k8s/shared/ssl/ca-config.json ]]; then
@@ -388,9 +372,6 @@ if [[ ! -f /etc/k8s/shared/ssl//etc/k8s/shared/ssl/kubernetes.pem ]]; then
     sudo chown kubernetes /etc/k8s/shared/ssl/kubernetes*csr*
 fi
 
-
-
-delete_ssl_lock_file
 
 set +e
 

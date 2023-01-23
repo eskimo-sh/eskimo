@@ -36,12 +36,15 @@
 
 # This script checks the gluster mount defined in /etc/fstab and attenpts to fix those that report issues
 
+# Not using eskimo-utils - locking features since this can run in container as well
+export VOLUME_MANAGEMENT_LOCK_FILE=/var/lib/gluster/volume_management_lock_check.lock
+
 function delete_gluster_check_lock_file() {
-     rm -Rf /var/lib/gluster/volume_management_lock_check
+     rm -Rf $VOLUME_MANAGEMENT_LOCK_FILE
 }
 
 # From here we will be messing with gluster and hence we need to take a lock
-if [[ -f /var/lib/gluster/volume_management_lock_check ]] ; then
+if [[ -f $VOLUME_MANAGEMENT_LOCK_FILE ]] ; then
     echo "$(date +'%Y-%m-%d %H:%M:%S') - glusterMountChecker.sh is in execution already. Skipping ..."
     exit 0
 fi
@@ -51,7 +54,7 @@ trap delete_gluster_check_lock_file EXIT
 trap delete_gluster_check_lock_file ERR
 
 mkdir -p /var/lib/gluster/
-touch /var/lib/gluster/volume_management_lock_check
+touch /var/lib/gluster/$VOLUME_MANAGEMENT_LOCK_FILE
 
 
 # when running on host, checking that the gluster container is actually running before doing anything

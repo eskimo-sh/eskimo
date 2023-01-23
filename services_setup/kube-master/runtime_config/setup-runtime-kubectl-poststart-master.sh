@@ -48,6 +48,8 @@ fi
 
 . /etc/k8s/env.sh
 
+. /usr/local/sbin/eskimo-utils.sh
+
 echo " - Postprocessing kube config file for user eskimo"
 
 echo "   + create temp folder"
@@ -55,29 +57,13 @@ tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
 cd $tmp_dir
 
 
-function delete_k8s_poststart_lock_file() {
-     rm -Rf /etc/k8s/k8s_poststart_management_lock
-}
 
-# From here we will be messing with gluster and hence we need to take a lock
-counter=0
-while [[ -f /etc/k8s/k8s_poststart_management_lock ]] ; do
-    echo "   + /etc/k8s/k8s_poststart_management_lock exist. waiting 2 secs ... "
-    sleep 2
-    let counter=counter+1
-    if [[ $counter -ge 15 ]]; then
-        echo " !!! Couldn't get /etc/k8s/k8s_poststart_management_lock in 30 seconds. crashing !"
-        exit 150
-    fi
-done
+take_global_lock k8s_poststart_management_lock /etc/k8s/
+if [[ $? != 0 ]]; then
+    echo " !!! Couldn't get /etc/k8s/k8s_poststart_management_lock in 30 seconds. crashing !"
+    exit 150
+fi
 
-
-trap delete_k8s_poststart_lock_file 15
-trap delete_k8s_poststart_lock_file EXIT
-trap delete_k8s_poststart_lock_file ERR
-
-
-touch /etc/k8s/k8s_poststart_management_lock
 
 set -e
 
@@ -176,9 +162,6 @@ fi
 echo "   + Copying kube config file to root"
 sudo cp /home/$ADMIN_USER/.kube/config /root/.kube/config
 sudo chown root.root /root/.kube/config
-
-
-delete_k8s_poststart_lock_file
 
 set +e
 

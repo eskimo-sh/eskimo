@@ -75,6 +75,8 @@ rm -Rf /tmp/gluster_mount_"$VOLUME"_log
 
 . /etc/eskimo_topology.sh
 
+. /usr/local/sbin/eskimo-utils.sh
+
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
     echo " - No Self Node Number found in topology"
@@ -88,22 +90,12 @@ fi
 
 set +e
 
-function delete_gluster_lock_file() {
-     rm -Rf /var/lib/gluster/volume_management_lock_$VOLUME
-}
-
-# From here we will be messing with gluster and hence we need to take a lock
-if [[ -f /var/lib/gluster/volume_management_lock_$VOLUME ]] ; then
+# Take exclusive lock
+take_global_lock volume_management_lock_$VOLUME /var/lib/gluster/ nonblock
+if [[ $? != 0 ]]; then
     echo " - gluster-mount.sh is in execution on $VOLUME already. Stopping"
     exit 0
 fi
-
-trap delete_gluster_lock_file 15
-trap delete_gluster_lock_file EXIT
-trap delete_gluster_lock_file ERR
-
-
-touch /var/lib/gluster/volume_management_lock_$VOLUME
 
 # Creating the mount point if it does not exist
 if [[ ! -d "$MOUNT_POINT" ]]; then
@@ -181,5 +173,3 @@ if [[ `stat -c '%U' $MOUNT_POINT` != "$OWNER" ]]; then
 fi
 
 chmod -R 777 $MOUNT_POINT
-
-delete_gluster_lock_file

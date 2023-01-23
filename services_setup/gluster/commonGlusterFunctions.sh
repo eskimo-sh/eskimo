@@ -34,14 +34,6 @@
 # Software.
 #
 
-
-# Take care of deleting the gluster management lock file upon maintenance script exit
-function delete_gluster_management_lock_file() {
-    echo " - releasing gluster_management_lock"
-    rm -Rf /var/lib/gluster/gluster_management_lock
-}
-
-
 # Convert list of hostnames passed in argument to IP addresses
 function hostnames_to_ips () {
 

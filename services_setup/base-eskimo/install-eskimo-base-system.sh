@@ -36,7 +36,7 @@
 
 echoerr() { echo "$@" 1>&2; }
 
-export PATH=/bin:/sbin/:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
+export PATH=$PATH:/bin:/sbin/:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 
 function fail_if_error(){
     if [[ $1 != 0 ]]; then
@@ -439,12 +439,6 @@ fi
 echo "  - Enabling docker"
 enable_docker
 
-#echo " - Creating eskimo docker bridge interface"
-#
-#if [[ `docker network ls | grep docker-eskimo` == "" ]]; then
-#    docker network create -d bridge --subnet 117.1.0.0/16 docker-eskimo
-#fi
-
 # Docker is likely running on systemd cgroup driver or cgroup2, need to bring it back to using systemd as cgroup driver
 if [[ `grep native.cgroupdriver=systemd /etc/docker/daemon.json` == "" ]]; then
 
@@ -570,9 +564,9 @@ create_user_infrastructure flink 3305
 
 create_user_infrastructure kubernetes 3306
 
-# removing all remaining locks
-rm -Rf /etc/k8s/k8s_poststart_management_lock
-rm -Rf /var/lib/gluster/volume_management_lock_*
+# removing all remaining / staled lock files upon startup
+rm -Rf /etc/k8s/*.lock
+rm -Rf /var/lib/gluster/*.lock
 
 EOF
 

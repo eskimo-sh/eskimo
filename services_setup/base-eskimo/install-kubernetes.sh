@@ -34,7 +34,13 @@
 # Software.
 #
 
-. /etc/eskimo_topology.sh
+if [[ $TEST_MODE != "true" ]]; then
+    . /etc/eskimo_topology.sh
+else
+    # use co-located dummy topology file in test mode
+    . ./eskimo_topology.sh
+fi
+
 
 function fail_if_error(){
     if [[ $1 != 0 ]]; then
@@ -60,7 +66,7 @@ sudo rm -Rf /tmp/kube_setup > /tmp/kube_install_log 2>&1
 mkdir -p /tmp/kube_setup
 
 echo " - Getting eskimo Kube package version"
-export ESKIMO_KUBE_PACKAGE=$(ls -1 eskimo_kube_*.tar.gz)
+export ESKIMO_KUBE_PACKAGE=$(/bin/ls -1 eskimo_kube_*.tar.gz)
 export K8S_VERSION=$(basename -s .tar.gz $ESKIMO_KUBE_PACKAGE  | awk -F"_" '{ print $3 }')
 
 if [[ "$K8S_VERSION" == "" ]]; then
@@ -72,7 +78,9 @@ fi
 
 mv eskimo_kube_$K8S_VERSION*.tar.gz /tmp/kube_setup/eskimo_kube_$K8S_VERSION.tar.gz
 
-cd /tmp/kube_setup
+if [[ -z $TEST_MODE ]]; then
+    cd /tmp/kube_setup
+fi
 
 
 echo " - Extracting kube_$K8S_VERSION"
@@ -155,24 +163,22 @@ if [[ ! -f /opt/cni/bin ]]; then
     sudo ln -s /usr/local/lib/k8s/cni-plugins /opt/cni/bin
 fi
 
-echo " - Create / update eskimo K8S version file"
-sudo bash -c "echo K8S_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"k8s-*.*\" | cut -d '-' -f 2` > /etc/eskimo_k8s_environment"
+if [[ -z $TEST_MODE ]]; then
+    echo " - Create / update eskimo K8S version file"
+    sudo bash -c "echo K8S_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"k8s-*.*\" | cut -d '-' -f 2` > /etc/eskimo_k8s_environment"
 
-echo " - Checking eskimo K8S version file"
-if [[ -z $TEST_MODE && ! -f /etc/eskimo_k8s_environment ]]; then
-    echo "Could not create /etc/eskimo_k8s_environment"
-    exit 21
+    echo " - Checking eskimo K8S version file"
+    if [[ ! -f /etc/eskimo_k8s_environment ]]; then
+        echo "Could not create /etc/eskimo_k8s_environment"
+        exit 21
+    fi
+    . /etc/eskimo_k8s_environment
+
+    if [[ ! -d /usr/local/lib/k8s-$K8S_VERSION ]]; then
+        echo "/etc/eskimo_k8s_environment doesn't point to valid mesos version"
+        exit 21
+    fi
 fi
-. /etc/eskimo_k8s_environment
-
-if [[ -z $TEST_MODE && ! -d /usr/local/lib/k8s-$K8S_VERSION ]]; then
-    echo "/etc/eskimo_k8s_environment doesn't point to valid mesos version"
-    exit 21
-fi
-
-echo " - Installation tests"
-echo "   + TODO"
-# TODO
 
 echo " - Cleaning build folder"
 cd $saved_dir

@@ -36,32 +36,17 @@
 
 echoerr() { echo "$@" 1>&2; }
 
+. /usr/local/sbin/eskimo-utils.sh
+
 
 echo " - Starting K8s Eskimo Slave"
 
-function delete_k8s_slave_lock_file() {
-   # Not in gluster share !!!
-   rm -Rf /var/lib/kubernetes/k8s_slave_management_lock
-}
-
-# From here we will be messing with gluster and hence we need to take a lock
-counter=0
-while [[ -f /var/lib/kubernetes/k8s_slave_management_lock ]] ; do
-    echo "   + /var/lib/kubernetes/k8s_slave_management_lock exist. waiting 2 secs ... "
-    sleep 2
-    let counter=counter+1
-    if [[ $counter -ge 15 ]]; then
-        echo " !!! Couldn't get /var/lib/kubernetes/k8s_slave_management_lock in 30 seconds. crashing !"
-        exit 150
-    fi
-done
-
-echo "   + Taking startup lock"
-touch /var/lib/kubernetes/k8s_slave_management_lock
-
-trap delete_k8s_slave_lock_file 15
-trap delete_k8s_slave_lock_file EXIT
-trap delete_k8s_slave_lock_file ERR
+take_lock k8s_slave_management_lock /var/lib/kubernetes/
+if [[ $? != 0 ]]; then
+    echo " !!! Couldn't get /var/lib/kubernetes/k8s_slave_management_lock in 30 seconds. crashing !"
+    exit 150
+fi
+export lock_handle=$LAST_LOCK_HANDLE
 
 
 echo "   + Sourcing kubernetes environment"
@@ -189,8 +174,8 @@ fi
 
 
 
-echo "   + Deleting lock file"
-delete_k8s_slave_lock_file
+echo "   + Releasing lock"
+release_lock $lock_handle
 
 echo "   + Entering monitoring loop"
 while : ; do

@@ -49,33 +49,20 @@ fi
 # Sourcing kubernetes environment
 . /etc/k8s/env.sh
 
+. /usr/local/sbin/eskimo-utils.sh
+
 export HOME=/root
 
 
 if [[ ! -f /etc/k8s/flag-dns-setup ]]; then
-    
-    function delete_k8s_dns_setup_lock_file() {
-         rm -Rf /etc/k8s/k8s_dns_setup_management_lock
-    }
-    
-    # From here we will be messing with gluster and hence we need to take a lock
-    counter=0
-    while [[ -f /etc/k8s/k8s_dns_setup_management_lock ]] ; do
-        echo "   + /etc/k8s/k8s_dns_setup_management_lock exist. waiting 2 secs ... "
-        sleep 2
-        let counter=counter+1
-        if [[ $counter -ge 15 ]]; then
-            echo " !!! Couldn't get /etc/k8s/k8s_dns_setup_management_lock in 30 seconds. crashing !"
-            exit 150
-        fi
-    done
-    
-    trap delete_k8s_dns_setup_lock_file 15
-    trap delete_k8s_dns_setup_lock_file EXIT
-    trap delete_k8s_dns_setup_lock_file ERR
 
-    
-    touch /etc/k8s/k8s_dns_setup_management_lock
+    take_lock k8s_dns_setup_management_lock /etc/k8s/
+    if [[ $? != 0 ]]; then
+        echo " !!! Couldn't get /etc/k8s/k8s_dns_setup_management_lock in 30 seconds. crashing !"
+        exit 150
+    fi
+    export lock_handle=$LAST_LOCK_HANDLE
+
       
     echo " - Setting up dnsmasq to reach kube services"
 
@@ -135,7 +122,8 @@ if [[ ! -f /etc/k8s/flag-dns-setup ]]; then
 
 
     touch /etc/k8s/flag-dns-setup
-    rm -Rf /etc/k8s/k8s_dns_setup_management_lock
+
+    release_lock $lock_handle
 fi
 
 

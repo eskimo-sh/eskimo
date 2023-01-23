@@ -37,22 +37,15 @@
 echoerr() { echo "$@" 1>&2; }
 
 
-function delete_kube_housekeeping_lock_file() {
-     rm -Rf /var/lib/kubernetes/kube_houskeeping_lock
-}
+. /usr/local/sbin/eskimo-utils.sh
 
-# From here we will be messing with kubernetes and hence we need to take a lock
-if [[ -f /var/lib/kubernetes/kube_houskeeping_lock ]] ; then
+# Take exclusive lock
+mkdir -p /var/lib/kubernetes/
+take_global_lock kube_houskeeping_lock /var/lib/kubernetes/ nonblock
+if [[ $? != 0 ]]; then
     echo `date +"%Y-%m-%d %H:%M:%S"`" - kube-housekeeping.sh is in execution already. Skipping ..."
     exit 0
 fi
-
-trap delete_kube_housekeeping_lock_file 15
-trap delete_kube_housekeeping_lock_file EXIT
-trap delete_kube_housekeeping_lock_file ERR
-
-mkdir -p /var/lib/kubernetes/
-touch /var/lib/kubernetes/kube_houskeeping_lock
 
 
 echo "   + Sourcing kubernetes environment"
@@ -84,5 +77,3 @@ for failedPod in `kubectl get pods --all-namespaces --field-selector 'status.pha
             >> /var/log/kubernetes/kube-houskeeping.log
 
 done
-
-delete_kube_housekeeping_lock_file
