@@ -45,7 +45,6 @@ import ch.niceideas.eskimo.services.SystemServiceTest;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.testwrappers.SetupServiceUnderTest;
 import org.apache.log4j.Logger;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -252,6 +251,7 @@ public abstract class AbstractSetupShellTest {
         createDummyExecutable("docker", tempFile.getAbsolutePath());
         createDummyExecutable("sed", tempFile.getAbsolutePath());
         createDummyExecutable("sudo", tempFile.getAbsolutePath());
+        createDummyExecutable("pidof", tempFile.getAbsolutePath());
 
         File var = new File (tempFile, "var");
         assertTrue (var.mkdirs());
@@ -400,7 +400,7 @@ public abstract class AbstractSetupShellTest {
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(currentFolder + "/.log_docker"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(dockerLogs)) {
 
-            System.err.println (dockerLogs);
+            //System.err.println (dockerLogs);
 
             int indexOfImagesQ = dockerLogs.indexOf("images -q eskimo:" + getTemplateName() + "_template");
             assertTrue(indexOfImagesQ > -1);

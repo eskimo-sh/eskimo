@@ -136,10 +136,12 @@ public class NodesConfigurationServiceTest {
         assertEquals (" - Calling install-eskimo-base-system.sh\n" +
                 " - Copying jq program\n" +
                 " - Copying gluster-mount script\n" +
+                " - Copying eskimo-utils.sh script\n" +
                 " - Copying eskimo-kubectl script\n", sb.toString());
 
         assertEquals ("192.168.10.11:./services_setup/base-eskimo/jq-1.6-linux64\n" +
                 "192.168.10.11:./services_setup/base-eskimo/gluster_mount.sh\n" +
+                "192.168.10.11:./services_setup/base-eskimo/eskimo-utils.sh\n" +
                 "192.168.10.11:./services_setup/base-eskimo/eskimo-kubectl", sshCommandServiceTest.getExecutedScpCommands().trim());
 
         assertEquals ("./services_setup/base-eskimo/install-eskimo-base-system.sh\n" +
@@ -149,6 +151,9 @@ public class NodesConfigurationServiceTest {
                 "sudo mv gluster_mount.sh /usr/local/sbin/gluster_mount.sh\n" +
                 "sudo chown root.root /usr/local/sbin/gluster_mount.sh\n" +
                 "sudo chmod 755 /usr/local/sbin/gluster_mount.sh\n" +
+                "sudo mv eskimo-utils.sh /usr/local/sbin/eskimo-utils.sh\n" +
+                "sudo chown root.root /usr/local/sbin/eskimo-utils.sh\n" +
+                "sudo chmod 755 /usr/local/sbin/eskimo-utils.sh\n" +
                 "sudo mv eskimo-kubectl /usr/local/bin/eskimo-kubectl\n" +
                 "sudo chown root.root /usr/local/bin/eskimo-kubectl\n" +
                 "sudo chmod 755 /usr/local/bin/eskimo-kubectl\n", sshCommandServiceTest.getExecutedCommands());

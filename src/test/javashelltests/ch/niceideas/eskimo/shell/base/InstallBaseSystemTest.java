@@ -49,11 +49,13 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class InstallKubernetesTest {
+public class InstallBaseSystemTest {
 
     protected String jailPath = null;
 
-    /** Run Test on Linux only */
+    /**
+     * Run Test on Linux only
+     */
     @BeforeEach
     public void beforeMethod() {
         Assumptions.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
@@ -71,92 +73,13 @@ public class InstallKubernetesTest {
         jailPath = AbstractSetupShellTest.createJail();
 
         FileUtils.copy(
-                new File("./services_setup/base-eskimo/install-kubernetes.sh"),
-                new File (jailPath + "/install-kubernetes.sh"));
+                new File("./services_setup/base-eskimo/install-eskimo-base-system.sh"),
+                new File(jailPath + "/install-eskimo-base-system.sh"));
 
-        ProcessHelper.exec(new String[]{"bash", "-c", "chmod 777 " + jailPath + "/install-kubernetes.sh"}, true);
+        ProcessHelper.exec(new String[]{"bash", "-c", "chmod 777 " + jailPath + "/install-eskimo-base-system.sh"}, true);
 
         // I need the real bash
-        assertTrue (new File (jailPath + "/bash").delete());
-
-        createEskimoKubeDummyPackage();
-    }
-
-    private void createEskimoKubeDummyPackage() throws Exception {
-        File k8s = new File (jailPath, "k8s");
-        assertTrue (k8s.mkdirs());
-
-        File cfssl = new File (k8s, "cfssl");
-        assertTrue (cfssl.mkdirs());
-        File cfsslBin = new File (cfssl, "bin");
-        assertTrue (cfsslBin.mkdirs());
-        FileUtils.writeFile(new File (cfsslBin, "cfssl-1.6.3_linux_amd64"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (cfsslBin, "cfssl"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (cfsslBin, "cfssljson-1.6.3_linux_amd64"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (cfsslBin, "cfssljson"), "#!/bin/bash\necho OK");
-
-        File cniPluginsV = new File (k8s, "cni-plugins-v1.1.1");
-        assertTrue (cniPluginsV.mkdirs());
-        ProcessHelper.exec(new String[]{"bash", "-c", "cd " + k8s.getAbsolutePath() + " && /bin/ln -s cni-plugins-v1.1.1 cni-plugins"}, true);
-        FileUtils.writeFile(new File (cniPluginsV, "bridge"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (cniPluginsV, "host-device"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (cniPluginsV, "host-local"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (cniPluginsV, "loopback"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (cniPluginsV, "static"), "#!/bin/bash\necho OK");
-
-        File criDockerdV = new File (k8s, "cri-dockerd-0.3.0");
-        assertTrue (criDockerdV.mkdirs());
-        ProcessHelper.exec(new String[]{"bash", "-c", "cd " + k8s.getAbsolutePath() + " && /bin/ln -s cri-dockerd-0.3.0 cri-dockerd"}, true);
-        FileUtils.writeFile(new File (cniPluginsV, "cri-dockerd"), "#!/bin/bash\necho OK");
-
-        File etcdV = new File (k8s, "etcd-v3.5.6");
-        assertTrue (etcdV.mkdirs());
-        ProcessHelper.exec(new String[]{"bash", "-c", "cd " + k8s.getAbsolutePath() + " && /bin/ln -s etcd-v3.5.6 etcd"}, true);
-        File etcdBin = new File (etcdV, "bin");
-        assertTrue (etcdBin.mkdirs());
-        FileUtils.writeFile(new File (etcdBin, "etcd"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (etcdBin, "etcdctl"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (etcdBin, "etcdutl"), "#!/bin/bash\necho OK");
-
-        File images = new File (k8s, "images");
-        assertTrue (images.mkdirs());
-        FileUtils.writeFile(new File (images, "coredns_coredns:1.10.0.tar.gz"), "DUMMY");
-        FileUtils.writeFile(new File (images, "k8s.gcr.io_pause:3.6.tar.gz"), "DUMMY");
-
-        File kubernetesV = new File (k8s, "kubernetes-v1.25.3");
-        assertTrue (kubernetesV.mkdirs());
-        ProcessHelper.exec(new String[]{"bash", "-c", "cd " + k8s.getAbsolutePath() + " && /bin/ln -s kubernetes-v1.25.3 kubernetes"}, true);
-        File kubernetesClient = new File (kubernetesV, "client");
-        assertTrue (kubernetesClient.mkdirs());
-        File kubernetesClientBin = new File (kubernetesClient, "client");
-        assertTrue (kubernetesClientBin.mkdirs());
-        FileUtils.writeFile(new File (kubernetesClientBin, "kubectl"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (kubernetesClientBin, "kubectl-convert"), "#!/bin/bash\necho OK");
-        File kubernetesServer = new File (kubernetesV, "server");
-        assertTrue (kubernetesServer.mkdirs());
-        File kubernetesServerBin = new File (kubernetesServer, "client");
-        assertTrue (kubernetesServerBin.mkdirs());
-        FileUtils.writeFile(new File (kubernetesServerBin, "kubeadm"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (kubernetesServerBin, "kube-aggregator"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (kubernetesServerBin, "kube-apiserver"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (kubernetesServerBin, "kube-controller-manager"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (kubernetesServerBin, "kube-ctl"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (kubernetesServerBin, "kubelet"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (kubernetesServerBin, "kube-proxy"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (kubernetesServerBin, "kube-scheduler"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (kubernetesServerBin, "kube-log-runner"), "#!/bin/bash\necho OK");
-        FileUtils.writeFile(new File (kubernetesServerBin, "mounter"), "#!/bin/bash\necho OK");
-
-        File kubeRouterV = new File (k8s, "kube-router-V1.5.3");
-        assertTrue (kubeRouterV.mkdirs());
-        ProcessHelper.exec(new String[]{"bash", "-c", "cd " + k8s.getAbsolutePath() + " && /bin/ln -s kube-router-V1.5.3 kube-router"}, true);
-        File kubeRouterBin = new File (kubeRouterV, "bin");
-        assertTrue (kubeRouterBin.mkdirs());
-        FileUtils.writeFile(new File (kubeRouterBin, "kube-router"), "#!/bin/bash\necho OK");
-
-        FileUtils.createTarFile(jailPath + "/k8s", new File (jailPath + "/eskimo_kube_1.25.5.tar.gz"));
-        Thread.sleep(100);
-        FileUtils.delete(k8s);
+        assertTrue(new File(jailPath + "/bash").delete());
     }
 
     private void createTestScript(String scriptName) throws FileException {
@@ -177,8 +100,8 @@ public class InstallKubernetesTest {
                 "export PATH=$SCRIPT_DIR:$PATH\n" +
                 "\n" +
                 "# Call command\n" +
-                "$SCRIPT_DIR/install-kubernetes.sh";
-        FileUtils.writeFile(new File (jailPath + "/" + scriptName), script);
+                "$SCRIPT_DIR/install-eskimo-base-system.sh";
+        FileUtils.writeFile(new File(jailPath + "/" + scriptName), script);
     }
 
 
@@ -198,98 +121,84 @@ public class InstallKubernetesTest {
         String sudoLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_sudo"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(sudoLogs)) {
 
-            int indexOfLnK8s = sudoLogs.indexOf("ln -s /usr/local/lib/k8s-1.25.5 /usr/local/lib/k8s");
-            assertTrue(indexOfLnK8s > -1);
+            int indexOfMkDirEskimo = sudoLogs.indexOf("mkdir -p /var/lib/eskimo");
+            assertTrue(indexOfMkDirEskimo > -1);
 
-            int indexOfLnK8sEtc = sudoLogs.indexOf("ln -s /usr/local/etc/k8s /usr/local/lib/k8s/etc", indexOfLnK8s);
-            assertTrue(indexOfLnK8sEtc > -1);
+            int indexOfEnableDocker = sudoLogs.indexOf("systemctl enable docker", indexOfMkDirEskimo);
+            assertTrue(indexOfEnableDocker > -1);
 
-            int indexOfLnEtcdEtc = sudoLogs.indexOf("ln -s /usr/local/etc/etcd /usr/local/lib/k8s/etcd_etc", indexOfLnK8sEtc);
-            assertTrue(indexOfLnEtcdEtc > -1);
+            int indexOfStardDocker = sudoLogs.indexOf("systemctl start docker", indexOfEnableDocker);
+            assertTrue(indexOfStardDocker > -1);
 
-            int indexOfLnCfssl = sudoLogs.indexOf("ln -s /usr/local/lib/k8s/cfssl/bin/cfssl /usr/local/bin/cfssl", indexOfLnEtcdEtc);
-            assertTrue(indexOfLnCfssl > -1);
+            int indexOfRestartDocker = sudoLogs.indexOf("systemctl restart docker", indexOfStardDocker);
+            assertTrue(indexOfRestartDocker > -1);
 
-            int indexOfLnCfsslJson = sudoLogs.indexOf("ln -s /usr/local/lib/k8s/cfssl/bin/cfssljson /usr/local/bin/cfssljson", indexOfLnCfssl);
-            assertTrue(indexOfLnCfsslJson > -1);
+            int indexOfMaxMapCount = sudoLogs.indexOf("sysctl -w vm.max_map_count=262144", indexOfRestartDocker);
+            assertTrue(indexOfMaxMapCount > -1);
 
-            int indexOfLnCni = sudoLogs.indexOf("ln -s /usr/local/lib/k8s/cni-plugins /opt/cni/bin", indexOfLnCfsslJson);
-            assertTrue(indexOfLnCni > -1);
+            int indexOfDaemonReload = sudoLogs.indexOf("systemctl daemon-reload", indexOfMaxMapCount);
+            assertTrue(indexOfDaemonReload > -1);
+
+            int indexOfStartEskimoChecks = sudoLogs.indexOf("systemctl start eskimo-startup-checks", indexOfDaemonReload);
+            assertTrue(indexOfStartEskimoChecks > -1);
+
+            int indexOfEnableEskimoChecks = sudoLogs.indexOf("systemctl enable eskimo-startup-checks", indexOfStartEskimoChecks);
+            assertTrue(indexOfEnableEskimoChecks > -1);
 
         } else {
-            fail ("Expected Sudo Logs");
+            fail("Expected Sudo Logs");
         }
     }
 
     private void assertExpectedScriptOutput(String result) {
 
-        int indexOfTitle = result.indexOf("INSTALLING KUBERNETES");
-        assertTrue(indexOfTitle > -1);
+        int indexOfCheckSystemd = result.indexOf("checking if systemd is running");
+        assertTrue(indexOfCheckSystemd > -1);
 
-        int indexOfCsDir = result.indexOf("Changing to temp directory", indexOfTitle + 1);
-        assertTrue(indexOfCsDir > -1);
+        int indexOfLinuxDistro = result.indexOf("Linux distribution is ", indexOfCheckSystemd);
+        assertTrue(indexOfLinuxDistro > -1);
 
-        int indexOfKubeVersion = result.indexOf("Eskimo Kube package version is 1.25.5", indexOfCsDir + 1);
-        assertTrue(indexOfKubeVersion > -1);
+        int indexOfUpdateApt = result.indexOf("updating apt package index", indexOfLinuxDistro);
+        assertTrue(indexOfUpdateApt > -1);
 
-        int indexOfExtract = result.indexOf("Extracting kube_1.25.5", indexOfKubeVersion + 1);
-        assertTrue(indexOfExtract > -1);
+        int indexOfRequiredDep = result.indexOf("installing some required dependencies", indexOfUpdateApt);
+        assertTrue(indexOfRequiredDep > -1);
 
-        int indexOfInstall = result.indexOf("Installing Kubernetes", indexOfExtract + 1);
-        assertTrue(indexOfInstall > -1);
+        int indexOfOtherDep = result.indexOf("Installing other eskimo dependencies", indexOfRequiredDep);
+        assertTrue(indexOfOtherDep > -1);
 
-        int indexOfSymlinkK8s = result.indexOf("Symlinking /usr/local/lib/k8s-1.25.5 to /usr/local/lib/k8s", indexOfInstall + 1);
-        assertTrue(indexOfSymlinkK8s > -1);
+        int indexOfGlusterCli = result.indexOf("Installing gluster client", indexOfOtherDep);
+        assertTrue(indexOfGlusterCli > -1);
 
-        int indexOfSymlinkK8sConfig = result.indexOf("Simlinking k8s config to /usr/local/etc/k8s", indexOfSymlinkK8s + 1);
-        assertTrue(indexOfSymlinkK8sConfig > -1);
+        int indexOfCheckDocker = result.indexOf("checking if docker is installed", indexOfGlusterCli);
+        assertTrue(indexOfCheckDocker > -1);
 
-        int indexOfSymlinkEtcdConfig = result.indexOf("Simlinking etcd config to /usr/local/etc/etcd", indexOfSymlinkK8sConfig + 1);
-        assertTrue(indexOfSymlinkEtcdConfig > -1);
+        int indexOfEnableDocker = result.indexOf("Enabling docker service", indexOfCheckDocker);
+        assertTrue(indexOfEnableDocker > -1);
 
-        int indexOfSymlinkK8sBinaries = result.indexOf("Simlinking K8s binaries to /usr/local/bin", indexOfSymlinkK8sConfig + 1);
-        assertTrue(indexOfSymlinkK8sBinaries > -1);
+        int indexOfStartDocker = result.indexOf("Starting docker service", indexOfEnableDocker);
+        assertTrue(indexOfStartDocker > -1);
 
-        int indexOfCfssl = result.indexOf("cfssl", indexOfSymlinkK8sConfig + 1);
-        assertTrue(indexOfCfssl > -1);
+        int indexOfAddUserDocker = result.indexOf("Adding current user to docker group", indexOfStartDocker);
+        assertTrue(indexOfAddUserDocker > -1);
 
-        int indexOfEtcd = result.indexOf("etcd", indexOfCfssl + 1);
-        assertTrue(indexOfEtcd > -1);
+        int indexOfRegisterRegistry = result.indexOf("Registering kubernetes.registry as insecure registry", indexOfAddUserDocker);
+        assertTrue(indexOfRegisterRegistry > -1);
 
-        int indexOfKubeClient = result.indexOf("Kubernetes client", indexOfEtcd + 1);
-        assertTrue(indexOfKubeClient > -1);
+        int indexOfRestartDocker = result.indexOf("Restart docker", indexOfRegisterRegistry);
+        assertTrue(indexOfRestartDocker > -1);
 
-        int indexOfKubeRouter = result.indexOf("Kube-router", indexOfKubeClient + 1);
-        assertTrue(indexOfKubeRouter > -1);
+        int indexOfDisableIpV6 = result.indexOf("Disabling IPv6", indexOfRestartDocker);
+        assertTrue(indexOfDisableIpV6 > -1);
 
-        int indexOfKubeServer = result.indexOf("Kubernetes server", indexOfKubeRouter + 1);
-        assertTrue(indexOfKubeServer > -1);
+        int indexOfIncreaseMaxMapCount = result.indexOf("Increasing system vm.max_map_count setting", indexOfDisableIpV6);
+        assertTrue(indexOfIncreaseMaxMapCount > -1);
 
-        int indexOfCriDockerd = result.indexOf("Installing cri-dockerd", indexOfKubeServer + 1);
-        assertTrue(indexOfCriDockerd > -1);
+        int indexOfDisableSELinux = result.indexOf("Disable selinux if enabled", indexOfIncreaseMaxMapCount);
+        assertTrue(indexOfDisableSELinux > -1);
 
-        int indexOfCniPlugins = result.indexOf("Installing cni plugins", indexOfCriDockerd + 1);
-        assertTrue(indexOfCniPlugins > -1);
-
-        int indexOfCleaning = result.indexOf("Cleaning build folder", indexOfCniPlugins + 1);
-        assertTrue(indexOfCleaning > -1);
-
-        // these are expected in error indeed in the test
-        int indexOfEtcdBinError = result.indexOf("ls: cannot access '/usr/local/lib/k8s/etcd/bin/': No such file or directory", indexOfCleaning + 1);
-        assertTrue(indexOfEtcdBinError > -1);
-
-        int indexOfKubeCliError = result.indexOf("ls: cannot access '/usr/local/lib/k8s/kubernetes/client/bin/': No such file or directory", indexOfEtcdBinError + 1);
-        assertTrue(indexOfKubeCliError > -1);
-
-        int indexOfKubeRouterError = result.indexOf("ls: cannot access '/usr/local/lib/k8s/kube-router/bin/': No such file or directory", indexOfKubeCliError + 1);
-        assertTrue(indexOfKubeRouterError > -1);
-
-        int indexOfKubeServerError = result.indexOf("ls: cannot access '/usr/local/lib/k8s/kubernetes/server/bin/': No such file or directory", indexOfKubeRouterError + 1);
-        assertTrue(indexOfKubeServerError > -1);
-
-        int indexOfDriDockerError = result.indexOf("ls: cannot access '/usr/local/lib/k8s/cri-dockerd/': No such file or directory\n", indexOfKubeServerError + 1);
-        assertTrue(indexOfDriDockerError > -1);
+        int indexOfCGroupHack = result.indexOf("cgroup creation hack", indexOfDisableSELinux);
+        assertTrue(indexOfCGroupHack > -1);
 
     }
-
 }

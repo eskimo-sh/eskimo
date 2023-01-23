@@ -120,7 +120,7 @@ public class SystemServiceTest {
     @Test
     public void testStartService() throws Exception {
         systemService.startService(servicesDefinition.getService("ntp"), "192.168.10.11");
-        assertEquals ("sudo systemctl start ntp", sshCommandServiceTest.getExecutedCommands().trim());
+        assertEquals ("sudo bash -c 'systemctl reset-failed ntp && systemctl start ntp'", sshCommandServiceTest.getExecutedCommands().trim());
     }
 
     @Test

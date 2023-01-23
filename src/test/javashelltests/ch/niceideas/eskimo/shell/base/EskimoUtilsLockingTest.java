@@ -35,8 +35,11 @@
 
 package ch.niceideas.eskimo.shell.base;
 
-import ch.niceideas.common.utils.*;
+import ch.niceideas.common.utils.FileException;
+import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.common.utils.ProcessHelper;
 import ch.niceideas.eskimo.shell.setup.AbstractSetupShellTest;
+import org.apache.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,11 +48,14 @@ import org.junit.platform.commons.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class EskimoUtilsTest {
+public class EskimoUtilsLockingTest {
+
+    private static final Logger logger = Logger.getLogger(EskimoUtilsLockingTest.class);
 
     protected String jailPath = null;
 
@@ -76,11 +82,12 @@ public class EskimoUtilsTest {
 
         ProcessHelper.exec(new String[]{"bash", "-c", "chmod 777 " + jailPath + "/eskimo-utils.sh"}, true);
 
-        // I need the real bash
+        // I need some real commands
         assertTrue (new File (jailPath + "/bash").delete());
+        assertTrue (new File (jailPath + "/sed").delete());
     }
 
-    private void createTestScript(String scriptName, File tempFileForIncrement) throws FileException {
+    private void createTestScript(String scriptName, File tempFileForIncrement, boolean global) throws FileException {
 
         String script = "#!/bin/bash\n" + "\n" +
                 "SCRIPT_DIR=\"$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" && pwd )\"\n" +
@@ -100,7 +107,13 @@ public class EskimoUtilsTest {
                 "# Source eskimo-utils.sh\n" +
                 ". $SCRIPT_DIR/eskimo-utils.sh\n" +
                 "\n" +
-                "export lock_handle=$(take_lock test_lock /tmp)\n" +
+                (global ?
+                    "take_global_lock test_lock /tmp\n"
+                        :
+                    "take_lock test_lock /tmp\n"
+                ) +
+                "if [[ $? != 0 ]]; then echo 'error flocking !'; fi\n " +
+                "export lock_handle=$LAST_LOCK_HANDLE\n" +
                 "\n" +
                 "if [[ ! -f " + tempFileForIncrement.getAbsolutePath() + " ]]; then\n" +
                 "    echo '0' > " + tempFileForIncrement.getAbsolutePath() + "\n" +
@@ -109,26 +122,84 @@ public class EskimoUtilsTest {
                 "let i=`cat " + tempFileForIncrement.getAbsolutePath() + "`+1\n" +
                 "echo $i > " + tempFileForIncrement.getAbsolutePath() + "\n" +
                 "\n" +
-                "release_lock $lock_handle";
+                (global ? "" :
+                        "release_lock $lock_handle\n");
 
         FileUtils.writeFile(new File (jailPath + "/" + scriptName), script);
     }
 
-
-    @Test
-    public void testNominalScript() throws Exception {
-
+    private File createCallingScript(boolean global) throws IOException, FileException {
         File tempFileForIncrement = File.createTempFile("eskimo-utils-test", "inc-file");
         assertTrue (tempFileForIncrement.delete());
         tempFileForIncrement.deleteOnExit();
 
-        createTestScript("calling_script.sh", tempFileForIncrement);
+        createTestScript("calling_script.sh", tempFileForIncrement, global);
+        return tempFileForIncrement;
+    }
+
+    @Test
+    public void testNominalLocking() throws Exception {
+
+        File tempFileForIncrement = createCallingScript(false);
 
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
-
-        System.err.println(result);
+        logger.debug (result);
 
         assertEquals ("1", FileUtils.readFile(tempFileForIncrement));
+    }
+
+    @Test
+    public void testMultithreadedLockingBehaviourSingle() throws Exception {
+        File tempFileForIncrement = createCallingScript(false);
+        testThreadedIncrement(tempFileForIncrement);
+    }
+
+    @Test
+    public void testMultithreadedLockingBehaviourGlobal() throws Exception {
+        File tempFileForIncrement = createCallingScript(true);
+        testThreadedIncrement(tempFileForIncrement);
+    }
+
+    private void testThreadedIncrement(File tempFileForIncrement) throws Exception {
+        AtomicReference<Exception> t1Error = new AtomicReference<>();
+        Thread t1 = createThread(t1Error);
+
+        AtomicReference<Exception> t2Error = new AtomicReference<>();
+        Thread t2 = createThread(t2Error);
+
+        AtomicReference<Exception> t3Error = new AtomicReference<>();
+        Thread t3 = createThread(t3Error);
+
+        t1.start();
+        t2.start();
+        t3.start();
+
+        t1.join();
+        t2.join();
+        t3.join();
+
+        if (t1Error.get() != null) {
+            throw new Exception (t1Error.get());
+        }
+        if (t2Error.get() != null) {
+            throw new Exception (t2Error.get());
+        }
+        if (t3Error.get() != null) {
+            throw new Exception (t3Error.get());
+        }
+
+        assertEquals ("600", FileUtils.readFile(tempFileForIncrement));
+    }
+
+    private Thread createThread(AtomicReference<Exception> errorTracker) {
+        return new Thread(() -> {
+            try {
+                logger.debug (ProcessHelper.exec(new String[]{"bash", "-c", "for i in `seq 1 200`; do echo $i; bash " + jailPath + "/calling_script.sh; done"}, true));
+            } catch (ProcessHelper.ProcessHelperException e) {
+                logger.error(e, e);
+                errorTracker.set(e);
+            }
+        });
     }
 
 }

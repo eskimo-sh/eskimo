@@ -47,6 +47,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class InstallKubernetesTest {
 
@@ -70,22 +71,95 @@ public class InstallKubernetesTest {
         jailPath = AbstractSetupShellTest.createJail();
 
         FileUtils.copy(
-                new File("./services_setup/base-eskimo/eskimo-kubectl"),
-                new File (jailPath + "/eskimo-kubectl"));
+                new File("./services_setup/base-eskimo/install-kubernetes.sh"),
+                new File (jailPath + "/install-kubernetes.sh"));
 
-        ProcessHelper.exec(new String[]{"bash", "-c", "chmod 777 " + jailPath + "/eskimo-kubectl"}, true);
+        ProcessHelper.exec(new String[]{"bash", "-c", "chmod 777 " + jailPath + "/install-kubernetes.sh"}, true);
 
-        String kubectlMockCommandContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoKubeCtlTest/kubectl"), StandardCharsets.UTF_8);
-        FileUtils.writeFile(new File (jailPath + "/kubectl"), kubectlMockCommandContent);
+        // I need the real bash
+        assertTrue (new File (jailPath + "/bash").delete());
 
-        ProcessHelper.exec(new String[]{"bash", "-c", "chmod 777 " + jailPath + "/kubectl"}, true);
-
-        // I need the real sed
-        assertTrue (new File (jailPath + "/sed").delete());
-
+        createEskimoKubeDummyPackage();
     }
 
-    private void createTestScript(String scriptName, String command) throws FileException, ProcessHelper.ProcessHelperException {
+    private void createEskimoKubeDummyPackage() throws Exception {
+        File k8s = new File (jailPath, "k8s");
+        assertTrue (k8s.mkdirs());
+
+        File cfssl = new File (k8s, "cfssl");
+        assertTrue (cfssl.mkdirs());
+        File cfsslBin = new File (cfssl, "bin");
+        assertTrue (cfsslBin.mkdirs());
+        FileUtils.writeFile(new File (cfsslBin, "cfssl-1.6.3_linux_amd64"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (cfsslBin, "cfssl"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (cfsslBin, "cfssljson-1.6.3_linux_amd64"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (cfsslBin, "cfssljson"), "#!/bin/bash\necho OK");
+
+        File cniPluginsV = new File (k8s, "cni-plugins-v1.1.1");
+        assertTrue (cniPluginsV.mkdirs());
+        ProcessHelper.exec(new String[]{"bash", "-c", "cd " + k8s.getAbsolutePath() + " && /bin/ln -s cni-plugins-v1.1.1 cni-plugins"}, true);
+        FileUtils.writeFile(new File (cniPluginsV, "bridge"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (cniPluginsV, "host-device"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (cniPluginsV, "host-local"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (cniPluginsV, "loopback"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (cniPluginsV, "static"), "#!/bin/bash\necho OK");
+
+        File criDockerdV = new File (k8s, "cri-dockerd-0.3.0");
+        assertTrue (criDockerdV.mkdirs());
+        ProcessHelper.exec(new String[]{"bash", "-c", "cd " + k8s.getAbsolutePath() + " && /bin/ln -s cri-dockerd-0.3.0 cri-dockerd"}, true);
+        FileUtils.writeFile(new File (cniPluginsV, "cri-dockerd"), "#!/bin/bash\necho OK");
+
+        File etcdV = new File (k8s, "etcd-v3.5.6");
+        assertTrue (etcdV.mkdirs());
+        ProcessHelper.exec(new String[]{"bash", "-c", "cd " + k8s.getAbsolutePath() + " && /bin/ln -s etcd-v3.5.6 etcd"}, true);
+        File etcdBin = new File (etcdV, "bin");
+        assertTrue (etcdBin.mkdirs());
+        FileUtils.writeFile(new File (etcdBin, "etcd"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (etcdBin, "etcdctl"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (etcdBin, "etcdutl"), "#!/bin/bash\necho OK");
+
+        File images = new File (k8s, "images");
+        assertTrue (images.mkdirs());
+        FileUtils.writeFile(new File (images, "coredns_coredns:1.10.0.tar.gz"), "DUMMY");
+        FileUtils.writeFile(new File (images, "k8s.gcr.io_pause:3.6.tar.gz"), "DUMMY");
+
+        File kubernetesV = new File (k8s, "kubernetes-v1.25.3");
+        assertTrue (kubernetesV.mkdirs());
+        ProcessHelper.exec(new String[]{"bash", "-c", "cd " + k8s.getAbsolutePath() + " && /bin/ln -s kubernetes-v1.25.3 kubernetes"}, true);
+        File kubernetesClient = new File (kubernetesV, "client");
+        assertTrue (kubernetesClient.mkdirs());
+        File kubernetesClientBin = new File (kubernetesClient, "client");
+        assertTrue (kubernetesClientBin.mkdirs());
+        FileUtils.writeFile(new File (kubernetesClientBin, "kubectl"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (kubernetesClientBin, "kubectl-convert"), "#!/bin/bash\necho OK");
+        File kubernetesServer = new File (kubernetesV, "server");
+        assertTrue (kubernetesServer.mkdirs());
+        File kubernetesServerBin = new File (kubernetesServer, "client");
+        assertTrue (kubernetesServerBin.mkdirs());
+        FileUtils.writeFile(new File (kubernetesServerBin, "kubeadm"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (kubernetesServerBin, "kube-aggregator"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (kubernetesServerBin, "kube-apiserver"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (kubernetesServerBin, "kube-controller-manager"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (kubernetesServerBin, "kube-ctl"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (kubernetesServerBin, "kubelet"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (kubernetesServerBin, "kube-proxy"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (kubernetesServerBin, "kube-scheduler"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (kubernetesServerBin, "kube-log-runner"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (kubernetesServerBin, "mounter"), "#!/bin/bash\necho OK");
+
+        File kubeRouterV = new File (k8s, "kube-router-V1.5.3");
+        assertTrue (kubeRouterV.mkdirs());
+        ProcessHelper.exec(new String[]{"bash", "-c", "cd " + k8s.getAbsolutePath() + " && /bin/ln -s kube-router-V1.5.3 kube-router"}, true);
+        File kubeRouterBin = new File (kubeRouterV, "bin");
+        assertTrue (kubeRouterBin.mkdirs());
+        FileUtils.writeFile(new File (kubeRouterBin, "kube-router"), "#!/bin/bash\necho OK");
+
+        FileUtils.createTarFile(jailPath + "/k8s", new File (jailPath + "/eskimo_kube_1.25.5.tar.gz"));
+        Thread.sleep(100);
+        FileUtils.delete(k8s);
+    }
+
+    private void createTestScript(String scriptName) throws FileException {
 
         String script = "#!/bin/bash\n" + "\n" +
                 "SCRIPT_DIR=\"$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" && pwd )\"\n" +
@@ -103,109 +177,119 @@ public class InstallKubernetesTest {
                 "export PATH=$SCRIPT_DIR:$PATH\n" +
                 "\n" +
                 "# Call command\n" +
-                "$SCRIPT_DIR/eskimo-kubectl " + command;
+                "$SCRIPT_DIR/install-kubernetes.sh";
         FileUtils.writeFile(new File (jailPath + "/" + scriptName), script);
     }
 
+
     @Test
-    public void testShowJournal_multiple() throws Exception {
-        createTestScript("calling_script.sh", "logs elasticsearch 192.168.56.31");
+    public void testRunScript() throws Exception {
+
+        createTestScript("calling_script.sh");
 
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
 
-        //System.err.println (result);
-        assertTrue (result.contains("-n default logs elasticsearch-0"));
+        assertExpectedScriptOutput(result);
+
+        assertExpectedSudoCommands();
     }
 
-    @Test
-    public void testShowJournal_single() throws Exception {
-        createTestScript("calling_script.sh", "logs cerebro 192.168.56.31");
+    private void assertExpectedSudoCommands() throws Exception {
+        String sudoLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_sudo"), StandardCharsets.UTF_8);
+        if (StringUtils.isNotBlank(sudoLogs)) {
 
-        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
+            int indexOfLnK8s = sudoLogs.indexOf("ln -s /usr/local/lib/k8s-1.25.5 /usr/local/lib/k8s");
+            assertTrue(indexOfLnK8s > -1);
 
-        //System.err.println (result);
-        assertTrue (result.contains("-n default logs cerebro-5bc7f5874b-w9x88"));
+            int indexOfLnK8sEtc = sudoLogs.indexOf("ln -s /usr/local/etc/k8s /usr/local/lib/k8s/etc", indexOfLnK8s);
+            assertTrue(indexOfLnK8sEtc > -1);
+
+            int indexOfLnEtcdEtc = sudoLogs.indexOf("ln -s /usr/local/etc/etcd /usr/local/lib/k8s/etcd_etc", indexOfLnK8sEtc);
+            assertTrue(indexOfLnEtcdEtc > -1);
+
+            int indexOfLnCfssl = sudoLogs.indexOf("ln -s /usr/local/lib/k8s/cfssl/bin/cfssl /usr/local/bin/cfssl", indexOfLnEtcdEtc);
+            assertTrue(indexOfLnCfssl > -1);
+
+            int indexOfLnCfsslJson = sudoLogs.indexOf("ln -s /usr/local/lib/k8s/cfssl/bin/cfssljson /usr/local/bin/cfssljson", indexOfLnCfssl);
+            assertTrue(indexOfLnCfsslJson > -1);
+
+            int indexOfLnCni = sudoLogs.indexOf("ln -s /usr/local/lib/k8s/cni-plugins /opt/cni/bin", indexOfLnCfsslJson);
+            assertTrue(indexOfLnCni > -1);
+
+        } else {
+            fail ("Expected Sudo Logs");
+        }
     }
 
-    @Test
-    public void testStop_deployment() throws Exception {
+    private void assertExpectedScriptOutput(String result) {
 
-        createTestScript("calling_script.sh", "stop cerebro 192.168.56.31");
+        int indexOfTitle = result.indexOf("INSTALLING KUBERNETES");
+        assertTrue(indexOfTitle > -1);
 
-        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
+        int indexOfCsDir = result.indexOf("Changing to temp directory", indexOfTitle + 1);
+        assertTrue(indexOfCsDir > -1);
 
-        //System.err.println (result);
-        assertTrue (result.contains("-n default delete deployment cerebro"));
+        int indexOfKubeVersion = result.indexOf("Eskimo Kube package version is 1.25.5", indexOfCsDir + 1);
+        assertTrue(indexOfKubeVersion > -1);
+
+        int indexOfExtract = result.indexOf("Extracting kube_1.25.5", indexOfKubeVersion + 1);
+        assertTrue(indexOfExtract > -1);
+
+        int indexOfInstall = result.indexOf("Installing Kubernetes", indexOfExtract + 1);
+        assertTrue(indexOfInstall > -1);
+
+        int indexOfSymlinkK8s = result.indexOf("Symlinking /usr/local/lib/k8s-1.25.5 to /usr/local/lib/k8s", indexOfInstall + 1);
+        assertTrue(indexOfSymlinkK8s > -1);
+
+        int indexOfSymlinkK8sConfig = result.indexOf("Simlinking k8s config to /usr/local/etc/k8s", indexOfSymlinkK8s + 1);
+        assertTrue(indexOfSymlinkK8sConfig > -1);
+
+        int indexOfSymlinkEtcdConfig = result.indexOf("Simlinking etcd config to /usr/local/etc/etcd", indexOfSymlinkK8sConfig + 1);
+        assertTrue(indexOfSymlinkEtcdConfig > -1);
+
+        int indexOfSymlinkK8sBinaries = result.indexOf("Simlinking K8s binaries to /usr/local/bin", indexOfSymlinkK8sConfig + 1);
+        assertTrue(indexOfSymlinkK8sBinaries > -1);
+
+        int indexOfCfssl = result.indexOf("cfssl", indexOfSymlinkK8sConfig + 1);
+        assertTrue(indexOfCfssl > -1);
+
+        int indexOfEtcd = result.indexOf("etcd", indexOfCfssl + 1);
+        assertTrue(indexOfEtcd > -1);
+
+        int indexOfKubeClient = result.indexOf("Kubernetes client", indexOfEtcd + 1);
+        assertTrue(indexOfKubeClient > -1);
+
+        int indexOfKubeRouter = result.indexOf("Kube-router", indexOfKubeClient + 1);
+        assertTrue(indexOfKubeRouter > -1);
+
+        int indexOfKubeServer = result.indexOf("Kubernetes server", indexOfKubeRouter + 1);
+        assertTrue(indexOfKubeServer > -1);
+
+        int indexOfCriDockerd = result.indexOf("Installing cri-dockerd", indexOfKubeServer + 1);
+        assertTrue(indexOfCriDockerd > -1);
+
+        int indexOfCniPlugins = result.indexOf("Installing cni plugins", indexOfCriDockerd + 1);
+        assertTrue(indexOfCniPlugins > -1);
+
+        int indexOfCleaning = result.indexOf("Cleaning build folder", indexOfCniPlugins + 1);
+        assertTrue(indexOfCleaning > -1);
+
+        // these are expected in error indeed in the test
+        int indexOfEtcdBinError = result.indexOf("ls: cannot access '/usr/local/lib/k8s/etcd/bin/': No such file or directory", indexOfCleaning + 1);
+        assertTrue(indexOfEtcdBinError > -1);
+
+        int indexOfKubeCliError = result.indexOf("ls: cannot access '/usr/local/lib/k8s/kubernetes/client/bin/': No such file or directory", indexOfEtcdBinError + 1);
+        assertTrue(indexOfKubeCliError > -1);
+
+        int indexOfKubeRouterError = result.indexOf("ls: cannot access '/usr/local/lib/k8s/kube-router/bin/': No such file or directory", indexOfKubeCliError + 1);
+        assertTrue(indexOfKubeRouterError > -1);
+
+        int indexOfKubeServerError = result.indexOf("ls: cannot access '/usr/local/lib/k8s/kubernetes/server/bin/': No such file or directory", indexOfKubeRouterError + 1);
+        assertTrue(indexOfKubeServerError > -1);
+
+        int indexOfDriDockerError = result.indexOf("ls: cannot access '/usr/local/lib/k8s/cri-dockerd/': No such file or directory\n", indexOfKubeServerError + 1);
+        assertTrue(indexOfDriDockerError > -1);
+
     }
 
-    @Test
-    public void testStop_statefulSet() throws Exception {
-        createTestScript("calling_script.sh", "stop kafka 192.168.56.31");
-
-        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
-
-        System.err.println (result);
-        assertTrue (result.contains("-n default delete statefulset kafka"));
-    }
-
-    @Test
-    public void testStart_deployment() throws Exception {
-        createTestScript("calling_script.sh", "start cerebro 192.168.56.31");
-
-        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
-
-        //System.err.println (result);
-        assertTrue (result.contains("apply -f -"));
-    }
-
-    @Test
-    public void testStart_statefulSet() throws Exception {
-        createTestScript("calling_script.sh", "start logstash 192.168.56.31");
-
-        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
-
-        //System.err.println (result);
-        assertTrue (result.contains("apply -f -"));
-    }
-
-    @Test
-    public void testRestart_deployment() throws Exception {
-        createTestScript("calling_script.sh", "restart cerebro 192.168.56.31");
-
-        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
-
-        //System.err.println (result);
-        //assertTrue (result.contains("delete -f -"));
-        assertTrue (result.contains("apply -f -"));
-    }
-
-    @Test
-    public void testRestart_statefulSet() throws Exception {
-        createTestScript("calling_script.sh", "restart elasticsearch 192.168.56.31");
-
-        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
-
-        //System.err.println (result);
-        //assertTrue (result.contains("delete -f -"));
-        assertTrue (result.contains("apply -f -"));
-    }
-
-    @Test
-    public void testUninstall_deployment() throws Exception {
-        createTestScript("calling_script.sh", "uninstall cerebro 192.168.56.31");
-
-        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
-
-        //System.err.println (result);
-        assertTrue (result.contains("delete -f -"));
-    }
-
-    @Test
-    public void testUninstall_statefulSet() throws Exception {
-        createTestScript("calling_script.sh", "uninstall kafka 192.168.56.31");
-
-        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
-
-        //System.err.println (result);
-        assertTrue (result.contains("delete -f -"));
-    }
+}

@@ -122,6 +122,9 @@ public abstract class AbstractWebTest {
 
     private static boolean hasQuit(WebDriver driver) {
         try {
+            if (driver == null) {
+                return true;
+            }
             driver.getTitle();
             return false;
         } catch (WebDriverException e) {

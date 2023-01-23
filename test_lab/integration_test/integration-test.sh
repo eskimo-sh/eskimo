@@ -1672,6 +1672,57 @@ prepare_demo() {
     echo_date "!!! You can now export the DemoVM using Virtual Box "
 }
 
+
+# Screenshots stuff
+# ----------------------------------------------------------------------------------------------------------------------
+do_screenshots() {
+
+    # make sure pom.xml is found at expected location
+    if [[ ! -f ../../pom.xml ]]; then
+        echo "Expecting pom.xml at $PWD/../../pom.xml"
+        exit 121
+    fi
+
+    echo_date " - Generating screemshots"
+
+     # running screenshot generator with maven
+     saved_dir=`pwd`
+     cd ../..
+     mvn exec:java -P screenshots >> /tmp/integration-test.log 2>&1
+     cd $saved_dir
+}
+
+do_overwrite_sc() {
+
+    if [[ ! -d ../../target/screenshots ]]; then
+        echo "Expecting screenshots in folder at $PWD/../../target/screenshots"
+        exit 122
+    fi
+
+    echo_date " - Overwriting Screenshots"
+    # overwrite all screenshots
+
+    cp ../../target/screenshots/console-wide.png ../../doc/guides/eskimo-guide/pngs/
+    cp ../../target/screenshots/file-manager-wide.png ../../doc/guides/eskimo-guide/pngs/
+    cp ../../target/screenshots/kube-config-medium.png ../../doc/guides/eskimo-guide/pngs/
+    cp ../../target/screenshots/nodes-config-wide.png ../../doc/guides/eskimo-guide/pngs/
+    cp ../../target/screenshots/services-config-wide.png ../../doc/guides/eskimo-guide/pngs/
+    cp ../../target/screenshots/setup-wide.png ../../doc/guides/eskimo-guide/pngs/
+    cp ../../target/screenshots/status-wide-condensed.png ../../doc/guides/eskimo-guide/pngs/
+
+    # FIXME Implement me
+
+    if [[ -d ../../../eskimo_companion_site ]]; then
+
+        echo_date " - Overwriting Screenshots in eskimo companion site"
+        # FIXME Implement me
+
+
+
+    fi
+
+}
+
 # get logs
 #vagrant ssh -c "sudo journalctl -u eskimo" integration-test
 
@@ -1689,6 +1740,8 @@ usage() {
     echo "    -z  Run Zeppelin notebooks test"
     echo "    -t  Run other tests"
     echo "    -c  Run cleanup"
+    echo "    -o  Take screenshots"
+    echo "    -w  Use screenshots to overwrite git tree images"
     echo "    -a  RUN ALL OF THE ABOVE"
     echo "    -d  Prepare the VM for DemoVM"
     echo "    -m  Test on multiple nodes"
@@ -1715,12 +1768,14 @@ export RUN_DATA_LOAD=""
 export RUN_NOTEBOOK_TESTS=""
 export RUN_OTHER_TESTS=""
 export RUN_CLEANUP=""
+export RUN_SCREENSHOTS=""
+export RUN_OVERWRITE_SC=""
 export REBUILD_PACKAGES=""
 export SKIP_PACKAGES=""
 
 
 # Parse options to the integration-test script
-while getopts ":hpnrfbeslztcadm" opt; do
+while getopts ":hpnrfbeslztcowadm" opt; do
     case ${opt} in
         h)
             usage
@@ -1756,6 +1811,12 @@ while getopts ":hpnrfbeslztcadm" opt; do
         t)
             export RUN_OTHER_TESTS="do"
             ;;
+        o)
+            export RUN_SCREENSHOTS="do"
+            ;;
+        w)
+            export RUN_OVERWRITE_SC="do"
+            ;;
         c)
             export RUN_CLEANUP="do"
             ;;
@@ -1768,6 +1829,8 @@ while getopts ":hpnrfbeslztcadm" opt; do
             export RUN_NOTEBOOK_TESTS="do"
             export RUN_OTHER_TESTS="do"
             export RUN_CLEANUP="do"
+            export RUN_SCREENSHOTS="do"
+            export RUN_OVERWRITE_SC="do"
             ;;
         d)
             export DEMO=demo
@@ -1800,7 +1863,7 @@ if [[ "$REBUILD_PACKAGES" != "" ]]; then
     check_for_docker
 fi
 
-if [[ "$REBUILD_ESKIMO" != "" ]]; then
+if [[ "$REBUILD_ESKIMO" != "" || "$RUN_SCREENSHOTS" != "" ]]; then
 
     check_for_maven
 
@@ -1871,6 +1934,14 @@ fi
 
 if [[ "$RUN_CLEANUP" != "" ]]; then
     do_cleanup
+fi
+
+if [[ "$RUN_SCREENSHOTS" != "" ]]; then
+    do_screenshots
+fi
+
+if [[ "$RUN_OVERWRITE_SC" != "" ]]; then
+    do_overwrite_sc
 fi
 
 if [[ $DEMO == "demo" ]]; then

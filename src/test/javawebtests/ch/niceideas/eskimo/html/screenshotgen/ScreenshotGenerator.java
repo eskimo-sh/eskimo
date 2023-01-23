@@ -86,6 +86,7 @@ public class ScreenshotGenerator {
 
             initInfrastructure (driver);
 
+
             screenshotsGrafana(driver, targetScreenshotFolder);
 
             screenshotsGluster(driver, targetScreenshotFolder);
@@ -120,7 +121,8 @@ public class ScreenshotGenerator {
 
             screenshotsOperations(driver, targetScreenshotFolder);
 
-        } catch (InterruptedException| CommonBusinessException | IOException | FileUtils.FileDeleteFailedException e) {
+
+        } catch (InterruptedException | CommonBusinessException | IOException | FileUtils.FileDeleteFailedException e) {
             logger.error (e, e);
             System.exit (2);
         } finally {
@@ -132,9 +134,9 @@ public class ScreenshotGenerator {
 
     private static void initInfrastructure(WebDriver driver) {
 
-        JavascriptExecutor jsExec = (JavascriptExecutor) driver;
-        jsExec.executeScript("window.resizeDone = true");
-        jsExec.executeScript("$(window).resize(function() {\n" +
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("window.resizeDone = true");
+        js.executeScript("$(window).resize(function() {\n" +
                 "    window.resizeDone = false;\n" +
                 "    clearTimeout(window.resizedFinished);\n" +
                 "    window.resizedFinished = setTimeout(function(){\n" +
@@ -143,12 +145,8 @@ public class ScreenshotGenerator {
                 "});");
     }
 
-    //main-menu-show-operations-link
-    // inner-content-operations
-
     private static void screenshotsOperations(WebDriver driver, String targetScreenshotFolder)
-            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
-
+            throws IOException, FileUtils.FileDeleteFailedException {
         logger.info (" - Operations");
 
         reachService(driver, "main-menu-show-nodes-config-link", null, "inner-content-nodes-config");
@@ -190,8 +188,7 @@ public class ScreenshotGenerator {
     }
 
     private static void screenshotsKubeConfig(WebDriver driver, String targetScreenshotFolder)
-            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
-
+            throws IOException, FileUtils.FileDeleteFailedException {
         logger.info (" - Kube Config");
 
         reachService(driver, "main-menu-show-kubernetes-services-config-link", null, "inner-content-kubernetes-services-config");
@@ -200,8 +197,7 @@ public class ScreenshotGenerator {
     }
 
     private static void screenshotsNodesConfig(WebDriver driver, String targetScreenshotFolder)
-            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
-
+            throws IOException, FileUtils.FileDeleteFailedException {
         logger.info (" - Nodes Config");
 
         reachService(driver, "main-menu-show-nodes-config-link", null, "inner-content-nodes-config");
@@ -210,8 +206,7 @@ public class ScreenshotGenerator {
     }
 
     private static void screenshotsServicesConfig(WebDriver driver, String targetScreenshotFolder)
-            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
-
+            throws IOException, FileUtils.FileDeleteFailedException {
         logger.info (" - Services Config");
 
         reachService(driver, "main-menu-show-services-settings-link", null, "inner-content-services-settings");
@@ -225,8 +220,7 @@ public class ScreenshotGenerator {
     }
 
     private static void screenshotsSetup(WebDriver driver, String targetScreenshotFolder)
-            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
-
+            throws IOException, FileUtils.FileDeleteFailedException {
         logger.info (" - Setup");
 
         reachService(driver, "main-menu-show-setup-link", null, "inner-content-setup");
@@ -235,8 +229,7 @@ public class ScreenshotGenerator {
     }
 
     private static void screenshotsStatus(WebDriver driver, String targetScreenshotFolder)
-            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
-
+            throws IOException, FileUtils.FileDeleteFailedException {
         logger.info (" - Status");
 
         reachService(driver, "main-menu-show-status-link", null, "inner-content-status");
@@ -245,8 +238,7 @@ public class ScreenshotGenerator {
     }
 
     private static void screenshotsFileManager(WebDriver driver, String targetScreenshotFolder)
-            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
-
+            throws IOException, FileUtils.FileDeleteFailedException {
         logger.info (" - File Manager");
 
         reachService(driver, "main-menu-show-file-managers-link", "folderMenuFileManagers", "inner-content-file-managers");
@@ -264,8 +256,7 @@ public class ScreenshotGenerator {
     }
 
     private static void screenshotsConsole(WebDriver driver, String targetScreenshotFolder)
-            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
-
+            throws IOException, FileUtils.FileDeleteFailedException {
         logger.info (" - Console");
 
         reachService(driver, "main-menu-show-consoles-link", "folderMenuConsoles", "inner-content-consoles");
@@ -283,8 +274,7 @@ public class ScreenshotGenerator {
     }
 
     private static void screenshotsZeppelin(WebDriver driver, String targetScreenshotFolder)
-            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
-
+            throws IOException, FileUtils.FileDeleteFailedException {
         logger.info (" - Zeppelin");
 
         // reach proper place
@@ -296,13 +286,18 @@ public class ScreenshotGenerator {
         wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a[href=\"#/notebook/2HS3PQPV6\"]")));
         driver.findElement(By.cssSelector("a[href=\"#/notebook/2HS3PQPV6\"]")).click();
 
-        Thread.sleep(5000);
+        JavascriptExecutor js = (JavascriptExecutor)driver;
 
-        JavascriptExecutor jsExec = (JavascriptExecutor) driver;
-        jsExec.executeScript("window.scrollBy(0, 670)");
+        // wait for one of the markdown to be shown (should give indication that notebook is well initialized)
+        ActiveWaiter.wait(() -> {
+            Object result = js.executeScript("return $(\"div.markdown-body p:contains('About bank data')\").length");
+            return result != null && result.toString().equals("1");
+        });
+
+        js.executeScript("window.scrollBy(0, 670)");
 
         // selecting proper chart types
-        JavascriptExecutor js = (JavascriptExecutor)driver;
+
         String chartSelectDivs = js.executeScript("window.eskCharts = ''; $('.result-chart-selector').each(function(cnt, el) {window.eskCharts += ($(el).attr('id') + ' '); }); return window.eskCharts").toString();
         //logger.info(chartSelectDivs);
         String[] divIds = chartSelectDivs.split(" ");
@@ -313,7 +308,11 @@ public class ScreenshotGenerator {
 
         driver.findElement(By.id(divIds[2])).findElement(By.cssSelector("button.btn-default[uib-tooltip=\"Line Chart\"]")).click();
 
-        Thread.sleep(2000);
+        // wait for the 3 graphs to be changed
+        ActiveWaiter.wait(() -> {
+            Object result = js.executeScript("return $(\"div:not(.ng-hide)[ng-show='graphMode == viz.id'] div.panel-heading span:contains('Available Fields')\").length");
+            return result != null && result.toString().equals("3");
+        });
 
         driver.switchTo().parentFrame();
 
@@ -321,8 +320,7 @@ public class ScreenshotGenerator {
     }
 
     private static void screenshotsKibana(WebDriver driver, String targetScreenshotFolder)
-            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
-
+            throws IOException, FileUtils.FileDeleteFailedException {
         logger.info (" - Kibana");
 
         // reach proper place
@@ -360,7 +358,11 @@ public class ScreenshotGenerator {
         JavascriptExecutor js = (JavascriptExecutor)driver;
         ActiveWaiter.wait(() -> js.executeScript("return $(\"div.legacyMtrVis__value:contains('1,056,320')\").length").toString().equals("1"), 6000);
 
-        Thread.sleep(4000);
+        // wait for the loading icon replacing the kibana icon on the top left to vanush
+        ActiveWaiter.wait(() -> {
+            Object result = js.executeScript("return $(\"svg[data-test-subj='globalLoadingIndicator-hidden']\").length");
+            return result != null && result.toString().equals("1");
+        });
 
         driver.switchTo().parentFrame();
 
@@ -368,8 +370,7 @@ public class ScreenshotGenerator {
     }
 
     private static void screenshotsCerebro(WebDriver driver, String targetScreenshotFolder)
-            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
-
+            throws IOException, FileUtils.FileDeleteFailedException {
         logger.info (" - Cerebro");
 
         // reach proper place
@@ -386,8 +387,7 @@ public class ScreenshotGenerator {
     }
 
     private static void screenshotsFlinkDashboard(WebDriver driver, String targetScreenshotFolder)
-            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
-
+            throws IOException, FileUtils.FileDeleteFailedException {
         logger.info (" - Flink Runtime");
 
         // reach proper place
@@ -403,8 +403,7 @@ public class ScreenshotGenerator {
     }
 
     private static void screenshotsSparkConsole(WebDriver driver, String targetScreenshotFolder)
-            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
-
+            throws IOException, FileUtils.FileDeleteFailedException {
         logger.info (" - Spark Console");
 
         // reach proper place
@@ -420,8 +419,7 @@ public class ScreenshotGenerator {
     }
 
     private static void screenshotsKafkaManager(WebDriver driver, String targetScreenshotFolder)
-            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
-
+            throws IOException, FileUtils.FileDeleteFailedException {
         logger.info (" - Kafka Manager");
 
         // reach proper place
@@ -442,8 +440,7 @@ public class ScreenshotGenerator {
     }
 
     private static void screenshotsKubeDashboard(WebDriver driver, String targetScreenshotFolder)
-            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
-
+            throws IOException, FileUtils.FileDeleteFailedException {
         logger.info (" - Kube Dashboard");
 
         // reach proper place
@@ -459,8 +456,7 @@ public class ScreenshotGenerator {
     }
 
     private static void screenshotsGluster(WebDriver driver, String targetScreenshotFolder)
-            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
-
+            throws IOException, FileUtils.FileDeleteFailedException {
         logger.info (" - Gluster");
 
         // reach proper place
@@ -476,8 +472,7 @@ public class ScreenshotGenerator {
     }
 
     private static void screenshotsGrafana(WebDriver driver, String targetScreenshotFolder)
-            throws IOException, FileUtils.FileDeleteFailedException, InterruptedException {
-
+            throws IOException, FileUtils.FileDeleteFailedException {
         logger.info (" - Grafana");
 
         // reach proper place
@@ -495,11 +490,22 @@ public class ScreenshotGenerator {
         handleScreenshots(driver, targetScreenshotFolder, "grafana");
     }
 
+    private static void login(WebDriver driver) {
+        logger.info (" - Login");
+
+        driver.findElement(By.id("eskimo-username")).sendKeys("admin");
+        driver.findElement(By.id("eskimo-password")).sendKeys("password");
+
+        driver.findElement(By.cssSelector("button.btn-info")).click();
+
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.id("show-all-nodes-btn")));
+    }
+
     private static void reachService(WebDriver driver, String menuLinkId, String menuLinkWrapperId, String contentId) {
-        wait(driver, 10000).until(ExpectedConditions.elementToBeClickable(By.id(menuLinkId)));
+        wait(driver, 20000).until(ExpectedConditions.elementToBeClickable(By.id(menuLinkId)));
 
         if (StringUtils.isNotBlank(menuLinkWrapperId)) {
-            wait(driver, 10000).until(ExpectedConditions.not(ExpectedConditions.attributeContains(By.id(menuLinkWrapperId), "class", "disabled")));
+            wait(driver, 20000).until(ExpectedConditions.not(ExpectedConditions.attributeContains(By.id(menuLinkWrapperId), "class", "disabled")));
         }
 
         driver.findElement(By.id(menuLinkId)).click();
@@ -512,55 +518,39 @@ public class ScreenshotGenerator {
     }
 
     private static void handleScreenshotsSimple(WebDriver driver, String targetScreenshotFolder, String type) throws IOException, FileUtils.FileDeleteFailedException {
-        JavascriptExecutor js = (JavascriptExecutor)driver;
-
-        driver.manage().window().setSize(SIZE_WIDE);
-        ActiveWaiter.wait(() -> js.executeScript("return window.resizeDone;").equals(true));
+        resizeWindow(driver, SIZE_WIDE);
         takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, type + "-wide.png");
 
-        driver.manage().window().setSize(SIZE_MEDIUM);
-        ActiveWaiter.wait(() -> js.executeScript("return window.resizeDone;").equals(true));
+        resizeWindow(driver, SIZE_MEDIUM);
         takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, type + "-medium.png");
 
-        driver.manage().window().setSize(SIZE_SMALL);
-        ActiveWaiter.wait(() -> js.executeScript("return window.resizeDone;").equals(true));
+        resizeWindow(driver, SIZE_SMALL);
         takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, type + "-small.png");
 
-        driver.manage().window().setSize(SIZE_WIDE);
-        ActiveWaiter.wait(() -> js.executeScript("return window.resizeDone;").equals(true));
+        resizeWindow(driver, SIZE_WIDE);
     }
 
-    private static void handleScreenshots(WebDriver driver, String targetScreenshotFolder, String system) throws InterruptedException, IOException, FileUtils.FileDeleteFailedException {
-        driver.manage().window().setSize(SIZE_WIDE);
-        Thread.sleep (200);
+    private static void handleScreenshots(WebDriver driver, String targetScreenshotFolder, String system) throws IOException, FileUtils.FileDeleteFailedException {
 
+        resizeWindow(driver, SIZE_WIDE);
         takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, system + "-wide.png");
 
-        driver.manage().window().setSize(SIZE_SMALL);
-
-        JavascriptExecutor js = (JavascriptExecutor)driver;
-        ActiveWaiter.wait(() -> js.executeScript("return window.resizeDone;").equals(true));
-
+        resizeWindow(driver, SIZE_SMALL);
         takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, system + "-small.png");
 
-        driver.manage().window().setSize(SIZE_MEDIUM);
-
-        ActiveWaiter.wait(() -> js.executeScript("return window.resizeDone;").equals(true));
+        resizeWindow(driver, SIZE_MEDIUM);
 
         driver.findElement(By.cssSelector("button.button-toggle-menu")).click();
-
         wait(driver, 10000).until(ExpectedConditions.attributeToBe(By.cssSelector("html"), "data-sidenav-size", "condensed"));
 
         takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, system + "-medium-condensed.png");
 
         driver.findElement(By.cssSelector("button.button-toggle-menu")).click();
-
         wait(driver, 10000).until(ExpectedConditions.attributeToBe(By.cssSelector("html"), "data-sidenav-size", "default"));
 
         takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, system + "-medium.png");
 
-        driver.manage().window().setSize(SIZE_WIDE);
-        ActiveWaiter.wait(() -> js.executeScript("return window.resizeDone;").equals(true));
+        resizeWindow(driver, SIZE_WIDE);
 
         driver.findElement(By.cssSelector("button.button-toggle-menu")).click();
 
@@ -574,22 +564,17 @@ public class ScreenshotGenerator {
 
     }
 
+    private static void resizeWindow(WebDriver driver, Dimension sizeWide) {
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+        driver.manage().window().setSize(sizeWide);
+        ActiveWaiter.wait(() -> js.executeScript("return window.resizeDone;").equals(true));
+    }
+
     private static void takeScreenshot(TakesScreenshot driver, String targetScreenshotFolder, String filename) throws IOException, FileUtils.FileDeleteFailedException {
         File file = driver.getScreenshotAs(OutputType.FILE);
         File destFile = new File(targetScreenshotFolder + "/" + filename);
 
         FileUtils.copy (file, destFile);
         FileUtils.delete(file);
-    }
-
-    private static void login(WebDriver driver) {
-        logger.info (" - Login");
-
-        driver.findElement(By.id("eskimo-username")).sendKeys("admin");
-        driver.findElement(By.id("eskimo-password")).sendKeys("password");
-
-        driver.findElement(By.cssSelector("button.btn-info")).click();
-
-        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.id("show-all-nodes-btn")));
     }
 }

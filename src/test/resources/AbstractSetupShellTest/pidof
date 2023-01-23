@@ -1,9 +1,5 @@
 #/bin/bash
 
-echo "$@" >> .log_sudo
+echo "$@" >> .log_pidof
 
-if [[ $1 == "sed" ]]; then
-
-    ./sed "${@:2}"
-
-fi
+echo 9
