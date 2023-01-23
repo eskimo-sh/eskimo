@@ -294,6 +294,9 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             ml.addInfo(" - Copying gluster-mount script");
             copyCommand("gluster_mount.sh", USR_LOCAL_SBIN_GLUSTER_MOUNT_SH, connection);
 
+            ml.addInfo(" - Copying eskimo-utils.sh script");
+            copyCommand("eskimo-utils.sh", "/usr/local/sbin/eskimo-utils.sh", connection);
+
             if (StringUtils.isNotBlank(enableKubernetes) && enableKubernetes.equals("true")) {
                 ml.addInfo(" - Copying eskimo-kubectl script");
                 copyCommand("eskimo-kubectl", USR_LOCAL_BIN_ESKIMO_KUBECTL, connection);
