@@ -25,7 +25,7 @@ embedded services.
 The service settings editor is available from the menu under "Configured Services", third menu entry under
 "*Platform Administration*".
 
-image::pngs/eskimo-settings.png[800, 800, align="center"]
+image::pngs/services-config-wide.png[800, 800, align="center"]
 
 For every service, administrators have access to supported configuration files and supported settings. +
 The default values enforced by eskimo right after installation are indicated.
@@ -51,7 +51,7 @@ Setting up a native services on the eskimo cluster usually boils down to these 2
 
 Below is an example of a tiny cluster with three nodes setup:
 
-image::pngs/eskimo-nodes-config.png[800, 800, align="center"]
+image::pngs/nodes-config-wide.png[800, 800, align="center"]
 
 Whenever nodes share the same configuration, they can be defined as a _range of IP addresses_ instead
 of defining each and every one of them, thus simplifying the configuration as explained in the next section.
@@ -149,7 +149,7 @@ This is performed by the fifth menu entry under "*Platform Administration*" call
 The process is actually very simple and one just needs to select the services to be installed and operated automatically
 by Kubernetes, along with the CPU and RAM resource rewuest to be passed to Kubernetes.
 
-image::pngs/eskimo-kubernetes-config.png[800, 800, align="center"]
+image::pngs/kube-config-medium.png[800, 800, align="center"]
 
 Just as for native node host services, Eskimo provides a possibility to force the reinstallation of Kubernetes services. +
 Just click on the "Force Reinstall" button and choose which services should be re-installed on kubernetes.

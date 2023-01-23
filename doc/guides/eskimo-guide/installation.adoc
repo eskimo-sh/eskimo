@@ -409,7 +409,7 @@ docker images (plus kubernetes packages) have not been either downloaded or buil
 
 The setup page is as follows:
 
-image::pngs/eskimo-setup.png[800, 800, align="center"]
+image::pngs/setup-wide.png[800, 800, align="center"]
 
 On the setup page, the user needs to input following information:
 

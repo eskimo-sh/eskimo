@@ -23,7 +23,7 @@ _System status screen_.
 
 This is an example of the status screen showing a three nodes cluster and the services installed on this cluster.
 
-image::pngs/eskimo-status.png[800, 800, align="center"]
+image::pngs/status-wide-condensed.png[800, 800, align="center"]
 
 On the example above, all services are in _green_, which indicates that they are working fine.
 
@@ -68,7 +68,7 @@ administer the cluster nodes.
 The menu "*SSH Terminals*" gives access to SSH terminals to each and every node configured in the eskimo cluster, just
 as a plain old SSH console, but from within your web browser.
 
-image::pngs/eskimo-console.png[800, 800, align="center"]
+image::pngs/console-wide.png[800, 800, align="center"]
 
 As a design choice, the SSH Terminal doesn't provide any toolbar but leverages on keyboard shortcuts to perform most
 useful actions.
@@ -101,7 +101,7 @@ The Menu "*SFTP File Manager*" gives access to a web file manager which one can 
 * Upload files on nodes
 * etc.
 
-image::pngs/eskimo-file-manager.png[800, 800, align="center"]
+image::pngs/file-manager-wide.png[800, 800, align="center"]
 
 === Services Web Consoles
 
