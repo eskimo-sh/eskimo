@@ -1688,6 +1688,7 @@ do_screenshots() {
      # running screenshot generator with maven
      saved_dir=`pwd`
      cd ../..
+     export ESKIMO_NODE=192.168.56.51
      mvn exec:java -P screenshots >> /tmp/integration-test.log 2>&1
      cd $saved_dir
 }

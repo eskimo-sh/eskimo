@@ -486,10 +486,10 @@ Software.
                             <classpathScope>test</classpathScope>
                             <arguments>
                                 <argument>
-                                    http://192.168.56.51/index.html
+                                    http://${env.ESKIMO_NODE}/index.html
                                 </argument>
                                 <argument>
-                                    /tmp/screenshots
+                                    ${project.build.directory}/screenshots
                                 </argument>
                             </arguments>
                         </configuration>
