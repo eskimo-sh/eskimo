@@ -473,6 +473,31 @@ Software.
 
     <profiles>
         <profile>
+            <id>screenshots</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <configuration>
+                            <includeProjectDependencies>true</includeProjectDependencies>
+                            <mainClass>ch.niceideas.eskimo.html.screenshotgen.ScreenshotGenerator</mainClass>
+                            <classpathScope>test</classpathScope>
+                            <arguments>
+                                <argument>
+                                    http://192.168.56.51/index.html
+                                </argument>
+                                <argument>
+                                    /tmp/screenshots
+                                </argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>coverage</id>
             <build>
                 <plugins>
