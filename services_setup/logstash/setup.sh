@@ -100,17 +100,11 @@ echo " - Configuring logstash container"
 docker exec logstash bash /scripts/inContainerSetupLogstash.sh | tee -a logstash_install_log 2>&1
 check_in_container_config_success logstash_install_log
 
-echo " - Copying inContainerMountGluster.sh script"
-docker_cp_script inContainerMountGluster.sh sbin logstash logstash_install_log
+echo " - Handling Eskimo Base Infrastructure"
+handle_eskimo_base_infrastructure logstash logstash_install_log
 
-echo " - Copying glusterMountChecker.sh Script"
-docker_cp_script glusterMountChecker.sh sbin logstash logstash_install_log
-
-echo " - Copying glusterMountCheckerPeriodic.sh Script"
-docker_cp_script glusterMountCheckerPeriodic.sh sbin logstash logstash_install_log
-
-echo " - Handling topology and setting injection"
-handle_topology_settings logstash logstash_install_log
+echo " - Handling topology infrastructure"
+handle_topology_infrastructure logstash logstash_install_log
 
 echo " - Committing changes to local template and exiting container logstash"
 commit_container logstash logstash_install_log

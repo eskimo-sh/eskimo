@@ -76,6 +76,11 @@ public class ScreenshotGenerator {
             System.exit (3);
         }
 
+        if (!new File (targetScreenshotFolder).mkdirs()) {
+            logger.error ("Could not mkdirs target folder");
+            System.exit (4);
+        }
+
         WebDriver driver = null;
         try {
             driver = AbstractWebTest.buildSeleniumDriver();
@@ -483,7 +488,7 @@ public class ScreenshotGenerator {
         JavascriptExecutor js = (JavascriptExecutor)driver;
         js.executeScript ("window.location.href = '/grafana/d/C9M0YVnWk/eskimo-nodes-system-monitoring?orgId=1'");
 
-        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button.dashboard-row__title")));
+        wait(driver, 20000).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button.dashboard-row__title")));
 
         driver.switchTo().parentFrame();
 

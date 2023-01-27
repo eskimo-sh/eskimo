@@ -79,8 +79,11 @@ echo " - Configuring ntp container"
 docker exec ntp bash /scripts/inContainerSetupNtp.sh | tee -a ntp_install_log 2>&1
 check_in_container_config_success ntp_install_log
 
-echo " - Handling topology and setting injection"
-handle_topology_settings ntp ntp_install_log
+echo " - Handling Eskimo Base Infrastructure"
+handle_eskimo_base_infrastructure ntp ntp_install_log
+
+echo " - Handling topology infrastructure"
+handle_topology_infrastructure ntp ntp_install_log
 
 echo " - Committing changes to local template and exiting container ntp"
 commit_container ntp ntp_install_log

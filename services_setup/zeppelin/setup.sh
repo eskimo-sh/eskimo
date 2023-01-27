@@ -156,20 +156,11 @@ docker_cp_script inContainerInjectTopologyFlink.sh sbin zeppelin zeppelin_instal
 echo " - Copying Service Start Script"
 docker_cp_script inContainerStartService.sh sbin zeppelin zeppelin_install_log
 
-echo " - Copying settingsInjector.sh Script"
-docker_cp_script settingsInjector.sh sbin zeppelin zeppelin_install_log
-
 echo " - Copying Topology Injection Script (Zeppelin)"
 docker_cp_script inContainerInjectTopologyZeppelin.sh sbin zeppelin zeppelin_install_log
 
-echo " - Copying glusterMountChecker.sh Script"
-docker_cp_script glusterMountChecker.sh sbin zeppelin zeppelin_install_log
-
-echo " - Copying glusterMountCheckerPeriodic.sh Script"
-docker_cp_script glusterMountCheckerPeriodic.sh sbin zeppelin zeppelin_install_log
-
-echo " - Copying containerWatchDog.sh script to container"
-docker_cp_script containerWatchDog.sh sbin zeppelin zeppelin_install_log
+echo " - Handling Eskimo Base Infrastructure"
+handle_eskimo_base_infrastructure zeppelin zeppelin_install_log
 
 # if /usr/local/bin/logstash-cli is found, then copy it to container
 if [[ -f /usr/local/bin/logstash-cli ]]; then
@@ -181,9 +172,6 @@ if [[ -f /usr/local/bin/logstash-cli ]]; then
     docker exec --user root zeppelin bash -c "chmod 755 /usr/local/bin/logstash-cli" >> zeppelin_install_log 2>&1
     fail_if_error $? zeppelin_install_log -24
 fi
-
-echo " - Copying inContainerMountGluster.sh script"
-docker_cp_script inContainerMountGluster.sh sbin zeppelin zeppelin_install_log
 
 
 # XXX Hack required for zeppelin pre-0.9 bug where notebooks imported through APIs are not anymore available after a restart

@@ -84,8 +84,11 @@ echo " - Configuring kibana container"
 docker exec kibana bash /scripts/inContainerSetupKibana.sh | tee -a kibana_install_log 2>&1
 check_in_container_config_success kibana_install_log
 
-echo " - Handling topology and setting injection"
-handle_topology_settings kibana kibana_install_log
+echo " - Handling Eskimo Base Infrastructure"
+handle_eskimo_base_infrastructure kibana kibana_install_log
+
+echo " - Handling topology infrastructure"
+handle_topology_infrastructure kibana kibana_install_log
 
 echo " - Committing changes to local template and exiting container kibana"
 commit_container kibana kibana_install_log

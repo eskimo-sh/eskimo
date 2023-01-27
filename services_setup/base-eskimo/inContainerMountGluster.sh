@@ -50,7 +50,7 @@ if [[ $2 == "" ]]; then
 fi
 export MOUNT_POINT=$2
 
-if [[ $2 == "" ]]; then
+if [[ $3 == "" ]]; then
     echo "Expecting owner as third argument"
     exit 3
 fi

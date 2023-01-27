@@ -79,8 +79,11 @@ echo " - Configuring grafana container"
 docker exec grafana bash /scripts/inContainerSetupGrafana.sh $grafana_user_id $CONTEXT_PATH | tee -a grafana_install_log 2>&1
 check_in_container_config_success grafana_install_log
 
-echo " - Handling topology and setting injection"
-handle_topology_settings grafana grafana_install_log
+echo " - Handling Eskimo Base Infrastructure"
+handle_eskimo_base_infrastructure grafana grafana_install_log
+
+echo " - Handling topology infrastructure"
+handle_topology_infrastructure grafana grafana_install_log
 
 echo " - Committing changes to local template and exiting container grafana"
 commit_container grafana grafana_install_log

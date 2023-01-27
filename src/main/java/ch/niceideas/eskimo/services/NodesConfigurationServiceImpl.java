@@ -70,9 +70,6 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
     private static final Logger logger = Logger.getLogger(NodesConfigurationServiceImpl.class);
 
-    public static final String USR_LOCAL_BIN_JQ = "/usr/local/bin/jq";
-    public static final String USR_LOCAL_SBIN_GLUSTER_MOUNT_SH = "/usr/local/sbin/gluster_mount.sh";
-    public static final String USR_LOCAL_BIN_ESKIMO_KUBECTL = "/usr/local/bin/eskimo-kubectl";
     public static final String ESKIMO_TOPOLOGY_SH = "/etc/eskimo_topology.sh";
 
     @Autowired
@@ -289,17 +286,22 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             ml.addInfo(sshCommandService.runSSHScriptPath(connection, servicesSetupPath + "/base-eskimo/install-eskimo-base-system.sh"));
 
             ml.addInfo(" - Copying jq program");
-            copyCommand("jq-1.6-linux64", USR_LOCAL_BIN_JQ, connection);
+            copyCommand("jq-1.6-linux64", "/usr/local/bin/jq", connection);
 
-            ml.addInfo(" - Copying gluster-mount script");
-            copyCommand("gluster_mount.sh", USR_LOCAL_SBIN_GLUSTER_MOUNT_SH, connection);
-
-            ml.addInfo(" - Copying eskimo-utils.sh script");
-            copyCommand("eskimo-utils.sh", "/usr/local/sbin/eskimo-utils.sh", connection);
+            for (String script : new String[] {
+                    "gluster-mount",
+                    "eskimo-utils.sh",
+                    "glusterMountChecker.sh",
+                    "glusterMountCheckerPeriodic.sh",
+                    "inContainerMountGluster.sh",
+                    "settingsInjector.sh"}) {
+                ml.addInfo(" - Copying script " + script);
+                copyCommand(script, "/usr/local/sbin/" + script, connection);
+            }
 
             if (StringUtils.isNotBlank(enableKubernetes) && enableKubernetes.equals("true")) {
                 ml.addInfo(" - Copying eskimo-kubectl script");
-                copyCommand("eskimo-kubectl", USR_LOCAL_BIN_ESKIMO_KUBECTL, connection);
+                copyCommand("eskimo-kubectl", "/usr/local/bin/eskimo-kubectl", connection);
             }
 
         } catch (ConnectionManagerException e) {

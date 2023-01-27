@@ -107,23 +107,11 @@ check_in_container_config_success spark_executor_install_log
 echo " - Copying Spark entrypoint script"
 docker_cp_script eskimo-spark-entrypoint.sh sbin spark spark_executor_install_log
 
+echo " - Handling Eskimo Base Infrastructure"
+handle_eskimo_base_infrastructure spark spark_executor_install_log
+
 echo " - Copying Topology Injection Script (common)"
 docker_cp_script inContainerInjectTopology.sh sbin spark spark_executor_install_log
-
-echo " - Copying settingsInjector.sh Script"
-docker_cp_script settingsInjector.sh sbin spark spark_executor_install_log
-
-echo " - Copying inContainerMountGluster.sh script"
-docker_cp_script inContainerMountGluster.sh sbin spark spark_executor_install_log
-
-echo " - Copying glusterMountChecker.sh Script"
-docker_cp_script glusterMountChecker.sh sbin spark spark_executor_install_log
-
-echo " - Copying glusterMountCheckerPeriodic.sh Script"
-docker_cp_script glusterMountCheckerPeriodic.sh sbin spark spark_executor_install_log
-
-echo " - Copying containerWatchDog.sh script to container"
-docker_cp_script containerWatchDog.sh sbin spark spark_executor_install_log
 
 echo " - Committing changes to local template and exiting container spark"
 commit_container spark spark_executor_install_log

@@ -101,23 +101,14 @@ echo " - Configuring spark-console container"
 docker exec spark-console bash /scripts/inContainerSetupSparkHistoryServer.sh | tee -a spark_console_install_log 2>&1
 check_in_container_config_success spark_console_install_log
 
-echo " - Handling topology and setting injection"
-handle_topology_settings spark-console spark_console_install_log
+echo " - Handling Eskimo Base Infrastructure"
+handle_eskimo_base_infrastructure spark-console spark_console_install_log
+
+echo " - Handling topology infrastructure"
+handle_topology_infrastructure spark-console spark_console_install_log
 
 echo " - Copying Topology Injection Script (Spark Console)"
 docker_cp_script inContainerInjectTopologySparkHistory.sh sbin spark-console spark_console_install_log
-
-echo " - Copying inContainerMountGluster.sh scriot"
-docker_cp_script inContainerMountGluster.sh sbin spark-console spark_console_install_log
-
-echo " - Copying glusterMountChecker.sh Script (Spark Console)"
-docker_cp_script glusterMountChecker.sh sbin spark-console spark_console_install_log
-
-echo " - Copying glusterMountCheckerPeriodic.sh Script (Spark Console)"
-docker_cp_script glusterMountCheckerPeriodic.sh sbin spark-console spark_console_install_log
-
-echo " - Copying containerWatchDog.sh script to container"
-docker_cp_script containerWatchDog.sh sbin spark-console spark_console_install_log
 
 echo " - Committing changes to local template and exiting container spark"
 commit_container spark-console spark_console_install_log

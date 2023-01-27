@@ -106,17 +106,11 @@ echo " - Configuring kafka container"
 docker exec kafka bash /scripts/inContainerSetupKafka.sh  | tee kafka_install_log 2>&1
 check_in_container_config_success kafka_install_log
 
-echo " - Copying inContainerMountGluster.sh script"
-docker_cp_script inContainerMountGluster.sh sbin kafka kafka_install_log
+echo " - Handling Eskimo Base Infrastructure"
+handle_eskimo_base_infrastructure kafka kafka_install_log
 
-echo " - Copying glusterMountChecker.sh Script"
-docker_cp_script glusterMountChecker.sh sbin kafka kafka_install_log
-
-echo " - Copying glusterMountCheckerPeriodic.sh Script"
-docker_cp_script glusterMountCheckerPeriodic.sh sbin kafka kafka_install_log
-
-echo " - Handling topology and setting injection"
-handle_topology_settings kafka kafka_install_log
+echo " - Handling topology infrastructure"
+handle_topology_infrastructure kafka kafka_install_log
 
 echo " - Committing changes to local template and exiting container kafka"
 commit_container kafka kafka_install_log

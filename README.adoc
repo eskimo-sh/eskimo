@@ -35,8 +35,8 @@ Software.
 
 
 :sectnums:
-:authors: www.eskimo.sh / 2019
-:copyright: www.eskimo.sh / 2019
+:authors: www.eskimo.sh
+:copyright: www.eskimo.sh / 2019 - 2023
 
 
 == Eskimo Introduction

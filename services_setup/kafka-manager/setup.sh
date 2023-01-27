@@ -82,9 +82,6 @@ docker run \
         -t eskimo:kafka-manager bash >> kafka-manager_install_log 2>&1
 fail_if_error $? "kafka-manager_install_log" -2
 
-# connect to container
-#docker exec -it kafka bash
-
 echo " - Configuring kafka container (common part)"
 docker exec kafka-manager bash /scripts/inContainerSetupKafkaCommon.sh $kafka_user_id | tee -a kafka-manager_install_log 2>&1
 check_in_container_config_success kafka-manager_install_log
@@ -93,11 +90,11 @@ echo " - Configuring kafka-manager container"
 docker exec kafka-manager bash /scripts/inContainerSetupKafkaManager.sh | tee -a kafka-manager_install_log 2>&1
 check_in_container_config_success kafka-manager_install_log
 
-#echo " - TODO"
-#docker exec -it kafka-manager TODO
+echo " - Handling Eskimo Base Infrastructure"
+handle_eskimo_base_infrastructure kafka-manager kafka-manager_install_log
 
-echo " - Handling topology and setting injection"
-handle_topology_settings kafka-manager kafka-manager_install_log
+echo " - Handling topology infrastructure"
+handle_topology_infrastructure kafka-manager kafka-manager_install_log
 
 echo " - Committing changes to local template and exiting container kafka-manager"
 commit_container kafka-manager kafka-manager_install_log

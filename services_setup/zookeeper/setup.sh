@@ -97,8 +97,11 @@ echo " - Configuring zookeeper container"
 docker exec zookeeper bash /scripts/inContainerSetupZookeeper.sh | tee -a zk_install_log 2>&1
 check_in_container_config_success zk_install_log
 
-echo " - Handling topology and setting injection"
-handle_topology_settings zookeeper zk_install_log
+echo " - Handling Eskimo Base Infrastructure"
+handle_eskimo_base_infrastructure zookeeper zk_install_log
+
+echo " - Handling topology infrastructure"
+handle_topology_infrastructure zookeeper zk_install_log
 
 echo " - Committing changes to local template and exiting container zookeeper"
 commit_container zookeeper zk_install_log

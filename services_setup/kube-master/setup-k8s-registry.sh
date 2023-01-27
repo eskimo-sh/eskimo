@@ -99,11 +99,11 @@ echo "   + Configuring Registry in container"
 docker exec k8s-registry bash /scripts/inContainerSetupRegistry.sh $kubernetes_user_id $SELF_IP_ADDRESS | tee -a k8s-registry_install_log 2>&1
 check_in_container_config_success k8s-registry_install_log
 
-#echo " - TODO"
-#docker exec -it kubernetes TODO
+echo " - Handling Eskimo Base Infrastructure"
+handle_eskimo_base_infrastructure k8s-registry k8s-registry_install_log
 
-echo "   + Handling topology and setting injection"
-handle_topology_settings k8s-registry k8s-registry_install_log
+echo "   + Handling topology infrastructure"
+handle_topology_infrastructure k8s-registry k8s-registry_install_log
 
 echo "   + Committing changes to local template and exiting container kubernetes"
 commit_container k8s-registry k8s-registry_install_log

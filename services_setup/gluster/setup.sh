@@ -91,8 +91,8 @@ docker run \
         -t eskimo:gluster bash >> gluster_install_log 2>&1
 fail_if_error $? "gluster_install_log" -2
 
-echo " - Copying containerWatchDog.sh script to container"
-docker_cp_script containerWatchDog.sh sbin gluster gluster_install_log
+echo " - Handling Eskimo Base Infrastructure"
+handle_eskimo_base_infrastructure gluster gluster_install_log
 
 echo " - Configuring gluster container"
 docker exec gluster bash /scripts/inContainerSetupGluster.sh | tee -a gluster_install_log 2>&1
@@ -102,8 +102,8 @@ echo " - Configuring EGMI - Eskimo Gluster Management Infrastructure"
 docker exec gluster bash /scripts/inContainerSetupEgmi.sh | tee -a gluster_install_log 2>&1
 check_in_container_config_success gluster_install_log
 
-echo " - Handling topology and setting injection"
-handle_topology_settings gluster gluster_install_log
+echo " - Handling topology infrastructure"
+handle_topology_infrastructure gluster gluster_install_log
 
 echo " - Copying commonGlusterFunctions.sh Script"
 docker_cp_script commonGlusterFunctions.sh sbin gluster gluster_install_log
@@ -125,12 +125,6 @@ for i in `find ./gluster_wrappers -mindepth 1`; do
     sudo chmod 755 /usr/local/sbin/$filename
 done
 
-
-echo " - Copying glusterMountChecker.sh script to /usr/local/sbin"
-sudo cp $SCRIPT_DIR/glusterMountChecker.sh /usr/local/sbin/glusterMountChecker.sh
-sudo chown root /usr/local/sbin/glusterMountChecker.sh
-sudo chmod 755 /usr/local/sbin/glusterMountChecker.sh
-
 if [[ `sudo crontab -u root -l 2>/dev/null | grep glusterMountChecker.sh` == "" ]]; then
     echo " - Scheduling periodic execution of glusterMountChecker.sh using crontab"
     sudo rm -f /tmp/crontab
@@ -138,7 +132,6 @@ if [[ `sudo crontab -u root -l 2>/dev/null | grep glusterMountChecker.sh` == "" 
     sudo bash -c "echo \"* * * * * /bin/bash /usr/local/sbin/glusterMountChecker.sh\" >> /tmp/crontab"
     sudo crontab -u root /tmp/crontab
 fi
-
 
 echo " - Copying gluster service docker container startup file"
 sudo cp startGlusterServiceContainer.sh /usr/local/sbin/startGlusterServiceContainer.sh

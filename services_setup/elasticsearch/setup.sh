@@ -97,8 +97,11 @@ echo " - Configuring Elasticsearch container"
 docker exec elasticsearch bash /scripts/inContainerSetupElasticSearch.sh | tee es_install_log 2>&1
 check_in_container_config_success es_install_log
 
-echo " - Handling topology and setting injection"
-handle_topology_settings elasticsearch cerebro_install_log
+echo " - Handling Eskimo Base Infrastructure"
+handle_eskimo_base_infrastructure elasticsearch es_install_log
+
+echo " - Handling topology infrastructure"
+handle_topology_infrastructure elasticsearch es_install_log
 
 echo " - Copying inContainerInjectIndexSettings.sh Script"
 docker_cp_script inContainerInjectIndexSettings.sh sbin elasticsearch es_install_log

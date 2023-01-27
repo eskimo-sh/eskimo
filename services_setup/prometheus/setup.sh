@@ -66,15 +66,15 @@ docker run \
         -t eskimo:prometheus bash >> prometheus_install_log 2>&1
 fail_if_error $? "prometheus_install_log" -2
 
-echo " - Copying containerWatchDog.sh script to container"
-docker_cp_script containerWatchDog.sh sbin prometheus prometheus_install_log
-
 echo " - Configuring prometheus container"
 docker exec prometheus bash /scripts/inContainerSetupPrometheus.sh | tee -a prometheus_install_log 2>&1
 check_in_container_config_success prometheus_install_log
 
-echo " - Handling topology and setting injection"
-handle_topology_settings prometheus prometheus_install_log
+echo " - Handling Eskimo Base Infrastructure"
+handle_eskimo_base_infrastructure prometheus prometheus_install_log
+
+echo " - Handling topology infrastructure"
+handle_topology_infrastructure prometheus prometheus_install_log
 
 echo " - Committing changes to local template and exiting container prometheus"
 commit_container prometheus prometheus_install_log

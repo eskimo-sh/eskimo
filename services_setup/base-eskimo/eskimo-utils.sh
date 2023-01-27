@@ -145,3 +145,122 @@ take_global_lock() {
 }
 
 
+# Get the local cluster domain names (space separated)
+get_kube_domain_names() {
+    DOMAIN_NAMES=" "
+    for i in $(/usr/local/bin/kubectl get cm coredns -n kube-system -o jsonpath="{.data.Corefile}" | grep ".local "); do
+        if [[ "$i" != "{" ]]; then
+            DOMAIN_NAMES="$i $DOMAIN_NAMES "
+        fi
+    done
+    echo $DOMAIN_NAMES
+}
+
+# Get the cluster defined services (space separated)
+get_kube_services() {
+    /usr/local/bin/kubectl get services -A -o jsonpath="{range .items[*]}{@.metadata.name}{'.'}{@.metadata.namespace}{' '}" | sed s/' \. '//g
+}
+
+__get_kube_service_IP() {
+
+    if [[ `echo $1 | grep '.'` == "" ]]; then
+        echo "Expecting service in format NAME.NAMESPACE"
+        return 1
+    fi
+
+    SERVICE=`echo $1 | cut -d '.' -f 1`
+    NAMESPACE=`echo $1 | cut -d '.' -f 2`
+
+    #/usr/local/bin/kubectl get endpoint $SERVICE -n $NAMESPACE -o jsonpath="{.spec.clusterIP}"
+    /usr/local/bin/kubectl get endpoints $SERVICE -n $NAMESPACE -o jsonpath="{range .subsets[*].addresses[*]}{@.hostname}{'/'}{@.ip}{' '}" | sed s/' \/ '//g
+}
+
+__dump_service_ip_dns() {
+
+    if [[ `echo $1 | grep ':'` == "" ]]; then
+        echo "Expecting service in format NAME:IP"
+        return 1
+    fi
+    FULL_SERVICE=$1
+
+    if [[ "$2" == "etc_hosts" ]]; then
+        export gks_format=$2
+    else
+        unset gks_format
+    fi
+
+    D_SERVICE=`echo $FULL_SERVICE | cut -d ':' -f 1`
+    D_NAMESPACE=`echo $FULL_SERVICE | cut -d ':' -f 2`
+    D_ADRESS=`echo $FULL_SERVICE | cut -d ':' -f 3`
+
+
+    if [[ "$D_SERVICE" == "" ]]; then
+        echo "Couldn't parse service in __dump_service_ip_dns"
+        return 2
+    fi
+
+    if [[ "$D_NAMESPACE" == "" ]]; then
+        echo "Couldn't parse namespace in __dump_service_ip_dns"
+        return 3
+    fi
+
+    if [[ "$D_ADRESS" == "" ]]; then
+        echo "Couldn't parse ADDRESS in __dump_service_ip_dns"
+        return 4
+    fi
+
+    eskimo_kube_domains=`get_kube_domain_names`
+
+    for eskimo_domain in `echo $eskimo_kube_domains`; do
+        if [[ `echo $eskimo_domain | grep arpa` == "" ]]; then
+            if [[ "$gks_format" == "etc_hosts" ]]; then
+                echo $D_ADRESS $D_SERVICE.$D_NAMESPACE.svc.$eskimo_domain
+            else
+                echo $D_SERVICE.$D_NAMESPACE.svc.$eskimo_domain $D_ADRESS
+            fi
+        fi
+    done
+}
+
+# Get a list of all DNS entries required to reach kubernetes services
+get_kube_services_IPs() {
+
+    if [[ "$1" == "etc_hosts" ]]; then
+        export gks_format=$1
+    else
+        unset gks_format
+    fi
+
+
+    for service in `get_kube_services`; do
+        if [[ `echo $service  | sed 's/ *$//g'` != "" ]]; then
+
+            SERVICE=`echo $service | cut -d '.' -f 1`
+            NAMESPACE=`echo $service | cut -d '.' -f 2`
+
+            #echo "Handling $SERVICE in $NAMESPACE"
+
+            type=single
+            for endpoint in `__get_kube_service_IP $service`; do
+
+                #echo $endpoint
+
+                HOST=`echo $endpoint | cut -d '/' -f 1`
+                IP=`echo $endpoint | cut -d '/' -f 2`
+
+                if [[ `echo $HOST | sed 's/ *$//g'` == "" ]]; then
+                    __dump_service_ip_dns $SERVICE:$NAMESPACE:$IP $gks_format
+                else
+                    type=many
+                    __dump_service_ip_dns $HOST:$NAMESPACE:$IP $gks_format
+                fi
+            done
+
+            if [[ "$type" == "many" ]]; then
+                __dump_service_ip_dns $SERVICE:$NAMESPACE:$IP $gks_format
+            fi
+        fi
+    done
+}
+
+

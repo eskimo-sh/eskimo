@@ -39,9 +39,6 @@ set -e
 echo " - Injecting topology"
 . /usr/local/sbin/inContainerInjectTopology.sh
 
-echo " - Inject settings"
-/usr/local/sbin/settingsInjector.sh config.yml
-
 echo " - Creating required directories (as config.yml)"
 mkdir -p /var/log/kubernetes/log
 

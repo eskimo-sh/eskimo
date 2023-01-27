@@ -68,24 +68,70 @@ docker_cp_script() {
     fi
     export LOGFILE=$4
 
-    echo " - Copying $SCRIPT Script to $CONTAINER"
-    docker cp $SCRIPT_DIR/$SCRIPT $CONTAINER:/usr/local/$FOLDER/$SCRIPT >> $LOGFILE 2>&1
+    echo " - Copying $SCRIPT to $CONTAINER"
+    FULL_LOCAL_PATH=$SCRIPT
+    if [[ -f $SCRIPT ]]; then
+        FULL_LOCAL_PATH=$SCRIPT_DIR/$SCRIPT
+    fi
+    if [[ -f $FULL_LOCAL_PATH ]]; then
+        echo "Script $FULL_LOCAL_PATH can't be found"
+        exit 99
+    fi
+
+    docker cp $FULL_LOCAL_PATH $CONTAINER:/usr/local/$FOLDER/$SCRIPT >> $LOGFILE 2>&1
     fail_if_error $? "$LOGFILE" 95
 
     docker exec --user root $CONTAINER bash -c "chmod 755 /usr/local/$FOLDER/$SCRIPT" >> $LOGFILE 2>&1
     fail_if_error $? "$LOGFILE" 96
 }
 
-
-# This function installs the topology related scripts
-# - inContainerInjectTopology.sh
-# - inContainerStartService.sh
-# - ../common/settingsInjector.sh
+# This function installs the common eskimo infrastructure scripts
+# - glusterMountChecker.sh
+# - glusterMountCheckerPeriodic.sh
+# - inContainerMountGluster.sh
+# - settingsInjector.sh
 # to the container passed as argument
 # Arguments are:
 # - $1 : the container to install the files to
 # - $2 - the log file in which to dump command outputs
-function handle_topology_settings() {
+function handle_eskimo_base_infrastructure() {
+
+    if [[ $1 == "" ]]; then
+        echo "Container needs to be passed in argument"
+        exit 81
+    fi
+    export CONTAINER=$1
+
+    if [[ $2 == "" ]]; then
+        echo "Log file path needs to be passed in argument"
+        exit 82
+    fi
+    export LOG_FILE=$2
+
+    echo "   + Copying settingsInjector.sh Script"
+    docker_cp_script /usr/local/sbin/settingsInjector.sh sbin $CONTAINER $LOG_FILE
+
+    echo "   + Copying glusterMountChecker.sh Script"
+    docker_cp_script /usr/local/sbin/glusterMountChecker.sh sbin $CONTAINER $LOG_FILE
+
+    echo "   + Copying glusterMountCheckerPeriodic.sh Script"
+    docker_cp_script /usr/local/sbin/glusterMountCheckerPeriodic.sh sbin $CONTAINER $LOG_FILE
+
+    echo "   + Copying inContainerMountGluster.sh Script"
+    docker_cp_script /usr/local/sbin/inContainerMountGluster.sh sbin $CONTAINER $LOG_FILE
+
+    echo "   + Copying containerWatchDog.sh Script"
+    docker_cp_script /usr/local/sbin/containerWatchDog.sh sbin $CONTAINER $LOG_FILE
+}
+
+# This function installs the topology related scripts
+# - inContainerInjectTopology.sh
+# - inContainerStartService.sh
+# to the container passed as argument
+# Arguments are:
+# - $1 : the container to install the files to
+# - $2 - the log file in which to dump command outputs
+function handle_topology_infrastructure() {
 
     if [[ $1 == "" ]]; then
         echo "Container needs to be passed in argument"
@@ -112,13 +158,6 @@ function handle_topology_settings() {
 
     docker exec --user root $CONTAINER bash -c "chmod 755 /usr/local/sbin/inContainerStartService.sh" >> $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE 86
-
-    echo " - Copying settingsInjector.sh Script"
-    docker cp $SCRIPT_DIR/settingsInjector.sh $CONTAINER:/usr/local/sbin/settingsInjector.sh >> $LOG_FILE 2>&1
-    fail_if_error $? $LOG_FILE 87
-
-    docker exec --user root $CONTAINER bash -c "chmod 755 /usr/local/sbin/settingsInjector.sh" >> $LOG_FILE 2>&1
-    fail_if_error $? $LOG_FILE 88
 }
 
 # This is used to load the topology definition file
@@ -630,4 +669,5 @@ function preinstall_unmount_gluster_share () {
             fi
         done
     fi
+}
 }

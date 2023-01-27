@@ -83,8 +83,11 @@ echo " - Configuring cerebro container"
 docker exec cerebro bash /scripts/inContainerSetupCerebro.sh | tee cerebro_install_log 2>&1
 check_in_container_config_success cerebro_install_log
 
-echo " - Handling topology and setting injection"
-handle_topology_settings cerebro cerebro_install_log
+echo " - Handling Eskimo Base Infrastructure"
+handle_eskimo_base_infrastructure cerebro cerebro_install_log
+
+echo " - Handling topology infrastructure"
+handle_topology_infrastructure cerebro cerebro_install_log
 
 echo " - Committing changes to local template and exiting container cerebro"
 commit_container cerebro cerebro_install_log
