@@ -947,3 +947,16 @@ span.status-node-cell-span-restart {
 html[data-sidenav-size=condensed]:not(.authentication-bg) .side-nav .side-nav-link img:first-child  {
     margin-left: 5px;
 }
+
+.folder-menu-items .side-nav-link .badge {
+    display: none;
+}
+
+.folder-menu-items.disabled .side-nav-link .badge {
+    display: inline-block;
+}
+
+html[data-sidenav-size=condensed] .folder-menu-items .side-nav-link .badge,
+html[data-sidenav-size=condensed]:not(.authentication-bg) .side-nav .side-nav-item:not(.nohover):hover .side-nav-link span.badge {
+    display: none;
+}
