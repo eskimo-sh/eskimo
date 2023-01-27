@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
@@ -34,36 +34,21 @@
 # Software.
 #
 
-if [[ $1 == "" ]]; then
-    echo "Expecting Gluster share name as first argument"
+
+# Make sure environment variable telling where the additonal_hosts file is found is well set
+if [[ $ADDITONAL_HOSTS_FILE == "" ]]; then
+    echo "Expected an environment variable ADDITONAL_HOSTS_FILE giving the path to the file declaring services' IPs"
     exit 1
 fi
-export SHARE_NAME=$1
 
-if [[ $2 == "" ]]; then
-    echo "Expecting share full path as second argument"
+# Make sure fle exist
+if [[ ! -f $ADDITONAL_HOSTS_FILE ]]; then
+    echo "File $ADDITONAL_HOSTS_FILE doesn't exist"
     exit 2
 fi
-export SHARE_PATH=$2
 
-if [[ $3 == "" ]]; then
-    echo "Expecting share user name as third argument"
-    exit 3
-fi
-export SHARE_USER=$3
+# Add file content to /etc/hosts
+cat $ADDITONAL_HOSTS_FILE >> /etc/hosts
 
-export DEPENDENT_UNIT_DEFINITON=$4
-
-
-echo ""
-echo " - Proceeding with gluster mount of $SHARE_PATH"
-echo "--------------------------------------------------------------------------------"
-
-/usr/local/sbin/gluster_mount_internal.sh $SHARE_NAME $SHARE_PATH $SHARE_USER "$DEPENDENT_UNIT_DEFINITON"
-if [[ $? != 0 ]]; then
-    echo "Failed!"
-    echo "--------------------------------------------------------------------------------"
-    exit 4
-fi
-
-echo "--------------------------------------------------------------------------------"
+# Run command passed in argument
+$@

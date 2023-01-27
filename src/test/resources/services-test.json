@@ -472,7 +472,7 @@
       {
         "id" : "mount_broker_data",
         "name" : "Mount broker_data on Host",
-        "command": "sudo /usr/local/sbin/gluster_mount.sh broker_data /var/lib/kafka/data broker",
+        "command": "sudo /usr/local/sbin/gluster-mount.sh broker_data /var/lib/kafka/data broker",
         "icon": "fa-folder"
       }
     ]
@@ -497,7 +497,7 @@
       {
         "id" : "mount_broker_data_brokercli",
         "name" : "Mount broker_data on Host",
-        "command": "sudo /usr/local/sbin/gluster_mount.sh broker_data /var/lib/broker/data broker",
+        "command": "sudo /usr/local/sbin/gluster-mount.sh broker_data /var/lib/broker/data broker",
         "icon": "fa-folder"
       }
     ]
@@ -566,7 +566,7 @@
       {
         "id" : "mount_broker_data_brokermgr",
         "name" : "Mount broker_data on Host",
-        "command": "sudo /usr/local/sbin/gluster_mount.sh broker_data /var/lib/broker/data broker",
+        "command": "sudo /usr/local/sbin/gluster-mount.sh broker_data /var/lib/broker/data broker",
         "icon": "fa-folder"
       }
     ]
@@ -666,13 +666,13 @@
       {
         "id" : "mount_calculator_eventlog",
         "name" : "Mount calculator_eventlog on Host",
-        "command": "sudo /usr/local/sbin/gluster_mount.sh calculator_eventlog /var/lib/calculator/eventlog calculator",
+        "command": "sudo /usr/local/sbin/gluster-mount.sh calculator_eventlog /var/lib/calculator/eventlog calculator",
         "icon": "fa-folder"
       },
       {
         "id" : "mount_calculator_data",
         "name" : "Mount calculator_data on Host",
-        "command": "sudo /usr/local/sbin/gluster_mount.sh calculator_data /var/lib/calculator/data calculator",
+        "command": "sudo /usr/local/sbin/gluster-mount.sh calculator_data /var/lib/calculator/data calculator",
         "icon": "fa-folder"
       }
     ]
@@ -697,13 +697,13 @@
       {
         "id" : "mount_calculator_eventlog_calculatorcli",
         "name" : "Mount calculator_eventlog on Host",
-        "command": "sudo /usr/local/sbin/gluster_mount.sh spark_eventlog /var/lib/calculator/eventlog calculator",
+        "command": "sudo /usr/local/sbin/gluster-mount.sh spark_eventlog /var/lib/calculator/eventlog calculator",
         "icon": "fa-folder"
       },
       {
         "id" : "mount_calculator_data_calculatorcli",
         "name" : "Mount calculator_data on Host",
-        "command": "sudo /usr/local/sbin/gluster_mount.sh calculator_data /var/lib/calculator/data calculator",
+        "command": "sudo /usr/local/sbin/gluster-mount.sh calculator_data /var/lib/calculator/data calculator",
         "icon": "fa-folder"
       }
     ]

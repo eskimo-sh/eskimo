@@ -288,13 +288,17 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             ml.addInfo(" - Copying jq program");
             copyCommand("jq-1.6-linux64", "/usr/local/bin/jq", connection);
 
+            ml.addInfo(" - Copying kube_do script");
+            copyCommand("kube_do", "/usr/local/bin/kube_do", connection);
+
             for (String script : new String[] {
-                    "gluster-mount",
+                    "gluster-mount.sh",
                     "eskimo-utils.sh",
                     "glusterMountChecker.sh",
                     "glusterMountCheckerPeriodic.sh",
                     "inContainerMountGluster.sh",
-                    "settingsInjector.sh"}) {
+                    "settingsInjector.sh",
+                    "containerWatchDog.sh"}) {
                 ml.addInfo(" - Copying script " + script);
                 copyCommand(script, "/usr/local/sbin/" + script, connection);
             }
@@ -315,10 +319,14 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
     @Override
     public void copyCommand (String source, String target, SSHConnection connection) throws SSHCommandException {
-        sshCommandService.copySCPFile(connection, servicesSetupPath + "/base-eskimo/" + source);
-        sshCommandService.runSSHCommand(connection, new String[]{"sudo", "mv", source, target});
-        sshCommandService.runSSHCommand(connection, new String[]{"sudo", "chown", "root.root", target});
-        sshChmod755(connection, target);
+        try {
+            sshCommandService.copySCPFile(connection, servicesSetupPath + "/base-eskimo/" + source);
+            sshCommandService.runSSHCommand(connection, new String[]{"sudo", "mv", source, target});
+            sshCommandService.runSSHCommand(connection, new String[]{"sudo", "chown", "root.root", target});
+            sshChmod755(connection, target);
+        } catch (SSHCommandException e) {
+            throw new SSHCommandException("Error during copy of " + source + " to " + target, e);
+        }
     }
 
     private boolean isMissingOnNode(String installation, String node) {
@@ -327,7 +335,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             String result = sshCommandService.runSSHCommand(node, "cat /etc/eskimo_flag_" + installation + "_installed");
             return StringUtils.isBlank(result) || !result.contains("OK");
         } catch (SSHCommandException e) {
-            logger.debug(e, e);
+            logger.debug(e.getMessage());
             return true;
         }
     }

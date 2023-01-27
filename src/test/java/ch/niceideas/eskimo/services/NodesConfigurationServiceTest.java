@@ -135,25 +135,55 @@ public class NodesConfigurationServiceTest {
 
         assertEquals (" - Calling install-eskimo-base-system.sh\n" +
                 " - Copying jq program\n" +
-                " - Copying gluster-mount script\n" +
-                " - Copying eskimo-utils.sh script\n" +
+                " - Copying kube_do script\n" +
+                " - Copying script gluster-mount.sh\n" +
+                " - Copying script eskimo-utils.sh\n" +
+                " - Copying script glusterMountChecker.sh\n" +
+                " - Copying script glusterMountCheckerPeriodic.sh\n" +
+                " - Copying script inContainerMountGluster.sh\n" +
+                " - Copying script settingsInjector.sh\n" +
+                " - Copying script containerWatchDog.sh\n" +
                 " - Copying eskimo-kubectl script\n", sb.toString());
 
         assertEquals ("192.168.10.11:./services_setup/base-eskimo/jq-1.6-linux64\n" +
-                "192.168.10.11:./services_setup/base-eskimo/gluster_mount.sh\n" +
+                "192.168.10.11:./services_setup/base-eskimo/kube_do\n" +
+                "192.168.10.11:./services_setup/base-eskimo/gluster-mount.sh\n" +
                 "192.168.10.11:./services_setup/base-eskimo/eskimo-utils.sh\n" +
+                "192.168.10.11:./services_setup/base-eskimo/glusterMountChecker.sh\n" +
+                "192.168.10.11:./services_setup/base-eskimo/glusterMountCheckerPeriodic.sh\n" +
+                "192.168.10.11:./services_setup/base-eskimo/inContainerMountGluster.sh\n" +
+                "192.168.10.11:./services_setup/base-eskimo/settingsInjector.sh\n" +
+                "192.168.10.11:./services_setup/base-eskimo/containerWatchDog.sh\n" +
                 "192.168.10.11:./services_setup/base-eskimo/eskimo-kubectl", sshCommandServiceTest.getExecutedScpCommands().trim());
 
         assertEquals ("./services_setup/base-eskimo/install-eskimo-base-system.sh\n" +
                 "sudo mv jq-1.6-linux64 /usr/local/bin/jq\n" +
                 "sudo chown root.root /usr/local/bin/jq\n" +
                 "sudo chmod 755 /usr/local/bin/jq\n" +
-                "sudo mv gluster_mount.sh /usr/local/sbin/gluster_mount.sh\n" +
-                "sudo chown root.root /usr/local/sbin/gluster_mount.sh\n" +
-                "sudo chmod 755 /usr/local/sbin/gluster_mount.sh\n" +
+                "sudo mv kube_do /usr/local/bin/kube_do\n" +
+                "sudo chown root.root /usr/local/bin/kube_do\n" +
+                "sudo chmod 755 /usr/local/bin/kube_do\n" +
+                "sudo mv gluster-mount.sh /usr/local/sbin/gluster-mount.sh\n" +
+                "sudo chown root.root /usr/local/sbin/gluster-mount.sh\n" +
+                "sudo chmod 755 /usr/local/sbin/gluster-mount.sh\n" +
                 "sudo mv eskimo-utils.sh /usr/local/sbin/eskimo-utils.sh\n" +
                 "sudo chown root.root /usr/local/sbin/eskimo-utils.sh\n" +
                 "sudo chmod 755 /usr/local/sbin/eskimo-utils.sh\n" +
+                "sudo mv glusterMountChecker.sh /usr/local/sbin/glusterMountChecker.sh\n" +
+                "sudo chown root.root /usr/local/sbin/glusterMountChecker.sh\n" +
+                "sudo chmod 755 /usr/local/sbin/glusterMountChecker.sh\n" +
+                "sudo mv glusterMountCheckerPeriodic.sh /usr/local/sbin/glusterMountCheckerPeriodic.sh\n" +
+                "sudo chown root.root /usr/local/sbin/glusterMountCheckerPeriodic.sh\n" +
+                "sudo chmod 755 /usr/local/sbin/glusterMountCheckerPeriodic.sh\n" +
+                "sudo mv inContainerMountGluster.sh /usr/local/sbin/inContainerMountGluster.sh\n" +
+                "sudo chown root.root /usr/local/sbin/inContainerMountGluster.sh\n" +
+                "sudo chmod 755 /usr/local/sbin/inContainerMountGluster.sh\n" +
+                "sudo mv settingsInjector.sh /usr/local/sbin/settingsInjector.sh\n" +
+                "sudo chown root.root /usr/local/sbin/settingsInjector.sh\n" +
+                "sudo chmod 755 /usr/local/sbin/settingsInjector.sh\n" +
+                "sudo mv containerWatchDog.sh /usr/local/sbin/containerWatchDog.sh\n" +
+                "sudo chown root.root /usr/local/sbin/containerWatchDog.sh\n" +
+                "sudo chmod 755 /usr/local/sbin/containerWatchDog.sh\n" +
                 "sudo mv eskimo-kubectl /usr/local/bin/eskimo-kubectl\n" +
                 "sudo chown root.root /usr/local/bin/eskimo-kubectl\n" +
                 "sudo chmod 755 /usr/local/bin/eskimo-kubectl\n", sshCommandServiceTest.getExecutedCommands());

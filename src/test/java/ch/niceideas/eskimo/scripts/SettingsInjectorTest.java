@@ -115,7 +115,7 @@ public class SettingsInjectorTest {
         cerebroJVMFile = copyFile (tempFile, "cerebro/config/eskimo.options");
         cerebroJVMOptsFile = copyFile (tempFile, "cerebro2/config/JVM_OPTS.sh");
 
-        settingsInjectorScriptFile = new File ("services_setup/common/settingsInjector.sh");
+        settingsInjectorScriptFile = new File ("services_setup/base-eskimo/settingsInjector.sh");
         //System.out.println(System.getProperty("user.dir"));
         assertTrue (settingsInjectorScriptFile.exists());
 

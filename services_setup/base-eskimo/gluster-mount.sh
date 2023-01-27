@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
@@ -34,9 +34,36 @@
 # Software.
 #
 
-set -e
+if [[ $1 == "" ]]; then
+    echo "Expecting Gluster share name as first argument"
+    exit 1
+fi
+export SHARE_NAME=$1
 
-. /etc/eskimo_k8s_environment
+if [[ $2 == "" ]]; then
+    echo "Expecting share full path as second argument"
+    exit 2
+fi
+export SHARE_PATH=$2
 
-# Handling /var/lib/kubernetes/docker_registry
-/usr/local/sbin/gluster-mount.sh kubernetes_shared /usr/local/etc/k8s/shared kubernetes "x-systemd.required-by=kube-slave,x-systemd.required-by=kube-master"
+if [[ $3 == "" ]]; then
+    echo "Expecting share user name as third argument"
+    exit 3
+fi
+export SHARE_USER=$3
+
+export DEPENDENT_UNIT_DEFINITON=$4
+
+
+echo ""
+echo " - Proceeding with gluster mount of $SHARE_PATH"
+echo "--------------------------------------------------------------------------------"
+
+/usr/local/sbin/gluster-mount-internal.sh $SHARE_NAME $SHARE_PATH $SHARE_USER "$DEPENDENT_UNIT_DEFINITON"
+if [[ $? != 0 ]]; then
+    echo "Failed!"
+    echo "--------------------------------------------------------------------------------"
+    exit 4
+fi
+
+echo "--------------------------------------------------------------------------------"

@@ -44,6 +44,10 @@ public class SSHCommandException extends CommonBusinessException {
         super(message);
     }
 
+    public SSHCommandException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public SSHCommandException(Throwable cause) {
         super(cause);
     }

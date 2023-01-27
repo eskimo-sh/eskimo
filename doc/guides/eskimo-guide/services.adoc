@@ -149,12 +149,12 @@ Gluster shares are mounted at runtime using standard mount command (fuse filesys
 
 However eskimo provides _Toolbox script_ that takes care of all the burden of managing shared folders with gluster.
 
-This _Toolbox script_ is the available on cluster nodes at: `/usr/local/sbin/gluster_mount.sh`. +
+This _Toolbox script_ is the available on cluster nodes at: `/usr/local/sbin/gluster-mount.sh`. +
 This script is called as follows:
 
-.calling /usr/local/sbin/gluster_mount.sh
+.calling /usr/local/sbin/gluster-mount.sh
 ----
-/usr/local/sbin/gluster_mount.sh VOLUME_NAME MOUNT_POINT OWNER_USER_ID
+/usr/local/sbin/gluster-mount.sh VOLUME_NAME MOUNT_POINT OWNER_USER_ID
 ----
 
 where:

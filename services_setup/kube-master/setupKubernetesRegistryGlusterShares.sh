@@ -37,4 +37,4 @@
 set -e
 
 # Handling /var/lib/kubernetes/docker_registry
-/usr/local/sbin/gluster_mount.sh kubernetes_registry /var/lib/kubernetes/docker_registry kubernetes
+/usr/local/sbin/gluster-mount.sh kubernetes_registry /var/lib/kubernetes/docker_registry kubernetes

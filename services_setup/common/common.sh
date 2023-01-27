@@ -69,13 +69,15 @@ docker_cp_script() {
     export LOGFILE=$4
 
     echo " - Copying $SCRIPT to $CONTAINER"
-    FULL_LOCAL_PATH=$SCRIPT
     if [[ -f $SCRIPT ]]; then
+        FULL_LOCAL_PATH=$SCRIPT
+        SCRIPT=`basename $SCRIPT`
+    else
         FULL_LOCAL_PATH=$SCRIPT_DIR/$SCRIPT
-    fi
-    if [[ -f $FULL_LOCAL_PATH ]]; then
-        echo "Script $FULL_LOCAL_PATH can't be found"
-        exit 99
+        if [[ -f $FULL_LOCAL_PATH ]]; then
+            echo "Script $FULL_LOCAL_PATH can't be found"
+            exit 99
+        fi
     fi
 
     docker cp $FULL_LOCAL_PATH $CONTAINER:/usr/local/$FOLDER/$SCRIPT >> $LOGFILE 2>&1
@@ -85,7 +87,8 @@ docker_cp_script() {
     fail_if_error $? "$LOGFILE" 96
 }
 
-# This function installs the common eskimo infrastructure scripts
+# This function installs the common eskimo infrastructure scripts to the target container
+# - containerWatchDog.sh
 # - glusterMountChecker.sh
 # - glusterMountCheckerPeriodic.sh
 # - inContainerMountGluster.sh
@@ -108,20 +111,19 @@ function handle_eskimo_base_infrastructure() {
     fi
     export LOG_FILE=$2
 
-    echo "   + Copying settingsInjector.sh Script"
     docker_cp_script /usr/local/sbin/settingsInjector.sh sbin $CONTAINER $LOG_FILE
 
-    echo "   + Copying glusterMountChecker.sh Script"
+    docker_cp_script /usr/local/sbin/gluster-mount.sh sbin $CONTAINER $LOG_FILE
+
     docker_cp_script /usr/local/sbin/glusterMountChecker.sh sbin $CONTAINER $LOG_FILE
 
-    echo "   + Copying glusterMountCheckerPeriodic.sh Script"
     docker_cp_script /usr/local/sbin/glusterMountCheckerPeriodic.sh sbin $CONTAINER $LOG_FILE
 
-    echo "   + Copying inContainerMountGluster.sh Script"
     docker_cp_script /usr/local/sbin/inContainerMountGluster.sh sbin $CONTAINER $LOG_FILE
 
-    echo "   + Copying containerWatchDog.sh Script"
     docker_cp_script /usr/local/sbin/containerWatchDog.sh sbin $CONTAINER $LOG_FILE
+
+    docker_cp_script /usr/local/bin/kube_do bin $CONTAINER $LOG_FILE
 }
 
 # This function installs the topology related scripts
@@ -669,5 +671,4 @@ function preinstall_unmount_gluster_share () {
             fi
         done
     fi
-}
 }

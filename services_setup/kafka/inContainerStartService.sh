@@ -53,8 +53,8 @@ if [[ -f /usr/local/lib/kafka/config/eskimo-memory.opts && `cat /usr/local/lib/k
     echo " - Using overriden memory settings : $KAFKA_HEAP_OPTS"
 fi
 
-echo " - Mounting logstash gluster shares"
-sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh kafka_data /var/lib/kafka
+echo " - Mounting kafka gluster shares"
+sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh kafka_data /var/lib/kafka kafka
 
 echo " - Creating kafka data directory /var/lib/kafka/$ESKIMO_POD_NAME"
 sudo /bin/mkdir -p /var/lib/kafka/$ESKIMO_POD_NAME

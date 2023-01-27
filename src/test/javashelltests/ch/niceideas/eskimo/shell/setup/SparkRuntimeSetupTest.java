@@ -94,7 +94,6 @@ public class SparkRuntimeSetupTest extends AbstractSetupShellTest {
         copyFile(jailPath, "inContainerSetupSpark.sh");
         copyFile(jailPath, "inContainerSetupSparkCommon.sh");
         copyFile(jailPath, "inContainerInjectTopology.sh");
-        copyFile(jailPath, "inContainerMountGluster.sh");
     }
 
     @Override

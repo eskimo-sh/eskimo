@@ -24,6 +24,7 @@ docker run \
           /tmp/test-es-spark.py
 
 
+KUBE_SERVICES_HOSTS_FILE=`create_kube_services_hosts_file`
 docker run \
     -it \
     --rm \
@@ -39,6 +40,8 @@ docker run \
     --mount type=bind,source=/home/spark/.kube/config,target=/home/spark/.kube/config \
     -v /etc/k8s:/etc/k8s:ro \
     -e NODE_NAME=test-node2 \
-    -e HOSTALIASES=/tmp/kube-hosts \
+    --mount type=bind,source=$KUBE_SERVICES_HOSTS_FILE,target=$KUBE_SERVICES_HOSTS_FILE \
+    -e ADDITONAL_HOSTS_FILE=$KUBE_SERVICES_HOSTS_FILE \
     kubernetes.registry:5000/spark \
-          /bin/bash -c "cat /etc/hosts"
+          /bin/bash -c "/usr/local/bin/kube_do cat /etc/hosts"
+rm -Rf $KUBE_SERVICES_HOSTS_FILE

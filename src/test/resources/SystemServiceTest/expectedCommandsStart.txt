@@ -5,9 +5,9 @@ cat /etc/eskimo_flag_base_system_installed
 sudo mv jq-1.6-linux64 /usr/local/bin/jq
 sudo chown root.root /usr/local/bin/jq
 sudo chmod 755 /usr/local/bin/jq
-sudo mv gluster_mount.sh /usr/local/sbin/gluster_mount.sh
-sudo chown root.root /usr/local/sbin/gluster_mount.sh
-sudo chmod 755 /usr/local/sbin/gluster_mount.sh
+sudo mv gluster-mount.sh /usr/local/sbin/gluster-mount.sh
+sudo chown root.root /usr/local/sbin/gluster-mount.sh
+sudo chmod 755 /usr/local/sbin/gluster-mount.sh
 sudo mv eskimo-kubectl /usr/local/bin/eskimo-kubectl
 sudo chown root.root /usr/local/bin/eskimo-kubectl
 sudo chmod 755 /usr/local/bin/eskimo-kubectl

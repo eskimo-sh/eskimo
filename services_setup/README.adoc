@@ -102,7 +102,7 @@ SystemD services rely on the host to mount gluster shares and then mount the sha
 host mount. +
 The way to do this is as follows:
 
-* The service `setup.sh` script calls the script `/usr/local/sbin/gluster_mount.sh [SHARE_NAME] [SHARE_PATH] [OWNER_USER]` +
+* The service `setup.sh` script calls the script `/usr/local/sbin/gluster-mount.sh [SHARE_NAME] [SHARE_PATH] [OWNER_USER]` +
   This script will take care of registering the gluster mount with SystemD, fstab, etc.
 * The service SystemD unit file should define a dependency on the SystemD mount by using the following statements +
   `After=gluster.service` +
@@ -143,8 +143,8 @@ These standard conventions are as follows (illustrated for a service called `ser
   from the runtime host as well.
 * Whenever a service `serviceX` requires a subfolder of `/var/log/serviceX` to be shared among cluster nodes, a script
 `setupServiceXGlusterSares.sh` should be defined that calls the common helper script (define at eskimo base system
-installation on every node) `/usr/local/sbin/gluster_mount.sh` in the following way, for instance to define
- the _flink data_ share : `/usr/local/sbin/gluster_mount.sh flink_data /var/lib/flink/data flink`
+installation on every node) `/usr/local/sbin/gluster-mount.sh` in the following way, for instance to define
+ the _flink data_ share : `/usr/local/sbin/gluster-mount.sh flink_data /var/lib/flink/data flink`
 * The approach is the same from within a container, but the name if the script to call is different:
 `/usr/local/sbin/inContainerMountGlusterShare.sh`.
 

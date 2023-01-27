@@ -104,17 +104,17 @@ public class CommonSetupShellTest {
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/docker_cp_script.sh"}, true);
 
         // no error reported
-        assertEquals (" - Copying /bin/bash Script to cerebro\n", result);
+        assertEquals (" - Copying /bin/bash to cerebro\n", result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(dockerLogs)) {
 
-            //System.err.println (dockerLogs);
+            System.err.println (dockerLogs);
 
-            int indexOfCp = dockerLogs.indexOf("cp ");
+            int indexOfCp = dockerLogs.indexOf("cp /bin/bash cerebro:/usr/local/bin/bash");
             assertTrue(indexOfCp > -1);
 
-            int indexOfExec = dockerLogs.indexOf("exec --user root cerebro bash -c chmod 755 /usr/local/bin//bin/bash", indexOfCp);
+            int indexOfExec = dockerLogs.indexOf("exec --user root cerebro bash -c chmod 755 /usr/local/bin/bash", indexOfCp);
             assertTrue(indexOfExec > -1);
 
         } else {
@@ -124,14 +124,13 @@ public class CommonSetupShellTest {
 
     @Test
     public void testHandleTopologySettings() throws Exception {
-        createTestScript("handle_topology_settings.sh", "handle_topology_settings cerebro /tmp/test.log");
+        createTestScript("handle_topology_infrastructure.sh", "handle_topology_infrastructure cerebro /tmp/test.log");
 
-        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/handle_topology_settings.sh"}, true);
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/handle_topology_infrastructure.sh"}, true);
 
         // no error reported
         assertEquals (" - Copying Topology Injection Script\n" +
-                " - Copying Service Start Script\n" +
-                " - Copying settingsInjector.sh Script\n", result);
+                " - Copying Service Start Script\n", result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(dockerLogs)) {
@@ -152,9 +151,6 @@ public class CommonSetupShellTest {
 
             int indexOfCpThird = dockerLogs.indexOf("cp ");
             assertTrue(indexOfCpThird > -1);
-
-            int indexOfExecThird = dockerLogs.indexOf("exec --user root cerebro bash -c chmod 755 /usr/local/sbin/settingsInjector.sh", indexOfCpThird);
-            assertTrue(indexOfExecThird > -1);
 
         } else {
             fail ("No docker manipulations found");
