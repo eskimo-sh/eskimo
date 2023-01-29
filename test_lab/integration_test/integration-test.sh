@@ -1506,19 +1506,139 @@ EOF
     sshpass -p vagrant ssh vagrant@$BOX_IP "sudo su -c '/usr/local/bin/flink run -py /tmp/flink-batch-example.py' eskimo" \
             2>&1 | tee /tmp/flink-batch-example.log  >> /tmp/integration-test.log
 
-    if [[ `grep 'Job has been submitted with JobID' /tmp/flink-batch-example.log` == "" ]]; then
+    if [[ `grep -F 'Job has been submitted with JobID' /tmp/flink-batch-example.log` == "" ]]; then
         echo_date "Failed to run flink job"
         exit 102
     fi
 
+    rm -Rf /tmp/flink-batch-example.log
+
+
     echo_date "   + Testing spark-submit"
 
-    echo_date "TO BE IMPLEMENTED"
-    exit 1
+    cat > /tmp/spark-batch-example.py <<EOF
+# Import SparkSession
+from pyspark.sql import SparkSession
+
+# Create SparkSession
+spark = SparkSession.builder \
+      .master("local[1]") \
+      .appName("SparkByExamples.com") \
+      .getOrCreate()
+
+data = [('James','','Smith','1991-04-01','M',3000),
+  ('Michael','Rose','','2000-05-19','M',4000),
+  ('Robert','','Williams','1978-09-05','M',4000),
+  ('Maria','Anne','Jones','1967-12-01','F',4000),
+  ('Jen','Mary','Brown','1980-02-17','F',-1)
+]
+
+columns = ["firstname","middlename","lastname","dob","gender","salary"]
+df = spark.createDataFrame(data=data, schema = columns)
+
+df.createOrReplaceTempView("PERSON_DATA")
+
+count = spark.sql("SELECT count(*) from PERSON_DATA ")
+print (count.collect())
+EOF
+
+    sshpass vagrant | scp /tmp/spark-batch-example.py vagrant@$BOX_IP  >> /tmp/integration-test.log 2>&1
+
+    sshpass -p vagrant ssh vagrant@$BOX_IP "sudo su -c '/usr/local/bin/spark-submit /tmp/spark-batch-example.py' eskimo" \
+            2>&1 | tee /tmp/spark-batch-example-python.log  >> /tmp/integration-test.log
+
+    if [[ `grep -F '[Row(count(1)=5)]' /tmp/spark-batch-example-python.log` == "" ]]; then
+        echo_date "Failed to run spark job"
+        exit 103
+    fi
+
+    rm -Rf /tmp/spark-batch-example-python.log
 
 
+    echo_date "   + Testing spark-shell"
+
+    cat > /tmp/spark-batch-example.scala <<EOF
+import org.apache.commons.io.IOUtils
+import java.net.URL
+import java.nio.charset.Charset
+
+// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)
+// So you don't need create them manually
+
+// load bank data
+val bankText = sc.parallelize(
+    IOUtils.toString(
+        new URL("https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv"),
+        Charset.forName("utf8")).split("\n"))
+
+case class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)
+
+val bank = bankText.map(s => s.split(";")).filter(s => s(0) != "\"age\"").map(
+    s => Bank(s(0).toInt,
+            s(1).replaceAll("\"", ""),
+            s(2).replaceAll("\"", ""),
+            s(3).replaceAll("\"", ""),
+            s(5).replaceAll("\"", "").toInt
+        )
+).toDF()
+bank.count()
+EOF
+
+    sshpass vagrant | scp /tmp/spark-batch-example.scala vagrant@$BOX_IP  >> /tmp/integration-test.log 2>&1
+
+    cat /tmp/spark-batch-example.scala | sshpass -p vagrant ssh vagrant@192.168.56.21 "sudo su -c '/usr/local/bin/spark-shell'" \
+          2>&1 | tee /tmp/spark-batch-example-scala.log  >> /tmp/integration-test.log
+
+    if [[ `grep -F 'res0: Long =' /tmp/spark-batch-example-scala.log` == "" ]]; then
+        echo_date "Failed to run spark shell job"
+        exit 104
+    fi
+
+    rm -Rf /tmp/spark-batch-example-scala.log
 
 
+    echo_date "   + Testing logstash"
+
+    cat > /tmp/csv-schema-short-numerical.csv<<EOF
+id,timestamp,paymentType,name,gender,ip_address,purpose,country,age
+1,2019-08-29T01:53:12Z,Amex,Giovanna Van der Linde,Female,185.216.194.245,Industrial,Philippines,55
+2,2019-11-16T14:55:13Z,Mastercard,Rod Edelmann,Male,131.61.251.254,Clothing,China,32
+3,2019-10-07T03:52:52Z,Amex,Michaella Gerrietz,Female,208.21.209.84,Computers,Thailand,32
+4,2019-07-05T22:58:10Z,Mastercard,Thornie Harbor,Male,196.160.55.198,Toys,Poland,51
+5,2019-06-26T08:53:59Z,Visa,Sydney Garlett,Male,64.237.78.240,Computers,South Korea,25
+EOF
+
+    cat > /tmp/csv-read.conf<<EOF
+input {
+    stdin { }
+}
+filter {
+  csv {
+      separator => ","
+      skip_header => "true"
+      columns => ["id","timestamp","paymentType","name","gender","ip_address","purpose","country","age"]
+  }
+}
+output {
+   elasticsearch {
+     hosts => "http://elasticsearch.default.svc.cluster.eskimo:9200"
+     index => "demo-csv"
+  }
+stdout {}
+}
+EOF
+
+    sshpass vagrant | scp /tmp/csv-read.conf vagrant@$BOX_IP  >> /tmp/integration-test.log 2>&1
+
+    cat /tmp/csv-schema-short-numerical.csv | sshpass -p vagrant ssh vagrant@192.168.56.21 "sudo su -c '/usr/local/bin/logstash -f /tmp/csv-read.conf'" \
+          2>&1 | tee /tmp/logstash-example.log  >> /tmp/integration-test.log
+
+    if [[ `grep -F 'Pipelines running' /tmp/logstash-example.log` == "" ]]; then
+        echo_date "Failed to run spark shell job"
+        exit 104
+    fi
+
+    rm -Rf /tmp/logstash-example.log
 }
 
 test_web_apps() {
