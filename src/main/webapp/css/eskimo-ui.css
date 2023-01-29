@@ -960,3 +960,17 @@ html[data-sidenav-size=condensed] .folder-menu-items .side-nav-link .badge,
 html[data-sidenav-size=condensed]:not(.authentication-bg) .side-nav .side-nav-item:not(.nohover):hover .side-nav-link span.badge {
     display: none;
 }
+
+.table-light{
+    --ct-table-color:#313a46;
+    --ct-table-bg:#f5f5f5;
+    --ct-table-border-color:#e7e9ed;
+    --ct-table-striped-bg:#eceef2;
+    --ct-table-striped-color:#313a46;
+    --ct-table-active-bg:#313a46;
+    --ct-table-active-color:#fff;
+    --ct-table-hover-bg:#313a46;
+    --ct-table-hover-color:#fff;
+    color:var(--ct-table-color);
+    border-color:var(--ct-table-border-color)
+}
