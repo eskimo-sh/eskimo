@@ -363,7 +363,7 @@ It's usage is at follows:
 
 .integration-test.sh
 ----
-badtrash@badbook:/work/eskimo/test_lab/integration_test$ ./integration-test.sh
+eskimo@notebook:/work/eskimo/test_lab/integration_test$ ./integration-test.sh
 Usage:
     -h  Display this help message.
     -p  Rebuild eskimo service packages
@@ -386,7 +386,7 @@ For instance, the DemoVM is built using the following call:
 
 .DemoVM building with integration-test.sh
 ----
-badtrash@badbook:/work/eskimo/test_lab/integration_test$ ./integration-test.sh -ad
+eskimo@notebook:/work/eskimo/test_lab/integration_test$ ./integration-test.sh -ad
 ----
 
 Multiple dependencies are required on the machine where this `integration-test.sh `script is intended to run:

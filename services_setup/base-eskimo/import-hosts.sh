@@ -34,57 +34,24 @@
 # Software.
 #
 
-# extract path arguments and create volume mount command part
-export DOCKER_VOLUMES_ARGS=""
-export PROCESS_NEXT="0"
-for argument in "$@"; do
-    if [[ $PROCESS_NEXT == "1" ]]; then
-        if [[ -d $argument ]]; then
-            export DIR=$argument
-        else
-            export DIR=`dirname $argument`
-        fi
-        if [[ `echo $DOCKER_VOLUMES_ARGS | grep "$DIR:$DIR:slave"` == "" ]]; then
-            export DOCKER_VOLUMES_ARGS=" -v $DIR:$DIR:slave $DOCKER_VOLUMES_ARGS"
-        fi
-    fi
-    if [[ $argument == "--config-file" || $argument == "--from-file" ]]; then
-        export PROCESS_NEXT="1"
-    else
-        export PROCESS_NEXT="0"
-    fi
-done
 
-# Add standard folders if not already part of it
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/lib/kafka` == "" ]]; then
-    export DOCKER_VOLUMES_ARGS=" -v /var/lib/kafka:/var/lib/kafka:shared $DOCKER_VOLUMES_ARGS"
-fi
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/log/kafka` == "" ]]; then
-    export DOCKER_VOLUMES_ARGS=" -v /var/log/kafka:/var/log/kafka:shared $DOCKER_VOLUMES_ARGS"
-fi
-
-#echo $DOCKER_VOLUMES_ARGS
-
-. /usr/local/sbin/eskimo-utils.sh
-
-KUBE_SERVICES_HOSTS_FILE=`create_kube_services_hosts_file`
-if [[ ! -f $KUBE_SERVICES_HOSTS_FILE ]]; then
-    echo "Fail to create 'Kube services host file' with create_kube_services_hosts_file"
+# Make sure environment variable telling where the additonal_hosts file is found is well set
+if [[ $ADDITONAL_HOSTS_FILE == "" ]]; then
+    echo "Expected an environment variable ADDITONAL_HOSTS_FILE giving the path to the file declaring services' IPs"
     exit 1
 fi
 
-/usr/bin/docker run \
-        -it \
-        --rm \
-        --network host \
-        --user kafka \
-        $DOCKER_VOLUMES_ARGS \
-        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
-        --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
-        --mount type=bind,source=$KUBE_SERVICES_HOSTS_FILE,target=$KUBE_SERVICES_HOSTS_FILE \
-        -e NODE_NAME=$HOSTNAME \
-        -e ADDITONAL_HOSTS_FILE=$KUBE_SERVICES_HOSTS_FILE \
-        kubernetes.registry:5000/kafka \
-            /usr/local/bin/kube_do /usr/local/sbin/kafka-streams-application-reset.sh "$@"
+# Make sure fle exist
+if [[ ! -f $ADDITONAL_HOSTS_FILE ]]; then
+    echo "File $ADDITONAL_HOSTS_FILE doesn't exist"
+    exit 2
+fi
 
-rm -Rf $KUBE_SERVICES_HOSTS_FILE
+# make sur run as root
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run as root"
+    exit 3
+fi
+
+# Add file content to /etc/hosts
+cat $ADDITONAL_HOSTS_FILE >> /etc/hosts

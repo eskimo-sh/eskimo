@@ -34,6 +34,9 @@
 # Software.
 #
 
+# This script is intended as a wrapper around another command call, taking care to update /etc/hosts with kubernetes
+# services addresses before calling the given command
+
 
 # Make sure environment variable telling where the additonal_hosts file is found is well set
 if [[ $ADDITONAL_HOSTS_FILE == "" ]]; then
@@ -45,10 +48,12 @@ fi
 if [[ ! -f $ADDITONAL_HOSTS_FILE ]]; then
     echo "File $ADDITONAL_HOSTS_FILE doesn't exist"
     exit 2
+else
+    export ADDITONAL_HOSTS_FILE
 fi
 
 # Add file content to /etc/hosts
-cat $ADDITONAL_HOSTS_FILE >> /etc/hosts
+sudo -E /bin/bash /usr/local/sbin/import-hosts.sh
 
 # Run command passed in argument
 $@

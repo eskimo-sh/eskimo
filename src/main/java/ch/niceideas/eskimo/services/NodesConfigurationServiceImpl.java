@@ -298,7 +298,8 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
                     "glusterMountCheckerPeriodic.sh",
                     "inContainerMountGluster.sh",
                     "settingsInjector.sh",
-                    "containerWatchDog.sh"}) {
+                    "containerWatchDog.sh",
+                    "import-hosts.sh"}) {
                 ml.addInfo(" - Copying script " + script);
                 copyCommand(script, "/usr/local/sbin/" + script, connection);
             }

@@ -277,7 +277,7 @@ eskimo.Menu = function() {
             if (eskimoMain.hasRole(uiConfig.role)) {
 
                 let menuEntry = '' +
-                    '<li class="side-nav-item folder-menu-items disabled align-middle" id="folderMenu' + getUcfirst(getCamelCase(service)) + '">\n' +
+                    '<li class="side-nav-item folder-menu-items disabled" id="folderMenu' + getUcfirst(getCamelCase(service)) + '">\n' +
                     '    <a id="services-menu_' + service + '" href="#" class="side-nav-link">\n' +
                     '        <em><img src="' + that.eskimoNodesConfig.getServiceIconPath(service) + '"></em>\n' +
                     '        <span class="menu-text">' + uiConfig.title + '</span>\n' +

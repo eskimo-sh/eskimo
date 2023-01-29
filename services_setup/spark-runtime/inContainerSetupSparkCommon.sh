@@ -71,6 +71,9 @@ sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/chown -R spark /var/lib/spark\"
 sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/chown -R spark. /var/lib/spark\" >> /etc/sudoers.d/spark"
 sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/bash /usr/local/sbin/glusterMountChecker.sh\" >> /etc/sudoers.d/spark"
 
+echo " - Enabling spark run kube_do"
+sudo bash -c "echo \"spark  ALL = NOPASSWD:SETENV: /bin/bash /usr/local/sbin/import-hosts.sh\" >> /etc/sudoers.d/spark"
+
 echo " - Enabling spark user to use host_spark"
 sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/rm -Rf /var/lib/spark\" >> /etc/sudoers.d/spark"
 sudo bash -c "echo \"spark  ALL = NOPASSWD: /bin/ln -s /var/lib/host_spark /var/lib/spark\" >> /etc/sudoers.d/spark"

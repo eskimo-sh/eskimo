@@ -111,6 +111,14 @@ fi
 # Find external IP for libprocess (mesos) configuration
 . /etc/eskimo_topology.sh
 
+. /usr/local/sbin/eskimo-utils.sh
+
+KUBE_SERVICES_HOSTS_FILE=`create_kube_services_hosts_file`
+if [[ ! -f $KUBE_SERVICES_HOSTS_FILE ]]; then
+    echo "Fail to create 'Kube services host file' with create_kube_services_hosts_file"
+    exit 1
+fi
+
 /usr/bin/docker run \
         -it \
         --rm \
@@ -122,9 +130,13 @@ fi
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
         --mount type=bind,source=/home/spark/.kube/config,target=/home/spark/.kube/config \
+        --mount type=bind,source=$KUBE_SERVICES_HOSTS_FILE,target=$KUBE_SERVICES_HOSTS_FILE \
         -v /etc/k8s:/etc/k8s:ro \
         -e NODE_NAME=$HOSTNAME \
+        -e ADDITONAL_HOSTS_FILE=$KUBE_SERVICES_HOSTS_FILE \
         kubernetes.registry:5000/spark \
-        /usr/local/bin/spark-sql "$@"
+            /usr/local/bin/kube_do /usr/local/bin/spark-sql "$@"
+
+rm -Rf $KUBE_SERVICES_HOSTS_FILE
 
 # -p 5000-5010:5000-5010 \

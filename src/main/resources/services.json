@@ -387,14 +387,6 @@
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": false
-      },
-      {
-        "masterElectionStrategy": "SAME_NODE",
-        "masterService": "kube-slave",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": false,
-        "dependentInstalledFirst": true
       }
     ]
   },

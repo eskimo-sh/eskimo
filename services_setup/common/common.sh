@@ -124,6 +124,8 @@ function handle_eskimo_base_infrastructure() {
     docker_cp_script /usr/local/sbin/containerWatchDog.sh sbin $CONTAINER $LOG_FILE
 
     docker_cp_script /usr/local/bin/kube_do bin $CONTAINER $LOG_FILE
+
+    docker_cp_script /usr/local/sbin/import-hosts.sh sbin $CONTAINER $LOG_FILE
 }
 
 # This function installs the topology related scripts

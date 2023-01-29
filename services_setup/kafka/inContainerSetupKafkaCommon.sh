@@ -66,6 +66,9 @@ echo " - Creating user kafka home directory"
 mkdir -p /home/kafka
 chown kafka /home/kafka
 
+echo " - Enabling kafka to run kube_do"
+sudo bash -c "echo \"kafka  ALL = NOPASSWD:SETENV: /bin/bash /usr/local/sbin/import-hosts.sh\" >> /etc/sudoers.d/kafka"
+
 
 # Caution : the in container setup script must mandatorily finish with this log"
 echo "$IN_CONTAINER_CONFIG_SUCESS_MESSAGE"

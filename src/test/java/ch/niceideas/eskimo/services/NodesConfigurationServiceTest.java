@@ -143,6 +143,7 @@ public class NodesConfigurationServiceTest {
                 " - Copying script inContainerMountGluster.sh\n" +
                 " - Copying script settingsInjector.sh\n" +
                 " - Copying script containerWatchDog.sh\n" +
+                " - Copying script import-hosts.sh\n" +
                 " - Copying eskimo-kubectl script\n", sb.toString());
 
         assertEquals ("192.168.10.11:./services_setup/base-eskimo/jq-1.6-linux64\n" +
@@ -154,6 +155,7 @@ public class NodesConfigurationServiceTest {
                 "192.168.10.11:./services_setup/base-eskimo/inContainerMountGluster.sh\n" +
                 "192.168.10.11:./services_setup/base-eskimo/settingsInjector.sh\n" +
                 "192.168.10.11:./services_setup/base-eskimo/containerWatchDog.sh\n" +
+                "192.168.10.11:./services_setup/base-eskimo/import-hosts.sh\n" +
                 "192.168.10.11:./services_setup/base-eskimo/eskimo-kubectl", sshCommandServiceTest.getExecutedScpCommands().trim());
 
         assertEquals ("./services_setup/base-eskimo/install-eskimo-base-system.sh\n" +
@@ -184,6 +186,9 @@ public class NodesConfigurationServiceTest {
                 "sudo mv containerWatchDog.sh /usr/local/sbin/containerWatchDog.sh\n" +
                 "sudo chown root.root /usr/local/sbin/containerWatchDog.sh\n" +
                 "sudo chmod 755 /usr/local/sbin/containerWatchDog.sh\n" +
+                "sudo mv import-hosts.sh /usr/local/sbin/import-hosts.sh\n" +
+                "sudo chown root.root /usr/local/sbin/import-hosts.sh\n" +
+                "sudo chmod 755 /usr/local/sbin/import-hosts.sh\n" +
                 "sudo mv eskimo-kubectl /usr/local/bin/eskimo-kubectl\n" +
                 "sudo chown root.root /usr/local/bin/eskimo-kubectl\n" +
                 "sudo chmod 755 /usr/local/bin/eskimo-kubectl\n", sshCommandServiceTest.getExecutedCommands());

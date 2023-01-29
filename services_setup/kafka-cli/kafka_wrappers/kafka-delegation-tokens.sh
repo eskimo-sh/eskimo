@@ -65,6 +65,14 @@ fi
 
 #echo $DOCKER_VOLUMES_ARGS
 
+. /usr/local/sbin/eskimo-utils.sh
+
+KUBE_SERVICES_HOSTS_FILE=`create_kube_services_hosts_file`
+if [[ ! -f $KUBE_SERVICES_HOSTS_FILE ]]; then
+    echo "Fail to create 'Kube services host file' with create_kube_services_hosts_file"
+    exit 1
+fi
+
 /usr/bin/docker run \
         -it \
         --rm \
@@ -73,8 +81,10 @@ fi
         $DOCKER_VOLUMES_ARGS \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
+        --mount type=bind,source=$KUBE_SERVICES_HOSTS_FILE,target=$KUBE_SERVICES_HOSTS_FILE \
         -e NODE_NAME=$HOSTNAME \
+        -e ADDITONAL_HOSTS_FILE=$KUBE_SERVICES_HOSTS_FILE \
         kubernetes.registry:5000/kafka \
-        /usr/local/bin/kafka-delegation-tokens.sh "$@"
+            /usr/local/bin/kube_do /usr/local/bin/kafka-delegation-tokens.sh "$@"
 
-
+rm -Rf $KUBE_SERVICES_HOSTS_FILE

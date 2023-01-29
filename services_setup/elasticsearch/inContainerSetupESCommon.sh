@@ -65,6 +65,8 @@ mkdir -p /home/elasticsearch
 chown elasticsearch /home/elasticsearch
 
 
+echo " - Enabling elasticsearch run kube_do"
+sudo bash -c "echo \"elasticsearch  ALL = NOPASSWD:SETENV: /bin/bash /usr/local/sbin/import-hosts.sh\" >> /etc/sudoers.d/elasticsearch"
 
 # Caution : the in container setup script must mandatorily finish with this log"
 echo "$IN_CONTAINER_CONFIG_SUCESS_MESSAGE"

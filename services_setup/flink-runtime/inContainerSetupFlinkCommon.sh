@@ -65,6 +65,9 @@ sudo bash -c "echo \"flink  ALL = NOPASSWD: /bin/chmod 777 /var/lib/flink/comple
 sudo bash -c "echo \"flink  ALL = NOPASSWD: /bin/chmod 777 /var/lib/flink/data\" >> /etc/sudoers.d/flink"
 sudo bash -c "echo \"flink  ALL = NOPASSWD: /bin/bash /usr/local/sbin/glusterMountChecker.sh\" >> /etc/sudoers.d/flink"
 
+echo " - Enabling flink to run kube_do"
+sudo bash -c "echo \"flink  ALL = NOPASSWD:SETENV: /bin/bash /usr/local/sbin/import-hosts.sh\" >> /etc/sudoers.d/flink"
+
 echo " - Creating user flink home directory"
 mkdir -p /home/flink
 mkdir -p /home/flink/.kube

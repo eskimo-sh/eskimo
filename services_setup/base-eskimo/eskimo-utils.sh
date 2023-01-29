@@ -209,9 +209,11 @@ __dump_service_ip_dns() {
         return 4
     fi
 
-    eskimo_kube_domains=`get_kube_domain_names`
+    if [[ "$ESKIMO_DOMAINS" == "" ]]; then
+        ESKIMO_DOMAINS=`get_kube_domain_names`
+    fi
 
-    for eskimo_domain in `echo $eskimo_kube_domains`; do
+    for eskimo_domain in `echo $ESKIMO_DOMAINS`; do
         if [[ `echo $eskimo_domain | grep arpa` == "" ]]; then
             if [[ "$gks_format" == "etc_hosts" ]]; then
                 echo $D_ADRESS $D_SERVICE.$D_NAMESPACE.svc.$eskimo_domain
@@ -231,6 +233,7 @@ get_kube_services_IPs() {
         unset gks_format
     fi
 
+    export ESKIMO_DOMAINS=`get_kube_domain_names`
 
     for service in `get_kube_services`; do
         if [[ `echo $service  | sed 's/ *$//g'` != "" ]]; then

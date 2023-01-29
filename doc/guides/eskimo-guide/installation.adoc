@@ -627,7 +627,7 @@ To generate an SSH key pair, run the command `ssh-keygen`.
 
 .Calling `ssh-keygen`
 ----
-badtrash@badbooknew:/tmp$ ssh-keygen
+eskimo@notebook:/tmp$ ssh-keygen
 Generating public/private rsa key pair.
 ----
 
@@ -636,7 +636,7 @@ Press Enter to choose the default location *unless you already have a key pair t
 take great care not to overwrite it*.
 
 ----
-Enter file in which to save the key (/home/badtrash/.ssh/id_rsa): /tmp/badtrash/id_rsa
+Enter file in which to save the key (/home/eskimo/.ssh/id_rsa): /tmp/eskimo/id_rsa
 ----
 
 Next, you'll be asked to choose a password. Using a password means a password will be required to use the private key.
@@ -653,15 +653,15 @@ After that, your public and private keys will be generated. There will be two di
 your private key. The one named `id_rsa.pub` is your public key.
 
 ----
-Your identification has been saved in /tmp/badtrash/id_rsa.
-Your public key has been saved in /tmp/badtrash/id_rsa.pub.
+Your identification has been saved in /tmp/eskimo/id_rsa.
+Your public key has been saved in /tmp/eskimo/id_rsa.pub.
 ----
 
 You'll also be shown a fingerprint and "visual fingerprint" of your key. You do not need to save these.
 
 ----
 The key fingerprint is:
-SHA256:/HPC91ROJtCQ6Q5FBdsqyPyppzU8xScfUThLj+3OKuw badtrash@badbooknew
+SHA256:/HPC91ROJtCQ6Q5FBdsqyPyppzU8xScfUThLj+3OKuw eskimo@notebook
 The key's randomart image is:
 +---[RSA 2048]----+
 |           .+=...|
@@ -735,7 +735,7 @@ When you're done, the .ssh/authorized_keys file will look something like this (d
 keys):
 
 ----
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSkT3A1j89RT/540ghIMHXIVwNlAEM3WtmqVG7YN/wYwtsJ8iCszg4/lXQsfLFxYmEVe8L9atgtMGCi5QdYPl4X/c+5YxFfm88Yjfx+2xEgUdOr864eaI22yaNMQ0AlyilmK+PcSyxKP4dzkf6B5Nsw8lhfB5n9F5md6GHLLjOGuBbHYlesKJKnt2cMzzS90BdRk73qW6wJ+MCUWo+cyBFZVGOzrjJGEcHewOCbVs+IJWBFSi6w1enbKGc+RY9KrnzeDKWWqzYnNofiHGVFAuMxrmZOasqlTIKiC2UK3RmLxZicWiQmPnpnjJRo7pL0oYM9r/sIWzD6i2S9szDy6aZ badtrash@badbook
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSkT3A1j89RT/540ghIMHXIVwNlAEM3WtmqVG7YN/wYwtsJ8iCszg4/lXQsfLFxYmEVe8L9atgtMGCi5QdYPl4X/c+5YxFfm88Yjfx+2xEgUdOr864eaI22yaNMQ0AlyilmK+PcSyxKP4dzkf6B5Nsw8lhfB5n9F5md6GHLLjOGuBbHYlesKJKnt2cMzzS90BdRk73qW6wJ+MCUWo+cyBFZVGOzrjJGEcHewOCbVs+IJWBFSi6w1enbKGc+RY9KrnzeDKWWqzYnNofiHGVFAuMxrmZOasqlTIKiC2UK3RmLxZicWiQmPnpnjJRo7pL0oYM9r/sIWzD6i2S9szDy6aZ eskimo@notebook
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzlL9Wo8ywEFXSvMJ8FYmxP6HHHMDTyYAWwM3AOtsc96DcYVQIJ5VsydZf5/4NWuq55MqnzdnGB2IfjQvOrW4JEn0cI5UFTvAG4PkfYZb00Hbvwho8JsSAwChvWU6IuhgiiUBofKSMMifKg+pEJ0dLjks2GUcfxeBwbNnAgxsBvY6BCXRfezIddPlqyfWfnftqnafIFvuiRFB1DeeBr24kik/550MaieQpJ848+MgIeVCjko4NPPLssJ/1jhGEHOTlGJpWKGDqQK+QBaOQZh7JB7ehTK+pwIFHbUaeAkr66iVYJuC05iA7ot9FZX8XGkxgmhlnaFHNf0l8ynosanqt badtrash@desktop
 ----
 
