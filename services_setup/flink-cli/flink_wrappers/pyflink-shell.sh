@@ -38,9 +38,7 @@
 export DOCKER_VOLUMES_ARGS=""
 
 # Add standard folders if not already part of it
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/lib/flink` == "" ]]; then
-    export DOCKER_VOLUMES_ARGS=" -v /var/lib/flink:/var/lib/flink:shared $DOCKER_VOLUMES_ARGS"
-fi
+# (avoid /var/lib/flink which is used inside container for gluster mounts)
 if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/log/flink` == "" ]]; then
     export DOCKER_VOLUMES_ARGS=" -v /var/log/flink:/var/log/flink:shared $DOCKER_VOLUMES_ARGS"
 fi
@@ -55,8 +53,9 @@ if [[ ! -f $KUBE_SERVICES_HOSTS_FILE ]]; then
     exit 1
 fi
 
+test -t 1 && USE_TTY="-t"
 /usr/bin/docker run \
-        -it \
+        -i $USE_TTY \
         --rm \
         --network host \
         --user flink \

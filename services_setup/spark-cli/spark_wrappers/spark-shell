@@ -119,8 +119,9 @@ if [[ ! -f $KUBE_SERVICES_HOSTS_FILE ]]; then
     exit 1
 fi
 
+test -t 1 && USE_TTY="-t"
 /usr/bin/docker run \
-        -it \
+        -i $USE_TTY \
         --rm \
         --network host \
         --user spark \

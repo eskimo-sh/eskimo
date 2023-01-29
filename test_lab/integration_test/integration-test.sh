@@ -65,12 +65,19 @@ check_for_virtualbox() {
     fi
 }
 
-check_for_vagrant() {
-    if [ -x "$(command -v vagrant)" ]; then
-        echo_date "Found vagrant : "$(vagrant -v)
+check_for_ssh() {
+    if [ -x "$(command -v ssh)" ]; then
+        echo_date "Found ssh : "$(which ssh)
     else
-        echo "Vagrant is not available on system"
-        exit 100
+        echo "ssh is not available on system"
+        exit 111
+    fi
+
+    if [ -x "$(command -v sshpass)" ]; then
+        echo_date "Found sshpass : "$(which sshpass)
+    else
+        echo "sshpass is not available on system"
+        exit 112
     fi
 }
 
@@ -1433,6 +1440,87 @@ do_cleanup() {
 
 }
 
+test_cli() {
+
+    # Testing CLI Tools
+    # ----------------------------------------------------------------------------------------------------------------------
+
+    echo_date " - Testing CLI Tools on $BOX_IP"
+
+    echo_date "   + Testing flink"
+
+    cat > /tmp/flink-batch-example.py <<EOF
+import argparse
+import logging
+import sys
+
+from pyflink.common import Row
+from pyflink.table import (EnvironmentSettings, TableEnvironment, TableDescriptor, Schema,
+                           DataTypes, FormatDescriptor)
+from pyflink.table.expressions import lit, col
+from pyflink.table.udf import udtf
+
+word_count_data = ["To be, or not to be,--that is the question:--",
+                   "Whether 'tis nobler in the mind to suffer",
+                   "The slings and arrows of outrageous fortune",
+                   "Or to take arms against a sea of troubles,",
+                   "And by opposing end them?--To die,--to sleep,--",
+                   "No more; and by a sleep to say we end",
+                   "The heartache, and the thousand natural shocks",
+                   "That flesh is heir to,--'tis a consummation",
+                   "Devoutly to be wish'd. To die,--to sleep;--"]
+
+def word_count():
+    t_env = TableEnvironment.create(EnvironmentSettings.in_streaming_mode())
+
+    tab = t_env.from_elements(map(lambda i: (i,), word_count_data),
+                              DataTypes.ROW([DataTypes.FIELD('line', DataTypes.STRING())]))
+
+    t_env.create_temporary_table(
+        'sink',
+        TableDescriptor.for_connector('print')
+                       .schema(Schema.new_builder()
+                               .column('word', DataTypes.STRING())
+                               .column('count', DataTypes.BIGINT())
+                               .build())
+                       .build())
+
+    @udtf(result_types=[DataTypes.STRING()])
+    def split(line: Row):
+        for s in line[0].split():
+            yield Row(s)
+
+    # compute word count
+    tab.flat_map(split).alias('word') \
+       .group_by(col('word')) \
+       .select(col('word'), lit(1).count) \
+       .execute_insert('sink')
+
+if __name__ == '__main__':
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(message)s")
+    word_count()
+EOF
+
+    sshpass vagrant | scp /tmp/flink-batch-example.py vagrant@$BOX_IP  >> /tmp/integration-test.log 2>&1
+
+    sshpass -p vagrant ssh vagrant@$BOX_IP "sudo su -c '/usr/local/bin/flink run -py /tmp/flink-batch-example.py' eskimo" \
+            2>&1 | tee /tmp/flink-batch-example.log  >> /tmp/integration-test.log
+
+    if [[ `grep 'Job has been submitted with JobID' /tmp/flink-batch-example.log` == "" ]]; then
+        echo_date "Failed to run flink job"
+        exit 102
+    fi
+
+    echo_date "   + Testing spark-submit"
+
+    echo_date "TO BE IMPLEMENTED"
+    exit 1
+
+
+
+
+}
+
 test_web_apps() {
 
     # Testing web apps
@@ -1728,7 +1816,9 @@ do_overwrite_sc() {
 #vagrant ssh -c "sudo journalctl -u eskimo" integration-test
 
 usage() {
-    echo "Usage:"
+    echo "Usage: integration-test.sh [Options] [Target Box IP]"
+    echo "  where [Target Box IP] is optional IP address of box to target tests at"
+    echo "  where [Options] in"
     echo "    -h  Display this help message."
     echo "    -p  Rebuild eskimo service packages"
     echo "        -n  Skip packages rebuild (useful when used with -a)"
@@ -1739,6 +1829,7 @@ usage() {
     echo "    -s  Setup Eskimo"
     echo "    -l  Run Data load"
     echo "    -z  Run Zeppelin notebooks test"
+    echo "    -i  Run CLI tests"
     echo "    -t  Run other tests"
     echo "    -c  Run cleanup"
     echo "    -o  Take screenshots"
@@ -1767,6 +1858,7 @@ export INSTALL_ESKIMO=""
 export SETUP_ESKIMO=""
 export RUN_DATA_LOAD=""
 export RUN_NOTEBOOK_TESTS=""
+export RUN_CLI_TESTS=""
 export RUN_OTHER_TESTS=""
 export RUN_CLEANUP=""
 export RUN_SCREENSHOTS=""
@@ -1776,7 +1868,7 @@ export SKIP_PACKAGES=""
 
 
 # Parse options to the integration-test script
-while getopts ":hpnrfbeslztcowadm" opt; do
+while getopts ":hpnrfbeslztcowadmi" opt; do
     case ${opt} in
         h)
             usage
@@ -1809,6 +1901,9 @@ while getopts ":hpnrfbeslztcowadm" opt; do
         z)
             export RUN_NOTEBOOK_TESTS="do"
             ;;
+        i)
+            export RUN_CLI_TESTS="do"
+            ;;
         t)
             export RUN_OTHER_TESTS="do"
             ;;
@@ -1828,6 +1923,7 @@ while getopts ":hpnrfbeslztcowadm" opt; do
             export SETUP_ESKIMO="do"
             export RUN_DATA_LOAD="do"
             export RUN_NOTEBOOK_TESTS="do"
+            export RUN_CLI_TESTS="do"
             export RUN_OTHER_TESTS="do"
             export RUN_CLEANUP="do"
             export RUN_SCREENSHOTS="do"
@@ -1849,6 +1945,19 @@ while getopts ":hpnrfbeslztcowadm" opt; do
             ;;
     esac
 done
+shift $(expr $OPTIND - 1 )
+
+if [[ "$1" != "" ]]; then
+    if [[ "$RECREATE_BOX" == "do" ]]; then
+        echo "Passing a [Target Box IP] is incompatible with '-b  Recreate box(es)'"
+        exit 201
+    fi
+    if [[ "$MULTIPLE_NODE" == "multiple" ]]; then
+        echo "Passing a [Target Box IP] is incompatible with '-m  Test on multiple nodes'"
+        exit 201
+    fi
+    export BOX_IP=$1
+fi
 
 trap __dump_error 15
 trap __dump_error EXIT
@@ -1869,6 +1978,11 @@ if [[ "$REBUILD_ESKIMO" != "" || "$RUN_SCREENSHOTS" != "" ]]; then
     check_for_maven
 
     check_for_java
+fi
+
+if [[ "$RUN_CLI_TESTS" == "do" ]]; then
+
+    check_for_ssh
 fi
 
 if [[ "$RECREATE_BOX" != "" || "$INSTALL_ESKIMO" != "" || "$SETUP_ESKIMO" != "" || "$RUN_DATA_LOAD" != "" || "$RUN_NOTEBOOK_TESTS" != "" || "$RUN_OTHER_TESTS" != "" || "$RUN_CLEANUP" != "" || $DEMO == "demo" ]] ; then
@@ -1894,18 +2008,21 @@ if [[ "$INSTALL_ESKIMO" != "" ]]; then
     install_eskimo
 fi
 
-login_eskimo
+if [[ "$RUN_DATA_LOAD" != "" || "$RUN_NOTEBOOK_TESTS" != "" || "$RUN_OTHER_TESTS" != "" || "$RUN_CLEANUP" != "" || "$RUN_SCREENSHOTS" != "" ]]; then
+    login_eskimo
+fi
 
 if [[ "$INSTALL_ESKIMO" != "" ]]; then
     initial_setup_eskimo
 fi
 
-
 if [[ "$SETUP_ESKIMO" != "" ]]; then
     setup_eskimo
 fi
 
-wait_all_services_up
+if [[ "$RUN_DATA_LOAD" != "" || "$RUN_NOTEBOOK_TESTS" != "" || "$RUN_OTHER_TESTS" != "" || "$RUN_CLEANUP" != "" || "$RUN_SCREENSHOTS" != "" ]]; then
+    wait_all_services_up
+fi
 
 if [[ "$RUN_DATA_LOAD" != "" ]]; then
     run_zeppelin_data_load
@@ -1925,6 +2042,10 @@ if [[ "$RUN_NOTEBOOK_TESTS" != "" ]]; then
     run_zeppelin_kafka_streams
 
     run_zeppelin_other_notes
+fi
+
+if [[ "$RUN_CLI_TESTS" != "" ]]; then
+    test_cli
 fi
 
 if [[ "$RUN_OTHER_TESTS" != "" ]]; then

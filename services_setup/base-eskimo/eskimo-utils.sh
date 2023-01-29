@@ -267,7 +267,7 @@ get_kube_services_IPs() {
 }
 
 create_kube_services_hosts_file() {
-    add_hosts_file=/var/lib/eskimo/`uuidgen -r`_hosts
+    add_hosts_file=/tmp/`uuidgen -r`_hosts
     get_kube_services_IPs etc_hosts >> $add_hosts_file
     if [[ $? != 0 ]]; then
         echo "Failed to create aditional host file"

@@ -473,6 +473,9 @@ A specific package called _flink-cli_ installs wrappers on the usual flink comma
 Flink distributions. It is intended to be installed on nodes where operators, administrators or developers will
 interact with flink.
 
+The _remote host_ to use in flink command line tools to reach flink deployed on Kubernetes with Eskimo is
+`flink-runtime-rest.default.svc.cluster.eskimo` and the port is `8081`.
+
 ==== Gluster shares for Flink
 
 Nodes where Flink is installed (either Flink App Master, Flink worker or Zeppelin) automatically have the following

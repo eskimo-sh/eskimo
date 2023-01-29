@@ -74,9 +74,9 @@ if [[ ! -f $KUBE_SERVICES_HOSTS_FILE ]]; then
     exit 1
 fi
 
-# Don't pass -t or docker won't let us pipe input
+test -t 1 && USE_TTY="-t"
 /usr/bin/docker run \
-        -i \
+        -i $USE_TTY \
         --rm \
         --network host \
         --user elasticsearch \
