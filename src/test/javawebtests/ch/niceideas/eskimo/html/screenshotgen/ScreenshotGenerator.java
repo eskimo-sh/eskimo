@@ -36,6 +36,7 @@
 package ch.niceideas.eskimo.html.screenshotgen;
 
 import ch.niceideas.common.exceptions.CommonBusinessException;
+import ch.niceideas.common.exceptions.CommonRTException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.html.AbstractWebTest;
@@ -57,9 +58,11 @@ public class ScreenshotGenerator {
     private static final Dimension SIZE_SMALL = new Dimension(960, 600);
     private static final Dimension SIZE_MEDIUM = new Dimension(1280, 720);
 
+    private static String nodeNameOverride = "192-168-56-51";
+
     public static void main (String[] args) {
 
-        if (args.length != 2) {
+        if (args.length <= 2) {
             logger.error ("Expecting 'target Eskimo URL' as first argument and 'destination folder for screenshots' as second argument");
             System.exit (1);
         }
@@ -76,9 +79,16 @@ public class ScreenshotGenerator {
             System.exit (3);
         }
 
-        if (!new File (targetScreenshotFolder).mkdirs()) {
-            logger.error ("Could not mkdirs target folder");
-            System.exit (4);
+        if (args.length == 3 && StringUtils.isNotBlank(args[2])) {
+            nodeNameOverride = args[2];
+        }
+
+        File targetScreenshotFolderFile = new File (targetScreenshotFolder);
+        if (!targetScreenshotFolderFile.exists()) {
+            if (!targetScreenshotFolderFile.mkdirs()) {
+                logger.error("Could not mkdirs target folder");
+                System.exit(4);
+            }
         }
 
         WebDriver driver = null;
@@ -87,10 +97,11 @@ public class ScreenshotGenerator {
 
             driver.get(targetEskimoUrl);
 
-            login(driver);
-
             initInfrastructure (driver);
 
+            login(driver, targetScreenshotFolder);
+
+            initInfrastructure (driver);
 
             screenshotsGrafana(driver, targetScreenshotFolder);
 
@@ -181,7 +192,7 @@ public class ScreenshotGenerator {
 
         driver.findElement(By.id("operations-command-button-validate")).click();
 
-        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.id("installation_logstash-cli_192-168-56-54-progress-wrapper")));
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.id("installation_logstash-cli_" + nodeNameOverride + "-progress-wrapper")));
 
         handleScreenshotsSimple(driver, targetScreenshotFolder, "operations");
 
@@ -251,11 +262,11 @@ public class ScreenshotGenerator {
         wait(driver, 10000).until(ExpectedConditions.elementToBeClickable(By.cssSelector("#file-managers-management div.btn-group button.dropdown-toggle")));
         driver.findElement(By.cssSelector("#file-managers-management div.btn-group button.dropdown-toggle")).click();
 
-        wait(driver, 10000).until(ExpectedConditions.elementToBeClickable(By.id("file_manager_open_192-168-56-51")));
+        wait(driver, 10000).until(ExpectedConditions.elementToBeClickable(By.id("file_manager_open_" + nodeNameOverride)));
 
-        driver.findElement(By.id("file_manager_open_192-168-56-51")).click();
+        driver.findElement(By.id("file_manager_open_" + nodeNameOverride)).click();
 
-        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.id("file-manager-close-192-168-56-51")));
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.id("file-manager-close-" + nodeNameOverride)));
 
         handleScreenshots(driver, targetScreenshotFolder, "file-manager");
     }
@@ -269,11 +280,11 @@ public class ScreenshotGenerator {
         wait(driver, 10000).until(ExpectedConditions.elementToBeClickable(By.cssSelector("#consoles-management div.btn-group button.dropdown-toggle")));
         driver.findElement(By.cssSelector("#consoles-management div.btn-group button.dropdown-toggle")).click();
 
-        wait(driver, 10000).until(ExpectedConditions.elementToBeClickable(By.id("console_open_192-168-56-51")));
+        wait(driver, 10000).until(ExpectedConditions.elementToBeClickable(By.id("console_open_" + nodeNameOverride)));
 
-        driver.findElement(By.id("console_open_192-168-56-51")).click();
+        driver.findElement(By.id("console_open_" + nodeNameOverride)).click();
 
-        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.id("console-close-192-168-56-51")));
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.id("console-close-" + nodeNameOverride)));
 
         handleScreenshots(driver, targetScreenshotFolder, "console");
     }
@@ -288,10 +299,19 @@ public class ScreenshotGenerator {
         driver.switchTo().frame("iframe-content-zeppelin");
 
         // Show Spark SQL notebook
-        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a[href=\"#/notebook/2HS3PQPV6\"]")));
-        driver.findElement(By.cssSelector("a[href=\"#/notebook/2HS3PQPV6\"]")).click();
-
         JavascriptExecutor js = (JavascriptExecutor)driver;
+
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-folder-item a")));
+
+        // get spark SQL notebook ID
+        Object notebookId = js.executeScript("return $('.note-folder-item a:contains(\" Spark SQL Demo \")').attr(\"href\").substring(11)");
+        if (notebookId == null || StringUtils.isBlank(notebookId.toString())) {
+            throw new CommonRTException("Couldn't get SparkSQL notebook ID");
+        }
+
+        wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a[href=\"#/notebook/" + notebookId + "\"]")));
+        driver.findElement(By.cssSelector("a[href=\"#/notebook/" + notebookId + "\"]")).click();
+
 
         // wait for one of the markdown to be shown (should give indication that notebook is well initialized)
         ActiveWaiter.wait(() -> {
@@ -495,11 +515,22 @@ public class ScreenshotGenerator {
         handleScreenshots(driver, targetScreenshotFolder, "grafana");
     }
 
-    private static void login(WebDriver driver) {
+    private static void login(WebDriver driver, String targetScreenshotFolder) throws IOException, FileUtils.FileDeleteFailedException {
         logger.info (" - Login");
 
         driver.findElement(By.id("eskimo-username")).sendKeys("admin");
         driver.findElement(By.id("eskimo-password")).sendKeys("password");
+
+        resizeWindow(driver, SIZE_WIDE);
+        takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, "login-wide.png");
+
+        resizeWindow(driver, SIZE_SMALL);
+        takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, "login-small.png");
+
+        resizeWindow(driver, SIZE_MEDIUM);
+        takeScreenshot((TakesScreenshot) driver, targetScreenshotFolder, "login-medium.png");
+
+        resizeWindow(driver, SIZE_WIDE);
 
         driver.findElement(By.cssSelector("button.btn-info")).click();
 

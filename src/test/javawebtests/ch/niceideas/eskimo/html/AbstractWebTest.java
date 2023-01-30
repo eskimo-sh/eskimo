@@ -95,11 +95,27 @@ public abstract class AbstractWebTest {
         co.addArguments("--headless");
         co.addArguments("--disable-gpu");
 
+        File resolutionCachePath = new File("/tmp/eskimo-selenium-resolution-cache");
+        if (!resolutionCachePath.exists()) {
+            if (!resolutionCachePath.mkdirs()) {
+                throw new CommonBusinessException("Couldn't create selenium resolution cache path " + resolutionCachePath);
+            }
+        }
+
+        File driverCachePath = new File("/tmp/eskimo-selenium-driver-cache");
+        if (!driverCachePath.exists()) {
+            if (!driverCachePath.mkdirs()) {
+                throw new CommonBusinessException("Couldn't create selenium driver cache path " + driverCachePath);
+            }
+        }
+
         WebDriver driver;
         for (int i = 0; ; i++) { // 10 attempts
             try {
                 driver = WebDriverManager.chromedriver()
                         .capabilities(co)
+                        .resolutionCachePath(resolutionCachePath.getAbsolutePath())
+                        .cachePath(driverCachePath.getAbsolutePath())
                         .create();
                 break;
             } catch (WebDriverManagerException e) {

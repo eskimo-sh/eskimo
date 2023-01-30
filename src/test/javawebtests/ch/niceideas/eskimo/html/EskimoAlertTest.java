@@ -38,6 +38,8 @@ import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class EskimoAlertTest extends AbstractWebTest {
 
     @BeforeEach
@@ -82,6 +84,34 @@ public class EskimoAlertTest extends AbstractWebTest {
         ActiveWaiter.wait(() -> !js("return $('#alert-modal').css('display')").equals("none"), 500);
         // shouldn't have worked
         assertCssValue("#alert-modal", "display", "none");
+    }
+
+    @Test
+    public void testConfirm() throws Exception {
+
+        js("eskimoAlert.confirm ('dummy message', " +
+                "function() { window.confirmCallbackCalled = \"called\"}, " +
+                "function() { window.closeCallbackCalled = \"called\"});");
+
+        ActiveWaiter.wait(() -> js("return $('#alert-modal').css('display')").equals("block"));
+        assertCssValue("#alert-modal", "display", "block");
+
+        getElementById("alert-button-cancel").click();
+
+        assertJavascriptEquals("called", "window.closeCallbackCalled ? window.closeCallbackCalled : 'none'");
+        assertJavascriptEquals("none", "window.confirmCallbackCalled ? window.confirmCallbackCalled : 'none'");
+
+        js("delete window.closeCallbackCalled");
+        js("delete window.confirmCallbackCalled");
+
+        js("eskimoAlert.confirm ('dummy message', " +
+                "function() { window.confirmCallbackCalled = \"called\"}, " +
+                "function() { window.closeCallbackCalled = \"called\"});");
+
+        getElementById("alert-button-validate").click();
+
+        assertJavascriptEquals("called", "window.closeCallbackCalled ? window.closeCallbackCalled : 'none'");
+        assertJavascriptEquals("called", "window.confirmCallbackCalled ? window.confirmCallbackCalled : 'none'");
     }
 
     @Test
