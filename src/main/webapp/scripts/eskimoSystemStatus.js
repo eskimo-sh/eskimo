@@ -441,9 +441,9 @@ eskimo.SystemStatus = function() {
 
     function reinstallService (service, node) {
         console.log("reinstallService ", service, node);
-        if (confirm ("Are you sure you want to reinstall " + service + " on " + node + " ?")) {
+        eskimoMain.confirm("Are you sure you want to reinstall " + service + " on " + node + " ?", () => {
             serviceAction("reinstall-service", service, node);
-        }
+        });
     }
     this.reinstallService = reinstallService;
 

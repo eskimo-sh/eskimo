@@ -394,7 +394,7 @@ eskimo.FileManagers = function() {
     };
 
     this.deletePath = function (node, nodeName, currentFolder, file) {
-        if (confirm("Are you sure you want to delete file " + file + "?")) {
+        eskimoMain.confirm("Are you sure you want to delete file " + file + "?", () => {
             $.ajaxGet({
                 context: this,
                 url: "file-manager-delete?nodeAddress=" + node + "&folder=" + currentFolder + "&file=" + file,
@@ -412,7 +412,7 @@ eskimo.FileManagers = function() {
                 },
                 error: errorHandler
             });
-        }
+        });
     };
 
     function showRoot (node, nodeName) {

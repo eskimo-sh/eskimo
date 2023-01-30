@@ -482,6 +482,10 @@ eskimo.Main = function() {
         eskimoAlert.showAlert(level, message, callback);
     }
 
+    this.confirm = function(message, confirmCallback, closeCallback) {
+        eskimoAlert.confirm(message, confirmCallback, closeCallback);
+    }
+
     this.initialize();
 };
 

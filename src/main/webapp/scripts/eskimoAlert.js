@@ -48,6 +48,7 @@ eskimo.Alert = function() {
     let currentMessage = null;
 
     let callback = null;
+    let confirmCallback = null;
 
     this.initialize = function() {
         // Initialize HTML Div from Template
@@ -56,7 +57,8 @@ eskimo.Alert = function() {
             if (statusTxt === "success") {
 
                 $('#alert-header-cancel').click(closeAlert);
-                $('#alert-button-validate').click(closeAlert);
+                $("#alert-button-cancel").click(closeAlert);
+                $('#alert-button-validate').click(validateAlert);
 
                 // this is done is EskimoAlert to be sure it's done last in the init process
                 if (isFunction (that.eskimoMenu.enforceMenuConsisteny)) {
@@ -71,7 +73,9 @@ eskimo.Alert = function() {
 
     function adaptLevel (level) {
         currentLevel = level;
-        if (level >= that.level.ERROR) {
+        if (level >= that.level.CONFIRM) {
+            $("#alert-header").attr("class", "modal-header bg-info text-white");
+        } else if (level == that.level.ERROR) {
             $("#alert-header").attr("class", "modal-header bg-danger text-white");
         } else if (level === that.level.WARNING) {
             $("#alert-header").attr("class", "modal-header bg-warning text-white");
@@ -80,13 +84,35 @@ eskimo.Alert = function() {
         }
     }
 
+    function confirm (message, confirmCallbackParam, closeCallback) {
+
+        confirmCallback = confirmCallbackParam;
+        callback = closeCallback;
+
+        const level = this.level.CONFIRM;
+
+        if (level > currentLevel) {
+            adaptLevel (level);
+        }
+
+        currentMessage = message;
+
+        $("#alert-body").html (currentMessage);
+
+        $("#alert-button-cancel").css("display", "inherit");
+        $("#alert-title").html("Comfirmation");
+        $("#alert-button-validate").html("Validate");
+
+        $('#alert-modal').modal("show");
+    }
+    this.confirm = confirm;
 
     function showAlert (level, message, closeCallback) {
 
         callback = closeCallback;
 
         if (!Number.isInteger(level) || level < 1 || level > 3) {
-            alert("eskimoAlert : expected level as an integer between 1 and 3. Use window.ESKIMO_ALERT_LEVEL.[ERROR, WARNING, INFO]");
+            alert("eskimoAlert : expected level for alert as an integer between 1 and 3. Use window.ESKIMO_ALERT_LEVEL.[ERROR, WARNING, INFO]");
         } else {
 
             if (level > currentLevel) {
@@ -100,10 +126,24 @@ eskimo.Alert = function() {
             }
             $("#alert-body").html (currentMessage);
 
+            $("#alert-button-cancel").css("display", "none");
+            $("#alert-title").html("Message");
+            $("#alert-button-validate").html("Close");
+
             $('#alert-modal').modal("show");
         }
     }
     this.showAlert = showAlert;
+
+    function validateAlert() {
+
+        if (isFunction (confirmCallback)) {
+            confirmCallback();
+        }
+
+        closeAlert();
+    }
+    this.validateAlert = validateAlert;
 
     function closeAlert() {
 
@@ -119,6 +159,7 @@ eskimo.Alert = function() {
     this.closeAlert = closeAlert;
 
     this.level = {
+        CONFIRM: 4,
         ERROR: 3,
         WARNING: 2,
         INFO: 1

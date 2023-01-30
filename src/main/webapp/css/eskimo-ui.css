@@ -686,10 +686,18 @@ td.operation-title{
     height: 20px;
     text-align: center;
     color: black;
+    padding-top: 5px;
 }
 
 .pending-link-operations a {
     color: black;
+    background-color: #EEEEEE;
+    text-decoration: underline;
+    border-color: #777777;
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 1px;
+    padding: 5px;
 }
 
 .side-nav-item .side-nav-link img {
