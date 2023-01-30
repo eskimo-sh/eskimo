@@ -147,8 +147,11 @@ take_global_lock() {
 
 # Get the local cluster domain names (space separated)
 get_kube_domain_names() {
+    if [[ ":$PATH:" != *":/usr/local/bin:"* ]]; then
+        PATH=$PATH:/usr/local/bin
+    fi
     DOMAIN_NAMES=" "
-    for i in $(/usr/local/bin/kubectl get cm coredns -n kube-system -o jsonpath="{.data.Corefile}" | grep ".local "); do
+    for i in $(kubectl get cm coredns -n kube-system -o jsonpath="{.data.Corefile}" | grep ".local "); do
         if [[ "$i" != "{" ]]; then
             DOMAIN_NAMES="$i $DOMAIN_NAMES "
         fi
@@ -158,26 +161,36 @@ get_kube_domain_names() {
 
 # Get the cluster defined services (space separated)
 get_kube_services() {
-    /usr/local/bin/kubectl get services -A -o jsonpath="{range .items[*]}{@.metadata.name}{'.'}{@.metadata.namespace}{' '}" | sed s/' \. '//g
+    if [[ ":$PATH:" != *":/usr/local/bin:"* ]]; then
+        PATH=$PATH:/usr/local/bin
+    fi
+    kubectl get services -A -o jsonpath="{range .items[*]}{@.metadata.name}{'.'}{@.metadata.namespace}{' '}" | sed s/' \. '//g
+    if [[ $? != 0 ]]; then
+        echo "Failed to list kube services with kubectl"
+        return 1
+    fi
 }
 
 __get_kube_service_IP() {
+
+    if [[ ":$PATH:" != *":/usr/local/bin:"* ]]; then
+        PATH=$PATH:/usr/local/bin
+    fi
 
     if [[ `echo $1 | grep '.'` == "" ]]; then
         echo "Expecting service in format NAME.NAMESPACE"
         return 1
     fi
 
-    SERVICE=`echo $1 | cut -d '.' -f 1`
-    NAMESPACE=`echo $1 | cut -d '.' -f 2`
+    SERVICE=$(echo $1 | cut -d '.' -f 1)
+    NAMESPACE=$(echo $1 | cut -d '.' -f 2)
 
-    #/usr/local/bin/kubectl get endpoint $SERVICE -n $NAMESPACE -o jsonpath="{.spec.clusterIP}"
-    /usr/local/bin/kubectl get endpoints $SERVICE -n $NAMESPACE -o jsonpath="{range .subsets[*].addresses[*]}{@.hostname}{'/'}{@.ip}{' '}" | sed s/' \/ '//g
+    kubectl get endpoints $SERVICE -n $NAMESPACE -o jsonpath="{range .subsets[*].addresses[*]}{@.hostname}{'/'}{@.ip}{' '}" | sed s/' \/ '//g
 }
 
 __dump_service_ip_dns() {
 
-    if [[ `echo $1 | grep ':'` == "" ]]; then
+    if [[ $(echo $1 | grep ':') == "" ]]; then
         echo "Expecting service in format NAME:IP"
         return 1
     fi
@@ -189,9 +202,9 @@ __dump_service_ip_dns() {
         unset gks_format
     fi
 
-    D_SERVICE=`echo $FULL_SERVICE | cut -d ':' -f 1`
-    D_NAMESPACE=`echo $FULL_SERVICE | cut -d ':' -f 2`
-    D_ADRESS=`echo $FULL_SERVICE | cut -d ':' -f 3`
+    D_SERVICE=$(echo $FULL_SERVICE | cut -d ':' -f 1)
+    D_NAMESPACE=$(echo $FULL_SERVICE | cut -d ':' -f 2)
+    D_ADRESS=$(echo $FULL_SERVICE | cut -d ':' -f 3)
 
 
     if [[ "$D_SERVICE" == "" ]]; then
@@ -210,11 +223,11 @@ __dump_service_ip_dns() {
     fi
 
     if [[ "$ESKIMO_DOMAINS" == "" ]]; then
-        ESKIMO_DOMAINS=`get_kube_domain_names`
+        ESKIMO_DOMAINS=$(get_kube_domain_names)
     fi
 
-    for eskimo_domain in `echo $ESKIMO_DOMAINS`; do
-        if [[ `echo $eskimo_domain | grep arpa` == "" ]]; then
+    for eskimo_domain in $(echo $ESKIMO_DOMAINS); do
+        if [[ $(echo $eskimo_domain | grep arpa) == "" ]]; then
             if [[ "$gks_format" == "etc_hosts" ]]; then
                 echo $D_ADRESS $D_SERVICE.$D_NAMESPACE.svc.$eskimo_domain
             else
@@ -233,29 +246,35 @@ get_kube_services_IPs() {
         unset gks_format
     fi
 
-    export ESKIMO_DOMAINS=`get_kube_domain_names`
+    export ESKIMO_DOMAINS=$(get_kube_domain_names)
 
-    for service in `get_kube_services`; do
-        if [[ `echo $service  | sed 's/ *$//g'` != "" ]]; then
+    local KUBE_SERVICES
+    KUBE_SERVICES=$(get_kube_services)
+    if [[ $? != 0 ]]; then
+        echo "Failed to list kube services with kubectl"
+        return 1
+    fi
+    for service in $KUBE_SERVICES; do
+        if [[ $(echo $service  | sed 's/ *$//g') != "" ]]; then
 
-            SERVICE=`echo $service | cut -d '.' -f 1`
-            NAMESPACE=`echo $service | cut -d '.' -f 2`
+            SERVICE=$(echo $service | cut -d '.' -f 1)
+            NAMESPACE=$(echo $service | cut -d '.' -f 2)
 
             #echo "Handling $SERVICE in $NAMESPACE"
 
             type=single
-            for endpoint in `__get_kube_service_IP $service`; do
+            for endpoint in $(__get_kube_service_IP $service); do
 
                 #echo $endpoint
 
-                HOST=`echo $endpoint | cut -d '/' -f 1`
-                IP=`echo $endpoint | cut -d '/' -f 2`
+                HOST=$(echo $endpoint | cut -d '/' -f 1)
+                IP=$(echo $endpoint | cut -d '/' -f 2)
 
-                if [[ `echo $HOST | sed 's/ *$//g'` == "" ]]; then
+                if [[ $(echo $HOST | sed 's/ *$//g') == "" ]]; then
                     __dump_service_ip_dns $SERVICE:$NAMESPACE:$IP $gks_format
                 else
                     type=many
-                    __dump_service_ip_dns $HOST:$NAMESPACE:$IP $gks_format
+                    __dump_service_ip_dns $HOST.$SERVICE:$NAMESPACE:$IP $gks_format
                 fi
             done
 
@@ -266,12 +285,99 @@ get_kube_services_IPs() {
     done
 }
 
+# Use ^get_kube_services_IP`to create a list of DNS entries for kube services in a temporary flat file
+# and echo file path to console
 create_kube_services_hosts_file() {
-    add_hosts_file=/tmp/`uuidgen -r`_hosts
+    add_hosts_file=/tmp/$(uuidgen -r)_hosts
     get_kube_services_IPs etc_hosts >> $add_hosts_file
     if [[ $? != 0 ]]; then
-        echo "Failed to create aditional host file"
-        exit 1
+        echo "Failed to create additional host file"
+        return 1
     fi
     echo $add_hosts_file
+}
+
+parse_cli_docker_volume_mounts() {
+
+    if [[ "$1" == "" ]]; then
+        echo "Expected coma separated searched args as first argument"
+        return 1
+    fi
+    local SEARCHES=$1
+    shift
+
+    if [[ "$1" == "" || ! ("$1" == "single" || "$1" == "multiple") ]]; then
+        echo "Expected MODE in [single, multiple] as argument"
+        return 1
+    fi
+    local MODE=$1
+    shift
+
+    if [[ "$MODE" == "single" ]]; then
+        if [[ "$1" == "" ]]; then
+            echo "Expected (list of) argument(s) to process as further parameters"
+            return 2
+        fi
+    else
+        if [[ "$1" == "" || ${#1} != 1 ]]; then
+            echo "Expected separator as first argument"
+            return 3
+        fi
+
+        local SEPARATOR=$1
+        shift
+
+        if [[ "$1" == "" ]]; then
+            echo "Expected (list of) argument(s) to process as further parameters"
+            return 2
+        fi
+    fi
+
+    if [[ "$DOCKER_VOLUMES_ARGS" == "" ]]; then
+        export DOCKER_VOLUMES_ARGS=""
+    fi
+
+    local DIR
+    local PROCESS_NEXT="0"
+    for argument in "$@"; do
+        if [[ $PROCESS_NEXT == "1" ]]; then
+
+            if [[ "$MODE" == "single" ]]; then
+
+                if [[ -d $argument ]]; then
+                    DIR=$argument
+                else
+                    DIR=$(dirname $argument)
+                fi
+                if [[ $(echo $DOCKER_VOLUMES_ARGS | grep "$DIR:$DIR:slave") == "" ]]; then
+                    export DOCKER_VOLUMES_ARGS=" -v $DIR:$DIR:slave $DOCKER_VOLUMES_ARGS"
+                fi
+
+            else
+
+                # --files is a comma-separated list of files
+                IFS="$SEPARATOR" read -ra files <<< $argument
+                for i in "${files[@]}"; do
+                    if [[ -d $i ]]; then
+                        DIR=$i
+                    else
+                        DIR=$(dirname $i)
+                    fi
+                    if [[ $(echo $DOCKER_VOLUMES_ARGS | grep "$DIR:$DIR:slave") == "" ]]; then
+                        export DOCKER_VOLUMES_ARGS=" -v $DIR:$DIR:slave $DOCKER_VOLUMES_ARGS"
+                    fi
+                done
+
+            fi
+        fi
+
+        PROCESS_NEXT="0"
+        for search in $(echo "$SEARCHES" | tr "," " "); do
+            if [[ $argument == "$search" ]]; then
+                PROCESS_NEXT="1"
+                break
+            fi
+        done
+    done
+
 }

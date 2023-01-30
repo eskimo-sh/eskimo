@@ -35,9 +35,7 @@
 
 package ch.niceideas.eskimo.shell.base;
 
-import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.ProcessHelper;
+import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.shell.setup.AbstractSetupShellTest;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
@@ -47,8 +45,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.StringUtils;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicReference;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -84,9 +81,14 @@ public class EskimoUtilsKubeDNTest {
         // I need some real commands
         assertTrue (new File (jailPath + "/bash").delete());
         assertTrue (new File (jailPath + "/sed").delete());
+
+        // kubectl mck up command
+        String resourceString = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoUtilsKubeDNTest/kubectl"), StandardCharsets.UTF_8);
+        File targetPath = AbstractSetupShellTest.copyResource("kubectl", jailPath, resourceString);
+        ProcessHelper.exec("chmod 755 " + targetPath, true);
     }
 
-    private void createTestScript(String scriptName, File tempFileForIncrement, boolean global) throws FileException {
+    private void createTestScript(String scriptName) throws FileException {
 
         String script = "#!/bin/bash\n" + "\n" +
                 "SCRIPT_DIR=\"$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" && pwd )\"\n" +
@@ -111,18 +113,86 @@ public class EskimoUtilsKubeDNTest {
         FileUtils.writeFile(new File (jailPath + "/" + scriptName), script);
     }
 
-    private File createCallingScript(boolean global) throws IOException, FileException {
-        File tempFileForIncrement = File.createTempFile("eskimo-utils-test", "inc-file");
-        assertTrue (tempFileForIncrement.delete());
-        tempFileForIncrement.deleteOnExit();
-
-        createTestScript("calling_script.sh", tempFileForIncrement, global);
-        return tempFileForIncrement;
-    }
-
     @Test
     public void testHostFileGeneration() throws Exception {
-        fail ("To BE Implemented");
+
+        createTestScript("calling_script.sh");
+
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
+        logger.debug (result);
+
+        assertEquals ("cerebro.default.svc.cluster.eskimo 172.30.0.6\n" +
+                "cerebro.default.svc.cluster.local 172.30.0.6\n" +
+                "cerebro.default.svc.kubernetes 172.30.0.6\n" +
+                "elasticsearch-0.elasticsearch.default.svc.cluster.eskimo 172.30.0.5\n" +
+                "elasticsearch-0.elasticsearch.default.svc.cluster.local 172.30.0.5\n" +
+                "elasticsearch-0.elasticsearch.default.svc.kubernetes 172.30.0.5\n" +
+                "elasticsearch-2.elasticsearch.default.svc.cluster.eskimo 172.30.2.2\n" +
+                "elasticsearch-2.elasticsearch.default.svc.cluster.local 172.30.2.2\n" +
+                "elasticsearch-2.elasticsearch.default.svc.kubernetes 172.30.2.2\n" +
+                "elasticsearch-1.elasticsearch.default.svc.cluster.eskimo 172.30.3.2\n" +
+                "elasticsearch-1.elasticsearch.default.svc.cluster.local 172.30.3.2\n" +
+                "elasticsearch-1.elasticsearch.default.svc.kubernetes 172.30.3.2\n" +
+                "elasticsearch-3.elasticsearch.default.svc.cluster.eskimo 172.30.4.2\n" +
+                "elasticsearch-3.elasticsearch.default.svc.cluster.local 172.30.4.2\n" +
+                "elasticsearch-3.elasticsearch.default.svc.kubernetes 172.30.4.2\n" +
+                "elasticsearch.default.svc.cluster.eskimo 172.30.4.2\n" +
+                "elasticsearch.default.svc.cluster.local 172.30.4.2\n" +
+                "elasticsearch.default.svc.kubernetes 172.30.4.2\n" +
+                "flink-runtime.default.svc.cluster.eskimo 172.30.3.6\n" +
+                "flink-runtime.default.svc.cluster.local 172.30.3.6\n" +
+                "flink-runtime.default.svc.kubernetes 172.30.3.6\n" +
+                "flink-runtime-rest.default.svc.cluster.eskimo 172.30.3.6\n" +
+                "flink-runtime-rest.default.svc.cluster.local 172.30.3.6\n" +
+                "flink-runtime-rest.default.svc.kubernetes 172.30.3.6\n" +
+                "grafana.default.svc.cluster.eskimo 172.30.3.3\n" +
+                "grafana.default.svc.cluster.local 172.30.3.3\n" +
+                "grafana.default.svc.kubernetes 172.30.3.3\n" +
+                "kafka-0.kafka.default.svc.cluster.eskimo 172.30.0.8\n" +
+                "kafka-0.kafka.default.svc.cluster.local 172.30.0.8\n" +
+                "kafka-0.kafka.default.svc.kubernetes 172.30.0.8\n" +
+                "kafka-2.kafka.default.svc.cluster.eskimo 172.30.2.4\n" +
+                "kafka-2.kafka.default.svc.cluster.local 172.30.2.4\n" +
+                "kafka-2.kafka.default.svc.kubernetes 172.30.2.4\n" +
+                "kafka-1.kafka.default.svc.cluster.eskimo 172.30.3.5\n" +
+                "kafka-1.kafka.default.svc.cluster.local 172.30.3.5\n" +
+                "kafka-1.kafka.default.svc.kubernetes 172.30.3.5\n" +
+                "kafka-3.kafka.default.svc.cluster.eskimo 172.30.4.4\n" +
+                "kafka-3.kafka.default.svc.cluster.local 172.30.4.4\n" +
+                "kafka-3.kafka.default.svc.kubernetes 172.30.4.4\n" +
+                "kafka.default.svc.cluster.eskimo 172.30.4.4\n" +
+                "kafka.default.svc.cluster.local 172.30.4.4\n" +
+                "kafka.default.svc.kubernetes 172.30.4.4\n" +
+                "kafka-manager.default.svc.cluster.eskimo 172.30.0.9\n" +
+                "kafka-manager.default.svc.cluster.local 172.30.0.9\n" +
+                "kafka-manager.default.svc.kubernetes 172.30.0.9\n" +
+                "kibana.default.svc.cluster.eskimo 172.30.0.10\n" +
+                "kibana.default.svc.cluster.local 172.30.0.10\n" +
+                "kibana.default.svc.kubernetes 172.30.0.10\n" +
+                "logstash-0.logstash.default.svc.cluster.eskimo 172.30.0.7\n" +
+                "logstash-0.logstash.default.svc.cluster.local 172.30.0.7\n" +
+                "logstash-0.logstash.default.svc.kubernetes 172.30.0.7\n" +
+                "logstash-3.logstash.default.svc.cluster.eskimo 172.30.2.3\n" +
+                "logstash-3.logstash.default.svc.cluster.local 172.30.2.3\n" +
+                "logstash-3.logstash.default.svc.kubernetes 172.30.2.3\n" +
+                "logstash-1.logstash.default.svc.cluster.eskimo 172.30.3.4\n" +
+                "logstash-1.logstash.default.svc.cluster.local 172.30.3.4\n" +
+                "logstash-1.logstash.default.svc.kubernetes 172.30.3.4\n" +
+                "logstash-2.logstash.default.svc.cluster.eskimo 172.30.4.3\n" +
+                "logstash-2.logstash.default.svc.cluster.local 172.30.4.3\n" +
+                "logstash-2.logstash.default.svc.kubernetes 172.30.4.3\n" +
+                "logstash.default.svc.cluster.eskimo 172.30.4.3\n" +
+                "logstash.default.svc.cluster.local 172.30.4.3\n" +
+                "logstash.default.svc.kubernetes 172.30.4.3\n" +
+                "kube-dns.kube-system.svc.cluster.eskimo 172.30.0.3\n" +
+                "kube-dns.kube-system.svc.cluster.local 172.30.0.3\n" +
+                "kube-dns.kube-system.svc.kubernetes 172.30.0.3\n" +
+                "dashboard-metrics-scraper.kubernetes-dashboard.svc.cluster.eskimo 192.168.56.24\n" +
+                "dashboard-metrics-scraper.kubernetes-dashboard.svc.cluster.local 192.168.56.24\n" +
+                "dashboard-metrics-scraper.kubernetes-dashboard.svc.kubernetes 192.168.56.24\n" +
+                "kubernetes-dashboard.kubernetes-dashboard.svc.cluster.eskimo 192.168.56.22\n" +
+                "kubernetes-dashboard.kubernetes-dashboard.svc.cluster.local 192.168.56.22\n" +
+                "kubernetes-dashboard.kubernetes-dashboard.svc.kubernetes 192.168.56.22\n", result);
     }
 
 }

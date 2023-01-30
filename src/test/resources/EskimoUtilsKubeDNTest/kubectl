@@ -1,0 +1,63 @@
+#/bin/bash
+
+echo "$@" >> .log_kubectl
+
+
+
+if [[ "$1" == "get" && "$2" == "services" && "$3" == "-A" && "$4" == "-o" ]]; then
+    echo "cerebro.default elasticsearch.default flink-runtime.default flink-runtime-rest.default grafana.default kafka.default kafka-manager.default kibana.default logstash.default kube-dns.kube-system dashboard-metrics-scraper.kubernetes-dashboard kubernetes-dashboard.kubernetes-dashboard . "
+fi
+
+
+if [[ "$1" == "get" && "$2" == "cm" && "$3" == "coredns" && "$4" == "-n" && "$5" == "kube-system" && "$6" == "-o" ]]; then
+    echo "kubernetes cluster.local cluster.eskimo in-addr.arpa ip6.arpa {"
+fi
+
+
+if [[ "$1" == "get" && "$2" == "endpoints" && "$3" == "cerebro" && "$4" == "-n" && "$5" == "default" && "$6" == "-o" ]]; then
+    echo "/172.30.0.6 / "
+fi
+
+if [[ "$1" == "get" && "$2" == "endpoints" && "$3" == "elasticsearch" && "$4" == "-n" && "$5" == "default" && "$6" == "-o" ]]; then
+    echo "elasticsearch-0/172.30.0.5 elasticsearch-2/172.30.2.2 elasticsearch-1/172.30.3.2 elasticsearch-3/172.30.4.2 / "
+fi
+
+if [[ "$1" == "get" && "$2" == "endpoints" && "$3" == "flink-runtime" && "$4" == "-n" && "$5" == "default" && "$6" == "-o" ]]; then
+    echo "/172.30.3.6 / "
+fi
+
+if [[ "$1" == "get" && "$2" == "endpoints" && "$3" == "flink-runtime-rest" && "$4" == "-n" && "$5" == "default" && "$6" == "-o" ]]; then
+    echo "/172.30.3.6 / "
+fi
+
+if [[ "$1" == "get" && "$2" == "endpoints" && "$3" == "grafana" && "$4" == "-n" && "$5" == "default" && "$6" == "-o" ]]; then
+    echo "/172.30.3.3 / "
+fi
+
+if [[ "$1" == "get" && "$2" == "endpoints" && "$3" == "kafka" && "$4" == "-n" && "$5" == "default" && "$6" == "-o" ]]; then
+    echo "kafka-0/172.30.0.8 kafka-2/172.30.2.4 kafka-1/172.30.3.5 kafka-3/172.30.4.4 / "
+fi
+
+if [[ "$1" == "get" && "$2" == "endpoints" && "$3" == "kafka-manager" && "$4" == "-n" && "$5" == "default" && "$6" == "-o" ]]; then
+    echo "/172.30.0.9 / "
+fi
+
+if [[ "$1" == "get" && "$2" == "endpoints" && "$3" == "kibana" && "$4" == "-n" && "$5" == "default" && "$6" == "-o" ]]; then
+    echo "/172.30.0.10 / "
+fi
+
+if [[ "$1" == "get" && "$2" == "endpoints" && "$3" == "logstash" && "$4" == "-n" && "$5" == "default" && "$6" == "-o" ]]; then
+    echo "logstash-0/172.30.0.7 logstash-3/172.30.2.3 logstash-1/172.30.3.4 logstash-2/172.30.4.3 / "
+fi
+
+if [[ "$1" == "get" && "$2" == "endpoints" && "$3" == "kube-dns" && "$4" == "-n" && "$5" == "kube-system" && "$6" == "-o" ]]; then
+    echo "/172.30.0.3 / "
+fi
+
+if [[ "$1" == "get" && "$2" == "endpoints" && "$3" == "dashboard-metrics-scraper" && "$4" == "-n" && "$5" == "kubernetes-dashboard" && "$6" == "-o" ]]; then
+    echo "/192.168.56.24 / "
+fi
+
+if [[ "$1" == "get" && "$2" == "endpoints" && "$3" == "kubernetes-dashboard" && "$4" == "-n" && "$5" == "kubernetes-dashboard" && "$6" == "-o" ]]; then
+    echo "/192.168.56.22 / "
+fi

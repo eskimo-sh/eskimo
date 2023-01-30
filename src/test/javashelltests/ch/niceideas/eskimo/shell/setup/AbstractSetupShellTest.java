@@ -287,7 +287,7 @@ public abstract class AbstractSetupShellTest {
         return copyResource(resourceFile, targetDir, resourceString);
     }
 
-    private static File copyResource(String resourceFile, String targetDir, String resourceString) throws FileException {
+    public static File copyResource(String resourceFile, String targetDir, String resourceString) throws FileException {
         File targetPath = new File (targetDir + "/" + resourceFile);
         FileUtils.writeFile(targetPath, resourceString);
 
