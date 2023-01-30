@@ -65,6 +65,15 @@ check_for_virtualbox() {
     fi
 }
 
+check_for_vagrant() {
+    if [ -x "$(command -v vagrant)" ]; then
+        echo_date "Found vagrant : "$(vagrant -v)
+    else
+        echo "Vagrant is not available on system"
+        exit 100
+    fi
+}
+
 check_for_ssh() {
     if [ -x "$(command -v ssh)" ]; then
         echo_date "Found ssh : "$(which ssh)
@@ -1107,13 +1116,13 @@ create_kafka_topics() {
 
     echo_date " - Creating topic berka-payments"
     vagrant ssh -c \
-        "/usr/local/bin/kafka-topics.sh --create --if-not-exists --replication-factor 1 --partitions $NBR_PARTITIONS --zookeeper localhost:2181 --topic berka-payments" \
+        "sudo su -c '/usr/local/bin/kafka-topics.sh --create --if-not-exists --replication-factor 1 --partitions $NBR_PARTITIONS --zookeeper localhost:2181 --topic berka-payments' eskimo" \
         $TARGET_MASTER_VM \
         >> /tmp/integration-test.log 2>&1
 
     echo_date " - Creating topic berka-payments-aggregate"
     vagrant ssh -c \
-        "/usr/local/bin/kafka-topics.sh --create --if-not-exists --replication-factor 1 --partitions $NBR_PARTITIONS --zookeeper localhost:2181 --topic berka-payments-aggregate" \
+        "sudo su -c '/usr/local/bin/kafka-topics.sh --create --if-not-exists --replication-factor 1 --partitions $NBR_PARTITIONS --zookeeper localhost:2181 --topic berka-payments-aggregate' eskimo" \
         $TARGET_MASTER_VM \
         >> /tmp/integration-test.log 2>&1
 }
@@ -1148,7 +1157,7 @@ run_zeppelin_spark_kafka() {
 
     echo_date " - ZEPPELIN spark Kafka demo - Now expecting some result on kafka topic berka-payments-aggregate"
     vagrant ssh -c \
-        "/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.default.svc.cluster.eskimo:9092 --topic berka-payments-aggregate --timeout-ms 120000 --max-messages 100" \
+        "sudo su -c '/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.default.svc.cluster.eskimo:9092 --topic berka-payments-aggregate --timeout-ms 150000 --max-messages 100' eskimo" \
         $TARGET_MASTER_VM \
         > kafka-berka-payments-aggregate-results 2> /dev/null
 
@@ -1162,7 +1171,7 @@ run_zeppelin_spark_kafka() {
 
         stop_zeppelin_pararaph "/Spark Integration Kafka" 8
 
-        rm -f kafka-berka-payments-aggregate-results
+        #rm -f kafka-berka-payments-aggregate-results
 
         exit 30
     fi
@@ -1266,13 +1275,13 @@ run_zeppelin_kafka_streams() {
     # Now check results
     echo_date " - ZEPPELIN Kafka Streams demo - Checking results"
     vagrant ssh -c \
-        "/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.default.svc.cluster.eskimo:9092 --topic streams-wordcount-output --timeout-ms 10000 --from-beginning --max-messages 100" \
+        "sudo su -c '/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.default.svc.cluster.eskimo:9092 --topic streams-wordcount-output --timeout-ms 20000 --from-beginning --max-messages 100' eskimo" \
         $TARGET_MASTER_VM \
         > streams-wordcount-output-results 2> /dev/null
 
     if [[ $(wc -l streams-wordcount-output-results | cut -d ' ' -f 1) -lt 4 ]]; then
         echo_date "Failed to fetch at least 4 word counts from result topic"
-        rm -f streams-wordcount-output-results
+        #rm -f streams-wordcount-output-results
         exit 102
     fi
 
@@ -1310,7 +1319,7 @@ run_zeppelin_flink_kafka() {
 
     echo_date " - ZEPPELIN flink Kafka demo - Now expecting some result on kafka topic berka-payments-aggregate"
     vagrant ssh -c \
-        "/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.default.svc.cluster.eskimo:9092 --topic berka-payments-aggregate --timeout-ms 120000 --max-messages 100" \
+        "sudo su -c '/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.default.svc.cluster.eskimo:9092 --topic berka-payments-aggregate --timeout-ms 150000 --max-messages 100' eskimo" \
         $TARGET_MASTER_VM \
         > kafka-berka-payments-aggregate-results 2> /dev/null
 
@@ -1586,7 +1595,7 @@ EOF
 
     sshpass vagrant | scp /tmp/spark-batch-example.scala vagrant@$BOX_IP  >> /tmp/integration-test.log 2>&1
 
-    cat /tmp/spark-batch-example.scala | sshpass -p vagrant ssh vagrant@192.168.56.21 "sudo su -c '/usr/local/bin/spark-shell'" \
+    cat /tmp/spark-batch-example.scala | sshpass -p vagrant ssh vagrant@192.168.56.21 "sudo su -c '/usr/local/bin/spark-shell' eskimo" \
           2>&1 | tee /tmp/spark-batch-example-scala.log  >> /tmp/integration-test.log
 
     if [[ `grep -F 'res0: Long =' /tmp/spark-batch-example-scala.log` == "" ]]; then
@@ -1630,7 +1639,7 @@ EOF
 
     sshpass vagrant | scp /tmp/csv-read.conf vagrant@$BOX_IP  >> /tmp/integration-test.log 2>&1
 
-    cat /tmp/csv-schema-short-numerical.csv | sshpass -p vagrant ssh vagrant@192.168.56.21 "sudo su -c '/usr/local/bin/logstash -f /tmp/csv-read.conf'" \
+    cat /tmp/csv-schema-short-numerical.csv | sshpass -p vagrant ssh vagrant@192.168.56.21 "sudo su -c '/usr/local/bin/logstash -f /tmp/csv-read.conf' eskimo" \
           2>&1 | tee /tmp/logstash-example.log  >> /tmp/integration-test.log
 
     if [[ `grep -F 'Pipelines running' /tmp/logstash-example.log` == "" ]]; then
@@ -1953,8 +1962,8 @@ usage() {
     echo "    -t  Run other tests"
     echo "    -c  Run cleanup"
     echo "    -o  Take screenshots"
-    echo "    -w  Use screenshots to overwrite git tree images"
     echo "    -a  RUN ALL OF THE ABOVE"
+    echo "    -w  Use screenshots to overwrite git tree images"
     echo "    -d  Prepare the VM for DemoVM"
     echo "    -m  Test on multiple nodes"
 }
@@ -2047,7 +2056,6 @@ while getopts ":hpnrfbeslztcowadmi" opt; do
             export RUN_OTHER_TESTS="do"
             export RUN_CLEANUP="do"
             export RUN_SCREENSHOTS="do"
-            export RUN_OVERWRITE_SC="do"
             ;;
         d)
             export DEMO=demo
