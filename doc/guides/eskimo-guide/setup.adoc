@@ -87,7 +87,7 @@ But for the time being, administrators need to configure eskimo using IP address
 With all nodes from the cluster to be managed by eskimo properly identified (either as single node or as part of a
 range) of nodes, services can be configured and deployed.
 
-image::pngs/multiple-services.png[600, 600, align="center"]
+image::pngs/node-services-choice-small.png[800, align="center"]
 
 ==== Master services
 
