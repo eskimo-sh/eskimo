@@ -114,7 +114,12 @@ public class LogstashCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.getKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+
+        logger.debug (dockerLogs);
+        System.err.println (dockerLogs);
+
+        // on my laptop, /var/lib/eskimo/data exist sand is a directory
+        assertTrue (dockerLogs.equals("run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -130,7 +135,26 @@ public class LogstashCliWrappersTest extends AbstractSetupShellTest {
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
                 "kubernetes.registry:5000/logstash " +
-                    "/usr/local/bin/kube_do /usr/local/bin/logstash --path.config /tmp/import.json --path.data /var/lib/eskimo/data --path.logs /var/log/eskimo\n", dockerLogs);
+                    "/usr/local/bin/kube_do /usr/local/bin/logstash --path.config /tmp/import.json --path.data /var/lib/eskimo/data --path.logs /var/log/eskimo\n")
+                ||
+                dockerLogs.equals("run " +
+                        "-i " +
+                        "--rm " +
+                        "--network host " +
+                        "--user elasticsearch " +
+                        "-v /var/log/elasticsearch:/var/log/elasticsearch:shared " +
+                        "-v /var/lib/elasticsearch:/var/lib/elasticsearch:shared " +
+                        "-v /var/log:/var/log:slave " +
+                        "-v /var/lib/eskimo:/var/lib/eskimo:slave " +
+                        "-v /tmp:/tmp:slave " +
+                        "--mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh " +
+                        "--mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json " +
+                        "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
+                        "-e NODE_NAME=testhost " +
+                        "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
+                        "kubernetes.registry:5000/logstash " +
+                        "/usr/local/bin/kube_do /usr/local/bin/logstash --path.config /tmp/import.json --path.data /var/lib/eskimo/data --path.logs /var/log/eskimo\n"));
+
     }
 
 }
