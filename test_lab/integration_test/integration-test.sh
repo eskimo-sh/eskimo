@@ -1510,9 +1510,15 @@ if __name__ == '__main__':
     word_count()
 EOF
 
-    sshpass vagrant | scp /tmp/flink-batch-example.py vagrant@$BOX_IP  >> /tmp/integration-test.log 2>&1
+    sshpass -p vagrant scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null  \
+            /tmp/flink-batch-example.py vagrant@$BOX_IP:/tmp/flink-batch-example.py  >> /tmp/integration-test.log 2>&1
+    if [[ $? != 0 ]]; then
+        echo "failed to copy flink-batch-example.py"
+        exit 1
+    fi
 
-    sshpass -p vagrant ssh vagrant@$BOX_IP "sudo su -c '/usr/local/bin/flink run -py /tmp/flink-batch-example.py' eskimo" \
+    sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
+            vagrant@$BOX_IP "sudo su -c '/usr/local/bin/flink run -py /tmp/flink-batch-example.py' eskimo" \
             2>&1 | tee /tmp/flink-batch-example.log  >> /tmp/integration-test.log
 
     if [[ `grep -F 'Job has been submitted with JobID' /tmp/flink-batch-example.log` == "" ]]; then
@@ -1551,9 +1557,11 @@ count = spark.sql("SELECT count(*) from PERSON_DATA ")
 print (count.collect())
 EOF
 
-    sshpass vagrant | scp /tmp/spark-batch-example.py vagrant@$BOX_IP  >> /tmp/integration-test.log 2>&1
+    sshpass -p vagrant scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null  \
+            /tmp/spark-batch-example.py vagrant@$BOX_IP:/tmp/spark-batch-example.py  >> /tmp/integration-test.log 2>&1
 
-    sshpass -p vagrant ssh vagrant@$BOX_IP "sudo su -c '/usr/local/bin/spark-submit /tmp/spark-batch-example.py' eskimo" \
+    sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
+            vagrant@$BOX_IP "sudo su -c '/usr/local/bin/spark-submit /tmp/spark-batch-example.py' eskimo" \
             2>&1 | tee /tmp/spark-batch-example-python.log  >> /tmp/integration-test.log
 
     if [[ `grep -F '[Row(count(1)=5)]' /tmp/spark-batch-example-python.log` == "" ]]; then
@@ -1593,9 +1601,12 @@ val bank = bankText.map(s => s.split(";")).filter(s => s(0) != "\"age\"").map(
 bank.count()
 EOF
 
-    sshpass vagrant | scp /tmp/spark-batch-example.scala vagrant@$BOX_IP  >> /tmp/integration-test.log 2>&1
+    sshpass -p vagrant scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null  \
+          /tmp/spark-batch-example.scala vagrant@$BOX_IP:/tmp/spark-batch-example.scala  >> /tmp/integration-test.log 2>&1
 
-    cat /tmp/spark-batch-example.scala | sshpass -p vagrant ssh vagrant@192.168.56.21 "sudo su -c '/usr/local/bin/spark-shell' eskimo" \
+    cat /tmp/spark-batch-example.scala | \
+          sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
+          vagrant@$BOX_IP "sudo su -c '/usr/local/bin/spark-shell' eskimo" \
           2>&1 | tee /tmp/spark-batch-example-scala.log  >> /tmp/integration-test.log
 
     if [[ `grep -F 'res0: Long =' /tmp/spark-batch-example-scala.log` == "" ]]; then
@@ -1637,9 +1648,12 @@ stdout {}
 }
 EOF
 
-    sshpass vagrant | scp /tmp/csv-read.conf vagrant@$BOX_IP  >> /tmp/integration-test.log 2>&1
+    sshpass -p vagrant scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null  \
+          /tmp/csv-read.conf vagrant@$BOX_IP:/tmp/csv-read.conf  >> /tmp/integration-test.log 2>&1
 
-    cat /tmp/csv-schema-short-numerical.csv | sshpass -p vagrant ssh vagrant@192.168.56.21 "sudo su -c '/usr/local/bin/logstash -f /tmp/csv-read.conf' eskimo" \
+    cat /tmp/csv-schema-short-numerical.csv | \
+          sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
+          vagrant@$BOX_IP "sudo su -c '/usr/local/bin/logstash -f /tmp/csv-read.conf' eskimo" \
           2>&1 | tee /tmp/logstash-example.log  >> /tmp/integration-test.log
 
     if [[ `grep -F 'Pipelines running' /tmp/logstash-example.log` == "" ]]; then
@@ -1900,13 +1914,13 @@ do_screenshots() {
         exit 121
     fi
 
-    echo_date " - Generating screemshots"
+    echo_date " - Generating screenshots"
 
      # running screenshot generator with maven
      saved_dir=`pwd`
      cd ../..
      export ESKIMO_NODE=192.168.56.51
-     mvn exec:java -P screenshots >> /tmp/integration-test.log 2>&1
+     mvn exec:java -P screenshots  >> /tmp/integration-test.log 2>&1
      cd $saved_dir
 }
 
@@ -1920,17 +1934,18 @@ do_overwrite_sc() {
     echo_date " - Overwriting Screenshots"
     # overwrite all screenshots
 
-    cp ../../target/screenshots/console-wide.png ../../doc/guides/eskimo-guide/pngs/
-    cp ../../target/screenshots/file-manager-wide.png ../../doc/guides/eskimo-guide/pngs/
-    cp ../../target/screenshots/kube-config-medium.png ../../doc/guides/eskimo-guide/pngs/
-    cp ../../target/screenshots/nodes-config-wide.png ../../doc/guides/eskimo-guide/pngs/
-    cp ../../target/screenshots/services-config-wide.png ../../doc/guides/eskimo-guide/pngs/
-    cp ../../target/screenshots/setup-wide.png ../../doc/guides/eskimo-guide/pngs/
-    cp ../../target/screenshots/status-wide-condensed.png ../../doc/guides/eskimo-guide/pngs/
+    cp $SCRIPT_DIR/../../target/screenshots/console-wide.png                $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
+    cp $SCRIPT_DIR/../../target/screenshots/file-manager-wide.png           $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
+    cp $SCRIPT_DIR/../../target/screenshots/kube-config-medium.png          $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
+    cp $SCRIPT_DIR/../../target/screenshots/nodes-config-wide.png           $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
+    cp $SCRIPT_DIR/../../target/screenshots/services-config-wide.png        $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
+    cp $SCRIPT_DIR/../../target/screenshots/setup-wide.png                  $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
+    cp $SCRIPT_DIR/../../target/screenshots/status-wide-condensed.png       $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
+    cp $SCRIPT_DIR/../../target/screenshots/node-services-choice-small.png  $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
 
     # FIXME Implement me
 
-    if [[ -d ../../../eskimo_companion_site ]]; then
+    if [[ -d $SCRIPT_DIR/../../../eskimo_companion_site ]]; then
 
         echo_date " - Overwriting Screenshots in eskimo companion site"
         # FIXME Implement me
