@@ -65,7 +65,10 @@ fi
 
 #echo $DOCKER_VOLUMES_ARGS
 
-. /usr/local/sbin/eskimo-utils.sh
+if [[ ":$PATH:" != *":/usr/local/sbin/:"* ]]; then
+    PATH=$PATH:/usr/local/sbin/
+fi
+. eskimo-utils.sh
 
 KUBE_SERVICES_HOSTS_FILE=`create_kube_services_hosts_file`
 if [[ ! -f $KUBE_SERVICES_HOSTS_FILE ]]; then
@@ -74,7 +77,7 @@ if [[ ! -f $KUBE_SERVICES_HOSTS_FILE ]]; then
 fi
 
 test -t 1 && USE_TTY="-t"
-/usr/bin/docker run \
+docker run \
         -i $USE_TTY \
         --rm \
         --network host \

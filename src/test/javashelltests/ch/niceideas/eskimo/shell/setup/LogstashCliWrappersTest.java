@@ -35,8 +35,7 @@
 
 package ch.niceideas.eskimo.shell.setup;
 
-import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.common.utils.*;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,13 +43,13 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class SparkCliWrappersTest extends AbstractSetupShellTest {
+public class LogstashCliWrappersTest extends AbstractSetupShellTest {
 
-    private static final Logger logger = Logger.getLogger(SparkCliWrappersTest.class);
+    private static final Logger logger = Logger.getLogger(LogstashCliWrappersTest.class);
 
     protected static String jailPath = null;
 
@@ -86,7 +85,7 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
 
     @Override
     protected String getServiceName() {
-        return "flink-cli";
+        return "logstash-cli";
     }
 
     @Override
@@ -103,54 +102,35 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
         copyFile(jailPath, "../base-eskimo/eskimo-utils.sh");
-        copyFile(jailPath, "spark_wrappers/beeline");
-        copyFile(jailPath, "spark_wrappers/pyspark");
-        copyFile(jailPath, "spark_wrappers/run-example");
-        copyFile(jailPath, "spark_wrappers/spark-class");
-        copyFile(jailPath, "spark_wrappers/spark-shell");
-        copyFile(jailPath, "spark_wrappers/spark-sql");
-        copyFile(jailPath, "spark_wrappers/spark-submit");
-        copyFile(jailPath, "spark_wrappers/sparkR");
+        copyFile(jailPath, "logstash_wrappers/logstash");
     }
 
     @Test
-    public void testSparkR() throws Exception {
-        fail ("To Be Implemented");
-    }
+    public void testLogstash() throws Exception {
+        FlinkCliWrappersTest.createScript(jailPath, "test-logstash.sh", "logstash --path.config /tmp/import.json --path.data /var/lib/eskimo/data --path.logs /var/log/eskimo");
 
-    @Test
-    public void testSparkSubmit() throws Exception {
-        fail ("To Be Implemented");
-    }
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/test-logstash.sh"}, true);
+        logger.debug (result);
 
-    @Test
-    public void testSparkSql() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-    @Test
-    public void testSparkShell() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-    @Test
-    public void testSparkClass() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-    @Test
-    public void testRunExample() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-    @Test
-    public void testPyspark() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-    @Test
-    public void testBeeline() throws Exception {
-        fail ("To Be Implemented");
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
+        String kubeNSFile = FlinkCliWrappersTest.getKubeNSFile(dockerLogs);
+        assertEquals ("run " +
+                "-i " +
+                "--rm " +
+                "--network host " +
+                "--user elasticsearch " +
+                "-v /var/log/elasticsearch:/var/log/elasticsearch:shared " +
+                "-v /var/lib/elasticsearch:/var/lib/elasticsearch:shared " +
+                "-v /var/log:/var/log:slave " +
+                "-v /var/lib/eskimo/data:/var/lib/eskimo/data:slave " +
+                "-v /tmp:/tmp:slave " +
+                "--mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh " +
+                "--mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json " +
+                "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
+                "-e NODE_NAME=badbook " +
+                "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
+                "kubernetes.registry:5000/logstash " +
+                    "/usr/local/bin/kube_do /usr/local/bin/logstash --path.config /tmp/import.json --path.data /var/lib/eskimo/data --path.logs /var/log/eskimo\n", dockerLogs);
     }
 
 }

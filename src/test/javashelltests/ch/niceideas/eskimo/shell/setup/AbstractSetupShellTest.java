@@ -71,7 +71,7 @@ public abstract class AbstractSetupShellTest {
     protected void copyFile(String jailPath, String source) throws IOException {
         FileUtils.copy(
                 new File ("./services_setup/" + getServiceName() + "/" + source),
-                new File (jailPath + "/" + source));
+                new File (jailPath + "/" + new File (source).getName()));
     }
 
     protected final String setupJail(String serviceName) throws Exception {
@@ -189,7 +189,9 @@ public abstract class AbstractSetupShellTest {
 
     protected abstract void copyScripts(String jailPath) throws IOException;
 
-    protected abstract String[] getScriptsToExecute();
+    protected String[] getScriptsToExecute() {
+        return new String[0];
+    }
 
     protected String[][] getCustomScriptsToExecute() {
         return new String[][]{};

@@ -54,7 +54,7 @@ public class ScreenshotGenerator {
 
     private static final Logger logger = Logger.getLogger(ScreenshotGenerator.class);
 
-    private static final Dimension SIZE_WIDE = new Dimension(1900, 1024);
+    private static final Dimension SIZE_WIDE = new Dimension(1900, 980);
     private static final Dimension SIZE_SMALL = new Dimension(960, 600);
     private static final Dimension SIZE_MEDIUM = new Dimension(1280, 720);
 
@@ -62,7 +62,7 @@ public class ScreenshotGenerator {
 
     public static void main (String[] args) {
 
-        if (args.length <= 2) {
+        if (args.length < 2) {
             logger.error ("Expecting 'target Eskimo URL' as first argument and 'destination folder for screenshots' as second argument");
             System.exit (1);
         }

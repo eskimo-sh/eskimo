@@ -260,12 +260,8 @@ get_kube_services_IPs() {
             SERVICE=$(echo $service | cut -d '.' -f 1)
             NAMESPACE=$(echo $service | cut -d '.' -f 2)
 
-            #echo "Handling $SERVICE in $NAMESPACE"
-
             type=single
             for endpoint in $(__get_kube_service_IP $service); do
-
-                #echo $endpoint
 
                 HOST=$(echo $endpoint | cut -d '/' -f 1)
                 IP=$(echo $endpoint | cut -d '/' -f 2)

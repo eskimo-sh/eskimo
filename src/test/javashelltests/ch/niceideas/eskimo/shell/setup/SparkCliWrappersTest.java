@@ -47,9 +47,9 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class KafkaCliWrappersTest extends AbstractSetupShellTest {
+public class SparkCliWrappersTest extends AbstractSetupShellTest {
 
-    private static final Logger logger = Logger.getLogger(KafkaCliWrappersTest.class);
+    private static final Logger logger = Logger.getLogger(SparkCliWrappersTest.class);
 
     protected static String jailPath = null;
 
@@ -85,7 +85,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
     @Override
     protected String getServiceName() {
-        return "flink-cli";
+        return "spark-cli";
     }
 
     @Override
@@ -102,133 +102,258 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
         copyFile(jailPath, "../base-eskimo/eskimo-utils.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-acls.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-broker-api-versions.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-configs.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-console-consumer.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-console-producer.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-consumer-groups.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-delegation-tokens.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-delete-records.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-dump-log.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-log-dirs.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-mirror-maker.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-preferred-replica-election.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-producer-perf-test.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-reassign-partitions.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-replica-verification.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-run-class.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-streams-application-reset.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-topics.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-trogdor.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-verifiable-consumer.sh");
-        copyFile(jailPath, "kafka_wrappers/kafka-verifiable-producer.sh");
+        copyFile(jailPath, "spark_wrappers/beeline");
+        copyFile(jailPath, "spark_wrappers/pyspark");
+        copyFile(jailPath, "spark_wrappers/run-example");
+        copyFile(jailPath, "spark_wrappers/spark-class");
+        copyFile(jailPath, "spark_wrappers/spark-shell");
+        copyFile(jailPath, "spark_wrappers/spark-sql");
+        copyFile(jailPath, "spark_wrappers/spark-submit");
+        copyFile(jailPath, "spark_wrappers/sparkR");
     }
 
     @Test
-    public void testKafkaVerifiableProducer() throws Exception {
-        fail ("To Be Implemented");
+    public void testSparkR() throws Exception {
+        FlinkCliWrappersTest.createScript(jailPath, "test-sparkR.sh", "sparkR --properties-file /tmp/test.properties -driver-class-path /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar --py-files /usr/local/lib/python-eskimo/test.py");
+
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/test-sparkR.sh"}, true);
+        logger.debug (result);
+
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
+        String kubeNSFile = FlinkCliWrappersTest.getKubeNSFile(dockerLogs);
+        assertEquals ("run " +
+                "-i " +
+                "--rm " +
+                "--network host " +
+                "--user spark " +
+                "--privileged " +
+                "-v /var/log/spark:/var/log/spark:shared " +
+                "-v /tmp:/tmp:slave " +
+                "-v /var/lib/spark:/var/lib/spark:slave " +
+                "-v /var/lib/eskimo:/var/lib/eskimo:slave " +
+                "-v /usr/local/lib/python-eskimo:/usr/local/lib/python-eskimo:slave " +
+                "--mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh " +
+                "--mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json " +
+                "--mount type=bind,source=/home/spark/.kube/config,target=/home/spark/.kube/config " +
+                "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
+                "-v /etc/k8s:/etc/k8s:ro " +
+                "-e NODE_NAME=badbook " +
+                "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
+                "kubernetes.registry:5000/spark " +
+                    "/usr/local/bin/kube_do /usr/local/bin/sparkR --properties-file /tmp/test.properties -driver-class-path /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar --py-files /usr/local/lib/python-eskimo/test.py\n", dockerLogs);
     }
 
     @Test
-    public void testKafkaVerifiableConsumer() throws Exception {
-        fail ("To Be Implemented");
+    public void testSparkSubmit() throws Exception {
+        FlinkCliWrappersTest.createScript(jailPath, "test-spark-submit.sh", "spark-submit --properties-file /tmp/test.properties -driver-class-path /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar --py-files /usr/local/lib/python-eskimo/test.py /usr/lib/spark/example.jar");
+
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/test-spark-submit.sh"}, true);
+        logger.debug (result);
+
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
+        String kubeNSFile = FlinkCliWrappersTest.getKubeNSFile(dockerLogs);
+        assertEquals ("run " +
+                "-i " +
+                "--rm " +
+                "--network host " +
+                "--user spark " +
+                "--privileged " +
+                "-v /var/log/spark:/var/log/spark:shared " +
+                "-v /tmp:/tmp:slave " +
+                "-v /var/lib/spark:/var/lib/spark:slave " +
+                "-v /var/lib/eskimo:/var/lib/eskimo:slave " +
+                "-v /usr/local/lib/python-eskimo:/usr/local/lib/python-eskimo:slave " +
+                "--mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh " +
+                "--mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json " +
+                "--mount type=bind,source=/home/spark/.kube/config,target=/home/spark/.kube/config " +
+                "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
+                "-v /etc/k8s:/etc/k8s:ro " +
+                "-e NODE_NAME=badbook " +
+                "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
+                "kubernetes.registry:5000/spark " +
+                    "/usr/local/bin/kube_do /usr/local/bin/spark-submit --properties-file /tmp/test.properties -driver-class-path /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar --py-files /usr/local/lib/python-eskimo/test.py /usr/lib/spark/example.jar\n", dockerLogs);
     }
 
     @Test
-    public void testKafkaTrogdor() throws Exception {
-        fail ("To Be Implemented");
+    public void testSparkSql() throws Exception {
+        FlinkCliWrappersTest.createScript(jailPath, "test-spark-sql.sh", "spark-sql --properties-file /tmp/test.properties -driver-class-path /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar --py-files /usr/local/lib/python-eskimo/test.py");
+
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/test-spark-sql.sh"}, true);
+        logger.debug (result);
+
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
+        String kubeNSFile = FlinkCliWrappersTest.getKubeNSFile(dockerLogs);
+        assertEquals ("run " +
+                "-i " +
+                "--rm " +
+                "--network host " +
+                "--user spark " +
+                "--privileged " +
+                "-v /var/log/spark:/var/log/spark:shared " +
+                "-v /tmp:/tmp:slave " +
+                "-v /var/lib/spark:/var/lib/spark:slave " +
+                "-v /var/lib/eskimo:/var/lib/eskimo:slave " +
+                "-v /usr/local/lib/python-eskimo:/usr/local/lib/python-eskimo:slave " +
+                "--mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh " +
+                "--mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json " +
+                "--mount type=bind,source=/home/spark/.kube/config,target=/home/spark/.kube/config " +
+                "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
+                "-v /etc/k8s:/etc/k8s:ro " +
+                "-e NODE_NAME=badbook " +
+                "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
+                "kubernetes.registry:5000/spark " +
+                    "/usr/local/bin/kube_do /usr/local/bin/spark-sql --properties-file /tmp/test.properties -driver-class-path /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar --py-files /usr/local/lib/python-eskimo/test.py\n", dockerLogs);
     }
 
     @Test
-    public void testKafkaTopics() throws Exception {
-        fail ("To Be Implemented");
+    public void testSparkShell() throws Exception {
+        FlinkCliWrappersTest.createScript(jailPath, "test-spark-shell.sh", "spark-shell --properties-file /tmp/test.properties -driver-class-path /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar --py-files /usr/local/lib/python-eskimo/test.py");
+
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/test-spark-shell.sh"}, true);
+        logger.debug (result);
+
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
+        String kubeNSFile = FlinkCliWrappersTest.getKubeNSFile(dockerLogs);
+        assertEquals ("run " +
+                "-i " +
+                "--rm " +
+                "--network host " +
+                "--user spark " +
+                "--privileged " +
+                "-v /var/log/spark:/var/log/spark:shared " +
+                "-v /tmp:/tmp:slave " +
+                "-v /var/lib/spark:/var/lib/spark:slave " +
+                "-v /var/lib/eskimo:/var/lib/eskimo:slave " +
+                "-v /usr/local/lib/python-eskimo:/usr/local/lib/python-eskimo:slave " +
+                "--mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh " +
+                "--mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json " +
+                "--mount type=bind,source=/home/spark/.kube/config,target=/home/spark/.kube/config " +
+                "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
+                "-v /etc/k8s:/etc/k8s:ro " +
+                "-e NODE_NAME=badbook " +
+                "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
+                "kubernetes.registry:5000/spark " +
+                    "/usr/local/bin/kube_do /usr/local/bin/spark-shell --properties-file /tmp/test.properties -driver-class-path /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar --py-files /usr/local/lib/python-eskimo/test.py\n", dockerLogs);
     }
 
     @Test
-    public void testKafkaStreamsApplicationReset() throws Exception {
-        fail ("To Be Implemented");
+    public void testSparkClass() throws Exception {
+        FlinkCliWrappersTest.createScript(jailPath, "test-spark-class.sh", "spark-class --jar /tmp/test.jar -classpath /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar");
+
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/test-spark-class.sh"}, true);
+        logger.debug (result);
+
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
+        String kubeNSFile = FlinkCliWrappersTest.getKubeNSFile(dockerLogs);
+        assertEquals ("run " +
+                "-i " +
+                "--rm " +
+                "--network host " +
+                "--user spark " +
+                "--privileged " +
+                "-v /var/log/spark:/var/log/spark:shared " +
+                "-v /var/lib/spark:/var/lib/spark:slave " +
+                "-v /var/lib/eskimo:/var/lib/eskimo:slave " +
+                "--mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh " +
+                "--mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json " +
+                "--mount type=bind,source=/home/spark/.kube/config,target=/home/spark/.kube/config " +
+                "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
+                "-v /etc/k8s:/etc/k8s:ro " +
+                "-e NODE_NAME=badbook " +
+                "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
+                "kubernetes.registry:5000/spark " +
+                    "/usr/local/bin/kube_do /usr/local/bin/spark-class --jar /tmp/test.jar -classpath /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar\n", dockerLogs);
     }
 
     @Test
-    public void testKafkaRunClass() throws Exception {
-        fail ("To Be Implemented");
+    public void testRunExample() throws Exception {
+        FlinkCliWrappersTest.createScript(jailPath, "test-run-example.sh", "run-example --properties-file /tmp/test.properties -driver-class-path /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar --py-files /usr/local/lib/python-eskimo/test.py");
+
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/test-run-example.sh"}, true);
+        logger.debug (result);
+
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
+        String kubeNSFile = FlinkCliWrappersTest.getKubeNSFile(dockerLogs);
+        assertEquals ("run " +
+                "-i " +
+                "--rm " +
+                "--network host " +
+                "--user spark " +
+                "--privileged " +
+                "-v /var/log/spark:/var/log/spark:shared " +
+                "-v /tmp:/tmp:slave " +
+                "-v /var/lib/spark:/var/lib/spark:slave " +
+                "-v /var/lib/eskimo:/var/lib/eskimo:slave " +
+                "-v /usr/local/lib/python-eskimo:/usr/local/lib/python-eskimo:slave " +
+                "--mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh " +
+                "--mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json " +
+                "--mount type=bind,source=/home/spark/.kube/config,target=/home/spark/.kube/config " +
+                "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
+                "-v /etc/k8s:/etc/k8s:ro " +
+                "-e NODE_NAME=badbook " +
+                "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
+                "kubernetes.registry:5000/spark " +
+                    "/usr/local/bin/kube_do /usr/local/bin/run-example --properties-file /tmp/test.properties -driver-class-path /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar --py-files /usr/local/lib/python-eskimo/test.py\n", dockerLogs);
     }
 
     @Test
-    public void testKafkaReplicaVerification() throws Exception {
-        fail ("To Be Implemented");
+    public void testPyspark() throws Exception {
+        FlinkCliWrappersTest.createScript(jailPath, "test-pyspark.sh", "pyspark --properties-file /tmp/test.properties -driver-class-path /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar --py-files /usr/local/lib/python-eskimo/test.py");
+
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/test-pyspark.sh"}, true);
+        logger.debug (result);
+
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
+        String kubeNSFile = FlinkCliWrappersTest.getKubeNSFile(dockerLogs);
+        assertEquals ("run " +
+                "-i " +
+                "--rm " +
+                "--network host " +
+                "--user spark " +
+                "--privileged " +
+                "-v /var/log/spark:/var/log/spark:shared " +
+                "-v /tmp:/tmp:slave " +
+                "-v /var/lib/spark:/var/lib/spark:slave " +
+                "-v /var/lib/eskimo:/var/lib/eskimo:slave " +
+                "-v /usr/local/lib/python-eskimo:/usr/local/lib/python-eskimo:slave " +
+                "--mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh " +
+                "--mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json " +
+                "--mount type=bind,source=/home/spark/.kube/config,target=/home/spark/.kube/config " +
+                "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
+                "-v /etc/k8s:/etc/k8s:ro " +
+                "-e NODE_NAME=badbook " +
+                "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
+                "kubernetes.registry:5000/spark " +
+                    "/usr/local/bin/kube_do /usr/local/bin/pyspark --properties-file /tmp/test.properties -driver-class-path /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar --py-files /usr/local/lib/python-eskimo/test.py\n", dockerLogs);
     }
 
     @Test
-    public void testKafkaReassignPartitions() throws Exception {
-        fail ("To Be Implemented");
-    }
+    public void testBeeline() throws Exception {
+        FlinkCliWrappersTest.createScript(jailPath, "test-beeline.sh", "beeline -f /tmp/test.json -w /var/lib/eskimo/test.json");
 
-    @Test
-    public void testKafkaProducerPerfTes() throws Exception {
-        fail ("To Be Implemented");
-    }
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/test-beeline.sh"}, true);
+        logger.debug (result);
 
-    @Test
-    public void testKafkaPreferredReplicaElection() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-    @Test
-    public void testKafkaMirrorMaker() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-    @Test
-    public void testKafkaLogDirs() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-    @Test
-    public void testKafkaDumpLogs() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-    @Test
-    public void testKafkaDeleteRecords() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-    @Test
-    public void testKafkaDelegationTokens() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-    @Test
-    public void testKafkaConsumerGroup() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-    @Test
-    public void testKafkaConsoleProducer() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-    @Test
-    public void testKafkaConsoleConsumer() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-    @Test
-    public void testKafkaConfigs() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-    @Test
-    public void testKafkaBrokerApiVersion() throws Exception {
-        fail ("To Be Implemented");
-    }
-
-
-    @Test
-    public void testKafkaAcl() throws Exception {
-        fail ("To Be Implemented");
+        String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
+        String kubeNSFile = FlinkCliWrappersTest.getKubeNSFile(dockerLogs);
+        assertEquals ("run " +
+                "-i " +
+                "--rm " +
+                "--network host " +
+                "--user spark " +
+                "--privileged " +
+                "-v /var/log/spark:/var/log/spark:shared " +
+                "-v /var/lib/eskimo:/var/lib/eskimo:slave " +
+                "-v /tmp:/tmp:slave " +
+                "--mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh " +
+                "--mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json " +
+                "--mount type=bind,source=/home/spark/.kube/config,target=/home/spark/.kube/config " +
+                "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
+                "-v /etc/k8s:/etc/k8s:ro " +
+                "-e NODE_NAME=badbook " +
+                "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
+                "kubernetes.registry:5000/spark " +
+                    "/usr/local/bin/kube_do /usr/local/bin/beeline -f /tmp/test.json -w /var/lib/eskimo/test.json\n", dockerLogs);
     }
 
 }

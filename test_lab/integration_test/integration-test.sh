@@ -1934,6 +1934,7 @@ do_overwrite_sc() {
     echo_date " - Overwriting Screenshots"
     # overwrite all screenshots
 
+    set -e
     cp $SCRIPT_DIR/../../target/screenshots/console-wide.png                $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
     cp $SCRIPT_DIR/../../target/screenshots/file-manager-wide.png           $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
     cp $SCRIPT_DIR/../../target/screenshots/kube-config-medium.png          $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
@@ -1941,19 +1942,33 @@ do_overwrite_sc() {
     cp $SCRIPT_DIR/../../target/screenshots/services-config-wide.png        $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
     cp $SCRIPT_DIR/../../target/screenshots/setup-wide.png                  $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
     cp $SCRIPT_DIR/../../target/screenshots/status-wide-condensed.png       $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
+    cp $SCRIPT_DIR/../../target/screenshots/status-wide.png       $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
     cp $SCRIPT_DIR/../../target/screenshots/node-services-choice-small.png  $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
-
-    # FIXME Implement me
+    set +e
 
     if [[ -d $SCRIPT_DIR/../../../eskimo_companion_site ]]; then
 
         echo_date " - Overwriting Screenshots in eskimo companion site"
-        # FIXME Implement me
 
+        set -e
+        cp $SCRIPT_DIR/../../target/screenshots/cerebro-medium-condensed.png               $SCRIPT_DIR/../../../eskimo_companion_site/images
+        cp $SCRIPT_DIR/../../target/screenshots/console-medium-condensed.png               $SCRIPT_DIR/../../../eskimo_companion_site/images
+        cp $SCRIPT_DIR/../../target/screenshots/file-manager-medium-condensed.png          $SCRIPT_DIR/../../../eskimo_companion_site/images
+        cp $SCRIPT_DIR/../../target/screenshots/flink-runtime-medium-condensed.png         $SCRIPT_DIR/../../../eskimo_companion_site/images
+        cp $SCRIPT_DIR/../../target/screenshots/gluster-medium-condensed.png               $SCRIPT_DIR/../../../eskimo_companion_site/images
+        cp $SCRIPT_DIR/../../target/screenshots/grafana-medium-condensed.png               $SCRIPT_DIR/../../../eskimo_companion_site/images
+        cp $SCRIPT_DIR/../../target/screenshots/kafka-manager-medium-condensed.png         $SCRIPT_DIR/../../../eskimo_companion_site/images
+        cp $SCRIPT_DIR/../../target/screenshots/kibana-medium-condensed.png                $SCRIPT_DIR/../../../eskimo_companion_site/images
+        cp $SCRIPT_DIR/../../target/screenshots/kubernetes-dashboard-medium-condensed.png  $SCRIPT_DIR/../../../eskimo_companion_site/images
+        cp $SCRIPT_DIR/../../target/screenshots/nodes-config-medium-condensed.png          $SCRIPT_DIR/../../../eskimo_companion_site/images
+        cp $SCRIPT_DIR/../../target/screenshots/services-config-medium-condensed.png       $SCRIPT_DIR/../../../eskimo_companion_site/images
+        cp $SCRIPT_DIR/../../target/screenshots/spark-console-medium-condensed.png         $SCRIPT_DIR/../../../eskimo_companion_site/images
+        cp $SCRIPT_DIR/../../target/screenshots/status-wide.png                            $SCRIPT_DIR/../../../eskimo_companion_site/images
+        cp $SCRIPT_DIR/../../target/screenshots/zeppelin-medium-condensed.png              $SCRIPT_DIR/../../../eskimo_companion_site/images
+        cp $SCRIPT_DIR/../../target/screenshots/flink-runtime-medium-condensed.png         $SCRIPT_DIR/../../../eskimo_companion_site/images
 
-
+        set +e
     fi
-
 }
 
 # get logs
