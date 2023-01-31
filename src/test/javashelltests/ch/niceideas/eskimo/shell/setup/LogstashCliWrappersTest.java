@@ -127,7 +127,7 @@ public class LogstashCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh " +
                 "--mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json " +
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
-                "-e NODE_NAME=badbook " +
+                "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
                 "kubernetes.registry:5000/logstash " +
                     "/usr/local/bin/kube_do /usr/local/bin/logstash --path.config /tmp/import.json --path.data /var/lib/eskimo/data --path.logs /var/log/eskimo\n", dockerLogs);
