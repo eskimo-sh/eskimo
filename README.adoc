@@ -363,8 +363,10 @@ It's usage is at follows:
 
 .integration-test.sh
 ----
-eskimo@notebook:/work/eskimo/test_lab/integration_test$ ./integration-test.sh
-Usage:
+eskimo@notebook:/work/eskimo/test_lab/integration_test$ ./integration-test.sh -h
+Usage: integration-test.sh [Options] [Target Box IP]
+  where [Target Box IP] is optional IP address of box to target tests at
+  where [Options] in
     -h  Display this help message.
     -p  Rebuild eskimo service packages
         -n  Skip packages rebuild (useful when used with -a)
@@ -375,9 +377,12 @@ Usage:
     -s  Setup Eskimo
     -l  Run Data load
     -z  Run Zeppelin notebooks test
+    -i  Run CLI tests
     -t  Run other tests
     -c  Run cleanup
+    -o  Take screenshots
     -a  RUN ALL OF THE ABOVE
+    -w  Use screenshots to overwrite git tree images
     -d  Prepare the VM for DemoVM
     -m  Test on multiple nodes
 ----
@@ -396,6 +401,7 @@ Multiple dependencies are required on the machine where this `integration-test.s
 * Apache Maven 3+
 * Java 11+
 * Docker 20+
+* OpenSSH and sshpass
 
 All of these needs to be available in the PATH. (Lower versions of these software components might work as well but
 without any guarantee).
