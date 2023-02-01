@@ -85,12 +85,12 @@ if [[ $? != 0 ]]; then
     fi
 fi
 
-if [[ `cat /etc/fstab | grep "$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT"` == "" ]]; then
+if [[ $(grep -F "$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT" /etc/fstab) == "" ]]; then
     echo "   + Registering gluster filesystem $VOLUME on $MOUNT_POINT"
     echo "$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs auto,rw,_netdev 0 0" >> /etc/fstab
 fi
 
-if [[ `cat /etc/mtab | grep $MOUNT_POINT | grep gluster` == "" ]]; then
+if [[ $(grep $MOUNT_POINT /etc/mtab | grep gluster) == "" ]]; then
 
     echo "   + Mounting $MOUNT_POINT"
     mount $MOUNT_POINT >> /tmp/mount_$VOLUME 2>&1
@@ -104,7 +104,7 @@ if [[ `cat /etc/mtab | grep $MOUNT_POINT | grep gluster` == "" ]]; then
     echo "   + Polling mtab for mount point appearance"
     cnt=0
     while : ; do
-        if [[ `cat /etc/mtab | grep $MOUNT_POINT | grep gluster` != "" ]]; then
+        if [[ $(cat grep $MOUNT_POINT /etc/mtab | grep gluster) != "" ]]; then
             break
         fi
         sleep 1
@@ -137,7 +137,7 @@ if [[ `cat /etc/mtab | grep $MOUNT_POINT | grep gluster` == "" ]]; then
 fi
 
 
-if [[ `stat -c '%U' $MOUNT_POINT` != "$OWNER" ]]; then
+if [[ $(stat -c '%U' $MOUNT_POINT) != "$OWNER" ]]; then
     echo "   + Changing owner of $MOUNT_POINT"
     # not doing it recursively
     chown $OWNER $MOUNT_POINT

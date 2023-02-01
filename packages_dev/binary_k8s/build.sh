@@ -46,7 +46,7 @@ check_for_docker
 
 
 mkdir -p /tmp/package-k8s
-saved_dir=`pwd`
+saved_dir=$(pwd)
 cleanup() {
     #rm -f Vagrantfile
     #rm -f ssh_key

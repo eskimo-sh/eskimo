@@ -111,9 +111,9 @@ check_in_container_install_success() {
         echo "expected log file to be checked as argument"
         exit 1
     fi
-    export LOG_FILE=$1
+    local LOG_FILE=$1
 
-    if [[ `tail -n 1 $LOG_FILE` != "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE" ]]; then
+    if [[ $(tail -n 1 $LOG_FILE) != "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE" ]]; then
         echo " - In container install script ended up in error"
         cat $LOG_FILE
         exit 100
@@ -176,19 +176,19 @@ function close_and_save_image() {
         echo "Image needs to be passed in argument"
         exit 2
     fi
-    IMAGE=$1
+    local IMAGE=$1
 
       if [[ $2 == "" ]]; then
         echo "Log file needs to be passed in argument"
         exit 3
     fi
-    LOG_FILE=$2
+    local LOG_FILE=$2
 
     if [[ $3 == "" ]]; then
         echo "Software version needs to be passed in argument"
         exit 4
     fi
-    VERSION=$3
+    local VERSION=$3
 
     echo " - Running apt-autoremove"
     docker exec -i $IMAGE apt -y autoremove > $LOG_FILE 2>&1
@@ -231,7 +231,7 @@ function close_and_save_image() {
     echo " - versioning image"
     for i in `seq 1 100`; do
         if [[ ! -f "../../packages_distrib/docker_template_"`echo $IMAGE | cut -d '_' -f 1`"_""$VERSION""_$i.tar.gz" ]]; then
-            mv ../../packages_distrib/tmp_image_"$IMAGE"_TEMP.tar.gz ../../packages_distrib/docker_template_`echo $IMAGE | cut -d '_' -f 1`_"$VERSION"_$i.tar.gz
+            mv ../../packages_distrib/tmp_image_"$IMAGE"_TEMP.tar.gz ../../packages_distrib/docker_template_"$(echo $IMAGE | cut -d '_' -f 1)"_"$VERSION"_$i.tar.gz
             break;
         fi
     done
@@ -253,17 +253,17 @@ function build_image() {
         echo "Image needs to be passed in argument"
         exit 2
     fi
-    IMAGE=$1
+    local IMAGE=$1
     
     if [[ $2 == "" ]]; then
         echo "Log file needs to be passed in argument"
         exit 3
     fi
-    LOG_FILE=$2
+    local LOG_FILE=$2
 
     if [[ -z "$NO_BASE_IMAGE" ]]; then
         echo " - Checking if base eskimo image is available"
-        if [[ `docker images -q eskimo:base-eskimo_template 2>/dev/null` == "" ]]; then
+        if [[ $(docker images -q eskimo:base-eskimo_template 2>/dev/null) == "" ]]; then
             echo " - Trying to load base eskimo image"
             for i in `ls -rt ../../packages_distrib/docker_template_base-eskimo*.tar.gz | tail -1`; do
                 echo "   + loading image $i"
@@ -274,7 +274,7 @@ function build_image() {
     fi
 
     echo " - Deleting any previous containers"
-    if [[ `docker ps -a -q -f name=$IMAGE` != "" ]]; then
+    if [[ $(docker ps -a -q -f name=$IMAGE) != "" ]]; then
         docker stop $IMAGE > /dev/null 2>&1
         docker container rm $IMAGE > /dev/null 2>&1
     fi
@@ -284,14 +284,14 @@ function build_image() {
     docker build --iidfile id_file --tag eskimo:"$IMAGE" .  > $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -11
 
-    export TMP_FOLDER=/tmp
+    local TMP_FOLDER=/tmp
     if [[ ! -z "$BUILD_TEMP_FOLDER" ]]; then
         export TMP_FOLDER=$BUILD_TEMP_FOLDER
 
         echo " - making sure I can write in $BUILD_TEMP_FOLDER"
-        temp_file_created=`mktemp`
+        temp_file_created=$(mktemp)
         rm -Rf $temp_file_created
-        temp_file_name=`basename $temp_file_created`
+        temp_file_name=$(basename $temp_file_created)
 
         touch $BUILD_TEMP_FOLDER/$temp_file_name > $LOG_FILE 2>&1
         fail_if_error $? $LOG_FILE -11
@@ -337,8 +337,8 @@ function create_binary_wrapper(){
         echo "target and wrapper have to be passed as argument of the create_binary_wrapper function"
         exit 2
     fi
-    TARGET=$1
-    WRAPPER=$2
+    local TARGET=$1
+    local WRAPPER=$2
 
     touch $WRAPPER
     chmod 777 $WRAPPER
@@ -372,6 +372,6 @@ function fail_if_error(){
 }
 
 function get_ip_address(){
-    export IP_ADDRESS="`cat /etc/network/interfaces | grep address | cut -d ' ' -f 8`"
+    export IP_ADDRESS="$(cat /etc/network/interfaces | grep address | cut -d ' ' -f 8)"
 }
 

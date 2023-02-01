@@ -46,7 +46,7 @@ if [[ $2 == "" ]]; then
    exit 2
 fi
 export MOUNT_POINT=$2
-export MOUNT_POINT_NAME=`echo $MOUNT_POINT | tr -s '/' '-'`
+export MOUNT_POINT_NAME=$(echo $MOUNT_POINT | tr -s '/' '-')
 export MOUNT_POINT_NAME=${MOUNT_POINT_NAME#?};
 
 if [[ $3 == "" ]]; then
@@ -110,9 +110,9 @@ echo " - Checking existing mount of $MOUNT_POINT"
 rm -Rf /tmp/gluster_error_$VOLUME
 ls -la $MOUNT_POINT >/dev/null 2>/tmp/gluster_error_$VOLUME
 if [[ $? != 0 ]]; then
-    if [[ `grep "Transport endpoint is not connected" /tmp/gluster_error_$VOLUME` != "" \
-         || `grep "Too many levels of symbolic links" /tmp/gluster_error_$VOLUME` != "" \
-         || `grep "No such device" /tmp/gluster_error_$VOLUME` != "" ]]; then
+    if [[ $(grep -F "Transport endpoint is not connected" /tmp/gluster_error_$VOLUME) != "" \
+         || $(grep -F "Too many levels of symbolic links" /tmp/gluster_error_$VOLUME) != "" \
+         || $(grep -F "No such device" /tmp/gluster_error_$VOLUME) != "" ]]; then
         echo " - There is an issue with $MOUNT_POINT (Transport endpoint is not connected / too many levels of symbolic links), unmounting ..."
         /bin/umount -f $MOUNT_POINT  >> /tmp/gluster_mount_"$VOLUME"_log 2>&1
         if [[ $? != 0 ]]; then
@@ -125,7 +125,7 @@ fi
 
 # The below is to define the systemd unit and the fstab entry to proceed with automatic mount of the gluster
 # share in the future
-if [[ `grep $MOUNT_POINT /etc/fstab` == "" ]]; then
+if [[ $(grep $MOUNT_POINT /etc/fstab) == "" ]]; then
 
     echo " - Enabling gluster share $MOUNT_POINT"
     # XXX I change noauto to auto following issues after recover from suspend
@@ -145,7 +145,7 @@ fi
 
 
 # Now we have everything ready to actually proceed with the mount
-if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
+if [[ $(grep "$MOUNT_POINT" /etc/mtab 2>/dev/null) == "" ]]; then
     echo " - Mounting $MOUNT_POINT"
     /bin/systemctl restart $MOUNT_POINT_NAME.mount > /tmp/gluster_mount_"$VOLUME"_log 2>&1
     if [[ $? != 0 ]]; then
@@ -156,7 +156,7 @@ if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
 
     sleep 1
 
-    if [[ `grep "$MOUNT_POINT" /etc/mtab 2>/dev/null` == "" ]]; then
+    if [[ $(grep "$MOUNT_POINT" /etc/mtab 2>/dev/null) == "" ]]; then
         echo "   + Unsuccessfully attempted to mount $MOUNT_POINT"
         cat /tmp/gluster_mount_"$VOLUME"_log
         exit 11

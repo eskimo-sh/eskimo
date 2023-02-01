@@ -50,13 +50,13 @@ take_lock() {
         echo "Expecting Unique lock identifier as argument"
         exit 1
     fi
-    export LOCK_NAME=$1
+    local LOCK_NAME=$1
 
     if [[ $2 == "" ]]; then
-        export LOCK_FOLDER=/var/lib/eskimo/locks/
+        local LOCK_FOLDER=/var/lib/eskimo/locks/
         sudo mkdir -p $LOCK_FOLDER
     else
-        export LOCK_FOLDER=$2
+        local LOCK_FOLDER=$2
         if [[ ! -d $LOCK_FOLDER ]]; then
             echo "Folder $LOCK_FOLDER doesn't exist"
             exit 2
@@ -64,11 +64,11 @@ take_lock() {
     fi
 
     if [[ $3 == "nonblock" ]]; then
-        export NON_BLOCK="true"
+        local NON_BLOCK="true"
     fi
 
-    export ESKIMO_LOCK_HANDLE=$(shuf -i 600-1023 -n 1)
-    export ESKIMO_LOCK_FILE="$LOCK_FOLDER/""$LOCK_NAME""_.lock"
+    local ESKIMO_LOCK_HANDLE=$(shuf -i 600-1023 -n 1)
+    local ESKIMO_LOCK_FILE="$LOCK_FOLDER/""$LOCK_NAME""_.lock"
 
     eval "exec $ESKIMO_LOCK_HANDLE>$ESKIMO_LOCK_FILE" || (echo "Couldn't take handle on lock file" && exit 3)
 
@@ -91,10 +91,10 @@ release_lock() {
         echo "Expecting lock handle representations as 'number:lock_file_path' in argument"
         exit 1
     fi
-    export ESKIMO_HANDLE_REPR=$1
+    local ESKIMO_HANDLE_REPR=$1
 
-    export ESKIMO_LOCK_HANDLE=$(echo "$ESKIMO_HANDLE_REPR" | sed s/'\([^:]*\):\(.*\)'/'\1'/g)
-    export ESKIMO_LOCK_FILE=$(echo "$ESKIMO_HANDLE_REPR" | sed s/'\([^:]*\):\(.*\)'/'\2'/g)
+    local ESKIMO_LOCK_HANDLE=$(echo "$ESKIMO_HANDLE_REPR" | sed s/'\([^:]*\):\(.*\)'/'\1'/g)
+    local ESKIMO_LOCK_FILE=$(echo "$ESKIMO_HANDLE_REPR" | sed s/'\([^:]*\):\(.*\)'/'\2'/g)
 
     if [[ "$ESKIMO_LOCK_HANDLE" == "" || "$ESKIMO_LOCK_HANDLE" == "$ESKIMO_HANDLE_REPR" ]]; then
         echo "Failed to parse HANDLE in lock handle representations $ESKIMO_HANDLE_REPR"
@@ -150,7 +150,7 @@ get_kube_domain_names() {
     if [[ ":$PATH:" != *":/usr/local/bin:"* ]]; then
         PATH=$PATH:/usr/local/bin
     fi
-    DOMAIN_NAMES=" "
+    local DOMAIN_NAMES=" "
     for i in $(kubectl get cm coredns -n kube-system -o jsonpath="{.data.Corefile}" | grep ".local "); do
         if [[ "$i" != "{" ]]; then
             DOMAIN_NAMES="$i $DOMAIN_NAMES "
@@ -182,8 +182,8 @@ __get_kube_service_IP() {
         return 1
     fi
 
-    SERVICE=$(echo $1 | cut -d '.' -f 1)
-    NAMESPACE=$(echo $1 | cut -d '.' -f 2)
+    local SERVICE=$(echo $1 | cut -d '.' -f 1)
+    local NAMESPACE=$(echo $1 | cut -d '.' -f 2)
 
     kubectl get endpoints $SERVICE -n $NAMESPACE -o jsonpath="{range .subsets[*].addresses[*]}{@.hostname}{'/'}{@.ip}{' '}" | sed s/' \/ '//g
 }
@@ -194,7 +194,7 @@ __dump_service_ip_dns() {
         echo "Expecting service in format NAME:IP"
         return 1
     fi
-    FULL_SERVICE=$1
+    local FULL_SERVICE=$1
 
     if [[ "$2" == "etc_hosts" ]]; then
         export gks_format=$2
@@ -202,9 +202,9 @@ __dump_service_ip_dns() {
         unset gks_format
     fi
 
-    D_SERVICE=$(echo $FULL_SERVICE | cut -d ':' -f 1)
-    D_NAMESPACE=$(echo $FULL_SERVICE | cut -d ':' -f 2)
-    D_ADRESS=$(echo $FULL_SERVICE | cut -d ':' -f 3)
+    local D_SERVICE=$(echo $FULL_SERVICE | cut -d ':' -f 1)
+    local D_NAMESPACE=$(echo $FULL_SERVICE | cut -d ':' -f 2)
+    local D_ADRESS=$(echo $FULL_SERVICE | cut -d ':' -f 3)
 
 
     if [[ "$D_SERVICE" == "" ]]; then
@@ -223,7 +223,7 @@ __dump_service_ip_dns() {
     fi
 
     if [[ "$ESKIMO_DOMAINS" == "" ]]; then
-        ESKIMO_DOMAINS=$(get_kube_domain_names)
+        local ESKIMO_DOMAINS=$(get_kube_domain_names)
     fi
 
     for eskimo_domain in $(echo $ESKIMO_DOMAINS); do
@@ -241,12 +241,12 @@ __dump_service_ip_dns() {
 get_kube_services_IPs() {
 
     if [[ "$1" == "etc_hosts" ]]; then
-        export gks_format=$1
+        local gks_format=$1
     else
         unset gks_format
     fi
 
-    export ESKIMO_DOMAINS=$(get_kube_domain_names)
+    local ESKIMO_DOMAINS=$(get_kube_domain_names)
 
     local KUBE_SERVICES
     KUBE_SERVICES=$(get_kube_services)
@@ -257,8 +257,8 @@ get_kube_services_IPs() {
     for service in $KUBE_SERVICES; do
         if [[ $(echo $service  | sed 's/ *$//g') != "" ]]; then
 
-            SERVICE=$(echo $service | cut -d '.' -f 1)
-            NAMESPACE=$(echo $service | cut -d '.' -f 2)
+            local SERVICE=$(echo $service | cut -d '.' -f 1)
+            local NAMESPACE=$(echo $service | cut -d '.' -f 2)
 
             type=single
             for endpoint in $(__get_kube_service_IP $service); do

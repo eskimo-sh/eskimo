@@ -46,7 +46,7 @@ if [ -z "$K8S_VERSION" ]; then
 fi
 
 
-saved_dir=`pwd`
+saved_dir=$(pwd)
 function returned_to_saved_dir() {
      cd $saved_dir
 }
@@ -63,33 +63,33 @@ cd /tmp/k8s_setup || (echo "Couldn't change to /tmp/k8s_setup" && exit 200)
 # Reference
 # https://github.com/shawnsong/kubernetes-handbook
 
-echo " - Downloading cfssl_"$CFSSL_VERSION"_linux_amd64"
-wget https://github.com/cloudflare/cfssl/releases/download/v$CFSSL_VERSION/cfssl_"$CFSSL_VERSION"_linux_amd64  >> /tmp/k8s_install_log 2>&1
+echo " - Downloading cfssl_${CFSSL_VERSION}_linux_amd64"
+wget https://github.com/cloudflare/cfssl/releases/download/v$CFSSL_VERSION/cfssl_${CFSSL_VERSION}_linux_amd64  >> /tmp/k8s_install_log 2>&1
 if [[ $? != 0 ]]; then
-    echo " -> Failed to download cfssl_"$CFSSL_VERSION"_linux_amd64 from https://github.com/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/cfssl_"$CFSSL_VERSION"_linux_amd64 >> /tmp/k8s_install_log 2>&1
+    echo " -> Failed to download cfssl_${CFSSL_VERSION}_linux_amd64 from https://github.com/. Trying to download from niceideas.ch"
+    wget http://niceideas.ch/mes/cfssl_"${CFSSL_VERSION}"_linux_amd64 >> /tmp/k8s_install_log 2>&1
     fail_if_error $? "/tmp/k8s_install_log" -1
 fi
 
-echo " - Installing cfssl_"$CFSL_VERSION"_linux_amd64"
+echo " - Installing cfssl_${CFSL_VERSION}_linux_amd64"
 
 set -e # failing on errors
 mkdir -p /usr/local/lib/k8s/cfssl/bin
-sudo mv cfssl_"$CFSSL_VERSION"_linux_amd64 /usr/local/lib/k8s/cfssl/bin
-chmod +x /usr/local/lib/k8s/cfssl/bin/cfssl_"$CFSSL_VERSION"_linux_amd64
-ln -s cfssl_"$CFSSL_VERSION"_linux_amd64 /usr/local/lib/k8s/cfssl/bin/cfssl
+sudo mv cfssl_${CFSSL_VERSION}_linux_amd64 /usr/local/lib/k8s/cfssl/bin
+chmod +x /usr/local/lib/k8s/cfssl/bin/cfssl_${CFSSL_VERSION}_linux_amd64
+ln -s cfssl_${CFSSL_VERSION}_linux_amd64 /usr/local/lib/k8s/cfssl/bin/cfssl
 set +e
 
 
-echo " - Downloading cfssljson_"$CFSSL_VERSION"_linux_amd64"
-wget https://github.com/cloudflare/cfssl/releases/download/v$CFSSL_VERSION/cfssljson_"$CFSSL_VERSION"_linux_amd64  >> /tmp/k8s_install_log 2>&1
+echo " - Downloading cfssljson_${CFSSL_VERSION}_linux_amd64"
+wget https://github.com/cloudflare/cfssl/releases/download/v$CFSSL_VERSION/cfssljson_${CFSSL_VERSION}_linux_amd64  >> /tmp/k8s_install_log 2>&1
 if [[ $? != 0 ]]; then
-    echo " -> Failed to download cfssljson_"$CFSSL_VERSION"_linux_amd64 from https://github.com/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/cfssljson_""$CFSSL_VERSION"_linux_amd64 >> /tmp/k8s_install_log 2>&1
+    echo " -> Failed to download cfssljson_${CFSSL_VERSION}_linux_amd64 from https://github.com/. Trying to download from niceideas.ch"
+    wget http://niceideas.ch/mes/cfssljson_${CFSSL_VERSION}_linux_amd64 >> /tmp/k8s_install_log 2>&1
     fail_if_error $? "/tmp/k8s_install_log" -1
 fi
 
-echo " - Installing cfssljson_"$CFSL_VERSION"_linux_amd64""
+echo " - Installing cfssljson_${CFSL_VERSION}_linux_amd64"
 
 set -e # failing on errors
 mkdir -p /usr/local/lib/k8s/cfssl/bin
@@ -137,17 +137,17 @@ set +e
 
 
 echo " - Downloading kube-router v$K8S_ROUTER_VERSION"
-wget https://github.com/cloudnativelabs/kube-router/releases/download/v$K8S_ROUTER_VERSION/kube-router_"$K8S_ROUTER_VERSION"_linux_amd64.tar.gz >> /tmp/k8s_install_log 2>&1
+wget https://github.com/cloudnativelabs/kube-router/releases/download/v$K8S_ROUTER_VERSION/kube-router_${K8S_ROUTER_VERSION}_linux_amd64.tar.gz >> /tmp/k8s_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to download kube-router v$K8S_ROUTER_VERSION from https://github.com/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/kube-router_"$K8S_ROUTER_VERSION"_linux_amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
+    wget http://niceideas.ch/mes/kube-router_${K8S_ROUTER_VERSION}_linux_amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
     fail_if_error $? "/tmp/k8s_install_log" -1
 fi
 
 echo " - Installing kube-router v$K8S_ROUTER_VERSION"
 
 set -e
-tar xvfz kube-router_"$K8S_ROUTER_VERSION"_linux_amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
+tar xvfz kube-router_${K8S_ROUTER_VERSION}_linux_amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
 mkdir /usr/local/lib/k8s/kube-router-v$K8S_ROUTER_VERSION
 ln -s kube-router-v$K8S_ROUTER_VERSION /usr/local/lib/k8s/kube-router
 mkdir -p /usr/local/lib/k8s/kube-router/bin
