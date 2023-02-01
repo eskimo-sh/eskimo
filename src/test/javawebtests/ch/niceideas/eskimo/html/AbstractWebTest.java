@@ -299,7 +299,7 @@ public abstract class AbstractWebTest {
         // 3 attempts
         for (int i = 0; i < 3 ; i++) {
             logger.info ("Loading jquery : attempt " + i);
-            loadScript("jquery-3.6.0.js");
+            loadScript("vendor/jquery-3.6.0.js");
 
             waitForDefinition("window.$");
 

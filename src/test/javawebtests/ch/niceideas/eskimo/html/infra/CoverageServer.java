@@ -68,7 +68,7 @@ public class CoverageServer implements TestResourcesServer {
             "--port=" + TestResourcesServer.LOCAL_TEST_SERVER_PORT,
             //"--no-branch",
             //"--no-function",
-            "--no-instrument=src/main/webapp/scripts/bootstrap-5.2.0.js",
+            "--no-instrument=src/main/webapp/scripts/vendor/bootstrap-5.2.0.js",
             "--log=INFO",
             "--report-dir=" + jsCoverReportDir
     };

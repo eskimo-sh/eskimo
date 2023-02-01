@@ -43,7 +43,7 @@ public class EskimoAboutTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript("bootstrap-5.2.0.js");
+        loadScript("vendor/bootstrap-5.2.0.js");
 
         loadScript("eskimoAbout.js");
 
