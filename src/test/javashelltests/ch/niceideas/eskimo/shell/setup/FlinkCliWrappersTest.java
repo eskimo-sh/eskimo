@@ -116,7 +116,7 @@ public class FlinkCliWrappersTest extends AbstractSetupShellTest {
         logger.debug (result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
-        String kubeNSFile = getKubeNSFile(dockerLogs);
+        String kubeNSFile = extractKubeNSFile(dockerLogs);
         assertEquals ("run " +
                 "-i " +
                 "--rm " +
@@ -147,7 +147,7 @@ public class FlinkCliWrappersTest extends AbstractSetupShellTest {
         logger.debug (result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
-        String kubeNSFile = getKubeNSFile(dockerLogs);
+        String kubeNSFile = extractKubeNSFile(dockerLogs);
         assertEquals ("run " +
                 "-i " +
                 "--rm " +
@@ -173,9 +173,10 @@ public class FlinkCliWrappersTest extends AbstractSetupShellTest {
 
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/test-flink.sh"}, true);
         logger.debug (result);
+        System.err.println (result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
-        String kubeNSFile = getKubeNSFile(dockerLogs);
+        String kubeNSFile = extractKubeNSFile(dockerLogs);
         assertEquals ("run " +
                 "-i " +
                 "--rm " +
@@ -198,7 +199,7 @@ public class FlinkCliWrappersTest extends AbstractSetupShellTest {
                     "/usr/local/bin/kube_do /usr/local/bin/flink --jarfile /var/lib/eskimo/flink-demo.jar -p /var/cache/eskimo --savepointPath /tmp ch.niceideas.eskmo-TestFlink\n", dockerLogs);
     }
 
-    public static String getKubeNSFile(String dockerLogs) {
+    public static String extractKubeNSFile(String dockerLogs) {
         int indexOfMount = dockerLogs.indexOf("--mount type=bind,source=/tmp/") + 30;
         return dockerLogs.substring(indexOfMount, dockerLogs.indexOf(",target=", indexOfMount));
     }

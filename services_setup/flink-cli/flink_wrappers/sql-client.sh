@@ -34,27 +34,18 @@
 # Software.
 #
 
+if [[ ":$PATH:" != *":/usr/local/sbin/:"* ]]; then
+    PATH=$PATH:/usr/local/sbin/
+fi
+. eskimo-utils.sh
+
 # extract path arguments and create volume mount command part
 export DOCKER_VOLUMES_ARGS=""
 
-export PROCESS_NEXT="0"
-for argument in "$@"; do
-    if [[ $PROCESS_NEXT == "1" ]]; then
-        if [[ -d $argument ]]; then
-            export DIR=$argument
-        else
-            export DIR=`dirname $argument`
-        fi
-        if [[ `echo $DOCKER_VOLUMES_ARGS | grep "$DIR:$DIR:slave"` == "" ]]; then
-            export DOCKER_VOLUMES_ARGS=" -v $DIR:$DIR:slave $DOCKER_VOLUMES_ARGS"
-        fi
-    fi
-    if [[ $argument == "-j" || $argument == "--jar" || $argument == "-l" || $argument == "--library" || $argument == "-d" || $argument == "-pyfs" || $argument == "--pyFiles" ]]; then
-        export PROCESS_NEXT="1"
-    else
-        export PROCESS_NEXT="0"
-    fi
-done
+parse_cli_docker_volume_mounts \
+        "-j,--jar,-l,--library,-d,-pyfs,--pyFiles" \
+        single \
+        "$@"
 
 # Add standard folders if not already part of it
 # (avoid /var/lib/flink which is used inside container for gluster mounts)

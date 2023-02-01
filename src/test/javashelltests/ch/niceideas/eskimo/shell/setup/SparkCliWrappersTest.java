@@ -45,7 +45,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SparkCliWrappersTest extends AbstractSetupShellTest {
 
@@ -120,7 +121,7 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
         logger.debug (result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
-        String kubeNSFile = FlinkCliWrappersTest.getKubeNSFile(dockerLogs);
+        String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
         assertEquals ("run " +
                 "-i " +
                 "--rm " +
@@ -151,7 +152,7 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
         logger.debug (result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
-        String kubeNSFile = FlinkCliWrappersTest.getKubeNSFile(dockerLogs);
+        String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
         assertEquals ("run " +
                 "-i " +
                 "--rm " +
@@ -182,7 +183,7 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
         logger.debug (result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
-        String kubeNSFile = FlinkCliWrappersTest.getKubeNSFile(dockerLogs);
+        String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
         assertEquals ("run " +
                 "-i " +
                 "--rm " +
@@ -213,7 +214,7 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
         logger.debug (result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
-        String kubeNSFile = FlinkCliWrappersTest.getKubeNSFile(dockerLogs);
+        String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
         assertEquals ("run " +
                 "-i " +
                 "--rm " +
@@ -244,7 +245,7 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
         logger.debug (result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
-        String kubeNSFile = FlinkCliWrappersTest.getKubeNSFile(dockerLogs);
+        String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
         assertEquals ("run " +
                 "-i " +
                 "--rm " +
@@ -273,7 +274,7 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
         logger.debug (result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
-        String kubeNSFile = FlinkCliWrappersTest.getKubeNSFile(dockerLogs);
+        String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
         assertEquals ("run " +
                 "-i " +
                 "--rm " +
@@ -304,7 +305,7 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
         logger.debug (result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
-        String kubeNSFile = FlinkCliWrappersTest.getKubeNSFile(dockerLogs);
+        String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
         assertEquals ("run " +
                 "-i " +
                 "--rm " +
@@ -335,7 +336,7 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
         logger.debug (result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
-        String kubeNSFile = FlinkCliWrappersTest.getKubeNSFile(dockerLogs);
+        String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
         assertEquals ("run " +
                 "-i " +
                 "--rm " +

@@ -49,8 +49,14 @@ import org.springframework.stereotype.Component;
 public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     private String returnResult = "";
+
     private StringBuilder executedCommands = new StringBuilder();
+    // unlike actual implementation, test service is not thread safe
+    private final Object executedCommandsMonitor = new Object();
+
     private StringBuilder executedScpCommands = new StringBuilder();
+    // unlike actual implementation, test service is not thread safe
+    private final Object executedScpCommandsMonitor = new Object();
 
     private ConnectionResultBuilder connectionResultBuilder = null;
     private NodeResultBuilder nodeResultBuilder = null;
@@ -64,19 +70,27 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     public String getExecutedCommands() {
-        return executedCommands.toString();
+        synchronized (executedCommandsMonitor) {
+            return executedCommands.toString();
+        }
     }
 
     public String getExecutedScpCommands() {
-        return executedScpCommands.toString();
+        synchronized (executedScpCommandsMonitor) {
+            return executedScpCommands.toString();
+        }
     }
 
     public void reset() {
         this.connectionResultBuilder = null;
         this.nodeResultBuilder = null;
         this.returnResult = "";
-        this.executedCommands = new StringBuilder();
-        this.executedScpCommands = new StringBuilder();
+        synchronized (executedCommandsMonitor) {
+            this.executedCommands = new StringBuilder();
+        }
+        synchronized (executedScpCommandsMonitor) {
+            this.executedScpCommands = new StringBuilder();
+        }
     }
 
     public void setResult(String returnResult) {
@@ -93,8 +107,10 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHScript(SSHConnection connection, String script) {
-        executedCommands.append(script);
-        executedCommands.append("\n");
+        synchronized (executedCommandsMonitor) {
+            executedCommands.append(script);
+            executedCommands.append("\n");
+        }
         if (connectionResultBuilder != null) {
             return connectionResultBuilder.build(connection, script);
         }
@@ -103,8 +119,10 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHScript(String node, String script) {
-        executedCommands.append(script);
-        executedCommands.append("\n");
+        synchronized (executedCommandsMonitor) {
+            executedCommands.append(script);
+            executedCommands.append("\n");
+        }
         if (nodeResultBuilder != null) {
             return nodeResultBuilder.build(node, script);
         }
@@ -113,8 +131,10 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHCommand(SSHConnection connection, String[] command) {
-        executedCommands.append(String.join(" ", command));
-        executedCommands.append("\n");
+        synchronized (executedCommandsMonitor) {
+            executedCommands.append(String.join(" ", command));
+            executedCommands.append("\n");
+        }
         if (connectionResultBuilder != null) {
             return connectionResultBuilder.build(connection, String.join(",", command));
         }
@@ -123,8 +143,10 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHScriptPath(SSHConnection connection, String scriptName) {
-        executedCommands.append(scriptName);
-        executedCommands.append("\n");
+        synchronized (executedCommandsMonitor) {
+            executedCommands.append(scriptName);
+            executedCommands.append("\n");
+        }
         if (connectionResultBuilder != null) {
             return connectionResultBuilder.build(connection, scriptName);
         }
@@ -133,8 +155,10 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHScriptPath(String node, String scriptName) {
-        executedCommands.append(scriptName);
-        executedCommands.append("\n");
+        synchronized (executedCommandsMonitor) {
+            executedCommands.append(scriptName);
+            executedCommands.append("\n");
+        }
         if (nodeResultBuilder != null) {
             return nodeResultBuilder.build(node, scriptName);
         }
@@ -143,8 +167,10 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHScript(String node, String script, boolean throwsException) {
-        executedCommands.append(script);
-        executedCommands.append("\n");
+        synchronized (executedCommandsMonitor) {
+            executedCommands.append(script);
+            executedCommands.append("\n");
+        }
         if (nodeResultBuilder != null) {
             return nodeResultBuilder.build(node, script);
         }
@@ -153,8 +179,10 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
-        executedCommands.append(script);
-        executedCommands.append("\n");
+        synchronized (executedCommandsMonitor) {
+            executedCommands.append(script);
+            executedCommands.append("\n");
+        }
         if (connectionResultBuilder != null) {
             return connectionResultBuilder.build(connection, script);
         }
@@ -163,8 +191,10 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHCommand(String node, String command) {
-        executedCommands.append(command);
-        executedCommands.append("\n");
+        synchronized (executedCommandsMonitor) {
+            executedCommands.append(command);
+            executedCommands.append("\n");
+        }
         if (nodeResultBuilder != null) {
             return nodeResultBuilder.build(node, command);
         }
@@ -173,8 +203,10 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public String runSSHCommand(SSHConnection connection, String command) {
-        executedCommands.append(command);
-        executedCommands.append("\n");
+        synchronized (executedCommandsMonitor) {
+            executedCommands.append(command);
+            executedCommands.append("\n");
+        }
         if (connectionResultBuilder != null) {
             return connectionResultBuilder.build(connection, command);
         }
@@ -183,12 +215,16 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
 
     @Override
     public void copySCPFile(String node, String filePath) {
-        this.executedScpCommands.append(node).append(":").append(filePath).append("\n");
+        synchronized (executedScpCommandsMonitor) {
+            this.executedScpCommands.append(node).append(":").append(filePath).append("\n");
+        }
     }
 
     @Override
     public void copySCPFile(SSHConnection connection, String filePath) {
-        this.executedScpCommands.append(connection != null ? connection.getHostname() : "null").append(":").append(filePath).append("\n");
+        synchronized (executedScpCommandsMonitor) {
+            this.executedScpCommands.append(connection != null ? connection.getHostname() : "null").append(":").append(filePath).append("\n");
+        }
     }
 
 }

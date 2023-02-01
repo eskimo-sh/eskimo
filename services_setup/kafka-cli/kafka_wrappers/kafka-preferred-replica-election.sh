@@ -34,26 +34,18 @@
 # Software.
 #
 
+if [[ ":$PATH:" != *":/usr/local/sbin/:"* ]]; then
+    PATH=$PATH:/usr/local/sbin/
+fi
+. eskimo-utils.sh
+
 # extract path arguments and create volume mount command part
 export DOCKER_VOLUMES_ARGS=""
-export PROCESS_NEXT="0"
-for argument in "$@"; do
-    if [[ $PROCESS_NEXT == "1" ]]; then
-        if [[ -d $argument ]]; then
-            export DIR=$argument
-        else
-            export DIR=`dirname $argument`
-        fi
-        if [[ `echo $DOCKER_VOLUMES_ARGS | grep "$DIR:$DIR:slave"` == "" ]]; then
-            export DOCKER_VOLUMES_ARGS=" -v $DIR:$DIR:slave $DOCKER_VOLUMES_ARGS"
-        fi
-    fi
-    if [[ $argument == "--path-to-json-file" || $argument == "--admin.config" ]]; then
-        export PROCESS_NEXT="1"
-    else
-        export PROCESS_NEXT="0"
-    fi
-done
+
+parse_cli_docker_volume_mounts \
+        "--path-to-json-file,--admin.config" \
+        single \
+        "$@"
 
 # Add standard folders if not already part of it
 if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/lib/kafka` == "" ]]; then
@@ -64,11 +56,6 @@ if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/log/kafka` == "" ]]; then
 fi
 
 #echo $DOCKER_VOLUMES_ARGS
-
-if [[ ":$PATH:" != *":/usr/local/sbin/:"* ]]; then
-    PATH=$PATH:/usr/local/sbin/
-fi
-. eskimo-utils.sh
 
 KUBE_SERVICES_HOSTS_FILE=`create_kube_services_hosts_file`
 if [[ ! -f $KUBE_SERVICES_HOSTS_FILE ]]; then

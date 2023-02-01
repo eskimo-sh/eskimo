@@ -34,6 +34,12 @@
 # Software.
 #
 
+if [[ ":$PATH:" != *":/usr/local/sbin/:"* ]]; then
+    PATH=$PATH:/usr/local/sbin/
+fi
+. eskimo-utils.sh
+
+
 export DOCKER_VOLUMES_ARGS=""
 
 # Add standard folders if not already part of it
@@ -43,11 +49,6 @@ fi
 if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/log/kafka` == "" ]]; then
     export DOCKER_VOLUMES_ARGS=" -v /var/log/kafka:/var/log/kafka:shared $DOCKER_VOLUMES_ARGS"
 fi
-
-if [[ ":$PATH:" != *":/usr/local/sbin/:"* ]]; then
-    PATH=$PATH:/usr/local/sbin/
-fi
-. eskimo-utils.sh
 
 KUBE_SERVICES_HOSTS_FILE=`create_kube_services_hosts_file`
 if [[ ! -f $KUBE_SERVICES_HOSTS_FILE ]]; then
