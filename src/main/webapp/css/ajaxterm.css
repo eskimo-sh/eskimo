@@ -43,7 +43,7 @@ Software.
     display: inline-block;
 }
 .ajaxterm pre.stat {/* status indicator line */
-	margin: 0px;
+	margin: 0;
 	padding: 4px;
 	display: block;
 	font-family: monospace;
@@ -53,7 +53,7 @@ Software.
 	color: white;
 }
 .ajaxterm pre.stat span {/* buttons inside the status line */
-	padding: 0px;
+	padding: 0;
 }
 .ajaxterm pre.stat span.on {/* button on state */
 	background-color: #080;
@@ -77,13 +77,13 @@ Software.
     font-family: monospace;
 }
 .ajaxterm div.spacer div.screen pre.term {/* this is what the server sends us */
-	margin: 0px;
-	padding: 0px;
+	margin: 0;
+	padding: 0;
 	display: block;
 	white-space: pre;
 	color: #eee;
 	background-color: transparent;
-	border: 0px none;
+	border: 0 none;
 }
 .ajaxterm div.spacer div.screen pre.term.dead {/* the session has finished */
     opacity: 0.5;

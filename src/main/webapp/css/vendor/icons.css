@@ -1,7 +1,7 @@
 @charset "UTF-8";
 @font-face{
     font-family:unicons;
-    src:url(../fonts/unicons.eot@34404611) format("embedded-opentype"),url(../fonts/unicons.woff2@34404611) format("woff2"),url(../fonts/unicons.woff@34404611) format("woff"),url(../fonts/unicons.ttf@34404611) format("truetype"),url(../fonts/unicons.svg@34404611) format("svg");
+    src:url(../../fonts/unicons.eot@34404611) format("embedded-opentype"),url(../../fonts/unicons.woff2@34404611) format("woff2"),url(../../fonts/unicons.woff@34404611) format("woff"),url(../../fonts/unicons.ttf@34404611) format("truetype"),url(../../fonts/unicons.svg@34404611) format("svg");
     font-weight:400;
     font-style:normal
 }
@@ -3228,8 +3228,8 @@
 }
 @font-face{
     font-family:remixicon;
-    src:url(../fonts/remixicon.eot@t=1590207869815);
-    src:url(../fonts/remixicon.eot@t=1590207869815) format("embedded-opentype"),url(../fonts/remixicon.woff2@t=1590207869815) format("woff2"),url(../fonts/remixicon.woff@t=1590207869815) format("woff"),url(../fonts/remixicon.ttf@t=1590207869815) format("truetype"),url(../fonts/remixicon.svg@t=1590207869815) format("svg");
+    src:url(../../fonts/remixicon.eot@t=1590207869815);
+    src:url(../../fonts/remixicon.eot@t=1590207869815) format("embedded-opentype"),url(../../fonts/remixicon.woff2@t=1590207869815) format("woff2"),url(../../fonts/remixicon.woff@t=1590207869815) format("woff"),url(../../fonts/remixicon.ttf@t=1590207869815) format("truetype"),url(../../fonts/remixicon.svg@t=1590207869815) format("svg");
     font-display:swap
 }
 [class*=" ri-"],[class^=ri-]{
@@ -10106,8 +10106,8 @@
 }
 @font-face{
     font-family:"Material Design Icons";
-    src:url(../fonts/materialdesignicons-webfont.eot@v=6.5.95);
-    src:url(../fonts/materialdesignicons-webfont.eot@) format("embedded-opentype"),url(../fonts/materialdesignicons-webfont.woff2@v=6.5.95) format("woff2"),url(../fonts/materialdesignicons-webfont.woff@v=6.5.95) format("woff"),url(../fonts/materialdesignicons-webfont.ttf@v=6.5.95) format("truetype");
+    src:url(../../fonts/materialdesignicons-webfont.eot@v=6.5.95);
+    src:url(../../fonts/materialdesignicons-webfont.eot@) format("embedded-opentype"),url(../../fonts/materialdesignicons-webfont.woff2@v=6.5.95) format("woff2"),url(../../fonts/materialdesignicons-webfont.woff@v=6.5.95) format("woff"),url(../../fonts/materialdesignicons-webfont.ttf@v=6.5.95) format("truetype");
     font-weight:400;
     font-style:normal
 }
