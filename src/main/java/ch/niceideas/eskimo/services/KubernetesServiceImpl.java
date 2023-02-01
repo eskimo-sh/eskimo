@@ -139,16 +139,16 @@ public class KubernetesServiceImpl implements KubernetesService {
 
     @Override
     public void startService(Service service, String node) throws SystemException {
-        kubeOp (service, node, "Starting", "start");
+        kubeOp (service, "Starting", "start");
     }
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public void stopService(Service service, String node) throws SystemException {
-        kubeOp (service, node, "Stopping", "stop");
+        kubeOp (service, "Stopping", "stop");
     }
 
-    private void kubeOp (Service service, String node, String opLabel, String op) throws SystemException {
+    private void kubeOp (Service service, String opLabel, String op) throws SystemException {
         systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, opLabel, () -> {
             if (service.isKubernetes()) {
                 try {
@@ -231,14 +231,7 @@ public class KubernetesServiceImpl implements KubernetesService {
             logger.debug (e, e);
         }
         systemOperationService.applySystemOperation(operation,
-                builder -> {
-                    try {
-                        proceedWithKubernetesServiceUninstallation(builder, kubeMasterNode, operation.getService());
-                    } catch (KubernetesException e) {
-                        logger.error (e, e);
-                        throw new SystemException(e);
-                    }
-                },
+                builder -> proceedWithKubernetesServiceUninstallation(builder, kubeMasterNode, operation.getService()),
                 status -> status.removeInstallationFlag(operation.getService(), ServicesInstallStatusWrapper.KUBERNETES_NODE));
         if (nodeIp != null) {
             proxyManagerService.removeServerForService(operation.getService(), nodeIp);
@@ -248,7 +241,7 @@ public class KubernetesServiceImpl implements KubernetesService {
     }
 
     private void proceedWithKubernetesServiceUninstallation(MessageLogger ml, String kubeMasterNode, String serviceName)
-            throws SSHCommandException, KubernetesException {
+            throws SSHCommandException {
         Service service = servicesDefinition.getService(serviceName);
 
         try (SSHConnection connection = connectionManagerService.getPrivateConnection(kubeMasterNode)){

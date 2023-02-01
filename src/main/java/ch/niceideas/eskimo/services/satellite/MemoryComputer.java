@@ -49,6 +49,8 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -171,20 +173,20 @@ public class MemoryComputer {
                         if (!nodeMemory.startsWith("MemTotal")) {
                             throw new SSHCommandException("Impossible to understand the format of the meminof result. Missing 'MemTotal' in " + nodeMemory);
                         }
-                        long divider = 0;
+                        BigDecimal divider = BigDecimal.ZERO;
                         if (nodeMemory.endsWith("B")) {
-                            divider = 1024^2;
+                            divider = BigDecimal.valueOf(1024^2);
                         } else if (nodeMemory.endsWith("kB")) {
-                            divider = 1024;
+                            divider = BigDecimal.valueOf(1024);
                         } else if (nodeMemory.endsWith("mB")) {
-                            divider = 1;
+                            divider = BigDecimal.valueOf(1);
                         } else if (nodeMemory.endsWith("gB")) {
-                            divider =  (1 / 1024);
+                            divider = BigDecimal.valueOf(1).divide(BigDecimal.valueOf(1024), RoundingMode.CEILING);
                         } else {
                             throw new SSHCommandException("Impossible to understand the format of " + nodeMemory);
                         }
-                        long memory = Long.parseLong(nodeMemory.substring(9, nodeMemory.length() - 2).trim());
-                        memoryMap.put (node, memory / divider);
+                        BigDecimal memory = BigDecimal.valueOf(Long.parseLong(nodeMemory.substring(9, nodeMemory.length() - 2).trim()));
+                        memoryMap.put (node, memory.divide(divider, RoundingMode.FLOOR).longValue());
                     } catch (SSHCommandException e) {
                         logger.error (e, e);
                         error.set(e);

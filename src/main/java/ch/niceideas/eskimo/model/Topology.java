@@ -573,11 +573,7 @@ public class Topology {
                 && nodesConfig.hasServiceConfigured(servicesDefinition.getKubeMasterService().getName()) &&
                 (   nodesConfig.isServiceOnNode(servicesDefinition.getKubeMasterService().getName(), nodeNbr)
                  || nodesConfig.isServiceOnNode(servicesDefinition.getKubeSlaveService().getName(), nodeNbr))) {
-            // No. In the end we need kubernetes topology on every node where a kube service might be potentially running
-            /*
-                && kubeConfig.hasEnabledServices()
-                && nodesConfig.isServiceOnNode(KubernetesService.KUBE_MASTER, nodeNbr)) {
-             */
+
             sb.append("\n#Kubernetes Topology\n");
 
             if (kubeConfig != null) {
