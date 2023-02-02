@@ -76,9 +76,15 @@ public class ServicesInstallationSorter {
             operationForService.add(operation);
         }
 
+        // 2. Order by dependencies
+        List<Service> services = groupedOperations.keySet().stream()
+                .sorted((one, other) -> servicesDefinition.compareServices(one, other))
+                .map(service -> servicesDefinition.getService(service))
+                .collect(Collectors.toList());
+
         // sort installation first, uninstallation after, restarts in the end
-        for (T operation : operations) {
-            List<T> operationForService = groupedOperations.get(operation);
+        for (Service service : services) {
+            List<T> operationForService = groupedOperations.get(service);
             if (operationForService != null) {
                 operationForService.sort((o1, o2) -> {
                     if (o1.getType().equals("installation")) {
@@ -107,12 +113,6 @@ public class ServicesInstallationSorter {
                 });
             }
         }
-
-        // 2. Order by dependencies
-        List<Service> services = groupedOperations.keySet().stream()
-                .sorted((one, other) -> servicesDefinition.compareServices(one, other))
-                .map(service -> servicesDefinition.getService(service))
-                .collect(Collectors.toList());
 
         // 3. Reprocess and separate master installation
         List<List<T>> orderedOperationsSteps = new ArrayList<>();
