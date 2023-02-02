@@ -175,7 +175,6 @@ public class KubernetesServiceImpl implements KubernetesService {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
     public String restartServiceInternal(Service service, String node) throws KubernetesException, SSHCommandException {
         if (service.isKubernetes()) {
             if (!service.isRegistryOnly()) {
