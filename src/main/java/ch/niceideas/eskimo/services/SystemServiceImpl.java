@@ -202,7 +202,7 @@ public class SystemServiceImpl implements SystemService {
             if (service.isKubernetes()) {
                 throw new UnsupportedOperationException("Restarting kubernetes service " + service.getName() + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
-                return sshCommandService.runSSHCommand(node, "sudo systemctl restart " + service.getName());
+                return sshCommandService.runSSHCommand(node, "sudo bash -c 'systemctl reset-failed " + service.getName() + " && systemctl restart " + service.getName());
             }
         });
     }

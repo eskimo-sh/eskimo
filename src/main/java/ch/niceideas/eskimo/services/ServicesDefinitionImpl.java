@@ -546,6 +546,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                             kubeDependency.setMasterService(getKubeMasterService().getName());
                             kubeDependency.setNumberOfMasters(1);
                             kubeDependency.setMandatory(true);
+                            kubeDependency.setRestart(false);
                             service.addDependency(kubeDependency);
                     });
         } catch (IllegalArgumentException e) {

@@ -51,8 +51,7 @@ import org.springframework.test.context.TestPropertySource;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
@@ -87,7 +86,7 @@ public class ServiceInstallationSorterTest {
                 StandardSetupHelpers.getStandard2NodesSetup()
         );
 
-        List<List<ServiceOperationsCommand.ServiceOperationId>> orderedRestart = restartCommand.getRestartsInOrder(
+        List<List<ServiceOperationsCommand.ServiceOperationId>> orderedRestart = restartCommand.getOperationsGroupInOrder(
                 sis, StandardSetupHelpers.getStandard2NodesSetup()
         );
 

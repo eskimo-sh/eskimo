@@ -76,12 +76,43 @@ public class ServicesInstallationSorter {
             operationForService.add(operation);
         }
 
+        // sort installation first, uninstallation after, restarts in the end
+        for (T operation : operations) {
+            List<T> operationForService = groupedOperations.get(operation);
+            if (operationForService != null) {
+                operationForService.sort((o1, o2) -> {
+                    if (o1.getType().equals("installation")) {
+                        if (o2.getType().equals("installation")) {
+                            return 0;
+                        } else {
+                            return -1;
+                        }
+                    }
+
+                    if (o1.getType().equals("uninstallation")) {
+                        if (o2.getType().equals("installation")) {
+                            return 1;
+                        } else if (o2.getType().equals("uninstallation")) {
+                            return 0;
+                        } else {
+                            return -1;
+                        }
+                    }
+
+                    if (o2.getType().equals("restart")) {
+                        return 0;
+                    } else {
+                        return 1;
+                    }
+                });
+            }
+        }
+
         // 2. Order by dependencies
         List<Service> services = groupedOperations.keySet().stream()
                 .sorted((one, other) -> servicesDefinition.compareServices(one, other))
                 .map(service -> servicesDefinition.getService(service))
                 .collect(Collectors.toList());
-
 
         // 3. Reprocess and separate master installation
         List<List<T>> orderedOperationsSteps = new ArrayList<>();
@@ -110,7 +141,7 @@ public class ServicesInstallationSorter {
                     List<T> newGroup = new ArrayList<>();
                     for (T operation : group) {
 
-                        if (operation.isOnNode(master)) {
+                        if (operation.isOnNode(master) && operation.getType().equals("installation")) {
 
                             // create ad'hoc single group for master
                             List<T> singleGroup = new ArrayList<>();

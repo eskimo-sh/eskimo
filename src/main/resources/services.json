@@ -43,15 +43,6 @@
       "logo" : "images/zookeeper-logo.png",
       "icon" : "images/zookeeper-icon.png"
     },
-    "dependencies": [
-      {
-        "masterElectionStrategy": "RANDOM",
-        "masterService": "zookeeper",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": true
-      }
-    ],
     "additionalEnvironment": [ "SERVICE_NUMBER_1_BASED" ],
     "editableSettings": [
       {

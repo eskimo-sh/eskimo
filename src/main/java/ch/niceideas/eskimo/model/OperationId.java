@@ -38,6 +38,8 @@ import java.io.Serializable;
 
 public interface OperationId extends Serializable {
 
+    String getType();
+
     String getMessage();
 
     String getService();

@@ -87,6 +87,10 @@ public class SimpleOperationCommand implements JSONOpCommand {
         private final String service;
         private final String node;
 
+        public String getType() {
+            return getOperation();
+        }
+
         public boolean isOnNode(String node) {
             return node.equals(this.node);
         }

@@ -38,9 +38,7 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.service.Dependency;
 import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
 import ch.niceideas.eskimo.model.service.Service;
-import ch.niceideas.eskimo.services.ServiceDefinitionException;
-import ch.niceideas.eskimo.services.ServicesDefinition;
-import ch.niceideas.eskimo.services.SystemException;
+import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
@@ -278,40 +276,28 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         return retSet;
     }
 
-    public List<List<ServiceOperationId>> getRestartsInOrder
-            (ServicesInstallationSorter servicesInstallationSorter, NodesConfigWrapper nodesConfig)
-            throws ServiceDefinitionException, NodesConfigurationException, SystemException {
-        return servicesInstallationSorter.orderOperations (getRestarts(), nodesConfig);
-    }
-
-    public List<List<ServiceOperationId>> getInstallationsInOrder
-            (ServicesInstallationSorter servicesInstallationSorter, NodesConfigWrapper nodesConfig)
-            throws ServiceDefinitionException, NodesConfigurationException, SystemException {
-        return servicesInstallationSorter.orderOperations (getInstallations(), nodesConfig);
-    }
-
-    public List<List<ServiceOperationId>> getUninstallationsInOrder
-            (ServicesInstallationSorter servicesInstallationSorter, NodesConfigWrapper nodesConfig)
-            throws ServiceDefinitionException, NodesConfigurationException, SystemException {
-        List<List<ServiceOperationId>> orderedUninstallations = servicesInstallationSorter.orderOperations (getUninstallations(), nodesConfig);
-        Collections.reverse(orderedUninstallations);
-        return orderedUninstallations;
-    }
-
     @Override
     public List<ServiceOperationId> getAllOperationsInOrder
             (OperationsContext context)
             throws ServiceDefinitionException, NodesConfigurationException, SystemException {
 
         List<ServiceOperationId> allOpList = new ArrayList<>();
-
         context.getNodesConfig().getNodeAddresses().forEach(node -> allOpList.add(new ServiceOperationId(CHECK_INSTALL_OP_TYPE, BASE_SYSTEM, node)));
-
-        getInstallationsInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
-        getUninstallationsInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
-        getRestartsInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
-
+        getOperationsGroupInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
         return allOpList;
+    }
+
+    public List<List<ServiceOperationId>> getOperationsGroupInOrder
+            (ServicesInstallationSorter sorter, NodesConfigWrapper nodesConfigWrapper)
+            throws ServiceDefinitionException, NodesConfigurationException, SystemException {
+
+        List<ServiceOperationId> allOpList = new ArrayList<>();
+
+        allOpList.addAll(getInstallations());
+        allOpList.addAll(getUninstallations());
+        allOpList.addAll(getRestarts());
+
+        return sorter.orderOperations(allOpList, nodesConfigWrapper);
     }
 
     public static class ServiceOperationId extends SimpleOperationCommand.SimpleOperationId implements OperationId {

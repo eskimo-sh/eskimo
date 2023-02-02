@@ -57,10 +57,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -205,59 +202,51 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
                     });
 
             // first thing first, flag services that need to be restarted as "needing to be restarted"
-            for (List<ServiceOperationsCommand.ServiceOperationId> restarts : command.getRestartsInOrder(servicesInstallationSorter, nodesConfig)) {
-                for (ServiceOperationsCommand.ServiceOperationId restart : restarts) {
-                    try {
-                        configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
-                            String nodeName = restart.getNode().replace(".", "-");
-                            if (restart.getNode().equals(ServiceOperationsCommand.KUBERNETES_FLAG)) {
-                                nodeName = ServicesInstallStatusWrapper.KUBERNETES_NODE;
-                            }
-                            servicesInstallationStatus.setInstallationFlag(restart.getService(), nodeName, "restart");
-                        });
-                    } catch (FileException | SetupException e) {
-                        logger.error(e, e);
-                        throw new SystemException(e);
-                    }
+            for (ServiceOperationsCommand.ServiceOperationId restart :
+                    command.getOperationsGroupInOrder(servicesInstallationSorter, nodesConfig).stream()
+                            .flatMap(Collection::stream)
+                            .filter(op -> op.getOperation().equals("restart"))
+                            .collect(Collectors.toList())) {
+                try {
+                    configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
+                        String nodeName = restart.getNode().replace(".", "-");
+                        if (restart.getNode().equals(ServiceOperationsCommand.KUBERNETES_FLAG)) {
+                            nodeName = ServicesInstallStatusWrapper.KUBERNETES_NODE;
+                        }
+                        servicesInstallationStatus.setInstallationFlag(restart.getService(), nodeName, "restart");
+                    });
+                } catch (FileException | SetupException e) {
+                    logger.error(e, e);
+                    throw new SystemException(e);
                 }
             }
 
             // Installation in batches (groups following dependencies)
-            for (List<ServiceOperationsCommand.ServiceOperationId> installations : command.getInstallationsInOrder(servicesInstallationSorter, nodesConfig)) {
+            for (List<ServiceOperationsCommand.ServiceOperationId> operationGroup : command.getOperationsGroupInOrder(servicesInstallationSorter, nodesConfig)) {
 
-                systemService.performPooledOperation(installations, parallelismInstallThreadCount, operationWaitTimoutSeconds,
+                systemService.performPooledOperation(operationGroup, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
-                            if (liveIps.contains(operation.getNode())) {
-                                installService(operation);
-                            }
-                        });
-            }
-
-            // uninstallations
-            for (List<ServiceOperationsCommand.ServiceOperationId> uninstallations : command.getUninstallationsInOrder(servicesInstallationSorter, nodesConfig)) {
-                systemService.performPooledOperation(uninstallations, parallelismInstallThreadCount, operationWaitTimoutSeconds,
-                        (operation, error) -> {
-                            if (!deadIps.contains(operation.getNode())) {
-                                uninstallService(operation);
-                            } else {
-                                if (!liveIps.contains(operation.getNode())) {
-                                    // this means that the node has been de-configured
-                                    // (since if it is neither dead nor alive then it just hasn't been tested since it's not
-                                    // in the config anymore)
-                                    // just consider it uninstalled
-                                    uninstallServiceNoOp(operation);
+                            if (operation.getOperation().equals("installation")) {
+                                if (liveIps.contains(operation.getNode())) {
+                                    installService(operation);
                                 }
-                            }
-                        });
-            }
 
-            // restarts
-            for (List<ServiceOperationsCommand.ServiceOperationId> restarts : servicesInstallationSorter.orderOperations(
-                    command.getRestarts(), nodesConfig)) {
-                systemService.performPooledOperation(restarts, parallelismInstallThreadCount, operationWaitTimoutSeconds,
-                        (operation, error) -> {
-                            if (operation.getNode().equals(ServiceOperationsCommand.KUBERNETES_FLAG) || liveIps.contains(operation.getNode())) {
-                                restartServiceForSystem(operation);
+                            } else if (operation.getOperation().equals("uninstallation")) {
+                                if (!deadIps.contains(operation.getNode())) {
+                                    uninstallService(operation);
+                                } else {
+                                    if (!liveIps.contains(operation.getNode())) {
+                                        // this means that the node has been de-configured
+                                        // (since if it is neither dead nor alive then it just hasn't been tested since it's not
+                                        // in the config anymore)
+                                        // just consider it uninstalled
+                                        uninstallServiceNoOp(operation);
+                                    }
+                                }
+                            } else { // restart
+                                if (operation.getNode().equals(ServiceOperationsCommand.KUBERNETES_FLAG) || liveIps.contains(operation.getNode())) {
+                                    restartServiceForSystem(operation);
+                                }
                             }
                         });
             }
@@ -466,7 +455,8 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
         } else {
             systemOperationService.applySystemOperation(operationId,
-                    ml -> ml.addInfo(sshCommandService.runSSHCommand(operationId.getNode(), "sudo systemctl restart " + operationId.getService())),
+                    ml -> ml.addInfo(sshCommandService.runSSHCommand(operationId.getNode(),
+                            "sudo bash -c 'systemctl reset-failed " + operationId.getService() + " && systemctl restart " + operationId.getService() + "'")),
                     status -> status.setInstallationFlag(operationId.getService(), nodeName, "OK"));
         }
     }

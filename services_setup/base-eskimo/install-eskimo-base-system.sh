@@ -106,6 +106,7 @@ function enable_docker() {
 
 EOF
 
+    sudo mkdir -p /etc/docker/
     sudo mv /tmp/daemon.json /etc/docker/daemon.json
     sudo chown root. /etc/docker/daemon.json
 
