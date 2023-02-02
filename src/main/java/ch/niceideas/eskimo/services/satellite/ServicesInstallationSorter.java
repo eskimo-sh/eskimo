@@ -84,7 +84,7 @@ public class ServicesInstallationSorter {
 
         // sort installation first, uninstallation after, restarts in the end
         for (Service service : services) {
-            List<T> operationForService = groupedOperations.get(service);
+            List<T> operationForService = groupedOperations.get(service.getName());
             if (operationForService != null) {
                 operationForService.sort((o1, o2) -> {
                     if (o1.getType().equals("installation")) {
