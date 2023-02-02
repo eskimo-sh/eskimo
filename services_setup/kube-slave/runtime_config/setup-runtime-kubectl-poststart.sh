@@ -106,7 +106,7 @@ sleep 4
 NEW_TOKEN=`kubectl describe secret $ADMIN_USER-secret | grep token: | sed 's/token: *\(.*\)/\1/'`
 if [[ "$NEW_TOKEN" == "" ]]; then
     echo " !! Failed to get new token"
-    echo "  -> this is the output of  kubectl get secrets"
+    echo "  -> this is the output of kubectl get secrets"
     kubectl get secrets
     exit 51
 fi

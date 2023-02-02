@@ -71,7 +71,7 @@ export ADMIN_USER=`cat /etc/eskimo_user`
 
 # Unfortunately, system doesn't pass me any environment variable, so I have to set them here
 # I am ensuring I run as root before messing with it
-if [[ `id -u` != 0 ]]; then
+if [[ $(id -u) != 0 ]]; then
     echo "This ExecStartPost script is intented to be executed as root"
     exit 200
 fi
@@ -88,8 +88,8 @@ fi
 
 echo "   + (Re-)Creating serviceaccount-$ADMIN_USER"
 kubectl apply -f /etc/k8s/serviceaccount-$ADMIN_USER.yaml
-# checking creation for 10 seconds
-for i in `seq 1 10`; do
+# checking creation for 15 seconds
+for i in $(seq 1 15); do
     sleep 1
     if [[ `kubectl get serviceaccount | grep $ADMIN_USER` != "" ]]; then
         break
@@ -102,7 +102,7 @@ fi
 
 
 # recreating on master
-if [[ `kubectl get secret | grep $ADMIN_USER` != "" ]]; then
+if [[ $(kubectl get secret | grep $ADMIN_USER) != "" ]]; then
     echo "   + Deleting secret-$ADMIN_USER"
     kubectl delete secret $ADMIN_USER-secret
     sleep 3
@@ -111,14 +111,14 @@ fi
 
 echo "   + (Re-)Creating serviceaccount-$ADMIN_USER-secret"
 kubectl apply -f /etc/k8s/serviceaccount-$ADMIN_USER-secret.yaml
-# checking creation for 10 seconds
-for i in `seq 1 10`; do
+# checking creation for 15 seconds
+for i in $(seq 1 10); do
     sleep 1
-    if [[ `kubectl get secret | grep $ADMIN_USER` != "" ]]; then
+    if [[ $(kubectl get secret | grep $ADMIN_USER) != "" ]]; then
         break
     fi
 done
-if [[ `kubectl get secret | grep $ADMIN_USER` == "" ]]; then
+if [[ $(kubectl get secret | grep $ADMIN_USER) == "" ]]; then
     echo "Could not successfully find secret for $ADMIN_USER after 10 seconds"
     echo "Result of 'kubectl get secret' is :"
     kubectl get secret
@@ -138,10 +138,16 @@ fi
 
 
 echo "   + Getting token"
-sleep 5
+for i in $(seq 1 15); do
+    sleep 1
+    NEW_TOKEN=`kubectl describe secret $ADMIN_USER-secret | grep token: | sed 's/token: *\(.*\)/\1/'`
+    if [[ "$NEW_TOKEN" != "" ]]; then
+        break
+    fi
+done
 NEW_TOKEN=`kubectl describe secret $ADMIN_USER-secret | grep token: | sed 's/token: *\(.*\)/\1/'`
 if [[ "$NEW_TOKEN" == "" ]]; then
-    echo " !! Failed to get new token"
+    echo " !! Failed to get new token (tried for 15 seconds)"
     echo "  -> this is the output of 'kubectl get secrets'"
     kubectl get secrets
     echo "  -> this is the output of 'kubectl describe secret $ADMIN_USER-secret'"
@@ -154,7 +160,7 @@ sudo sed -i s/'token: .*'/"token: $NEW_TOKEN"/ /home/$ADMIN_USER/.kube/config
 sudo chown $ADMIN_USER.$ADMIN_USER /home/$ADMIN_USER/.kube/config
 
 echo "   + Checking installation"
-if [[ `cat /home/$ADMIN_USER/.kube/config | grep $NEW_TOKEN` == "" ]]; then
+if [[ $(grep -F $NEW_TOKEN /home/$ADMIN_USER/.kube/config) == "" ]]; then
     echo "Failed to install new token"
     exit 61
 fi

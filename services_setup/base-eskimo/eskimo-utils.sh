@@ -79,7 +79,7 @@ take_lock() {
     fi
 
     export LAST_LOCK_HANDLE="$ESKIMO_LOCK_HANDLE:$ESKIMO_LOCK_FILE"
-    echo "New Lock handle : $LAST_LOCK_HANDLE"
+    #echo "New Lock handle : $LAST_LOCK_HANDLE"
 }
 
 # Release the lock identified with the handle passed as argument.
@@ -111,14 +111,13 @@ release_lock() {
 
 __release_global_lock() {
 
-    if [[ "$GLOBAL_LOCK" == "" ]]; then
-        echo "No defined global lock"
+    if [[ "$" == "$1" ]]; then
+        echo "No passed global lock"
         exit 1
     fi
+    local GLOBAL_LOCK=$1
 
     release_lock $GLOBAL_LOCK
-
-    unset GLOBAL_LOCK
 }
 
 # Take a lock with flock on the file identified as argument.
@@ -139,9 +138,9 @@ take_global_lock() {
 
     export GLOBAL_LOCK=$LAST_LOCK_HANDLE
 
-    trap __release_global_lock 15
-    trap __release_global_lock EXIT
-    trap __release_global_lock ERR
+    trap "__release_global_lock $GLOBAL_LOCK" 15
+    trap "__release_global_lock $GLOBAL_LOCK" EXIT
+    trap "__release_global_lock $GLOBAL_LOCK" ERR
 }
 
 

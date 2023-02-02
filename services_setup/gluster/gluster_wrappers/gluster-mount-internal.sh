@@ -125,6 +125,7 @@ fi
 
 # The below is to define the systemd unit and the fstab entry to proceed with automatic mount of the gluster
 # share in the future
+echo " - Checking fstab for $MOUNT_POINT"
 if [[ $(grep $MOUNT_POINT /etc/fstab) == "" ]]; then
 
     echo " - Enabling gluster share $MOUNT_POINT"
@@ -145,6 +146,7 @@ fi
 
 
 # Now we have everything ready to actually proceed with the mount
+echo " - Checking mtab for $MOUNT_POINT"
 if [[ $(grep "$MOUNT_POINT" /etc/mtab 2>/dev/null) == "" ]]; then
     echo " - Mounting $MOUNT_POINT"
     /bin/systemctl restart $MOUNT_POINT_NAME.mount > /tmp/gluster_mount_"$VOLUME"_log 2>&1
@@ -154,22 +156,28 @@ if [[ $(grep "$MOUNT_POINT" /etc/mtab 2>/dev/null) == "" ]]; then
         exit 10
     fi
 
-    sleep 1
-
-    if [[ $(grep "$MOUNT_POINT" /etc/mtab 2>/dev/null) == "" ]]; then
-        echo "   + Unsuccessfully attempted to mount $MOUNT_POINT"
-        cat /tmp/gluster_mount_"$VOLUME"_log
-        exit 11
-    fi
+    i=0
+    while [[ $(grep "$MOUNT_POINT" /etc/mtab 2>/dev/null) == ""  ]]; do
+        if [[ -z "$NO_SLEEP" ]]; then sleep 1; fi
+        i=$((i+1))
+        if [[ $1 == 10 ]]; then
+            echo "   + Unsuccessfully attempted to mount $MOUNT_POINT - mount point not found in mtab after 10 seconds"
+            cat /tmp/gluster_mount_"$VOLUME"_log
+            exit 11
+        fi
+    done
 fi
 
 
 # give it a little time to actually connect the transport
+echo " - waiting for transport to connect ..."
 sleep 4
 
+echo " - checking owner of $MOUNT_POINT"
 if [[ `stat -c '%U' $MOUNT_POINT` != "$OWNER" ]]; then
     echo " - Changing owner and rights of $MOUNT_POINT"
     chown -R $OWNER $MOUNT_POINT
 fi
 
+echo " - changing rights to 777 on $MOUNT_POINT"
 chmod -R 777 $MOUNT_POINT
