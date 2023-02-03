@@ -584,6 +584,8 @@ setup_eskimo() {
          "flink-runtime-taskmanager---memory---process---size:":"1100m",
          "flink-runtime-parallelism---default":"",
          "flink-runtime-taskmanager---numberOfTaskSlots":"",
+         "flink-runtime-taskmanager---slot---timeout":"",
+         "flink-runtime-resourcemanager---taskmanager---timeout":"30000",
          "gluster-target---volumes":"spark_eventlog,spark_data,flink_data,kafka_data,flink_completed_jobs,logstash_data,kubernetes_registry,kubernetes_shared",
          "gluster-target---volumes---performance---off":"kafka_data",
          "gluster-config---performance---off":"performance.quick-read,performance.io-cache,performance.write-behind,performance.stat-prefetch,performance.read-ahead,performance.readdir-ahead,performance.open-behind",
@@ -606,9 +608,9 @@ setup_eskimo() {
          "spark-runtime-spark---rpc---retry---wait":"",
          "spark-runtime-spark---scheduler---mode":"",
          "spark-runtime-spark---locality---wait":"",
-         "spark-runtime-spark---dynamicAllocation---executorIdleTimeout":"",
-         "spark-runtime-spark---dynamicAllocation---cachedExecutorIdleTimeout":"",
-         "spark-runtime-spark---dynamicAllocation---shuffleTracking---timeout":"",
+         "spark-runtime-spark---dynamicAllocation---executorIdleTimeout":"60s",
+         "spark-runtime-spark---dynamicAllocation---cachedExecutorIdleTimeout":"80s",
+         "spark-runtime-spark---dynamicAllocation---shuffleTracking---timeout":"80s",
          "spark-runtime-spark---dynamicAllocation---schedulerBacklogTimeout":"",
          "spark-runtime-spark---executor---memory":"1100m",
          "zeppelin-Xmx":"1200m",
@@ -1572,6 +1574,21 @@ EOF
     rm -Rf /tmp/spark-batch-example-python.log
 
 
+    echo_date "   + Testing pyspark"
+
+    cat /tmp/spark-batch-example.py | \
+          sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
+          vagrant@$BOX_IP "sudo su -c '/usr/local/bin/pyspark' eskimo" \
+          2>&1 | tee /tmp/spark-batch-example-python.log  >> /tmp/integration-test.log
+
+    if [[ `grep -F '[Row(count(1)=5)]' /tmp/spark-batch-example-python.log` == "" ]]; then
+        echo_date "Failed to run pyspark job"
+        exit 103
+    fi
+
+    rm -Rf /tmp/spark-batch-example-python.log
+
+
     echo_date "   + Testing spark-shell"
 
     cat > /tmp/spark-batch-example.scala <<EOF
@@ -1919,7 +1936,7 @@ do_screenshots() {
      # running screenshot generator with maven
      saved_dir=`pwd`
      cd ../..
-     export ESKIMO_NODE=192.168.56.51
+     export ESKIMO_NODE=$BOX_IP
      mvn exec:java -P screenshots  >> /tmp/integration-test.log 2>&1
      cd $saved_dir
 }
