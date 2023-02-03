@@ -72,7 +72,8 @@ if [[ ! -f $KUBE_SERVICES_HOSTS_FILE ]]; then
     exit 1
 fi
 
-test -t 1 && USE_TTY="-t"
+# Finding out if we have y TTY here
+tty -s && USE_TTY="-t"
 docker run \
         -i $USE_TTY \
         --rm \
