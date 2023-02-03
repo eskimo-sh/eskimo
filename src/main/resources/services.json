@@ -1035,6 +1035,16 @@
             "name": "taskmanager.numberOfTaskSlots",
             "comment": "The number of parallel operator or user function instances that a single TaskManager can run. Default value : 1.",
             "defaultValue": "1"
+          },
+          {
+            "name": "taskmanager.slot.timeout",
+            "comment": "Timeout used for identifying inactive slots. The TaskManager will free the slot if it does not become active within the given amount of time. Default value : 20 s.",
+            "defaultValue": "20 s"
+          },
+          {
+            "name": "resourcemanager.taskmanager-timeout",
+            "comment": "The timeout for an idle task manager to be released, expressed in ms. Default value : 60000.",
+            "defaultValue": "60000"
           }
         ]
       }
