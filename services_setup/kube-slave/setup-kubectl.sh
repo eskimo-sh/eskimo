@@ -47,6 +47,14 @@ if [[ ! -f /etc/k8s/env.sh ]]; then
     exit 1
 fi
 
+# attempt to recreate  / remount gluster shares
+echo " - Re-create / mount k8s gluster share"
+sudo /bin/bash /usr/local/sbin/setupK8sGlusterShares.sh
+if [[ $? != 0 ]]; then
+    echo " ! Couldn't mount k8s shared gluster share"
+    exit 201
+fi
+
 . /etc/k8s/env.sh
 
 . /usr/local/sbin/eskimo-utils.sh
@@ -75,8 +83,6 @@ if [[ ! -d /etc/k8s/shared/ ]]; then
     sudo mkdir -p /etc/k8s/shared
 fi
 
-# attempt to recreate  / remount gluster shares
-sudo /bin/bash /usr/local/sbin/setupK8sGlusterShares.sh
 
 # this needs to be done after gluster share above
 if [[ ! -d /etc/k8s/shared/ssl/ ]]; then
@@ -202,7 +208,7 @@ fi
 
 
 if [[ ! -f /etc/k8s/shared/ssl/$USER-csr.json ]]; then
-    echo "   + Create and install ${user}-csr.json"
+    echo "   + Create and install ${USER}-csr.json"
     cat > $USER-csr.json <<EOF
 {
   "CN": "$USER",
@@ -310,7 +316,7 @@ EOF
 fi
 
 
-if [[ ! -f /etc/k8s/shared/ssl//etc/k8s/shared/ssl/kubernetes-csr.json ]]; then
+if [[ ! -f /etc/k8s/shared/ssl/etc/k8s/shared/ssl/kubernetes-csr.json ]]; then
     echo "   + Create and install kubernetes-csr.json"
     cat > kubernetes-csr.json <<EOF
 {

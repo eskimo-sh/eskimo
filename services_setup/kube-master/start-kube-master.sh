@@ -48,9 +48,6 @@ fi
 export lock_handle=$LAST_LOCK_HANDLE
 
 
-echo "   + Sourcing kubernetes environment"
-. /etc/k8s/env.sh
-
 export HOME=/root
 
 echo "   + Mounting Kubernetes Eskimo Gluster shares"
@@ -60,6 +57,9 @@ if [[ $? != 0 ]]; then
     cat /var/log/kubernetes/start_k8s_master.log 2>&1
     exit 41
 fi
+
+echo "   + Sourcing kubernetes environment"
+. /etc/k8s/env.sh
 
 echo "   + Setup runtime kubectl"
 /etc/k8s/runtime_config/setup-runtime-kubectl.sh  >> /var/log/kubernetes/start_k8s_master.log 2>&1

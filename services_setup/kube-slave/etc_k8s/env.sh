@@ -42,15 +42,42 @@ fi
 
 . /etc/eskimo_topology.sh
 
+. /usr/local/sbin/eskimo-utils.sh
+
 # Port of etcd cluster
 export EKIMO_ETCD_PORT=2379
 
 # IPs of master nodes
 export MASTER1_IP=$MASTER_KUBE_MASTER_1
 
-# TLS Bootstrapping Token
-# $(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c32;)
-export BOOTSTRAP_TOKEN=1Qb_YYlsOFKa0q-4hur12yn_7urzYCRZ
+
+# getting TLS Bootstrapping Token (BOOTSTRAP_TOKEN)
+if [[ ! -d /etc/k8s/shared ]]; then
+    echo "Couldn't find /etc/k8s/shared"
+    exit 1
+fi
+
+if [[ ! -f /etc/k8s/shared/token.sh ]]; then
+
+     take_lock k8s_bootstrap_token_lock /etc/k8s/shared/
+     if [[ $? != 0 ]]; then
+         echo " !!! Couldn't get /etc/k8s/shared/k8s_bootstrap_token_lock in 30 seconds. crashing !"
+         exit 150
+     fi
+     export lock_handle=$LAST_LOCK_HANDLE
+
+     # double check locking
+     if [[ ! -f /etc/k8s/shared/token.sh ]]; then
+        export TOKEN=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c32;)
+
+        echo '#!/bin/bash' > /etc/k8s/shared/token.sh
+        echo "export BOOTSTRAP_TOKEN=$TOKEN" >> /etc/k8s/shared/token.sh
+     fi
+
+     release_lock $lock_handle
+fi
+
+. /etc/k8s/shared/token.sh
 
 # Use unused netword ip range to define service ip and pod ip
 # (Service CIDR)
