@@ -104,7 +104,7 @@ if [[ $(grep $MOUNT_POINT /etc/mtab | grep gluster) == "" ]]; then
     echo "   + Polling mtab for mount point appearance"
     cnt=0
     while : ; do
-        if [[ $(cat grep $MOUNT_POINT /etc/mtab | grep gluster) != "" ]]; then
+        if [[ $(grep -F $MOUNT_POINT /etc/mtab | grep gluster) != "" ]]; then
             break
         fi
         sleep 1
