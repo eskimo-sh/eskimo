@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.common.exceptions.CommonRTException;
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.*;
@@ -53,6 +54,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -69,6 +71,7 @@ public class SystemServiceTest {
 
     protected String systemStatusTest = null;
     protected String expectedFullStatus = null;
+    protected String expectedFullStatusNoKubernetes = null;
     protected String expectedPrevStatusServicesRemoved = null;
     protected String expectedPrevStatusAllServicesStay = null;
 
@@ -98,6 +101,7 @@ public class SystemServiceTest {
         notificationService.clear();
         systemStatusTest = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/systemStatusTest.log"), StandardCharsets.UTF_8);
         expectedFullStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedFullStatus.json"), StandardCharsets.UTF_8);
+        expectedFullStatusNoKubernetes = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedFullStatusNoKubernetes.json"), StandardCharsets.UTF_8);
         expectedPrevStatusServicesRemoved = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedPrevStatusServicesRemoved.json"), StandardCharsets.UTF_8);
         expectedPrevStatusAllServicesStay = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedPrevStatusAllServicesStay.json"), StandardCharsets.UTF_8);
     }
@@ -166,6 +170,28 @@ public class SystemServiceTest {
             if (script.startsWith("sudo systemctl status --no-pager")) {
                 return systemStatusTest;
             }
+            if (script.startsWith("/usr/local/bin/kubectl get pod")) {
+                try {
+                    return StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/kubeCtlPods.txt"), StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    throw new CommonRTException(e);
+                }
+
+            } else if (script.startsWith("/usr/local/bin/kubectl get service")) {
+                try {
+                    return StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/kubeCtlServices.txt"), StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    throw new CommonRTException(e);
+                }
+
+            } else if (script.startsWith("/bin/ls -1")) {
+                try {
+                    return StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/lsl.txt"), StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    throw new CommonRTException(e);
+                }
+
+            }
             return "";
         });
 
@@ -180,6 +206,41 @@ public class SystemServiceTest {
         //System.err.println (actual.toString(2));
 
         assertTrue(new JSONObject(expectedFullStatus).similar(actual), actual.toString(2));
+    }
+
+    @Test
+    public void testUpdateStatusNoKubernetes() throws Exception {
+
+        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+        configurationServiceTest.saveNodesConfig(nodesConfig);
+
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+        configurationServiceTest.saveServicesInstallationStatus(servicesInstallStatus);
+
+        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
+        configurationServiceTest.saveKubernetesServicesConfig(kubeServicesConfig);
+
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
+            if (script.equals("echo OK")) {
+                return "OK";
+            }
+            if (script.startsWith("sudo systemctl status --no-pager")) {
+                return systemStatusTest;
+            }
+            return "";
+        });
+
+        sshCommandServiceTest.setConnectionResultBuilder((connection, script) -> script);
+
+        systemService.updateStatus();
+
+        SystemStatusWrapper systemStatus = systemService.getStatus();
+
+        JSONObject actual = systemStatus.getJSONObject();
+
+        //System.err.println (actual.toString(2));
+
+        assertTrue(new JSONObject(expectedFullStatusNoKubernetes).similar(actual), actual.toString(2));
     }
 
     @Test

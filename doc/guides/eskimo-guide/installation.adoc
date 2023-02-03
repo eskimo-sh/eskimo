@@ -120,10 +120,10 @@ In case of cluster deployment:
 [[eskimo_nodes_prerequisites]]
 ==== Prerequisites on eskimo cluster nodes
 
-Linux distributions successfully tested with Eskimo and officially supported are the following:
+Linux's distributions successfully tested for usage as Eskimo cluster nodes and officially supported are the following:
 
-* Debian Stretch and greater
-* Ubuntu Xenial and greater
+* Debian Bullseye and greater
+* Ubuntu Focal and greater
 * CentOS 7.x and 8.x, CentOS stream 8
 * RHEL 8.2 and greater
 * Fedora 35 or greater

@@ -1,0 +1,16 @@
+cerebro
+coredns
+elasticsearch
+flink
+flink-runtime
+grafana
+k8s.gcr.io
+kafka
+kafka-manager
+kibana
+kubernetesui
+logstash
+spark
+spark-console
+spark-runtime
+zeppelin

@@ -78,17 +78,25 @@ public class EskimoSetupCommandTest extends AbstractWebTest {
     @Test
     public void testSubmit() throws Exception {
 
-        js("$.ajaxPost = function(callback) { callback.success ({}); }");
+        js("$.ajaxPost = function(callback) { callback.success ({ \"status\" : \"OK\"}); }");
 
         js("eskimoMain.scheduleStopOperationInProgress = function (result) { window.stopOperationInProgressResult = result; }");
 
-        js("eskimoSetup.showSetupMessage = function (message) { // No-Op\n }");
-
         testShowCommand();
-
         getElementById("setup-command-button-validate").click();
 
+        assertJavascriptEquals("Configuration applied successfully", "window.setupMessage");
+        assertJavascriptEquals("true", "window.setupStatus");
         assertJavascriptEquals("true", "window.stopOperationInProgressResult");
+
+        js("$.ajaxPost = function(callback) { callback.success ({ \"status\" : \"KO\",  \"error\": \"test error\"}); }");
+
+        testShowCommand();
+        getElementById("setup-command-button-validate").click();
+
+        assertJavascriptEquals("test error", "window.setupMessage");
+        assertJavascriptEquals("false", "window.setupStatus");
+        assertJavascriptEquals("false", "window.stopOperationInProgressResult");
     }
 
     @Test
