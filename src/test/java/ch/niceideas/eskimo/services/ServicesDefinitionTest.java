@@ -43,6 +43,8 @@ import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationChecker;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +54,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -89,7 +93,7 @@ public class ServicesDefinitionTest {
 
     @Test
     public void testServiceToStringNoStackOverflow() {
-        assertDoesNotThrow(() ->  servicesDefinition.getService("calculator-runtime").toString());
+        assertDoesNotThrow(() ->  servicesDefinition.getServiceDefinition(Service.from ("calculator-runtime")).toString());
     }
 
     @Test
@@ -100,13 +104,13 @@ public class ServicesDefinitionTest {
     @Test
     public void testServiceHasDependency() {
 
-        assertFalse (servicesDefinition.getService("distributed-time").hasDependency(servicesDefinition.getService("user-console")));
-        assertFalse (servicesDefinition.getService("distributed-filesystem").hasDependency(servicesDefinition.getService("cluster-master")));
-        assertFalse (servicesDefinition.getService("cluster-manager").hasDependency(servicesDefinition.getService("broker-manager")));
-        assertFalse (servicesDefinition.getService("cluster-manager").hasDependency(servicesDefinition.getService("broker")));
+        assertFalse (servicesDefinition.getServiceDefinition(Service.from ("distributed-time")).hasDependency(servicesDefinition.getServiceDefinition(Service.from ("user-console"))));
+        assertFalse (servicesDefinition.getServiceDefinition(Service.from ("distributed-filesystem")).hasDependency(servicesDefinition.getServiceDefinition(Service.from ("cluster-master"))));
+        assertFalse (servicesDefinition.getServiceDefinition(Service.from ("cluster-manager")).hasDependency(servicesDefinition.getServiceDefinition(Service.from ("broker-manager"))));
+        assertFalse (servicesDefinition.getServiceDefinition(Service.from ("cluster-manager")).hasDependency(servicesDefinition.getServiceDefinition(Service.from ("broker"))));
 
-        assertTrue (servicesDefinition.getService("broker").hasDependency(servicesDefinition.getService("cluster-manager")));
-        assertTrue (servicesDefinition.getService("cluster-slave").hasDependency(servicesDefinition.getService("cluster-master")));
+        assertTrue (servicesDefinition.getServiceDefinition(Service.from ("broker")).hasDependency(servicesDefinition.getServiceDefinition(Service.from ("cluster-manager"))));
+        assertTrue (servicesDefinition.getServiceDefinition(Service.from ("cluster-slave")).hasDependency(servicesDefinition.getServiceDefinition(Service.from ("cluster-master"))));
     }
 
     @Test
@@ -115,7 +119,7 @@ public class ServicesDefinitionTest {
         Topology topology = servicesDefinition.getTopology(
                 new NodesConfigWrapper(jsonMinimalConfig),
                 KubernetesServicesConfigWrapper.empty(),
-                "192.168.56.23");
+                Node.fromAddress("192.168.56.23"));
 
         assertEquals ("#Topology\n" +
                 "export MASTER_CLUSTER_MANAGER_1=192.168.56.21\n" +
@@ -128,7 +132,7 @@ public class ServicesDefinitionTest {
         Topology topology = servicesDefinition.getTopology(
                 new NodesConfigWrapper(jsonNodesConfig),
                 new KubernetesServicesConfigWrapper(jsonKubernetesConfig),
-                "192.168.10.11");
+                Node.fromAddress("192.168.10.11"));
 
         assertEquals (
                 "#Topology\n" +
@@ -146,7 +150,7 @@ public class ServicesDefinitionTest {
         Topology topology = servicesDefinition.getTopology(
                 nodesConfig,
                 new KubernetesServicesConfigWrapper(jsonKubernetesConfig),
-                "192.168.10.11");
+                Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                         "export MASTER_CLUSTER_MANAGER_1=192.168.10.11\n" +
@@ -215,7 +219,7 @@ public class ServicesDefinitionTest {
         Topology topology = servicesDefinition.getTopology(
                 nodesConfig,
                 kubeServicesConfig,
-                "192.168.10.11");
+                Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                         "export MASTER_CLUSTER_MANAGER_1=192.168.10.11\n" +
@@ -258,23 +262,23 @@ public class ServicesDefinitionTest {
     @Test
     public void testListServicesOrderedByDependencies() {
 
-        String[] orderedServices = servicesDefinition.listServicesOrderedByDependencies();
+        Service[] orderedServices = servicesDefinition.listServicesOrderedByDependencies();
 
         assertEquals(14, orderedServices.length);
 
-        assertTrue (orderedServices[0].equals("cluster-manager")
-                || orderedServices[0].equals("distributed-time")
-                || orderedServices[0].equals("broker-cli"));
+        assertTrue (orderedServices[0].equals(Service.from("cluster-manager"))
+                || orderedServices[0].equals(Service.from("distributed-time"))
+                || orderedServices[0].equals(Service.from("broker-cli")));
 
-        assertTrue (orderedServices[orderedServices.length - 1].equals("user-console")
-                || orderedServices[orderedServices.length - 1].equals("calculator-runtime"));
+        assertTrue (orderedServices[orderedServices.length - 1].equals(Service.from("user-console"))
+                || orderedServices[orderedServices.length - 1].equals(Service.from("calculator-runtime")));
 
     }
 
     @Test
     public void testListServicesInOrder() {
 
-        String[] orderedServices = servicesDefinition.listServicesInOrder();
+        String[] orderedServices = Arrays.stream(servicesDefinition.listServicesInOrder()).map(Service::getName).toArray(String[]::new);
 
         assertEquals(14, orderedServices.length, String.join(",", orderedServices));
 
@@ -299,7 +303,7 @@ public class ServicesDefinitionTest {
     @Test
     public void testListUniqueServices() {
 
-        String[] orderedServices = servicesDefinition.listUniqueServices();
+        String[] orderedServices = Arrays.stream(servicesDefinition.listUniqueServices()).map(Service::getName).toArray(String[]::new);
 
         assertEquals(2, orderedServices.length);
 
@@ -311,7 +315,8 @@ public class ServicesDefinitionTest {
 
     @Test
     public void testListKubernetesServices() {
-        String[] kubernetesServices = servicesDefinition.listKubernetesServices();
+
+        String[] kubernetesServices = Arrays.stream(servicesDefinition.listKubernetesServices()).map(Service::getName).toArray(String[]::new);
 
         assertEquals(7, kubernetesServices.length);
 
@@ -329,7 +334,7 @@ public class ServicesDefinitionTest {
     @Test
     public void testListUIServices() {
 
-        String[] orderedServices = servicesDefinition.listUIServices();
+        String[] orderedServices = Arrays.stream(servicesDefinition.listUIServices()).map(Service::getName).toArray(String[]::new);
 
         assertEquals(5, orderedServices.length, String.join(",", orderedServices));
 
@@ -345,7 +350,7 @@ public class ServicesDefinitionTest {
     @Test
     public void testListMultipleServices() {
 
-        String[] orderedServices = servicesDefinition.listMultipleServicesNonKubernetes();
+        String[] orderedServices = Arrays.stream(servicesDefinition.listMultipleServicesNonKubernetes()).map(Service::getName).toArray(String[]::new);
 
         assertEquals(5, orderedServices.length);
 
@@ -360,15 +365,15 @@ public class ServicesDefinitionTest {
 
     @Test
     public void testGetDependentServices() {
+        String[] elasticsearchDep = servicesDefinition.getDependentServices(Service.from("database")).stream().map(Service::getName).toArray(String[]::new);
 
-        String[] elasticsearchDep = servicesDefinition.getDependentServices("database").toArray(new String[0]);
         assertEquals(2, elasticsearchDep.length);
         assertArrayEquals(new String[] {
                 "database-manager",
                 "user-console"
         }, elasticsearchDep);
 
-        String[] zookeeperDep = servicesDefinition.getDependentServices("cluster-manager").toArray(new String[0]);
+        String[] zookeeperDep = servicesDefinition.getDependentServices(Service.from("cluster-manager")).stream().map(Service::getName).toArray(String[]::new);
         assertEquals(5, zookeeperDep.length, String.join(",", zookeeperDep));
         assertArrayEquals(new String[] {
                 "cluster-manager",
@@ -397,7 +402,7 @@ public class ServicesDefinitionTest {
         Topology topology = servicesDefinition.getTopology(
                 nodeRangeResolver.resolveRanges(nodesConfig),
                 kubeServicesConfig,
-                "192.168.10.11");
+                Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                         "export MASTER_CLUSTER_MANAGER_1=192.168.10.11\n" +
@@ -421,7 +426,7 @@ public class ServicesDefinitionTest {
     @Test
     public void testEditableConfiguration() throws Exception {
 
-        Service sparkService = servicesDefinition.getService("calculator-runtime");
+        ServiceDef sparkService = servicesDefinition.getServiceDefinition(Service.from("calculator-runtime"));
         assertNotNull(sparkService);
 
         List<EditableSettings> confs = sparkService.getEditableSettings();
@@ -465,7 +470,7 @@ public class ServicesDefinitionTest {
 
     @Test
     public void testCommandFrameworkDefinition() throws Exception {
-        Service ntp = servicesDefinition.getService("distributed-time");
+        ServiceDef ntp = servicesDefinition.getServiceDefinition(Service.from ("distributed-time"));
         assertNotNull (ntp.getCommands());
         assertEquals (1, ntp.getCommands().size());
 
@@ -482,8 +487,9 @@ public class ServicesDefinitionTest {
                 "}", logCommand.toStatusConfigJSON().toString(2));
 
         AtomicReference<String> callRef = new AtomicReference<>();
-        logCommand.call("192.168.10.11", new SSHCommandServiceImpl() {
-            public String runSSHCommand(String node, String command) {
+        logCommand.call(Node.fromAddress("192.168.10.11"), new SSHCommandServiceImpl() {
+            @Override
+            public String runSSHCommand(Node node, String command) {
                 callRef.set(node + "-" + command);
                 return callRef.get();
             }

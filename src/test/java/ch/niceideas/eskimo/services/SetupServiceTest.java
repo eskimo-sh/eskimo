@@ -49,7 +49,6 @@ import ch.niceideas.eskimo.test.testwrappers.SetupServiceUnderTest;
 import ch.niceideas.eskimo.utils.OSDetector;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
-import org.junit.After;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -269,7 +268,7 @@ public class SetupServiceTest {
         setupService.buildPackage("cerebro");
 
         List<String> messages = operationsMonitoringServiceTest.getNewMessages(
-                new SetupCommand.SetupOperationId(SetupCommand.TYPE_BUILD, "cerebro"), 0);
+                new SetupCommand.SetupOperationId(SetupCommand.SetupOperation.BUILD, "cerebro"), 0);
         //List<String> messages = messagingService.getSubList(0);
         //assertEquals (5, messages.size());
 

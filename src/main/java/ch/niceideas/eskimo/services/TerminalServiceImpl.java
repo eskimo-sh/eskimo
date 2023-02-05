@@ -39,6 +39,7 @@ import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.terminal.ScreenImage;
 import ch.niceideas.eskimo.terminal.Session;
 import ch.niceideas.eskimo.terminal.SshProcessWithPty;
+import ch.niceideas.eskimo.types.Node;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -192,7 +193,7 @@ public class TerminalServiceImpl implements TerminalService {
 
             String node = extractArgument (terminalBody, "node");
 
-            SSHConnection con = connectionManagerService.getPrivateConnection(node);
+            SSHConnection con = connectionManagerService.getPrivateConnection(Node.fromAddress(node));
 
             com.trilead.ssh2.Session innerSession = con.openSession();
 

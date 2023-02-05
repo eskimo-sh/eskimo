@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.types.Service;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -61,11 +62,12 @@ public class KubernetesServicesConfigWrapper extends JsonWrapper implements Seri
         super(jsonString);
     }
 
-    public Collection<String> getEnabledServices() {
+    public Collection<Service> getEnabledServices() {
         return getRootKeys().stream()
                 .filter(key -> key.contains(INSTALL_FLAG))
                 .filter(key -> getValueForPath(key).equals("on"))
                 .map(key -> key.substring(0, key.indexOf(INSTALL_FLAG)))
+                .map (Service::from)
                 .collect(Collectors.toList());
     }
 
@@ -77,15 +79,15 @@ public class KubernetesServicesConfigWrapper extends JsonWrapper implements Seri
                 .count();
     }
 
-    public String getCpuSetting(String service) {
+    public String getCpuSetting(Service service) {
         return getValueForPathAsString(service + CPU_FLAG);
     }
 
-    public String getRamSetting(String service) {
+    public String getRamSetting(Service service) {
         return getValueForPathAsString(service + RAM_FLAG);
     }
 
-    public boolean isServiceInstallRequired(String service) {
+    public boolean isServiceInstallRequired(Service service) {
         return StringUtils.isNotBlank(getValueForPathAsString(service + INSTALL_FLAG))
                 && getValueForPath(service + INSTALL_FLAG).equals("on");
     }
@@ -96,7 +98,7 @@ public class KubernetesServicesConfigWrapper extends JsonWrapper implements Seri
                 .anyMatch(key -> getValueForPath(key).equals("on"));
     }
 
-    public boolean isDifferentConfig(KubernetesServicesConfigWrapper previousConfig, String service) {
+    public boolean isDifferentConfig(KubernetesServicesConfigWrapper previousConfig, Service service) {
 
         String prevCpu = previousConfig.getCpuSetting(service);
         String prevRam = previousConfig.getRamSetting(service);

@@ -38,9 +38,11 @@ package ch.niceideas.eskimo.test.services;
 import ch.niceideas.eskimo.model.KubernetesOperationsCommand;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.services.KubernetesService;
 import ch.niceideas.eskimo.services.SystemException;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
@@ -55,27 +57,27 @@ import java.util.Map;
 public class KubernetesServiceTestImpl implements KubernetesService {
 
     @Override
-    public void showJournal(Service service, String node) {
+    public void showJournal(ServiceDef service, Node node) {
         // No-Op
     }
 
     @Override
-    public void startService(Service service, String node) throws SystemException {
+    public void startService(ServiceDef service, Node node) throws SystemException {
         // No-Op
     }
 
     @Override
-    public void stopService(Service service, String node) {
+    public void stopService(ServiceDef service, Node node) {
         // No-Op
     }
 
     @Override
-    public void restartService(Service service, String node) {
+    public void restartService(ServiceDef service, Node node) {
         // No-Op
     }
 
     @Override
-    public String restartServiceInternal(Service service, String node) {
+    public String restartServiceInternal(ServiceDef service, Node node) {
         return null;
     }
 
@@ -90,17 +92,17 @@ public class KubernetesServiceTestImpl implements KubernetesService {
     }
 
     @Override
-    public boolean shouldInstall(KubernetesServicesConfigWrapper kubeServicesConfig, String service) {
+    public boolean shouldInstall(KubernetesServicesConfigWrapper kubeServicesConfig, Service service) {
         return false;
     }
 
     @Override
-    public void uninstallService(KubernetesOperationsCommand.KubernetesOperationId operation, String kubeMasterNode) {
+    public void uninstallService(KubernetesOperationsCommand.KubernetesOperationId operation, Node kubeMasterNode) {
 
     }
 
     @Override
-    public void installService(KubernetesOperationsCommand.KubernetesOperationId operation, String kubeMasterNode) throws SystemException {
+    public void installService(KubernetesOperationsCommand.KubernetesOperationId operation, Node kubeMasterNode) throws SystemException {
 
     }
 }

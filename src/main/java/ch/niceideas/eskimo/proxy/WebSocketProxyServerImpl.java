@@ -35,8 +35,10 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.eskimo.configurations.ProxyConfiguration;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -93,16 +95,16 @@ public class WebSocketProxyServerImpl extends AbstractWebSocketHandler implement
         int indexOfWs = uri.indexOf(ProxyConfiguration.ESKIMO_WEB_SOCKET_URL_PREFIX);
         int indexOfSlash = uri.indexOf('/', indexOfWs + 4);
 
-        String serviceName = uri.substring(indexOfWs + 4, indexOfSlash > -1 ? indexOfSlash : uri.length());
+        Service service = Service.from(uri.substring(indexOfWs + 4, indexOfSlash > -1 ? indexOfSlash : uri.length()));
 
-        Service service = servicesDefinition.getService(serviceName);
+        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
 
         String targetPath = indexOfSlash > -1 ? uri.substring(indexOfSlash) : "";
-        String serviceId = serviceName;
-        if (!service.isUnique()) {
-            String targetHost = proxyManagerService.extractHostFromPathInfo(uri.substring(indexOfSlash));
-            serviceId = service.getServiceId(targetHost);
-            targetPath = uri.substring(uri.indexOf(targetHost) + targetHost.length());
+        String serviceId = service.getName();
+        if (!serviceDef.isUnique()) {
+            Node targetHost = proxyManagerService.extractHostFromPathInfo(uri.substring(indexOfSlash));
+            serviceId = serviceDef.getServiceId(targetHost);
+            targetPath = uri.substring(uri.indexOf(targetHost.getAddress()) + targetHost.getAddress().length());
         }
 
         try {

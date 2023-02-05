@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.utils;
 import ch.niceideas.common.utils.ProcessHelper;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.types.Service;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
@@ -64,7 +65,7 @@ public class SystemStatusParserTest {
 
         SystemStatusParser parser = new SystemStatusParser(testString);
 
-        String serviceStatus = parser.getServiceStatus("kube-slave");
+        String serviceStatus = parser.getServiceStatus(Service.from("kube-slave"));
 
         assertEquals ("Result: exit-code", serviceStatus);
 
@@ -79,10 +80,10 @@ public class SystemStatusParserTest {
 
         SystemStatusParser parser = new SystemStatusParser(debConfig);
 
-        assertEquals ("NA", parser.getServiceStatus("tada"));
-        assertEquals ("running", parser.getServiceStatus("elasticsearch"));
-        assertEquals ("running", parser.getServiceStatus("mesos-agent"));
-        assertEquals ("dead", parser.getServiceStatus("emergency"));
+        assertEquals ("NA", parser.getServiceStatus(Service.from("tada")));
+        assertEquals ("running", parser.getServiceStatus(Service.from("elasticsearch")));
+        assertEquals ("running", parser.getServiceStatus(Service.from("mesos-agent")));
+        assertEquals ("dead", parser.getServiceStatus(Service.from("emergency")));
     }
 
     @Test
@@ -94,10 +95,10 @@ public class SystemStatusParserTest {
 
         SystemStatusParser parser = new SystemStatusParser(centConfig);
 
-        assertEquals ("NA", parser.getServiceStatus("tada"));
-        assertEquals ("running", parser.getServiceStatus("elasticsearch"));
-        assertEquals ("running", parser.getServiceStatus("cerebro"));
-        assertEquals ("dead", parser.getServiceStatus("emergency"));
+        assertEquals ("NA", parser.getServiceStatus(Service.from("tada")));
+        assertEquals ("running", parser.getServiceStatus(Service.from("elasticsearch")));
+        assertEquals ("running", parser.getServiceStatus(Service.from("cerebro")));
+        assertEquals ("dead", parser.getServiceStatus(Service.from("emergency")));
     }
 
     @Test
@@ -109,10 +110,10 @@ public class SystemStatusParserTest {
 
         SystemStatusParser parser = new SystemStatusParser(centConfig);
 
-        assertEquals ("NA", parser.getServiceStatus("tada"));
-        assertEquals ("running", parser.getServiceStatus("elasticsearch"));
-        assertEquals ("running", parser.getServiceStatus("cerebro"));
-        assertEquals ("Result: exit-code", parser.getServiceStatus("kafka-manager"));
+        assertEquals ("NA", parser.getServiceStatus(Service.from("tada")));
+        assertEquals ("running", parser.getServiceStatus(Service.from("elasticsearch")));
+        assertEquals ("running", parser.getServiceStatus(Service.from("cerebro")));
+        assertEquals ("Result: exit-code", parser.getServiceStatus(Service.from("kafka-manager")));
     }
 
     @Test
@@ -124,13 +125,13 @@ public class SystemStatusParserTest {
 
         SystemStatusParser parser = new SystemStatusParser(debConfig);
 
-        assertEquals ("NA", parser.getServiceStatus("tada"));
-        assertEquals ("running", parser.getServiceStatus("zookeeper"));
-        assertEquals ("running", parser.getServiceStatus("ntp"));
-        assertEquals ("NA", parser.getServiceStatus("kafka-manager"));
-        assertEquals ("NA", parser.getServiceStatus("elasticsearch"));
-        assertEquals ("NA", parser.getServiceStatus("cerebro"));
-        assertEquals ("NA", parser.getServiceStatus("kibama"));
+        assertEquals ("NA", parser.getServiceStatus(Service.from("tada")));
+        assertEquals ("running", parser.getServiceStatus(Service.from("zookeeper")));
+        assertEquals ("running", parser.getServiceStatus(Service.from("ntp")));
+        assertEquals ("NA", parser.getServiceStatus(Service.from("kafka-manager")));
+        assertEquals ("NA", parser.getServiceStatus(Service.from("elasticsearch")));
+        assertEquals ("NA", parser.getServiceStatus(Service.from("cerebro")));
+        assertEquals ("NA", parser.getServiceStatus(Service.from("kibama")));
     }
 
     private String loadTestConfig (String fileName) throws IOException, ProcessHelper.ProcessHelperException{

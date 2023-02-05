@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.model.SettingsOperationsCommand;
+import ch.niceideas.eskimo.types.Service;
 
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,6 @@ public interface ServicesSettingsService {
     ServicesSettingsWrapper prepareSaveSettings (
             String settingsFormAsString,
             Map<String, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
-            List<String> restartedServices) throws FileException, SetupException;
+            List<Service> restartedServices) throws FileException, SetupException;
 
 }

@@ -37,9 +37,10 @@ package ch.niceideas.eskimo.model.service;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.Command;
 import ch.niceideas.eskimo.model.ConditionalInstallation;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.service.proxy.WebCommand;
 import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import lombok.Data;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -49,7 +50,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Data
-public class Service {
+public class ServiceDef {
 
     private String name;
 
@@ -84,7 +85,7 @@ public class Service {
 
     private MemoryConsumptionSize memoryConsumptionSize;
 
-    private final List<String> additionalMemoryServices = new ArrayList<>();
+    private final List<Service> additionalMemoryServices = new ArrayList<>();
 
     private String logo;
     private String icon;
@@ -92,6 +93,10 @@ public class Service {
     private final List<Command> commands = new ArrayList<>();
 
     private final List<WebCommand> webCommands = new ArrayList<>();
+
+    public Service toService() {
+        return Service.from(getName());
+    }
 
     public void addCommand (Command command) {
         commands.add (command);
@@ -111,7 +116,7 @@ public class Service {
     public int getMemoryConsumptionParts (ServicesDefinition servicesDefinition) {
         AtomicInteger parts = new AtomicInteger (getMemoryConsumptionSize().getNbrParts());
         getAdditionalMemoryServices().stream()
-                .map(servicesDefinition::getService)
+                .map(servicesDefinition::getServiceDefinition)
                 .forEach(service -> parts.addAndGet(service.getMemoryConsumptionSize().getNbrParts()));
         return parts.get();
     }
@@ -120,7 +125,7 @@ public class Service {
         return !kubernetes;
     }
 
-    public boolean dependsOn (String service) {
+    public boolean dependsOn (Service service) {
         return dependencies.stream()
                 .anyMatch(o -> o.getMasterService().equals(service));
     }
@@ -144,8 +149,9 @@ public class Service {
     public int getRelevantDependenciesCount() {
         return (int) dependencies.stream()
                 .filter(dep ->
-                           !dep.getMasterService().equals(getName())
-                        && !dep.getMasterService().equals(NodesConfigWrapper.NODE_ID_FIELD)
+                           !dep.getMasterService().equals(this.toService())
+                        // FIXME WTF ?!?
+                        //&& !dep.getMasterService().equals(NodesConfigWrapper.NODE_ID_FIELD)
                         && !dep.isDependentInstalledFirst()
                 )
                 .count();
@@ -213,26 +219,26 @@ public class Service {
         return isProxied() && getUiConfig().isUsingKubeProxy();
     }
 
-    public boolean hasDependency(Service service) {
+    public boolean hasDependency(ServiceDef service) {
         return this.getDependencies().stream()
-                .anyMatch(dep -> dep.getMasterService().equals(service.getName()));
+                .anyMatch(dep -> dep.getMasterService().equals(service.toService()));
     }
 
-    public Optional<Dependency> getDependency(Service service) {
+    public Optional<Dependency> getDependency(ServiceDef service) {
         return this.getDependencies().stream()
-                .filter(dep -> dep.getMasterService().equals(service.getName()))
+                .filter(dep -> dep.getMasterService().equals(service.toService()))
                 .findFirst();
     }
 
-    public void addAdditionalMemory(String memAdditionalService) {
+    public void addAdditionalMemory(Service memAdditionalService) {
         this.additionalMemoryServices.add(memAdditionalService);
     }
 
-    public String getServiceId(String host) {
+    public String getServiceId(Node host) {
         if (isUnique()) {
-            return name;
+            return getName();
         } else {
-            return name + "/" + host.replace(".", "-");
+            return getName() + "/" + host.getName();
         }
     }
 

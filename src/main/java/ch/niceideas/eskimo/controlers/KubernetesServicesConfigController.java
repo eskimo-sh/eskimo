@@ -168,10 +168,7 @@ public class KubernetesServicesConfigController extends AbstractOperationControl
             KubernetesServicesConfigWrapper reinstallModelConfig = new KubernetesServicesConfigWrapper(reinstallModel);
 
             for (String serviceInstallStatusFlag : servicesInstallStatus.getInstalledServicesFlags()) {
-
-                String serviceInstallation = servicesInstallStatus.getServiceInstallation(serviceInstallStatusFlag);
-
-                if (!reinstallModelConfig.isServiceInstallRequired(serviceInstallation)) {
+                if (!reinstallModelConfig.isServiceInstallRequired(servicesInstallStatus.getService(serviceInstallStatusFlag))) {
                     newServicesInstallStatus.copyFrom (serviceInstallStatusFlag, servicesInstallStatus);
                 }
             }

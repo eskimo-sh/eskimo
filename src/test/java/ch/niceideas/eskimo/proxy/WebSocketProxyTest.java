@@ -39,6 +39,8 @@ import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.configurations.ProxyConfiguration;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
@@ -245,17 +247,17 @@ public class WebSocketProxyTest {
                             @Override
                             public ProxyTunnelConfig getTunnelConfig(String serviceId) {
                                 if (serviceId.equals("cerebro")) {
-                                    return new ProxyTunnelConfig("cerebro", tomcatServerLocalPort, "dummy", -1);
+                                    return new ProxyTunnelConfig(Service.from("cerebro"), tomcatServerLocalPort, Node.fromName("dummy"), -1);
                                 }
                                 if (serviceId.equals("grafana")) {
-                                    return new ProxyTunnelConfig("grafana", tomcatServerLocalPort, "dummy", -1);
+                                    return new ProxyTunnelConfig(Service.from("grafana"), tomcatServerLocalPort, Node.fromName("dummy"), -1);
                                 }
                                 throw new IllegalStateException();
                             }
                         },
                         sd),
                         Arrays.stream(sd.listProxiedServices())
-                        .map(sd::getService)
+                        .map(sd::getServiceDefinition)
                         .map(service -> ProxyConfiguration.ESKIMO_WEB_SOCKET_URL_PREFIX + "/" + service.getName() + "/**/*")
                         .toArray(String[]::new))
                     .setHandshakeHandler(new DefaultHandshakeHandler(upgradeStrategy));

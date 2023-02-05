@@ -39,6 +39,7 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.SSHConnection;
+import ch.niceideas.eskimo.types.Node;
 import com.trilead.ssh2.SFTPv3Client;
 import com.trilead.ssh2.SFTPv3DirectoryEntry;
 import com.trilead.ssh2.SFTPv3FileAttributes;
@@ -97,7 +98,7 @@ public class FileManagerServiceImpl implements FileManagerService {
     protected int maxFileSize = 2097152;
 
     /* Session scope */
-    private final Map<String, SFTPv3Client> sftpClients = new ConcurrentHashMap<>();
+    private final Map<Node, SFTPv3Client> sftpClients = new ConcurrentHashMap<>();
 
 
     /** For tests */
@@ -109,7 +110,7 @@ public class FileManagerServiceImpl implements FileManagerService {
     }
 
     @Override
-    public void removeFileManager(String node) {
+    public void removeFileManager(Node node) {
         logger.debug(node);
 
         SFTPv3Client client = sftpClients.get(node);
@@ -122,7 +123,7 @@ public class FileManagerServiceImpl implements FileManagerService {
     }
 
     @Override
-    public Pair<String, JSONObject> navigateFileManager(String node, String folder, String subFolder) throws IOException {
+    public Pair<String, JSONObject> navigateFileManager(Node node, String folder, String subFolder) throws IOException {
 
         try {
 
@@ -142,7 +143,7 @@ public class FileManagerServiceImpl implements FileManagerService {
     }
 
     @Override
-    public Pair<String, JSONObject> createFile(String node, String folder, String fileName) throws IOException {
+    public Pair<String, JSONObject> createFile(Node node, String folder, String fileName) throws IOException {
 
         try {
 
@@ -165,7 +166,7 @@ public class FileManagerServiceImpl implements FileManagerService {
     }
 
     @Override
-    public JSONObject openFile(String node, String folder, String file) {
+    public JSONObject openFile(Node node, String folder, String file) {
 
         try {
 
@@ -240,7 +241,7 @@ public class FileManagerServiceImpl implements FileManagerService {
     }
 
     @Override
-    public void downloadFile(String node, String folder, String file, HttpServletResponseAdapter response) {
+    public void downloadFile(Node node, String folder, String file, HttpServletResponseAdapter response) {
         try {
 
             SFTPv3Client client = getClient(node);
@@ -268,7 +269,7 @@ public class FileManagerServiceImpl implements FileManagerService {
     }
 
     @Override
-    public String deletePath(String node, String folder, String file) throws IOException {
+    public String deletePath(Node node, String folder, String file) throws IOException {
 
         try {
             SFTPv3Client client = getClient(node);
@@ -286,7 +287,7 @@ public class FileManagerServiceImpl implements FileManagerService {
     }
 
     @Override
-    public void uploadFile(String node, String folder, String name, InputStream fileContent) throws IOException {
+    public void uploadFile(Node node, String folder, String name, InputStream fileContent) throws IOException {
 
         SFTPv3Client client = null;
 
@@ -310,7 +311,7 @@ public class FileManagerServiceImpl implements FileManagerService {
         }
     }
 
-    protected void writeFile(String node, String fullPath, InputStream fileContent) throws IOException {
+    protected void writeFile(Node node, String fullPath, InputStream fileContent) throws IOException {
 
         try {
             SFTPv3Client client = getClient(node);
@@ -325,7 +326,7 @@ public class FileManagerServiceImpl implements FileManagerService {
         }
     }
 
-    String getFileMimeType(String node, String newPath) throws SSHCommandException {
+    String getFileMimeType(Node node, String newPath) throws SSHCommandException {
         return sshCommandService.runSSHCommand(node, "file --brief --mime-type " + StringEscapeUtils.escapeXSI(newPath));
     }
 
@@ -344,7 +345,7 @@ public class FileManagerServiceImpl implements FileManagerService {
         }
     }
 
-    synchronized SFTPv3Client getClient(String node) throws ConnectionManagerException, IOException {
+    synchronized SFTPv3Client getClient(Node node) throws ConnectionManagerException, IOException {
 
         SFTPv3Client client = sftpClients.get(node);
 
@@ -378,7 +379,7 @@ public class FileManagerServiceImpl implements FileManagerService {
         return client;
     }
 
-    private SFTPv3Client recreateClient(String node) throws ConnectionManagerException, IOException {
+    private SFTPv3Client recreateClient(Node node) throws ConnectionManagerException, IOException {
         sftpClients.remove(node);
         return getClient(node);
     }

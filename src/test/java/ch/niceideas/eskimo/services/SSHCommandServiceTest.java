@@ -40,6 +40,7 @@ import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
 import ch.niceideas.eskimo.test.testwrappers.SetupServiceUnderTest;
+import ch.niceideas.eskimo.types.Node;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.junit.jupiter.api.AfterEach;
@@ -109,13 +110,13 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
 
     @Test
     public void testRunSSHCommandStdOut() throws Exception {
-        assertEquals ("1\n", sshCommandService.runSSHCommand("localhost", "echo 1"));
+        assertEquals ("1\n", sshCommandService.runSSHCommand(Node.fromName("localhost"), "echo 1"));
     }
 
     @Test
     public void testRunSSHCommandStdErr() {
         try {
-            sshCommandService.runSSHCommand("localhost", "/bin/bash -c /bin/tada");
+            sshCommandService.runSSHCommand(Node.fromName("localhost"), "/bin/bash -c /bin/tada");
             fail ("Exception expected");
         } catch (SSHCommandException e) {
             assertNotNull(e);
@@ -132,20 +133,20 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
     public void testRunSSHScriptStdOut() throws Exception {
         assertEquals ("1\n" +
                 "2\n" +
-                "3\n", sshCommandService.runSSHScript("localhost", "echo 1; echo 2 && echo 3;"));
+                "3\n", sshCommandService.runSSHScript(Node.fromName("localhost"), "echo 1; echo 2 && echo 3;"));
     }
 
     @Test
     public void testRunSSHScriptNewLinesStdOut() throws Exception {
         assertEquals ("1\n" +
                 "2\n" +
-                "3\n", sshCommandService.runSSHScript("localhost", "echo 1\necho 2\necho 3;"));
+                "3\n", sshCommandService.runSSHScript(Node.fromName("localhost"), "echo 1\necho 2\necho 3;"));
     }
 
     @Test
     public void testRunSSHScriptErr() {
         try {
-            sshCommandService.runSSHScript("localhost", "/bin/tada");
+            sshCommandService.runSSHScript(Node.fromName("localhost"), "/bin/tada");
             fail ("Exception expected");
         } catch (SSHCommandException e) {
             assertNotNull(e);

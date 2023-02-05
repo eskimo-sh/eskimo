@@ -35,18 +35,20 @@
 package ch.niceideas.eskimo.model.service;
 
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 
 import java.util.Map;
 
 public class MemoryModel {
 
-    private final Map<String, Map<String, Long>> innerModel;
+    private final Map<Node, Map<Service, Long>> innerModel;
 
-    public MemoryModel(Map<String, Map<String, Long>> innerModel) {
+    public MemoryModel(Map<Node, Map<Service, Long>> innerModel) {
         this.innerModel = innerModel;
     }
 
-    public Map<String,Long> getModelForNode(NodesConfigWrapper nodesConfig, int nodeNbr) {
-        return innerModel.get(nodesConfig.getNodeAddress(nodeNbr));
+    public Map<Service, Long> getModelForNode(NodesConfigWrapper nodesConfig, int nodeNbr) {
+        return innerModel.get(nodesConfig.getNode(nodeNbr));
     }
 }

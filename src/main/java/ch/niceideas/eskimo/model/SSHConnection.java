@@ -35,6 +35,7 @@
 
 package ch.niceideas.eskimo.model;
 
+import ch.niceideas.eskimo.types.Node;
 import com.trilead.ssh2.*;
 import com.trilead.ssh2.auth.AgentProxy;
 import com.trilead.ssh2.transport.ClientServerHello;
@@ -54,18 +55,18 @@ public class SSHConnection implements Closeable {
 
     private final int readTimeout;
 
-    public SSHConnection(String hostname, int readTimeout) {
-        under = new Connection (hostname, 22);
+    public SSHConnection(Node node, int readTimeout) {
+        under = new Connection (node.getAddress(), 22);
         this.readTimeout = readTimeout;
     }
 
-    public SSHConnection(String hostname, int port, int readTimeout) {
-        under = new Connection (hostname, port);
+    public SSHConnection(Node node, int port, int readTimeout) {
+        under = new Connection (node.getAddress(), port);
         this.readTimeout = readTimeout;
     }
 
-    public SSHConnection(String hostname, int port, String sourceAddress, int readTimeout) {
-        under = new Connection (hostname, port, sourceAddress);
+    public SSHConnection(Node node, int port, String sourceAddress, int readTimeout) {
+        under = new Connection (node.getAddress(), port, sourceAddress);
         this.readTimeout = readTimeout;
     }
 

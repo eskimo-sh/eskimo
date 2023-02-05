@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public abstract class JSONInstallOpCommand<T extends OperationId> implements JSONOpCommand {
+public abstract class JSONInstallOpCommand<T extends OperationId<?>> implements JSONOpCommand {
 
     @Getter
     private final ArrayList<T> installations = new ArrayList<>();
@@ -76,12 +76,12 @@ public abstract class JSONInstallOpCommand<T extends OperationId> implements JSO
         restarts.sort(c);
     }
 
-    protected Collection<Object> toJsonList(List<? extends SimpleOperationCommand.SimpleOperationId> listOfPairs) {
+    protected Collection<Object> toJsonList(List<? extends AbstractStandardOperationId<?>> listOfPairs) {
         return listOfPairs.stream()
-                .map((Function<SimpleOperationCommand.SimpleOperationId, Object>) id -> {
+                .map((Function<AbstractStandardOperationId<?>, Object>) id -> {
                     JSONObject ret = new JSONObject();
                     try {
-                        ret.put(id.getService(), id.getNode());
+                        ret.put(id.getService().getName(), id.getNode().getAddress());
                     } catch (JSONException e) {
                         // cannot happen
                     }

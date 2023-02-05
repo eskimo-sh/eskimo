@@ -61,7 +61,7 @@ public class SystemOperationServiceImpl implements SystemOperationService {
     private OperationsMonitoringService operationsMonitoringService;
 
     @Override
-    public void applySystemOperation(OperationId operationId, SystemOperation operation, SystemService.StatusUpdater statusUpdater)
+    public void applySystemOperation(OperationId<?> operationId, SystemOperation operation, SystemService.StatusUpdater statusUpdater)
             throws SystemException  {
 
         if (!operationsMonitoringService.isInterrupted()) {
@@ -117,7 +117,7 @@ public class SystemOperationServiceImpl implements SystemOperationService {
         }
     }
 
-    private void logOperationMessage(OperationId operationId, String operation) {
+    private void logOperationMessage(OperationId<?> operationId, String operation) {
         operationsMonitoringService.addInfo(operationId, new String[]{
                 "\n" + operation
         });

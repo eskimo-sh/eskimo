@@ -42,6 +42,8 @@ import ch.niceideas.eskimo.model.SettingsOperationsCommand;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.*;
+import ch.niceideas.eskimo.types.Service;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +64,8 @@ public class ServicesSettingsServiceTest {
 
     private String jsonConfig = null;
     private String testForm = null;
+    private String expectedJsonString = null;
+    private String expectedNewConfig = null;
 
     @Autowired
     private ServicesSettingsService servicesSettingsService;
@@ -89,6 +93,8 @@ public class ServicesSettingsServiceTest {
 
         jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
         testForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testForm.json"), StandardCharsets.UTF_8);
+        expectedJsonString = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesSettingsServiceTest/expectedCommand.json"), StandardCharsets.UTF_8);
+        expectedNewConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesSettingsServiceTest/expectedNewConfig.json"), StandardCharsets.UTF_8);
 
         SecurityContextHelper.loginAdmin();
         operationsMonitoringServiceTest.endCommand(true);
@@ -125,99 +131,29 @@ public class ServicesSettingsServiceTest {
 
         SettingsOperationsCommand command = SettingsOperationsCommand.create(testForm, servicesSettingsService);
 
-        assertEquals (4, command.getRestartedServices().size());
+        //System.err.println (command.toJSON().toString(2));
 
-        assertEquals ("elasticsearch", command.getRestartedServices().get(0));
-        assertEquals ("grafana", command.getRestartedServices().get(1));
-        assertEquals ("kafka", command.getRestartedServices().get(2));
-        assertEquals ("spark-runtime", command.getRestartedServices().get(3));
+        assertTrue (new JSONObject(expectedJsonString).similar(command.toJSON()));
 
         servicesSettingsService.applyServicesSettings(command);
 
         ServicesSettingsWrapper newConfig = configurationServiceTest.loadServicesSettings();
 
-        // test elasticsearch config
-        assertEquals ("bootstrap.memory_lock", newConfig.getValueForPath("settings.8.settings.0.properties.0.name"));
-        assertEquals ("false", newConfig.getValueForPath("settings.8.settings.0.properties.0.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.8.settings.0.properties.0.value"));
+        //System.err.println (newConfig.getFormattedValue());
 
-        assertEquals ("action.destructive_requires_name", newConfig.getValueForPath("settings.8.settings.0.properties.1.name"));
-        assertEquals ("true", newConfig.getValueForPath("settings.8.settings.0.properties.1.defaultValue"));
-        assertEquals ("false", newConfig.getValueForPath("settings.8.settings.0.properties.1.value"));
-
-        // test kafka config
-        assertEquals ("num.network.threads", newConfig.getValueForPath("settings.11.settings.0.properties.0.name"));
-        assertEquals ("3", newConfig.getValueForPath("settings.11.settings.0.properties.0.defaultValue"));
-        assertEquals ("5", newConfig.getValueForPath("settings.11.settings.0.properties.0.value"));
-
-        assertEquals ("num.io.threads", newConfig.getValueForPath("settings.11.settings.0.properties.1.name"));
-        assertEquals ("8", newConfig.getValueForPath("settings.11.settings.0.properties.1.defaultValue"));
-        assertEquals ("10", newConfig.getValueForPath("settings.11.settings.0.properties.1.value"));
-
-        assertEquals ("socket.send.buffer.bytes", newConfig.getValueForPath("settings.11.settings.0.properties.2.name"));
-        assertEquals ("102400", newConfig.getValueForPath("settings.11.settings.0.properties.2.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.11.settings.0.properties.2.value"));
-
-        assertEquals ("socket.receive.buffer.bytes", newConfig.getValueForPath("settings.11.settings.0.properties.3.name"));
-        assertEquals ("102400", newConfig.getValueForPath("settings.11.settings.0.properties.3.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.11.settings.0.properties.3.value"));
-
-        assertEquals ("socket.request.max.bytes", newConfig.getValueForPath("settings.11.settings.0.properties.4.name"));
-        assertEquals ("104857600", newConfig.getValueForPath("settings.11.settings.0.properties.4.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.11.settings.0.properties.4.value"));
-
-        assertEquals ("num.partitions", newConfig.getValueForPath("settings.11.settings.0.properties.5.name"));
-        assertEquals ("1", newConfig.getValueForPath("settings.11.settings.0.properties.5.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.11.settings.0.properties.5.value"));
-
-        assertEquals ("log.retention.hours", newConfig.getValueForPath("settings.11.settings.0.properties.6.name"));
-        assertEquals ("168", newConfig.getValueForPath("settings.11.settings.0.properties.6.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.11.settings.0.properties.6.value"));
-
-        // test spark config
-        assertEquals ("spark.driver.memory", newConfig.getValueForPath("settings.12.settings.0.properties.0.name"));
-        assertEquals ("800m", newConfig.getValueForPath("settings.12.settings.0.properties.0.defaultValue"));
-        assertEquals ("500m", newConfig.getValueForPath("settings.12.settings.0.properties.0.value"));
-
-        assertEquals ("spark.rpc.numRetries", newConfig.getValueForPath("settings.12.settings.0.properties.1.name"));
-        assertEquals ("5", newConfig.getValueForPath("settings.12.settings.0.properties.1.defaultValue"));
-        assertEquals ("10", newConfig.getValueForPath("settings.12.settings.0.properties.1.value"));
-
-        assertEquals ("spark.rpc.retry.wait", newConfig.getValueForPath("settings.12.settings.0.properties.2.name"));
-        assertEquals ("5s", newConfig.getValueForPath("settings.12.settings.0.properties.2.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.12.settings.0.properties.2.value"));
-
-        assertEquals ("spark.scheduler.mode", newConfig.getValueForPath("settings.12.settings.0.properties.3.name"));
-        assertEquals ("FAIR", newConfig.getValueForPath("settings.12.settings.0.properties.3.defaultValue"));
-        assertEquals ("FIFO", newConfig.getValueForPath("settings.12.settings.0.properties.3.value"));
-
-        assertEquals ("spark.locality.wait", newConfig.getValueForPath("settings.12.settings.0.properties.4.name"));
-        assertEquals ("20s", newConfig.getValueForPath("settings.12.settings.0.properties.4.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.12.settings.0.properties.4.value"));
-
-        assertEquals ("spark.dynamicAllocation.executorIdleTimeout", newConfig.getValueForPath("settings.12.settings.0.properties.5.name"));
-        assertEquals ("200s", newConfig.getValueForPath("settings.12.settings.0.properties.5.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.12.settings.0.properties.5.value"));
-
-        assertEquals ("spark.dynamicAllocation.cachedExecutorIdleTimeout", newConfig.getValueForPath("settings.12.settings.0.properties.6.name"));
-        assertEquals ("300s", newConfig.getValueForPath("settings.12.settings.0.properties.6.defaultValue"));
-        assertEquals ("400s", newConfig.getValueForPath("settings.12.settings.0.properties.6.value"));
-
-        assertEquals ("spark.executor.memory", newConfig.getValueForPath("settings.12.settings.0.properties.7.name"));
-        assertEquals ("[ESKIMO_DEFAULT]", newConfig.getValueForPath("settings.12.settings.0.properties.7.defaultValue"));
-        assertNull(newConfig.getValueForPath("settings.12.settings.0.properties.7.value"));
+        assertTrue (new JSONObject(expectedNewConfig).similar(newConfig.getJSONObject()));
 
         String notifications = operationsMonitoringServiceTest.getAllMessages();
 
         //System.err.println (notifications);
 
-        assertTrue(notifications.contains("Check--Install_Settings_192-168-10-11 : --> Done : Check / Install of Settings on 192.168.10.11"));
-        assertTrue(notifications.contains("Check--Install_Settings_192-168-10-13 : --> Done : Check / Install of Settings on 192.168.10.13"));
+        assertTrue(notifications.contains("Check--Install_settings_192-168-10-13 : --> Done : Executing Check / Install of settings on 192.168.10.13"));
+        assertTrue(notifications.contains("Check--Install_settings_192-168-10-11 : --> Done : Executing Check / Install of settings on 192.168.10.11"));
 
-        assertTrue(notifications.contains("Done : Executing restart on elasticsearch on (kubernetes)"));
-        assertTrue(notifications.contains("Done : Executing restart on grafana on (kubernetes)"));
-        assertTrue(notifications.contains("Done : Executing restart on spark-runtime on (kubernetes)"));
-        assertTrue(notifications.contains("Done : Executing restart on kafka on (kubernetes)"));
+        assertTrue(notifications.contains("Done : Executing restart of elasticsearch on (kubernetes)"));
+        assertTrue(notifications.contains("Done : Executing restart of grafana on (kubernetes)"));
+        assertTrue(notifications.contains("Done : Executing restart of spark-runtime on (kubernetes)"));
+        assertTrue(notifications.contains("Done : Executing restart of kafka on (kubernetes)"));
     }
 
 }

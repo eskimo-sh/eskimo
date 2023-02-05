@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.eskimo.services.SSHCommandException;
 import ch.niceideas.eskimo.services.SSHCommandService;
+import ch.niceideas.eskimo.types.Node;
 import lombok.Data;
 import org.json.JSONObject;
 
@@ -58,7 +59,7 @@ public class Command {
         }});
     }
 
-    public String call(String node, SSHCommandService sshCommandService) throws SSHCommandException {
+    public String call(Node node, SSHCommandService sshCommandService) throws SSHCommandException {
         return sshCommandService.runSSHCommand(node, commandCall);
     }
 }

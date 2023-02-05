@@ -79,8 +79,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         LOG.info('- Got POST request: %s', self.path)
 
         fullArgs = self.rfile.read(int(self.headers['Content-Length']))
-        # FIXME remove me
-        LOG.info('- fullArgs raw: %s', fullArgs)
+
         LOG.info('- fullArgs raw: %s', fullArgs.decode('utf-8'))
 
         if 'stdin_file' in self.headers:

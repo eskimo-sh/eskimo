@@ -36,8 +36,10 @@
 package ch.niceideas.eskimo.utils;
 
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -143,19 +145,19 @@ public class KubeStatusParserTest {
 
         KubeStatusParser parser = new KubeStatusParser(allPodStatus, allServicesStatus, registryServices, sd);
 
-        List<Pair<String, String>>  kafkaNodes = parser.getPodNodesAndStatus("kafka");
+        List<Pair<Node, String>>  kafkaNodes = parser.getPodNodesAndStatus(Service.from("kafka"));
         assertEquals (4, kafkaNodes.size());
 
-        assertEquals("192.168.56.24", kafkaNodes.get(0).getKey());
+        assertEquals(Node.fromAddress("192.168.56.24"), kafkaNodes.get(0).getKey());
         assertEquals("CrashLoopBackOff", kafkaNodes.get(0).getValue());
 
-        assertEquals("192.168.56.22", kafkaNodes.get(1).getKey());
+        assertEquals(Node.fromAddress("192.168.56.22"), kafkaNodes.get(1).getKey());
         assertEquals("Running", kafkaNodes.get(1).getValue());
 
-        assertEquals("192.168.56.21", kafkaNodes.get(3).getKey());
+        assertEquals(Node.fromAddress("192.168.56.21"), kafkaNodes.get(3).getKey());
         assertEquals("Error", kafkaNodes.get(3).getValue());
 
-        List<Pair<String, String>>  kafkaManagerNodes = parser.getPodNodesAndStatus("kafka-manager");
+        List<Pair<Node, String>>  kafkaManagerNodes = parser.getPodNodesAndStatus(Service.from("kafka-manager"));
         assertEquals (1, kafkaManagerNodes.size());
 
     }
@@ -165,36 +167,36 @@ public class KubeStatusParserTest {
 
         KubeStatusParser parser = new KubeStatusParser(allPodStatus, allServicesStatus, registryServices, sd);
 
-        Service coreDnsSrv = new Service();
+        ServiceDef coreDnsSrv = new ServiceDef();
         coreDnsSrv.setName("coredns");
         coreDnsSrv.setUnique(true);
-        Pair<String, String> srnCoredns = parser.getServiceRuntimeNode(coreDnsSrv, "111.111.111.111");
+        Pair<Node, String> srnCoredns = parser.getServiceRuntimeNode(coreDnsSrv, Node.fromAddress("111.111.111.111"));
         assertNotNull (srnCoredns);
         assertNull(srnCoredns.getKey());
         assertEquals ("notOK", srnCoredns.getValue());
 
-        Service cerebroSrv = new Service();
+        ServiceDef cerebroSrv = new ServiceDef();
         cerebroSrv.setName("cerebro");
         cerebroSrv.setUnique(true);
-        Pair<String, String> srnCerebro = parser.getServiceRuntimeNode(cerebroSrv, "111.111.111.111");
+        Pair<Node, String> srnCerebro = parser.getServiceRuntimeNode(cerebroSrv, Node.fromAddress("111.111.111.111"));
         assertNotNull (srnCerebro);
-        assertEquals ("111.111.111.111", srnCerebro.getKey());
+        assertEquals (Node.fromAddress("111.111.111.111"), srnCerebro.getKey());
         assertEquals ("notOK", srnCerebro.getValue());
 
-        Service elasticsearchSrv = new Service();
+        ServiceDef elasticsearchSrv = new ServiceDef();
         elasticsearchSrv.setName("elasticsearch");
         elasticsearchSrv.setUnique(false);
-        Pair<String, String> srnES = parser.getServiceRuntimeNode(elasticsearchSrv, "111.111.111.111");
+        Pair<Node, String> srnES = parser.getServiceRuntimeNode(elasticsearchSrv, Node.fromAddress("111.111.111.111"));
         assertNotNull (srnES);
-        assertEquals ("111.111.111.111", srnES.getKey());
+        assertEquals (Node.fromAddress("111.111.111.111"), srnES.getKey());
         assertEquals ("Running", srnES.getValue());
 
-        Service kubeDasboardSrv = new Service();
+        ServiceDef kubeDasboardSrv = new ServiceDef();
         kubeDasboardSrv.setName("kubernetes-dashboard");
         kubeDasboardSrv.setUnique(false);
-        Pair<String, String> srnKubeDasboardSrv = parser.getServiceRuntimeNode(kubeDasboardSrv, "111.111.111.111");
+        Pair<Node, String> srnKubeDasboardSrv = parser.getServiceRuntimeNode(kubeDasboardSrv, Node.fromAddress("111.111.111.111"));
         assertNotNull (srnKubeDasboardSrv);
-        assertEquals ("111.111.111.111", srnKubeDasboardSrv.getKey());
+        assertEquals (Node.fromAddress("111.111.111.111"), srnKubeDasboardSrv.getKey());
         assertEquals ("Running", srnKubeDasboardSrv.getValue());
     }
 
@@ -204,28 +206,28 @@ public class KubeStatusParserTest {
 
         KubeStatusParser parser = new KubeStatusParser(allPodStatus, allServicesStatus, registryServices, sd);
 
-        List<Pair<String, String>> coreDnsNodes = parser.getServiceRuntimeNodes("coredns");
+        List<Pair<Node, String>> coreDnsNodes = parser.getServiceRuntimeNodes(Service.from("coredns"));
         assertNotNull (coreDnsNodes);
         assertEquals (1, coreDnsNodes.size());
-        assertEquals ("192.168.56.23", coreDnsNodes.get(0).getKey());
+        assertEquals (Node.fromAddress("192.168.56.23"), coreDnsNodes.get(0).getKey());
         assertEquals ("Running", coreDnsNodes.get(0).getValue());
 
-        List<Pair<String, String>> cerebroNodes = parser.getServiceRuntimeNodes("cerebro");
+        List<Pair<Node, String>> cerebroNodes = parser.getServiceRuntimeNodes(Service.from("cerebro"));
         assertNotNull (cerebroNodes);
         assertEquals (1, cerebroNodes.size());
-        assertEquals ("192.168.56.23", cerebroNodes.get(0).getKey());
+        assertEquals (Node.fromAddress("192.168.56.23"), cerebroNodes.get(0).getKey());
         assertEquals ("Error", cerebroNodes.get(0).getValue());
 
-        List<Pair<String, String>> esNodes = parser.getServiceRuntimeNodes("elasticsearch");
+        List<Pair<Node, String>> esNodes = parser.getServiceRuntimeNodes(Service.from("elasticsearch"));
         assertNotNull (esNodes);
         assertEquals (3, esNodes.size());
-        assertEquals ("192.168.56.21", esNodes.get(0).getKey());
+        assertEquals (Node.fromAddress("192.168.56.21"), esNodes.get(0).getKey());
         assertEquals ("Error", esNodes.get(0).getValue());
 
-        assertEquals ("192.168.56.22", esNodes.get(1).getKey());
+        assertEquals (Node.fromAddress("192.168.56.22"), esNodes.get(1).getKey());
         assertEquals ("Running", esNodes.get(1).getValue());
 
-        assertEquals ("192.168.56.23", esNodes.get(2).getKey());
+        assertEquals (Node.fromAddress("192.168.56.23"), esNodes.get(2).getKey());
         assertEquals ("Running", esNodes.get(2).getValue());
     }
 

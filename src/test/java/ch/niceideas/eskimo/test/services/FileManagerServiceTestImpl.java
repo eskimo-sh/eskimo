@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.test.services;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.services.FileManagerService;
+import ch.niceideas.eskimo.types.Node;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -55,14 +56,14 @@ import java.util.HashMap;
 public class FileManagerServiceTestImpl implements FileManagerService {
 
     @Override
-    public void removeFileManager(String node) {
+    public void removeFileManager(Node node) {
         // NO-OP
     }
 
     @Override
-    public Pair<String, JSONObject> navigateFileManager(String node, String folder, String subFolder) throws IOException {
+    public Pair<String, JSONObject> navigateFileManager(Node node, String folder, String subFolder) throws IOException {
 
-        if (node.equals("192.168.10.15")) {
+        if (node.getAddress().equals("192.168.10.15")) {
 
             return new Pair<>(folder + subFolder, new JSONObject(new HashMap<String, Object>() {{
                 put("test", new JSONObject(new HashMap<String, Object>() {{
@@ -81,9 +82,9 @@ public class FileManagerServiceTestImpl implements FileManagerService {
     }
 
     @Override
-    public Pair<String, JSONObject> createFile(String node, String folder, String fileName) throws IOException {
+    public Pair<String, JSONObject> createFile(Node node, String folder, String fileName) throws IOException {
 
-        if (node.equals("192.168.10.15")) {
+        if (node.getAddress().equals("192.168.10.15")) {
             return new Pair<>(folder, new JSONObject(new HashMap<String, Object>() {{
                 put(fileName, new JSONObject(new HashMap<String, Object>() {{
                     put("permissions", "rwxrwxrwx");
@@ -101,8 +102,8 @@ public class FileManagerServiceTestImpl implements FileManagerService {
     }
 
     @Override
-    public JSONObject openFile(String node, String folder, String file) {
-        if (node.equals("192.168.10.15")) {
+    public JSONObject openFile(Node node, String folder, String file) {
+        if (node.getAddress().equals("192.168.10.15")) {
             return new JSONObject(new HashMap<String, Object>() {{
                 put("status", "OK");
                 put("accessible", true);
@@ -118,13 +119,13 @@ public class FileManagerServiceTestImpl implements FileManagerService {
     }
 
     @Override
-    public void downloadFile(String node, String folder, String file, HttpServletResponseAdapter response) {
+    public void downloadFile(Node node, String folder, String file, HttpServletResponseAdapter response) {
 
     }
 
     @Override
-    public String deletePath(String node, String folder, String file) throws IOException {
-        if (node.equals("192.168.10.15")) {
+    public String deletePath(Node node, String folder, String file) throws IOException {
+        if (node.getAddress().equals("192.168.10.15")) {
             return folder + file;
         } else {
             throw new IOException("Test Error");
@@ -132,8 +133,8 @@ public class FileManagerServiceTestImpl implements FileManagerService {
     }
 
     @Override
-    public void uploadFile(String node, String folder, String name, InputStream fileContent) throws IOException {
-        if (node.equals("192.168.10.15")) {
+    public void uploadFile(Node node, String folder, String name, InputStream fileContent) throws IOException {
+        if (node.getAddress().equals("192.168.10.15")) {
             // No-Op
         } else {
             throw new IOException("Test Error");

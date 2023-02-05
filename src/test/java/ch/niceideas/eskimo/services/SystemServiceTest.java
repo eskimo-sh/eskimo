@@ -43,6 +43,8 @@ import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SSHCommandServiceTestImpl;
 import ch.niceideas.eskimo.test.testwrappers.SystemServiceUnderTest;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -117,25 +119,25 @@ public class SystemServiceTest {
 
     @Test
     public void testShowJournal() throws Exception {
-        systemService.showJournal(servicesDefinition.getService("ntp"), "192.168.10.11");
+        systemService.showJournal(servicesDefinition.getServiceDefinition(Service.from("ntp")), Node.fromAddress("192.168.10.11"));
         assertEquals ("sudo journalctl -u ntp", sshCommandServiceTest.getExecutedCommands().trim());
     }
 
     @Test
     public void testStartService() throws Exception {
-        systemService.startService(servicesDefinition.getService("ntp"), "192.168.10.11");
+        systemService.startService(servicesDefinition.getServiceDefinition(Service.from("ntp")), Node.fromAddress("192.168.10.11"));
         assertEquals ("sudo bash -c 'systemctl reset-failed ntp && systemctl start ntp'", sshCommandServiceTest.getExecutedCommands().trim());
     }
 
     @Test
     public void testStopService() throws Exception {
-        systemService.stopService(servicesDefinition.getService("ntp"), "192.168.10.11");
+        systemService.stopService(servicesDefinition.getServiceDefinition(Service.from("ntp")), Node.fromAddress("192.168.10.11"));
         assertEquals ("sudo systemctl stop ntp", sshCommandServiceTest.getExecutedCommands().trim());
     }
 
     @Test
     public void testRestartService() throws Exception {
-        systemService.restartService(servicesDefinition.getService("ntp"), "192.168.10.11");
+        systemService.restartService(servicesDefinition.getServiceDefinition(Service.from("ntp")), Node.fromAddress("192.168.10.11"));
         assertEquals ("sudo bash -c 'systemctl reset-failed ntp && systemctl restart ntp", sshCommandServiceTest.getExecutedCommands().trim());
     }
 
@@ -143,11 +145,11 @@ public class SystemServiceTest {
     public void testCallCommand() throws Exception {
 
         SystemException exception = assertThrows(SystemException.class,
-                () -> systemService.callCommand("dummy", "ntp", "192.168.10.11"));
+                () -> systemService.callCommand("dummy", Service.from("ntp"), Node.fromAddress("192.168.10.11")));
         assertNotNull(exception);
         assertEquals("Command dummy is unknown for service ntp", exception.getMessage());
 
-        systemService.callCommand("show_log", "ntp", "192.168.10.11");
+        systemService.callCommand("show_log", Service.from("ntp"), Node.fromAddress("192.168.10.11"));
         assertEquals ("cat /var/log/ntp/ntp.log", sshCommandServiceTest.getExecutedCommands().trim());
     }
 
@@ -252,10 +254,7 @@ public class SystemServiceTest {
 
         Map<String, String> statusMap = new HashMap<>();
 
-        int nodeNbr = 1;
-        String ipAddress = "192.168.10.11";
-
-        Pair<String, String> nodeNumnberAndIpAddress = new Pair<>(""+nodeNbr, ipAddress);
+        Pair<Integer, Node> nodeNumnberAndIpAddress = new Pair<>(1, Node.fromAddress("192.168.10.11"));
 
         sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
             if (script.equals("echo OK")) {
@@ -289,10 +288,7 @@ public class SystemServiceTest {
 
         Map<String, String> statusMap = new HashMap<>();
 
-        int nodeNbr = 1;
-        String ipAddress = "192.168.10.11";
-
-        Pair<String, String> nbrAndPair = new Pair<>(""+nodeNbr, ipAddress);
+        Pair<Integer, Node> nbrAndPair = new Pair<>(1, Node.fromAddress("192.168.10.11"));
 
         sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
             if (script.equals("echo OK")) {
@@ -415,9 +411,9 @@ public class SystemServiceTest {
     @Test
     public void testHandleStatusChanges() throws Exception {
 
-        Set<String> configuredAndLiveIps = new HashSet<>(){{
-            add("192.168.10.11");
-            add("192.168.10.13");
+        Set<Node> configuredAndLiveIps = new HashSet<>(){{
+            add(Node.fromAddress("192.168.10.11"));
+            add(Node.fromAddress("192.168.10.13"));
         }};
 
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
@@ -447,9 +443,9 @@ public class SystemServiceTest {
     @Test
     public void testHandleStatusChangesNodeDown() throws Exception {
 
-        Set<String> configuredAndLiveIps = new HashSet<>(){{
-            add("192.168.10.11");
-            add("192.168.10.13");
+        Set<Node> configuredAndLiveIps = new HashSet<>(){{
+            add(Node.fromAddress("192.168.10.11"));
+            add(Node.fromAddress("192.168.10.13"));
         }};
 
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
@@ -487,9 +483,9 @@ public class SystemServiceTest {
     @Test
     public void testHandleStatusChangesKubernetesService() throws Exception {
 
-        Set<String> configuredAndLiveIps = new HashSet<>(){{
-            add("192.168.10.11");
-            add("192.168.10.13");
+        Set<Node> configuredAndLiveIps = new HashSet<>(){{
+            add(Node.fromAddress("192.168.10.11"));
+            add(Node.fromAddress("192.168.10.13"));
         }};
 
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
@@ -524,9 +520,9 @@ public class SystemServiceTest {
     @Test
     public void testHandleStatusChangesKubernetesServiceWhenKubernetesDown() throws Exception {
 
-        Set<String> configuredAndLiveIps = new HashSet<>(){{
-            add("192.168.10.11");
-            add("192.168.10.13");
+        Set<Node> configuredAndLiveIps = new HashSet<>(){{
+            add(Node.fromAddress("192.168.10.11"));
+            add(Node.fromAddress("192.168.10.13"));
         }};
 
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
@@ -555,9 +551,9 @@ public class SystemServiceTest {
     @Test
     public void testHandleStatusChangeMoreServicesRemoved() throws Exception {
 
-        Set<String> configuredAndLiveIps = new HashSet<>(){{
-            add("192.168.10.11");
-            add("192.168.10.13");
+        Set<Node> configuredAndLiveIps = new HashSet<>(){{
+            add(Node.fromAddress("192.168.10.11"));
+            add(Node.fromAddress("192.168.10.13"));
         }};
 
         // the objective here is to make sur that when a node entirely vanishes from configuration,
@@ -615,9 +611,9 @@ public class SystemServiceTest {
     @Test
     public void testHandleStatusChangeWhenNodeRemovedFromConfig() throws Exception {
 
-        Set<String> configuredAndLiveIps = new HashSet<>(){{
-            add("192.168.10.11");
-            add("192.168.10.13");
+        Set<Node> configuredAndLiveIps = new HashSet<>(){{
+            add(Node.fromAddress("192.168.10.11"));
+            add(Node.fromAddress("192.168.10.13"));
         }};
 
         // the objective here is to make sur that when a node entirely vanishes from configuration,
@@ -663,8 +659,8 @@ public class SystemServiceTest {
     @Test
     public void testHandleStatusChangeWhenNodeRemovedFromConfigAndNodeIsDown() throws Exception {
 
-        Set<String> configuredAndLiveIps = new HashSet<>(){{
-            add("192.168.10.11");
+        Set<Node> configuredAndLiveIps = new HashSet<>(){{
+            add(Node.fromAddress("192.168.10.11"));
         }};
 
         // the objective here is to make sur that when a node entirely vanishes from configuration,
@@ -723,7 +719,7 @@ public class SystemServiceTest {
 
         AtomicBoolean called = new AtomicBoolean(false);
 
-        systemService.applyServiceOperation("ntp", "192.168.10.11", "test op", () -> {
+        systemService.applyServiceOperation(Service.from("ntp"), Node.fromAddress("192.168.10.11"), SimpleOperationCommand.SimpleOperation.COMMAND, () -> {
             called.set(true);
             return "OK";
         });
@@ -733,17 +729,21 @@ public class SystemServiceTest {
         List<JSONObject> result = notificationService.getSubList(0);
 
         assertEquals("Doing", result.get(0).getString("type"));
-        assertEquals("test op ntp on 192.168.10.11", result.get(0).getString("message"));
+        assertEquals("Calling custom command ntp on 192.168.10.11", result.get(0).getString("message"));
 
         assertEquals("Info", result.get(1).getString("type"));
-        assertEquals("test op ntp succeeded on 192.168.10.11", result.get(1).getString("message"));
+        assertEquals("Calling custom command ntp succeeded on 192.168.10.11", result.get(1).getString("message"));
 
-        SimpleOperationCommand.SimpleOperationId operationId = new SimpleOperationCommand.SimpleOperationId("test op", "ntp", "192.168.10.11");
+        SimpleOperationCommand.SimpleOperationId operationId = new SimpleOperationCommand.SimpleOperationId(
+                SimpleOperationCommand.SimpleOperation.COMMAND,
+                Service.from("ntp"),
+                Node.fromAddress("192.168.10.11"));
 
         List<String> messages = operationsMonitoringService.getNewMessages(operationId, 0);
 
         assertEquals ("[\n" +
-                "test op ntp on 192.168.10.11, Done test op ntp on 192.168.10.11, " +
+                "Calling custom command ntp on 192.168.10.11, " +
+                "Done Calling custom command ntp on 192.168.10.11, " +
                 "-------------------------------------------------------------------------------, " +
                 "OK" +
                 "]", ""+messages);

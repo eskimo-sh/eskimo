@@ -54,6 +54,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
@@ -79,10 +80,10 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
     private final AtomicBoolean interruptionNotified = new AtomicBoolean(false);
     private boolean lastOperationSuccess;
 
-    private List<? extends OperationId> operationList = null;
+    private List<? extends OperationId<?>> operationList = null;
     private final MessagingManager globalMessages = new MessagingManager();
-    private final Map<OperationId, MessagingManager> operationLogs = new ConcurrentHashMap<>();
-    private final Map<OperationId, OperationStatus> operationStatus = new ConcurrentHashMap<>();
+    private final Map<OperationId<?>, MessagingManager> operationLogs = new ConcurrentHashMap<>();
+    private final Map<OperationId<?>, OperationStatus> operationStatus = new ConcurrentHashMap<>();
     private JSONOpCommand currentOperation = null;
 
     @Override
@@ -97,7 +98,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
             put ("result", "OK");
 
             put("labels", new JSONArray(new ArrayList<>() {{
-                for (OperationId opId : operationList) {
+                for (OperationId<?> opId : operationList) {
                     add(new JSONObject(new HashMap<>(){{
                         put ("operation", opId.toString());
                         put ("label", opId.getMessage());
@@ -112,7 +113,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
             }}));
 
             put("messages", new JSONObject(new HashMap<>() {{
-                    for (OperationId opId : operationLogs.keySet()) {
+                    for (OperationId<?> opId : operationLogs.keySet()) {
                         MessagingManager mgr = operationLogs.computeIfAbsent(opId, op -> {
                             throw new IllegalStateException();
                         });
@@ -127,7 +128,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
                 }}));
 
             put("status", new JSONObject(new HashMap<>() {{
-                for (OperationId opId : operationLogs.keySet()) {
+                for (OperationId<?> opId : operationLogs.keySet()) {
                     put(opId.toString(), operationStatus.computeIfAbsent(opId, op -> OperationStatus.INIT).toString());
                 }
             }}));
@@ -216,7 +217,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
 
     // Individual operation monitoring
     @Override
-    public void addInfo(OperationId operation, String message) {
+    public void addInfo(OperationId<?> operation, String message) {
         if (StringUtils.isNotBlank(message)) {
             if (!isProcessingPending()) {
                 throw new IllegalStateException(NO_OPERATION_GROUP_ERROR_MESSAGE);
@@ -229,7 +230,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
     }
 
     @Override
-    public void addInfo(OperationId operation, String[] messages) {
+    public void addInfo(OperationId<?> operation, String[] messages) {
         if (messages != null && messages.length > 0) {
             if (!isProcessingPending()) {
                 throw new IllegalStateException(NO_OPERATION_GROUP_ERROR_MESSAGE);
@@ -242,7 +243,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
     }
 
     @Override
-    public List<String> getNewMessages (OperationId operation, int lastLine) {
+    public List<String> getNewMessages (OperationId<?> operation, int lastLine) {
         MessagingManager msgMgr = operationLogs.get(operation);
         if (msgMgr == null) {
             return Collections.emptyList();
@@ -251,7 +252,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
     }
 
     @Override
-    public Pair<Integer, String> fetchNewMessages (OperationId operation, int lastLine) {
+    public Pair<Integer, String> fetchNewMessages (OperationId<?> operation, int lastLine) {
         MessagingManager msgMgr = operationLogs.get(operation);
         if (msgMgr == null) {
             return new Pair<>(0, "");
@@ -260,7 +261,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
     }
 
     @Override
-    public void startOperation(OperationId operationId) {
+    public void startOperation(OperationId<?> operationId) {
         if (!isProcessingPending()) {
             throw new IllegalStateException(NO_OPERATION_GROUP_ERROR_MESSAGE);
         }
@@ -268,7 +269,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
     }
 
     @Override
-    public void endOperationError(OperationId operationId) {
+    public void endOperationError(OperationId<?> operationId) {
         if (!isProcessingPending()) {
             throw new IllegalStateException(NO_OPERATION_GROUP_ERROR_MESSAGE);
         }
@@ -276,7 +277,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
     }
 
     @Override
-    public void endOperation(OperationId operationId) {
+    public void endOperation(OperationId<?> operationId) {
         if (!isProcessingPending()) {
             throw new IllegalStateException(NO_OPERATION_GROUP_ERROR_MESSAGE);
         }

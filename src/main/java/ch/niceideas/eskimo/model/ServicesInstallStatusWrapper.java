@@ -36,6 +36,8 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.*;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -71,20 +73,20 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
         super(jsonString);
     }
 
-    public boolean isServiceOK(String service, String nodeName) {
+    public boolean isServiceOK(Service service, Node node) {
         try {
-            return ("OK".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + nodeName)));
+            return ("OK".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName())));
         } catch (JSONException e) {
             logger.error(e, e);
             return false;
         }
     }
 
-    public boolean isServiceInstalledAnywhere(String service) {
+    public boolean isServiceInstalledAnywhere(Service service) {
         try {
-            for (String node : getNodesAndKubeFlags()) {
-                if ("OK".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.replace(".", "-")))
-                        || "restart".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.replace(".", "-")))) {
+            for (Node node : getNodesAndKubeFlags()) {
+                if ("OK".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName()))
+                        || "restart".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName()))) {
                     return true;
                 }
             }
@@ -95,10 +97,10 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
         }
     }
 
-    public boolean isServiceInstalled(String service, String nodeName) {
+    public boolean isServiceInstalled(Service service, Node node) {
         try {
-            return ("OK".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + nodeName))
-                 || "restart".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + nodeName)));
+            return ("OK".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName()))
+                 || "restart".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName())));
         } catch (JSONException e) {
             logger.error(e, e);
             return false;
@@ -115,37 +117,37 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
                 .collect(Collectors.toList());
     }
 
-    public String getServiceInstallation(String serviceInstallStatusFlag) {
-        return serviceInstallStatusFlag.substring(0, serviceInstallStatusFlag.indexOf("_installed"));
+    public Service getService(String serviceInstallStatusFlag) {
+        return Service.from(serviceInstallStatusFlag.substring(0, serviceInstallStatusFlag.indexOf("_installed")));
     }
 
-    public List<String> getAllInstallStatusesExceptServiceOnNode(String service, String nodeName) {
+    public List<String> getAllInstallStatusesExceptServiceOnNode(Service service, Node node) {
         return keySet().stream()
                 .filter(is -> is.startsWith("node_check_IP")
-                        || !is.substring(0, is.indexOf("_installed")).equals(service)
-                        || !is.contains(nodeName))
+                        || !Service.from(is.substring(0, is.indexOf(INSTALLED_ON_IP_FLAG))).equals(service)
+                        || !is.contains(node.getName()))
                 .collect(Collectors.toList());
     }
 
-    public Set<String> getNodesAndKubeFlags() {
+    public Set<Node> getNodesAndKubeFlags() {
         return getRootKeys().stream()
                 .filter(key -> key.contains(INSTALLED_ON_IP_FLAG))
                 .map(key -> key.substring(key.indexOf(INSTALLED_ON_IP_FLAG) + INSTALLED_ON_IP_FLAG.length()))
-                .map(key -> key.replace("-", "."))
+                .map(Node::fromName)
                 .collect(Collectors.toSet());
     }
 
-    public static Pair<String, String> parseInstallStatusFlag (String serviceInstallStatusFlag) {
+    public static Pair<Service, Node> parseInstallStatusFlag (String serviceInstallStatusFlag) {
         if (StringUtils.isBlank(serviceInstallStatusFlag)) {
             return null;
         }
         return new Pair<> (
-                serviceInstallStatusFlag.substring (0, serviceInstallStatusFlag.indexOf(INSTALLED_ON_IP_FLAG)),
-                serviceInstallStatusFlag.substring(serviceInstallStatusFlag.indexOf(INSTALLED_ON_IP_FLAG) + INSTALLED_ON_IP_FLAG.length())
+                Service.from(serviceInstallStatusFlag.substring (0, serviceInstallStatusFlag.indexOf(INSTALLED_ON_IP_FLAG))),
+                Node.fromName(serviceInstallStatusFlag.substring(serviceInstallStatusFlag.indexOf(INSTALLED_ON_IP_FLAG) + INSTALLED_ON_IP_FLAG.length()))
         );
     }
 
-    public List<Pair<String, String>> getAllServiceAndNodeNameInstallationPairs() {
+    public List<Pair<Service, Node>> getAllServiceAndNodeNameInstallationPairs() {
         return getRootKeys().stream()
                 .filter(key -> key.contains(INSTALLED_ON_IP_FLAG))
                 .map(ServicesInstallStatusWrapper::parseInstallStatusFlag)
@@ -153,41 +155,33 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
                 .collect(Collectors.toList());
     }
 
-    public void removeInstallationFlag (String service, String nodeName) {
-        removeRootKey(service + INSTALLED_ON_IP_FLAG + nodeName);
+    public void removeInstallationFlag (Service service, Node node) {
+        removeRootKey(service + INSTALLED_ON_IP_FLAG + node.getName());
     }
 
-    public void setInstallationFlag (String service, String nodeName, String flag) {
-        setValueForPath(service + INSTALLED_ON_IP_FLAG + nodeName, flag);
+    public void setInstallationFlag (Service service, Node node, String flag) {
+        setValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName(), flag);
     }
 
-    public Set<String> getNodes() {
+    public Set<Node> getNodes() {
         return getRootKeys().stream()
                 .filter(key -> key.contains(INSTALLED_ON_IP_FLAG))
                 .map(key -> key.substring(key.indexOf(INSTALLED_ON_IP_FLAG) + INSTALLED_ON_IP_FLAG.length()))
                 .filter(key -> !key.equals(KUBERNETES_NODE))
-                .map(key -> key.replace("-", "."))
+                .map(Node::fromName)
                 .collect(Collectors.toSet());
     }
 
-    public String getFirstNodeName(String service) {
-        List<String> allNodes = getRootKeys().stream()
+    public Node getFirstNode(Service service) {
+        List<Node> allNodes = getRootKeys().stream()
                 .filter(key -> key.contains(INSTALLED_ON_IP_FLAG))
                 .filter(key -> key.startsWith(service + "_"))
                 .map(key -> key.substring(key.indexOf(INSTALLED_ON_IP_FLAG) + INSTALLED_ON_IP_FLAG.length()))
+                .map(Node::fromName)
                 .collect(Collectors.toList());
         if (allNodes.isEmpty()) {
             return null;
         }
         return allNodes.get(0);
-    }
-
-    public String getFirstNode(String service) {
-        String serviceNodeName = getFirstNodeName(service);
-        if (StringUtils.isBlank(serviceNodeName)) {
-            return null;
-        }
-
-        return serviceNodeName.replace("-", ".");
     }
 }

@@ -34,9 +34,10 @@
 
 package ch.niceideas.eskimo.controlers;
 
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.model.service.UIConfig;
 import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.types.Service;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -48,6 +49,7 @@ import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -65,14 +67,14 @@ public class ServicesController {
     @ResponseBody
     public String listServices() {
         return ReturnStatusHelper.createOKStatus(map ->
-                map.put("services", new JSONArray(servicesDefinition.listServicesInOrder())));
+                map.put("services", new JSONArray(Arrays.stream(servicesDefinition.listServicesInOrder()).map(Service::getName).collect(Collectors.toList()))));
     }
 
     @GetMapping("/list-ui-services")
     @ResponseBody
     public String listUIServices() {
         return ReturnStatusHelper.createOKStatus(map ->
-                map.put("uiServices", new JSONArray(servicesDefinition.listUIServices())));
+                map.put("uiServices", new JSONArray(Arrays.stream(servicesDefinition.listUIServices()).map(Service::getName).collect(Collectors.toList()))));
     }
 
     @GetMapping("/get-ui-services-config")
@@ -80,10 +82,10 @@ public class ServicesController {
     public String getUIServicesConfig() {
         return ReturnStatusHelper.createOKStatus(map -> {
             Map<String, Object> uiServicesConfig = new HashMap<>();
-            Map<String, UIConfig> uiConfigs = servicesDefinition.getUIServicesConfig();
+            Map<Service, UIConfig> uiConfigs = servicesDefinition.getUIServicesConfig();
 
             uiConfigs.keySet()
-                    .forEach(name -> uiServicesConfig.put (name, uiConfigs.get(name).toJSON()));
+                    .forEach(service -> uiServicesConfig.put (service.getName(), uiConfigs.get(service).toJSON()));
 
             map.put("uiServicesConfig", new JSONObject(uiServicesConfig));
         });
@@ -96,8 +98,8 @@ public class ServicesController {
             Map<String, Object> uiServicesStatusConfig = new HashMap<>();
 
             Arrays.stream(servicesDefinition.listAllServices())
-                    .map(name -> servicesDefinition.getService(name))
-                    .forEach(service -> uiServicesStatusConfig.put (service.getName(), service.toUiStatusConfigJSON()));
+                    .map(service -> servicesDefinition.getServiceDefinition(service))
+                    .forEach(serviceDef -> uiServicesStatusConfig.put (serviceDef.getName(), serviceDef.toUiStatusConfigJSON()));
 
             map.put("uiServicesStatusConfig", new JSONObject(uiServicesStatusConfig));
         });
@@ -110,8 +112,8 @@ public class ServicesController {
             Map<String, Object> servicesDependencies = new HashMap<>();
 
             Arrays.stream(servicesDefinition.listAllServices())
-                    .map(name -> servicesDefinition.getService(name))
-                    .forEach(service -> servicesDependencies.put (service.getName(), service.toDependenciesJSON()));
+                    .map(service -> servicesDefinition.getServiceDefinition(service))
+                    .forEach(serviceDef -> servicesDependencies.put (serviceDef.getName(), serviceDef.toDependenciesJSON()));
 
             map.put("servicesDependencies", new JSONObject(servicesDependencies));
         });
@@ -124,9 +126,9 @@ public class ServicesController {
             Map<String, Object> servicesConfigurations = new HashMap<>();
 
             Arrays.stream(servicesDefinition.listAllServices())
-                    .map(name -> servicesDefinition.getService(name))
-                    .filter(service -> !service.isKubernetes())
-                    .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));
+                    .map(service -> servicesDefinition.getServiceDefinition(service))
+                    .filter(serviceDef -> !serviceDef.isKubernetes())
+                    .forEach(serviceDef -> servicesConfigurations.put (serviceDef.getName(), serviceDef.toConfigJSON()));
 
             map.put("servicesConfigurations", new JSONObject(servicesConfigurations));
         });
@@ -140,12 +142,12 @@ public class ServicesController {
             Map<String, Object> servicesConfigurations = new HashMap<>();
 
             Arrays.stream(servicesDefinition.listAllServices())
-                    .map(name -> servicesDefinition.getService(name))
-                    .forEach(service -> servicesConfigurations.put (service.getName(), service.toConfigJSON()));
+                    .map(service -> servicesDefinition.getServiceDefinition(service))
+                    .forEach(serviceDef -> servicesConfigurations.put (serviceDef.getName(), serviceDef.toConfigJSON()));
 
-            map.put("uniqueServices", new JSONArray(servicesDefinition.listUniqueServices()));
-            map.put("multipleServices", new JSONArray(servicesDefinition.listMultipleServicesNonKubernetes()));
-            map.put("mandatoryServices", new JSONArray(servicesDefinition.listMandatoryServices()));
+            map.put("uniqueServices", new JSONArray(Arrays.stream(servicesDefinition.listUniqueServices()).map(Service::getName).collect(Collectors.toList())));
+            map.put("multipleServices", new JSONArray(Arrays.stream(servicesDefinition.listMultipleServicesNonKubernetes()).map(Service::getName).collect(Collectors.toList())));
+            map.put("mandatoryServices", new JSONArray(Arrays.stream(servicesDefinition.listMandatoryServices()).map(Service::getName).collect(Collectors.toList())));
             map.put("servicesConfigurations", new JSONObject(servicesConfigurations));
         });
     }
@@ -158,9 +160,9 @@ public class ServicesController {
             Map<String, Object> kubeServicesConfig = new HashMap<>();
 
             Arrays.stream(servicesDefinition.listAllServices())
-                    .map(name -> servicesDefinition.getService(name))
-                    .filter(Service::isKubernetes)
-                    .forEach(service -> kubeServicesConfig.put (service.getName(), service.toConfigJSON()));
+                    .map(service -> servicesDefinition.getServiceDefinition(service))
+                    .filter(ServiceDef::isKubernetes)
+                    .forEach(serviceDef -> kubeServicesConfig.put (serviceDef.getName(), serviceDef.toConfigJSON()));
 
             map.put("kubernetesServices", new JSONArray(servicesDefinition.listKubernetesServices()));
             map.put("kubernetesServicesConfigurations", new JSONObject(kubeServicesConfig));

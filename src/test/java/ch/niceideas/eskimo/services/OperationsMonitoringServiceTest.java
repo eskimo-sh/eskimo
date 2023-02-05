@@ -43,6 +43,8 @@ import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.*;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
@@ -120,7 +122,10 @@ public class OperationsMonitoringServiceTest {
         assertFalse(operationsMonitoringService.isInterrupted());
 
         // test interruption
-        operationsMonitoringService.startCommand(new SimpleOperationCommand("test", "test", "test"));
+        operationsMonitoringService.startCommand(new SimpleOperationCommand(
+                SimpleOperationCommand.SimpleOperation.COMMAND,
+                Service.from ("test"),
+                Node.fromName("test")));
 
         operationsMonitoringService.interruptProcessing();
 

@@ -48,6 +48,8 @@ import ch.niceideas.eskimo.test.infrastructure.NotificationHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.ServicesSettingsServiceTestImpl;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,7 +149,8 @@ public class ServicesSettingsControllerTest {
 
         servicesSettingsServiceTest.reset();
 
-        operationsMonitoringService.startCommand(new SimpleOperationCommand("test", "test", "192.168.10.15"));
+        operationsMonitoringService.startCommand(new SimpleOperationCommand(
+                SimpleOperationCommand.SimpleOperation.COMMAND, Service.from("test"), Node.fromAddress("192.168.10.15")));
 
         assertEquals("{\n" +
                 "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed..\",\n" +

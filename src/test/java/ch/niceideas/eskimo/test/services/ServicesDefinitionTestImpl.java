@@ -39,13 +39,15 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.Topology;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.model.service.UIConfig;
 import ch.niceideas.eskimo.services.ServiceDefinitionException;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.json.JSONException;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
@@ -96,7 +98,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public Topology getTopology(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, String currentNode) throws ServiceDefinitionException, NodesConfigurationException {
+    public Topology getTopology(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, Node currentNode) throws ServiceDefinitionException, NodesConfigurationException {
         if (error) {
             throw new ServiceDefinitionException("Test error");
         }
@@ -104,15 +106,15 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public Service getService(String serviceName) {
+    public ServiceDef getServiceDefinition(Service service) {
         if (error) {
             throw new JSONException("Test error");
         }
-        return super.getService(serviceName);
+        return super.getServiceDefinition(service);
     }
 
     @Override
-    public String[] listAllServices() {
+    public Service[] listAllServices() {
         if (error) {
             throw new JSONException("Test error");
         }
@@ -120,7 +122,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public String[] listAllNodesServices() {
+    public Service[] listAllNodesServices() {
         if (error) {
             throw new JSONException("Test error");
         }
@@ -136,7 +138,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public String[] listMultipleServicesNonKubernetes() {
+    public Service[] listMultipleServicesNonKubernetes() {
         if (error) {
             throw new JSONException("Test error");
         }
@@ -144,7 +146,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public String[] listMultipleServices() {
+    public Service[] listMultipleServices() {
         if (error) {
             throw new JSONException("Test error");
         }
@@ -152,7 +154,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public String[] listMandatoryServices() {
+    public Service[] listMandatoryServices() {
         if (error) {
             throw new JSONException("Test error");
         }
@@ -160,7 +162,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public String[] listUniqueServices() {
+    public Service[] listUniqueServices() {
         if (error) {
             throw new JSONException("Test error");
         }
@@ -168,7 +170,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public String[] listKubernetesServices() {
+    public Service[] listKubernetesServices() {
         if (error) {
             throw new JSONException("Test error");
         }
@@ -184,7 +186,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public String[] listProxiedServices() {
+    public Service[] listProxiedServices() {
         if (error) {
             throw new JSONException("Test error");
         }
@@ -192,7 +194,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public String[] listUIServices() {
+    public Service[] listUIServices() {
         if (error) {
             throw new JSONException("Test error");
         }
@@ -200,7 +202,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public Map<String, UIConfig> getUIServicesConfig() {
+    public Map<Service, UIConfig> getUIServicesConfig() {
         if (error) {
             throw new JSONException("Test error");
         }
@@ -208,7 +210,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public String[] listServicesInOrder() {
+    public Service[] listServicesInOrder() {
         if (error) {
             throw new JSONException("Test error");
         }
@@ -216,7 +218,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public String[] listServicesOrderedByDependencies() {
+    public Service[] listServicesOrderedByDependencies() {
         if (error) {
             throw new JSONException("Test error");
         }
@@ -224,7 +226,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public String[] listKubernetesServicesOrderedByDependencies() {
+    public Service[] listKubernetesServicesOrderedByDependencies() {
         if (error) {
             throw new JSONException("Test error");
         }
@@ -232,7 +234,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public int compareServices(Service one, Service other) {
+    public int compareServices(ServiceDef one, ServiceDef other) {
         if (error) {
             throw new JSONException("Test error");
         }
@@ -240,7 +242,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public int compareServices(String servOne, String servOther) {
+    public int compareServices(Service servOne, Service servOther) {
         if (error) {
             throw new JSONException("Test error");
         }
@@ -248,7 +250,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public Collection<String> getDependentServices(String service) {
+    public Collection<Service> getDependentServices(Service service) {
         if (error) {
             throw new JSONException("Test error");
         }

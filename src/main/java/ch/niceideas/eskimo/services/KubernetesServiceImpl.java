@@ -40,11 +40,13 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.MemoryModel;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.services.satellite.MemoryComputer;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import ch.niceideas.eskimo.utils.KubeStatusParser;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -68,8 +70,6 @@ public class KubernetesServiceImpl implements KubernetesService {
     private static final Logger logger = Logger.getLogger(KubernetesServiceImpl.class);
 
     public static final String KUBE_MASTER_NOT_INSTALLED = "Couldn't find service KUBE-MASTER in installation status";
-    public static final String KUBE_NA_FLAG = "KUBERNETES_NA";
-    public static final String KUBERNETES_NODE = "kubernetes node";
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -117,52 +117,52 @@ public class KubernetesServiceImpl implements KubernetesService {
     private int kubernetesOperationWaitTimoutSeconds = 100 * 60; // 100 minutes
 
     @Override
-    public void showJournal(Service service, String node) throws SystemException {
-        systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Showing journal", () -> {
-            if (service.isKubernetes()) {
+    public void showJournal(ServiceDef serviceDef, Node node) throws SystemException {
+        systemService.applyServiceOperation(serviceDef.toService(), Node.KUBERNETES_NODE, SimpleOperationCommand.SimpleOperation.SHOW_JOURNAL, () -> {
+            if (serviceDef.isKubernetes()) {
                 try {
-                    String kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(servicesDefinition.getKubeMasterService().getName());
-                    if (StringUtils.isBlank(kubeMasterNode)) {
+                    Node kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(servicesDefinition.getKubeMasterService().toService());
+                    if (kubeMasterNode == null) {
                         throw new KubernetesException(KUBE_MASTER_NOT_INSTALLED);
                     }
-                    return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl logs " + service.getName() + " " + node);
+                    return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl logs " + serviceDef.getName() + " " + node);
                 } catch (FileException | SetupException e) {
                     logger.error (e, e);
                     throw new KubernetesException(e);
                 }
             } else {
-                throw new UnsupportedOperationException("Showing service journal for " + service.getName()
+                throw new UnsupportedOperationException("Showing service journal for " + serviceDef.getName()
                         + SystemService.SHOULD_NOT_HAPPEN_FROM_HERE);
             }
         });
     }
 
     @Override
-    public void startService(Service service, String node) throws SystemException {
-        kubeOp (service, "Starting", "start");
+    public void startService(ServiceDef service, Node node) throws SystemException {
+        kubeOp (service, SimpleOperationCommand.SimpleOperation.START, "start");
     }
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void stopService(Service service, String node) throws SystemException {
-        kubeOp (service, "Stopping", "stop");
+    public void stopService(ServiceDef service, Node node) throws SystemException {
+        kubeOp (service, SimpleOperationCommand.SimpleOperation.STOP, "stop");
     }
 
-    private void kubeOp (Service service, String opLabel, String op) throws SystemException {
-        systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, opLabel, () -> {
-            if (service.isKubernetes()) {
+    private void kubeOp (ServiceDef serviceDef, SimpleOperationCommand.SimpleOperation simpleOp, String op) throws SystemException {
+        systemService.applyServiceOperation(serviceDef.toService(), Node.KUBERNETES_NODE, simpleOp, () -> {
+            if (serviceDef.isKubernetes()) {
                 try {
-                    String kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(servicesDefinition.getKubeMasterService().getName());
-                    if (StringUtils.isBlank(kubeMasterNode)) {
+                    Node kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(servicesDefinition.getKubeMasterService().toService());
+                    if (kubeMasterNode == null) {
                         throw new KubernetesException(KUBE_MASTER_NOT_INSTALLED);
                     }
-                    return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl " + op + " " + service.getName() + " " + kubeMasterNode);
+                    return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl " + op + " " + serviceDef.getName() + " " + kubeMasterNode);
                 } catch (FileException | SetupException e) {
                     logger.error (e, e);
                     throw new KubernetesException(e);
                 }
             } else {
-                throw new UnsupportedOperationException(opLabel + " service for " + service.getName()
+                throw new UnsupportedOperationException(simpleOp.getLabel() + " service for " + serviceDef.getName()
                         + SystemService.SHOULD_NOT_HAPPEN_FROM_HERE);
             }
         });
@@ -170,30 +170,34 @@ public class KubernetesServiceImpl implements KubernetesService {
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void restartService(Service service, String node) throws SystemException {
-        systemService.applyServiceOperation(service.getName(), KUBERNETES_NODE, "Restart", () -> restartServiceInternal(service, node));
+    public void restartService(ServiceDef serviceDef, Node node) throws SystemException {
+        systemService.applyServiceOperation(
+                serviceDef.toService(),
+                Node.KUBERNETES_NODE,
+                SimpleOperationCommand.SimpleOperation.RESTART,
+                () -> restartServiceInternal(serviceDef, node));
     }
 
     @Override
-    public String restartServiceInternal(Service service, String node) throws KubernetesException, SSHCommandException {
-        if (service.isKubernetes()) {
-            if (!service.isRegistryOnly()) {
+    public String restartServiceInternal(ServiceDef serviceDef, Node node) throws KubernetesException, SSHCommandException {
+        if (serviceDef.isKubernetes()) {
+            if (!serviceDef.isRegistryOnly()) {
                 try {
-                    String kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(servicesDefinition.getKubeMasterService().getName());
-                    if (StringUtils.isBlank(kubeMasterNode)) {
+                    Node kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(servicesDefinition.getKubeMasterService().toService());
+                    if (kubeMasterNode == null) {
                         throw new KubernetesException(KUBE_MASTER_NOT_INSTALLED);
                     }
-                    return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl restart " + service.getName() + " " + kubeMasterNode);
+                    return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl restart " + serviceDef.getName() + " " + kubeMasterNode);
                 } catch (FileException | SetupException e) {
                     logger.error(e, e);
                     throw new KubernetesException(e);
                 }
             } else {
-                logger.info ("No restarting " + service.getName() + " since it's a registry only service");
+                logger.info ("No restarting " + serviceDef.getName() + " since it's a registry only service");
                 return "";
             }
         } else {
-            throw new UnsupportedOperationException("Restarting service for " + service.getName()
+            throw new UnsupportedOperationException("Restarting service for " + serviceDef.getName()
                     + SystemService.SHOULD_NOT_HAPPEN_FROM_HERE);
         }
     }
@@ -202,56 +206,56 @@ public class KubernetesServiceImpl implements KubernetesService {
         systemOperationService.applySystemOperation(operationId,
                 ml -> {
                     try {
-                        ml.addInfo(restartServiceInternal(servicesDefinition.getService(operationId.getService()), KUBERNETES_NODE));
+                        ml.addInfo(restartServiceInternal(servicesDefinition.getServiceDefinition(operationId.getService()), Node.KUBERNETES_NODE));
                     } catch (KubernetesException e) {
                         logger.error (e, e);
                         throw new SystemException (e);
                     }
                 },
-                status -> status.setInstallationFlag(operationId.getService(), ServicesInstallStatusWrapper.KUBERNETES_NODE, "OK") );
+                status -> status.setInstallationFlag(operationId.getService(), Node.KUBERNETES_NODE, "OK") );
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void installService(KubernetesOperationsCommand.KubernetesOperationId operation, String kubeMasterNode)
+    public void installService(KubernetesOperationsCommand.KubernetesOperationId operation, Node kubeMasterNode)
             throws SystemException {
         systemOperationService.applySystemOperation(operation,
                 logger -> proceedWithKubernetesServiceInstallation(logger, kubeMasterNode, operation.getService()),
-                status -> status.setInstallationFlag(operation.getService(), ServicesInstallStatusWrapper.KUBERNETES_NODE, "OK") );
+                status -> status.setInstallationFlag(operation.getService(), Node.KUBERNETES_NODE, "OK") );
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void uninstallService(KubernetesOperationsCommand.KubernetesOperationId operation, String kubeMasterNode) throws SystemException {
-        String nodeIp = null;
+    public void uninstallService(KubernetesOperationsCommand.KubernetesOperationId operation, Node kubeMasterNode) throws SystemException {
+        Node kubeNode = null;
         try {
-            Pair<String, String> nodeNameAndStatus = this.getServiceRuntimeNode(servicesDefinition.getService(operation.getService()), kubeMasterNode);
-            nodeIp = nodeNameAndStatus.getKey();
+            Pair<Node, String> nodeNameAndStatus = this.getServiceRuntimeNode(servicesDefinition.getServiceDefinition(operation.getService()), kubeMasterNode);
+            kubeNode = nodeNameAndStatus.getKey();
         } catch (KubernetesException e) {
             logger.warn (e.getMessage());
             logger.debug (e, e);
         }
         systemOperationService.applySystemOperation(operation,
                 builder -> proceedWithKubernetesServiceUninstallation(builder, kubeMasterNode, operation.getService()),
-                status -> status.removeInstallationFlag(operation.getService(), ServicesInstallStatusWrapper.KUBERNETES_NODE));
-        if (nodeIp != null) {
-            proxyManagerService.removeServerForService(operation.getService(), nodeIp);
+                status -> status.removeInstallationFlag(operation.getService(), Node.KUBERNETES_NODE));
+        if (kubeNode != null) {
+            proxyManagerService.removeServerForService(operation.getService(), kubeNode);
         } else {
             logger.warn ("No previous IP could be found for service " + operation.getService());
         }
     }
 
-    private void proceedWithKubernetesServiceUninstallation(MessageLogger ml, String kubeMasterNode, String serviceName)
+    private void proceedWithKubernetesServiceUninstallation(MessageLogger ml, Node kubeMasterNode, Service service)
             throws SSHCommandException {
-        Service service = servicesDefinition.getService(serviceName);
+        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
 
         try (SSHConnection connection = connectionManagerService.getPrivateConnection(kubeMasterNode)){
-            sshCommandService.runSSHCommand(connection, "eskimo-kubectl uninstall " + service.getName() + " " + kubeMasterNode);
+            sshCommandService.runSSHCommand(connection, "eskimo-kubectl uninstall " + service + " " + kubeMasterNode);
         } catch (ConnectionManagerException e) {
             throw new SSHCommandException(e);
         }
     }
 
     @Override
-    public boolean shouldInstall(KubernetesServicesConfigWrapper kubeServicesConfig, String service) {
+    public boolean shouldInstall(KubernetesServicesConfigWrapper kubeServicesConfig, Service service) {
         if (kubeServicesConfig != null) {
             return kubeServicesConfig.isServiceInstallRequired(service);
         }
@@ -268,77 +272,74 @@ public class KubernetesServiceImpl implements KubernetesService {
 
             KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
 
-            String kubeMasterNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterService().getName());
-            if (kubeServicesConfig == null || StringUtils.isBlank(kubeMasterNode) && kubeServicesConfig.hasEnabledServices()) {
+            Node kubeMasterNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterService().toService());
+            if (kubeServicesConfig == null || kubeMasterNode == null && kubeServicesConfig.hasEnabledServices()) {
                 logger.warn("Kubernetes is not installed");
             }
 
             // get kubectl status all at once and then below get it from Kubectl result
             KubeStatusParser parser = getKubeStatusParser();
 
-            for (String service : servicesDefinition.listKubernetesServices()) {
+            for (Service service : servicesDefinition.listKubernetesServices()) {
 
                 // should service be installed on kubernetes ?
                 boolean shall = this.shouldInstall(kubeServicesConfig, service);
 
-                Pair<String, String> nodeNameAndStatus = new Pair<>(KUBE_NA_FLAG, "NA");
+                Pair<Node, String> nodeNameAndStatus = new Pair<>(Node.KUBE_NA_FLAG, "NA");
                 if (parser != null) {
-                    nodeNameAndStatus = parser.getServiceRuntimeNode(servicesDefinition.getService(service), kubeMasterNode);
+                    nodeNameAndStatus = parser.getServiceRuntimeNode(servicesDefinition.getServiceDefinition(service), kubeMasterNode);
                 }
 
-                String nodeIp = nodeNameAndStatus.getKey();
+                Node serviceRuntimeNode = nodeNameAndStatus.getKey();
 
                 // if kubernetes is not answering, we assume service is still installed if it has been installed before
                 // we identify it on kubernetes node then.
-                if (nodeIp != null && nodeIp.equals(KUBE_NA_FLAG)) {
-                    if (StringUtils.isNotBlank(servicesInstallationStatus.getFirstNode(service))) {
-                        nodeIp = kubeMasterNode;
+                if (serviceRuntimeNode != null && serviceRuntimeNode.equals(Node.KUBE_NA_FLAG)) {
+                    if (servicesInstallationStatus.getFirstNode(service) != null) {
+                        serviceRuntimeNode = kubeMasterNode;
                     } else {
-                        nodeIp = null;
+                        serviceRuntimeNode = null;
                     }
                 }
 
-                boolean installed = StringUtils.isNotBlank(nodeIp);
+                boolean installed = serviceRuntimeNode != null;
                 boolean running = nodeNameAndStatus.getValue().equalsIgnoreCase(STATUS_RUNNING);
 
-                String nodeName = nodeIp != null ? nodeIp.replace(".", "-") : null;
-
                 // if there is any kind of problem, boild down to identify service on kube master
-                if (!installed || !running || servicesDefinition.getService(service).isRegistryOnly() || parser == null) {
+                if (!installed || !running || servicesDefinition.getServiceDefinition(service).isRegistryOnly() || parser == null) {
 
                     // uninstalled services are identified on the kubernetes node
-                    if (StringUtils.isBlank(nodeName)) {
-                        if (StringUtils.isNotBlank(kubeMasterNode)) {
-                            nodeName = kubeMasterNode.replace(".", "-");
+                    if (serviceRuntimeNode == null) {
+                        if (kubeMasterNode != null) {
+                            serviceRuntimeNode = kubeMasterNode;
                         } else {
-                            nodeName = servicesInstallationStatus.getFirstNodeName(servicesDefinition.getKubeMasterService().getName());
+                            serviceRuntimeNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterService().toService());
                         }
-                        // last attempt, get it from theoretical perspective
-                        if (StringUtils.isBlank(nodeName)) {
-                            nodeName = configurationService.loadNodesConfig().getFirstNodeName(servicesDefinition.getKubeMasterService().getName());
+                        // last attempt, get it from where should theoretically be the kube master
+                        if (serviceRuntimeNode == null) {
+                            serviceRuntimeNode = configurationService.loadNodesConfig().getFirstNode(servicesDefinition.getKubeMasterService().toService());
                         }
                     }
 
                     systemService.feedInServiceStatus(
-                            statusMap, servicesInstallationStatus, nodeIp, nodeName,
-                            ServicesInstallStatusWrapper.KUBERNETES_NODE,
+                            statusMap, servicesInstallationStatus, serviceRuntimeNode,
+                            Node.KUBERNETES_NODE,
                             service, shall, installed, running);
                 }
 
                 //otherwise show service running on nodes where it is running
                 else {
 
-                    List<Pair<String, String>> nodeNamesAndStatuses = parser.getServiceRuntimeNodes(service);
+                    List<Pair<Node, String>> nodeNamesAndStatuses = parser.getServiceRuntimeNodes(service);
 
-                    for (Pair<String, String> rtNnodeNameAndStatus : nodeNamesAndStatuses) {
-                        String runtimeNodeIp = rtNnodeNameAndStatus.getKey();
-                        String runtimeNodeName = runtimeNodeIp.replace(".", "-");
+                    for (Pair<Node, String> rtNnodeNameAndStatus : nodeNamesAndStatuses) {
+                        Node runtimeNode = rtNnodeNameAndStatus.getKey();
 
                         boolean runtimeRunning = rtNnodeNameAndStatus.getValue().equals(STATUS_RUNNING);
 
                         systemService.feedInServiceStatus(
-                                statusMap, servicesInstallationStatus, runtimeNodeIp, runtimeNodeName,
-                                ServicesInstallStatusWrapper.KUBERNETES_NODE,
+                                statusMap, servicesInstallationStatus, runtimeNode,
+                                Node.KUBERNETES_NODE,
                                 service, shall, true, runtimeRunning);
                     }
                 }
@@ -362,8 +363,8 @@ public class KubernetesServiceImpl implements KubernetesService {
             // Find out node running Kubernetes
             ServicesInstallStatusWrapper servicesInstallStatus = configurationService.loadServicesInstallationStatus();
 
-            String kubeMasterNode = servicesInstallStatus.getFirstNode(servicesDefinition.getKubeMasterService().getName());
-            if (StringUtils.isBlank(kubeMasterNode)) {
+            Node kubeMasterNode = servicesInstallStatus.getFirstNode(servicesDefinition.getKubeMasterService().toService());
+            if (kubeMasterNode == null) {
 
                 notificationService.addError("Kube Master doesn't seem to be installed");
 
@@ -372,13 +373,12 @@ public class KubernetesServiceImpl implements KubernetesService {
                 // special case : if some Kubernetes services are getting uninstalled, and Kubernetes is nowhere installed or anything, let's force flag them as uninstalled
                 try {
                     SystemStatusWrapper lastStatus = systemService.getStatus();
-                    String kubeMasterNodeName = lastStatus.getFirstNodeName(servicesDefinition.getKubeMasterService().getName());
-                    if (StringUtils.isBlank(kubeMasterNodeName)
-                            && !command.getUninstallations().isEmpty()) {
+                    Node lastKubeMasterNode = lastStatus.getFirstNode(servicesDefinition.getKubeMasterService().toService());
+                    if (lastKubeMasterNode == null && !command.getUninstallations().isEmpty()) {
                         logger.warn("Uninstalled Kubernetes services will be flagged as uninstalled even though no operation can be performed in kubernetes.");
                         configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
                             for (KubernetesOperationsCommand.KubernetesOperationId uninstalledKubeService : command.getUninstallations()) {
-                                servicesInstallationStatus.removeInstallationFlag(uninstalledKubeService.getService(), ServicesInstallStatusWrapper.KUBERNETES_NODE);
+                                servicesInstallationStatus.removeInstallationFlag(uninstalledKubeService.getService(), Node.KUBERNETES_NODE);
                             }
                         });
                     }
@@ -390,8 +390,8 @@ public class KubernetesServiceImpl implements KubernetesService {
                 throw new SystemException(message);
             }
 
-            Set<String> liveIps = new HashSet<>();
-            Set<String> deadIps = new HashSet<>();
+            Set<Node> liveIps = new HashSet<>();
+            Set<Node> deadIps = new HashSet<>();
 
             // handle potential interruption request
             if (operationsMonitoringService.isInterrupted()) {
@@ -401,7 +401,7 @@ public class KubernetesServiceImpl implements KubernetesService {
             NodesConfigWrapper rawNodesConfig = configurationService.loadNodesConfig();
             NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
 
-            List<Pair<String, String>> nodesSetup = systemService.buildDeadIps(new HashSet<>(){{add(kubeMasterNode);}}, nodesConfig, liveIps, deadIps);
+            List<Pair<String, Node>> nodesSetup = systemService.buildDeadIps(new HashSet<>(){{add(kubeMasterNode);}}, nodesConfig, liveIps, deadIps);
 
             if (deadIps.contains(kubeMasterNode)) {
                 notificationService.addError("The Kube Master node is dead. cannot proceed any further with installation.");
@@ -425,7 +425,8 @@ public class KubernetesServiceImpl implements KubernetesService {
             }
 
             // Nodes re-setup (topology)
-            systemOperationService.applySystemOperation(new KubernetesOperationsCommand.KubernetesOperationId("Installation", TOPOLOGY_ALL_NODES),
+            systemOperationService.applySystemOperation(new KubernetesOperationsCommand.KubernetesOperationId(
+                    KubernetesOperationsCommand.KuberneteOperation.INSTALLATION, Service.TOPOLOGY_ALL_NODES),
                     ml -> systemService.performPooledOperation (new ArrayList<>(liveIps), parallelismInstallThreadCount, baseInstallWaitTimout,
                             (operation, error) -> {
                                 // topology
@@ -467,12 +468,12 @@ public class KubernetesServiceImpl implements KubernetesService {
         }
     }
 
-    private void proceedWithKubernetesServiceInstallation(MessageLogger ml, String kubeMasterNode, String service)
+    private void proceedWithKubernetesServiceInstallation(MessageLogger ml, Node kubeMasterNode, Service service)
             throws IOException, SystemException, SSHCommandException {
 
         try (SSHConnection connection = connectionManagerService.getPrivateConnection(kubeMasterNode)){
 
-            String imageName = servicesDefinition.getService(service).getImageName();
+            String imageName = servicesDefinition.getServiceDefinition(service).getImageName();
 
             ml.addInfo(" - Creating archive and copying it over to Kube Master node");
             File tmpArchiveFile = systemService.createRemotePackageFolder(ml, connection, kubeMasterNode, service, imageName);
@@ -495,10 +496,10 @@ public class KubernetesServiceImpl implements KubernetesService {
         try {
             ServicesInstallStatusWrapper servicesInstallationStatus = configurationService.loadServicesInstallationStatus();
 
-            String kubeMasterNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterService().getName());
+            Node kubeMasterNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterService().toService());
 
             String ping = null;
-            if (!StringUtils.isBlank(kubeMasterNode)) {
+            if (kubeMasterNode != null) {
 
                 // find out if SSH connection to host can succeeed
                 try {
@@ -530,11 +531,11 @@ public class KubernetesServiceImpl implements KubernetesService {
         }
     }
 
-    private Pair<String,String> getServiceRuntimeNode(Service service, String kubeIp) throws KubernetesException {
+    private Pair<Node,String> getServiceRuntimeNode(ServiceDef service, Node kubeIp) throws KubernetesException {
 
         KubeStatusParser parser = getKubeStatusParser();
         if (parser == null) {
-            return new Pair<>(KUBE_NA_FLAG, "NA");
+            return new Pair<>(Node.KUBE_NA_FLAG, "NA");
         }
         return parser.getServiceRuntimeNode (service, kubeIp);
     }

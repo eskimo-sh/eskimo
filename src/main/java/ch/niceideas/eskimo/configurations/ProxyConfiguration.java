@@ -135,7 +135,7 @@ public class ProxyConfiguration implements WebSocketConfigurer {
                         connectTimeout,
                         connectionRequestTimeout),
                 Arrays.stream(servicesDefinition.listProxiedServices())
-                        .map(serviceName -> servicesDefinition.getService(serviceName))
+                        .map(serviceName -> servicesDefinition.getServiceDefinition(serviceName))
                         .map(service -> "/" + service.getName() + "/*")
                         .toArray(String[]::new));
 
@@ -172,7 +172,7 @@ public class ProxyConfiguration implements WebSocketConfigurer {
     @Profile("!no-web-stack")
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         String[] allWsUrls = Arrays.stream(servicesDefinition.listProxiedServices())
-                .map(serviceName -> servicesDefinition.getService(serviceName))
+                .map(serviceName -> servicesDefinition.getServiceDefinition(serviceName))
                 .map(service -> ESKIMO_WEB_SOCKET_URL_PREFIX + "/" + service.getName() + "/**")
                 .toArray(String[]::new);
         registry.addHandler(webSocketProxyServer, allWsUrls);

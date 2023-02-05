@@ -35,7 +35,9 @@
 
 package ch.niceideas.eskimo.model;
 
+import ch.niceideas.eskimo.types.Service;
+
 public interface ConfigurationOwner {
 
-    boolean hasServiceConfigured(String serviceName);
+    boolean hasServiceConfigured(Service service);
 }

@@ -37,8 +37,10 @@ package ch.niceideas.eskimo.services.satellite;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.Dependency;
 import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -57,7 +59,7 @@ public class ServicesInstallationSorter {
     @Autowired
     private ConfigurationService configurationService;
 
-    public <T extends OperationId> List<List<T>> orderOperations  (
+    public <T extends OperationId<?>> List<List<T>> orderOperations  (
             List<T> operations,
             NodesConfigWrapper nodesConfig) throws NodesConfigurationException, ServiceDefinitionException, SystemException {
 
@@ -66,10 +68,10 @@ public class ServicesInstallationSorter {
         }
 
         // 1. group services togethers
-        Map<String, List<T>> groupedOperations = new HashMap<>();
+        Map<Service, List<T>> groupedOperations = new HashMap<>();
         for (T operation : operations) {
 
-            String service = operation.getService();
+            Service service = operation.getService();
 
             List<T> operationForService = groupedOperations.computeIfAbsent(service, k -> new ArrayList<>());
 
@@ -77,35 +79,35 @@ public class ServicesInstallationSorter {
         }
 
         // 2. Order by dependencies
-        List<Service> services = groupedOperations.keySet().stream()
+        List<ServiceDef> services = groupedOperations.keySet().stream()
                 .sorted((one, other) -> servicesDefinition.compareServices(one, other))
-                .map(service -> servicesDefinition.getService(service))
+                .map(service -> servicesDefinition.getServiceDefinition(service))
                 .collect(Collectors.toList());
 
         // sort installation first, uninstallation after, restarts in the end
-        for (Service service : services) {
-            List<T> operationForService = groupedOperations.get(service.getName());
+        for (ServiceDef serviceDef : services) {
+            List<T> operationForService = groupedOperations.get(serviceDef.toService());
             if (operationForService != null) {
                 operationForService.sort((o1, o2) -> {
-                    if (o1.getType().equals("installation")) {
-                        if (o2.getType().equals("installation")) {
+                    if (o1.getOperation().getType().equals("installation")) {
+                        if (o2.getOperation().getType().equals("installation")) {
                             return 0;
                         } else {
                             return -1;
                         }
                     }
 
-                    if (o1.getType().equals("uninstallation")) {
-                        if (o2.getType().equals("installation")) {
+                    if (o1.getOperation().getType().equals("uninstallation")) {
+                        if (o2.getOperation().getType().equals("installation")) {
                             return 1;
-                        } else if (o2.getType().equals("uninstallation")) {
+                        } else if (o2.getOperation().getType().equals("uninstallation")) {
                             return 0;
                         } else {
                             return -1;
                         }
                     }
 
-                    if (o2.getType().equals("restart")) {
+                    if (o2.getOperation().getType().equals("restart")) {
                         return 0;
                     } else {
                         return 1;
@@ -119,29 +121,29 @@ public class ServicesInstallationSorter {
 
         Topology topology = servicesDefinition.getTopology(nodesConfig, configurationService.loadKubernetesServicesConfig(), null);
 
-        for (Service service : services) {
+        for (ServiceDef serviceDef : services) {
 
-            List<T> group = groupedOperations.get(service.getName());
+            List<T> group = groupedOperations.get(serviceDef.toService());
 
             // If service has its own in dependency, this is where we have an issue
             // then it depends on the type of dependency:
             // if master is random, don't bother
             // if master is fixed, install it first
 
-            Optional<Dependency> dependency = service.getDependency(service);
+            Optional<Dependency> dependency = serviceDef.getDependency(serviceDef);
 
             if (dependency.isPresent()
                     && (dependency.get().getMes().equals(MasterElectionStrategy.FIRST_NODE)
                     || dependency.get().getMes().equals(MasterElectionStrategy.RANDOM))) {
 
-                String[] masters = topology.getMasters(service);
+                Node[] masters = topology.getMasters(serviceDef);
 
-                for (String master : masters) {
+                for (Node master : masters) {
 
                     List<T> newGroup = new ArrayList<>();
                     for (T operation : group) {
 
-                        if (operation.isOnNode(master) && operation.getType().equals("installation")) {
+                        if (operation.isOnNode(master) && operation.getOperation().getType().equals("installation")) {
 
                             // create ad'hoc single group for master
                             List<T> singleGroup = new ArrayList<>();
@@ -175,20 +177,20 @@ public class ServicesInstallationSorter {
                 List<T> prev = orderedOperationsSteps.get(i - 1);
 
                 // Does any service in current have any dependency on any service in prev ?
-                Set<Service> currentServices = new HashSet<>();
-                for (OperationId installation : current) {
-                    currentServices.add(servicesDefinition.getService(installation.getService()));
+                Set<ServiceDef> currentServices = new HashSet<>();
+                for (OperationId<?> installation : current) {
+                    currentServices.add(servicesDefinition.getServiceDefinition(installation.getService()));
                 }
 
-                Set<Service> prevServices = new HashSet<>();
-                for (OperationId installation : prev) {
-                    prevServices.add(servicesDefinition.getService(installation.getService()));
+                Set<ServiceDef> prevServices = new HashSet<>();
+                for (OperationId<?> installation : prev) {
+                    prevServices.add(servicesDefinition.getServiceDefinition(installation.getService()));
                 }
 
                 boolean hasDependency = false;
                 boolean mixUpKubernetes = false;
-                for (Service currentService : currentServices) {
-                    for (Service prevService : prevServices) {
+                for (ServiceDef currentService : currentServices) {
+                    for (ServiceDef prevService : prevServices) {
                         if (currentService.hasDependency(prevService)) {
                             hasDependency = true;
                         }
@@ -201,8 +203,8 @@ public class ServicesInstallationSorter {
 
                 // Does any installation happen on same node ?
                 boolean hasSameNode = false;
-                for (OperationId installCurrent : current) {
-                    for (OperationId installPrev : prev) {
+                for (OperationId<?> installCurrent : current) {
+                    for (OperationId<?> installPrev : prev) {
                         if (installCurrent.isSameNode(installPrev)) {
                             hasSameNode = true;
                             break;

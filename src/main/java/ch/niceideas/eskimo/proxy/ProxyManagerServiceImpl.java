@@ -35,11 +35,12 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +82,7 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
         logger.debug("");
     }
 
+    @Override
     public HttpHost getServerHost(String serviceId) {
         ProxyTunnelConfig config =  proxyTunnelConfigs.get(serviceId);
         if (config == null) {
@@ -89,16 +91,17 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
         return new HttpHost("http", "localhost", config.getLocalPort());
     }
 
-    public String getServerURI(String serviceName, String pathInfo) {
+    @Override
+    public String getServerURI(Service service, String pathInfo) {
 
-        Service service = servicesDefinition.getService(serviceName);
+        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
 
-        String serviceId = null;
-        String targetHost = null;
-        if (!service.isUnique()) {
+        String serviceId;
+        Node targetHost = null;
+        if (!serviceDef.isUnique()) {
             targetHost = extractHostFromPathInfo(pathInfo);
         }
-        serviceId = service.getServiceId(targetHost);
+        serviceId = serviceDef.getServiceId(targetHost);
 
         HttpHost serverHost = getServerHost(serviceId);
         if (serverHost == null) {
@@ -107,7 +110,8 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
         return serverHost.getSchemeName() + "://" + serverHost.getHostName() + ":" + serverHost.getPort() + "/";
     }
 
-    public String extractHostFromPathInfo(String pathInfo) {
+    @Override
+    public Node extractHostFromPathInfo(String pathInfo) {
         int startIndex = 0;
         if (pathInfo.startsWith("/")) {
             startIndex = 1;
@@ -116,99 +120,102 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
         if (lastIndex == -1) {
             lastIndex = pathInfo.length();
         }
-        return pathInfo.substring(startIndex, lastIndex);
+        return Node.fromAddress(pathInfo.substring(startIndex, lastIndex));
     }
 
-    public List<ProxyTunnelConfig> getTunnelConfigForHost (String host) {
+    @Override
+    public List<ProxyTunnelConfig> getTunnelConfigForHost (Node host) {
         return proxyTunnelConfigs.values().stream()
                 .filter(config -> config.getNode().equals(host))
                 .collect(Collectors.toList());
     }
 
-    public void updateServerForService(String serviceName, String runtimeNode) throws ConnectionManagerException {
+    @Override
+    public void updateServerForService(Service service, Node runtimeNode) throws ConnectionManagerException {
 
-        Service service = servicesDefinition.getService(serviceName);
-        if (service != null && service.isProxied()) {
+        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
+        if (serviceDef != null && serviceDef.isProxied()) {
 
             // need to make a distinction between unique and multiple services here !!
-            String serviceId = service.getServiceId(runtimeNode);
+            String serviceId = serviceDef.getServiceId(runtimeNode);
 
-            String effNode = getRuntimeNode(runtimeNode, service);
+            Node effNode = getRuntimeNode(runtimeNode, serviceDef);
 
             ProxyTunnelConfig prevConfig = proxyTunnelConfigs.get(serviceId);
 
             if (prevConfig == null || !prevConfig.getNode().equals(effNode)) {
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("------ BEFORE ---- updateServerForService (" + serviceName + "," + runtimeNode + ") ----------- ");
+                    logger.debug("------ BEFORE ---- updateServerForService (" + service + "," + runtimeNode + ") ----------- ");
                     __dumpProxyTunnelConfig();
                 }
 
                 // Handle host has changed !
                 ProxyTunnelConfig newConfig = new ProxyTunnelConfig(
-                        serviceName,
+                        service,
                         ProxyManagerService.generateLocalPort(),
                         effNode,
-                        service.getUiConfig().getProxyTargetPort());
+                        serviceDef.getUiConfig().getProxyTargetPort());
 
                 proxyTunnelConfigs.put(serviceId, newConfig);
 
                 if (prevConfig != null) {
-                    logger.info ("Updating server config for service " + serviceName + ". Will recreate tunnels to "
+                    logger.info ("Updating server config for service " + service + ". Will recreate tunnels to "
                             + effNode + " and " + prevConfig.getNode() + " (dropping service)");
                     try {
                         connectionManagerService.recreateTunnels(prevConfig.getNode());
                     } catch (ConnectionManagerException e) {
-                        logger.error ("Couldn't drop former tunnels for " + serviceName + " on " + prevConfig.getNode() +
+                        logger.error ("Couldn't drop former tunnels for " + service + " on " + prevConfig.getNode() +
                                 " - got " + e.getClass() + ":" + e.getMessage());
                     }
                 } else {
-                    logger.info ("Updating server config for service " + serviceName + ". Will recreate tunnels to " + effNode);
+                    logger.info ("Updating server config for service " + service + ". Will recreate tunnels to " + effNode);
                 }
 
                 connectionManagerService.recreateTunnels (effNode);
                 webSocketProxyServer.removeForwardersForService(serviceId); // just remove them, they will be recreated automagically
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("------ AFTER ---- updateServerForService (" + serviceName + "," + runtimeNode + ") ----------- ");
+                    logger.debug("------ AFTER ---- updateServerForService (" + service + "," + runtimeNode + ") ----------- ");
                     __dumpProxyTunnelConfig();
                 }
             }
         }
     }
 
-    private String getRuntimeNode(String runtimeNodeName, Service service) throws ConnectionManagerException {
-        String effNode = runtimeNodeName;
+    private Node getRuntimeNode(Node runtimeNode, ServiceDef service) throws ConnectionManagerException {
+        Node effNode = runtimeNode;
         if (service.isUsingKubeProxy()) {
 
             // Kubernetes services are redirected to kubernetes master node if they are reached through the kubectl
             // proxy, this is mandatory
 
-            ServicesInstallStatusWrapper servicesInstallationStatus = null;
+            ServicesInstallStatusWrapper servicesInstallationStatus;
             try {
                 servicesInstallationStatus = configurationService.loadServicesInstallationStatus();
             } catch (FileException | SetupException e) {
                 logger.error(e, e);
                 throw new ConnectionManagerException(e.getMessage(), e);
             }
-            effNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterService().getName());
-            if (StringUtils.isBlank(effNode)) {
+            effNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterService().toService());
+            if (effNode == null) {
                 throw new ConnectionManagerException("Asked for kube master runtime node, but it couldn't be found in installation status");
             }
         }
         return effNode;
     }
 
-    public void removeServerForService(String serviceName, String runtimeNode) {
+    @Override
+    public void removeServerForService(Service service, Node runtimeNode) {
 
         if (logger.isDebugEnabled()) {
-            logger.debug("------ BEFORE ---- removeServerForService (" + serviceName + "," + runtimeNode + ") ----------- ");
+            logger.debug("------ BEFORE ---- removeServerForService (" + service + "," + runtimeNode + ") ----------- ");
             __dumpProxyTunnelConfig();
         }
 
-        Service service = servicesDefinition.getService(serviceName);
-        if (service != null && service.isProxied()) {
-            String serviceId = service.getServiceId(runtimeNode);
+        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
+        if (serviceDef != null && serviceDef.isProxied()) {
+            String serviceId = serviceDef.getServiceId(runtimeNode);
 
             ProxyTunnelConfig prevConfig = proxyTunnelConfigs.get(serviceId);
 
@@ -221,15 +228,17 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("------ AFTER ---- removeServerForService (" + serviceName + "," + runtimeNode + ") ----------- ");
+            logger.debug("------ AFTER ---- removeServerForService (" + service + "," + runtimeNode + ") ----------- ");
             __dumpProxyTunnelConfig();
         }
     }
 
+    @Override
     public Collection<String> getAllTunnelConfigKeys() {
         return proxyTunnelConfigs.keySet();
     }
 
+    @Override
     public ProxyTunnelConfig getTunnelConfig(String serviceId) {
         return proxyTunnelConfigs.get(serviceId);
     }

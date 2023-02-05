@@ -564,7 +564,7 @@ eskimo.FileManagers = function() {
 
             event.preventDefault();
             $.ajax({
-                url: "file-manager-upload?nodeAddress=" + node+ "&nodeName=" + nodeName,
+                url: "file-manager-upload?nodeAddress=" + node,
                 xhr: () => {
                     let xhr = new window.XMLHttpRequest();
                     xhr.upload.addEventListener("progress", evt => {

@@ -35,28 +35,30 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.eskimo.model.SSHConnection;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 
 public interface SSHCommandService {
 
     String runSSHScript(SSHConnection connection, String script) throws SSHCommandException;
 
-    String runSSHScript(String node, String script) throws SSHCommandException;
+    String runSSHScript(Node node, String script) throws SSHCommandException;
 
     String runSSHCommand(SSHConnection connection, String[] command) throws SSHCommandException;
 
     String runSSHScriptPath(SSHConnection connection, String scriptName) throws SSHCommandException;
 
-    String runSSHScriptPath(String node, String scriptName) throws SSHCommandException;
+    String runSSHScriptPath(Node node, String scriptName) throws SSHCommandException;
 
-    String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException;
+    String runSSHScript(Node node, String script, boolean throwsException) throws SSHCommandException;
 
     String runSSHScript(SSHConnection connection, String script, boolean throwsException) throws SSHCommandException;
 
-    String runSSHCommand(String node, String command) throws SSHCommandException;
+    String runSSHCommand(Node node, String command) throws SSHCommandException;
 
     String runSSHCommand(SSHConnection connection, String command) throws SSHCommandException;
 
-    void copySCPFile(String node, String filePath) throws SSHCommandException;
+    void copySCPFile(Node node, String filePath) throws SSHCommandException;
 
     void copySCPFile(SSHConnection connection, String filePath) throws SSHCommandException;
 }

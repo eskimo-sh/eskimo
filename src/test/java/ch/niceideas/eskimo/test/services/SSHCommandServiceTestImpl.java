@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.test.services;
 
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.services.SSHCommandService;
+import ch.niceideas.eskimo.types.Node;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
@@ -66,7 +67,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     public interface NodeResultBuilder {
-        String build (String node, String script);
+        String build (Node node, String script);
     }
 
     public String getExecutedCommands() {
@@ -118,7 +119,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHScript(String node, String script) {
+    public String runSSHScript(Node node, String script) {
         synchronized (executedCommandsMonitor) {
             executedCommands.append(script);
             executedCommands.append("\n");
@@ -154,7 +155,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHScriptPath(String node, String scriptName) {
+    public String runSSHScriptPath(Node node, String scriptName) {
         synchronized (executedCommandsMonitor) {
             executedCommands.append(scriptName);
             executedCommands.append("\n");
@@ -166,7 +167,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHScript(String node, String script, boolean throwsException) {
+    public String runSSHScript(Node node, String script, boolean throwsException) {
         synchronized (executedCommandsMonitor) {
             executedCommands.append(script);
             executedCommands.append("\n");
@@ -190,7 +191,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHCommand(String node, String command) {
+    public String runSSHCommand(Node node, String command) {
         synchronized (executedCommandsMonitor) {
             executedCommands.append(command);
             executedCommands.append("\n");
@@ -214,7 +215,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public void copySCPFile(String node, String filePath) {
+    public void copySCPFile(Node node, String filePath) {
         synchronized (executedScpCommandsMonitor) {
             this.executedScpCommands.append(node).append(":").append(filePath).append("\n");
         }

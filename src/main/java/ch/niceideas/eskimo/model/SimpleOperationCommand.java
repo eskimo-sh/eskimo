@@ -36,7 +36,10 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.StringUtils;
-import lombok.Data;
+import ch.niceideas.eskimo.types.LabelledOperation;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 
@@ -47,16 +50,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SimpleOperationCommand implements JSONOpCommand {
 
-    private final String operation;
-    private final String service;
-    private final String node;
+    private final SimpleOperation operation;
+    private final Service service;
+    private final Node node;
 
     @Override
     public JSONObject toJSON() {
         return new JSONObject(new HashMap<String, Object>() {{
-            put("operation", operation);
-            put("service", service);
-            put("node", node);
+            put("operation", operation.getType());
+            put("service", service.getName());
+            put("node", node.getAddress());
         }});
     }
 
@@ -79,37 +82,30 @@ public class SimpleOperationCommand implements JSONOpCommand {
         return member.replace("(", "").replace(")", "").replace("/", "").replace(" ", "-").replace(".", "-");
     }
 
-    @Data
+
+    public static class SimpleOperationId extends AbstractStandardOperationId<SimpleOperation> implements OperationId<SimpleOperation> {
+
+        public SimpleOperationId (SimpleOperation operation, Service service, Node node) {
+            super (operation, service, node);
+        }
+    }
+
     @RequiredArgsConstructor
-    public static class SimpleOperationId implements OperationId {
+    public enum SimpleOperation implements LabelledOperation {
+        SHOW_JOURNAL("show_journal", "Showing journal"),
+        START("start", "Starting"),
+        STOP ("stop", "Stopping"),
+        RESTART ("restart", "Restarting"),
+        COMMAND ("command", "Calling custom command");
 
-        private final String operation;
-        private final String service;
-        private final String node;
+        @Getter
+        private final String type;
 
-        public String getType() {
-            return getOperation();
-        }
+        @Getter
+        private final String label;
 
-        public boolean isOnNode(String node) {
-            return node.equals(this.node);
-        }
-
-        public boolean isSameNode(OperationId other) {
-            return other.isOnNode(this.node);
-        }
-
-        public String getMessage() {
-            return "Executing " + operation + " on " + getService() + " on " + getNode();
-        }
-
-        @Override
-        public String toString() {
-            return standardizeOperationMember(operation)
-                    + "_"
-                    + standardizeOperationMember (service)
-                    + "_"
-                    + standardizeOperationMember (node);
+        public String toString () {
+            return type;
         }
     }
 }

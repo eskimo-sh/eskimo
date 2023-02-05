@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.eskimo.types.Node;
 import org.json.JSONObject;
 
 import javax.servlet.ServletOutputStream;
@@ -44,34 +45,30 @@ import java.io.InputStream;
 
 public interface FileManagerService {
 
-    void removeFileManager(String node);
+    void removeFileManager(Node node);
 
-    Pair<String, JSONObject> navigateFileManager(String node, String folder, String subFolder) throws IOException;
+    Pair<String, JSONObject> navigateFileManager(Node node, String folder, String subFolder) throws IOException;
 
-    Pair<String, JSONObject> createFile(String node, String folder, String fileName) throws IOException;
+    Pair<String, JSONObject> createFile(Node node, String folder, String fileName) throws IOException;
 
-    JSONObject openFile(String node, String folder, String file);
+    JSONObject openFile(Node node, String folder, String file);
 
-    void downloadFile(String node, String folder, String file, HttpServletResponseAdapter response);
+    void downloadFile(Node node, String folder, String file, HttpServletResponseAdapter response);
 
-    String deletePath(String node, String folder, String file) throws IOException;
+    String deletePath(Node node, String folder, String file) throws IOException;
 
-    void uploadFile(String node, String folder, String name, InputStream fileContent) throws IOException;
+    void uploadFile(Node node, String folder, String name, InputStream fileContent) throws IOException;
 
-    public static class FileDownloadException extends RuntimeException {
+    class FileDownloadException extends RuntimeException {
 
         static final long serialVersionUID = -3117632123352229248L;
 
         public FileDownloadException(String message, Throwable cause) {
             super(message, cause);
         }
-
-        FileDownloadException(String message) {
-            super(message);
-        }
     }
 
-    public interface HttpServletResponseAdapter {
+    interface HttpServletResponseAdapter {
         void setContentType(String type);
 
         ServletOutputStream getOutputStream() throws IOException;

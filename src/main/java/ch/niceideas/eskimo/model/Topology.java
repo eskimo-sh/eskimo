@@ -42,12 +42,14 @@ import ch.niceideas.eskimo.model.NodesConfigWrapper.ParsedNodesConfigProperty;
 import ch.niceideas.eskimo.model.service.Dependency;
 import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
 import ch.niceideas.eskimo.model.service.MemoryModel;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.services.ServiceDefinitionException;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.SystemException;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 
@@ -67,8 +69,8 @@ public class Topology {
     public static final String CONTEXT_PATH = "CONTEXT_PATH";
     public static final String SERVICE = "Service";
 
-    private final Map<String, String> definedMasters = new HashMap<>();
-    private final Map<String, Map<String, String>> additionalEnvironment = new HashMap<>();
+    private final Map<String, Node> definedMasters = new HashMap<>();
+    private final Map<Service, Map<String, String>> additionalEnvironment = new HashMap<>();
     private final String contextPath;
 
     Topology() {
@@ -89,7 +91,7 @@ public class Topology {
 
         int nodeNbr = getNodeNbr(key, nodesConfig, property);
 
-        return new ParsedNodesConfigProperty(property.getServiceName(), nodeNbr > -1 ? nodeNbr : null);
+        return new ParsedNodesConfigProperty(property.getService(), nodeNbr > -1 ? nodeNbr : null);
     }
 
     public static int getNodeNbr(String key, NodesConfigWrapper nodesConfig, ParsedNodesConfigProperty property) throws NodesConfigurationException {
@@ -108,7 +110,7 @@ public class Topology {
 
     public static Topology create(
             NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig,
-            ServicesDefinition servicesDefinition, String contextPath, String currentNode)
+            ServicesDefinition servicesDefinition, String contextPath, Node currentNode)
             throws ServiceDefinitionException, NodesConfigurationException {
 
         Topology topology = new Topology(contextPath);
@@ -119,9 +121,9 @@ public class Topology {
 
                 ParsedNodesConfigProperty result = parseKeyToServiceConfig (key, nodesConfig);
 
-                Service service = servicesDefinition.getService(result.getServiceName());
+                ServiceDef service = servicesDefinition.getServiceDefinition(result.getService());
                 if (service == null) {
-                    throw new NodesConfigurationException("Could not find any service definition matching " + result.getServiceName());
+                    throw new NodesConfigurationException("Could not find any service definition matching " + result.getService());
                 }
 
                 topology.defineMasters(servicesDefinition, service, result.getNodeNumber(), nodesConfig, kubeServicesConfig);
@@ -131,9 +133,9 @@ public class Topology {
 
             // Define master for kubernetes services
             if (currentNode != null && kubeServicesConfig != null) {
-                for (String key : kubeServicesConfig.getEnabledServices()) {
+                for (Service key : kubeServicesConfig.getEnabledServices()) {
 
-                    Service service = servicesDefinition.getService(key);
+                    ServiceDef service = servicesDefinition.getServiceDefinition(key);
                     if (service == null) {
                         throw new NodesConfigurationException("Could not find any service definition matching " + key);
                     }
@@ -153,22 +155,22 @@ public class Topology {
     }
 
     private void defineAdditionalEnvionment (
-            Service service, ServicesDefinition servicesDefinition, String contextPath, int nodeNbr, NodesConfigWrapper nodesConfig)
+            ServiceDef service, ServicesDefinition servicesDefinition, String contextPath, int nodeNbr, NodesConfigWrapper nodesConfig)
             throws ServiceDefinitionException, FileException, SetupException {
 
-        String node = nodesConfig.getNodeAddress (nodeNbr);
+        Node node = nodesConfig.getNode (nodeNbr);
 
         for (String addEnv : service.getAdditionalEnvironment()) {
-            Map<String, String> addEnvForService = additionalEnvironment.computeIfAbsent(service.getName(), k -> new HashMap<>());
+            Map<String, String> addEnvForService = additionalEnvironment.computeIfAbsent(service.toService(), k -> new HashMap<>());
 
             if (addEnv.equals(SERVICE_NUMBER_0_BASED) || addEnv.equals(SERVICE_NUMBER_1_BASED)) {
 
                 servicesDefinition.executeInEnvironmentLock(persistentEnvironment -> {
 
                     String variableName = NODE_NBR_PREFIX
-                            + service.getName().toUpperCase().toUpperCase().replace("-", "_")
+                            + service.toService().getEnv()
                             + "_"
-                            + node.replace(".", "");
+                            + node.getEnv();
 
                     String varValue = (String) persistentEnvironment.getValueForPath(variableName);
                     if (StringUtils.isBlank(varValue)) {
@@ -202,13 +204,13 @@ public class Topology {
 
             } else if (addEnv.startsWith(ALL_NODES_LIST_PREFIX)) {
 
-                String serviceToList = addEnv.substring(ALL_NODES_LIST_PREFIX.length());
+                Service serviceToList = Service.from(addEnv.substring(ALL_NODES_LIST_PREFIX.length()));
 
                 String varName = addEnv.replace("-", "_");
 
-                List<String> allNodeList = new ArrayList<>(nodesConfig.getAllNodeAddressesWithService(serviceToList));
+                List<Node> allNodeList = new ArrayList<>(nodesConfig.getAllNodesWithService(serviceToList));
                 Collections.sort(allNodeList); // THis is absolutely key, the order needs to be predictable
-                String allNodes = String.join(",", allNodeList.toArray(new String[0]));
+                String allNodes = String.join(",", allNodeList.stream().map(Node::getAddress).toArray(String[]::new));
 
                 if (StringUtils.isNotBlank(allNodes)) {
                     addEnvForService.put(varName, allNodes);
@@ -228,12 +230,12 @@ public class Topology {
         }
     }
 
-    private void defineMasters(ServicesDefinition servicesDefinition, Service service, int nodeNbr, NodesConfigWrapper nodesConfig,
+    private void defineMasters(ServicesDefinition servicesDefinition, ServiceDef service, int nodeNbr, NodesConfigWrapper nodesConfig,
                                KubernetesServicesConfigWrapper kubeServicesConfig)
             throws NodesConfigurationException, ServiceDefinitionException {
         for (Dependency dep : service.getDependencies()) {
 
-            Service masterService = servicesDefinition.getService(dep.getMasterService());
+            ServiceDef masterService = servicesDefinition.getServiceDefinition(dep.getMasterService());
             if (masterService.isKubernetes()) {
 
                 if (!service.isKubernetes()) {
@@ -241,7 +243,7 @@ public class Topology {
                             + " defines a dependency on a kube service " + masterService.getName() + " which is not supported.");
                 }
 
-                if (kubeServicesConfig == null || !kubeServicesConfig.isServiceInstallRequired(masterService.getName())) {
+                if (kubeServicesConfig == null || !kubeServicesConfig.isServiceInstallRequired(masterService.toService())) {
                     throw new ServiceDefinitionException (SERVICE + " " + service.getName()
                             + " defines a dependency on another kube service " + masterService.getName() + " but that service is not going to be installed.");
                 }
@@ -262,22 +264,22 @@ public class Topology {
         }
 
     }
-    private void defineMasters(Dependency dep, Service service, int nodeNbr,
-                    NodesConfigWrapper nodesConfig)
+    private void defineMasters(Dependency dep, ServiceDef service, int nodeNbr,
+                               NodesConfigWrapper nodesConfig)
             throws ServiceDefinitionException, NodesConfigurationException {
 
-        Set<String> otherMasters = new HashSet<>();
-        String node = nodesConfig.getNodeAddress(nodeNbr);
+        Set<Node> otherMasters = new HashSet<>();
+        Node node = nodesConfig.getNode(nodeNbr);
 
         switch (dep.getMes()) {
 
             case FIRST_NODE:
                 for (int i = 1; i <= dep.getNumberOfMasters(); i++) {
-                    String masterIp = findFirstOtherServiceNode(nodesConfig, dep.getMasterService(), otherMasters);
-                    masterIp = handleMissingMaster(nodesConfig, dep, service, masterIp, i);
-                    if (StringUtils.isNotBlank(masterIp)) {
-                        definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + i, masterIp);
-                        otherMasters.add(masterIp);
+                    Node masterNode = findFirstOtherServiceNode(nodesConfig, dep.getMasterService(), otherMasters);
+                    masterNode = handleMissingMaster(nodesConfig, dep, service, masterNode, i);
+                    if (masterNode != null) {
+                        definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + i, masterNode);
+                        otherMasters.add(masterNode);
                     }
                 }
                 break;
@@ -287,18 +289,18 @@ public class Topology {
                     throw new ServiceDefinitionException (SERVICE + " " + service.getName() + " defined several master required. This is unsupported for SAME_NODE_OR_RANDOM");
                 }
 
-                String multiServiceValue = (String) nodesConfig.getValueForPath(dep.getMasterService() + nodeNbr);
+                String multiServiceValue = (String) nodesConfig.getValueForPath(dep.getMasterService().getName() + nodeNbr);
                 if (StringUtils.isNotBlank(multiServiceValue)) {
-                    definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep)+"_"+node.replace(".", ""), node);
+                    definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep)+"_"+node.getEnv(), node);
                 } else {
-                    String uniqueServiceNbrString = (String) nodesConfig.getValueForPath(dep.getMasterService());
+                    String uniqueServiceNbrString = (String) nodesConfig.getValueForPath(dep.getMasterService().getName());
                     if (StringUtils.isNotBlank(uniqueServiceNbrString)) {
-                        definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep)+"_"+node.replace(".", ""), node);
+                        definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep)+"_"+node.getEnv(), node);
                     } else {
-                        String masterIp = findFirstServiceNode(nodesConfig, dep.getMasterService());
-                        masterIp = handleMissingMaster(nodesConfig, dep, service, masterIp);
-                        if (StringUtils.isNotBlank(masterIp)) {
-                            definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep) + "_" + node.replace(".", ""), masterIp);
+                        Node masterNode = findFirstServiceNode(nodesConfig, dep.getMasterService());
+                        masterNode = handleMissingMaster(nodesConfig, dep, service, masterNode);
+                        if (masterNode != null) {
+                            definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep) + "_" + node.getEnv(), masterNode);
                         }
                     }
                 }
@@ -306,11 +308,11 @@ public class Topology {
 
             case RANDOM:
                 for (int i = 1; i <= dep.getNumberOfMasters(); i++) {
-                    String masterIp = findRandomOtherServiceNode(nodesConfig, dep.getMasterService(), otherMasters);
-                    masterIp = handleMissingMaster(nodesConfig, dep, service, masterIp, i);
-                    if (StringUtils.isNotBlank(masterIp)) {
-                        definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + i, masterIp);
-                        otherMasters.add(masterIp);
+                    Node masterNode = findRandomOtherServiceNode(nodesConfig, dep.getMasterService(), otherMasters);
+                    masterNode = handleMissingMaster(nodesConfig, dep, service, masterNode, i);
+                    if (masterNode != null) {
+                        definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + i, masterNode);
+                        otherMasters.add(masterNode);
                     }
                 }
                 break;
@@ -325,14 +327,14 @@ public class Topology {
                     throw new ServiceDefinitionException (SERVICE + " " + service.getName() + " defined several master required. This is unsupported for RANDOM_NODE_AFTER");
                 }
 
-                String masterIp = findRandomServiceNodeAfter(nodesConfig, dep.getMasterService(), nodeNbr);
+                Node masterNode = findRandomServiceNodeAfter(nodesConfig, dep.getMasterService(), nodeNbr);
 
-                if (dep.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER_OR_SAME) && StringUtils.isBlank(masterIp)) {
-                    masterIp = findRandomOtherServiceNode(nodesConfig, dep.getMasterService(), otherMasters);
+                if (dep.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER_OR_SAME) && masterNode == null) {
+                    masterNode = findRandomOtherServiceNode(nodesConfig, dep.getMasterService(), otherMasters);
                 }
-                if (StringUtils.isNotBlank(masterIp)) {
-                    masterIp = handleMissingMaster(nodesConfig, dep, service, masterIp);
-                    definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + node.replace(".", ""), masterIp);
+                if (masterNode != null) {
+                    masterNode = handleMissingMaster(nodesConfig, dep, service, masterNode);
+                    definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + node.getEnv(), masterNode);
                 }
                 break;
 
@@ -351,36 +353,36 @@ public class Topology {
     }
 
     String getVariableName(Dependency dep) {
-        return dep.getMasterService().toUpperCase().replace("-", "_");
+        return dep.getMasterService().getEnv();
     }
 
-    private String handleMissingMaster(ConfigurationOwner nodesConfig, Dependency dep, Service service, String masterIp, int countOfMaster) throws NodesConfigurationException {
-        return handleMissingMasterInternal (nodesConfig, dep, masterIp,
+    private Node handleMissingMaster(ConfigurationOwner nodesConfig, Dependency dep, ServiceDef service, Node masterNode, int countOfMaster) throws NodesConfigurationException {
+        return handleMissingMasterInternal (nodesConfig, dep, masterNode,
                 "Dependency " + dep.getMasterService() + " for service " + service.getName() + " could not found occurence " + countOfMaster);
     }
 
-    private String handleMissingMaster(ConfigurationOwner nodesConfig, Dependency dep, Service service, String masterIp) throws NodesConfigurationException {
-        return handleMissingMasterInternal (nodesConfig, dep, masterIp,
+    private Node handleMissingMaster(ConfigurationOwner nodesConfig, Dependency dep, ServiceDef service, Node masterNode) throws NodesConfigurationException {
+        return handleMissingMasterInternal (nodesConfig, dep, masterNode,
                 "Dependency " + dep.getMasterService() + " for service" + service.getName() + " could not be found");
     }
 
-    private String handleMissingMasterInternal(ConfigurationOwner nodesConfig, Dependency dep, String masterIp, String message) throws NodesConfigurationException {
-        if (masterIp == null) {
+    private Node handleMissingMasterInternal(ConfigurationOwner nodesConfig, Dependency dep, Node masterNode, String message) throws NodesConfigurationException {
+        if (masterNode == null) {
             if (!dep.isMandatory(nodesConfig)) {
                 // if none could be found, then well ... none could be found
-                masterIp = "";
+                return null;
             } else {
                 throw new NodesConfigurationException(message);
             }
         }
-        return masterIp;
+        return masterNode;
     }
 
 
-    private String findFirstServiceNode(NodesConfigWrapper nodesConfig, String serviceName) throws NodesConfigurationException {
+    private Node findFirstServiceNode(NodesConfigWrapper nodesConfig, Service service) throws NodesConfigurationException {
         int nodeNbr = Integer.MAX_VALUE;
 
-        for (int candidateNbr : nodesConfig.getNodeNumbers(serviceName)) {
+        for (int candidateNbr : nodesConfig.getNodeNumbers(service)) {
             if (candidateNbr < nodeNbr) {
                 nodeNbr = candidateNbr;
             }
@@ -393,13 +395,13 @@ public class Topology {
         return findNodeNumberNode(nodesConfig, nodeNbr);
     }
 
-    private String findFirstOtherServiceNode(
-            NodesConfigWrapper nodesConfig, String serviceName, Set<String> existingMasters)
+    private Node findFirstOtherServiceNode(
+            NodesConfigWrapper nodesConfig, Service service, Set<Node> existingMasters)
             throws NodesConfigurationException {
         int nodeNbr = Integer.MAX_VALUE;
 
-        for (int candidateNbr : nodesConfig.getNodeNumbers(serviceName)) {
-            String otherNode = nodesConfig.getNodeAddress(candidateNbr);
+        for (int candidateNbr : nodesConfig.getNodeNumbers(service)) {
+            Node otherNode = nodesConfig.getNode(candidateNbr);
             if (!existingMasters.contains(otherNode)
                     && (candidateNbr < nodeNbr)) {
                 nodeNbr = candidateNbr;
@@ -412,11 +414,11 @@ public class Topology {
         return findNodeNumberNode(nodesConfig, nodeNbr);
     }
 
-    private String findRandomOtherServiceNode(NodesConfigWrapper nodesConfig, String serviceName, Set<String> existingMasters) {
+    private Node findRandomOtherServiceNode(NodesConfigWrapper nodesConfig, Service service, Set<Node> existingMasters) {
 
         // Try to find any other node running service
-        for (int otherNbr : nodesConfig.getNodeNumbers(serviceName)) {
-            String otherNode = nodesConfig.getNodeAddress(otherNbr);
+        for (int otherNbr : nodesConfig.getNodeNumbers(service)) {
+            Node otherNode = nodesConfig.getNode (otherNbr);
             if (!existingMasters.contains(otherNode)) {
                 return otherNode;
             }
@@ -425,11 +427,11 @@ public class Topology {
         return null;
     }
 
-    private String findRandomServiceNodeAfter(NodesConfigWrapper nodesConfig, String serviceName, int currentNodeNumber)
+    private Node findRandomServiceNodeAfter(NodesConfigWrapper nodesConfig, Service service, int currentNodeNumber)
             throws NodesConfigurationException {
         int masterNumber = -1;
 
-        for (int otherNbr : nodesConfig.getNodeNumbers(serviceName)) {
+        for (int otherNbr : nodesConfig.getNodeNumbers(service)) {
             if (otherNbr > currentNodeNumber && (masterNumber == -1 || otherNbr < masterNumber) // try to find closest one (next in a chain)
                     ) {
                 masterNumber = otherNbr;
@@ -437,19 +439,19 @@ public class Topology {
         }
 
         if (masterNumber == -1) {
-            Set<String> existingMasters = new HashSet<>();
+            Set<Node> existingMasters = new HashSet<>();
             existingMasters.add (findNodeNumberNode(nodesConfig, currentNodeNumber));
-            return findFirstOtherServiceNode(nodesConfig, serviceName, existingMasters);
+            return findFirstOtherServiceNode(nodesConfig, service, existingMasters);
         } else {
             return findNodeNumberNode(nodesConfig, masterNumber);
         }
     }
 
-    private String findNodeNumberNode(NodesConfigWrapper nodesConfig, int nodeNumber) throws NodesConfigurationException {
+    private Node findNodeNumberNode(NodesConfigWrapper nodesConfig, int nodeNumber) throws NodesConfigurationException {
         if (nodeNumber > -1) {
             // return IP address corresponding to master number
-            String node = nodesConfig.getNodeAddress(nodeNumber);
-            if (StringUtils.isBlank(node)) {
+            Node node = nodesConfig.getNode(nodeNumber);
+            if (node == null) {
                 throw new NodesConfigurationException("Inconsistency : could not find IP of " + nodeNumber);
             }
 
@@ -458,19 +460,19 @@ public class Topology {
         return null;
     }
 
-    public String[] getMasters(Service service) {
+    public Node[] getMasters(ServiceDef service) {
 
         String variableName = service.getName().toUpperCase().replace("-", "_");
 
-        List<String> retMasters = new ArrayList<>();
+        List<Node> retMasters = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            String node = definedMasters.get(MASTER_PREFIX + variableName + "_" + i);
-            if (StringUtils.isNotBlank(node)) {
+            Node node = definedMasters.get(MASTER_PREFIX + variableName + "_" + i);
+            if (node != null) {
                 retMasters.add(node);
             }
         }
 
-        return retMasters.toArray(new String[0]);
+        return retMasters.toArray(new Node[0]);
     }
 
     private void appendExport (StringBuilder sb, String variable, String value) {
@@ -487,21 +489,22 @@ public class Topology {
         sb.append("#Topology\n");
         definedMasters.keySet().stream()
                 .sorted(Comparator.naturalOrder())
-                .forEach(master -> appendExport (sb, master, definedMasters.get(master)));
+                .forEach(master -> appendExport (sb, master, definedMasters.get(master).getAddress()));
 
         if (!serviceInstallStatus.isEmpty()) {
 
             sb.append("\n#Eskimo installation status\n");
 
             serviceInstallStatus.getInstalledServicesFlags()
-                    .forEach(serviceInstallStatusGlag -> {
-                        Pair<String, String> serviceInstall = ServicesInstallStatusWrapper.parseInstallStatusFlag(serviceInstallStatusGlag);
+                    .forEach(serviceInstallStatusFlag -> {
+                        Pair<Service, Node> serviceInstall = ServicesInstallStatusWrapper.parseInstallStatusFlag(serviceInstallStatusFlag);
                         if (serviceInstall != null) {
-                            String installedService = serviceInstall.getKey();
-                            String nodeName = serviceInstall.getValue();
+                            Service installedService = serviceInstall.getKey();
+                            Node node = serviceInstall.getValue();
                             appendExport(sb,
-                                    "ESKIMO_INSTALLED_" + installedService.replace("-", "_") + "_" + nodeName.replace("-", ""),
-                                    serviceInstallStatus.getValueForPathAsString(serviceInstallStatusGlag));
+                                    // FIXME Make it so I get use getEnv() for service here as well
+                                    "ESKIMO_INSTALLED_" + installedService.getName().replace("-", "_") + "_" + node.getEnv(),
+                                    serviceInstallStatus.getValueForPathAsString(serviceInstallStatusFlag));
                         }
                     });
         }
@@ -520,7 +523,7 @@ public class Topology {
         sb.append(getTopologyScript(serviceInstallStatus));
 
         // find all services on node
-        Set<String> serviceNames = new HashSet<>();
+        Set<Service> services = new HashSet<>();
         for (String key : nodesConfig.getRootKeys()) {
 
             ParsedNodesConfigProperty property = NodesConfigWrapper.parseProperty(key);
@@ -532,61 +535,61 @@ public class Topology {
             int otherNodeNbr = getNodeNbr(key, nodesConfig, property);
 
             if (otherNodeNbr == nodeNbr) {
-                serviceNames.add (property.getServiceName());
+                services.add (property.getService());
             }
         }
 
         sb.append("\n#Additional Environment\n");
-        serviceNames.stream()
+        services.stream()
                 .sorted(Comparator.naturalOrder())
-                .filter(serviceName -> additionalEnvironment.get(serviceName) != null)
-                .forEach(serviceName -> {
-                    for (String additionalProp : additionalEnvironment.get(serviceName).keySet()) {
-                        appendExport (sb, additionalProp, additionalEnvironment.get(serviceName).get(additionalProp));
+                .filter(service -> additionalEnvironment.get(service) != null)
+                .forEach(service -> {
+                    for (String additionalProp : additionalEnvironment.get(service).keySet()) {
+                        appendExport (sb, additionalProp, additionalEnvironment.get(service).get(additionalProp));
                     }
                 });
 
         // Add self variable
         sb.append("\n#Self identification\n");
-        String node = nodesConfig.getNodeAddress(nodeNbr);
-        if (StringUtils.isBlank(node)) {
+        Node node = nodesConfig.getNode(nodeNbr);
+        if (node == null) {
             throw new NodesConfigurationException("No Node Address found for node number " + nodeNbr);
         }
-        appendExport(sb, "SELF_IP_ADDRESS", node);
+        appendExport(sb, "SELF_IP_ADDRESS", node.getAddress());
 
         appendExport(sb, "SELF_NODE_NUMBER", ""+nodeNbr);
 
-        appendExport(sb, "ESKIMO_NODE_COUNT", ""+nodesConfig.getNodeAddresses().size());
+        appendExport(sb, "ESKIMO_NODE_COUNT", ""+nodesConfig.getAllNodes().size());
 
         if (StringUtils.isNotBlank(contextPath)) {
             appendExport(sb, CONTEXT_PATH, ""+contextPath);
         }
 
-        List<String> allNodeList = new ArrayList<>(nodesConfig.getNodeAddresses());
+        List<Node> allNodeList = new ArrayList<>(nodesConfig.getAllNodes());
         Collections.sort(allNodeList); // THis is absolutely key, the order needs to be predictable
-        String allNodes = String.join(",", allNodeList.toArray(new String[0]));
+        String allNodes = String.join(",", allNodeList.stream().map(Node::getAddress).toArray(String[]::new));
 
         appendExport(sb, ALL_NODES_LIST, allNodes);
 
         // Kubernetes Topology
         if (servicesDefinition.getKubeMasterService() != null
-                && nodesConfig.hasServiceConfigured(servicesDefinition.getKubeMasterService().getName()) &&
-                (   nodesConfig.isServiceOnNode(servicesDefinition.getKubeMasterService().getName(), nodeNbr)
-                 || nodesConfig.isServiceOnNode(servicesDefinition.getKubeSlaveService().getName(), nodeNbr))) {
+                && nodesConfig.hasServiceConfigured(servicesDefinition.getKubeMasterService().toService()) &&
+                (   nodesConfig.isServiceOnNode(servicesDefinition.getKubeMasterService().toService(), nodeNbr)
+                 || nodesConfig.isServiceOnNode(servicesDefinition.getKubeSlaveService().toService(), nodeNbr))) {
 
             sb.append("\n#Kubernetes Topology\n");
 
             if (kubeConfig != null) {
-                for (String service : kubeConfig.getEnabledServices()) {
+                for (Service service : kubeConfig.getEnabledServices()) {
 
                     String cpuSetting = kubeConfig.getCpuSetting(service);
                     if (StringUtils.isNotBlank(cpuSetting)) {
-                        appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.toUpperCase().replace("-", "_") + "_CPU", cpuSetting);
+                        appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.getEnv() + "_CPU", cpuSetting);
                     }
 
                     String ramSetting = kubeConfig.getRamSetting(service);
                     if (StringUtils.isNotBlank(ramSetting)) {
-                        appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.toUpperCase().replace("-", "_") + "_RAM", ramSetting);
+                        appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.getEnv() + "_RAM", ramSetting);
                     }
 
                 }
@@ -594,14 +597,14 @@ public class Topology {
         }
 
         // memory management
-        Map<String, Long> memorySettings = memoryModel.getModelForNode(nodesConfig, nodeNbr);
+        Map<Service, Long> memorySettings = memoryModel.getModelForNode(nodesConfig, nodeNbr);
         if (memorySettings != null && !memorySettings.isEmpty()) {
             sb.append("\n#Memory Management\n");
 
             memorySettings.keySet().stream()
                     .sorted()
                     .forEach(service -> appendExport(sb,
-                            "MEMORY_" + service.toUpperCase().replace("-", "_"), "" + memorySettings.get(service)));
+                            "MEMORY_" + service.getEnv(), "" + memorySettings.get(service)));
         }
 
         return sb.toString();

@@ -35,10 +35,11 @@
 package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.services.KubernetesService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SystemService;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Operation;
+import ch.niceideas.eskimo.types.Service;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static ch.niceideas.eskimo.model.SimpleOperationCommand.standardizeOperationMember;
@@ -71,36 +73,36 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
         KubernetesOperationsCommand retCommand = new KubernetesOperationsCommand(rawKubeServicesConfig);
 
         // 1. Find out about services that need to be installed
-        for (String service : servicesDefinition.listKubernetesServicesOrderedByDependencies()) {
+        for (Service service : servicesDefinition.listKubernetesServicesOrderedByDependencies()) {
             if (rawKubeServicesConfig.isServiceInstallRequired(service)
                     && !servicesInstallStatus.isServiceInstalledAnywhere(service)) {
 
-                retCommand.addInstallation(new KubernetesOperationId("installation", service));
+                retCommand.addInstallation(new KubernetesOperationId(KuberneteOperation.INSTALLATION, service));
             }
         }
 
         // 2. Find out about services that need to be uninstalled
         for (String installStatusFlag : servicesInstallStatus.getRootKeys()) {
 
-            Pair<String, String> serviceAndNodePair = ServicesInstallStatusWrapper.parseInstallStatusFlag (installStatusFlag);
-            String installedService = serviceAndNodePair.getKey();
-            String nodeName = serviceAndNodePair.getValue();
+            Pair<Service, Node> serviceAndNodePair = Objects.requireNonNull(ServicesInstallStatusWrapper.parseInstallStatusFlag (installStatusFlag));
+            Service installedService = serviceAndNodePair.getKey();
+            Node node = serviceAndNodePair.getValue();
 
-            if (nodeName.equals(ServicesInstallStatusWrapper.KUBERNETES_NODE)
+            if (node.equals(Node.KUBERNETES_NODE)
                     // search it in config
                     && !rawKubeServicesConfig.isServiceInstallRequired(installedService)) {
 
-                retCommand.addUninstallation(new KubernetesOperationId("uninstallation", installedService));
+                retCommand.addUninstallation(new KubernetesOperationId(KuberneteOperation.UNINSTALLATION, installedService));
             }
         }
 
         // 3. Find out about service that need to be restarted
         if (previousConfig != null) {
-            for (String service : servicesDefinition.listKubernetesServicesOrderedByDependencies()) {
+            for (Service service : servicesDefinition.listKubernetesServicesOrderedByDependencies()) {
                 if (rawKubeServicesConfig.isServiceInstallRequired(service)
-                        && !retCommand.getInstallations().contains(new KubernetesOperationId("installation", service))
+                        && !retCommand.getInstallations().contains(new KubernetesOperationId(KuberneteOperation.INSTALLATION, service))
                         && rawKubeServicesConfig.isDifferentConfig(previousConfig, service)) {
-                    retCommand.addRestart(new KubernetesOperationId("restart", service));
+                    retCommand.addRestart(new KubernetesOperationId(KuberneteOperation.RESTART, service));
                 }
             }
         }
@@ -110,15 +112,15 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
             try {
                 SystemStatusWrapper lastStatus = systemService.getStatus();
 
-                String kubeNodeName = lastStatus.getFirstNodeName(servicesDefinition.getKubeMasterService().getName());
-                if (StringUtils.isBlank(kubeNodeName)) {
+                Node kubeNode = lastStatus.getFirstNode(servicesDefinition.getKubeMasterService().toService());
+                if (kubeNode == null) {
                     retCommand.setWarnings("Kubernetes is not available. The changes in kubernetes services configuration and " +
                             "deployments will be saved but they will <strong>need to be applied again</strong> another time when " +
                             "Kubernetes Master is available");
 
                 } else {
 
-                    if (!lastStatus.isServiceOKOnNode(servicesDefinition.getKubeMasterService().getName(), kubeNodeName)) {
+                    if (!lastStatus.isServiceOKOnNode(servicesDefinition.getKubeMasterService().toService(), kubeNode)) {
 
                         retCommand.setWarnings("Kubernetes is not properly running. The changes in kubernetes services configuration and " +
                                 "deployments will be saved but they will <strong>need to be applied again</strong> another time when " +
@@ -147,9 +149,9 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
 
     public JSONObject toJSON () {
         return new JSONObject(new HashMap<String, Object>() {{
-            put("installations", new JSONArray(getInstallations().stream().map(KubernetesOperationId::getService).collect(Collectors.toList())));
-            put("uninstallations", new JSONArray(getUninstallations().stream().map(KubernetesOperationId::getService).collect(Collectors.toList())));
-            put("restarts", new JSONArray(getRestarts().stream().map(KubernetesOperationId::getService).collect(Collectors.toList())));
+            put("installations", new JSONArray(getInstallations().stream().map(KubernetesOperationId::getService).map(Service::getName).collect(Collectors.toList())));
+            put("uninstallations", new JSONArray(getUninstallations().stream().map(KubernetesOperationId::getService).map(Service::getName).collect(Collectors.toList())));
+            put("restarts", new JSONArray(getRestarts().stream().map(KubernetesOperationId::getService).map(Service::getName).collect(Collectors.toList())));
             put("warnings", warnings);
         }});
     }
@@ -158,7 +160,7 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
 
         List<KubernetesOperationId> allOpList = new ArrayList<>();
 
-        allOpList.add(new KubernetesOperationId("Installation", KubernetesService.TOPOLOGY_ALL_NODES));
+        allOpList.add(new KubernetesOperationId(KuberneteOperation.INSTALLATION, Service.TOPOLOGY_ALL_NODES));
 
         allOpList.addAll(getInstallations());
         allOpList.addAll(getUninstallations());
@@ -169,28 +171,47 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
 
     @Data
     @RequiredArgsConstructor
-    public static class KubernetesOperationId implements OperationId {
+    public static class KubernetesOperationId implements OperationId<KuberneteOperation> {
 
-        private final String type;
-        private final String service;
+        private final KuberneteOperation operation;
+        private final Service service;
 
-        public boolean isOnNode(String node) {
-            return  node.equals(ServicesInstallStatusWrapper.KUBERNETES_NODE);
+        public boolean isOnNode(Node node) {
+            return node.equals(Node.KUBERNETES_NODE);
         }
 
-        public boolean isSameNode(OperationId other) {
-            return  other.isOnNode(ServicesInstallStatusWrapper.KUBERNETES_NODE);
+        public boolean isSameNode(OperationId<?> other) {
+            return other.isOnNode(Node.KUBERNETES_NODE);
         }
 
         public String getMessage() {
-            return type + " of " + getService() + " on kubernetes";
+            return operation + " of " + getService() + " on kubernetes";
         }
 
         @Override
         public String toString() {
-            return standardizeOperationMember (type)
+            return standardizeOperationMember (operation.getType())
                     + "_"
-                    + standardizeOperationMember (service);
+                    + standardizeOperationMember (service.getName());
+        }
+
+        @Override
+        public int compareTo(OperationId<?> o) {
+            return toString().compareTo(o.toString());
+        }
+    }
+
+    @RequiredArgsConstructor
+    public enum KuberneteOperation implements Operation {
+        INSTALLATION("installation"),
+        UNINSTALLATION ("uninstallation"),
+        RESTART ("restart");
+
+        @Getter
+        private final String type;
+
+        public String toString () {
+            return type;
         }
     }
 }

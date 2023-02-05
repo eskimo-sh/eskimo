@@ -43,6 +43,8 @@ import ch.niceideas.eskimo.services.satellite.MemoryComputer;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -62,8 +64,6 @@ import java.util.stream.Collectors;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 @Profile("!test-services-settings")
 public class ServicesSettingsServiceImpl implements ServicesSettingsService {
-
-    public static final String OPERATION_SETTINGS = "Settings";
 
     private static final Logger logger = Logger.getLogger(ServicesSettingsServiceImpl.class);
 
@@ -114,7 +114,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
 
             ServicesSettingsWrapper servicesSettings = command.getNewSettings();
 
-            List<String> dirtyServices = command.getRestartedServices();
+            List<Service> dirtyServices = command.getRestartedServices();
 
             configurationService.saveServicesSettings(servicesSettings);
 
@@ -134,13 +134,13 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                 operationsMonitoringService.startCommand(restartCommand);
                 try {
 
-                    Set<String> liveIps = new HashSet<>();
-                    Set<String> deadIps = new HashSet<>();
+                    Set<Node> liveNodes = new HashSet<>();
+                    Set<Node> deadNodes = new HashSet<>();
 
-                    List<Pair<String, String>> nodeSetupPairs = systemService.buildDeadIps(
+                    List<Pair<String, Node>> nodeSetupPairs = systemService.buildDeadIps(
                             restartCommand.getAllNodes(),
                             nodesConfig,
-                            liveIps, deadIps);
+                            liveNodes, deadNodes);
                     if (nodeSetupPairs == null) {
                         return;
                     }
@@ -148,21 +148,24 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                     List<ServiceOperationsCommand.ServiceOperationId> nodesSetup =
                             nodeSetupPairs.stream()
                                     .map(nodeSetupPair -> new ServiceOperationsCommand.ServiceOperationId(
-                                            ServiceOperationsCommand.CHECK_INSTALL_OP_TYPE,
-                                            OPERATION_SETTINGS,
+                                            ServiceOperationsCommand.ServiceOperation.CHECK_INSTALL,
+                                            Service.SETTINGS,
                                             nodeSetupPair.getValue()))
                                     .collect(Collectors.toList());
 
-                    MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, kubeServicesConfig, deadIps);
+                    MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, kubeServicesConfig, deadNodes);
 
                     // Nodes setup
                     systemService.performPooledOperation (nodesSetup, parallelismInstallThreadCount, baseInstallWaitTimout,
                             (operation, error) -> {
-                                String node = operation.getNode();
-                                if (nodesConfig.getNodeAddresses().contains(node) && liveIps.contains(node)) {
+                                Node node = operation.getNode();
+                                if (nodesConfig.getAllNodes().contains(node) && liveNodes.contains(node)) {
 
                                     systemOperationService.applySystemOperation(
-                                            new ServiceOperationsCommand.ServiceOperationId(ServiceOperationsCommand.CHECK_INSTALL_OP_TYPE, OPERATION_SETTINGS, node),
+                                            new ServiceOperationsCommand.ServiceOperationId(
+                                                    ServiceOperationsCommand.ServiceOperation.CHECK_INSTALL,
+                                                    Service.SETTINGS,
+                                                    node),
                                             ml -> {
 
                                                 // topology
@@ -176,11 +179,11 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                             });
 
                     // restarts
-                    for (List<SimpleOperationCommand.SimpleOperationId> restarts : servicesInstallationSorter.orderOperations (
+                    for (List<ServiceOperationsCommand.ServiceOperationId> restarts : servicesInstallationSorter.orderOperations (
                             restartCommand.getRestarts(), nodesConfig)) {
                         systemService.performPooledOperation(restarts, 1, operationWaitTimoutSeconds,
                                 (operation, error) -> {
-                                    if (operation.getNode().equals(ServiceOperationsCommand.KUBERNETES_FLAG) || liveIps.contains(operation.getNode())) {
+                                    if (operation.getNode().equals(Node.KUBERNETES_FLAG) || liveNodes.contains(operation.getNode())) {
                                         nodesConfigurationService.restartServiceForSystem(operation);
                                     }
                                 });
@@ -206,40 +209,40 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
     public ServicesSettingsWrapper prepareSaveSettings (
             String settingsFormAsString,
             Map<String, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
-            List<String> restartedServices) throws FileException, SetupException  {
+            List<Service> restartedServices) throws FileException, SetupException  {
 
         ServicesSettingsWrapper servicesSettings = configurationService.loadServicesSettings();
 
-        String[] dirtyServices = fillInEditedConfigs(changedSettings, new JSONObject(settingsFormAsString), servicesSettings.getSubJSONArray("settings"));
+        Service[] dirtyServices = fillInEditedConfigs(changedSettings, new JSONObject(settingsFormAsString), servicesSettings.getSubJSONArray("settings"));
 
         restartedServices.addAll(Arrays.asList(dirtyServices));
 
         return servicesSettings;
     }
 
-    protected String[] fillInEditedConfigs(Map<String, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
+    protected Service[] fillInEditedConfigs(Map<String, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
                                  JSONObject settingsForm, JSONArray configArrayForService) {
 
-        Set<String> dirtyServices = new HashSet<>();
+        Set<Service> dirtyServices = new HashSet<>();
 
         // apply changes, proceed service by service
-        for (String service : servicesDefinition.listAllServices()) {
+        for (Service service : servicesDefinition.listAllServices()) {
 
             // get all properties for service
             for (String settingsKey : settingsForm.keySet()) {
 
-                if (settingsKey.startsWith(service)) {
+                if (settingsKey.startsWith(service.getName())) {
 
                     String value = settingsForm.getString(settingsKey);
 
-                    String propertyKey = settingsKey.substring(service.length() + 1).replace("---", ".");
+                    String propertyKey = settingsKey.substring(service.getName().length() + 1).replace("---", ".");
 
                     // now iterate through saved (existing) configs and update values
                     main:
                     for (int i = 0; i < configArrayForService.length(); i++) {
                         JSONObject object = configArrayForService.getJSONObject(i);
                         String serviceName = object.getString("name");
-                        if (serviceName.equals(service)) {
+                        if (serviceName.equals(service.getName())) {
 
                             // iterate through all editableConfiguration
                             JSONArray editableConfigurations = object.getJSONArray("settings");
@@ -264,7 +267,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                                             || (StringUtils.isNotBlank(previousValue) && StringUtils.isNotBlank(value) && !previousValue.equals(value)
                                                 )) {
 
-                                            dirtyServices.add(serviceName);
+                                            dirtyServices.add(service);
 
                                             Map<String, List<SettingsOperationsCommand.ChangedSettings>> changedSettingsforService =
                                                     changedSettings.computeIfAbsent(serviceName, ser -> new HashMap<>());
@@ -292,31 +295,31 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
             }
         }
 
-        return dirtyServices.toArray(new String[0]);
+        return dirtyServices.toArray(new Service[0]);
     }
 
-    private static class ServiceRestartOperationsCommand extends JSONInstallOpCommand<SimpleOperationCommand.SimpleOperationId> {
+    private static class ServiceRestartOperationsCommand extends JSONInstallOpCommand<ServiceOperationsCommand.ServiceOperationId> {
 
         public static ServiceRestartOperationsCommand create (
                 ServicesDefinition servicesDefinition,
                 NodesConfigWrapper nodesConfig,
-                List<String> dirtyServices) {
+                List<Service> dirtyServices) {
             return new ServiceRestartOperationsCommand(servicesDefinition, nodesConfig, dirtyServices);
         }
 
         public ServiceRestartOperationsCommand (
                 ServicesDefinition servicesDefinition,
                 NodesConfigWrapper nodesConfig,
-                List<String> dirtyServices) {
+                List<Service> dirtyServices) {
             dirtyServices.stream()
-                    .map (servicesDefinition::getService)
+                    .map (servicesDefinition::getServiceDefinition)
                     .forEach(service -> {
                         if (service.isKubernetes()) {
-                            addRestart(new SimpleOperationCommand.SimpleOperationId("restart", service.getName(), ServiceOperationsCommand.KUBERNETES_FLAG));
+                            addRestart(new ServiceOperationsCommand.ServiceOperationId(ServiceOperationsCommand.ServiceOperation.RESTART, service.toService(), Node.KUBERNETES_FLAG));
                         } else {
-                            nodesConfig.getNodeNumbers(service.getName()).stream()
-                                    .map (nodesConfig::getNodeAddress)
-                                    .forEach(node -> addRestart(new SimpleOperationCommand.SimpleOperationId("restart", service.getName(), node)));
+                            nodesConfig.getNodeNumbers(service.toService()).stream()
+                                    .map (nodesConfig::getNode)
+                                    .forEach(node -> addRestart(new ServiceOperationsCommand.ServiceOperationId(ServiceOperationsCommand.ServiceOperation.RESTART, service.toService(), node)));
                         }
                     });
             //
@@ -329,35 +332,37 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
             }});
         }
 
-        public Set<String> getAllNodes() {
-            Set<String> retSet = new HashSet<>();
+        public Set<Node> getAllNodes() {
+            Set<Node> retSet = new HashSet<>();
             getRestarts().stream()
-                    .map(SimpleOperationCommand.SimpleOperationId::getNode)
+                    .map(ServiceOperationsCommand.ServiceOperationId::getNode)
                     .forEach(retSet::add);
 
             // this one can come from restartes flags
-            retSet.remove(ServiceOperationsCommand.KUBERNETES_FLAG);
+            retSet.remove(Node.KUBERNETES_FLAG);
 
             return retSet;
         }
 
         @Override
-        public List<SimpleOperationCommand.SimpleOperationId> getAllOperationsInOrder
+        public List<ServiceOperationsCommand.ServiceOperationId> getAllOperationsInOrder
                 (OperationsContext context)
                 throws ServiceDefinitionException, NodesConfigurationException, SystemException {
 
-            List<SimpleOperationCommand.SimpleOperationId> allOpList = new ArrayList<>();
+            List<ServiceOperationsCommand.ServiceOperationId> allOpList = new ArrayList<>();
 
-            context.getNodesConfig().getNodeAddresses()
+            context.getNodesConfig().getAllNodes()
                     .forEach(node -> allOpList.add(new ServiceOperationsCommand.ServiceOperationId(
-                            ServiceOperationsCommand.CHECK_INSTALL_OP_TYPE, OPERATION_SETTINGS, node)));
+                            ServiceOperationsCommand.ServiceOperation.RESTART,
+                            Service.SETTINGS,
+                            node)));
 
             getRestartsInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
 
             return allOpList;
         }
 
-        public List<List<SimpleOperationCommand.SimpleOperationId>> getRestartsInOrder
+        public List<List<ServiceOperationsCommand.ServiceOperationId>> getRestartsInOrder
                 (ServicesInstallationSorter servicesInstallationSorter, NodesConfigWrapper nodesConfig)
                 throws ServiceDefinitionException, NodesConfigurationException, SystemException {
             return servicesInstallationSorter.orderOperations (getRestarts(), nodesConfig);

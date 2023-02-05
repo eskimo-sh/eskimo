@@ -36,13 +36,14 @@
 package ch.niceideas.eskimo.test.services;
 
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.services.SSHCommandException;
 import ch.niceideas.eskimo.services.SystemException;
 import ch.niceideas.eskimo.services.SystemService;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
@@ -119,12 +120,12 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public void showJournal(Service service, String node) {
+    public void showJournal(ServiceDef service, Node node) {
         executedActions.add ("Show Journal - " + service + " - " + node);
     }
 
     @Override
-    public void startService(Service service, String node) throws SystemException {
+    public void startService(ServiceDef service, Node node) throws SystemException {
         executedActions.add ("Start service - " + service + " - " + node);
         if (startServiceError) {
             throw new SystemException("Test Error");
@@ -132,18 +133,18 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public void stopService(Service service, String node) {
+    public void stopService(ServiceDef service, Node node) {
         executedActions.add ("Stop service - " + service + " - " + node);
     }
 
     @Override
-    public void restartService(Service service, String node) {
+    public void restartService(ServiceDef service, Node node) {
         executedActions.add ("restart service - " + service + " - " + node);
     }
 
     @Override
-    public void callCommand(String commandId, String serviceName, String node) {
-        executedActions.add ("Call command  - " + commandId + " - " + serviceName + " - " + node);
+    public void callCommand(String commandId, Service service, Node node) {
+        executedActions.add ("Call command  - " + commandId + " - " + service + " - " + node);
     }
 
     @Override
@@ -168,20 +169,20 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public void handleStatusChanges(ServicesInstallStatusWrapper servicesInstallationStatus, SystemStatusWrapper systemStatus, Set<String> configuredNodesAndOtherLiveNodes) {
+    public void handleStatusChanges(ServicesInstallStatusWrapper servicesInstallationStatus, SystemStatusWrapper systemStatus, Set<Node> configuredNodesAndOtherLiveNodes) {
         // No-Op
     }
 
     @Override
-    public List<Pair<String, String>> buildDeadIps(Set<String> allNodes, NodesConfigWrapper nodesConfig, Set<String> liveIps, Set<String> deadIps) {
-        liveIps.addAll(nodesConfig.getNodeAddresses());
+    public List<Pair<String, Node>> buildDeadIps(Set<Node> allNodes, NodesConfigWrapper nodesConfig, Set<Node> liveNodes, Set<Node> deadNodes) {
+        liveNodes.addAll(nodesConfig.getAllNodes());
 
-        List<Pair<String, String>> nodesSetup = new ArrayList<>();
+        List<Pair<String, Node>> nodesSetup = new ArrayList<>();
 
         // Find out about dead IPs
-        Set<String> nodesToTest = new HashSet<>(allNodes);
-        nodesToTest.addAll(nodesConfig.getNodeAddresses());
-        for (String node : nodesToTest) {
+        Set<Node> nodesToTest = new HashSet<>(allNodes);
+        nodesToTest.addAll(nodesConfig.getAllNodes());
+        for (Node node : nodesToTest) {
 
             nodesSetup.add(new Pair<>("node_setup", node));
         }
@@ -204,7 +205,7 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public String sendPing(String node) throws SSHCommandException {
+    public String sendPing(Node node) throws SSHCommandException {
         if (pingError) {
             throw new SSHCommandException("Node dead");
         }
@@ -212,48 +213,48 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public File createTempFile(String service, String node, String extension) throws IOException {
-        return File.createTempFile(service, extension);
+    public File createTempFile(Service service, String extension) throws IOException {
+        return File.createTempFile(service.getName(), extension);
     }
 
     @Override
-    public void callUninstallScript(MessageLogger ml, SSHConnection connection, String service){
+    public void callUninstallScript(MessageLogger ml, SSHConnection connection, Service service){
         executedActions.add ("call Uninstall script  - " + service + " - " + connection.getHostname());
     }
 
     @Override
-    public File createRemotePackageFolder(MessageLogger ml, SSHConnection connection, String node, String service, String imageName) {
+    public File createRemotePackageFolder(MessageLogger ml, SSHConnection connection, Node node, Service service, String imageName) {
         return null;
     }
 
     @Override
-    public void installationSetup(MessageLogger ml, SSHConnection connection, String node, String service) {
+    public void installationSetup(MessageLogger ml, SSHConnection connection, Node node, Service service) {
         executedActions.add ("Installation setup  - " + service + " - " + node + " - " + connection.getHostname());
     }
 
     @Override
-    public void installationCleanup(MessageLogger ml, SSHConnection connection, String service, String imageName, File tmpArchiveFile) {
+    public void installationCleanup(MessageLogger ml, SSHConnection connection, Service service, String imageName, File tmpArchiveFile) {
         executedActions.add ("Installation cleanup  - " + service + " - " + imageName + " - " + connection.getHostname());
     }
 
     @Override
-    public void applyServiceOperation(String service, String node, String opLabel, ServiceOperation<String> operation) {
-        executedActions.add ("Apply service operation  - " + service + " - " + node + " - " + opLabel);
+    public void applyServiceOperation(Service service, Node node, SimpleOperationCommand.SimpleOperation labelledOp, ServiceOperation<String> operation) {
+        executedActions.add ("Apply service operation  - " + service + " - " + node + " - " + labelledOp.getLabel());
     }
 
     @Override
-    public void feedInServiceStatus(Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus, String node, String nodeName, String referenceNodeName, String service, boolean shall, boolean installed, boolean running) {
-        if (StringUtils.isBlank(nodeName)) {
+    public void feedInServiceStatus(Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus, Node node, Node referenceNode, Service service, boolean shall, boolean installed, boolean running) {
+        if (node == null) {
             throw new IllegalArgumentException("nodeName can't be null");
         }
-        if (StringUtils.isBlank(service)) {
+        if (service == null) {
             throw new IllegalArgumentException("service can't be null");
         }
 
         if (shall) {
             if (!installed) {
 
-                statusMap.put(SystemStatusWrapper.buildStatusFlag(service, nodeName), "NA");
+                statusMap.put(SystemStatusWrapper.buildStatusFlag(service, node), "NA");
 
             } else {
 
@@ -261,20 +262,20 @@ public class SystemServiceTestImpl implements SystemService {
                 // check if service running using SSH
 
                 if (!running) {
-                    statusMap.put(SystemStatusWrapper.buildStatusFlag (service, nodeName), "KO");
+                    statusMap.put(SystemStatusWrapper.buildStatusFlag (service, node), "KO");
 
                 } else {
 
-                    if (servicesInstallationStatus.isServiceOK (service, referenceNodeName)) {
-                        statusMap.put(SystemStatusWrapper.buildStatusFlag (service, nodeName), "OK");
+                    if (servicesInstallationStatus.isServiceOK (service, referenceNode)) {
+                        statusMap.put(SystemStatusWrapper.buildStatusFlag (service, node), "OK");
                     } else {
-                        statusMap.put(SystemStatusWrapper.buildStatusFlag (service, nodeName), "restart");
+                        statusMap.put(SystemStatusWrapper.buildStatusFlag (service, node), "restart");
                     }
                 }
             }
         } else {
             if (installed) {
-                statusMap.put(SystemStatusWrapper.buildStatusFlag (service, nodeName), "TD"); // To Be Deleted
+                statusMap.put(SystemStatusWrapper.buildStatusFlag (service, node), "TD"); // To Be Deleted
             }
         }
     }

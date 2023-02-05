@@ -37,11 +37,18 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.service.Dependency;
 import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
-import ch.niceideas.eskimo.model.service.Service;
-import ch.niceideas.eskimo.services.*;
+import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.services.ServiceDefinitionException;
+import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.services.SystemException;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Operation;
+import ch.niceideas.eskimo.types.Service;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -54,9 +61,8 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
 
     private static final Logger logger = Logger.getLogger(ServiceOperationsCommand.class);
 
+    // TODO remove
     public static final String KUBERNETES_FLAG = "(kubernetes)";
-    public static final String CHECK_INSTALL_OP_TYPE = "Check / Install";
-    public static final String BASE_SYSTEM = "Base System";
 
     private final NodesConfigWrapper rawNodesConfig;
 
@@ -71,34 +77,31 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges (rawNodesConfig);
 
         // 1. Find out about services that need to be installed
-        for (String service : servicesDefinition.listServicesOrderedByDependencies()) {
+        for (Service service : servicesDefinition.listServicesOrderedByDependencies()) {
             for (int nodeNumber : nodesConfig.getNodeNumbers(service)) {
 
-                String node = nodesConfig.getNodeAddress(nodeNumber);
-                String nodeName = node.replace(".", "-");
+                Node node = nodesConfig.getNode(nodeNumber);
 
-                if (!servicesInstallStatus.isServiceInstalled(service, nodeName)) {
+                if (!servicesInstallStatus.isServiceInstalled(service, node)) {
 
-                    retCommand.addInstallation(new ServiceOperationId("installation", service, node));
+                    retCommand.addInstallation(new ServiceOperationId(ServiceOperation.INSTALLATION, service, node));
                 }
             }
         }
 
         // 2. Find out about services that need to be uninstalled
 
-        for (Pair<String, String> installationPairs : servicesInstallStatus.getAllServiceAndNodeNameInstallationPairs()) {
+        for (Pair<Service, Node> installationPairs : servicesInstallStatus.getAllServiceAndNodeNameInstallationPairs()) {
 
-            String installedService = installationPairs.getKey();
-            String nodeName = installationPairs.getValue();
+            Service installedService = installationPairs.getKey();
+            Node node = installationPairs.getValue();
 
-            Service service = servicesDefinition.getService(installedService);
+            ServiceDef service = servicesDefinition.getServiceDefinition(installedService);
             if (service == null) {
                 throw new IllegalStateException("Cann find service " + installedService + " in services definition");
             }
 
             if (!service.isKubernetes()) {
-
-                String node = nodeName.replace("-", ".");
 
                 try {
                     int nodeNbr = nodesConfig.getNodeNumber(node);
@@ -114,18 +117,18 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
                     }
 
                     if (!found) {
-                        retCommand.addUninstallation(new ServiceOperationId("uninstallation", installedService, node));
+                        retCommand.addUninstallation(new ServiceOperationId(ServiceOperation.UNINSTALLATION, installedService, node));
                     }
 
                 } catch (SystemException e) {
                     logger.debug(e, e);
-                    retCommand.addUninstallation(new ServiceOperationId("uninstallation", installedService, node));
+                    retCommand.addUninstallation(new ServiceOperationId(ServiceOperation.UNINSTALLATION, installedService, node));
                 }
             }
         }
 
         // 3. If a services changed, dependent services need to be restarted
-        Set<String> changedServices = new HashSet<>();
+        Set<Service> changedServices = new HashSet<>();
 
         changedServices.addAll (retCommand.getInstallations().stream().map(ServiceOperationId::getService).collect(Collectors.toList()));
         changedServices.addAll (retCommand.getUninstallations().stream().map(ServiceOperationId::getService).collect(Collectors.toList()));
@@ -133,25 +136,26 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         //Set<String> restartedServices = new HashSet<>();
         changedServices.forEach(service -> servicesDefinition.getDependentServices(service).stream()
                 .filter(dependent -> {
-                    Service masterService = servicesDefinition.getService(service);
-                    Dependency dep = servicesDefinition.getService(dependent).getDependency(masterService).orElseThrow(IllegalStateException::new);
+                    ServiceDef masterService = servicesDefinition.getServiceDefinition(service);
+                    Dependency dep = servicesDefinition.getServiceDefinition(dependent).getDependency(masterService).orElseThrow(
+                            () -> new IllegalStateException("Couldn't find dependency "  + masterService + " on " + dependent));
                     return dep.isRestart();
                 })
                 .forEach(dependent -> {
 
-                    if (servicesDefinition.getService(dependent).isKubernetes()) {
+                    if (servicesDefinition.getServiceDefinition(dependent).isKubernetes()) {
                         if (servicesInstallStatus.isServiceInstalledAnywhere(dependent)) {
-                            retCommand.addRestartIfNotInstalled(dependent, KUBERNETES_FLAG);
+                            retCommand.addRestartIfNotInstalled(dependent, Node.KUBERNETES_FLAG);
                         }
 
                     } else {
 
                         for (int nodeNumber : nodesConfig.getNodeNumbers(dependent)) {
 
-                            String node = nodesConfig.getNodeAddress(nodeNumber);
+                            Node node = nodesConfig.getNode(nodeNumber);
 
-                            Service masterService = servicesDefinition.getService(service);
-                            Dependency dep = servicesDefinition.getService(dependent).getDependency(masterService).orElseThrow(IllegalStateException::new);
+                            ServiceDef masterService = servicesDefinition.getServiceDefinition(service);
+                            Dependency dep = servicesDefinition.getServiceDefinition(dependent).getDependency(masterService).orElseThrow(IllegalStateException::new);
 
                             // if dependency is same node, only restart if service on same node is impacted
                             if (!dep.getMes().equals(MasterElectionStrategy.SAME_NODE) || isServiceImpactedOnSameNode(retCommand, masterService, node)) {
@@ -163,10 +167,9 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
 
         // also add services simply flagged as needed restart previously
         servicesInstallStatus.getRootKeys().forEach(installStatusFlag -> {
-            Pair<String, String> serviceAndNodePair = ServicesInstallStatusWrapper.parseInstallStatusFlag (installStatusFlag);
-            String installedService = Objects.requireNonNull(serviceAndNodePair).getKey();
-            String nodeName = Objects.requireNonNull(serviceAndNodePair).getValue();
-            String node = nodeName.replace("-", ".");
+            Pair<Service, Node> serviceAndNodePair = ServicesInstallStatusWrapper.parseInstallStatusFlag (installStatusFlag);
+            Service installedService = Objects.requireNonNull(serviceAndNodePair).getKey();
+            Node node = Objects.requireNonNull(serviceAndNodePair).getValue();
             String status = (String) servicesInstallStatus.getValueForPath(installStatusFlag);
             if (status.equals("restart")) {
                 feedInRestartService(servicesDefinition, servicesInstallStatus, retCommand, node, installedService);
@@ -181,36 +184,36 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         return retCommand;
     }
 
-    private static boolean isServiceImpactedOnSameNode(ServiceOperationsCommand retCommand, Service masterService, String node) {
+    private static boolean isServiceImpactedOnSameNode(ServiceOperationsCommand retCommand, ServiceDef masterService, Node node) {
         return retCommand.getInstallations().stream()
-                .anyMatch (operationId -> operationId.getNode().equals(node) && operationId.getService().equals(masterService.getName()));
+                .anyMatch (operationId -> operationId.getNode().equals(node) && operationId.getService().equals(masterService.toService()));
     }
 
-    static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, NodesConfigWrapper nodesConfig, Set<String> restartedServices) {
+    static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, NodesConfigWrapper nodesConfig, Set<Service> restartedServices) {
         restartedServices.stream()
                 .sorted(servicesDefinition::compareServices)
-                .forEach(serviceName -> feedInRestartService(servicesDefinition, servicesInstallStatus, retCommand, nodesConfig, serviceName));
+                .forEach(service -> feedInRestartService(servicesDefinition, servicesInstallStatus, retCommand, nodesConfig, service));
     }
 
-    private static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, String node, String restartedService) {
-        if (servicesDefinition.getService(restartedService).isKubernetes()) {
+    private static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, Node node, Service restartedService) {
+        if (servicesDefinition.getServiceDefinition(restartedService).isKubernetes()) {
             if (servicesInstallStatus.isServiceInstalledAnywhere(restartedService)) {
-                retCommand.addRestartIfNotInstalled(restartedService, KUBERNETES_FLAG);
+                retCommand.addRestartIfNotInstalled(restartedService, Node.KUBERNETES_FLAG);
             }
         } else {
             retCommand.addRestartIfNotInstalled(restartedService, node);
         }
     }
 
-    private static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, NodesConfigWrapper nodesConfig, String restartedService) {
-        if (servicesDefinition.getService(restartedService).isKubernetes()) {
+    private static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, NodesConfigWrapper nodesConfig, Service restartedService) {
+        if (servicesDefinition.getServiceDefinition(restartedService).isKubernetes()) {
             if (servicesInstallStatus.isServiceInstalledAnywhere(restartedService)) {
-                retCommand.addRestartIfNotInstalled(restartedService, KUBERNETES_FLAG);
+                retCommand.addRestartIfNotInstalled(restartedService, Node.KUBERNETES_FLAG);
             }
         } else {
             for (int nodeNumber : nodesConfig.getNodeNumbers(restartedService)) {
 
-                String node = nodesConfig.getNodeAddress(nodeNumber);
+                Node node = nodesConfig.getNode(nodeNumber);
 
                 retCommand.addRestartIfNotInstalled(restartedService, node);
             }
@@ -220,7 +223,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
     public static ServiceOperationsCommand createForRestartsOnly (
             ServicesDefinition servicesDefinition,
             NodeRangeResolver nodeRangeResolver,
-            String[] servicesToRestart,
+            Service[] servicesToRestart,
             ServicesInstallStatusWrapper servicesInstallStatus,
             NodesConfigWrapper rawNodesConfig) throws NodesConfigurationException {
 
@@ -228,7 +231,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
 
         NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges (rawNodesConfig);
 
-        Set<String> restartedServices = new HashSet<>(Arrays.asList(servicesToRestart));
+        Set<Service> restartedServices = new HashSet<>(Arrays.asList(servicesToRestart));
 
         feedInRestartService(servicesDefinition, servicesInstallStatus, retCommand, nodesConfig, restartedServices);
 
@@ -243,10 +246,10 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         return rawNodesConfig;
     }
 
-    void addRestartIfNotInstalled(String service, String node) {
-        if (   !getInstallations().contains(new ServiceOperationId ("installation", service, node))
-            && !getRestarts().contains(new ServiceOperationId ("restart", service, node))) {
-            addRestart(new ServiceOperationId ("restart", service, node));
+    void addRestartIfNotInstalled(Service service, Node node) {
+        if (   !getInstallations().contains(new ServiceOperationId (ServiceOperation.INSTALLATION, service, node))
+            && !getRestarts().contains(new ServiceOperationId (ServiceOperation.RESTART, service, node))) {
+            addRestart(new ServiceOperationId (ServiceOperation.RESTART, service, node));
         }
     }
 
@@ -258,8 +261,8 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         }});
     }
 
-    public Set<String> getAllNodes() {
-        Set<String> retSet = new HashSet<>();
+    public Set<Node> getAllNodes() {
+        Set<Node> retSet = new HashSet<>();
         getInstallations().stream()
                 .map(ServiceOperationId::getNode)
                 .forEach(retSet::add);
@@ -271,7 +274,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
                 .forEach(retSet::add);
 
         // this one can come from restartes flags
-        retSet.remove(ServiceOperationsCommand.KUBERNETES_FLAG);
+        retSet.remove(Node.KUBERNETES_FLAG);
 
         return retSet;
     }
@@ -282,7 +285,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
             throws ServiceDefinitionException, NodesConfigurationException, SystemException {
 
         List<ServiceOperationId> allOpList = new ArrayList<>();
-        context.getNodesConfig().getNodeAddresses().forEach(node -> allOpList.add(new ServiceOperationId(CHECK_INSTALL_OP_TYPE, BASE_SYSTEM, node)));
+        context.getNodesConfig().getAllNodes().forEach(node -> allOpList.add(new ServiceOperationId(ServiceOperation.CHECK_INSTALL, Service.BASE_SYSTEM, node)));
         getOperationsGroupInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
         return allOpList;
     }
@@ -300,16 +303,26 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         return sorter.orderOperations(allOpList, nodesConfigWrapper);
     }
 
-    public static class ServiceOperationId extends SimpleOperationCommand.SimpleOperationId implements OperationId {
 
-        public ServiceOperationId (String type, String service, String node) {
-            super (type, service, node);
+    public static class ServiceOperationId extends AbstractStandardOperationId<ServiceOperation> implements OperationId<ServiceOperation> {
+
+        public ServiceOperationId (ServiceOperation operation, Service service, Node node) {
+            super (operation, service, node);
         }
+    }
 
-        @Override
-        public String getMessage() {
-            return getOperation() + " of " + getService() + " on " + getNode();
+    @RequiredArgsConstructor
+    public enum ServiceOperation implements Operation {
+        CHECK_INSTALL("Check / Install"),
+        INSTALLATION("installation"),
+        UNINSTALLATION ("uninstallation"),
+        RESTART ("restart");
+
+        @Getter
+        private final String type;
+
+        public String toString () {
+            return type;
         }
-
     }
 }

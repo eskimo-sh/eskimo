@@ -42,6 +42,8 @@ import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,7 +137,8 @@ public class SetupConfigControllerTest {
         setupServiceTest.setSetupCompleted();
         configurationServiceTest.setSetupCompleted();
 
-        operationsMonitoringService.startCommand(new SimpleOperationCommand("test", "test", "192.168.10.15"));
+        operationsMonitoringService.startCommand(new SimpleOperationCommand(
+                SimpleOperationCommand.SimpleOperation.COMMAND, Service.from("test"), Node.fromAddress("192.168.10.15")));
 
         assertEquals ("{\n" +
                 "    \"processingPending\": true,\n" +
@@ -167,7 +170,8 @@ public class SetupConfigControllerTest {
 
         HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
-        operationsMonitoringService.startCommand(new SimpleOperationCommand("test", "test", "192.168.10.15"));
+        operationsMonitoringService.startCommand(new SimpleOperationCommand(
+                SimpleOperationCommand.SimpleOperation.COMMAND, Service.from("test"), Node.fromAddress("192.168.10.15")));
 
         assertEquals ("{\n" +
                 "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed.\",\n" +

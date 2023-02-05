@@ -39,6 +39,7 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.SSHConnection;
+import ch.niceideas.eskimo.types.Node;
 import com.trilead.ssh2.ChannelCondition;
 import com.trilead.ssh2.SCPClient;
 import com.trilead.ssh2.Session;
@@ -68,7 +69,7 @@ public class SSHCommandServiceImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHScript(String node, String script) throws SSHCommandException {
+    public String runSSHScript(Node node, String script) throws SSHCommandException {
         return runSSHScript(node, script, true);
     }
 
@@ -87,7 +88,7 @@ public class SSHCommandServiceImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHScriptPath(String node, String scriptName) throws SSHCommandException {
+    public String runSSHScriptPath(Node node, String scriptName) throws SSHCommandException {
         return runSSHScript(node, getScriptContent(scriptName));
     }
 
@@ -115,7 +116,7 @@ public class SSHCommandServiceImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHScript(String node, String script, boolean throwsException) throws SSHCommandException {
+    public String runSSHScript(Node node, String script, boolean throwsException) throws SSHCommandException {
         try {
             SSHConnection connection = connectionManagerService.getSharedConnection(node);
             return runSSHScript(connection, script, throwsException);
@@ -191,7 +192,7 @@ public class SSHCommandServiceImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHCommand(String node, String command) throws SSHCommandException {
+    public String runSSHCommand(Node node, String command) throws SSHCommandException {
         try {
             SSHConnection connection = connectionManagerService.getSharedConnection(node);
             return runSSHCommand(connection, command);
@@ -221,7 +222,7 @@ public class SSHCommandServiceImpl implements SSHCommandService {
     }
 
     @Override
-    public void copySCPFile(String node, String filePath) throws SSHCommandException {
+    public void copySCPFile(Node node, String filePath) throws SSHCommandException {
         try {
             SSHConnection connection = connectionManagerService.getSharedConnection(node);
             copySCPFile(connection, filePath);

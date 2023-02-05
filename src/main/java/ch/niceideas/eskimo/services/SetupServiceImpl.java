@@ -38,7 +38,7 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.MessageLogger;
 import ch.niceideas.eskimo.model.SetupCommand;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -134,8 +134,8 @@ public class SetupServiceImpl implements SetupService {
     @Override
     public String getPackagesToBuild() {
         return additionalPackagesToBuild + "," + Arrays.stream(servicesDefinition.listAllServices())
-                .map (serviceName -> servicesDefinition.getService(serviceName))
-                .map (Service::getImageName)
+                .map (serviceName -> servicesDefinition.getServiceDefinition(serviceName))
+                .map (ServiceDef::getImageName)
                 .filter(Objects::nonNull)
                 .sorted()
                 .distinct()
@@ -680,7 +680,7 @@ public class SetupServiceImpl implements SetupService {
         if (!operationsMonitoringService.isInterrupted()) {
             try {
                 systemOperationService.applySystemOperation(
-                        new SetupCommand.SetupOperationId(SetupCommand.TYPE_DOWNLOAD, packageIdentifier),
+                        new SetupCommand.SetupOperationId(SetupCommand.SetupOperation.DOWNLOAD, packageIdentifier),
                         ml -> {
 
                             File targetFile = new File(packageDistributionPath + "/" + fileName);
@@ -728,7 +728,7 @@ public class SetupServiceImpl implements SetupService {
 
             try {
                 systemOperationService.applySystemOperation(
-                        new SetupCommand.SetupOperationId(SetupCommand.TYPE_BUILD, image),
+                        new SetupCommand.SetupOperationId(SetupCommand.SetupOperation.BUILD, image),
                         ml -> {
                             try {
 

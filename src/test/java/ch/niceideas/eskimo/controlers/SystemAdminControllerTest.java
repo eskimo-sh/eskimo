@@ -41,6 +41,8 @@ import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.OperationsMonitoringServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SystemServiceTestImpl;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,7 +165,8 @@ public class SystemAdminControllerTest {
     @Test
     public void testReinstallService_processingPending() throws Exception {
 
-        operationsMonitoringServiceTest.startCommand(new SimpleOperationCommand("test", "test", "192.168.10.15"));
+        operationsMonitoringServiceTest.startCommand(new SimpleOperationCommand(
+                SimpleOperationCommand.SimpleOperation.COMMAND, Service.from("test"), Node.fromAddress("192.168.10.15")));
 
         assertEquals ("{\n" +
                 "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed.\",\n" +

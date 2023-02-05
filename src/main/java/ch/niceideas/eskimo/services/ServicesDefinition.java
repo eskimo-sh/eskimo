@@ -39,6 +39,8 @@ import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.*;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 
 import java.util.*;
 
@@ -52,50 +54,50 @@ public interface ServicesDefinition {
 
     String getAllServicesString();
 
-    Topology getTopology(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, String currentNode)
+    Topology getTopology(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, Node currentNode)
             throws ServiceDefinitionException, NodesConfigurationException;
 
-    Service getService(String serviceName);
+    ServiceDef getServiceDefinition(Service service);
 
-    String[] listAllServices();
+    Service[] listAllServices();
 
-    String[] listAllNodesServices();
+    Service[] listAllNodesServices();
 
     long countAllNodesServices();
 
-    String[] listMultipleServicesNonKubernetes();
+    Service[] listMultipleServicesNonKubernetes();
 
-    String[] listMultipleServices();
+    Service[] listMultipleServices();
 
-    String[] listMandatoryServices();
+    Service[] listMandatoryServices();
 
-    String[] listUniqueServices();
+    Service[] listUniqueServices();
 
-    String[] listKubernetesServices();
+    Service[] listKubernetesServices();
 
     long countKubernetesServices();
 
-    String[] listProxiedServices();
+    Service[] listProxiedServices();
 
-    String[] listUIServices();
+    Service[] listUIServices();
 
-    Map<String, UIConfig> getUIServicesConfig();
+    Map<Service, UIConfig> getUIServicesConfig();
 
-    String[] listServicesInOrder();
+    Service[] listServicesInOrder();
 
-    String[] listServicesOrderedByDependencies();
+    Service[] listServicesOrderedByDependencies();
 
-    String[] listKubernetesServicesOrderedByDependencies();
+    Service[] listKubernetesServicesOrderedByDependencies();
 
-    int compareServices(Service one, Service other);
+    int compareServices(ServiceDef one, ServiceDef other);
 
-    int compareServices(String servOne, String servOther);
+    int compareServices(Service servOne, Service servOther);
 
-    Collection<String> getDependentServices(String service);
+    Collection<Service> getDependentServices(Service service);
 
-    Service getKubeMasterService();
+    ServiceDef getKubeMasterService();
 
-    Service getKubeSlaveService();
+    ServiceDef getKubeSlaveService();
 
     interface EnvironmentOperation {
         void call(JsonWrapper persistentEnvironment) throws ServiceDefinitionException;

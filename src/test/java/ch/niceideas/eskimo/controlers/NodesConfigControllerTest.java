@@ -47,6 +47,8 @@ import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SSHCommandServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -171,8 +173,8 @@ public class NodesConfigControllerTest {
         HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
         ServicesInstallStatusWrapper serviceInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        serviceInstallStatus.setInstallationFlag("kafka-cli", "192-168-10-11", "OK");
-        serviceInstallStatus.setInstallationFlag("kafka-cli", "192-168-10-13", "OK");
+        serviceInstallStatus.setInstallationFlag(Service.from("kafka-cli"), Node.fromName("192-168-10-11"), "OK");
+        serviceInstallStatus.setInstallationFlag(Service.from("kafka-cli"), Node.fromName("192-168-10-13"), "OK");
         configurationServiceTest.saveServicesInstallationStatus(serviceInstallStatus);
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
@@ -194,8 +196,8 @@ public class NodesConfigControllerTest {
 
         // now we're expecting that only kafka-cli was removed from the one stored in session
 
-        serviceInstallStatus.removeInstallationFlag("kafka-cli", "192-168-10-11");
-        serviceInstallStatus.removeInstallationFlag("kafka-cli", "192-168-10-13");
+        serviceInstallStatus.removeInstallationFlag(Service.from("kafka-cli"), Node.fromName("192-168-10-11"));
+        serviceInstallStatus.removeInstallationFlag(Service.from("kafka-cli"), Node.fromName("192-168-10-13"));
 
         //assertEquals(serviceInstallStatus.getFormattedValue(), ((ServicesInstallStatusWrapper)session.getAttribute(NodesConfigController.PENDING_OPERATIONS_STATUS_OVERRIDE)).getFormattedValue());
 
@@ -258,7 +260,8 @@ public class NodesConfigControllerTest {
 
         HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
-        operationsMonitoringService.startCommand(new SimpleOperationCommand("test", "test", "192.168.10.15"));
+        operationsMonitoringService.startCommand(new SimpleOperationCommand(
+                SimpleOperationCommand.SimpleOperation.COMMAND, Service.from("test"), Node.fromAddress("192.168.10.15")));
 
         assertEquals ("{\n" +
                 "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed.\",\n" +

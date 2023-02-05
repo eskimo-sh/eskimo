@@ -44,6 +44,7 @@ import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
 import ch.niceideas.eskimo.services.SystemServiceTest;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.testwrappers.SetupServiceUnderTest;
+import ch.niceideas.eskimo.types.Node;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
@@ -109,7 +110,7 @@ public abstract class AbstractSetupShellTest {
         def.setSetupService(setupService);
         def.afterPropertiesSet();
 
-        Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, Node.fromAddress("192.168.10.11"));
 
         FileUtils.writeFile(new File (jailPath + "/eskimo-topology.sh"),
                 topology.getTopologyScriptForNode(

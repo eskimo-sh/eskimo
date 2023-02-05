@@ -8,14 +8,6 @@
       "urlTemplate": "database-manager/api/v1/namespaces/default/services/cerebro:31900/proxy/#/overview?host=http:%2F%2Fdatabase.default.svc.cluster.eskimo:9200",
       "unique": true
     },
-    "cluster-dashboard": {
-      "role": "ADMIN",
-      "proxyContext": "./cluster-dashboard/",
-      "title": "Cluster Dashboard",
-      "waitTime": 5000,
-      "urlTemplate": "cluster-dashboard/api/v1/namespaces/cluster-dashboard/services/https:cluster-dashboard:/proxy/#/workloads?namespace=_all",
-      "unique": true
-    },
     "distributed-filesystem": {
       "role": "ADMIN",
       "proxyContext": "./distributed-filesystem/",
@@ -23,6 +15,14 @@
       "waitTime": 10000,
       "urlTemplate": "./distributed-filesystem/{NODE_ADDRESS}/management/app.html",
       "unique": false
+    },
+    "cluster-dashboard": {
+      "role": "ADMIN",
+      "proxyContext": "./cluster-dashboard/",
+      "title": "Cluster Dashboard",
+      "waitTime": 5000,
+      "urlTemplate": "cluster-dashboard/api/v1/namespaces/cluster-dashboard/services/https:cluster-dashboard:/proxy/#/workloads?namespace=_all",
+      "unique": true
     },
     "user-console": {
       "role": "*",

@@ -36,6 +36,8 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import com.trilead.ssh2.LocalPortForwarder;
 import org.apache.log4j.Logger;
 
@@ -46,13 +48,13 @@ import java.util.Objects;
 
 public interface ConnectionManagerService {
 
-    SSHConnection getPrivateConnection (String node) throws ConnectionManagerException;
+    SSHConnection getPrivateConnection (Node node) throws ConnectionManagerException;
 
-    SSHConnection getSharedConnection (String node) throws ConnectionManagerException;
+    SSHConnection getSharedConnection (Node node) throws ConnectionManagerException;
 
-    void recreateTunnels(String host) throws ConnectionManagerException;
+    void recreateTunnels(Node host) throws ConnectionManagerException;
 
-    void dropTunnelsToBeClosed(String host);
+    void dropTunnelsToBeClosed(Node host);
 
     class LocalPortForwarderWrapper {
 
@@ -60,19 +62,19 @@ public interface ConnectionManagerService {
 
         private final LocalPortForwarder forwarder;
 
-        private final String serviceName;
+        private final Service service;
         private final int localPort;
-        private final String targetHost;
+        private final Node targetHost;
         private final int targetPort;
 
-        public LocalPortForwarderWrapper (String serviceName, SSHConnection connection, int localPort, String targetHost, int targetPort) throws ConnectionManagerException {
-            this.serviceName = serviceName;
+        public LocalPortForwarderWrapper (Service service, SSHConnection connection, int localPort, Node targetHost, int targetPort) throws ConnectionManagerException {
+            this.service = service;
             this.localPort = localPort;
             this.targetHost = targetHost;
             this.targetPort = targetPort;
             try {
-                logger.info("Creating tunnel for service " + serviceName + " - from " + localPort + " to " + targetHost + ":" + targetPort);
-                this.forwarder = connection.createLocalPortForwarder(localPort, targetHost, targetPort);
+                logger.info("Creating tunnel for service " + service + " - from " + localPort + " to " + targetHost + ":" + targetPort);
+                this.forwarder = connection.createLocalPortForwarder(localPort, targetHost.getAddress(), targetPort);
             } catch (BindException e) {
                 logger.error (e, e);
                 throw new RemoveForwarderException (e);
@@ -84,7 +86,7 @@ public interface ConnectionManagerService {
 
         @Override
         public String toString() {
-            return serviceName + " - from " + localPort + " to " + targetHost + ":" + targetPort;
+            return service + " - from " + localPort + " to " + targetHost + ":" + targetPort;
         }
 
         public void close() {
@@ -99,19 +101,19 @@ public interface ConnectionManagerService {
             }
         }
 
-        public boolean matches (String serviceName, int localPort, String targetHost, int targetPort) {
-            return serviceName.matches(this.serviceName)
+        public boolean matches (Service service, int localPort, Node targetHost, int targetPort) {
+            return service.equals(this.service)
                     && (localPort == this.localPort)
                     && targetHost.equals(this.targetHost)
                     && (targetPort == this.targetPort);
         }
 
         public boolean matches(ProxyTunnelConfig config) {
-            return matches(config.getServiceName(), config.getLocalPort(), config.getNode(), config.getRemotePort());
+            return matches(config.getService(), config.getLocalPort(), config.getNode(), config.getRemotePort());
         }
 
-        public String getServiceName() {
-            return serviceName;
+        public Service getService() {
+            return service;
         }
 
         @Override

@@ -36,10 +36,12 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -73,26 +75,19 @@ public class SystemAdminController extends AbstractOperationController {
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     public String interruptProcessing() {
-
         try {
             operationsMonitoringService.interruptProcessing();
-
             return ReturnStatusHelper.createOKStatus();
-
         } catch (JSONException e) {
             logger.error(e, e);
             return ReturnStatusHelper.createErrorStatus(e);
-
         }
     }
 
     private String performKubernetesOperation(KubernetesOperation operation, String message) {
-
         try {
             operation.performOperation(kubernetesService);
-
             return ReturnStatusHelper.createOKStatus(map -> map.put("messages", message));
-
         } catch (KubernetesException | SystemException e) {
             logger.error(e, e);
             return ReturnStatusHelper.createErrorStatus(e);
@@ -100,12 +95,9 @@ public class SystemAdminController extends AbstractOperationController {
     }
 
     private String performSystemOperation(SystemOperation operation, String message) {
-
         try {
             operation.performOperation(systemService);
-
             return ReturnStatusHelper.createOKStatus(map -> map.put("messages", message));
-
         } catch (SSHCommandException | NodesConfigurationException | ServiceDefinitionException | SystemException e) {
             logger.error(e, e);
             return ReturnStatusHelper.createErrorStatus(e);
@@ -114,68 +106,68 @@ public class SystemAdminController extends AbstractOperationController {
 
     @GetMapping("/show-journal")
     @ResponseBody
-    public String showJournal(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
-        Service service = servicesDefinition.getService(serviceName);
-        if (service.isKubernetes()) {
+    public String showJournal(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String nodeAddress) {
+        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(Service.from(serviceName));
+        if (serviceDef.isKubernetes()) {
             return performKubernetesOperation(
-                    kubernetesService -> kubernetesService.showJournal(service, node),
+                    kubernetesService -> kubernetesService.showJournal(serviceDef, Node.fromAddress(nodeAddress)),
                     "Successfully shown journal of " +  serviceName + ".");
 
         } else {
             return performSystemOperation(
-                    sysService -> sysService.showJournal(service, node),
-                    serviceName + " journal display from " + node + ".");
+                    sysService -> sysService.showJournal(serviceDef, Node.fromAddress(nodeAddress)),
+                    serviceName + " journal display from " + nodeAddress + ".");
         }
 
     }
 
     @GetMapping("/start-service")
     @ResponseBody
-    public String startService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
-        Service service = servicesDefinition.getService(serviceName);
-        if (service.isKubernetes()) {
+    public String startService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String nodeAddress) {
+        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(Service.from(serviceName));
+        if (serviceDef.isKubernetes()) {
             return performKubernetesOperation(
-                    kubernetesService -> kubernetesService.startService(service, node),
+                    kubernetesService -> kubernetesService.startService(serviceDef, Node.fromAddress(nodeAddress)),
                     serviceName + " has been started successfuly on kubernetes.");
 
         } else {
             return performSystemOperation(
-                    sysService -> sysService.startService(service, node),
-                    serviceName + " has been started successfuly on " + node + ".");
+                    sysService -> sysService.startService(serviceDef, Node.fromAddress(nodeAddress)),
+                    serviceName + " has been started successfuly on " + nodeAddress + ".");
         }
     }
 
     @GetMapping("/stop-service")
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
-    public String stopService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
-        Service service = servicesDefinition.getService(serviceName);
-        if (service.isKubernetes()) {
+    public String stopService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String nodeAddress) {
+        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(Service.from(serviceName));
+        if (serviceDef.isKubernetes()) {
             return performKubernetesOperation(
-                    kubernetesService -> kubernetesService.stopService(service, node),
+                    kubernetesService -> kubernetesService.stopService(serviceDef, Node.fromAddress(nodeAddress)),
                     serviceName + " has been stopped successfuly on kubernetes.");
 
         } else {
             return performSystemOperation(
-                    sysService -> sysService.stopService(service, node),
-                    serviceName + " has been stopped successfuly on " + node + ".");
+                    sysService -> sysService.stopService(serviceDef, Node.fromAddress(nodeAddress)),
+                    serviceName + " has been stopped successfuly on " + nodeAddress + ".");
         }
     }
 
     @GetMapping("/restart-service")
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
-    public String restartService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
-        Service service = servicesDefinition.getService(serviceName);
-        if (service.isKubernetes()) {
+    public String restartService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String nodeAddress) {
+        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(Service.from(serviceName));
+        if (serviceDef.isKubernetes()) {
             return performKubernetesOperation(
-                    kubernetesService -> kubernetesService.restartService(service, node),
+                    kubernetesService -> kubernetesService.restartService(serviceDef, Node.fromAddress(nodeAddress)),
                     serviceName + " has been restarted successfuly on kubernetes.");
 
         } else {
             return performSystemOperation(
-                    sysService -> sysService.restartService(service, node),
-                    serviceName + " has been restarted successfuly on " + node + ".");
+                    sysService -> sysService.restartService(serviceDef, Node.fromAddress(nodeAddress)),
+                    serviceName + " has been restarted successfuly on " + nodeAddress + ".");
         }
     }
 
@@ -184,16 +176,16 @@ public class SystemAdminController extends AbstractOperationController {
     public String serviceActionCustom(
             @RequestParam(name="action") String commandId,
             @RequestParam(name="service") String serviceName,
-            @RequestParam(name="nodeAddress") String node) {
+            @RequestParam(name="nodeAddress") String nodeAddress) {
         return performSystemOperation(
-                sysService -> sysService.callCommand(commandId, serviceName, node),
-                "command " + commandId + " for " + serviceName + " has been executed successfuly on " + node + ".");
+                sysService -> sysService.callCommand(commandId, Service.from(serviceName), Node.fromAddress(nodeAddress)),
+                "command " + commandId + " for " + serviceName + " has been executed successfuly on " + nodeAddress + ".");
     }
 
     @GetMapping("/reinstall-service")
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
-    public String reinstallService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String node) {
+    public String reinstallService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String nodeAddress) {
 
         try {
 
@@ -202,26 +194,27 @@ public class SystemAdminController extends AbstractOperationController {
                 return checkObject.toString(2);
             }
 
-            Service service = servicesDefinition.getService(serviceName);
+            Service service = Service.from(serviceName);
+            ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
 
-            String nodeName;
-            if (service.isKubernetes()) {
-                nodeName = ServicesInstallStatusWrapper.KUBERNETES_NODE;
+            Node node;
+            if (serviceDef.isKubernetes()) {
+                node = Node.KUBERNETES_NODE;
             } else {
-                nodeName = node.replace(".", "-");
+                node = Node.fromAddress(nodeAddress);
             }
 
             ServicesInstallStatusWrapper formerServicesInstallationStatus = configurationService.loadServicesInstallationStatus();
 
             ServicesInstallStatusWrapper newServicesInstallationStatus = ServicesInstallStatusWrapper.empty();
 
-            for (String is : formerServicesInstallationStatus.getAllInstallStatusesExceptServiceOnNode(serviceName, nodeName)) {
+            for (String is : formerServicesInstallationStatus.getAllInstallStatusesExceptServiceOnNode(service, node)) {
                 newServicesInstallationStatus.setValueForPath(is, formerServicesInstallationStatus.getValueForPath(is));
             }
 
             configurationService.saveServicesInstallationStatus(newServicesInstallationStatus);
 
-            if (service.isKubernetes()) {
+            if (serviceDef.isKubernetes()) {
 
                 KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
                 if (kubeServicesConfig == null || kubeServicesConfig.isEmpty()) {

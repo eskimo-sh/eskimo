@@ -38,6 +38,7 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import ch.niceideas.eskimo.types.Node;
 
 import java.io.IOException;
 
@@ -51,18 +52,18 @@ public interface NodesConfigurationService {
             KubernetesServicesConfigWrapper kubeServicesConfig,
             ServicesInstallStatusWrapper servicesInstallStatus,
             MemoryModel memoryModel,
-            String node)
+            Node node)
             throws SystemException, SSHCommandException, IOException;
 
-    void restartServiceForSystem(SimpleOperationCommand.SimpleOperationId operationId) throws SystemException;
+    void restartServiceForSystem(AbstractStandardOperationId<?> operationId) throws SystemException;
 
-    void installEskimoBaseSystem(MessageLogger ml, String node) throws SSHCommandException;
+    void installEskimoBaseSystem(MessageLogger ml, Node node) throws SSHCommandException;
 
     String getNodeFlavour(SSHConnection connection) throws SSHCommandException, SystemException;
 
     void copyCommand (String source, String target, SSHConnection connection) throws SSHCommandException;
 
-    void uninstallService(ServiceOperationsCommand.ServiceOperationId operationId) throws SystemException;
+    void uninstallService(AbstractStandardOperationId<?> operationId) throws SystemException;
 
-    void installService(ServiceOperationsCommand.ServiceOperationId operationId) throws SystemException;
+    void installService(AbstractStandardOperationId<?> operationId) throws SystemException;
 }

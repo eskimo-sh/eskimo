@@ -38,28 +38,28 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.eskimo.model.KubernetesOperationsCommand;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 
 import java.util.Map;
 
 
 public interface KubernetesService {
 
-    String TOPOLOGY_ALL_NODES = "Topology (All Nodes)";
-
     String STATUS_RUNNING = "Running";
     String STATUS_TERMINATING = "Terminating";
     String STATUS_CONTAINER_CREATING = "ContainerCreating";
 
-    void showJournal(Service service, String node) throws SystemException;
+    void showJournal(ServiceDef service, Node node) throws SystemException;
 
-    void startService(Service service, String node) throws SystemException;
+    void startService(ServiceDef service, Node node) throws SystemException;
 
-    void stopService(Service service, String node) throws SystemException;
+    void stopService(ServiceDef service, Node node) throws SystemException;
 
-    void restartService(Service service, String node) throws SystemException;
+    void restartService(ServiceDef service, Node node) throws SystemException;
 
-    String restartServiceInternal(Service service, String node) throws KubernetesException, SSHCommandException;
+    String restartServiceInternal(ServiceDef service, Node node) throws KubernetesException, SSHCommandException;
 
     void fetchKubernetesServicesStatus
             (Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus)
@@ -67,9 +67,9 @@ public interface KubernetesService {
 
     void applyServicesConfig(KubernetesOperationsCommand command) throws KubernetesException;
 
-    boolean shouldInstall(KubernetesServicesConfigWrapper kubeServicesConfig, String service);
+    boolean shouldInstall(KubernetesServicesConfigWrapper kubeServicesConfig, Service service);
 
-    void uninstallService(KubernetesOperationsCommand.KubernetesOperationId operation, String kubeMasterNode) throws SystemException;
+    void uninstallService(KubernetesOperationsCommand.KubernetesOperationId operation, Node kubeMasterNode) throws SystemException;
 
-    void installService(KubernetesOperationsCommand.KubernetesOperationId operation, String kubeMasterNode) throws SystemException;
+    void installService(KubernetesOperationsCommand.KubernetesOperationId operation, Node kubeMasterNode) throws SystemException;
 }

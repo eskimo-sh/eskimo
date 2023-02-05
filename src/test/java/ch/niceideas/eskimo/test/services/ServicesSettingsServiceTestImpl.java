@@ -40,6 +40,7 @@ import ch.niceideas.eskimo.model.SettingsOperationsCommand;
 import ch.niceideas.eskimo.services.ServicesSettingsService;
 import ch.niceideas.eskimo.services.ServicesSettingsServiceImpl;
 import ch.niceideas.eskimo.services.SetupException;
+import ch.niceideas.eskimo.types.Service;
 import org.json.JSONObject;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
@@ -77,11 +78,11 @@ public class ServicesSettingsServiceTestImpl extends ServicesSettingsServiceImpl
     public ServicesSettingsWrapper prepareSaveSettings(
             String settingsFormAsString,
             Map<String, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
-            List<String> restartedServices){
+            List<Service> restartedServices){
 
         ServicesSettingsWrapper servicesSettings = new ServicesSettingsWrapper ("{settings: []}");
 
-        String[] dirtyServices = fillInEditedConfigs(
+        Service[] dirtyServices = fillInEditedConfigs(
                 changedSettings,
                 new JSONObject(settingsFormAsString),
                 servicesSettings.getSubJSONArray("settings"));

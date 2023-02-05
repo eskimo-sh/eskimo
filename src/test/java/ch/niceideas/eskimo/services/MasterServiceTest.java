@@ -38,6 +38,8 @@ import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SSHCommandServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SystemServiceTestImpl;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +83,7 @@ public class MasterServiceTest {
                 return "OK";
             }
             if (script.endsWith("cat /proc/meminfo | grep MemTotal")) {
-                switch (node) {
+                switch (node.getAddress()) {
                     case "192.168.10.11":
                         return "MemTotal:        5969796 kB";
                     case "192.168.10.12":
@@ -91,7 +93,7 @@ public class MasterServiceTest {
                 }
             }
             if (script.equals("grep 'I am the new leader' /var/log/gluster/egmi/egmi.log")) {
-                if (node.equals("192.168.10.11")) {
+                if (node.getAddress().equals("192.168.10.11")) {
                     return "2021-01-17 22:44:05,633 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: status - options: all detail\n" +
                             "2021-01-17 22:44:36,564 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options: \n" +
                             "2021-01-17 22:44:36,682 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options: \n" +
@@ -121,8 +123,8 @@ public class MasterServiceTest {
         assertEquals(1, masterService.getServiceMasterNodes().size());
         assertEquals(1, masterService.getServiceMasterTimestamps().size());
 
-        assertEquals("192.168.10.11", masterService.getServiceMasterNodes().get("gluster"));
-        assertNotNull(masterService.getServiceMasterTimestamps().get("gluster"));
+        assertEquals(Node.fromAddress("192.168.10.11"), masterService.getServiceMasterNodes().get(Service.from("gluster")));
+        assertNotNull(masterService.getServiceMasterTimestamps().get(Service.from("gluster")));
     }
 
     @Test
@@ -138,8 +140,8 @@ public class MasterServiceTest {
         assertEquals(1, masterService.getServiceMasterNodes().size());
         assertEquals(1, masterService.getServiceMasterTimestamps().size());
 
-        assertEquals("192.168.10.11", masterService.getServiceMasterNodes().get("gluster"));
-        assertNotNull(masterService.getServiceMasterTimestamps().get("gluster"));
+        assertEquals(Node.fromAddress("192.168.10.11"), masterService.getServiceMasterNodes().get(Service.from("gluster")));
+        assertNotNull(masterService.getServiceMasterTimestamps().get(Service.from("gluster")));
     }
 
 }

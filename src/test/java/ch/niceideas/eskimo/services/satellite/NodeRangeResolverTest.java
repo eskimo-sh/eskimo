@@ -37,6 +37,8 @@ package ch.niceideas.eskimo.services.satellite;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.comparator.Comparators;
@@ -58,7 +60,7 @@ public class NodeRangeResolverTest {
     }
 
     @Test
-    public void testRangeOverlapNode() throws Exception {
+    public void testRangeOverlapNode() {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
@@ -95,7 +97,7 @@ public class NodeRangeResolverTest {
     }
 
     @Test
-    public void testEmptyRange() throws Exception {
+    public void testEmptyRange() {
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
@@ -131,7 +133,7 @@ public class NodeRangeResolverTest {
     }
 
     @Test
-    public void testRangeOverlapRange() throws Exception {
+    public void testRangeOverlapRange() {
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11-192.168.10.13");
@@ -167,7 +169,7 @@ public class NodeRangeResolverTest {
     }
 
     @Test
-    public void testGenerateRangeIps() throws Exception {
+    public void testGenerateRangeIps() {
 
         List<String> range = nrr.generateRangeIps("192.168.0.1-192.168.0.15");
 
@@ -289,18 +291,21 @@ public class NodeRangeResolverTest {
                         .toArray(String[]::new)));
 
         assertEquals("192.168.10.11,192.168.10.13,192.168.10.14,192.168.10.15,192.168.10.16,192.168.10.17,192.168.10.18", String.join(",",
-                resolvedConfig.getAllNodeAddressesWithService("ntp").stream()
+                resolvedConfig.getAllNodesWithService(Service.from("ntp")).stream()
                         .sorted(Comparators.comparable())
+                        .map(Node::getAddress)
                         .toArray(String[]::new)));
 
         assertEquals("192.168.10.13,192.168.10.14,192.168.10.15,192.168.10.16,192.168.10.17,192.168.10.18", String.join(",",
-                resolvedConfig.getAllNodeAddressesWithService("kafka").stream()
+                resolvedConfig.getAllNodesWithService(Service.from("kafka")).stream()
                         .sorted(Comparators.comparable())
+                        .map(Node::getAddress)
                         .toArray(String[]::new)));
 
         assertEquals("192.168.10.11", String.join(",",
-                resolvedConfig.getAllNodeAddressesWithService("mesos-master").stream()
+                resolvedConfig.getAllNodesWithService(Service.from("mesos-master")).stream()
                         .sorted(Comparators.comparable())
+                        .map(Node::getAddress)
                         .toArray(String[]::new)));
     }
 

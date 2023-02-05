@@ -167,9 +167,9 @@ public class ServicesControllerTest {
     @Test
     public void testListConfigServices() throws Exception {
 
-        //System.err.println(sc.listConfigServices());
-
         String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesControllerTest/expecteConfigServices.json"), StandardCharsets.UTF_8);
+
+        System.err.println(sc.listConfigServices());
 
         assertTrue(new JSONObject(expectedResult).similar(new JSONObject(sc.listConfigServices())));
     }

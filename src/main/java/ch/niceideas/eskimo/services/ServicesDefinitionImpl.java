@@ -43,6 +43,8 @@ import ch.niceideas.eskimo.model.service.proxy.ProxyReplacement;
 import ch.niceideas.eskimo.model.service.proxy.UrlRewriting;
 import ch.niceideas.eskimo.model.service.proxy.WebCommand;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -81,14 +83,14 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
     private final ReentrantLock persistEnvLock = new ReentrantLock();
 
-    private final Map<String, Service> services = new HashMap<>();
+    private final Map<Service, ServiceDef> services = new HashMap<>();
 
-    private Service kubeMasterService;
-    private Service kubeSlaveService;
+    private ServiceDef kubeMasterService;
+    private ServiceDef kubeSlaveService;
 
     /** For tests only */
-    public void addService(Service service) {
-        this.services.put (service.getName(), service);
+    public void addService(ServiceDef service) {
+        this.services.put (service.toService(), service);
     }
     public void setSetupService(SetupService setupService) {
         this.setupService = setupService;
@@ -101,7 +103,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
     @Override
     public void afterPropertiesSet() throws Exception {
 
-        HashMap<WebCommand, String> webCommandServices = new HashMap<>();
+        HashMap<WebCommand, Service> webCommandServices = new HashMap<>();
 
         logger.info ("Using services definition from file : " + getServicesDefinitionFile());
 
@@ -117,7 +119,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
         for (String serviceString : servicesConfig.getRootKeys()) {
 
-            Service service = new Service();
+            ServiceDef service = new ServiceDef();
 
             service.setName(serviceString);
 
@@ -211,7 +213,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 for (int i = 0; i < memAdditionalArray.length(); i++) {
 
                     String memAdditionalService = memAdditionalArray.getString(i);
-                    service.addAdditionalMemory (memAdditionalService);
+                    service.addAdditionalMemory (Service.from(memAdditionalService));
                 }
             }
 
@@ -331,7 +333,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
                     String masterServiceString = depObj.getString("masterService");
                     if (masterServiceString != null) {
-                        dependency.setMasterService(masterServiceString);
+                        dependency.setMasterService(Service.from(masterServiceString));
                     }
 
                     Integer numberOfMaster = depObj.has("numberOfMasters") ? depObj.getInt("numberOfMasters") : null;
@@ -351,7 +353,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
                     String conditionalDependency = depObj.has("conditional") ? depObj.getString("conditional") : null;
                     if (StringUtils.isNotBlank(conditionalDependency)) {
-                        dependency.setConditional (conditionalDependency);
+                        dependency.setConditionalDependency(Service.from(conditionalDependency));
                     }
 
                     service.addDependency(dependency);
@@ -381,7 +383,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                     if (StringUtils.isBlank(serviceName)) {
                         throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a Web command without a service name");
                     }
-                    webCommandServices.put (command, serviceName);
+                    webCommandServices.put (command, Service.from(serviceName));
 
                     service.addWebCommand (command);
                 }
@@ -525,17 +527,17 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 }
             }
 
-            services.put(serviceString, service);
+            services.put(service.toService(), service);
         }
 
         // post-processing web commands
         webCommandServices.keySet().forEach(
-                command -> command.setService(getService(webCommandServices.get(command)))
+                command -> command.setService(getServiceDefinition(webCommandServices.get(command)))
         );
 
         try {
             services.values().stream()
-                    .filter(Service::isKubernetes)
+                    .filter(ServiceDef::isKubernetes)
                     .forEach(service -> {
                         // Kubernetes services have an implicit dependency on kubernetes
                             Dependency kubeDependency = new Dependency();
@@ -543,7 +545,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                             if (getKubeMasterService() == null) {
                                 throw new IllegalArgumentException("No Kube Master service found !");
                             }
-                            kubeDependency.setMasterService(getKubeMasterService().getName());
+                            kubeDependency.setMasterService(getKubeMasterService().toService());
                             kubeDependency.setNumberOfMasters(1);
                             kubeDependency.setMandatory(true);
                             kubeDependency.setRestart(false);
@@ -560,7 +562,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
         // make sure there is no hole in order: sum of configOrder should be n(n+1) / 2
         int effSum = services.values().stream()
-                .map (Service::getConfigOrder)
+                .map (ServiceDef::getConfigOrder)
                 .reduce(0, Integer::sum);
 
         int nbr = services.keySet().size();
@@ -573,10 +575,10 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
         // make sure all master service exist
         try {
             services.values().stream()
-                    .map(Service::getDependencies)
+                    .map(ServiceDef::getDependencies)
                     .flatMap(Collection::stream)
                     .forEach(dep -> {
-                        String master = dep.getMasterService();
+                        Service master = dep.getMasterService();
                         if (services.get(master) == null) {
                             throw new IllegalArgumentException("Master service " + master + " doesn't exist");
                         }
@@ -588,8 +590,8 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
         // make sure all webCommand services are set !
         try {
             Arrays.stream(listUIServices())
-                    .map(this::getService)
-                    .map (Service::getWebCommands)
+                    .map(this::getServiceDefinition)
+                    .map (ServiceDef::getWebCommands)
                     .flatMap(List::stream)
                     .forEach(webCommand -> {
                         if (webCommand.getService() == null) {
@@ -637,33 +639,33 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
     @Override
     public String getAllServicesString() {
-        return String.join(" ", listAllServices());
+        return Arrays.stream(listAllServices()).map(Service::getName).sorted().collect(Collectors.joining(" "));
     }
 
     @Override
-    public Topology getTopology(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, String currentNode)
+    public Topology getTopology(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, Node currentNode)
             throws ServiceDefinitionException, NodesConfigurationException {
         return Topology.create(nodesConfig, kubeServicesConfig, this, configuredContextPath, currentNode);
     }
 
     @Override
-    public Service getService(String serviceName) {
-        return services.get (serviceName);
+    public ServiceDef getServiceDefinition(Service service) {
+        return services.get (service);
     }
 
     @Override
-    public String[] listAllServices() {
+    public Service[] listAllServices() {
         return services.values().stream()
-                .map(Service::getName)
-                .sorted().toArray(String[]::new);
+                .map(ServiceDef::toService)
+                .sorted().toArray(Service[]::new);
     }
 
     @Override
-    public String[] listAllNodesServices() {
+    public Service[] listAllNodesServices() {
         return services.values().stream()
                 .filter(service -> !service.isKubernetes())
-                .map(Service::getName)
-                .sorted().toArray(String[]::new);
+                .map(ServiceDef::toService)
+                .sorted().toArray(Service[]::new);
     }
 
     @Override
@@ -674,107 +676,108 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
     }
 
     @Override
-    public String[] listMultipleServicesNonKubernetes() {
+    public Service[] listMultipleServicesNonKubernetes() {
         return services.values().stream()
                 .filter(it -> !it.isUnique() && !it.isKubernetes())
-                .map(Service::getName)
-                .sorted().toArray(String[]::new);
+                .map(ServiceDef::toService)
+                .sorted().toArray(Service[]::new);
     }
 
     @Override
-    public String[] listMultipleServices() {
+    public Service[] listMultipleServices() {
         return services.values().stream()
                 .filter(it -> !it.isUnique())
-                .map(Service::getName)
-                .sorted().toArray(String[]::new);
+                .map(ServiceDef::toService)
+                .sorted().toArray(Service[]::new);
     }
 
     @Override
-    public String[] listMandatoryServices() {
+    public Service[] listMandatoryServices() {
         return services.values().stream()
-                .filter(Service::isMandatory)
-                .map(Service::getName)
+                .filter(ServiceDef::isMandatory)
+                .map(ServiceDef::toService)
                 .sorted()
-                .toArray(String[]::new);
+                .toArray(Service[]::new);
     }
 
     @Override
-    public String[] listUniqueServices() {
+    public Service[] listUniqueServices() {
         return services.values().stream()
-                .filter(Service::isUnique)
-                .filter(Service::isNotKubernetes)
-                .map(Service::getName)
+                .filter(ServiceDef::isUnique)
+                .filter(ServiceDef::isNotKubernetes)
+                .map(ServiceDef::toService)
                 .sorted()
-                .toArray(String[]::new);
+                .toArray(Service[]::new);
     }
 
     @Override
-    public String[] listKubernetesServices() {
+    public Service[] listKubernetesServices() {
         return services.values().stream()
-                .filter(Service::isKubernetes)
-                .map(Service::getName)
+                .filter(ServiceDef::isKubernetes)
+                .map(ServiceDef::toService)
                 .sorted()
-                .toArray(String[]::new);
+                .toArray(Service[]::new);
     }
 
     @Override
     public long countKubernetesServices() {
         return services.values().stream()
-                .filter(Service::isKubernetes)
+                .filter(ServiceDef::isKubernetes)
                 .count();
     }
 
     @Override
-    public String[] listProxiedServices() {
+    public Service[] listProxiedServices() {
         return services.values().stream()
-                .filter(Service::isProxied)
-                .sorted(Comparator.comparingInt(Service::getConfigOrder))
-                .map(Service::getName)
-                .toArray(String[]::new);
+                .filter(ServiceDef::isProxied)
+                .sorted(Comparator.comparingInt(ServiceDef::getConfigOrder))
+                .map(ServiceDef::toService)
+                .toArray(Service[]::new);
     }
 
     @Override
-    public String[] listUIServices() {
+    public Service[] listUIServices() {
         return services.values().stream()
-                .filter(Service::isUiService)
-                .sorted(Comparator.comparingInt(Service::getConfigOrder))
-                .map(Service::getName)
-                .toArray(String[]::new);
+                .filter(ServiceDef::isUiService)
+                .sorted(Comparator.comparingInt(ServiceDef::getConfigOrder))
+                .map(ServiceDef::toService)
+                .toArray(Service[]::new);
     }
 
     @Override
-    public Map<String, UIConfig> getUIServicesConfig() {
+    public Map<Service, UIConfig> getUIServicesConfig() {
         return services.values().stream()
-                .filter(Service::isUiService)
-                .collect(Collectors.toMap(Service::getName, Service::getUiConfig));
+                .filter(ServiceDef::isUiService)
+                .collect(Collectors.toMap(ServiceDef::toService, ServiceDef::getUiConfig));
     }
 
     @Override
-    public String[] listServicesInOrder() {
+    public Service[] listServicesInOrder() {
         return services.values().stream()
-                .sorted(Comparator.comparingInt(Service::getConfigOrder))
-                .map(Service::getName).toArray(String[]::new);
+                .sorted(Comparator.comparingInt(ServiceDef::getConfigOrder))
+                .map(ServiceDef::toService)
+                .toArray(Service[]::new);
     }
 
     @Override
-    public String[] listServicesOrderedByDependencies() {
+    public Service[] listServicesOrderedByDependencies() {
         return services.values().stream()
                 .sorted(this::compareServices)
-                .map(Service::getName)
-                .toArray(String[]::new);
+                .map(ServiceDef::toService)
+                .toArray(Service[]::new);
     }
 
     @Override
-    public String[] listKubernetesServicesOrderedByDependencies() {
+    public Service[] listKubernetesServicesOrderedByDependencies() {
         return services.values().stream()
                 .sorted(this::compareServices) // dunno why, but if I sort after filtering, it's not working (copare not called)
-                .filter(Service::isKubernetes)
-                .map(Service::getName)
-                .toArray(String[]::new);
+                .filter(ServiceDef::isKubernetes)
+                .map(ServiceDef::toService)
+                .toArray(Service[]::new);
     }
 
     @Override
-    public int compareServices(Service one, Service other) {
+    public int compareServices(ServiceDef one, ServiceDef other) {
 
         // kubernetes services are always last
         if (one.isKubernetes() && !other.isKubernetes()) {
@@ -794,12 +797,12 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
         // need to browse dependencies
         for (Dependency dep : one.getDependencies()) {
-            if (dep.getMasterService().equals(other.getName()) && !dep.isDependentInstalledFirst()) {
+            if (dep.getMasterService().equals(other.toService()) && !dep.isDependentInstalledFirst()) {
                 return 1;
             }
         }
         for (Dependency dep : other.getDependencies()) {
-            if (dep.getMasterService().equals(one.getName()) && !dep.isDependentInstalledFirst()) {
+            if (dep.getMasterService().equals(one.toService()) && !dep.isDependentInstalledFirst()) {
                 return -1;
             }
         }
@@ -808,16 +811,16 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
     }
 
     @Override
-    public int compareServices(String servOne, String servOther) {
+    public int compareServices(Service servOne, Service servOther) {
 
-        Service one = getService(servOne);
-        Service other = getService(servOther);
+        ServiceDef one = getServiceDefinition(servOne);
+        ServiceDef other = getServiceDefinition(servOther);
 
         return compareServices(one, other);
     }
 
     @Override
-    public Collection<String> getDependentServices(String service) {
+    public Collection<Service> getDependentServices(Service service) {
         return getDependentServicesInner(service, new HashSet<>()).stream()
                 .sorted((service1, service2) -> {
                     if (getDependentServicesInner(service1, new HashSet<>()).contains(service2)) {
@@ -831,25 +834,25 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
     }
 
     @Override
-    public Service getKubeMasterService() {
+    public ServiceDef getKubeMasterService() {
         return kubeMasterService;
     }
 
     @Override
-    public Service getKubeSlaveService() {
+    public ServiceDef getKubeSlaveService() {
         return kubeSlaveService;
     }
 
-    private Set<String> getDependentServicesInner(String service, Set<String> currentSet) {
+    private Set<Service> getDependentServicesInner(Service service, Set<Service> currentSet) {
         if (currentSet.contains(service)) {
             return new HashSet<>();
         }
-        List<String> directDependentList = services.values().stream()
+        List<Service> directDependentList = services.values().stream()
                 .filter(it -> it.dependsOn(service))
-                .map(Service::getName)
+                .map(ServiceDef::toService)
                 .collect(Collectors.toList());
         currentSet.addAll(directDependentList);
-        for (String depService: directDependentList) {
+        for (Service depService: directDependentList) {
             currentSet.addAll(getDependentServicesInner(depService, currentSet));
         }
         return currentSet;

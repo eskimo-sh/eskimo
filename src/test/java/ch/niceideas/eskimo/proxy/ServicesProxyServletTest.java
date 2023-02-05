@@ -35,13 +35,15 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.model.service.proxy.ReplacementContext;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
 import ch.niceideas.eskimo.test.services.WebSocketProxyServerTestImpl;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.apache.catalina.ssi.ByteArrayServletOutputStream;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpHeaders;
@@ -90,20 +92,20 @@ public class ServicesProxyServletTest {
     public void setUp() throws Exception {
         configurationServiceTest.setStandard2NodesInstallStatus();
 
-        pms.removeServerForService ("gluster", "192.168.10.11");
-        pms.removeServerForService ("gluster", "192.168.10.13");
+        pms.removeServerForService (Service.from("gluster"), Node.fromAddress("192.168.10.11"));
+        pms.removeServerForService (Service.from("gluster"), Node.fromAddress("192.168.10.13"));
 
-        pms.removeServerForService ("zeppelin", "192.168.10.11");
+        pms.removeServerForService (Service.from("zeppelin"), Node.fromAddress("192.168.10.11"));
 
-        pms.removeServerForService ("flink-runtime", "192.168.10.11");
-        pms.removeServerForService ("flink-runtime", "192.168.10.12");
-        pms.removeServerForService ("flink-runtime", "192.168.10.13");
+        pms.removeServerForService (Service.from("flink-runtime"), Node.fromAddress("192.168.10.11"));
+        pms.removeServerForService (Service.from("flink-runtime"), Node.fromAddress("192.168.10.12"));
+        pms.removeServerForService (Service.from("flink-runtime"), Node.fromAddress("192.168.10.13"));
 
-        pms.removeServerForService ("kubernetes-dashboard", "192.168.10.11");
-        pms.removeServerForService ("kubernetes-dashboard", "192.168.10.13");
+        pms.removeServerForService (Service.from("kubernetes-dashboard"), Node.fromAddress("192.168.10.11"));
+        pms.removeServerForService (Service.from("kubernetes-dashboard"), Node.fromAddress("192.168.10.13"));
 
-        pms.removeServerForService ("kibana", "192.168.10.11");
-        pms.removeServerForService ("kibana", "192.168.10.13");
+        pms.removeServerForService (Service.from("kibana"), Node.fromAddress("192.168.10.11"));
+        pms.removeServerForService (Service.from("kibana"), Node.fromAddress("192.168.10.13"));
 
         connectionManagerServiceTest.reset();
         connectionManagerServiceTest.dontConnect();
@@ -117,7 +119,7 @@ public class ServicesProxyServletTest {
 
         HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("cerebro");
 
-        pms.updateServerForService("cerebro", "192.168.10.11");
+        pms.updateServerForService(Service.from("cerebro"), Node.fromAddress("192.168.10.11"));
 
         assertEquals ("http://localhost:"
                 + pms.getTunnelConfig("cerebro").getLocalPort()
@@ -130,7 +132,7 @@ public class ServicesProxyServletTest {
 
         HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("cerebro");
 
-        pms.updateServerForService("cerebro", "192.168.10.11");
+        pms.updateServerForService(Service.from("cerebro"), Node.fromAddress("192.168.10.11"));
 
         assertEquals("http://localhost:"
                 + pms.getTunnelConfig("cerebro").getLocalPort()
@@ -143,7 +145,7 @@ public class ServicesProxyServletTest {
 
         HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("cerebro");
 
-        pms.updateServerForService("cerebro", "192.168.10.11");
+        pms.updateServerForService(Service.from("cerebro"), Node.fromAddress("192.168.10.11"));
 
         assertEquals("http://localhost:9090/cerebro/nodeStats/statistics=192.168.10.13",
                 servlet.rewriteUrlFromResponse(request, "http://localhost:" +
@@ -155,7 +157,7 @@ public class ServicesProxyServletTest {
     public void testRewriteUrlFromResponse_sparkHistoryCase() throws Exception {
         HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("spark-console");
 
-        pms.updateServerForService("spark-console", "192.168.10.11");
+        pms.updateServerForService(Service.from("spark-console"), Node.fromAddress("192.168.10.11"));
 
         // http://localhost:9191/history/spark-application-1653861510346/jobs/
 
@@ -166,7 +168,7 @@ public class ServicesProxyServletTest {
     @Test
     public void testNominalReplacements() {
 
-        Service kafkaManagerService = servicesDefinition.getService("kafka-manager");
+        ServiceDef kafkaManagerService = servicesDefinition.getServiceDefinition(Service.from("kafka-manager"));
         assertNotNull(kafkaManagerService);
 
         String toReplace  = "\n <a href='/toto.txt'>\na/a>";
@@ -179,7 +181,7 @@ public class ServicesProxyServletTest {
 
     @Test
     public void testPageScripterInjection() {
-        Service kubeDashboardService = servicesDefinition.getService("kubernetes-dashboard");
+        ServiceDef kubeDashboardService = servicesDefinition.getServiceDefinition(Service.from("kubernetes-dashboard"));
         assertNotNull(kubeDashboardService);
 
         String toReplace  = ""+"" +
@@ -202,7 +204,7 @@ public class ServicesProxyServletTest {
     @Test
     public void testZeppelinReplacements() {
 
-        Service zeppelinService = servicesDefinition.getService("zeppelin");
+        ServiceDef zeppelinService = servicesDefinition.getServiceDefinition(Service.from("zeppelin"));
 
         String toReplace = "function(e, t, n) {\n" +
                 "    \"use strict\";\n" +

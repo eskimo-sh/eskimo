@@ -40,6 +40,8 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.services.SystemException;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -73,17 +75,17 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
         super(jsonString);
     }
 
-    public boolean isServiceOnNode(String serviceName, int nodeNbr) {
-        return getNodeNumbers(serviceName).contains(nodeNbr);
+    public boolean isServiceOnNode(Service service, int nodeNbr) {
+        return getNodeNumbers(service).contains(nodeNbr);
     }
 
-    public boolean hasServiceConfigured(String serviceName) {
+    public boolean hasServiceConfigured(Service service) {
         try {
             return this.keySet().stream()
                     .map(NodesConfigWrapper::parseProperty)
                     .filter(Objects::nonNull)
-                    .map (ParsedNodesConfigProperty::getServiceName)
-                    .anyMatch(propertyServiceName -> propertyServiceName.equals (serviceName));
+                    .map (ParsedNodesConfigProperty::getService)
+                    .anyMatch(propertyService -> propertyService.equals (service));
         } catch (JSONException e) {
             logger.debug (e, e);
             return false;
@@ -107,7 +109,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
                 .filter(key -> !key.contains(NODE_ID_FIELD))
                 .map(NodesConfigWrapper::parseProperty)
                 .filter(Objects::nonNull)
-                .map (ParsedNodesConfigProperty::getServiceName)
+                .map (ParsedNodesConfigProperty::getService)
                 .distinct().count();
     }
 
@@ -117,19 +119,15 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
                 .collect(Collectors.toList());
     }
 
-    public String getNodeAddress(int nodeNbr) {
-        return (String) getValueForPath(NODE_ID_FIELD + nodeNbr);
-    }
-
-    public String getNodeName(int nodeNbr) {
+    public Node getNode(int nodeNbr) {
         String nodeAddress = (String) getValueForPath(NODE_ID_FIELD + nodeNbr);
-        if (StringUtils.isNotBlank(nodeAddress)) {
-            return nodeAddress.replace(".", "-");
+        if (StringUtils.isBlank(nodeAddress)) {
+            throw new IllegalArgumentException("No node with number " + nodeNbr);
         }
-        return null;
+        return Node.fromAddress(nodeAddress);
     }
 
-    public List<String> getAllNodeAddressesWithService(String serviceName) {
+    public List<Node> getAllNodesWithService(Service service) {
         return getRootKeys().stream()
                 .map (key -> {
                     try {
@@ -140,10 +138,10 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
                     }
                 })
                 .filter(Objects::nonNull)
-                .filter(serviceConfig -> serviceConfig.getServiceName().equals(serviceName))
+                .filter(serviceConfig -> serviceConfig.getService().equals(service))
                 .map(serviceConfig -> {
                     try {
-                        return getNodeAddress (serviceConfig.getNodeNumber());
+                        return getNode (serviceConfig.getNodeNumber());
                     } catch (JSONException e) {
                         logger.debug (e, e);
                         return null;
@@ -153,13 +151,15 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
                 .collect(Collectors.toList());
     }
 
-    public List<Pair<String, String>> getNodeAdresses() {
-        List<Pair<String, String>> retList = new ArrayList<>();
+    public List<Pair<Integer, Node>> getNodes() {
+        List<Pair<Integer, Node>> retList = new ArrayList<>();
 
         getNodeAddressKeys()
                 .forEach(key -> {
                     try {
-                        retList.add(new Pair<>(key.substring(NODE_ID_FIELD.length()), (String) getValueForPath(key)));
+                        retList.add(new Pair<>(
+                                Integer.valueOf(key.substring(NODE_ID_FIELD.length())),
+                                Node.fromAddress((String) getValueForPath(key))));
                     } catch (JSONException e) {
                         throw new NodesConfigWrapperException(e);
                     }
@@ -168,7 +168,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
         return retList;
     }
 
-    public List<String> getServicesForNode(String node) throws SystemException {
+    public List<Service> getServicesForNode(Node node) throws SystemException {
         return getServicesForNode(getNodeNumber(node));
     }
 
@@ -179,11 +179,15 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
 
             if (matcher.groupCount() >= 2 && StringUtils.isNotBlank(matcher.group(2))) {
 
-                return new ParsedNodesConfigProperty (matcher.group(1), Integer.valueOf (matcher.group(2)));
+                return new ParsedNodesConfigProperty (
+                        Service.from(matcher.group(1)),
+                        Integer.valueOf (matcher.group(2)));
 
             } else if (matcher.groupCount() >= 1) {
 
-                return new ParsedNodesConfigProperty (matcher.group(1), null);
+                return new ParsedNodesConfigProperty (
+                        Service.from(matcher.group(1))
+                        , null);
 
             } else {
 
@@ -194,7 +198,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
         return null;
     }
 
-    public List<String> getServicesForNode (int number) {
+    public List<Service> getServicesForNode (int number) {
         return getServiceKeys().stream()
                 .map (key -> {
                     try {
@@ -206,16 +210,16 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
                 })
                 .filter(Objects::nonNull)
                 .filter(serviceConfig -> serviceConfig.getNodeNumber() == number)
-                .map(ParsedNodesConfigProperty::getServiceName)
+                .map(ParsedNodesConfigProperty::getService)
                 .collect(Collectors.toList());
     }
 
-    public int getNodeNumber(String node) throws SystemException {
+    public int getNodeNumber(Node node) throws SystemException {
         for (String key : getRootKeys()) {
             if (key.startsWith(NODE_ID_FIELD)) {
 
                 try {
-                    if (getValueForPath(key).equals(node)) {
+                    if (getValueForPath(key).equals(node.getAddress())) {
                         return Integer.parseInt(key.substring(NODE_ID_FIELD.length()));
                     }
                 } catch (JSONException e) {
@@ -227,24 +231,24 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
         throw new SystemException("Impossible to find node number for node " + node);
     }
 
-    public boolean shouldInstall(String service, int nodeNbr) {
+    public boolean shouldInstall(Service service, int nodeNbr) {
 
         boolean shall = false;
 
 
         if (
             // First case : unique service
-            (getValueForPath(service) != null && getValueForPath(service).equals("" + nodeNbr))
+            (getValueForPath(service.getName()) != null && getValueForPath(service.getName()).equals("" + nodeNbr))
             ||
             // second case multiple service
-            (getValueForPath(service + nodeNbr) != null && getValueForPath(service + nodeNbr).equals("on"))) {
+            (getValueForPath(service.getName() + nodeNbr) != null && getValueForPath(service.getName() + nodeNbr).equals("on"))) {
             shall = true;
         }
 
         return shall;
     }
 
-    public List<String> getNodeAddresses() {
+    public List<Node> getAllNodes() {
         return getNodeAddressKeys().stream()
                 .map(key -> {
                     try {
@@ -255,11 +259,12 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
                     }
                 })
                 .filter(Objects::nonNull)
+                .map(Node::fromAddress)
                 .sorted()
                 .collect(Collectors.toList());
     }
 
-    public List<Integer> getNodeNumbers(String service) {
+    public List<Integer> getNodeNumbers(Service service) {
         return getRootKeys().stream()
                 .map(key -> {
                     try {
@@ -269,17 +274,17 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
                         throw new TopologyException(e);
                     }
                 })
-                .filter(result -> result.getServiceName().equals(service))
+                .filter(result -> result.getService().equals(service))
                 .map(result -> result.getNodeNumber() == null ? -1 : result.getNodeNumber())
                 .filter (value -> value != -1)
                 .sorted()
                 .collect(Collectors.toList());
     }
 
-    public String getFirstNodeName(String serviceName) {
-        List<String> nodeAddresses = getAllNodeAddressesWithService(serviceName);
+    public Node getFirstNode(Service service) {
+        List<Node> nodeAddresses = getAllNodesWithService(service);
         if (!nodeAddresses.isEmpty()) {
-            return nodeAddresses.get(0).replace(".", "-");
+            return nodeAddresses.get(0);
         }
         return null;
     }
@@ -294,16 +299,16 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
 
     public static final class ParsedNodesConfigProperty {
 
-        private final String serviceName;
+        private final Service service;
         private final Integer nodeNumber;
 
-        public ParsedNodesConfigProperty(String serviceName, Integer nodeNumber) {
-            this.serviceName = serviceName;
+        public ParsedNodesConfigProperty(Service service, Integer nodeNumber) {
+            this.service = service;
             this.nodeNumber = nodeNumber;
         }
 
-        public String getServiceName() {
-            return serviceName;
+        public Service getService() {
+            return service;
         }
 
         public Integer getNodeNumber() {

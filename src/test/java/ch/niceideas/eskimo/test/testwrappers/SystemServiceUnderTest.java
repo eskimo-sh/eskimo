@@ -42,6 +42,7 @@ import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import ch.niceideas.eskimo.services.SystemException;
 import ch.niceideas.eskimo.services.SystemService;
 import ch.niceideas.eskimo.services.SystemServiceImpl;
+import ch.niceideas.eskimo.types.Node;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
@@ -60,7 +61,7 @@ public class SystemServiceUnderTest extends SystemServiceImpl implements SystemS
     }
 
     public void fetchNodeStatus
-            (NodesConfigWrapper nodesConfig, Map<String, String> statusMap, Pair<String, String> nbrAndPair,
+            (NodesConfigWrapper nodesConfig, Map<String, String> statusMap, Pair<Integer, Node> nbrAndPair,
              ServicesInstallStatusWrapper servicesInstallationStatus)
             throws SystemException {
         super.fetchNodeStatus(nodesConfig, statusMap, nbrAndPair, servicesInstallationStatus);

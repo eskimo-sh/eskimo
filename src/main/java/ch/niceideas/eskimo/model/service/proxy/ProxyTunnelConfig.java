@@ -35,6 +35,8 @@
 
 package ch.niceideas.eskimo.model.service.proxy;
 
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -42,13 +44,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProxyTunnelConfig {
 
-    private final String serviceName;
+    private final Service service;
     private final int localPort;
-    private final String node;
+    private final Node node;
     private final int remotePort;
 
     @Override
     public String toString() {
-        return serviceName + " - " + localPort + " -> " + node + ":" + remotePort;
+        return service + " - " + localPort + " -> " + node + ":" + remotePort;
     }
 }

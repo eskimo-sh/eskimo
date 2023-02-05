@@ -38,6 +38,8 @@ package ch.niceideas.eskimo.test.services;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.services.ConnectionManagerException;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.apache.hc.core5.http.HttpHost;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
@@ -54,9 +56,9 @@ public class ProxyManagerServiceTestImpl implements ProxyManagerService {
 
     private int tomcatServerLocalPort;
 
-    private final Map<String, List<ProxyTunnelConfig>> forwarderConfigForHosts = new HashMap<>();
+    private final Map<Node, List<ProxyTunnelConfig>> forwarderConfigForHosts = new HashMap<>();
 
-    public void setForwarderConfigForHosts (String host, List<ProxyTunnelConfig> forwardersConfig) {
+    public void setForwarderConfigForHosts (Node host, List<ProxyTunnelConfig> forwardersConfig) {
         forwarderConfigForHosts.put (host, forwardersConfig);
     }
 
@@ -75,27 +77,27 @@ public class ProxyManagerServiceTestImpl implements ProxyManagerService {
     }
 
     @Override
-    public String getServerURI(String serviceName, String pathInfo) {
+    public String getServerURI(Service service, String pathInfo) {
         return null;
     }
 
     @Override
-    public String extractHostFromPathInfo(String pathInfo) {
+    public Node extractHostFromPathInfo(String pathInfo) {
         return null;
     }
 
     @Override
-    public List<ProxyTunnelConfig> getTunnelConfigForHost(String host) {
+    public List<ProxyTunnelConfig> getTunnelConfigForHost(Node host) {
         return Optional.ofNullable(forwarderConfigForHosts.get(host)).orElse(Collections.emptyList());
     }
 
     @Override
-    public void updateServerForService(String serviceName, String runtimeNode) {
+    public void updateServerForService(Service service, Node runtimeNode) {
 
     }
 
     @Override
-    public void removeServerForService(String serviceName, String runtimeNode) {
+    public void removeServerForService(Service service, Node runtimeNode) {
 
     }
 
@@ -105,14 +107,14 @@ public class ProxyManagerServiceTestImpl implements ProxyManagerService {
     }
 
     @Override
-    public ProxyTunnelConfig getTunnelConfig(String serviceId) {
-        if (serviceId.equals("cerebro")) {
-            return new ProxyTunnelConfig("cerebro", tomcatServerLocalPort, "dummy", -1);
+    public ProxyTunnelConfig getTunnelConfig(String serviceName) {
+        if (serviceName.equals("cerebro")) {
+            return new ProxyTunnelConfig(Service.from("cerebro"), tomcatServerLocalPort, Node.fromName("dummy"), -1);
         }
-        if (serviceId.equals("grafana")) {
-            return new ProxyTunnelConfig("grafana", tomcatServerLocalPort, "dummy", -1);
+        if (serviceName.equals("grafana")) {
+            return new ProxyTunnelConfig(Service.from("grafana"), tomcatServerLocalPort, Node.fromName("dummy"), -1);
         }
-        return new ProxyTunnelConfig(serviceId, 12345, "192.168.10.11", 8080);
+        return new ProxyTunnelConfig(Service.from (serviceName), 12345, Node.fromAddress("192.168.10.11"), 8080);
     }
 
 }

@@ -39,6 +39,7 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.services.ServicesSettingsService;
 import ch.niceideas.eskimo.services.SetupException;
+import ch.niceideas.eskimo.types.Service;
 import lombok.Data;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -54,7 +55,7 @@ import java.util.stream.Collectors;
 public class SettingsOperationsCommand implements Serializable {
 
     private Map<String, Map<String, List<ChangedSettings>>> changedSettings = null;
-    private List<String> restartedServices = null;
+    private List<Service> restartedServices = null;
     private ServicesSettingsWrapper newSettings;
 
     public static SettingsOperationsCommand create (
@@ -62,7 +63,7 @@ public class SettingsOperationsCommand implements Serializable {
             throws FileException, SetupException {
 
         Map<String, Map<String, List<ChangedSettings>>> changedSettings = new HashMap<>();
-        List<String> restartedServices = new ArrayList<>();
+        List<Service> restartedServices = new ArrayList<>();
 
         ServicesSettingsWrapper newSettings = servicesSettingsService.prepareSaveSettings(settingsFormAsString, changedSettings, restartedServices);
 
@@ -105,7 +106,7 @@ public class SettingsOperationsCommand implements Serializable {
         retAsMap.put("settings", new JSONObject(settingsMap));
 
         // 2. restarts
-        retAsMap.put("restarts", new JSONArray(restartedServices));
+        retAsMap.put("restarts", new JSONArray(restartedServices.stream().map(Service::getName).collect(Collectors.toList())));
 
         return new JSONObject(retAsMap);
     }
@@ -113,13 +114,13 @@ public class SettingsOperationsCommand implements Serializable {
     @Data
     public static class ChangedSettings implements Serializable {
 
-        private final String service;
+        private final Service service;
         private final String configFile;
         private final String key;
         private final String value;
         private final String oldValue;
 
-        public ChangedSettings(String service, String configFile, String key, String value, String oldValue) {
+        public ChangedSettings(Service service, String configFile, String key, String value, String oldValue) {
             this.service = service;
             this.configFile = configFile;
             this.key = key;

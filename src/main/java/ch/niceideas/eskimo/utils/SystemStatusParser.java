@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.utils;
 
+import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -57,7 +58,7 @@ public class SystemStatusParser {
 
     static final Pattern pattern = Pattern.compile(" *Active: ([^\\( ]+) \\(([^\\(\\)]+)\\).*");
 
-    private final Map<String, String> serviceStatus = new HashMap<>();
+    private final Map<Service, String> serviceStatus = new HashMap<>();
 
     public SystemStatusParser (String content) {
         parse(content);
@@ -73,20 +74,19 @@ public class SystemStatusParser {
                     || contentLines[i].startsWith("○"))
                     && contentLines[i].contains(".service")) {
 
-                handleServiceFound (
-                        contentLines[i].substring(
-                                (contentLines[i].indexOf('●') > -1 ? contentLines[i].indexOf('●') :
-                                        (contentLines[i].contains("○") ? contentLines[i].indexOf("○") : contentLines[i].indexOf('×'))) + 2,
-                                contentLines[i].indexOf(".service")),
-                        i,
-                        contentLines);
+                String foundService = contentLines[i].substring(
+                        (contentLines[i].indexOf('●') > -1 ? contentLines[i].indexOf('●') :
+                                (contentLines[i].contains("○") ? contentLines[i].indexOf("○") : contentLines[i].indexOf('×'))) + 2,
+                        contentLines[i].indexOf(".service"));
+
+                handleServiceFound (Service.from(foundService), i, contentLines);
 
             }
         }
 
     }
 
-    private void handleServiceFound(String service, int position, String[] contentLines) {
+    private void handleServiceFound(Service service, int position, String[] contentLines) {
 
         // search for active flag
         for (int i = position + 1; i < position + 5; i++) {
@@ -114,13 +114,13 @@ public class SystemStatusParser {
 
     public String getDebugLog () {
         StringBuilder builder = new StringBuilder();
-        for(String service : serviceStatus.keySet()) {
+        for(Service service : serviceStatus.keySet()) {
             builder.append(service).append(" : ").append(serviceStatus.get(service));
         }
         return builder.toString();
     }
 
-    public String getServiceStatus(String service) {
+    public String getServiceStatus(Service service) {
         if (serviceStatus.containsKey(service)) {
             return serviceStatus.get(service);
         }

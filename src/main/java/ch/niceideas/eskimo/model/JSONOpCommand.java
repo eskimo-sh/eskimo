@@ -48,7 +48,7 @@ public interface JSONOpCommand extends Serializable {
 
     boolean hasChanges();
 
-    List<? extends OperationId> getAllOperationsInOrder (OperationsContext context)
+    List<? extends OperationId<?>> getAllOperationsInOrder (OperationsContext context)
             throws ServiceDefinitionException, NodesConfigurationException, SystemException;
 
 }

@@ -51,7 +51,7 @@ public class UIConfig {
 
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private final Service service;
+    private final ServiceDef service;
 
     private boolean usingKubeProxy = false;
     private String urlTemplate;
@@ -66,7 +66,7 @@ public class UIConfig {
     private final List<UrlRewriting> urlRewritings = new ArrayList<>();
     private final List<PageScripter> pageScripters = new ArrayList<>();
 
-    public UIConfig (Service service) {
+    public UIConfig (ServiceDef service) {
         this.service = service;
     }
 

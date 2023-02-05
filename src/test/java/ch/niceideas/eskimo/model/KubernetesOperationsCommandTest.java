@@ -38,6 +38,7 @@ import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.services.SystemServiceTestImpl;
+import ch.niceideas.eskimo.types.Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,6 +103,7 @@ public class KubernetesOperationsCommandTest {
 
         assertEquals ("kafka-manager", koc.getInstallations().stream()
                 .map(KubernetesOperationsCommand.KubernetesOperationId::getService)
+                .map(Service::getName)
                 .collect(Collectors.joining(",")));
     }
 
@@ -123,6 +125,7 @@ public class KubernetesOperationsCommandTest {
 
         assertEquals ("kafka-manager", koc.getUninstallations().stream()
                 .map(KubernetesOperationsCommand.KubernetesOperationId::getService)
+                .map(Service::getName)
                 .collect(Collectors.joining(",")));
     }
 
@@ -133,9 +136,9 @@ public class KubernetesOperationsCommandTest {
 
         assertEquals("{\n" +
                 "  \"restarts\": [\n" +
-                "    \"spark-console\",\n" +
                 "    \"elasticsearch\",\n" +
                 "    \"spark-runtime\",\n" +
+                "    \"spark-console\",\n" +
                 "    \"logstash\",\n" +
                 "    \"kafka\"\n" +
                 "  ],\n" +
@@ -176,9 +179,16 @@ public class KubernetesOperationsCommandTest {
 
         List<KubernetesOperationsCommand.KubernetesOperationId> opInOrder = moc.getAllOperationsInOrder(null);
 
-        assertEquals ("Installation_Topology-All-Nodes,installation_cerebro,installation_kibana," +
-                        "uninstallation_kafka-manager,uninstallation_zeppelin," +
-                        "restart_spark-console,restart_elasticsearch,restart_spark-runtime,restart_logstash,restart_kafka",
+        assertEquals ("installation_Topology-All-Nodes," +
+                        "installation_cerebro," +
+                        "installation_kibana," +
+                        "uninstallation_kafka-manager," +
+                        "uninstallation_zeppelin," +
+                        "restart_elasticsearch," +
+                        "restart_spark-runtime," +
+                        "restart_spark-console," +
+                        "restart_logstash," +
+                        "restart_kafka",
                 opInOrder.stream().map(KubernetesOperationsCommand.KubernetesOperationId::toString).collect(Collectors.joining(",")));
     }
 
@@ -200,11 +210,11 @@ public class KubernetesOperationsCommandTest {
         assertEquals(0, koc.getUninstallations().size());
         assertEquals(2, koc.getRestarts().size());
 
-        assertEquals ("kafka", koc.getRestarts().get(0).getService());
-        assertEquals ("restart", koc.getRestarts().get(0).getType());
+        assertEquals (Service.from("kafka"), koc.getRestarts().get(0).getService());
+        assertEquals (KubernetesOperationsCommand.KuberneteOperation.RESTART, koc.getRestarts().get(0).getOperation());
 
-        assertEquals ("zeppelin", koc.getRestarts().get(1).getService());
-        assertEquals ("restart", koc.getRestarts().get(1).getType());
+        assertEquals (Service.from("zeppelin"), koc.getRestarts().get(1).getService());
+        assertEquals (KubernetesOperationsCommand.KuberneteOperation.RESTART, koc.getRestarts().get(1).getOperation());
 
     }
 

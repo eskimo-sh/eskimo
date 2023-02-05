@@ -39,8 +39,9 @@ import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.NodesConfigWrapper.ParsedNodesConfigProperty;
 import ch.niceideas.eskimo.model.service.Dependency;
 import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.types.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -82,18 +83,18 @@ public class NodesConfigurationChecker {
         for (String key : nodesConfig.getServiceKeys()) {
 
             ParsedNodesConfigProperty property = NodesConfigWrapper.parseProperty(key);
-            if (property != null && StringUtils.isNotBlank(property.getServiceName())) {
+            if (property != null && property.getService() != null) {
 
                 int nodeNbr = Topology.getNodeNbr(key, nodesConfig, property);
 
-                Service service = servicesDefinition.getService(property.getServiceName());
+                ServiceDef serviceDef = servicesDefinition.getServiceDefinition(property.getService());
 
-                for (Dependency dependency : service.getDependencies()) {
+                for (Dependency dependency : serviceDef.getDependencies()) {
 
-                    Service otherService = servicesDefinition.getService(dependency.getMasterService());
+                    ServiceDef otherService = servicesDefinition.getServiceDefinition(dependency.getMasterService());
                     if (otherService.isKubernetes()) {
                         throw new NodesConfigurationException(
-                                "Inconsistency found : Service " + property.getServiceName()
+                                "Inconsistency found : Service " + property.getService()
                                         + " is defining a dependency on a kubernetes service :  "
                                         + dependency.getMasterService() + ", which is disallowed");
                     }
@@ -101,14 +102,14 @@ public class NodesConfigurationChecker {
                     // I want the dependency on same node if dependency is mandatory
                     if (dependency.getMes().equals(MasterElectionStrategy.SAME_NODE)) {
 
-                        enforceDependencySameNode(nodesConfig, property.getServiceName(), nodeNbr, dependency);
+                        enforceDependencySameNode(nodesConfig, property.getService(), nodeNbr, dependency);
                     }
 
                     // I want the dependency somewhere
                     else if (dependency.isMandatory(nodesConfig)) {
 
                         // ensure count of dependencies are available
-                        enforceMandatoryDependency(nodesConfig, property.getServiceName(), nodeNbr, dependency);
+                        enforceMandatoryDependency(nodesConfig, property.getService(), nodeNbr, dependency);
                     }
                 }
             }
@@ -116,7 +117,7 @@ public class NodesConfigurationChecker {
     }
 
     static void enforceMandatoryDependency(
-            NodesConfigWrapper nodesConfig, String serviceName, Integer nodeNbr, Dependency dependency)
+            NodesConfigWrapper nodesConfig, Service service, Integer nodeNbr, Dependency dependency)
             throws NodesConfigurationException {
 
         // ensure count of dependencies are available
@@ -126,8 +127,8 @@ public class NodesConfigurationChecker {
         for (String otherKey : nodesConfig.keySet()) {
             NodesConfigWrapper.ParsedNodesConfigProperty otherProperty = NodesConfigWrapper.parseProperty(otherKey);
             if (otherProperty != null
-                    && StringUtils.isNotBlank(otherProperty.getServiceName())
-                    && otherProperty.getServiceName().equals(dependency.getMasterService())) {
+                    && (otherProperty.getService() != null)
+                    && otherProperty.getService().equals(dependency.getMasterService())) {
 
                 // RANDOM_NODE_AFTER wants a different node, I need to check IPs
                 if (nodeNbr != null && dependency.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER)) {
@@ -144,14 +145,14 @@ public class NodesConfigurationChecker {
 
         if (actualCount < expectedCount) {
             throw new NodesConfigurationException(
-                    "Inconsistency found : Service " + serviceName + " expects " + expectedCount
+                    "Inconsistency found : Service " + service + " expects " + expectedCount
                             + " " + dependency.getMasterService() + " instance(s). " +
                             "But only " + actualCount + " has been found !");
         }
     }
 
     static void enforceDependencySameNode(
-            NodesConfigWrapper nodesConfig, String serviceName, int nodeNbr, Dependency dependency)
+            NodesConfigWrapper nodesConfig, Service service, int nodeNbr, Dependency dependency)
             throws NodesConfigurationException {
 
         boolean serviceFound = false;
@@ -159,8 +160,8 @@ public class NodesConfigurationChecker {
 
             NodesConfigWrapper.ParsedNodesConfigProperty otherProperty = NodesConfigWrapper.parseProperty(otherKey);
             if (otherProperty != null
-                    && StringUtils.isNotBlank(otherProperty.getServiceName())
-                    && otherProperty.getServiceName().equals(dependency.getMasterService())) {
+                    && (otherProperty.getService() != null)
+                    && otherProperty.getService().equals(dependency.getMasterService())) {
 
                 int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherProperty);
                 if (otherNodeNbr == nodeNbr) {
@@ -172,7 +173,7 @@ public class NodesConfigurationChecker {
 
         if (!serviceFound && dependency.isMandatory(nodesConfig)) {
             throw new NodesConfigurationException(
-                    "Inconsistency found : Service " + serviceName + " was expecting a service " +
+                    "Inconsistency found : Service " + service + " was expecting a service " +
                             dependency.getMasterService() + " on same node, but none were found !");
         }
     }
@@ -180,11 +181,11 @@ public class NodesConfigurationChecker {
     void enforceMandatoryServices(NodesConfigWrapper nodesConfig, int nodeCount) throws NodesConfigurationException {
 
         // enforce mandatory services
-        for (String mandatoryServiceName : servicesDefinition.listMandatoryServices()) {
+        for (Service mandatoryService : servicesDefinition.listMandatoryServices()) {
 
-            Service mandatoryService = servicesDefinition.getService(mandatoryServiceName);
+            ServiceDef mandatoryServiceDef = servicesDefinition.getServiceDefinition(mandatoryService);
 
-            ConditionalInstallation conditional = mandatoryService.getConditional();
+            ConditionalInstallation conditional = mandatoryServiceDef.getConditional();
 
             if (conditional.equals(ConditionalInstallation.NONE) ||
                     (conditional.equals(ConditionalInstallation.MULTIPLE_NODES) && nodeCount > 1)) {
@@ -196,15 +197,15 @@ public class NodesConfigurationChecker {
                     ParsedNodesConfigProperty property = NodesConfigWrapper.parseProperty(key);
 
                     if (property != null
-                            && StringUtils.isNotBlank(property.getServiceName())
-                            && property.getServiceName().equals(mandatoryServiceName)) {
+                            && (property.getService() != null)
+                            && property.getService().equals(mandatoryService)) {
 
                         foundNodes++;
                     }
                 }
 
                 if (foundNodes != nodeCount) {
-                    throw new NodesConfigurationException("Inconsistency found : service " + mandatoryServiceName
+                    throw new NodesConfigurationException("Inconsistency found : service " + mandatoryService
                             + " is mandatory on all nodes but some nodes are lacking it.");
                 }
             }
@@ -218,16 +219,16 @@ public class NodesConfigurationChecker {
 
             ParsedNodesConfigProperty property = NodesConfigWrapper.parseProperty(key);
             if (property != null
-                    && StringUtils.isNotBlank(property.getServiceName())
-                    && !property.getServiceName().equals(NodesConfigWrapper.NODE_ID_FIELD)) {
+                    && (property.getService() != null)
+                    && !property.getService().equals(Service.NODE_ID_FIELD)) {
 
-                Service service = servicesDefinition.getService(property.getServiceName());
-                if (service == null) {
-                    throw new NodesConfigurationException("Inconsistency found : service " + property.getServiceName()
+                ServiceDef serviceDef = servicesDefinition.getServiceDefinition(property.getService());
+                if (serviceDef == null) {
+                    throw new NodesConfigurationException("Inconsistency found : service " + property.getService()
                             + " doesn't exist in ServiceDefinition");
                 }
-                if (service.isKubernetes()) {
-                    throw new NodesConfigurationException("Inconsistency found : service " + property.getServiceName()
+                if (serviceDef.isKubernetes()) {
+                    throw new NodesConfigurationException("Inconsistency found : service " + property.getService()
                             + " is a kubernetes service which should not be selectable here.");
                 }
             }
@@ -291,20 +292,20 @@ public class NodesConfigurationChecker {
 
                 if (StringUtils.isNotBlank(matcher.group(1))) { // then it's a range
 
-                    for (String uniqueServiceName : servicesDefinition.listUniqueServices()) {
+                    for (Service uniqueService : servicesDefinition.listUniqueServices()) {
 
                         // just make sure it is installed on every node
                         for (String otherKey : nodesConfig.keySet()) {
 
                             ParsedNodesConfigProperty otherProperty = NodesConfigWrapper.parseProperty(otherKey);
                             if (otherProperty != null
-                                    && otherProperty.getServiceName().equals(uniqueServiceName)) {
+                                    && otherProperty.getService().equals(uniqueService)) {
 
                                 int otherNodeNbr = Topology.getNodeNbr(otherKey, nodesConfig, otherProperty);
                                 if (otherNodeNbr == nodeNbr) {
                                     throw new NodesConfigurationException("Node "
                                             + key.substring(NodesConfigWrapper.NODE_ID_FIELD.length())
-                                            + " is a range an declares service " + otherProperty.getServiceName()
+                                            + " is a range an declares service " + otherProperty.getService()
                                             + " which is a unique service, hence forbidden on a range.");
                                 }
                             }

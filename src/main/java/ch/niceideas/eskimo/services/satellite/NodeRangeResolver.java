@@ -152,7 +152,7 @@ public class NodeRangeResolver  {
                         actualNbr++;
                     }
 
-                    String newKey = key.endsWith(rangeNodeNbr.toString()) ? property.getServiceName() + actualNbr : property.getServiceName();
+                    String newKey = key.endsWith(rangeNodeNbr.toString()) ? property.getService().getName() + actualNbr : property.getService().getName();
                     String newValue;
                     if (key.endsWith(rangeNodeNbr.toString())) {
                         newValue = key.startsWith(NODE_ID_FLAG) ? node : value;
@@ -191,7 +191,7 @@ public class NodeRangeResolver  {
 
     static int ipToInt(String ipAddr) {
         int compacted = 0;
-        byte[] bytes = new byte[0];
+        byte[] bytes;
         try {
             bytes = InetAddress.getByName(ipAddr).getAddress();
         } catch (UnknownHostException e) {

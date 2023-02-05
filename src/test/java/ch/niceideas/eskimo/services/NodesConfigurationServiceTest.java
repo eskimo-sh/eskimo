@@ -46,6 +46,8 @@ import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.*;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,7 +132,7 @@ public class NodesConfigurationServiceTest {
                 }
             }
         };
-        nodesConfigurationService.installEskimoBaseSystem(ml, "192.168.10.11");
+        nodesConfigurationService.installEskimoBaseSystem(ml, Node.fromAddress("192.168.10.11"));
 
 
         assertEquals (" - Calling install-eskimo-base-system.sh\n" +
@@ -235,7 +237,10 @@ public class NodesConfigurationServiceTest {
         operationsMonitoringServiceTest.startCommand(command);
 
         // testing zookeeper installation
-        nodesConfigurationService.installService(new ServiceOperationsCommand.ServiceOperationId("installation", "zookeeper", "192.168.10.13"));
+        nodesConfigurationService.installService(new ServiceOperationsCommand.ServiceOperationId(
+                ServiceOperationsCommand.ServiceOperation.INSTALLATION,
+                Service.from("zookeeper"),
+                Node.fromAddress("192.168.10.13")));
 
         String executedActions = String.join("\n", systemServiceTest.getExecutedActions());
 
@@ -302,8 +307,6 @@ public class NodesConfigurationServiceTest {
                 "Installation cleanup  - kube-slave - null - 192.168.10.15\n" +
                 "Installation setup  - kube-slave - 192.168.10.13 - 192.168.10.13\n" +
                 "Installation cleanup  - kube-slave - null - 192.168.10.13\n" +
-                "Installation setup  - spark-console - 192.168.10.15 - 192.168.10.15\n" +
-                "Installation cleanup  - spark-console - spark - 192.168.10.15\n" +
                 "Installation setup  - elasticsearch - 192.168.10.15 - 192.168.10.15\n" +
                 "Installation cleanup  - elasticsearch - elasticsearch - 192.168.10.15\n" +
                 "Installation setup  - elasticsearch - 192.168.10.13 - 192.168.10.13\n" +
@@ -312,6 +315,8 @@ public class NodesConfigurationServiceTest {
                 "Installation cleanup  - spark-runtime - spark - 192.168.10.15\n" +
                 "Installation setup  - spark-runtime - 192.168.10.13 - 192.168.10.13\n" +
                 "Installation cleanup  - spark-runtime - spark - 192.168.10.13\n" +
+                "Installation setup  - spark-console - 192.168.10.15 - 192.168.10.15\n" +
+                "Installation cleanup  - spark-console - spark - 192.168.10.15\n" +
                 "Installation setup  - zeppelin - 192.168.10.15 - 192.168.10.15\n" +
                 "Installation cleanup  - zeppelin - zeppelin - 192.168.10.15", String.join("\n", systemServiceTest.getExecutedActions()));
 
@@ -351,7 +356,10 @@ public class NodesConfigurationServiceTest {
         operationsMonitoringServiceTest.startCommand(command);
 
         // testing zookeeper installation
-        nodesConfigurationService.uninstallService(new ServiceOperationsCommand.ServiceOperationId("uninstallation", "zookeeper", "192.168.10.11"));
+        nodesConfigurationService.uninstallService(new ServiceOperationsCommand.ServiceOperationId(
+                ServiceOperationsCommand.ServiceOperation.INSTALLATION,
+                Service.from("zookeeper"),
+                Node.fromAddress("192.168.10.11")));
 
         assertTrue(sshCommandServiceTest.getExecutedCommands().contains(
                 "sudo systemctl stop zookeeper\n" +

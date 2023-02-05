@@ -38,10 +38,12 @@ import ch.niceideas.eskimo.model.MasterStatusWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import ch.niceideas.eskimo.model.service.MasterDetection;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.services.mdstrategy.MdStrategy;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -92,16 +94,16 @@ public class MasterServiceImpl implements MasterService {
     private final ReentrantLock statusUpdateLock = new ReentrantLock();
     private final ScheduledExecutorService statusRefreshScheduler;
 
-    private final Map<String, String> serviceMasterNodes = new ConcurrentHashMap<>();
-    private final Map<String, Date> serviceMasterTimestamps = new ConcurrentHashMap<>();
+    private final Map<Service, Node> serviceMasterNodes = new ConcurrentHashMap<>();
+    private final Map<Service, Date> serviceMasterTimestamps = new ConcurrentHashMap<>();
 
     /**
      * for tests
      */
-    Map<String, String>  getServiceMasterNodes() {
+    Map<Service, Node>  getServiceMasterNodes() {
         return Collections.unmodifiableMap(serviceMasterNodes);
     }
-    Map<String, Date> getServiceMasterTimestamps() {
+    Map<Service, Date> getServiceMasterTimestamps() {
         return Collections.unmodifiableMap(serviceMasterTimestamps);
     }
 
@@ -154,10 +156,10 @@ public class MasterServiceImpl implements MasterService {
 
     private void ensureDefaultMastersSet() throws SetupException, SystemException, NodesConfigurationException {
 
-        List<Service> missingMasterServices = Arrays.stream(servicesDefinition.listMultipleServices())
-                .map(serviceName -> servicesDefinition.getService(serviceName))
-                .filter(service -> service.getMasterDetection() != null)
-                .filter(service -> !serviceMasterNodes.containsKey(service.getName()))
+        List<ServiceDef> missingMasterServices = Arrays.stream(servicesDefinition.listMultipleServices())
+                .map(service -> servicesDefinition.getServiceDefinition(service))
+                .filter(serviceDef -> serviceDef.getMasterDetection() != null)
+                .filter(serviceDef -> !serviceMasterNodes.containsKey(serviceDef.toService()))
                 .collect(Collectors.toList());
 
         if (!missingMasterServices.isEmpty()) {
@@ -168,21 +170,21 @@ public class MasterServiceImpl implements MasterService {
 
                 NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
 
-                for (Service service : missingMasterServices) {
+                for (ServiceDef serviceDef : missingMasterServices) {
 
-                    List<String> serviceNodes;
-                    if (service.isKubernetes()) {
-                        serviceNodes = nodesConfig.getAllNodeAddressesWithService(servicesDefinition.getKubeMasterService().getName());
+                    List<Node> serviceNodes;
+                    if (serviceDef.isKubernetes()) {
+                        serviceNodes = nodesConfig.getAllNodesWithService(servicesDefinition.getKubeMasterService().toService());
                     } else {
                         // get any node where it's supposed to be install (always the same one)
-                        serviceNodes = nodesConfig.getAllNodeAddressesWithService(service.getName());
+                        serviceNodes = nodesConfig.getAllNodesWithService(serviceDef.toService());
                     }
 
                     if (!serviceNodes.isEmpty()) {
 
                         Collections.sort(serviceNodes);
-                        serviceMasterNodes.put(service.getName(), serviceNodes.get(0));
-                        serviceMasterTimestamps.put(service.getName(), new Date(Long.MIN_VALUE));
+                        serviceMasterNodes.put(serviceDef.toService(), serviceNodes.get(0));
+                        serviceMasterTimestamps.put(serviceDef.toService(), new Date(Long.MIN_VALUE));
                     }
                 }
             }
@@ -203,43 +205,43 @@ public class MasterServiceImpl implements MasterService {
                 NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
 
                 // 2. Browse all services that are multiple
-                List<Service> masterServices = Arrays.stream(servicesDefinition.listMultipleServices())
-                        .map(serviceName -> servicesDefinition.getService(serviceName))
-                        .filter(service -> service.getMasterDetection() != null)
+                List<ServiceDef> masterServices = Arrays.stream(servicesDefinition.listMultipleServices())
+                        .map(service -> servicesDefinition.getServiceDefinition(service))
+                        .filter(serviceDef -> serviceDef.getMasterDetection() != null)
                         .collect(Collectors.toList());
 
                 SystemStatusWrapper lastStatus = systemService.getStatus();
 
-                for (Service service : masterServices) {
+                for (ServiceDef serviceDef : masterServices) {
 
                     // If service is available on a single node in anyway, don't bother going to master election
-                    List<String> serviceNodes = lastStatus.getAllNodesForServiceRegardlessStatus(service.getName());
+                    List<Node> serviceNodes = lastStatus.getAllNodesForServiceRegardlessStatus(serviceDef.toService());
                     if (serviceNodes.size() == 1) {
 
-                        serviceMasterTimestamps.put(service.getName(),
+                        serviceMasterTimestamps.put(serviceDef.toService(),
                                 new Date(System.currentTimeMillis() - TEN_YEARS_AGO_IN_MILLIS)); // 10 years ago
-                        serviceMasterNodes.put(service.getName(), serviceNodes.get(0));
+                        serviceMasterNodes.put(serviceDef.toService(), serviceNodes.get(0));
 
                     } else {
 
-                        MasterDetection masterDetection = service.getMasterDetection();
+                        MasterDetection masterDetection = serviceDef.getMasterDetection();
                         MdStrategy strategy = masterDetection.getDetectionStrategy().getStrategy();
 
                         // 3. If service is installed on multiple node, attempt to detect master
-                        List<String> nodes = service.isKubernetes() ?
-                                nodesConfig.getNodeAddresses() :
-                                nodesConfig.getAllNodeAddressesWithService(service.getName());
+                        List<Node> nodes = serviceDef.isKubernetes() ?
+                                nodesConfig.getAllNodes() :
+                                nodesConfig.getAllNodesWithService(serviceDef.toService());
 
-                        for (String node : nodes) {
+                        for (Node node : nodes) {
 
-                            if (lastStatus.isServiceOKOnNode(service.getName(), node)) {
+                            if (lastStatus.isServiceOKOnNode(serviceDef.toService(), node)) {
 
                                 try {
                                     Date masterElectedDate = strategy.detectMaster(
-                                            service, node, masterDetection, this, sshCommandService, notificationService);
+                                            serviceDef, node, masterDetection, this, sshCommandService, notificationService);
 
                                     if (masterElectedDate != null) {
-                                        handleMasterDetectedDate(service, node, masterElectedDate);
+                                        handleMasterDetectedDate(serviceDef.toService(), node, masterElectedDate);
                                     }
 
                                 } catch (MasterDetectionException e) {
@@ -247,8 +249,8 @@ public class MasterServiceImpl implements MasterService {
                                     logger.debug(e, e);
                                 }
                             } else {
-                                if (!service.isKubernetes()) {
-                                    logger.warn("Not checking if service " + service.getName() + " is master on " + node + " since service reports issues");
+                                if (!serviceDef.isKubernetes()) {
+                                    logger.warn("Not checking if service " + serviceDef.getName() + " is master on " + node + " since service reports issues");
                                 }
                             }
                         }
@@ -276,17 +278,17 @@ public class MasterServiceImpl implements MasterService {
         serviceMasterNodes.keySet().forEach(
               service -> masterStatus.setValueForPath(
                       "masters." + service,
-                      serviceMasterNodes.get(service).replace(".", "-")));
+                      serviceMasterNodes.get(service).getName()));
 
         return masterStatus;
     }
 
-    private void handleMasterDetectedDate(Service service, String node, Date masterElectedDate) {
+    private void handleMasterDetectedDate(Service service, Node node, Date masterElectedDate) {
 
-        Date previous = serviceMasterTimestamps.get(service.getName());
+        Date previous = serviceMasterTimestamps.get(service);
         if (previous == null || previous.before(masterElectedDate)) {
-            serviceMasterTimestamps.put(service.getName(), masterElectedDate);
-            serviceMasterNodes.put(service.getName(), node);
+            serviceMasterTimestamps.put(service, masterElectedDate);
+            serviceMasterNodes.put(service, node);
         }
     }
 

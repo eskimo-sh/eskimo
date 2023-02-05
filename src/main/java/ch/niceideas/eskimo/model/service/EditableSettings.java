@@ -51,7 +51,7 @@ public class EditableSettings {
 
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private final Service service;
+    private final ServiceDef service;
 
     private final String filename;
     private final EditablePropertyType propertyType;
@@ -60,7 +60,7 @@ public class EditableSettings {
     private String commentPrefix = "";
     private final List<EditableProperty> properties = new ArrayList<>();
 
-    public EditableSettings(Service service, String filename, EditablePropertyType propertyType, String propertyFormat, String filesystemService) {
+    public EditableSettings(ServiceDef service, String filename, EditablePropertyType propertyType, String propertyFormat, String filesystemService) {
         this.filesystemService = filesystemService;
         this.service = service;
         this.filename = filename;

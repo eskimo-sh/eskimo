@@ -42,6 +42,8 @@ import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.*;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -190,8 +192,8 @@ public class KubernetesServicesConfigControllerTest {
                 "    \"restarts\": [],\n" +
                 "    \"installations\": [\n" +
                 "      \"elasticsearch\",\n" +
-                "      \"cerebro\",\n" +
                 "      \"spark-runtime\",\n" +
+                "      \"cerebro\",\n" +
                 "      \"kafka\",\n" +
                 "      \"zeppelin\"\n" +
                 "    ],\n" +
@@ -225,7 +227,8 @@ public class KubernetesServicesConfigControllerTest {
         Map<String, Object> sessionContent = new HashMap<>();
         HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
-        operationsMonitoringService.startCommand(new SimpleOperationCommand("test", "test", "192.168.10.15"));
+        operationsMonitoringService.startCommand(new SimpleOperationCommand(
+                SimpleOperationCommand.SimpleOperation.COMMAND, Service.from("test"), Node.fromAddress("192.168.10.15")));
 
         assertEquals ("{\n" +
                 "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed.\",\n" +
@@ -247,14 +250,14 @@ public class KubernetesServicesConfigControllerTest {
                         "  \"command\": {\n" +
                         "    \"uninstallations\": [],\n" +
                         "    \"restarts\": [\n" +
-                        "      \"spark-console\",\n" +
                         "      \"elasticsearch\",\n" +
-                        "      \"cerebro\",\n" +
                         "      \"spark-runtime\",\n" +
+                        "      \"spark-console\",\n" +
+                        "      \"cerebro\",\n" +
+                        "      \"kibana\",\n" +
                         "      \"logstash\",\n" +
                         "      \"kafka\",\n" +
                         "      \"kafka-manager\",\n" +
-                        "      \"kibana\",\n" +
                         "      \"zeppelin\"\n" +
                         "    ],\n" +
                         "    \"installations\": [],\n" +

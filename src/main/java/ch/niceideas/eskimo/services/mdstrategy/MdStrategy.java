@@ -36,18 +36,19 @@
 package ch.niceideas.eskimo.services.mdstrategy;
 
 import ch.niceideas.eskimo.model.service.MasterDetection;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.services.MasterDetectionException;
 import ch.niceideas.eskimo.services.MasterService;
 import ch.niceideas.eskimo.services.NotificationService;
 import ch.niceideas.eskimo.services.SSHCommandService;
+import ch.niceideas.eskimo.types.Node;
 
 import java.util.Date;
 
 public interface MdStrategy {
 
     Date detectMaster(
-            Service service, String node, MasterDetection masterDetection,
+            ServiceDef service, Node node, MasterDetection masterDetection,
             MasterService masterService, SSHCommandService sshCommandService,
             NotificationService notificationService) throws MasterDetectionException;
 }

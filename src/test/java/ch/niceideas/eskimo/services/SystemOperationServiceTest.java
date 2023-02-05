@@ -36,9 +36,10 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.model.OperationId;
 import ch.niceideas.eskimo.model.SimpleOperationCommand;
 import ch.niceideas.eskimo.test.services.OperationsMonitoringServiceTestImpl;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,7 +72,10 @@ public class SystemOperationServiceTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        operationsMonitoringServiceTest.startCommand(new SimpleOperationCommand("test", "test", "test"));
+        operationsMonitoringServiceTest.startCommand(new SimpleOperationCommand(
+                SimpleOperationCommand.SimpleOperation.COMMAND,
+                Service.from ("test"),
+                Node.fromName("test")));
     }
 
     @AfterEach
@@ -82,7 +86,9 @@ public class SystemOperationServiceTest {
     @Test
     public void testApplySystemOperation() throws Exception {
 
-        OperationId operation = new SimpleOperationCommand.SimpleOperationId("test", "test", "test");
+        SimpleOperationCommand.SimpleOperationId operation = new SimpleOperationCommand.SimpleOperationId(SimpleOperationCommand.SimpleOperation.COMMAND,
+                Service.from ("test"),
+                Node.fromName("test"));
 
         systemOperationService.applySystemOperation(operation,
                 ml -> ml.addInfo("In operation"),
@@ -93,9 +99,9 @@ public class SystemOperationServiceTest {
         assertNotNull (messages);
         assertEquals(Integer.valueOf (3), messages.getKey());
         assertEquals("\n" +
-                "Executing test on test on test\n" +
+                "Executing command of test on test\n" +
                 "In operation\n" +
-                "--> Done : Executing test on test on test\n" +
+                "--> Done : Executing command of test on test\n" +
                 "-------------------------------------------------------------------------------\n" +
                 "--> Completed Successfuly.\n", messages.getValue());
 
@@ -104,9 +110,9 @@ public class SystemOperationServiceTest {
         assertEquals(Integer.valueOf(2), notifications.getKey());
 
         assertEquals("Doing", notifications.getValue().get(0).getString("type"));
-        assertEquals("Executing test on test on test", notifications.getValue().get(0).getString("message"));
+        assertEquals("Executing command of test on test", notifications.getValue().get(0).getString("message"));
 
         assertEquals("Info", notifications.getValue().get(1).getString("type"));
-        assertEquals("Executing test on test on test succeeded", notifications.getValue().get(1).getString("message"));
+        assertEquals("Executing command of test on test succeeded", notifications.getValue().get(1).getString("message"));
     }
 }

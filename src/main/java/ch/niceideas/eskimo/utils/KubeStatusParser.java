@@ -37,9 +37,11 @@ package ch.niceideas.eskimo.utils;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.services.KubernetesService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -123,7 +125,7 @@ public class KubeStatusParser {
         }
     }
 
-    private String getServiceIp(String service) {
+    private Node getServiceNode(String service) {
         Map<String, String> serviceFields = serviceStatuses.get(service);
         if (serviceFields == null) {
             return null;
@@ -132,21 +134,21 @@ public class KubeStatusParser {
         if (serviceIp.equalsIgnoreCase("None")) {
             return null;
         }
-        return serviceIp;
+        return Node.fromAddress(serviceIp);
     }
 
-    List<Pair<String, String>> getPodNodesAndStatus(String service) {
-        List<Pair<String, String>> retList = new ArrayList<>();
+    List<Pair<Node, String>> getPodNodesAndStatus(Service service) {
+        List<Pair<Node, String>> retList = new ArrayList<>();
 
         List<String> podList = new ArrayList<>(podStatuses.keySet());
         podList.sort(Comparator.naturalOrder()); // need reproduceable results
         for (String podName : podList) {
-            if (podName.startsWith(service) && !podNameMatchOtherService (service, podName)) {
+            if (podName.startsWith(service.getName()) && !podNameMatchOtherService (service, podName)) {
 
                 Map<String, String> podFields = podStatuses.get(podName);
                 if (podFields != null) {
                     String status = podFields.get("STATUS");
-                    String node = podFields.get("NODE");
+                    Node node = Node.fromAddress(podFields.get("NODE"));
                     retList.add(new Pair<>(node, status));
                 }
             }
@@ -155,25 +157,25 @@ public class KubeStatusParser {
         return retList;
     }
 
-    private boolean podNameMatchOtherService(String curService, String podName) {
+    private boolean podNameMatchOtherService(Service curService, String podName) {
         return Arrays.stream(servicesDefinition.listKubernetesServices())
-                .filter (serviceName -> !serviceName.equals(curService))
-                .filter(serviceName -> serviceName.length() > curService.length())
-                .map (servicesDefinition::getService)
+                .filter (service -> !service.equals(curService))
+                .filter(service -> service.getName().length() > curService.getName().length())
+                .map (servicesDefinition::getServiceDefinition)
                 .filter (service -> podName.startsWith(service.getName()))
                 .findAny().orElse(null) != null;
     }
 
-    public Pair<String, String> getServiceRuntimeNode(Service service, String kubeIp) {
+    public Pair<Node, String> getServiceRuntimeNode(ServiceDef service, Node kubeNode) {
 
-        List<Pair<String, String>> podNodesAndStatus = getPodNodesAndStatus(service.getName());
-        String serviceIp = getServiceIp(service.getName());
+        List<Pair<Node, String>> podNodesAndStatus = getPodNodesAndStatus(service.toService());
+        Node serviceNode = getServiceNode(service.getName());
         boolean serviceFound = serviceStatuses.get(service.getName()) != null;
 
         // 0. registryOnlyservices are a specific case
         if (service.isRegistryOnly()) {
             if (registryServices.stream().anyMatch(registrySrv -> registrySrv.equalsIgnoreCase(service.getName()))) {
-                return new Pair<>(kubeIp, KubernetesService.STATUS_RUNNING);
+                return new Pair<>(kubeNode, KubernetesService.STATUS_RUNNING);
             } else {
                 return new Pair<>(null, "NA");
             }
@@ -181,14 +183,14 @@ public class KubeStatusParser {
 
         // 1. if at east one POD is running and service is OK, return running on kubeIp
         if (serviceFound
-                && (StringUtils.isNotBlank(serviceIp) || !service.isUnique())
+                && (serviceNode != null || !service.isUnique())
                 && !podNodesAndStatus.isEmpty()
                 && podNodesAndStatus.stream()
                     .map(Pair::getValue)
                     .anyMatch(status -> status.equalsIgnoreCase(KubernetesService.STATUS_RUNNING)
                             || status.equalsIgnoreCase(KubernetesService.STATUS_TERMINATING)
                             || status.equalsIgnoreCase(KubernetesService.STATUS_CONTAINER_CREATING))) {
-            return new Pair<>(kubeIp, KubernetesService.STATUS_RUNNING);
+            return new Pair<>(kubeNode, KubernetesService.STATUS_RUNNING);
         }
 
         // 2. If neither any POD nor the service cannot be found, return new Pair<>(null, "NA");
@@ -202,13 +204,13 @@ public class KubeStatusParser {
                 .noneMatch(status -> status.equalsIgnoreCase(KubernetesService.STATUS_RUNNING)
                         || status.equalsIgnoreCase(KubernetesService.STATUS_TERMINATING)
                         || status.equalsIgnoreCase(KubernetesService.STATUS_CONTAINER_CREATING))) {
-            return new Pair<>(kubeIp, "notOK");
+            return new Pair<>(kubeNode, "notOK");
         }
 
         return new Pair<>(null, "notOK");
     }
 
-    public List<Pair<String, String>> getServiceRuntimeNodes(String service) {
+    public List<Pair<Node, String>> getServiceRuntimeNodes(Service service) {
         return getPodNodesAndStatus(service);
     }
 }

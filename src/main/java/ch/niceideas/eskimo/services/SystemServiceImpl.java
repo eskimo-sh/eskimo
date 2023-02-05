@@ -39,10 +39,13 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import ch.niceideas.eskimo.types.LabelledOperation;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import ch.niceideas.eskimo.utils.SystemStatusParser;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -162,8 +165,8 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public void showJournal(Service service, String node) throws SystemException {
-        applyServiceOperation(service.getName(), node, "Showing journal of", () -> {
+    public void showJournal(ServiceDef service, Node node) throws SystemException {
+        applyServiceOperation(service.toService(), node, SimpleOperationCommand.SimpleOperation.SHOW_JOURNAL, () -> {
             if (service.isKubernetes()) {
                 throw new UnsupportedOperationException("Showing kubernetes service journal for " + service.getName() + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
@@ -173,8 +176,8 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public void startService(Service service, String node) throws SystemException {
-        applyServiceOperation(service.getName(), node, "Starting", () -> {
+    public void startService(ServiceDef service, Node node) throws SystemException {
+        applyServiceOperation(service.toService(), node, SimpleOperationCommand.SimpleOperation.START, () -> {
             if (service.isKubernetes()) {
                 throw new UnsupportedOperationException("Starting kubernetes service " + service.getName() + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
@@ -185,8 +188,8 @@ public class SystemServiceImpl implements SystemService {
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void stopService(Service service, String node) throws SystemException{
-        applyServiceOperation(service.getName(), node, "Stopping", () -> {
+    public void stopService(ServiceDef service, Node node) throws SystemException{
+        applyServiceOperation(service.toService(), node, SimpleOperationCommand.SimpleOperation.STOP, () -> {
             if (service.isKubernetes()) {
                 throw new UnsupportedOperationException("Stopping kubernetes service " + service.getName() + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
@@ -197,8 +200,8 @@ public class SystemServiceImpl implements SystemService {
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void restartService(Service service, String node) throws SystemException {
-        applyServiceOperation(service.getName(), node, "Restarting", () -> {
+    public void restartService(ServiceDef service, Node node) throws SystemException {
+        applyServiceOperation(service.toService(), node, SimpleOperationCommand.SimpleOperation.RESTART, () -> {
             if (service.isKubernetes()) {
                 throw new UnsupportedOperationException("Restarting kubernetes service " + service.getName() + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
@@ -208,46 +211,50 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public void callCommand(String commandId, String serviceName, String node) throws SystemException {
-        applyServiceOperation(serviceName, node, "Calling command " + commandId , () -> {
-            Service service = servicesDefinition.getService(serviceName);
+    public void callCommand(String commandId, Service service, Node node) throws SystemException {
+        applyServiceOperation(service, node, SimpleOperationCommand.SimpleOperation.COMMAND , () -> {
+            ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
 
-            Command command = service.getCommand (commandId);
+            Command command = serviceDef.getCommand (commandId);
             if (command == null) {
-                throw new SSHCommandException("Command " + commandId + " is unknown for service " + serviceName);
+                throw new SSHCommandException("Command " + commandId + " is unknown for service " + service);
             }
+
+            SimpleOperationCommand.SimpleOperationId op = new SimpleOperationCommand.SimpleOperationId(SimpleOperationCommand.SimpleOperation.COMMAND, service, node);
+            logOperationMessage(op, "Command ID is " + commandId);
+            logOperationMessage(op, "Command is " + command.getCommandCall());
 
             return command.call (node, sshCommandService);
         });
     }
 
-    private void logOperationMessage(OperationId operationId, String operation) {
+    private void logOperationMessage(OperationId<?> operationId, String operation) {
         operationsMonitoringService.addInfo(operationId, new String[]{
                 "\n" + operation
         });
     }
 
     @Override
-    public void applyServiceOperation(String service, String node, String opLabel, ServiceOperation<String> operation) throws SystemException {
-        String message = opLabel + " " + service + " on " + node;
+    public void applyServiceOperation(Service service, Node node, SimpleOperationCommand.SimpleOperation simpleOp, ServiceOperation<String> operation) throws SystemException {
+        String message = simpleOp.getLabel() + " " + service + " on " + node;
         boolean success = false;
 
-        SimpleOperationCommand.SimpleOperationId operationId = new SimpleOperationCommand.SimpleOperationId(opLabel, service, node);
+        SimpleOperationCommand.SimpleOperationId operationId = new SimpleOperationCommand.SimpleOperationId(simpleOp, service, node);
 
         try {
 
-            operationsMonitoringService.startCommand(new SimpleOperationCommand(opLabel, service, node));
+            operationsMonitoringService.startCommand(new SimpleOperationCommand(simpleOp, service, node));
 
             operationsMonitoringService.startOperation(operationId);
 
-            notificationService.addDoing(opLabel + " " + service + " on " + node);
+            notificationService.addDoing(simpleOp.getLabel() + " " + service + " on " + node);
             logOperationMessage(operationId, message);
 
             operationsMonitoringService.addInfo(operationId, "Done "
                     + message
                     + "\n-------------------------------------------------------------------------------\n"
                     + operation.call());
-            notificationService.addInfo(opLabel + " " + service + " succeeded on " + node);
+            notificationService.addInfo(simpleOp.getLabel() + " " + service + " succeeded on " + node);
 
             success = true;
         } catch (SSHCommandException | KubernetesException | ServiceDefinitionException | NodesConfigurationException e) {
@@ -313,14 +320,13 @@ public class SystemServiceImpl implements SystemService {
                 final ConcurrentHashMap<String, String> statusMap = new ConcurrentHashMap<>();
                 final ExecutorService threadPool = Executors.newFixedThreadPool(parallelismStatusThreadCount);
 
-                for (Pair<String, String> nbrAndPair : nodesConfig.getNodeAdresses()) {
+                for (Pair<Integer, Node> nbrAndPair : nodesConfig.getNodes()) {
 
-                    int nodeNbr = Integer.parseInt(nbrAndPair.getKey());
-                    String node = nbrAndPair.getValue();
-                    String nodeName = node.replace(".", "-");
+                    int nodeNbr = nbrAndPair.getKey();
+                    Node node = nbrAndPair.getValue();
 
-                    statusMap.put(("node_nbr_" + nodeName), "" + nodeNbr);
-                    statusMap.put(("node_address_" + nodeName), node);
+                    statusMap.put(("node_nbr_" + node.getName()), "" + nodeNbr);
+                    statusMap.put(("node_address_" + node.getName()), node.getAddress());
 
                     threadPool.execute(() -> {
                         try {
@@ -347,13 +353,12 @@ public class SystemServiceImpl implements SystemService {
                 } catch (KubernetesException e) {
                     logger.debug(e, e);
                     // workaround : flag all Kubernetes services as KO on kube node
-                    String kubeNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterService().getName());
-                    if (StringUtils.isNotBlank(kubeNode)) {
-                        String kubeNodeName = kubeNode.replace(".", "-");
+                    Node kubeNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterService().toService());
+                    if (kubeNode != null) {
                         KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
-                        for (String service : servicesDefinition.listKubernetesServices()) {
+                        for (Service service : servicesDefinition.listKubernetesServices()) {
                             if (kubernetesService.shouldInstall(kubeServicesConfig, service)) {
-                                statusMap.put(SystemStatusWrapper.SERVICE_PREFIX + service + "_" + kubeNodeName, "KO");
+                                statusMap.put(SystemStatusWrapper.SERVICE_PREFIX + service + "_" + kubeNode.getName(), "KO");
                             }
                         }
                     }
@@ -375,13 +380,13 @@ public class SystemServiceImpl implements SystemService {
             // 5. Handle status update if a service seem to have disappeared
 
             // 5.1 Test if any additional node should be check for being live
-            Set<String> systemStatusNodes = systemStatus.getNodes();
-            Set<String> additionalIpToTests = servicesInstallationStatus.getNodes().stream()
+            Set<Node> systemStatusNodes = systemStatus.getNodes();
+            Set<Node> additionalIpToTests = servicesInstallationStatus.getNodes().stream()
                     .filter(ip -> !systemStatusNodes.contains(ip))
                     .collect(Collectors.toSet());
 
-            Set<String> configuredNodesAndOtherLiveNodes = new HashSet<>(systemStatusNodes);
-            for (String node : additionalIpToTests) {
+            Set<Node> configuredNodesAndOtherLiveNodes = new HashSet<>(systemStatusNodes);
+            for (Node node : additionalIpToTests) {
 
                 // find out if SSH connection to host can succeed
                 try {
@@ -417,7 +422,7 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public String sendPing(String node) throws SSHCommandException {
+    public String sendPing(Node node) throws SSHCommandException {
         return sshCommandService.runSSHScript(node, "echo OK", false);
     }
 
@@ -467,13 +472,12 @@ public class SystemServiceImpl implements SystemService {
     }
 
     protected void fetchNodeStatus
-            (NodesConfigWrapper nodesConfig, Map<String, String> statusMap, Pair<String, String> nbrAndPair,
+            (NodesConfigWrapper nodesConfig, Map<String, String> statusMap, Pair<Integer, Node> nbrAndPair,
              ServicesInstallStatusWrapper servicesInstallationStatus)
                 throws SystemException {
 
-        int nodeNbr = Integer.parseInt(nbrAndPair.getKey());
-        String node = nbrAndPair.getValue();
-        String nodeName = node.replace(".", "-");
+        int nodeNbr = nbrAndPair.getKey();
+        Node node = nbrAndPair.getValue();
 
         // 3.1 Node answers
         try {
@@ -489,18 +493,18 @@ public class SystemServiceImpl implements SystemService {
 
             if (StringUtils.isBlank(ping) || !ping.startsWith("OK")) {
 
-                statusMap.put(("node_alive_" + nodeName), "KO");
+                statusMap.put(("node_alive_" + node.getName()), "KO");
 
             } else {
 
-                statusMap.put(("node_alive_" + nodeName), "OK");
+                statusMap.put(("node_alive_" + node.getName()), "OK");
 
                 String allServicesStatus = sshCommandService.runSSHScript(node,
                         "sudo systemctl status --no-pager --no-block -al " + servicesDefinition.getAllServicesString() + " 2>/dev/null ", false);
 
                 SystemStatusParser parser = new SystemStatusParser(allServicesStatus);
 
-                for (String service : servicesDefinition.listAllNodesServices()) {
+                for (Service service : servicesDefinition.listAllNodesServices()) {
 
                     // should service be installed on node ?
                     boolean shall = nodesConfig.shouldInstall (service, nodeNbr);
@@ -512,7 +516,7 @@ public class SystemServiceImpl implements SystemService {
                     boolean running = serviceStatus.equalsIgnoreCase("running");
 
                     feedInServiceStatus (
-                            statusMap, servicesInstallationStatus, node, nodeName, nodeName,
+                            statusMap, servicesInstallationStatus, node, node,
                             service, shall, installed, running);
                 }
             }
@@ -526,25 +530,24 @@ public class SystemServiceImpl implements SystemService {
     public void feedInServiceStatus (
             Map<String, String> statusMap,
             ServicesInstallStatusWrapper servicesInstallationStatus,
-            String node,
-            String nodeName,
-            String referenceNodeName,
-            String service,
+            Node node,
+            Node referenceNode,
+            Service service,
             boolean shall,
             boolean installed,
             boolean running) throws ConnectionManagerException {
 
-        if (StringUtils.isBlank(nodeName)) {
+        if (node == null) {
             throw new IllegalArgumentException("nodeName can't be null");
         }
-        if (StringUtils.isBlank(service)) {
+        if (service == null) {
             throw new IllegalArgumentException("service can't be null");
         }
 
         if (shall) {
             if (!installed) {
 
-                statusMap.put(SystemStatusWrapper.buildStatusFlag(service, nodeName), "NA");
+                statusMap.put(SystemStatusWrapper.buildStatusFlag(service, node), "NA");
 
             } else {
 
@@ -552,14 +555,14 @@ public class SystemServiceImpl implements SystemService {
                 // check if service running using SSH
 
                 if (!running) {
-                    statusMap.put(SystemStatusWrapper.buildStatusFlag (service, nodeName), "KO");
+                    statusMap.put(SystemStatusWrapper.buildStatusFlag (service, node), "KO");
 
                 } else {
 
-                    if (servicesInstallationStatus.isServiceOK (service, referenceNodeName)) {
-                        statusMap.put(SystemStatusWrapper.buildStatusFlag (service, nodeName), "OK");
+                    if (servicesInstallationStatus.isServiceOK (service, referenceNode)) {
+                        statusMap.put(SystemStatusWrapper.buildStatusFlag (service, node), "OK");
                     } else {
-                        statusMap.put(SystemStatusWrapper.buildStatusFlag (service, nodeName), "restart");
+                        statusMap.put(SystemStatusWrapper.buildStatusFlag (service, node), "restart");
                     }
 
                     // configure proxy if required
@@ -568,7 +571,7 @@ public class SystemServiceImpl implements SystemService {
             }
         } else {
             if (installed) {
-                statusMap.put(SystemStatusWrapper.buildStatusFlag (service, nodeName), "TD"); // To Be Deleted
+                statusMap.put(SystemStatusWrapper.buildStatusFlag (service, node), "TD"); // To Be Deleted
             }
         }
     }
@@ -576,7 +579,7 @@ public class SystemServiceImpl implements SystemService {
     @Override
     public void handleStatusChanges(
             ServicesInstallStatusWrapper servicesInstallationStatus, SystemStatusWrapper systemStatus,
-            Set<String> configuredNodesAndOtherLiveNodes)
+            Set<Node> configuredNodesAndOtherLiveNodes)
                 throws FileException, SetupException {
 
         // If there is some processing pending, then nothing is reliable, just move on
@@ -586,32 +589,31 @@ public class SystemServiceImpl implements SystemService {
 
                 boolean changes = false;
 
-                for (Pair<String, String> installationPairs : servicesInstallationStatus.getAllServiceAndNodeNameInstallationPairs()) {
+                for (Pair<Service, Node> installationPairs : servicesInstallationStatus.getAllServiceAndNodeNameInstallationPairs()) {
 
-                    String savedService = installationPairs.getKey();
-                    String nodeName = installationPairs.getValue();
-                    String originalNodeName = nodeName;
+                    Service savedService = installationPairs.getKey();
+                    Node node = installationPairs.getValue();
+                    Node originalNode = node;
 
                     // if service is a kubernetes service
-                    if (nodeName.equals(ServicesInstallStatusWrapper.KUBERNETES_NODE)) {
+                    if (node.equals(Node.KUBERNETES_NODE)) {
 
                         // if kubernetes is not available, don't do anything
-                        String kubeNodeName = systemStatus.getFirstNodeName(servicesDefinition.getKubeMasterService().getName());
-                        if (StringUtils.isBlank(kubeNodeName)) { // if Kubernetes is not found, don't touch anything. Let's wait for it to come back.
+                        Node kubeNode = systemStatus.getFirstNode(servicesDefinition.getKubeMasterService().toService());
+                        if (kubeNode == null) { // if Kubernetes is not found, don't touch anything. Let's wait for it to come back.
                             //notificationService.addError("Kubernetes inconsistency.");
                             //logger.warn("Kubernetes could not be found - not potentially flagging kubernetes services as disappeared as long as kubernetes is not back.");
                             continue;
                         }
 
-                        if (!systemStatus.isServiceOKOnNode(servicesDefinition.getKubeMasterService().getName(), kubeNodeName)) {
+                        if (!systemStatus.isServiceOKOnNode(servicesDefinition.getKubeMasterService().toService(), kubeNode)) {
                             //logger.warn("Kubernetes is not OK - not potentially flagging kubernetes services as disappeared as long as kubernetes is not back.");
 
                             // reset missing counter on kubernetes services when kube is down
                             configuredNodesAndOtherLiveNodes.forEach(
-                                    nodeIp -> {
-                                        String effNodeName = nodeIp.replace(".", "-");
+                                    effNode -> {
                                         new ArrayList<>(serviceMissingCounter.keySet()).stream()
-                                                .filter(flag -> flag.equals(savedService + "-" + effNodeName))
+                                                .filter(flag -> flag.equals(savedService + "-" + effNode))
                                                 .forEach(serviceMissingCounter::remove);
                                     }
                             );
@@ -619,16 +621,14 @@ public class SystemServiceImpl implements SystemService {
                         }
 
                         // get first node actually running service
-                        nodeName = systemStatus.getFirstNodeName(savedService);
-                        if (StringUtils.isBlank(nodeName)) {
+                        node = systemStatus.getFirstNode(savedService);
+                        if (node == null) {
                             // if none, consider kubernetes node as DEFAULT node running service
-                            nodeName = kubeNodeName;
+                            node = kubeNode;
                         }
                     }
 
-                    String nodeIp = nodeName.replace("-", ".");
-
-                    Boolean nodeAlive = StringUtils.isNotBlank(nodeName) ? systemStatus.isNodeAlive (nodeName) : Boolean.FALSE;
+                    Boolean nodeAlive = node != null ? systemStatus.isNodeAlive (node) : Boolean.FALSE;
 
                     // A. In case target node both configured and up, check services actual statuses before doing anything
                     if (    // nodes is configured and responding (up and running
@@ -636,7 +636,7 @@ public class SystemServiceImpl implements SystemService {
                             nodeAlive != null && nodeAlive
                             ) {
 
-                        if (handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, savedService, nodeName, originalNodeName)) {
+                        if (handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, savedService, node, originalNode)) {
                             changes = true;
                         }
                     }
@@ -646,8 +646,8 @@ public class SystemServiceImpl implements SystemService {
                     // => so nothing to do, don't touch anything in installed services registry
 
                     // c. if node is both down and not configured anymore, we just remove all services whatever their statuses
-                    if (!configuredNodesAndOtherLiveNodes.contains(nodeIp)
-                            && countErrorAndRemoveServices(servicesInstallationStatus, savedService, nodeName, originalNodeName)) {
+                    if (!configuredNodesAndOtherLiveNodes.contains(node)
+                            && countErrorAndRemoveServices(servicesInstallationStatus, savedService, node, originalNode)) {
                         changes = true;
                     }
 
@@ -668,15 +668,15 @@ public class SystemServiceImpl implements SystemService {
 
     boolean handleRemoveServiceIfDown(
             ServicesInstallStatusWrapper servicesInstallStatus, SystemStatusWrapper systemStatusWrapper,
-            String savedService, String nodeName, String originalNodeName) {
+            Service savedService, Node node, Node originalNode) {
 
         boolean changes = false;
 
-        if (systemStatusWrapper.isServiceAvailableOnNode(savedService, nodeName)) {
-            serviceMissingCounter.remove(savedService + "-" + nodeName);
+        if (systemStatusWrapper.isServiceAvailableOnNode(savedService, node)) {
+            serviceMissingCounter.remove(savedService + "-" + node);
 
         } else {
-            if (countErrorAndRemoveServices(servicesInstallStatus, savedService, nodeName, originalNodeName)) {
+            if (countErrorAndRemoveServices(servicesInstallStatus, savedService, node, originalNode)) {
                 changes = true;
             }
         }
@@ -685,13 +685,13 @@ public class SystemServiceImpl implements SystemService {
 
     boolean countErrorAndRemoveServices(
             ServicesInstallStatusWrapper servicesInstallationStatus,
-            String savedService, String nodeName, String originalNodeName) {
+            Service savedService, Node node, Node originalNode) {
         boolean changes = false;
         // otherwise count error
-        Integer counter = serviceMissingCounter.get(savedService + "-" + nodeName);
+        Integer counter = serviceMissingCounter.get(savedService + "-" + node);
         if (counter == null) {
             counter = 0;
-            serviceMissingCounter.put(savedService + "-" + nodeName, counter);
+            serviceMissingCounter.put(savedService + "-" + node, counter);
 
         } else {
 
@@ -700,17 +700,17 @@ public class SystemServiceImpl implements SystemService {
             // if error count > 2 (i.e. 3), consider service uninstalled, remove it from saved status
             if (counter > failedServicesTriggerCount) {
 
-                servicesInstallationStatus.removeInstallationFlag(savedService, originalNodeName);
-                serviceMissingCounter.remove(savedService + "-" + nodeName);
-                notificationService.addError(SERVICE_PREFIX + savedService + " on " + nodeName + " vanished!");
-                logger.warn (SERVICE_PREFIX + savedService + " on " + nodeName + " has been removed from ServiceInstallationStatus!");
+                servicesInstallationStatus.removeInstallationFlag(savedService, originalNode);
+                serviceMissingCounter.remove(savedService + "-" + node);
+                notificationService.addError(SERVICE_PREFIX + savedService + " on " + node + " vanished!");
+                logger.warn (SERVICE_PREFIX + savedService + " on " + node + " has been removed from ServiceInstallationStatus!");
 
                 // unconfigure proxy if required
-                proxyManagerService.removeServerForService(savedService, nodeName.replace("-", "."));
+                proxyManagerService.removeServerForService(savedService, node);
                 changes = true;
 
             } else {
-                serviceMissingCounter.put(savedService + "-" + nodeName, counter);
+                serviceMissingCounter.put(savedService + "-" + node, counter);
             }
         }
         return changes;
@@ -726,8 +726,8 @@ public class SystemServiceImpl implements SystemService {
                 if (!systemStatus.isServiceStatusFlagOK(serviceStatusFlag) && lastStatus.get().isServiceStatusFlagOK(serviceStatusFlag)) {
 
                     logger.warn("For service " + serviceStatusFlag + " - previous status was OK and status is " + systemStatus.getValueForPath(serviceStatusFlag));
-                    notificationService.addError(SERVICE_PREFIX + SystemStatusWrapper.getServiceName(serviceStatusFlag)
-                            + " on " +  Objects.requireNonNull(SystemStatusWrapper.getNodeName(serviceStatusFlag)).replace("-", ".")
+                    notificationService.addError(SERVICE_PREFIX + SystemStatusWrapper.getService(serviceStatusFlag)
+                            + " on " +  Objects.requireNonNull(SystemStatusWrapper.getNode(serviceStatusFlag))
                             + " got into problem");
                 }
             }
@@ -735,7 +735,7 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public void callUninstallScript(MessageLogger ml, SSHConnection connection, String service) throws SystemException {
+    public void callUninstallScript(MessageLogger ml, SSHConnection connection, Service service) throws SystemException {
         File containerFolder = new File(servicesSetupPath + "/" + service);
         if (!containerFolder.exists()) {
             throw new SystemException("Folder " + servicesSetupPath + "/" + service + " doesn't exist !");
@@ -755,9 +755,9 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public void installationSetup(MessageLogger ml, SSHConnection connection, String node, String service) throws SystemException {
+    public void installationSetup(MessageLogger ml, SSHConnection connection, Node node, Service service) throws SystemException {
         try {
-            exec(connection, ml, new String[]{"bash", TMP_PATH_PREFIX + service + "/setup.sh", node});
+            exec(connection, ml, new String[]{"bash", TMP_PATH_PREFIX + service + "/setup.sh", node.getAddress()});
         } catch (SSHCommandException e) {
             logger.debug (e, e);
             ml.addInfo(e.getMessage());
@@ -766,7 +766,7 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public void installationCleanup(MessageLogger ml, SSHConnection connection, String service, String imageName, File tmpArchiveFile) throws SSHCommandException, SystemException {
+    public void installationCleanup(MessageLogger ml, SSHConnection connection, Service service, String imageName, File tmpArchiveFile) throws SSHCommandException, SystemException {
         exec(connection, ml, "rm -Rf " + TMP_PATH_PREFIX + service);
         exec(connection, ml, "rm -f " + TMP_PATH_PREFIX + service + ".tgz");
 
@@ -809,13 +809,13 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public List<Pair<String, String>> buildDeadIps(Set<String> allNodes, NodesConfigWrapper nodesConfig, Set<String> liveIps, Set<String> deadIps) {
-        List<Pair<String, String>> nodesSetup = new ArrayList<>();
+    public List<Pair<String, Node>> buildDeadIps(Set<Node> allNodes, NodesConfigWrapper nodesConfig, Set<Node> liveNodes, Set<Node> deadNodes) {
+        List<Pair<String, Node>> nodesSetup = new ArrayList<>();
 
         // Find out about dead IPs
-        Set<String> nodesToTest = new HashSet<>(allNodes);
-        nodesToTest.addAll(nodesConfig.getNodeAddresses());
-        for (String node : nodesToTest) {
+        Set<Node> nodesToTest = new HashSet<>(allNodes);
+        nodesToTest.addAll(nodesConfig.getAllNodes());
+        for (Node node : nodesToTest) {
 
             // handle potential interruption request
             if (operationsMonitoringService.isInterrupted()) {
@@ -832,17 +832,17 @@ public class SystemServiceImpl implements SystemService {
 
                 if (!ping.startsWith("OK")) {
 
-                    handleNodeDead(deadIps, node);
+                    handleNodeDead(deadNodes, node);
                 } else {
-                    liveIps.add(node);
+                    liveNodes.add(node);
                 }
 
                 // Ensure sudo is possible
-                checkSudoPossible (deadIps, node);
+                checkSudoPossible (deadNodes, node);
 
             } catch (SSHCommandException e) {
                 logger.debug(e, e);
-                handleSSHFails(deadIps, node);
+                handleSSHFails(deadNodes, node);
             }
         }
 
@@ -856,7 +856,7 @@ public class SystemServiceImpl implements SystemService {
         return nodesSetup;
     }
 
-    private void checkSudoPossible(Set<String> deadIps, String node) throws SSHCommandException {
+    private void checkSudoPossible(Set<Node> deadIps, Node node) throws SSHCommandException {
 
         String result = sshCommandService.runSSHScript(node, "sudo ls", false);
         if (   result.contains("a terminal is required to read the password")
@@ -868,25 +868,25 @@ public class SystemServiceImpl implements SystemService {
 
     }
 
-    void handleNodeDead(Set<String> deadIps, String node) {
+    void handleNodeDead(Set<Node> deadNodes, Node node) {
         /* FIXME : wherever this  is used, this should be returned to the UI as a warning either at the end of
         the operation or during.
         //messagingService.addLines("\nNode seems dead " + node);
         */
         notificationService.addError("Node " + node + " is dead.");
-        deadIps.add(node);
+        deadNodes.add(node);
     }
 
-    void handleSSHFails(Set<String> deadIps, String node) {
+    void handleSSHFails(Set<Node> deadNodes, Node node) {
         /* FIXME : wherever this  is used, this should be returned to the UI as a warning either at the end of
         //messagingService.addLines("\nNode " + node + " couldn't be joined through SSH\nIs the user to be used by eskimo properly created and the public key properly added to SSH authorized keys ? (See User Guide)");
         */
         notificationService.addError("Node " + node + " not reachable.");
-        deadIps.add(node);
+        deadNodes.add(node);
     }
 
     @Override
-    public File createRemotePackageFolder(MessageLogger ml, SSHConnection connection, String node, String service, String imageName) throws SystemException, IOException, SSHCommandException {
+    public File createRemotePackageFolder(MessageLogger ml, SSHConnection connection, Node node, Service service, String imageName) throws SystemException, IOException, SSHCommandException {
         // 1. Find container folder, archive and copy there
 
         // 1.1 Make sure folder exist
@@ -897,7 +897,7 @@ public class SystemServiceImpl implements SystemService {
 
         // 1.2 Create archive
 
-        File tmpArchiveFile = createTempFile(service, node, ".tgz");
+        File tmpArchiveFile = createTempFile(service, ".tgz");
         try {
             FileUtils.delete(tmpArchiveFile);
         } catch (FileUtils.FileDeleteFailedException e) {
@@ -953,7 +953,7 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public File createTempFile(String service, String node, String extension) throws IOException {
-        return File.createTempFile(service, extension);
+    public File createTempFile(Service service, String extension) throws IOException {
+        return File.createTempFile(service.getName(), extension);
     }
 }

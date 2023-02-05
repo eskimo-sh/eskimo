@@ -41,6 +41,8 @@ import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
 import ch.niceideas.eskimo.test.services.ProxyManagerServiceTestImpl;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -97,18 +99,18 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         assertNotNull (sshd);
 
         // create a connection to localhost
-        SSHConnection connection = connectionManagerServiceTest.getSharedConnection("localhost");
+        SSHConnection connection = connectionManagerServiceTest.getSharedConnection(Node.fromName("localhost"));
         assertNotNull(connection);
 
         // get a second connection and make sure it matches
-        SSHConnection second = connectionManagerServiceTest.getSharedConnection("localhost");
+        SSHConnection second = connectionManagerServiceTest.getSharedConnection(Node.fromName("localhost"));
         assertNotNull(second);
         assertSame(connection, second);
 
         // close connection and make sure it gets properly recreated
         second.close();
 
-        SSHConnection newOne = connectionManagerServiceTest.getSharedConnection("localhost");
+        SSHConnection newOne = connectionManagerServiceTest.getSharedConnection(Node.fromName("localhost"));
         assertNotNull(newOne);
         assertNotSame (newOne, second);
     }
@@ -168,13 +170,13 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
     @Test
     public void testLocalPortForwarderWrapper() throws Exception {
 
-        proxyManagerServiceTest.setForwarderConfigForHosts("localhost", new ArrayList<>(){{
-            add (new ProxyTunnelConfig("dummyService", 6123, "localhost", 123));
-            add (new ProxyTunnelConfig("dummyService",6124, "localhost", 124));
-            add (new ProxyTunnelConfig("dummyService",6125, "localhost", 125));
+        proxyManagerServiceTest.setForwarderConfigForHosts(Node.fromName("localhost"), new ArrayList<>(){{
+            add (new ProxyTunnelConfig(Service.from("dummyService"), 6123, Node.fromName("localhost"), 123));
+            add (new ProxyTunnelConfig(Service.from("dummyService"),6124, Node.fromName("localhost"), 124));
+            add (new ProxyTunnelConfig(Service.from("dummyService"),6125, Node.fromName("localhost"), 125));
         }});
 
-        SSHConnection connection = connectionManagerServiceTest.getSharedConnection("localhost");
+        SSHConnection connection = connectionManagerServiceTest.getSharedConnection(Node.fromName("localhost"));
 
         assertEquals(3, connectionManagerServiceTest.getCreateCallFor().size());
         assertEquals("123,124,125", String.join(",", connectionManagerServiceTest.getCreateCallFor()));
@@ -185,23 +187,23 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
 
         connectionManagerServiceTest.resetCountersOnly();
 
-        connectionManagerServiceTest.recreateTunnels("localhost");
+        connectionManagerServiceTest.recreateTunnels(Node.fromName("localhost"));
 
         // nothing actually recreated since nothing changed
         assertEquals(0, connectionManagerServiceTest.getCreateCallFor().size());
         assertEquals(1, connectionManagerServiceTest.getDropCallFor().size());
 
         proxyManagerServiceTest.reset();
-        proxyManagerServiceTest.setForwarderConfigForHosts("localhost", new ArrayList<>(){{
-            add (new ProxyTunnelConfig("dummyService", 20123, "localhost", 11123));
-            add (new ProxyTunnelConfig("dummyService",20124, "localhost", 11124));
-            add (new ProxyTunnelConfig("dummyService",20125, "localhost", 11125));
+        proxyManagerServiceTest.setForwarderConfigForHosts(Node.fromName("localhost"), new ArrayList<>(){{
+            add (new ProxyTunnelConfig(Service.from("dummyService"), 20123, Node.fromName("localhost"), 11123));
+            add (new ProxyTunnelConfig(Service.from("dummyService"),20124, Node.fromName("localhost"), 11124));
+            add (new ProxyTunnelConfig(Service.from("dummyService"),20125, Node.fromName("localhost"), 11125));
         }});
 
 
         connectionManagerServiceTest.resetCountersOnly();
 
-        connectionManagerServiceTest.recreateTunnels("localhost");
+        connectionManagerServiceTest.recreateTunnels(Node.fromName("localhost"));
 
         assertEquals(3, connectionManagerServiceTest.getCreateCallFor().size());
 

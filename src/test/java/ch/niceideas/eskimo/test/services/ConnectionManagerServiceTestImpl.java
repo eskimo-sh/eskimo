@@ -43,6 +43,7 @@ import ch.niceideas.eskimo.services.ConnectionManagerException;
 import ch.niceideas.eskimo.services.ConnectionManagerService;
 import ch.niceideas.eskimo.services.ConnectionManagerServiceImpl;
 import ch.niceideas.eskimo.services.SetupException;
+import ch.niceideas.eskimo.types.Node;
 import com.trilead.ssh2.LocalPortForwarder;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
@@ -67,7 +68,7 @@ public class ConnectionManagerServiceTestImpl extends ConnectionManagerServiceIm
     final List<String> closedForwarders = new ArrayList<>();
 
     final List<String> createCalledFor = new ArrayList<>();
-    final List<String> dropCalledFor = new ArrayList<>();
+    final List<Node> dropCalledFor = new ArrayList<>();
 
     private boolean doConnect = true;
 
@@ -75,7 +76,7 @@ public class ConnectionManagerServiceTestImpl extends ConnectionManagerServiceIm
         return Collections.unmodifiableList(createCalledFor);
     }
 
-    public List<String> getDropCallFor() {
+    public List<Node> getDropCallFor() {
         return Collections.unmodifiableList(dropCalledFor);
     }
 
@@ -121,17 +122,17 @@ public class ConnectionManagerServiceTestImpl extends ConnectionManagerServiceIm
     }
 
     @Override
-    public SSHConnection getPrivateConnection(String node) throws ConnectionManagerException {
+    public SSHConnection getPrivateConnection(Node node) throws ConnectionManagerException {
         return super.getPrivateConnection(node);
     }
 
     @Override
-    public SSHConnection getSharedConnection(String node) throws ConnectionManagerException {
+    public SSHConnection getSharedConnection(Node node) throws ConnectionManagerException {
         return super.getSharedConnection(node);
     }
 
     @Override
-    public void recreateTunnels(String host) throws ConnectionManagerException {
+    public void recreateTunnels(Node host) throws ConnectionManagerException {
         recreateTunnelsCalled.set(true);
         super.recreateTunnels(host);
     }
@@ -140,7 +141,7 @@ public class ConnectionManagerServiceTestImpl extends ConnectionManagerServiceIm
     protected LocalPortForwarderWrapper createPortForwarder(SSHConnection connection, ProxyTunnelConfig config) throws ConnectionManagerException {
         openedForwarders.add (config.getLocalPort() + "/" + config.getNode() + "/" + config.getRemotePort());
         return new LocalPortForwarderWrapper(
-                config.getServiceName(), connection, config.getLocalPort(), config.getNode(), config.getRemotePort()) {
+                config.getService(), connection, config.getLocalPort(), config.getNode(), config.getRemotePort()) {
             @Override
             public void close() {
                 closedForwarders.add (config.getLocalPort() + "/" + config.getNode() + "/" + config.getRemotePort());
@@ -149,7 +150,7 @@ public class ConnectionManagerServiceTestImpl extends ConnectionManagerServiceIm
     }
 
     @Override
-    protected SSHConnection createConnectionInternal(String node, int operationTimeout) throws IOException, SetupException, FileException {
+    protected SSHConnection createConnectionInternal(Node node, int operationTimeout) throws IOException, SetupException, FileException {
         SSHConnection connection = new SSHConnection(node, sshPort, operationTimeout) {
             private boolean isClosed = false;
             @Override
@@ -178,13 +179,13 @@ public class ConnectionManagerServiceTestImpl extends ConnectionManagerServiceIm
     }
 
     @Override
-    protected void dropTunnelsToBeClosed(SSHConnection connection, String node)  {
+    protected void dropTunnelsToBeClosed(SSHConnection connection, Node node)  {
         super.dropTunnelsToBeClosed(connection, node);
         dropCalledFor.add(node);
     }
 
     @Override
-    public void dropTunnelsToBeClosed(String host) {
+    public void dropTunnelsToBeClosed(Node host) {
         super.dropTunnelsToBeClosed(host);
     }
 }

@@ -57,19 +57,19 @@ public interface OperationsMonitoringService extends OperationsContext {
 
     void addGlobalInfo (String message);
 
-    void addInfo(OperationId operation, String message);
+    void addInfo(OperationId<?> operation, String message);
 
-    void addInfo(OperationId operation, String[] messages);
+    void addInfo(OperationId<?> operation, String[] messages);
 
-    List<String> getNewMessages (OperationId operation, int lastLine);
+    List<String> getNewMessages (OperationId<?> operation, int lastLine);
 
-    Pair<Integer, String> fetchNewMessages (OperationId operation, int lastLine);
+    Pair<Integer, String> fetchNewMessages (OperationId<?> operation, int lastLine);
 
-    void startOperation(OperationId operationId);
+    void startOperation(OperationId<?> operationId);
 
-    void endOperationError(OperationId operationId);
+    void endOperationError(OperationId<?> operationId);
 
-    void endOperation(OperationId operationId);
+    void endOperation(OperationId<?> operationId);
 
     boolean isInterrupted ();
 

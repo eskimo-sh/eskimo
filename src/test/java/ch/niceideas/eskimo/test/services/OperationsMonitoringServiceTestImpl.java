@@ -139,13 +139,13 @@ public class OperationsMonitoringServiceTestImpl implements OperationsMonitoring
     }
 
     @Override
-    public void addInfo(OperationId operation, String message) {
+    public void addInfo(OperationId<?> operation, String message) {
         messagesCollector.append(operation).append(" : ").append(message).append("\n");
         messagingManager.addLine(message);
     }
 
     @Override
-    public void addInfo(OperationId operation, String[] messages) {
+    public void addInfo(OperationId<?> operation, String[] messages) {
         Arrays.stream(messages).forEach(
                 message -> messagesCollector.append(operation).append(" : ").append(message).append("\n")
         );
@@ -153,27 +153,27 @@ public class OperationsMonitoringServiceTestImpl implements OperationsMonitoring
     }
 
     @Override
-    public List<String> getNewMessages(OperationId operation, int lastLine) {
+    public List<String> getNewMessages(OperationId<?> operation, int lastLine) {
         return messagingManager.getSubList(lastLine);
     }
 
     @Override
-    public Pair<Integer, String> fetchNewMessages(OperationId operation, int lastLine) {
+    public Pair<Integer, String> fetchNewMessages(OperationId<?> operation, int lastLine) {
         return messagingManager.fetchElements(lastLine);
     }
 
     @Override
-    public void startOperation(OperationId operationId) {
+    public void startOperation(OperationId<?> operationId) {
 
     }
 
     @Override
-    public void endOperationError(OperationId operationId) {
+    public void endOperationError(OperationId<?> operationId) {
 
     }
 
     @Override
-    public void endOperation(OperationId operationId) {
+    public void endOperation(OperationId<?> operationId) {
 
     }
 

@@ -46,6 +46,8 @@ import ch.niceideas.eskimo.services.satellite.MemoryComputer;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -141,23 +143,26 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             NodesConfigWrapper rawNodesConfig = command.getRawConfig();
             NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
 
-            Set<String> liveIps = new HashSet<>();
-            Set<String> deadIps = new HashSet<>();
+            Set<Node> liveNodes = new HashSet<>();
+            Set<Node> deadNodes = new HashSet<>();
 
-            List<Pair<String, String>> nodeSetupPairs = systemService.buildDeadIps(command.getAllNodes(), nodesConfig, liveIps, deadIps);
+            List<Pair<String, Node>> nodeSetupPairs = systemService.buildDeadIps(command.getAllNodes(), nodesConfig, liveNodes, deadNodes);
             if (nodeSetupPairs == null) {
                 return;
             }
 
             List<ServiceOperationsCommand.ServiceOperationId> nodesSetup =
                     nodeSetupPairs.stream()
-                            .map(nodeSetupPair -> new ServiceOperationsCommand.ServiceOperationId(ServiceOperationsCommand.CHECK_INSTALL_OP_TYPE, ServiceOperationsCommand.BASE_SYSTEM, nodeSetupPair.getValue()))
+                            .map(nodeSetupPair -> new ServiceOperationsCommand.ServiceOperationId(
+                                    ServiceOperationsCommand.ServiceOperation.CHECK_INSTALL,
+                                    Service.BASE_SYSTEM,
+                                    nodeSetupPair.getValue()))
                             .collect(Collectors.toList());
 
             KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
             ServicesInstallStatusWrapper servicesInstallStatus = configurationService.loadServicesInstallationStatus();
 
-            MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, kubeServicesConfig, deadIps);
+            MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, kubeServicesConfig, deadNodes);
 
             if (operationsMonitoringService.isInterrupted()) {
                 return;
@@ -166,11 +171,14 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             // Nodes setup
             systemService.performPooledOperation(nodesSetup, parallelismInstallThreadCount, baseInstallWaitTimout,
                     (operation, error) -> {
-                        String node = operation.getNode();
-                        if (nodesConfig.getNodeAddresses().contains(node) && liveIps.contains(node)) {
+                        Node node = operation.getNode();
+                        if (nodesConfig.getAllNodes().contains(node) && liveNodes.contains(node)) {
 
                             systemOperationService.applySystemOperation(
-                                    new ServiceOperationsCommand.ServiceOperationId(ServiceOperationsCommand.CHECK_INSTALL_OP_TYPE, ServiceOperationsCommand.BASE_SYSTEM, node),
+                                    new ServiceOperationsCommand.ServiceOperationId(
+                                            ServiceOperationsCommand.ServiceOperation.CHECK_INSTALL,
+                                            Service.BASE_SYSTEM,
+                                            node),
                                     ml -> {
 
                                         if (!operationsMonitoringService.isInterrupted() && error.get() == null) {
@@ -205,15 +213,15 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             for (ServiceOperationsCommand.ServiceOperationId restart :
                     command.getOperationsGroupInOrder(servicesInstallationSorter, nodesConfig).stream()
                             .flatMap(Collection::stream)
-                            .filter(op -> op.getOperation().equals("restart"))
+                            .filter(op -> op.getOperation().equals(ServiceOperationsCommand.ServiceOperation.RESTART))
                             .collect(Collectors.toList())) {
                 try {
                     configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
-                        String nodeName = restart.getNode().replace(".", "-");
-                        if (restart.getNode().equals(ServiceOperationsCommand.KUBERNETES_FLAG)) {
-                            nodeName = ServicesInstallStatusWrapper.KUBERNETES_NODE;
+                        Node node = restart.getNode();
+                        if (restart.getNode().equals(Node.KUBERNETES_FLAG)) {
+                            node = Node.KUBERNETES_NODE;
                         }
-                        servicesInstallationStatus.setInstallationFlag(restart.getService(), nodeName, "restart");
+                        servicesInstallationStatus.setInstallationFlag(restart.getService(), node, "restart");
                     });
                 } catch (FileException | SetupException e) {
                     logger.error(e, e);
@@ -226,16 +234,16 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
                 systemService.performPooledOperation(operationGroup, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
-                            if (operation.getOperation().equals("installation")) {
-                                if (liveIps.contains(operation.getNode())) {
+                            if (operation.getOperation().equals(ServiceOperationsCommand.ServiceOperation.INSTALLATION)) {
+                                if (liveNodes.contains(operation.getNode())) {
                                     installService(operation);
                                 }
 
-                            } else if (operation.getOperation().equals("uninstallation")) {
-                                if (!deadIps.contains(operation.getNode())) {
+                            } else if (operation.getOperation().equals(ServiceOperationsCommand.ServiceOperation.UNINSTALLATION)) {
+                                if (!deadNodes.contains(operation.getNode())) {
                                     uninstallService(operation);
                                 } else {
-                                    if (!liveIps.contains(operation.getNode())) {
+                                    if (!liveNodes.contains(operation.getNode())) {
                                         // this means that the node has been de-configured
                                         // (since if it is neither dead nor alive then it just hasn't been tested since it's not
                                         // in the config anymore)
@@ -244,14 +252,14 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
                                     }
                                 }
                             } else { // restart
-                                if (operation.getNode().equals(ServiceOperationsCommand.KUBERNETES_FLAG) || liveIps.contains(operation.getNode())) {
+                                if (operation.getNode().equals(Node.KUBERNETES_FLAG) || liveNodes.contains(operation.getNode())) {
                                     restartServiceForSystem(operation);
                                 }
                             }
                         });
             }
 
-            if (!operationsMonitoringService.isInterrupted() && (!Collections.disjoint(deadIps, nodesConfig.getNodeAddresses()))) {
+            if (!operationsMonitoringService.isInterrupted() && (!Collections.disjoint(deadNodes, nodesConfig.getAllNodes()))) {
                 operationsMonitoringService.addGlobalInfo("At least one configured node was found dead");
                 throw new NodesConfigurationException("At least one configured node was found dead");
             }
@@ -268,7 +276,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
     }
 
     @Override
-    public void installEskimoBaseSystem(MessageLogger ml, String node) throws SSHCommandException {
+    public void installEskimoBaseSystem(MessageLogger ml, Node node) throws SSHCommandException {
         try (SSHConnection connection = connectionManagerService.getPrivateConnection(node)) {
 
             ml.addInfo(" - Calling install-eskimo-base-system.sh");
@@ -303,7 +311,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
         }
     }
 
-    private String installK8s(String node) throws SSHCommandException {
+    private String installK8s(Node node) throws SSHCommandException {
         return sshCommandService.runSSHScriptPath(node, servicesSetupPath + "/base-eskimo/install-kubernetes.sh");
     }
 
@@ -319,7 +327,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
         }
     }
 
-    private boolean isMissingOnNode(String installation, String node) {
+    private boolean isMissingOnNode(String installation, Node node) {
 
         try {
             String result = sshCommandService.runSSHCommand(node, "cat /etc/eskimo_flag_" + installation + "_installed");
@@ -335,12 +343,12 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             NodesConfigWrapper nodesConfig,
             KubernetesServicesConfigWrapper kubeServicesConfig,
             ServicesInstallStatusWrapper servicesInstallStatus,
-            MemoryModel memoryModel, String node)
+            MemoryModel memoryModel, Node node)
             throws SystemException, SSHCommandException, IOException {
 
         try (SSHConnection connection = connectionManagerService.getPrivateConnection(node)) {
 
-            File tempTopologyFile = systemService.createTempFile("eskimo_topology", node, ".sh");
+            File tempTopologyFile = systemService.createTempFile(Service.TOPOLOGY_FLAG, ".sh");
             deleteTempFile(tempTopologyFile);
             try {
                 FileUtils.writeFile(tempTopologyFile, servicesDefinition
@@ -358,7 +366,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
             ServicesSettingsWrapper servicesConfig = configurationService.loadServicesConfigNoLock();
 
-            File tempServicesSettingsFile = systemService.createTempFile("eskimo_services-settings", node, ".json");
+            File tempServicesSettingsFile = systemService.createTempFile(Service.SERVICES_SETTINGS_FLAG, ".json");
             deleteTempFile(tempServicesSettingsFile);
 
             FileUtils.writeFile(tempServicesSettingsFile, servicesConfig.getFormattedValue());
@@ -387,7 +395,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
         }
     }
 
-    private void flagInstalledOnNode(String installation, String node) throws SystemException {
+    private void flagInstalledOnNode(String installation, Node node) throws SystemException {
         try {
             sshCommandService.runSSHCommand(node, "sudo bash -c \"echo OK > /etc/eskimo_flag_" + installation + "_installed\"");
         } catch (SSHCommandException e) {
@@ -396,7 +404,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
         }
     }
 
-    private void uploadKubernetes(String node) throws SSHCommandException, SystemException {
+    private void uploadKubernetes(Node node) throws SSHCommandException, SystemException {
         try (SSHConnection connection = connectionManagerService.getPrivateConnection(node)) {
 
             File packageDistributionDir = new File (packageDistributionPath);
@@ -412,56 +420,51 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
     }
 
     @Override
-    public void uninstallService(ServiceOperationsCommand.ServiceOperationId operationId) throws SystemException {
-        String nodeName = operationId.getNode().replace(".", "-");
+    public void uninstallService(AbstractStandardOperationId<?> operationId) throws SystemException {
         systemOperationService.applySystemOperation(operationId,
                 ml -> proceedWithServiceUninstallation(ml, operationId.getNode(), operationId.getService()),
-                status -> status.removeInstallationFlag(operationId.getService(), nodeName));
+                status -> status.removeInstallationFlag(operationId.getService(), operationId.getNode()));
         proxyManagerService.removeServerForService(operationId.getService(), operationId.getNode());
     }
 
-    void uninstallServiceNoOp(ServiceOperationsCommand.ServiceOperationId operationId) throws SystemException {
-        String nodeName = operationId.getNode().replace(".", "-");
+    void uninstallServiceNoOp(AbstractStandardOperationId<?> operationId) throws SystemException {
         systemOperationService.applySystemOperation(operationId,
                 builder -> {},
-                status -> status.removeInstallationFlag(operationId.getService(), nodeName));
+                status -> status.removeInstallationFlag(operationId.getService(), operationId.getNode()));
         proxyManagerService.removeServerForService(operationId.getService(), operationId.getNode());
     }
 
     @Override
-    public void installService(ServiceOperationsCommand.ServiceOperationId operationId) throws SystemException {
-        String nodeName = operationId.getNode().replace(".", "-");
+    public void installService(AbstractStandardOperationId<?> operationId) throws SystemException {
         systemOperationService.applySystemOperation(operationId,
                 ml -> proceedWithServiceInstallation(ml, operationId.getNode(), operationId.getService()),
-                status -> status.setInstallationFlag(operationId.getService(), nodeName, "OK"));
+                status -> status.setInstallationFlag(operationId.getService(), operationId.getNode(), "OK"));
     }
 
     @Override
-    public void restartServiceForSystem(SimpleOperationCommand.SimpleOperationId operationId) throws SystemException {
-        String nodeName = operationId.getNode().replace(".", "-");
-
-        if (servicesDefinition.getService(operationId.getService()).isKubernetes()) {
+    public void restartServiceForSystem(AbstractStandardOperationId<?> operationId) throws SystemException {
+        if (servicesDefinition.getServiceDefinition(operationId.getService()).isKubernetes()) {
 
             systemOperationService.applySystemOperation(operationId,
                     ml -> {
                         try {
-                            ml.addInfo(kubernetesService.restartServiceInternal(servicesDefinition.getService(operationId.getService()), operationId.getNode()));
+                            ml.addInfo(kubernetesService.restartServiceInternal(servicesDefinition.getServiceDefinition(operationId.getService()), operationId.getNode()));
                         } catch (KubernetesException e) {
                             logger.error (e, e);
                             throw new SystemException (e);
                         }
                     },
-                    status -> status.setInstallationFlag(operationId.getService(), ServicesInstallStatusWrapper.KUBERNETES_NODE, "OK") );
+                    status -> status.setInstallationFlag(operationId.getService(), Node.KUBERNETES_NODE, "OK") );
 
         } else {
             systemOperationService.applySystemOperation(operationId,
                     ml -> ml.addInfo(sshCommandService.runSSHCommand(operationId.getNode(),
                             "sudo bash -c 'systemctl reset-failed " + operationId.getService() + " && systemctl restart " + operationId.getService() + "'")),
-                    status -> status.setInstallationFlag(operationId.getService(), nodeName, "OK"));
+                    status -> status.setInstallationFlag(operationId.getService(), operationId.getNode(), "OK"));
         }
     }
 
-    private void proceedWithServiceUninstallation(MessageLogger ml, String node, String service)
+    private void proceedWithServiceUninstallation(MessageLogger ml, Node node, Service service)
             throws SSHCommandException, SystemException {
         try (SSHConnection connection = connectionManagerService.getPrivateConnection(node)) {
 
@@ -488,7 +491,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
             // 5. Delete docker image
             ml.addInfo(" - Removing docker image");
-            sshCommandService.runSSHCommand(connection, "sudo docker image rm -f eskimo:" + servicesDefinition.getService(service).getImageName());
+            sshCommandService.runSSHCommand(connection, "sudo docker image rm -f eskimo:" + servicesDefinition.getServiceDefinition(service).getImageName());
 
             // 6. Reloading systemd daemon
             ml.addInfo(" - Reloading systemd daemon");
@@ -500,10 +503,10 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
         }
     }
 
-    private void proceedWithServiceInstallation(MessageLogger ml, String node, String service)
+    private void proceedWithServiceInstallation(MessageLogger ml, Node node, Service service)
             throws IOException, SystemException, SSHCommandException {
 
-        String imageName = servicesDefinition.getService(service).getImageName();
+        String imageName = servicesDefinition.getServiceDefinition(service).getImageName();
 
         try (SSHConnection connection = connectionManagerService.getPrivateConnection(node)) {
 

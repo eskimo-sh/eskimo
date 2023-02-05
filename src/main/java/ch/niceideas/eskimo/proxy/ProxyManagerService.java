@@ -36,6 +36,8 @@ package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.ConnectionManagerException;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.apache.hc.core5.http.HttpHost;
 
 import java.io.IOException;
@@ -52,15 +54,15 @@ public interface ProxyManagerService {
 
     HttpHost getServerHost(String serviceId);
 
-    String getServerURI(String serviceName, String pathInfo);
+    String getServerURI(Service serviceName, String pathInfo);
 
-    String extractHostFromPathInfo(String pathInfo);
+    Node extractHostFromPathInfo(String pathInfo);
 
-    List<ProxyTunnelConfig> getTunnelConfigForHost (String host);
+    List<ProxyTunnelConfig> getTunnelConfigForHost (Node host);
 
-    void updateServerForService(String serviceName, String runtimeNode) throws ConnectionManagerException;
+    void updateServerForService(Service service, Node runtimeNode) throws ConnectionManagerException;
 
-    void removeServerForService(String serviceName, String runtimeNode);
+    void removeServerForService(Service service, Node runtimeNode);
 
     Collection<String> getAllTunnelConfigKeys();
 

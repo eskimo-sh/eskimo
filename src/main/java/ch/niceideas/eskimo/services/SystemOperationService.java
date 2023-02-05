@@ -44,7 +44,7 @@ import java.io.IOException;
 
 public interface SystemOperationService {
 
-    void applySystemOperation(OperationId operationId, SystemOperation operation, SystemService.StatusUpdater statusUpdater)
+    void applySystemOperation(OperationId<?> operationId, SystemOperation operation, SystemService.StatusUpdater statusUpdater)
             throws SystemException;
 
 

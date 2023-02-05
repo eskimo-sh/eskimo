@@ -40,6 +40,8 @@ import ch.niceideas.eskimo.model.ServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +83,12 @@ public class ServiceInstallationSorterTest {
         ServiceOperationsCommand restartCommand = ServiceOperationsCommand.createForRestartsOnly(
                 servicesDefinition,
                 nodeRangeResolver,
-                new String[] {"kube-master", "kube-slave", "gluster", "cerebro", "kibana"},
+                new Service[] {
+                        Service.from("kube-master"),
+                        Service.from("kube-slave"),
+                        Service.from("gluster"),
+                        Service.from("cerebro"),
+                        Service.from("kibana")},
                 StandardSetupHelpers.getStandard2NodesInstallStatus(),
                 StandardSetupHelpers.getStandard2NodesSetup()
         );
@@ -92,29 +99,29 @@ public class ServiceInstallationSorterTest {
 
         List<ServiceOperationsCommand.ServiceOperationId> group1 = orderedRestart.get(0);
         assertEquals(2, group1.size());
-        assertEquals("gluster", group1.get(0).getService());
-        assertEquals("192.168.10.11", group1.get(0).getNode());
+        assertEquals(Service.from("gluster"), group1.get(0).getService());
+        assertEquals(Node.fromAddress("192.168.10.11"), group1.get(0).getNode());
 
-        assertEquals("gluster", group1.get(1).getService());
-        assertEquals("192.168.10.13", group1.get(1).getNode());
+        assertEquals(Service.from("gluster"), group1.get(1).getService());
+        assertEquals(Node.fromAddress("192.168.10.13"), group1.get(1).getNode());
 
         List<ServiceOperationsCommand.ServiceOperationId> group2 = orderedRestart.get(1);
         assertEquals(1, group2.size());
-        assertEquals("kube-master", group2.get(0).getService());
-        assertEquals("192.168.10.11", group2.get(0).getNode());
+        assertEquals(Service.from("kube-master"), group2.get(0).getService());
+        assertEquals(Node.fromAddress("192.168.10.11"), group2.get(0).getNode());
 
         List<ServiceOperationsCommand.ServiceOperationId> group3 = orderedRestart.get(2);
         assertEquals(2, group3.size());
-        assertEquals("kube-slave", group3.get(0).getService());
-        assertEquals("192.168.10.11", group3.get(0).getNode());
+        assertEquals(Service.from("kube-slave"), group3.get(0).getService());
+        assertEquals(Node.fromAddress("192.168.10.11"), group3.get(0).getNode());
 
-        assertEquals("kube-slave", group3.get(1).getService());
-        assertEquals("192.168.10.13", group3.get(1).getNode());
+        assertEquals(Service.from("kube-slave"), group3.get(1).getService());
+        assertEquals(Node.fromAddress("192.168.10.13"), group3.get(1).getNode());
 
         List<ServiceOperationsCommand.ServiceOperationId> group4 = orderedRestart.get(3);
         assertEquals(1, group4.size());
-        assertEquals("cerebro", group4.get(0).getService());
-        assertEquals("(kubernetes)", group4.get(0).getNode());
+        assertEquals(Service.from("cerebro"), group4.get(0).getService());
+        assertEquals(Node.KUBERNETES_FLAG, group4.get(0).getNode());
 
     }
 
@@ -130,30 +137,29 @@ public class ServiceInstallationSorterTest {
 
         assertNotNull(orderedInstall);
 
-        assertEquals(6, orderedInstall.size());
+        StringBuilder resultBuilder = new StringBuilder();
+        orderedInstall.forEach(
+                installGroup -> installGroup.forEach(
+                        serviceOpId -> {
+                            resultBuilder.append (serviceOpId.toString()).append("\n");
+                        }
+                )
+        );
 
-        // Test first, third and last group
-        List<ServiceOperationsCommand.ServiceOperationId> group1 = orderedInstall.get(0);
-        assertEquals(2, group1.size());
-        assertEquals("zookeeper", group1.get(0).getService());
-        assertEquals("192.168.10.13", group1.get(0).getNode());
+        System.err.println (resultBuilder);
 
-        assertEquals("ntp", group1.get(1).getService());
-        assertEquals("192.168.10.11", group1.get(1).getNode());
+        assertEquals(7, orderedInstall.size());
 
-        List<ServiceOperationsCommand.ServiceOperationId> group4 = orderedInstall.get(4);
-        assertEquals(1, group4.size());
-        assertEquals("kube-master", group4.get(0).getService());
-        assertEquals("192.168.10.11", group4.get(0).getNode());
-
-        List<ServiceOperationsCommand.ServiceOperationId> group5 = orderedInstall.get(5);
-        assertEquals(2, group5.size());
-        assertEquals("kube-slave", group5.get(0).getService());
-        assertEquals("192.168.10.11", group5.get(0).getNode());
-        assertEquals("kube-slave", group5.get(1).getService());
-        assertEquals("192.168.10.13", group5.get(1).getNode());
-
-
+        assertEquals("installation_ntp_192-168-10-11\n" +
+                "installation_ntp_192-168-10-13\n" +
+                "installation_zookeeper_192-168-10-13\n" +
+                "installation_gluster_192-168-10-11\n" +
+                "installation_gluster_192-168-10-13\n" +
+                "installation_etcd_192-168-10-11\n" +
+                "installation_etcd_192-168-10-13\n" +
+                "installation_kube-master_192-168-10-11\n" +
+                "installation_kube-slave_192-168-10-11\n" +
+                "installation_kube-slave_192-168-10-13\n", resultBuilder.toString());
     }
 
 }

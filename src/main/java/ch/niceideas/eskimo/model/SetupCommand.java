@@ -36,11 +36,15 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.SetupService;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Operation;
+import ch.niceideas.eskimo.types.Service;
 import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -53,8 +57,6 @@ import static ch.niceideas.eskimo.model.SimpleOperationCommand.standardizeOperat
 @Data
 public class SetupCommand implements JSONOpCommand {
 
-    public static final String TYPE_DOWNLOAD = "Download";
-    public static final String TYPE_BUILD = "Build";
     public static final String BASE_ESKIMO_PACKAGE = "base-eskimo";
     private final JsonWrapper rawSetup;
 
@@ -100,10 +102,10 @@ public class SetupCommand implements JSONOpCommand {
                 .collect(Collectors.toList());
 
         List<String> sortedServices = Arrays.stream(servicesDefinition.listAllServices())
-                .map(servicesDefinition::getService)
+                .map(servicesDefinition::getServiceDefinition)
                 .filter(service -> missingServices.contains(service.getImageName()))
                 .sorted(servicesDefinition::compareServices)
-                .map(Service::getImageName)
+                .map(ServiceDef::getImageName)
                 .distinct()
                 .collect(Collectors.toList());
 
@@ -179,23 +181,23 @@ public class SetupCommand implements JSONOpCommand {
         List<SetupOperationId> allOpList = new ArrayList<>();
 
         downloadPackages.stream()
-                .map (pack -> new SetupOperationId(TYPE_DOWNLOAD, pack))
+                .map (pack -> new SetupOperationId(SetupOperation.DOWNLOAD, pack))
                 .forEach(allOpList::add);
 
         buildPackage.stream()
-                .map (pack -> new SetupOperationId(TYPE_BUILD, pack))
+                .map (pack -> new SetupOperationId(SetupOperation.BUILD, pack))
                 .forEach(allOpList::add);
 
         downloadKube.stream()
-                .map (pack -> new SetupOperationId(TYPE_DOWNLOAD, pack))
+                .map (pack -> new SetupOperationId(SetupOperation.DOWNLOAD, pack))
                 .forEach(allOpList::add);
 
         buildKube.stream()
-                .map (pack -> new SetupOperationId(TYPE_BUILD, pack))
+                .map (pack -> new SetupOperationId(SetupOperation.BUILD, pack))
                 .forEach(allOpList::add);
 
         packageUpdates.stream()
-                .map (pack -> new SetupOperationId(TYPE_DOWNLOAD, pack))
+                .map (pack -> new SetupOperationId(SetupOperation.DOWNLOAD, pack))
                 .forEach(allOpList::add);
 
         return allOpList;
@@ -203,28 +205,50 @@ public class SetupCommand implements JSONOpCommand {
 
     @Data
     @RequiredArgsConstructor
-    public static class SetupOperationId implements OperationId {
+    public static class SetupOperationId implements OperationId<SetupOperation> {
 
-        private final String type;
-        private final String service;
+        private final SetupOperation operation;
+        private final String pack;
 
-        public boolean isOnNode(String node) {
+        public Service getService() {
+            throw new UnsupportedOperationException();
+        }
+
+        public boolean isOnNode(Node node) {
             return false;
         }
 
-        public boolean isSameNode(OperationId other) {
+        public boolean isSameNode(OperationId<?> other) {
             return false;
         }
 
         public String getMessage() {
-            return type + " of package " + getService();
+            return operation + " of package " + pack;
         }
 
         @Override
         public String toString() {
-            return standardizeOperationMember (type)
+            return standardizeOperationMember (operation.getType())
                     + "_"
-                    + standardizeOperationMember (service);
+                    + standardizeOperationMember (pack);
+        }
+
+        @Override
+        public int compareTo(OperationId<?> o) {
+            return toString().compareTo(o.toString());
+        }
+    }
+
+    @RequiredArgsConstructor
+    public enum SetupOperation implements Operation {
+        DOWNLOAD("Download"),
+        BUILD ("Build");
+
+        @Getter
+        private final String type;
+
+        public String toString () {
+            return type;
         }
     }
 }

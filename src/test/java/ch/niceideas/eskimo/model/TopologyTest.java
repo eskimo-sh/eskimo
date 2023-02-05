@@ -43,6 +43,8 @@ import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.testwrappers.SetupServiceUnderTest;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,35 +83,35 @@ public class TopologyTest {
 
     public void initFirstNodeDependencies() {
 
-        Service serviceA = new Service();
+        ServiceDef serviceA = new ServiceDef();
         serviceA.setName("service_a");
         Dependency depA = new Dependency();
         depA.setMes(MasterElectionStrategy.FIRST_NODE);
-        depA.setMasterService("service_b");
+        depA.setMasterService(Service.from("service_b"));
         depA.setNumberOfMasters(1);
         serviceA.addDependency (depA);
         def.addService(serviceA);
 
-        Service serviceB = new Service();
+        ServiceDef serviceB = new ServiceDef();
         serviceB.setName("service_b");
         Dependency depB = new Dependency();
         depB.setMes(MasterElectionStrategy.FIRST_NODE);
-        depB.setMasterService("service_c");
+        depB.setMasterService(Service.from("service_c"));
         depB.setNumberOfMasters(2);
         serviceB.addDependency (depB);
         def.addService(serviceB);
 
-        Service serviceC = new Service();
+        ServiceDef serviceC = new ServiceDef();
         serviceC.setName("service_c");
         def.addService(serviceC);
 
-        Service serviceD = new Service();
+        ServiceDef serviceD = new ServiceDef();
         serviceD.setName("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.FIRST_NODE);
-        depD.setMasterService("service_c");
+        depD.setMasterService(Service.from("service_c"));
         depD.setNumberOfMasters(1);
         serviceD.addDependency (depD);
         def.addService(serviceD);
@@ -117,30 +119,30 @@ public class TopologyTest {
 
     public void initConditionalDependency() {
 
-        Service serviceA = new Service();
+        ServiceDef serviceA = new ServiceDef();
         serviceA.setName("service_a");
         Dependency depA = new Dependency();
         depA.setMes(MasterElectionStrategy.FIRST_NODE);
-        depA.setMasterService("service_b");
+        depA.setMasterService(Service.from("service_b"));
         depA.setNumberOfMasters(1);
         serviceA.addDependency (depA);
         def.addService(serviceA);
 
-        Service serviceB = new Service();
+        ServiceDef serviceB = new ServiceDef();
         serviceB.setName("service_b");
         Dependency depB = new Dependency();
         depB.setMes(MasterElectionStrategy.FIRST_NODE);
-        depB.setMasterService("service_c");
+        depB.setMasterService(Service.from("service_c"));
         depB.setNumberOfMasters(1);
-        depB.setConditional("service_d");
+        depB.setConditionalDependency(Service.from("service_d"));
         serviceB.addDependency (depB);
         def.addService(serviceB);
 
-        Service serviceC = new Service();
+        ServiceDef serviceC = new ServiceDef();
         serviceC.setName("service_c");
         def.addService(serviceC);
 
-        Service serviceD = new Service();
+        ServiceDef serviceD = new ServiceDef();
         serviceD.setName("service_d");
         def.addService(serviceD);
     }
@@ -158,35 +160,35 @@ public class TopologyTest {
 
     public void initSameNodeOrRandomDependencies() {
 
-        Service serviceA = new Service();
+        ServiceDef serviceA = new ServiceDef();
         serviceA.setName("service_a");
         Dependency depA = new Dependency();
         depA.setMes(MasterElectionStrategy.SAME_NODE_OR_RANDOM);
-        depA.setMasterService("service_b");
+        depA.setMasterService(Service.from("service_b"));
         depA.setNumberOfMasters(1);
         serviceA.addDependency (depA);
         def.addService(serviceA);
 
-        Service serviceB = new Service();
+        ServiceDef serviceB = new ServiceDef();
         serviceB.setName("service_b");
         Dependency depB = new Dependency();
         depB.setMes(MasterElectionStrategy.SAME_NODE_OR_RANDOM);
-        depB.setMasterService("service_c");
+        depB.setMasterService(Service.from("service_c"));
         depB.setNumberOfMasters(1);
         serviceB.addDependency (depB);
         def.addService(serviceB);
 
-        Service serviceC = new Service();
+        ServiceDef serviceC = new ServiceDef();
         serviceC.setName("service_c");
         def.addService(serviceC);
 
-        Service serviceD = new Service();
+        ServiceDef serviceD = new ServiceDef();
         serviceD.setName("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.FIRST_NODE);
-        depD.setMasterService("service_c");
+        depD.setMasterService(Service.from("service_c"));
         depD.setNumberOfMasters(1);
         serviceD.addDependency (depD);
         def.addService(serviceD);
@@ -194,35 +196,35 @@ public class TopologyTest {
 
     public void initRandomDependencies() {
 
-        Service serviceA = new Service();
+        ServiceDef serviceA = new ServiceDef();
         serviceA.setName("service_a");
         Dependency depA = new Dependency();
         depA.setMes(MasterElectionStrategy.RANDOM);
-        depA.setMasterService("service_b");
+        depA.setMasterService(Service.from("service_b"));
         depA.setNumberOfMasters(1);
         serviceA.addDependency (depA);
         def.addService(serviceA);
 
-        Service serviceB = new Service();
+        ServiceDef serviceB = new ServiceDef();
         serviceB.setName("service_b");
         Dependency depB = new Dependency();
         depB.setMes(MasterElectionStrategy.RANDOM);
-        depB.setMasterService("service_c");
+        depB.setMasterService(Service.from("service_c"));
         depB.setNumberOfMasters(2);
         serviceB.addDependency (depB);
         def.addService(serviceB);
 
-        Service serviceC = new Service();
+        ServiceDef serviceC = new ServiceDef();
         serviceC.setName("service_c");
         def.addService(serviceC);
 
-        Service serviceD = new Service();
+        ServiceDef serviceD = new ServiceDef();
         serviceD.setName("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.FIRST_NODE);
-        depD.setMasterService("service_c");
+        depD.setMasterService(Service.from("service_c"));
         depD.setNumberOfMasters(2);
         serviceD.addDependency (depD);
         def.addService(serviceD);
@@ -230,30 +232,30 @@ public class TopologyTest {
 
     public void initRandomDependenciesFewer() {
 
-        Service serviceA = new Service();
+        ServiceDef serviceA = new ServiceDef();
         serviceA.setName("service_a");
         def.addService(serviceA);
 
-        Service serviceB = new Service();
+        ServiceDef serviceB = new ServiceDef();
         serviceB.setName("service_b");
         Dependency depB = new Dependency();
         depB.setMes(MasterElectionStrategy.RANDOM);
-        depB.setMasterService("service_c");
+        depB.setMasterService(Service.from("service_c"));
         depB.setNumberOfMasters(2);
         serviceB.addDependency (depB);
         def.addService(serviceB);
 
-        Service serviceC = new Service();
+        ServiceDef serviceC = new ServiceDef();
         serviceC.setName("service_c");
         def.addService(serviceC);
 
-        Service serviceD = new Service();
+        ServiceDef serviceD = new ServiceDef();
         serviceD.setName("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.FIRST_NODE);
-        depD.setMasterService("service_c");
+        depD.setMasterService(Service.from("service_c"));
         depD.setNumberOfMasters(2);
         serviceD.addDependency (depD);
         def.addService(serviceD);
@@ -261,35 +263,35 @@ public class TopologyTest {
 
     public void initRandomNodeAfterOrSameDependencies() {
 
-        Service serviceA = new Service();
+        ServiceDef serviceA = new ServiceDef();
         serviceA.setName("service_a");
         Dependency depA = new Dependency();
         depA.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER_OR_SAME);
-        depA.setMasterService("service_b");
+        depA.setMasterService(Service.from("service_b"));
         depA.setNumberOfMasters(1);
         serviceA.addDependency (depA);
         def.addService(serviceA);
 
-        Service serviceB = new Service();
+        ServiceDef serviceB = new ServiceDef();
         serviceB.setName("service_b");
         Dependency depB = new Dependency();
         depB.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER_OR_SAME);
-        depB.setMasterService("service_c");
+        depB.setMasterService(Service.from("service_c"));
         depB.setNumberOfMasters(1);
         serviceB.addDependency (depB);
         def.addService(serviceB);
 
-        Service serviceC = new Service();
+        ServiceDef serviceC = new ServiceDef();
         serviceC.setName("service_c");
         def.addService(serviceC);
 
-        Service serviceD = new Service();
+        ServiceDef serviceD = new ServiceDef();
         serviceD.setName("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.RANDOM);
-        depD.setMasterService("service_c");
+        depD.setMasterService(Service.from("service_c"));
         depD.setNumberOfMasters(1);
         serviceD.addDependency (depD);
         def.addService(serviceD);
@@ -297,35 +299,35 @@ public class TopologyTest {
 
     public void initRandomNodeAfterDependencies() {
 
-        Service serviceA = new Service();
+        ServiceDef serviceA = new ServiceDef();
         serviceA.setName("service_a");
         Dependency depA = new Dependency();
         depA.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER);
-        depA.setMasterService("service_b");
+        depA.setMasterService(Service.from("service_b"));
         depA.setNumberOfMasters(1);
         serviceA.addDependency (depA);
         def.addService(serviceA);
 
-        Service serviceB = new Service();
+        ServiceDef serviceB = new ServiceDef();
         serviceB.setName("service_b");
         Dependency depB = new Dependency();
         depB.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER);
-        depB.setMasterService("service_c");
+        depB.setMasterService(Service.from("service_c"));
         depB.setNumberOfMasters(1);
         serviceB.addDependency (depB);
         def.addService(serviceB);
 
-        Service serviceC = new Service();
+        ServiceDef serviceC = new ServiceDef();
         serviceC.setName("service_c");
         def.addService(serviceC);
 
-        Service serviceD = new Service();
+        ServiceDef serviceD = new ServiceDef();
         serviceD.setName("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.RANDOM);
-        depD.setMasterService("service_c");
+        depD.setMasterService(Service.from("service_c"));
         depD.setNumberOfMasters(1);
         serviceD.addDependency (depD);
         def.addService(serviceD);
@@ -333,21 +335,21 @@ public class TopologyTest {
 
     public void initAdditionalEnvironment() {
 
-        Service serviceA = new Service();
+        ServiceDef serviceA = new ServiceDef();
         serviceA.setName("service_a");
         serviceA.addAdditionalEnvironment("SERVICE_NUMBER_0_BASED");
         def.addService(serviceA);
 
-        Service serviceB = new Service();
+        ServiceDef serviceB = new ServiceDef();
         serviceB.setName("service_b");
         def.addService(serviceB);
 
-        Service serviceC = new Service();
+        ServiceDef serviceC = new ServiceDef();
         serviceC.setName("service_c");
         serviceC.addAdditionalEnvironment("SERVICE_NUMBER_1_BASED");
         def.addService(serviceC);
 
-        Service serviceD = new Service();
+        ServiceDef serviceD = new ServiceDef();
         serviceD.setName("service_d");
         serviceD.setKubernetes(true);
         def.addService(serviceD);
@@ -355,30 +357,30 @@ public class TopologyTest {
 
     public void initAdditionalNodeList() {
 
-        Service serviceA = new Service();
+        ServiceDef serviceA = new ServiceDef();
         serviceA.setName("service_a");
         serviceA.addAdditionalEnvironment("ALL_NODES_LIST_service_a");
         serviceA.setMemoryConsumptionSize(MemoryConsumptionSize.LARGE);
         def.addService(serviceA);
 
-        Service serviceB = new Service();
+        ServiceDef serviceB = new ServiceDef();
         serviceB.setName("service_b");
         serviceB.setMemoryConsumptionSize(MemoryConsumptionSize.MEDIUM);
         def.addService(serviceB);
 
-        Service serviceC = new Service();
+        ServiceDef serviceC = new ServiceDef();
         serviceC.setName("service_c");
         serviceC.addAdditionalEnvironment("ALL_NODES_LIST_service_b");
         serviceC.setMemoryConsumptionSize(MemoryConsumptionSize.NEGLIGIBLE);
         def.addService(serviceC);
 
-        Service serviceD = new Service();
+        ServiceDef serviceD = new ServiceDef();
         serviceD.setName("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.FIRST_NODE);
-        depD.setMasterService("service_c");
+        depD.setMasterService(Service.from("service_c"));
         depD.setNumberOfMasters(1);
         serviceD.addDependency (depD);
         def.addService(serviceD);
@@ -387,31 +389,31 @@ public class TopologyTest {
 
     public void initAdditionalNodeListWithAdditionalMemory() {
 
-        Service serviceA = new Service();
+        ServiceDef serviceA = new ServiceDef();
         serviceA.setName("service_a");
         serviceA.addAdditionalEnvironment("ALL_NODES_LIST_service_a");
         serviceA.setMemoryConsumptionSize(MemoryConsumptionSize.LARGE);
         def.addService(serviceA);
 
-        Service serviceB = new Service();
+        ServiceDef serviceB = new ServiceDef();
         serviceB.setName("service_b");
         serviceB.setMemoryConsumptionSize(MemoryConsumptionSize.MEDIUM);
-        serviceB.addAdditionalMemory("service_c");
+        serviceB.addAdditionalMemory(Service.from("service_c"));
         def.addService(serviceB);
 
-        Service serviceC = new Service();
+        ServiceDef serviceC = new ServiceDef();
         serviceC.setName("service_c");
         serviceC.addAdditionalEnvironment("ALL_NODES_LIST_service_b");
         serviceC.setMemoryConsumptionSize(MemoryConsumptionSize.NEGLIGIBLE);
         def.addService(serviceC);
 
-        Service serviceD = new Service();
+        ServiceDef serviceD = new ServiceDef();
         serviceD.setName("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.FIRST_NODE);
-        depD.setMasterService("service_c");
+        depD.setMasterService(Service.from("service_c"));
         depD.setNumberOfMasters(1);
         serviceD.addDependency (depD);
         def.addService(serviceD);
@@ -425,7 +427,7 @@ public class TopologyTest {
         NodesConfigWrapper nodesConfig = createTestNodesConfig();
         KubernetesServicesConfigWrapper kubeServicesConfig = createTestKubernetesConfig();
 
-        Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_B_1=192.168.10.12\n" +
@@ -438,15 +440,6 @@ public class TopologyTest {
             put("service_d_install", "on");
             put("service_d_cpu", "1");
             put("service_d_ram", "1024m");
-        }});
-    }
-
-    private ServicesInstallStatusWrapper createTestInstallStatus() {
-        return new ServicesInstallStatusWrapper(new HashMap<>() {{
-            put("service_a" + ServicesInstallStatusWrapper.INSTALLED_ON_IP_FLAG + "192-168-10-11", "OK");
-            put("service_c" + ServicesInstallStatusWrapper.INSTALLED_ON_IP_FLAG + "192-168-10-11", "OK");
-            put("service_c" + ServicesInstallStatusWrapper.INSTALLED_ON_IP_FLAG + "192-168-10-12", "OK");
-            put("service_d" + ServicesInstallStatusWrapper.INSTALLED_ON_IP_FLAG + ServicesInstallStatusWrapper.KUBERNETES_NODE, "OK");
         }});
     }
 
@@ -470,7 +463,7 @@ public class TopologyTest {
         NodesConfigWrapper nodesConfig = createTestNodesConfig();
         nodesConfig.setValueForPath("service_b", "1");
 
-        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                 "export SELF_MASTER_SERVICE_B_1921681011=192.168.10.11\n" +
@@ -486,7 +479,7 @@ public class TopologyTest {
 
         KubernetesServicesConfigWrapper kubeServicesConfig = createTestKubernetesConfig();
 
-        Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_B_1=192.168.10.12\n" +
@@ -499,7 +492,7 @@ public class TopologyTest {
 
         initRandomNodeAfterDependencies();
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("service_a1", "on");
                 put("service_c1", "on");
@@ -510,7 +503,7 @@ public class TopologyTest {
                 put("service_c3", "on");
         }});
 
-        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_B_1921681011=192.168.10.13\n" +
@@ -523,7 +516,7 @@ public class TopologyTest {
 
         initRandomNodeAfterOrSameDependencies();
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("service_c1", "on");
@@ -534,7 +527,7 @@ public class TopologyTest {
             put("service_c3", "on");
         }});
 
-        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_B_1921681011=192.168.10.13\n" +
@@ -547,14 +540,14 @@ public class TopologyTest {
 
         initRandomNodeAfterOrSameDependencies();
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("service_b1", "on");
             put("service_c1", "on");
         }});
 
-        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_B_1921681011=192.168.10.11\n" +
@@ -566,7 +559,7 @@ public class TopologyTest {
 
         initRandomNodeAfterDependencies();
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("service_a1", "on");
                 put("service_b1", "on");
@@ -581,7 +574,7 @@ public class TopologyTest {
                 put("service_c4", "on");
         }});
 
-        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_B_1921681011=192.168.10.12\n" +
@@ -599,16 +592,16 @@ public class TopologyTest {
         def = new ServicesDefinitionImpl();
         def.setSetupService (setupService);
 
-        Service serviceA = new Service();
+        ServiceDef serviceA = new ServiceDef();
         serviceA.setName("gluster");
         Dependency depA = new Dependency();
         depA.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER);
-        depA.setMasterService("gluster");
+        depA.setMasterService(Service.from ("gluster"));
         depA.setNumberOfMasters(1);
         serviceA.addDependency (depA);
         def.addService(serviceA);
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("node_id2", "192.168.10.13-192.168.10.14");
                 put("node_id3", "192.168.10.12");
@@ -617,7 +610,7 @@ public class TopologyTest {
                 put("gluster3", "on");
         }});
 
-        Topology topology = Topology.create(nrr.resolveRanges(nodesConfig), KubernetesServicesConfigWrapper.empty(),  def, null, "192.168.10.11");
+        Topology topology = Topology.create(nrr.resolveRanges(nodesConfig), KubernetesServicesConfigWrapper.empty(),  def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                 "export MASTER_GLUSTER_1921681011=192.168.10.13\n" +
@@ -652,7 +645,7 @@ public class TopologyTest {
 
         initAdditionalEnvironment();
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("service_a1", "on");
                 put("node_id2", "192.168.10.12");
@@ -661,7 +654,7 @@ public class TopologyTest {
                 put("service_b3", "on");
         }});
 
-        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
     }
@@ -678,7 +671,7 @@ public class TopologyTest {
             put("service_b", "1");
         }});
 
-        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_B_1=192.168.10.11\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
@@ -692,12 +685,12 @@ public class TopologyTest {
         }});
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class,
-                () -> Topology.create(nodesConfig2, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11")
+                () -> Topology.create(nodesConfig2, KubernetesServicesConfigWrapper.empty(), def, null, Node.fromAddress("192.168.10.11"))
         );
 
         assertEquals ("Dependency service_c for service service_b could not found occurence 1", exception.getMessage());
 
-        nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("node_id2", "192.168.10.12");
@@ -706,7 +699,7 @@ public class TopologyTest {
             put("service_d", "1");
         }});
 
-        topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
+        topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_B_1=192.168.10.11\n" +
@@ -728,7 +721,7 @@ public class TopologyTest {
                 put("service_c3", "on");
         }});
 
-        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                 "\n" +
@@ -798,7 +791,7 @@ public class TopologyTest {
 
         Topology topology = Topology.create(
                 StandardSetupHelpers.getStandard2NodesSetup(),
-                kubeConfig, def, null, "192.168.10.11");
+                kubeConfig, def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                         "export MASTER_GLUSTER_1=192.168.10.11\n" +
@@ -853,7 +846,7 @@ public class TopologyTest {
 
         Topology topology = Topology.create(
                 StandardSetupHelpers.getStandard2NodesSetup(),
-                StandardSetupHelpers.getStandardKubernetesConfig(), def, null, "192.168.10.11");
+                StandardSetupHelpers.getStandardKubernetesConfig(), def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                         "export MASTER_GLUSTER_1=192.168.10.11\n" +
@@ -928,10 +921,10 @@ public class TopologyTest {
     public void testMemoryModel() throws Exception {
 
         MemoryModel memoryModel = new MemoryModel(new HashMap<>(){{
-            put ("192.168.10.11", new HashMap<>(){{
-                put ("service_a", Long.valueOf("100"));
-                put ("service_b", Long.valueOf("200"));
-                put ("service_c", Long.valueOf("300"));
+            put (Node.fromAddress("192.168.10.11"), new HashMap<>(){{
+                put (Service.from("service_a"), Long.valueOf("100"));
+                put (Service.from("service_b"), Long.valueOf("200"));
+                put (Service.from("service_c"), Long.valueOf("300"));
             }});
         }});
 
@@ -944,7 +937,7 @@ public class TopologyTest {
             put("service_c1", "on");
         }});
 
-        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                 "\n" +
@@ -973,23 +966,23 @@ public class TopologyTest {
     public void testMemoryModelWithAdditional() throws Exception {
 
         MemoryModel memoryModel = new MemoryModel(new HashMap<>(){{
-            put ("192.168.10.11", new HashMap<>(){{
-                put ("service_a", Long.valueOf("100"));
-                put ("service_b", Long.valueOf("200"));
-                put ("service_c", Long.valueOf("300"));
+            put (Node.fromAddress("192.168.10.11"), new HashMap<>(){{
+                put (Service.from("service_a"), Long.valueOf("100"));
+                put (Service.from("service_b"), Long.valueOf("200"));
+                put (Service.from("service_c"), Long.valueOf("300"));
             }});
         }});
 
 
         initAdditionalNodeListWithAdditionalMemory();
 
-        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<String, Object>() {{
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("service_a1", "on");
             put("service_b1", "on");
         }});
 
-        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                 "\n" +
@@ -1037,7 +1030,7 @@ public class TopologyTest {
 
         KubernetesServicesConfigWrapper kubeServicesConfig = createTestKubernetesConfig();
 
-        Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_C_1=192.168.10.12\n" +
@@ -1075,10 +1068,10 @@ public class TopologyTest {
     }
 
     @Test
-    public void testGetVariableName() throws Exception {
+    public void testGetVariableName() {
         Dependency depA = new Dependency();
         depA.setMes(MasterElectionStrategy.FIRST_NODE);
-        depA.setMasterService("mesos-master");
+        depA.setMasterService(Service.from("mesos-master"));
         depA.setNumberOfMasters(1);
 
         Topology topology = new Topology();
@@ -1104,7 +1097,7 @@ public class TopologyTest {
 
         KubernetesServicesConfigWrapper kubeServicesConfig = createTestKubernetesConfig();
 
-        Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                         "\n" +
@@ -1140,7 +1133,7 @@ public class TopologyTest {
                 put("service_c5", "on");
         }});
 
-        topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
+        topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                         "\n" +
@@ -1165,28 +1158,28 @@ public class TopologyTest {
     }
 
     @Test
-    public void testKubernetesServiceUnsupportedDependencies() throws Exception {
+    public void testKubernetesServiceUnsupportedDependencies() {
 
-        Service serviceA = new Service();
+        ServiceDef serviceA = new ServiceDef();
         serviceA.setName("service_a");
         Dependency depA = new Dependency();
         depA.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER);
-        depA.setMasterService("service_b");
+        depA.setMasterService(Service.from("service_b"));
         depA.setNumberOfMasters(1);
         serviceA.addDependency (depA);
         def.addService(serviceA);
 
-        Service serviceB = new Service();
+        ServiceDef serviceB = new ServiceDef();
         serviceB.setName("service_b");
         def.addService(serviceB);
 
-        Service serviceD = new Service();
+        ServiceDef serviceD = new ServiceDef();
         serviceD.setName("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.SAME_NODE);
-        depD.setMasterService("service_b");
+        depD.setMasterService(Service.from("service_b"));
         depD.setNumberOfMasters(1);
         serviceD.addDependency (depD);
         def.addService(serviceD);
@@ -1202,21 +1195,21 @@ public class TopologyTest {
         KubernetesServicesConfigWrapper kubeServicesConfig = createTestKubernetesConfig();
 
         ServiceDefinitionException exception = assertThrows(ServiceDefinitionException.class,
-                () -> Topology.create(nodesConfig, kubeServicesConfig,  def, null, "192.168.10.11"));
+                () -> Topology.create(nodesConfig, kubeServicesConfig,  def, null, Node.fromAddress("192.168.10.11")));
 
         assertEquals("Service service_d defines a SAME_NODE dependency on service_b, which is not supported for kubernetes services", exception.getMessage());
 
         depD.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER);
 
         exception = assertThrows(ServiceDefinitionException.class,
-                () -> Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11"));
+                () -> Topology.create(nodesConfig, kubeServicesConfig, def, null, Node.fromAddress("192.168.10.11")));
 
         assertEquals("Service service_d defines a RANDOM_NODE_AFTER dependency on service_b, which is not supported for kubernetes services", exception.getMessage());
 
         depD.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER_OR_SAME);
 
         exception = assertThrows(ServiceDefinitionException.class,
-                () -> Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11"));
+                () -> Topology.create(nodesConfig, kubeServicesConfig, def, null, Node.fromAddress("192.168.10.11")));
 
         assertEquals("Service service_d defines a RANDOM_NODE_AFTER_OR_SAME dependency on service_b, which is not supported for kubernetes services", exception.getMessage());
     }
@@ -1224,22 +1217,22 @@ public class TopologyTest {
     @Test
     public void testKubernetesOnKubernetesDependencies() throws Exception {
 
-        Service serviceA = new Service();
+        ServiceDef serviceA = new ServiceDef();
         serviceA.setName("service_a");
         def.addService(serviceA);
 
-        Service serviceB = new Service();
+        ServiceDef serviceB = new ServiceDef();
         serviceB.setKubernetes(true);
         serviceB.setName("service_b");
         def.addService(serviceB);
 
-        Service serviceD = new Service();
+        ServiceDef serviceD = new ServiceDef();
         serviceD.setName("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
         depD.setMes(MasterElectionStrategy.RANDOM);
-        depD.setMasterService("service_b");
+        depD.setMasterService(Service.from("service_b"));
         depD.setNumberOfMasters(1);
         serviceD.addDependency (depD);
         def.addService(serviceD);
@@ -1255,13 +1248,13 @@ public class TopologyTest {
         KubernetesServicesConfigWrapper kubeServicesConfig = createTestKubernetesConfig();
 
         ServiceDefinitionException exception = assertThrows(ServiceDefinitionException.class,
-                () -> Topology.create(nodesConfig, kubeServicesConfig,  def, null, "192.168.10.11"));
+                () -> Topology.create(nodesConfig, kubeServicesConfig,  def, null, Node.fromAddress("192.168.10.11")));
 
         assertEquals("Service service_d defines a dependency on another kube service service_b but that service is not going to be installed.", exception.getMessage());
 
         kubeServicesConfig.setValueForPath("service_b_install", "on");
 
-        Topology topology = Topology.create(nodesConfig, kubeServicesConfig,  def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, kubeServicesConfig,  def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                 "\n" +
@@ -1296,7 +1289,7 @@ public class TopologyTest {
 
         KubernetesServicesConfigWrapper kubeServicesConfig = createTestKubernetesConfig();
 
-        Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_C_1=192.168.10.11\n" +
@@ -1326,7 +1319,7 @@ public class TopologyTest {
 
         KubernetesServicesConfigWrapper kubeServicesConfig = createTestKubernetesConfig();
 
-        Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, "192.168.10.11");
+        Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_B_1=192.168.10.11\n" +

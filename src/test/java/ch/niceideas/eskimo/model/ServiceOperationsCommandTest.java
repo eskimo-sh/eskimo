@@ -42,6 +42,8 @@ import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,14 +102,14 @@ public class ServiceOperationsCommandTest {
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         assertEquals(1, oc.getInstallations().size());
-        assertEquals("kube-master", oc.getInstallations().get(0).getService());
-        assertEquals("192.168.10.11", oc.getInstallations().get(0).getNode());
+        assertEquals(Service.from("kube-master"), oc.getInstallations().get(0).getService());
+        assertEquals(Node.fromAddress("192.168.10.11"), oc.getInstallations().get(0).getNode());
 
         assertEquals(0, oc.getUninstallations().size());
 
         assertEquals(2, oc.getRestarts().size());
-        assertEquals("kube-slave", oc.getRestarts().get(0).getService());
-        assertEquals("192.168.10.11", oc.getRestarts().get(0).getNode());
+        assertEquals(Service.from("kube-slave"), oc.getRestarts().get(0).getService());
+        assertEquals(Node.fromAddress("192.168.10.11"), oc.getRestarts().get(0).getNode());
     }
 
     @Test
@@ -124,12 +126,12 @@ public class ServiceOperationsCommandTest {
         assertEquals(0, oc.getInstallations().size());
 
         assertEquals(1, oc.getUninstallations().size());
-        assertEquals("kube-master", oc.getUninstallations().get(0).getService());
-        assertEquals("192.168.10.11", oc.getUninstallations().get(0).getNode());
+        assertEquals(Service.from("kube-master"), oc.getUninstallations().get(0).getService());
+        assertEquals(Node.fromAddress("192.168.10.11"), oc.getUninstallations().get(0).getNode());
 
         assertEquals(2, oc.getRestarts().size());
-        assertEquals("kube-slave", oc.getRestarts().get(0).getService());
-        assertEquals("192.168.10.11", oc.getRestarts().get(0).getNode());
+        assertEquals(Service.from("kube-slave"), oc.getRestarts().get(0).getService());
+        assertEquals(Node.fromAddress("192.168.10.11"), oc.getRestarts().get(0).getNode());
     }
 
     @Test
@@ -137,12 +139,12 @@ public class ServiceOperationsCommandTest {
 
         ServiceOperationsCommand oc = prepareFiveOps();
 
-        //System.err.println (oc.toJSON());
+        System.err.println (oc.toJSON());
 
         assertTrue (new JSONObject(
-                "{\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
-                        "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
-                        "\"installations\":[{\"zookeeper\":\"192.168.10.11\"},{\"etcd\":\"192.168.10.13\"}]}")
+                "{\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
+                "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
+                "\"installations\":[{\"zookeeper\":\"192.168.10.11\"},{\"etcd\":\"192.168.10.13\"}]}")
                 .similar(oc.toJSON()));
     }
 
@@ -159,8 +161,8 @@ public class ServiceOperationsCommandTest {
 
         assertEquals(1, oc.getInstallations().size());
 
-        assertEquals("gluster", oc.getInstallations().get(0).getService());
-        assertEquals("192.168.10.11", oc.getInstallations().get(0).getNode());
+        assertEquals(Service.from("gluster"), oc.getInstallations().get(0).getService());
+        assertEquals(Node.fromAddress("192.168.10.11"), oc.getInstallations().get(0).getNode());
 
         assertEquals(0, oc.getUninstallations().size());
 
@@ -192,7 +194,7 @@ public class ServiceOperationsCommandTest {
         ServiceOperationsCommand oc = ServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
-        //System.err.println (oc.toJSON());
+        System.err.println (oc.toJSON());
 
         assertTrue (new JSONObject("{" +
                 "\"restarts\":[]," +
@@ -207,15 +209,21 @@ public class ServiceOperationsCommandTest {
 
         ServiceOperationsCommand oc = new ServiceOperationsCommand(NodesConfigWrapper.empty());
 
-        oc.addInstallation(new ServiceOperationsCommand.ServiceOperationId("installation", "elasticsearch", "192.168.10.11"));
-        oc.addInstallation(new ServiceOperationsCommand.ServiceOperationId("installation", "kibana", "192.168.10.11"));
-        oc.addInstallation(new ServiceOperationsCommand.ServiceOperationId("installation", "cerebro", "192.168.10.11"));
+        oc.addInstallation(new ServiceOperationsCommand.ServiceOperationId(
+                ServiceOperationsCommand.ServiceOperation.INSTALLATION, Service.from("elasticsearch"), Node.fromAddress("192.168.10.11")));
+        oc.addInstallation(new ServiceOperationsCommand.ServiceOperationId(
+                ServiceOperationsCommand.ServiceOperation.INSTALLATION, Service.from("kibana"), Node.fromAddress("192.168.10.11")));
+        oc.addInstallation(new ServiceOperationsCommand.ServiceOperationId(
+                ServiceOperationsCommand.ServiceOperation.INSTALLATION, Service.from("cerebro"), Node.fromAddress("192.168.10.11")));
 
-        oc.addUninstallation(new ServiceOperationsCommand.ServiceOperationId("uninstallation", "cerebro", "192.168.10.13"));
-        oc.addUninstallation(new ServiceOperationsCommand.ServiceOperationId("uninstallation", "kibana", "192.168.10.13"));
-        oc.addUninstallation(new ServiceOperationsCommand.ServiceOperationId("uninstallation", "logstash", "192.168.10.13"));
+        oc.addUninstallation(new ServiceOperationsCommand.ServiceOperationId(
+                ServiceOperationsCommand.ServiceOperation.UNINSTALLATION, Service.from("cerebro"), Node.fromAddress("192.168.10.13")));
+        oc.addUninstallation(new ServiceOperationsCommand.ServiceOperationId(
+                ServiceOperationsCommand.ServiceOperation.UNINSTALLATION, Service.from("kibana"), Node.fromAddress("192.168.10.13")));
+        oc.addUninstallation(new ServiceOperationsCommand.ServiceOperationId(
+                ServiceOperationsCommand.ServiceOperation.UNINSTALLATION, Service.from("logstash"), Node.fromAddress("192.168.10.13")));
 
-        oc.addRestartIfNotInstalled("zeppelin", "192.168.10.13");
+        oc.addRestartIfNotInstalled(Service.from("zeppelin"), Node.fromAddress("192.168.10.13"));
 
         assertTrue(new JSONObject("{\n" +
                 "  \"installations\": [\n" +
@@ -269,10 +277,10 @@ public class ServiceOperationsCommandTest {
         ServiceOperationsCommand oc = ServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
-        //System.err.println (oc.toJSON());
+        System.err.println (oc.toJSON());
 
-        assertTrue (new JSONObject("{" +
-                "\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
+        assertTrue (new JSONObject(
+                "{\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
                 "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
                 "\"installations\":[{\"zookeeper\":\"192.168.10.11\"},{\"etcd\":\"192.168.10.13\"}]}")
                 .similar(oc.toJSON()));
@@ -296,24 +304,9 @@ public class ServiceOperationsCommandTest {
         System.err.println (oc2.toJSON());
 
         assertTrue (new JSONObject(
-                "{\"restarts\":[" +
-                        "{\"gluster\":\"192.168.10.11\"}," +
-                        "{\"gluster\":\"192.168.10.13\"}," +
-                        "{\"etcd\":\"192.168.10.11\"}," +
-                        "{\"kube-master\":\"192.168.10.11\"}," +
-                        "{\"kube-master\":\"192.168.10.13\"}," +
-                        "{\"kube-slave\":\"192.168.10.13\"}," +
-                        "{\"elasticsearch\":\"(kubernetes)\"}," +
-                        "{\"kafka\":\"(kubernetes)\"}," +
-                        "{\"kafka-manager\":\"(kubernetes)\"}," +
-                        "{\"logstash\":\"(kubernetes)\"}," +
-                        "{\"zeppelin\":\"(kubernetes)\"}]," +
-                 "\"uninstallations\":[" +
-                        "{\"etcd\":\"192.168.10.11\"}," +
-                        "{\"kube-master\":\"192.168.10.13\"}," +
-                        "{\"kube-slave\":\"192.168.10.11\"}," +
-                        "{\"zookeeper\":\"192.168.10.13\"}]," +
-                 "\"installations\":[]}")
+                "{\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"etcd\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.13\"},{\"kube-slave\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
+                "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.13\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
+                "\"installations\":[]}")
                 .similar(oc2.toJSON()));
     }
 
@@ -333,10 +326,10 @@ public class ServiceOperationsCommandTest {
         ServiceOperationsCommand oc = ServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
-        //System.err.println (oc.toJSON());
+        System.err.println (oc.toJSON());
 
-        assertTrue(new JSONObject("{" +
-                "\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
+        assertTrue(new JSONObject(
+                "{\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
                 "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
                 "\"installations\":[{\"zookeeper\":\"192.168.10.11\"},{\"etcd\":\"192.168.10.13\"}]}")
                 .similar(oc.toJSON()));
@@ -390,10 +383,10 @@ public class ServiceOperationsCommandTest {
         ServiceOperationsCommand oc = ServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
-        //System.err.println (oc.toJSON());
+        System.err.println (oc.toJSON());
 
-        assertTrue(new JSONObject("{" +
-                "\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
+        assertTrue(new JSONObject(
+                "{\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
                 "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
                 "\"installations\":[{\"zookeeper\":\"192.168.10.11\"},{\"etcd\":\"192.168.10.13\"}]}")
                 .similar(oc.toJSON()));
@@ -445,8 +438,8 @@ public class ServiceOperationsCommandTest {
                 "    {\"gluster\": \"192.168.10.13\"},\n" +
                 "    {\"elasticsearch\": \"(kubernetes)\"},\n" +
                 "    {\"kafka\": \"(kubernetes)\"},\n" +
-                "    {\"kafka-manager\": \"(kubernetes)\"},\n" +
                 "    {\"logstash\": \"(kubernetes)\"},\n" +
+                "    {\"kafka-manager\": \"(kubernetes)\"},\n" +
                 "    {\"zeppelin\": \"(kubernetes)\"}\n" +
                 "  ],\n" +
                 "  \"uninstallations\": [\n" +
@@ -498,19 +491,19 @@ public class ServiceOperationsCommandTest {
 
         assertEquals(
                 "Check--Install_Base-System_192-168-10-11,\n" +
-                "Check--Install_Base-System_192-168-10-13,\n" +
-                "installation_zookeeper_192-168-10-11,\n" +
-                "uninstallation_zookeeper_192-168-10-13,\n" +
-                "restart_gluster_192-168-10-11,\n" +
-                "restart_gluster_192-168-10-13,\n" +
-                "installation_etcd_192-168-10-13,\n" +
-                "uninstallation_etcd_192-168-10-11,\n" +
-                "uninstallation_kube-slave_192-168-10-11,\n" +
-                "restart_elasticsearch_kubernetes,\n" +
-                "restart_logstash_kubernetes,\n" +
-                "restart_kafka_kubernetes,\n" +
-                "restart_kafka-manager_kubernetes,\n" +
-                "restart_zeppelin_kubernetes",
+                        "Check--Install_Base-System_192-168-10-13,\n" +
+                        "installation_zookeeper_192-168-10-11,\n" +
+                        "uninstallation_zookeeper_192-168-10-13,\n" +
+                        "restart_gluster_192-168-10-11,\n" +
+                        "restart_gluster_192-168-10-13,\n" +
+                        "installation_etcd_192-168-10-13,\n" +
+                        "uninstallation_etcd_192-168-10-11,\n" +
+                        "uninstallation_kube-slave_192-168-10-11,\n" +
+                        "restart_elasticsearch_kubernetes,\n" +
+                        "restart_kafka_kubernetes,\n" +
+                        "restart_kafka-manager_kubernetes,\n" +
+                        "restart_logstash_kubernetes,\n" +
+                        "restart_zeppelin_kubernetes",
                 opsInOrder.stream()
                         .map(ServiceOperationsCommand.ServiceOperationId::toString)
                         .collect(Collectors.joining(","))

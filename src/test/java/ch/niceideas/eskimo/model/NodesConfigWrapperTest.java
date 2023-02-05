@@ -34,6 +34,8 @@
 
 package ch.niceideas.eskimo.model;
 
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.junit.jupiter.api.Test;
 
 import java.util.stream.Collectors;
@@ -73,20 +75,20 @@ public class NodesConfigWrapperTest {
 
     @Test
     public void testHasServiceConfigured() {
-        assertTrue(ncw.hasServiceConfigured("kube-master"));
-        assertTrue(ncw.hasServiceConfigured("ntp"));
-        assertTrue(ncw.hasServiceConfigured("kafka-cli"));
-        assertFalse(ncw.hasServiceConfigured("kafka"));
-        assertFalse(ncw.hasServiceConfigured("blablabla"));
+        assertTrue(ncw.hasServiceConfigured(Service.from ("kube-master")));
+        assertTrue(ncw.hasServiceConfigured(Service.from ("ntp")));
+        assertTrue(ncw.hasServiceConfigured(Service.from ("kafka-cli")));
+        assertFalse(ncw.hasServiceConfigured(Service.from ("kafka")));
+        assertFalse(ncw.hasServiceConfigured(Service.from ("blablabla")));
     }
 
     @Test
     public void testIsServiceOnNode() {
-        assertTrue(ncw.isServiceOnNode("kube-master", 1));
-        assertFalse(ncw.isServiceOnNode("kube-master", 2));
+        assertTrue(ncw.isServiceOnNode(Service.from ("kube-master"), 1));
+        assertFalse(ncw.isServiceOnNode(Service.from ("kube-master"), 2));
 
-        assertTrue(ncw.isServiceOnNode("zookeeper", 1));
-        assertFalse(ncw.isServiceOnNode("zookeeper", 2));
+        assertTrue(ncw.isServiceOnNode(Service.from ("zookeeper"), 1));
+        assertFalse(ncw.isServiceOnNode(Service.from ("zookeeper"), 2));
     }
 
     @Test
@@ -100,48 +102,45 @@ public class NodesConfigWrapperTest {
     }
 
     @Test
-    public void testGetNodeAddress() {
-        assertEquals ("192.168.56.21", ncw.getNodeAddress(1));
-        assertEquals ("192.168.56.22", ncw.getNodeAddress(2));
-        assertEquals ("192.168.56.23", ncw.getNodeAddress(3));
-    }
-
-    @Test
-    public void testGetNodeName() {
-        assertEquals ("192-168-56-21", ncw.getNodeName(1));
-        assertEquals ("192-168-56-22", ncw.getNodeName(2));
-        assertEquals ("192-168-56-23", ncw.getNodeName(3));
+    public void testGetNode() {
+        assertEquals (Node.fromAddress("192.168.56.21"), ncw.getNode(1));
+        assertEquals (Node.fromAddress("192.168.56.22"), ncw.getNode(2));
+        assertEquals (Node.fromAddress("192.168.56.23"), ncw.getNode(3));
     }
 
     @Test
     public void testGetAllNodeAddressesWithService() {
-        assertEquals ("192.168.56.21,192.168.56.22,192.168.56.23", String.join(",", ncw.getAllNodeAddressesWithService("ntp")));
-        assertEquals ("192.168.56.21", String.join(",", ncw.getAllNodeAddressesWithService("kube-master")));
+        assertEquals ("192.168.56.21,192.168.56.22,192.168.56.23",
+                ncw.getAllNodesWithService(Service.from("ntp")).stream().map(Node::getAddress).collect(Collectors.joining(",")));
+        assertEquals ("192.168.56.21", String.join(",",
+                ncw.getAllNodesWithService(Service.from("kube-master")).stream().map(Node::getAddress).collect(Collectors.joining(","))));
     }
 
     @Test
     public void testGetServicesForNode() throws Exception {
-        assertEquals ("elasticsearch,gluster,k8s-slave,kafka-cli,kube-master,logstash,ntp,prometheus,zookeeper", String.join(",", ncw.getServicesForNode("192.168.56.21")));
-        assertEquals ("elasticsearch,gluster,k8s-slave,kafka-cli,kube-master,logstash,ntp,prometheus,zookeeper", String.join(",", ncw.getServicesForNode(1)));
+        assertEquals ("elasticsearch,gluster,k8s-slave,kafka-cli,kube-master,logstash,ntp,prometheus,zookeeper",
+                ncw.getServicesForNode(Node.fromAddress("192.168.56.21")).stream().map(Service::getName).collect(Collectors.joining(",")));
+        assertEquals ("elasticsearch,gluster,k8s-slave,kafka-cli,kube-master,logstash,ntp,prometheus,zookeeper",
+                String.join(",", ncw.getServicesForNode(1).stream().map(Service::getName).collect(Collectors.joining(","))));
     }
 
     @Test
     public void testGetNodeNumber() throws Exception {
-        assertEquals (1, ncw.getNodeNumber("192.168.56.21"));
-        assertEquals (3, ncw.getNodeNumber("192.168.56.23"));
+        assertEquals (1, ncw.getNodeNumber(Node.fromAddress("192.168.56.21")));
+        assertEquals (3, ncw.getNodeNumber(Node.fromAddress("192.168.56.23")));
     }
 
     @Test
     public void testGetNodeNumbers() {
-        assertEquals ("1,2,3", ncw.getNodeNumbers("elasticsearch").stream().map(nbr -> "" + nbr).collect(Collectors.joining(",")));
-        assertEquals ("1,2,3", ncw.getNodeNumbers("k8s-slave").stream().map(nbr -> "" + nbr).collect(Collectors.joining(",")));
-        assertEquals ("1", ncw.getNodeNumbers("zookeeper").stream().map(nbr -> "" + nbr).collect(Collectors.joining(",")));
+        assertEquals ("1,2,3", ncw.getNodeNumbers(Service.from("elasticsearch")).stream().map(nbr -> "" + nbr).collect(Collectors.joining(",")));
+        assertEquals ("1,2,3", ncw.getNodeNumbers(Service.from("k8s-slave")).stream().map(nbr -> "" + nbr).collect(Collectors.joining(",")));
+        assertEquals ("1", ncw.getNodeNumbers(Service.from("zookeeper")).stream().map(nbr -> "" + nbr).collect(Collectors.joining(",")));
     }
 
     @Test
     public void testGetFirstNodeName() {
-        assertEquals ("192-168-56-21", ncw.getFirstNodeName("elasticsearch"));
-        assertEquals ("192-168-56-21", ncw.getFirstNodeName("ntp"));
-        assertEquals ("192-168-56-21", ncw.getFirstNodeName("zookeeper"));
+        assertEquals (Node.fromName ("192-168-56-21"), ncw.getFirstNode(Service.from ("elasticsearch")));
+        assertEquals (Node.fromName ("192-168-56-21"), ncw.getFirstNode(Service.from ("ntp")));
+        assertEquals (Node.fromName ("192-168-56-21"), ncw.getFirstNode(Service.from ("zookeeper")));
     }
 }

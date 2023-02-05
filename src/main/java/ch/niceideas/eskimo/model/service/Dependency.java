@@ -34,8 +34,8 @@
 
 package ch.niceideas.eskimo.model.service;
 
-import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.ConfigurationOwner;
+import ch.niceideas.eskimo.types.Service;
 import lombok.Getter;
 import lombok.Setter;
 import org.json.JSONObject;
@@ -48,7 +48,7 @@ public class Dependency {
     private MasterElectionStrategy mes = MasterElectionStrategy.NONE;
 
     @Getter @Setter
-    private String masterService = null;
+    private Service masterService = null;
 
     @Getter @Setter
     private int numberOfMasters = 0;
@@ -62,31 +62,33 @@ public class Dependency {
     @Getter @Setter
     private boolean dependentInstalledFirst = false; // false by default
 
-    private String conditional = null;
+    private Service conditionalDependency = null;
 
     public boolean isMandatory(ConfigurationOwner wrapper) {
         if (mandatory) {
             return true;
         }
-        if (StringUtils.isNotBlank(conditional)) {
-            return wrapper.hasServiceConfigured(conditional);
+        if (conditionalDependency != null) {
+            return wrapper.hasServiceConfigured(conditionalDependency);
         }
         return false;
     }
 
-    public void setConditional(String conditional) {
+    public void setConditionalDependency(Service conditionalDependency) {
         this.mandatory = false;
-        this.conditional = conditional;
+        this.conditionalDependency = conditionalDependency;
     }
 
     public JSONObject toJSON () {
         return new JSONObject(new HashMap<String, Object>() {{
             put("mes", mes == null ? "" : mes.name());
-            put("masterService", masterService == null ? "" : masterService);
+            put("masterService", masterService == null ? "" : masterService.getName());
             put("numberOfMasters", numberOfMasters);
             put("mandatory", mandatory);
             put("restart", restart);
-            put("conditional", conditional);
+            if (conditionalDependency != null) {
+                put("conditional", conditionalDependency.getName());
+            }
         }});
     }
 }

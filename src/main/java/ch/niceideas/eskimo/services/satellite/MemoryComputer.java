@@ -35,13 +35,15 @@
 package ch.niceideas.eskimo.services.satellite;
 
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
-import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.MemoryModel;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.services.SSHCommandException;
 import ch.niceideas.eskimo.services.SSHCommandService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SystemException;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -82,33 +84,33 @@ public class MemoryComputer {
     @Value("${system.reservedMemoryOnNodes}")
     private long reservedMemoryMb = 1000;
 
-    public MemoryModel buildMemoryModel (NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, Set<String> deadIps) throws SystemException {
-        return new MemoryModel(computeMemory(nodesConfig, kubeServicesConfig, deadIps));
+    public MemoryModel buildMemoryModel (NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, Set<Node> deadNodes) throws SystemException {
+        return new MemoryModel(computeMemory(nodesConfig, kubeServicesConfig, deadNodes));
     }
 
-    Map<String, Map<String, Long>> computeMemory(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, Set<String> deadIps) throws SystemException {
+    Map<Node, Map<Service, Long>> computeMemory(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, Set<Node> deadNodes) throws SystemException {
 
         // returns ipAdress -> service -> memory in MB
-        Map<String, Map<String, Long>> retMap = new HashMap<>();
+        Map<Node, Map<Service, Long>> retMap = new HashMap<>();
 
         // 1. Find out about available RAM on nodes
-        Map<String, Long> memoryMap = getMemoryMap(nodesConfig, deadIps);
+        Map<Node, Long> memoryMap = getMemoryMap(nodesConfig, deadNodes);
 
         // 2. for every node
-        for (Map.Entry<String, Long> entry: memoryMap.entrySet()) {
+        for (Map.Entry<Node, Long> entry: memoryMap.entrySet()) {
 
-            String node = entry.getKey();
-            Map<String, Long> nodeMemoryModel = new HashMap<>();
+            Node node = entry.getKey();
+            Map<Service, Long> nodeMemoryModel = new HashMap<>();
 
             long totalMemory = entry.getValue();
 
             // 2..1  Compute total amount of memory shards (high = 3, medium = 2, small = 1, negligible = 0)
             //       assume filesystem cache has to keep a high share (3) or medium share (2) => dynamical
-            Set<String> services = new HashSet<>(nodesConfig.getServicesForNode(node));
+            Set<Service> services = new HashSet<>(nodesConfig.getServicesForNode(node));
 
             long sumOfParts = services.stream()
-                    .map (serviceName -> servicesDefinition.getService(serviceName))
-                    .map (service -> (long) service.getMemoryConsumptionParts(servicesDefinition))
+                    .map (service -> servicesDefinition.getServiceDefinition(service))
+                    .map (serviceDef -> (long) serviceDef.getMemoryConsumptionParts(servicesDefinition))
                     .reduce( (long)(totalMemory > 10000 ? 3 : 2), Long::sum); // the filesystem cache is considered always 3 or 2
 
             // 3. Now get full memory required for Kubernetes services, divide it by number of nodes and add it to each node
@@ -116,15 +118,15 @@ public class MemoryComputer {
 
                 // 3.1 non unique services are considered on the node
                 sumOfParts += (kubeServicesConfig.getEnabledServices().stream()
-                        .map(serviceName -> servicesDefinition.getService(serviceName))
+                        .map(serviceName -> servicesDefinition.getServiceDefinition(serviceName))
                         .filter(service -> !service.isUnique())
                         .map(service -> (long) service.getMemoryConsumptionParts(servicesDefinition))
                         .reduce(0L, Long::sum));
 
                 // 3.2, Unique services sum is divided by number of nodes
                 long sumOfUniqueParts = (kubeServicesConfig.getEnabledServices().stream()
-                        .map(serviceName -> servicesDefinition.getService(serviceName))
-                        .filter(Service::isUnique)
+                        .map(serviceName -> servicesDefinition.getServiceDefinition(serviceName))
+                        .filter(ServiceDef::isUnique)
                         .map(service -> (long) service.getMemoryConsumptionParts(servicesDefinition))
                         .reduce(0L, Long::sum));
 
@@ -137,16 +139,16 @@ public class MemoryComputer {
 
             // 4.1 Now assign the memory to every node service for the node
             services.stream()
-                    .map (service -> servicesDefinition.getService(service))
+                    .map (service -> servicesDefinition.getServiceDefinition(service))
                     .filter (service -> service.getMemoryConsumptionSize().getNbrParts() > 0)
-                    .forEach(service -> nodeMemoryModel.put (service.getName(), service.getMemoryConsumptionParts(servicesDefinition) * valueOfShard));
+                    .forEach(service -> nodeMemoryModel.put (service.toService(), service.getMemoryConsumptionParts(servicesDefinition) * valueOfShard));
 
             // 4.2 Do the same for multiple kubernetes services
             if (kubeServicesConfig != null) {
                 kubeServicesConfig.getEnabledServices().stream()
-                        .map(service -> servicesDefinition.getService(service))
+                        .map(service -> servicesDefinition.getServiceDefinition(service))
                         .filter(service -> service.getMemoryConsumptionSize().getNbrParts() > 0)
-                        .forEach(service -> nodeMemoryModel.put(service.getName(), service.getMemoryConsumptionParts(servicesDefinition) * valueOfShard));
+                        .forEach(service -> nodeMemoryModel.put(service.toService(), service.getMemoryConsumptionParts(servicesDefinition) * valueOfShard));
             }
 
             retMap.put(node, nodeMemoryModel);
@@ -155,16 +157,16 @@ public class MemoryComputer {
         return retMap;
     }
 
-    Map<String, Long> getMemoryMap(NodesConfigWrapper nodesConfig, Set<String> deadIps) throws SystemException {
+    Map<Node, Long> getMemoryMap(NodesConfigWrapper nodesConfig, Set<Node> deadNodes) throws SystemException {
         // concurrently build map of ipAddress -> full RAM in MB
-        Map<String, Long> memoryMap = new ConcurrentHashMap<>();
+        Map<Node, Long> memoryMap = new ConcurrentHashMap<>();
         final ExecutorService threadPool = Executors.newFixedThreadPool(parallelismInstallThreadCount);
         AtomicReference<Exception> error = new AtomicReference<>();
 
         // iterator in IP addresses
-        for (String node : nodesConfig.getNodeAddresses()) {
+        for (Node node : nodesConfig.getAllNodes()) {
 
-            if (!deadIps.contains(node)) {
+            if (!deadNodes.contains(node)) {
 
                 threadPool.execute(() -> {
                     try {
@@ -173,7 +175,7 @@ public class MemoryComputer {
                         if (!nodeMemory.startsWith("MemTotal")) {
                             throw new SSHCommandException("Impossible to understand the format of the meminof result. Missing 'MemTotal' in " + nodeMemory);
                         }
-                        BigDecimal divider = BigDecimal.ZERO;
+                        BigDecimal divider;
                         if (nodeMemory.endsWith("B")) {
                             divider = BigDecimal.valueOf(1024^2);
                         } else if (nodeMemory.endsWith("kB")) {
@@ -198,7 +200,9 @@ public class MemoryComputer {
 
         threadPool.shutdown();
         try {
-            threadPool.awaitTermination(operationWaitTimout, TimeUnit.SECONDS);
+            if (!threadPool.awaitTermination(operationWaitTimout, TimeUnit.SECONDS)) {
+                logger.warn ("Memor computation shell commandds ended ip in timeout");
+            }
         } catch (InterruptedException e) {
             logger.error (e, e);
         }

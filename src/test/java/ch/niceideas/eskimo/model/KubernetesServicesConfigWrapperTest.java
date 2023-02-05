@@ -35,7 +35,10 @@
 
 package ch.niceideas.eskimo.model;
 
+import ch.niceideas.eskimo.types.Service;
 import org.junit.jupiter.api.Test;
+
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -82,25 +85,26 @@ public class KubernetesServicesConfigWrapperTest {
 
     @Test
     public void testGetEnabledServices()  {
-        assertEquals ("cerebro,elasticsearch,flink-runtime,grafana,kafka-manager,kafka,kibana,kubernetes-dashboard,logstash,spark-console,spark-runtime,zeppelin", String.join(",", kscw.getEnabledServices()));
+        assertEquals ("cerebro,elasticsearch,flink-runtime,grafana,kafka-manager,kafka,kibana,kubernetes-dashboard,logstash,spark-console,spark-runtime,zeppelin",
+                kscw.getEnabledServices().stream().map(Service::getName).collect(Collectors.joining(",")));
     }
 
     @Test
     public void testGetCpuSetting() {
-        assertEquals ("0.4", kscw.getCpuSetting("elasticsearch"));
-        assertEquals ("0.2", kscw.getCpuSetting("cerebro"));
+        assertEquals ("0.4", kscw.getCpuSetting(Service.from ("elasticsearch")));
+        assertEquals ("0.2", kscw.getCpuSetting(Service.from ("cerebro")));
     }
 
     @Test
     public void testGetRamSetting() {
-        assertEquals ("1024M", kscw.getRamSetting("elasticsearch"));
-        assertEquals ("800M", kscw.getRamSetting("cerebro"));
+        assertEquals ("1024M", kscw.getRamSetting(Service.from ("elasticsearch")));
+        assertEquals ("800M", kscw.getRamSetting(Service.from ("cerebro")));
     }
 
     @Test
     public void testIsServiceInstallRequired() {
-        assertTrue (kscw.isServiceInstallRequired("elasticsearch"));
-        assertFalse (kscw.isServiceInstallRequired("dummy"));
+        assertTrue (kscw.isServiceInstallRequired(Service.from ("elasticsearch")));
+        assertFalse (kscw.isServiceInstallRequired(Service.from ("dummy")));
     }
 
     @Test
@@ -110,27 +114,25 @@ public class KubernetesServicesConfigWrapperTest {
         KubernetesServicesConfigWrapper other = new KubernetesServicesConfigWrapper(kscw.getFormattedValue());
         kscw.getRootKeys().stream()
                 .filter(key -> key.contains(KubernetesServicesConfigWrapper.INSTALL_FLAG))
-                .forEach(key -> {
-                    other.setValueForPath(key, "off");
-                });
+                .forEach(key -> other.setValueForPath(key, "off"));
 
         assertFalse (other.hasEnabledServices());
     }
 
     @Test
     public void testIsDifferentConfig() {
-        assertFalse (kscw.isDifferentConfig(new KubernetesServicesConfigWrapper(kscw.getFormattedValue()), "zeppelin"));
-        assertFalse (kscw.isDifferentConfig(new KubernetesServicesConfigWrapper(kscw.getFormattedValue()), "elasticsearch"));
-        assertFalse (kscw.isDifferentConfig(new KubernetesServicesConfigWrapper(kscw.getFormattedValue()), "cerebro"));
-        assertFalse (kscw.isDifferentConfig(new KubernetesServicesConfigWrapper(kscw.getFormattedValue()), "kibana"));
+        assertFalse (kscw.isDifferentConfig(new KubernetesServicesConfigWrapper(kscw.getFormattedValue()), Service.from ("zeppelin")));
+        assertFalse (kscw.isDifferentConfig(new KubernetesServicesConfigWrapper(kscw.getFormattedValue()), Service.from ("elasticsearch")));
+        assertFalse (kscw.isDifferentConfig(new KubernetesServicesConfigWrapper(kscw.getFormattedValue()), Service.from ("cerebro")));
+        assertFalse (kscw.isDifferentConfig(new KubernetesServicesConfigWrapper(kscw.getFormattedValue()), Service.from ("kibana")));
 
         KubernetesServicesConfigWrapper other = new KubernetesServicesConfigWrapper(kscw.getFormattedValue());
         other.setValueForPath("zeppelin_ram", "2048m");
 
-        assertTrue (kscw.isDifferentConfig(other, "zeppelin"));
-        assertFalse (kscw.isDifferentConfig(other, "elasticsearch"));
-        assertFalse (kscw.isDifferentConfig(other, "kibana"));
-        assertFalse (kscw.isDifferentConfig(other, "cerebro"));
+        assertTrue (kscw.isDifferentConfig(other, Service.from ("zeppelin")));
+        assertFalse (kscw.isDifferentConfig(other, Service.from ("elasticsearch")));
+        assertFalse (kscw.isDifferentConfig(other, Service.from ("kibana")));
+        assertFalse (kscw.isDifferentConfig(other, Service.from ("cerebro")));
     }
 
 }

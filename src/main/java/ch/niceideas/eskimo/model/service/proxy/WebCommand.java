@@ -35,7 +35,7 @@
 
 package ch.niceideas.eskimo.model.service.proxy;
 
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -44,7 +44,7 @@ import lombok.NoArgsConstructor;
 public class WebCommand {
 
     private String id;
-    private Service service;
+    private ServiceDef service;
     private String command;
 
 }

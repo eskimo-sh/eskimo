@@ -44,6 +44,8 @@ import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.*;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,8 +105,8 @@ public class KubernetesServiceTest {
         configurationServiceTest.reset();
         configurationServiceTest.saveSetupConfig("{ \"" + SetupService.SSH_USERNAME_FIELD + "\" : \"test\" }");
 
-        proxyManagerServiceTest.setForwarderConfigForHosts("localhost", new ArrayList<>(){{
-            add (new ProxyTunnelConfig("dummyService", 12345, "192.178.10.11", 5050));
+        proxyManagerServiceTest.setForwarderConfigForHosts(Node.fromName("localhost"), new ArrayList<>(){{
+            add (new ProxyTunnelConfig(Service.from("dummyService"), 12345, Node.fromAddress("192.178.10.11"), 5050));
         }});
 
         nodesConfigurationServiceTest.reset();
@@ -120,17 +122,17 @@ public class KubernetesServiceTest {
         sshCommandServiceTest.reset();
     }
 
-    private List<String> getInstallations() {
+    private List<Service> getInstallations() {
 
         return systemServiceTest.getAppliedOperations().stream()
-                .filter(pair -> ((KubernetesOperationsCommand.KubernetesOperationId)pair.getKey()).getType().equals("installation"))
+                .filter(pair -> ((KubernetesOperationsCommand.KubernetesOperationId)pair.getKey()).getOperation().equals(KubernetesOperationsCommand.KuberneteOperation.INSTALLATION))
                 .map(pair -> ((KubernetesOperationsCommand.KubernetesOperationId)pair.getKey()).getService())
                 .collect(Collectors.toList());
     }
 
-    private List<String> getUninstallations() {
+    private List<Service> getUninstallations() {
         return systemServiceTest.getAppliedOperations().stream()
-                .filter(pair -> ((KubernetesOperationsCommand.KubernetesOperationId)pair.getKey()).getType().equals("uninstallation"))
+                .filter(pair -> ((KubernetesOperationsCommand.KubernetesOperationId)pair.getKey()).getOperation().equals(KubernetesOperationsCommand.KuberneteOperation.UNINSTALLATION))
                 .map(pair -> ((KubernetesOperationsCommand.KubernetesOperationId)pair.getKey()).getService())
                 .collect(Collectors.toList());
     }
@@ -139,11 +141,11 @@ public class KubernetesServiceTest {
     public void testApplyKubernetesServicesConfig () throws Exception {
 
         ServicesInstallStatusWrapper serviceInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        serviceInstallStatus.removeInstallationFlag("cerebro", "KUBERNETES_NODE");
-        serviceInstallStatus.removeInstallationFlag("kafka-manager", "KUBERNETES_NODE");
-        serviceInstallStatus.removeInstallationFlag("kibana", "KUBERNETES_NODE");
-        serviceInstallStatus.removeInstallationFlag("spark-console", "KUBERNETES_NODE");
-        serviceInstallStatus.removeInstallationFlag("zeppelin", "KUBERNETES_NODE");
+        serviceInstallStatus.removeInstallationFlag(Service.from("cerebro"), Node.KUBERNETES_NODE);
+        serviceInstallStatus.removeInstallationFlag(Service.from("kafka-manager"), Node.KUBERNETES_NODE);
+        serviceInstallStatus.removeInstallationFlag(Service.from("kibana"), Node.KUBERNETES_NODE);
+        serviceInstallStatus.removeInstallationFlag(Service.from("spark-console"), Node.KUBERNETES_NODE);
+        serviceInstallStatus.removeInstallationFlag(Service.from("zeppelin"), Node.KUBERNETES_NODE);
         serviceInstallStatus.setValueForPath("grafana_installed_on_IP_KUBERNETES_NODE", "OK");
 
         configurationServiceTest.saveServicesInstallationStatus(ServicesInstallStatusWrapper.empty());
@@ -169,7 +171,7 @@ public class KubernetesServiceTest {
         systemServiceTest.setStandard2NodesStatus();
 
         sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
-            switch (node) {
+            switch (node.getAddress()) {
                 case "192.168.10.11":
                     return "MemTotal:        5969796 kB";
                 case "192.168.10.12":
@@ -183,16 +185,16 @@ public class KubernetesServiceTest {
 
         kubernetesService.applyServicesConfig(command);
 
-        List<String> installList = getInstallations();
+        List<Service> installList = getInstallations();
 
         assertEquals(5, installList.size());
         assertEquals("" +
-                "spark-console,cerebro,kafka-manager,kibana,zeppelin", String.join(",", installList));
+                "spark-console,cerebro,kibana,kafka-manager,zeppelin", installList.stream().map(Service::getName).collect(Collectors.joining(",")));
 
-        List<String> uninstallList = getUninstallations();
+        List<Service> uninstallList = getUninstallations();
 
         assertEquals(5, uninstallList.size());
-        assertEquals("elasticsearch,grafana,kafka,logstash,spark-runtime", String.join(",", uninstallList));
+        assertEquals("elasticsearch,grafana,kafka,logstash,spark-runtime", uninstallList.stream().map(Service::getName).collect(Collectors.joining(",")));
     }
 
 
@@ -205,7 +207,8 @@ public class KubernetesServiceTest {
         ServicesInstallStatusWrapper serviceInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         serviceInstallStatus.setValueForPath("grafana_installed_on_IP_KUBERNETES_NODE", "OK");
 
-        KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("KubernetesServiceTest/kubernetes-services-config.json"), StandardCharsets.UTF_8));
+        KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(
+                StreamUtils.getAsString(ResourceUtils.getResourceAsStream("KubernetesServiceTest/kubernetes-services-config.json"), StandardCharsets.UTF_8));
         kubeServicesConfig.setValueForPath("cerebro_install", "off");
 
         KubernetesOperationsCommand.create (
@@ -216,7 +219,10 @@ public class KubernetesServiceTest {
                 kubeServicesConfig
         );
 
-        kubernetesService.uninstallService(new KubernetesOperationsCommand.KubernetesOperationId("uninstallation", "cerebro"), "192.168.10.11");
+        kubernetesService.uninstallService(new KubernetesOperationsCommand.KubernetesOperationId(
+                KubernetesOperationsCommand.KuberneteOperation.UNINSTALLATION,
+                Service.from("cerebro")),
+                Node.fromAddress("192.168.10.11"));
 
         //System.err.println (testSSHCommandScript.toString());
 
@@ -233,7 +239,7 @@ public class KubernetesServiceTest {
         systemServiceTest.setStandard2NodesStatus();
 
         ServicesInstallStatusWrapper serviceInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        serviceInstallStatus.removeInstallationFlag("cerebro", "KUBERNETES_NODE");
+        serviceInstallStatus.removeInstallationFlag(Service.from("cerebro"), Node.KUBERNETES_NODE);
         serviceInstallStatus.setValueForPath("grafana_installed_on_IP_KUBERNETES_NODE", "OK");
 
         KubernetesOperationsCommand command = KubernetesOperationsCommand.create (
@@ -246,7 +252,10 @@ public class KubernetesServiceTest {
 
         operationsMonitoringServiceTest.startCommand(command);
 
-        kubernetesService.installService(new KubernetesOperationsCommand.KubernetesOperationId("installation", "cerebro"), "192.168.10.11");
+        kubernetesService.installService(new KubernetesOperationsCommand.KubernetesOperationId(
+                KubernetesOperationsCommand.KuberneteOperation.INSTALLATION,
+                Service.from("cerebro")),
+                Node.fromAddress("192.168.10.11"));
 
         String executedCommands = String.join("\n", systemServiceTest.getExecutedActions());
         //System.err.println (executedCommands);
@@ -325,40 +334,40 @@ public class KubernetesServiceTest {
 
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
 
-        assertTrue (kubernetesService.shouldInstall(kubeServicesConfig, "cerebro"));
-        assertTrue (kubernetesService.shouldInstall(kubeServicesConfig, "kibana"));
-        assertTrue (kubernetesService.shouldInstall(kubeServicesConfig, "spark-console"));
-        assertFalse (kubernetesService.shouldInstall(kubeServicesConfig, "grafana"));
-        assertTrue (kubernetesService.shouldInstall(kubeServicesConfig, "zeppelin"));
-        assertTrue (kubernetesService.shouldInstall(kubeServicesConfig, "kafka-manager"));
+        assertTrue (kubernetesService.shouldInstall(kubeServicesConfig, Service.from("cerebro")));
+        assertTrue (kubernetesService.shouldInstall(kubeServicesConfig, Service.from("kibana")));
+        assertTrue (kubernetesService.shouldInstall(kubeServicesConfig, Service.from("spark-console")));
+        assertFalse (kubernetesService.shouldInstall(kubeServicesConfig, Service.from("grafana")));
+        assertTrue (kubernetesService.shouldInstall(kubeServicesConfig, Service.from("zeppelin")));
+        assertTrue (kubernetesService.shouldInstall(kubeServicesConfig, Service.from("kafka-manager")));
     }
 
     @Test
     public void testShowJournalKubernetes () throws Exception {
         configurationServiceTest.setStandard2NodesInstallStatus();
-        kubernetesService.showJournal(servicesDefinition.getService("cerebro"), "192.168.10.11");
-        assertEquals ("Apply service operation  - cerebro - kubernetes node - Showing journal", String.join(",", systemServiceTest.getExecutedActions()));
+        kubernetesService.showJournal(servicesDefinition.getServiceDefinition(Service.from("cerebro")), Node.fromAddress("192.168.10.11"));
+        assertEquals ("Apply service operation  - cerebro - KUBERNETES_NODE - Showing journal", String.join(",", systemServiceTest.getExecutedActions()));
     }
 
     @Test
     public void testStartServiceKubernetes () throws Exception {
         configurationServiceTest.setStandard2NodesInstallStatus();
-        kubernetesService.startService(servicesDefinition.getService("cerebro"), "192.168.10.11");
-        assertEquals ("Apply service operation  - cerebro - kubernetes node - Starting", String.join(",", systemServiceTest.getExecutedActions()));
+        kubernetesService.startService(servicesDefinition.getServiceDefinition(Service.from("cerebro")), Node.fromAddress("192.168.10.11"));
+        assertEquals ("Apply service operation  - cerebro - KUBERNETES_NODE - Starting", String.join(",", systemServiceTest.getExecutedActions()));
     }
 
     @Test
     public void testStopServiceKubernetes () throws Exception {
         configurationServiceTest.setStandard2NodesInstallStatus();
-        kubernetesService.stopService(servicesDefinition.getService("cerebro"), "192.168.10.11");
-        assertEquals ("Apply service operation  - cerebro - kubernetes node - Stopping", String.join(",", systemServiceTest.getExecutedActions()));
+        kubernetesService.stopService(servicesDefinition.getServiceDefinition(Service.from("cerebro")), Node.fromAddress("192.168.10.11"));
+        assertEquals ("Apply service operation  - cerebro - KUBERNETES_NODE - Stopping", String.join(",", systemServiceTest.getExecutedActions()));
     }
 
     @Test
     public void testRestartServiceKubernetes() throws Exception {
         configurationServiceTest.setStandard2NodesInstallStatus();
-        kubernetesService.restartService(servicesDefinition.getService("cerebro"), "192.168.10.11");
-        assertEquals ("Apply service operation  - cerebro - kubernetes node - Restart", String.join(",", systemServiceTest.getExecutedActions()));
+        kubernetesService.restartService(servicesDefinition.getServiceDefinition(Service.from("cerebro")), Node.fromAddress("192.168.10.11"));
+        assertEquals ("Apply service operation  - cerebro - KUBERNETES_NODE - Restarting", String.join(",", systemServiceTest.getExecutedActions()));
     }
 
 }

@@ -34,17 +34,21 @@
 
 package ch.niceideas.eskimo.model;
 
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Operation;
+import ch.niceideas.eskimo.types.Service;
+
 import java.io.Serializable;
 
-public interface OperationId extends Serializable {
+public interface OperationId<T extends Operation> extends Serializable, Comparable<OperationId<?>> {
 
-    String getType();
+    T getOperation();
 
     String getMessage();
 
-    String getService();
+    Service getService();
 
-    boolean isOnNode(String node);
+    boolean isOnNode(Node node);
 
-    boolean isSameNode(OperationId other);
+    boolean isSameNode(OperationId<?> other);
 }

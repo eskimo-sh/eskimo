@@ -76,8 +76,7 @@ public class TerminalController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public String postUpdate(@RequestBody String terminalBody, HttpServletResponse resp) {
         try {
-            return terminalService.postUpdate(terminalBody)
-                    .renderResponse(resp);
+            return terminalService.postUpdate(terminalBody).renderResponse(resp);
         } catch (IOException e) {
             logger.error(e, e);
             return e.getMessage();

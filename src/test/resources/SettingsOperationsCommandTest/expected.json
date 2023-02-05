@@ -93,9 +93,9 @@
     }
   },
   "restarts": [
-    "elasticsearch",
-    "grafana",
     "kafka",
-    "spark-runtime"
+    "elasticsearch",
+    "spark-runtime",
+    "grafana"
   ]
 }

@@ -121,9 +121,7 @@ public class NodesConfigController extends AbstractOperationController {
 
             for (String serviceInstallStatusFlag : servicesInstallStatus.getInstalledServicesFlags()) {
 
-                String serviceInstallation = servicesInstallStatus.getServiceInstallation(serviceInstallStatusFlag);
-
-                if (!reinstallModelConfig.hasServiceConfigured(serviceInstallation)) {
+                if (!reinstallModelConfig.hasServiceConfigured(servicesInstallStatus.getService(serviceInstallStatusFlag))) {
                     newServicesInstallStatus.copyFrom (serviceInstallStatusFlag, servicesInstallStatus);
                 }
             }

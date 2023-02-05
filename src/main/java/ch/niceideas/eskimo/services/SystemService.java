@@ -37,8 +37,11 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.model.service.Service;
+import ch.niceideas.eskimo.model.service.ServiceDef;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import ch.niceideas.eskimo.types.LabelledOperation;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,15 +56,15 @@ public interface SystemService {
 
     void delegateApplyNodesConfig(ServiceOperationsCommand command) throws NodesConfigurationException;
 
-    void showJournal(Service service, String node) throws SystemException;
+    void showJournal(ServiceDef service, Node node) throws SystemException;
 
-    void startService(Service service, String node) throws SystemException;
+    void startService(ServiceDef service, Node node) throws SystemException;
 
-    void stopService(Service service, String node) throws SystemException;
+    void stopService(ServiceDef service, Node node) throws SystemException;
 
-    void restartService(Service service, String node) throws SystemException;
+    void restartService(ServiceDef service, Node node) throws SystemException;
 
-    void callCommand(String commandId, String serviceName, String node) throws SystemException;
+    void callCommand(String commandId, Service service, Node node) throws SystemException;
 
     SystemStatusWrapper getStatus() throws StatusExceptionWrapperException;
 
@@ -69,36 +72,35 @@ public interface SystemService {
 
     void handleStatusChanges(
             ServicesInstallStatusWrapper servicesInstallationStatus, SystemStatusWrapper systemStatus,
-            Set<String> configuredNodesAndOtherLiveNodes)
+            Set<Node> configuredNodesAndOtherLiveNodes)
                 throws FileException, SetupException;
 
-    List<Pair<String, String>> buildDeadIps(Set<String> allNodes, NodesConfigWrapper nodesConfig, Set<String> liveIps, Set<String> deadIps);
+    List<Pair<String, Node>> buildDeadIps(Set<Node> allNodes, NodesConfigWrapper nodesConfig, Set<Node> liveNodes, Set<Node> deadNodes);
 
     <T extends Serializable> void performPooledOperation(
             List<T> operations, int parallelism, long operationWaitTimout, PooledOperation<T> operation)
             throws SystemException;
 
-    String sendPing(String node) throws SSHCommandException;
+    String sendPing(Node node) throws SSHCommandException;
 
-    File createTempFile(String service, String node, String extension) throws IOException;
+    File createTempFile(Service service, String extension) throws IOException;
 
-    void callUninstallScript(MessageLogger ml, SSHConnection connection, String service) throws SystemException;
+    void callUninstallScript(MessageLogger ml, SSHConnection connection, Service service) throws SystemException;
 
-    File createRemotePackageFolder(MessageLogger ml, SSHConnection connection, String node, String service, String imageName) throws SystemException, IOException, SSHCommandException;
+    File createRemotePackageFolder(MessageLogger ml, SSHConnection connection, Node node, Service service, String imageName) throws SystemException, IOException, SSHCommandException;
 
-    void installationSetup(MessageLogger ml, SSHConnection connection, String node, String service) throws SystemException;
+    void installationSetup(MessageLogger ml, SSHConnection connection, Node node, Service service) throws SystemException;
 
-    void installationCleanup(MessageLogger ml, SSHConnection connection, String service, String imageName, File tmpArchiveFile) throws SSHCommandException, SystemException;
+    void installationCleanup(MessageLogger ml, SSHConnection connection, Service service, String imageName, File tmpArchiveFile) throws SSHCommandException, SystemException;
 
-    void applyServiceOperation(String service, String node, String opLabel, ServiceOperation<String> operation) throws SystemException;
+    void applyServiceOperation(Service service, Node node, SimpleOperationCommand.SimpleOperation labelledOp, ServiceOperation<String> operation) throws SystemException;
 
     void feedInServiceStatus (
             Map<String, String> statusMap,
             ServicesInstallStatusWrapper servicesInstallationStatus,
-            String node,
-            String nodeName,
-            String referenceNodeName,
-            String service,
+            Node node,
+            Node referenceNode,
+            Service service,
             boolean shall,
             boolean installed,
             boolean running) throws ConnectionManagerException;
@@ -119,10 +121,6 @@ public interface SystemService {
     class PooledOperationException extends RuntimeException {
 
         static final long serialVersionUID = -3317632123352229248L;
-
-        PooledOperationException(String message) {
-            super(message);
-        }
 
         PooledOperationException(Throwable cause) {
             super(cause);

@@ -35,9 +35,12 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.eskimo.EskimoApplication;
+import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
 import ch.niceideas.eskimo.test.services.WebSocketProxyServerTestImpl;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -76,25 +79,28 @@ public class ProxyManagerServiceTest {
     @Autowired
     private ConnectionManagerServiceTestImpl connectionManagerServiceTest;
 
+    @Autowired
+    private ServicesDefinition servicesDefinition;
+
     @BeforeEach
     public void setUp() throws Exception {
 
         configurationServiceTest.setStandard2NodesInstallStatus();
 
-        proxyManagerService.removeServerForService ("gluster", "192.168.10.11");
-        proxyManagerService.removeServerForService ("gluster", "192.168.10.13");
+        proxyManagerService.removeServerForService (Service.from("gluster"), Node.fromAddress("192.168.10.11"));
+        proxyManagerService.removeServerForService (Service.from("gluster"), Node.fromAddress("192.168.10.13"));
 
-        proxyManagerService.removeServerForService ("zeppelin", "192.168.10.11");
+        proxyManagerService.removeServerForService (Service.from("zeppelin"), Node.fromAddress("192.168.10.11"));
 
-        proxyManagerService.removeServerForService ("flink-runtime", "192.168.10.11");
-        proxyManagerService.removeServerForService ("flink-runtime", "192.168.10.12");
-        proxyManagerService.removeServerForService ("flink-runtime", "192.168.10.13");
+        proxyManagerService.removeServerForService (Service.from("flink-runtime"), Node.fromAddress("192.168.10.11"));
+        proxyManagerService.removeServerForService (Service.from("flink-runtime"), Node.fromAddress("192.168.10.12"));
+        proxyManagerService.removeServerForService (Service.from("flink-runtime"), Node.fromAddress("192.168.10.13"));
 
-        proxyManagerService.removeServerForService ("kubernetes-dashboard", "192.168.10.11");
-        proxyManagerService.removeServerForService ("kubernetes-dashboard", "192.168.10.13");
+        proxyManagerService.removeServerForService (Service.from("kubernetes-dashboard"), Node.fromAddress("192.168.10.11"));
+        proxyManagerService.removeServerForService (Service.from("kubernetes-dashboard"), Node.fromAddress("192.168.10.13"));
 
-        proxyManagerService.removeServerForService ("kibana", "192.168.10.11");
-        proxyManagerService.removeServerForService ("kibana", "192.168.10.13");
+        proxyManagerService.removeServerForService (Service.from("kibana"), Node.fromAddress("192.168.10.11"));
+        proxyManagerService.removeServerForService (Service.from("kibana"), Node.fromAddress("192.168.10.13"));
 
         connectionManagerServiceTest.reset();
         webSocketProxyServerTest.reset();
@@ -130,7 +136,7 @@ public class ProxyManagerServiceTest {
 
             ((org.apache.logging.log4j.core.Logger) testLogger).addAppender(testAppender);
 
-            proxyManagerService.updateServerForService("gluster", "192.168.10.11");
+            proxyManagerService.updateServerForService(Service.from("gluster"), Node.fromAddress("192.168.10.11"));
 
             String result = builder.toString();
 
@@ -148,19 +154,24 @@ public class ProxyManagerServiceTest {
     @Test
     @DirtiesContext
     public void testGetServerURI() throws Exception {
-        proxyManagerService.updateServerForService("zeppelin", "192.168.10.11");
+        proxyManagerService.updateServerForService(Service.from("zeppelin"), Node.fromAddress("192.168.10.11"));
 
-        assertEquals("http://localhost:"+proxyManagerService.getTunnelConfig("zeppelin").getLocalPort()+"/", proxyManagerService.getServerURI("zeppelin", "/localhost:8080/zeppelin"));
-        assertEquals("http://localhost:"+proxyManagerService.getTunnelConfig("zeppelin").getLocalPort()+"/", proxyManagerService.getServerURI("zeppelin", "/localhost:8080/zeppelin/tugudu"));
+        assertEquals("http://localhost:"+proxyManagerService.getTunnelConfig("zeppelin").getLocalPort()+"/", proxyManagerService.getServerURI(Service.from ("zeppelin"), "/zeppelin"));
+        assertEquals("http://localhost:"+proxyManagerService.getTunnelConfig("zeppelin").getLocalPort()+"/", proxyManagerService.getServerURI(Service.from ("zeppelin"), "/zeppelin/tugudu"));
 
         assertTrue (proxyManagerService.getTunnelConfig("zeppelin").getLocalPort() >= ProxyManagerService.LOCAL_PORT_RANGE_START && proxyManagerService.getTunnelConfig("zeppelin").getLocalPort() <= 65535);
+
+        proxyManagerService.updateServerForService(Service.from("gluster"), Node.fromAddress("192.168.10.11"));
+
+        String glusterServiceId  = servicesDefinition.getServiceDefinition(Service.from("gluster")).getServiceId(Node.fromAddress("192.168.10.11"));
+        assertEquals("http://localhost:"+proxyManagerService.getTunnelConfig(glusterServiceId).getLocalPort()+"/", proxyManagerService.getServerURI(Service.from ("gluster"), "/192-168-10-11/test"));
     }
 
     @Test
     public void testExtractHostFromPathInfo() {
-        assertEquals("192-168-10-11", proxyManagerService.extractHostFromPathInfo("192-168-10-11//slave(1)/monitor/statistics"));
-        assertEquals("192-168-10-11", proxyManagerService.extractHostFromPathInfo("/192-168-10-11//slave(1)/monitor/statistics"));
-        assertEquals("192-168-10-11", proxyManagerService.extractHostFromPathInfo("/192-168-10-11"));
+        assertEquals(Node.fromAddress("192.168.10.11"), proxyManagerService.extractHostFromPathInfo("192.168.10.11//slave(1)/monitor/statistics"));
+        assertEquals(Node.fromAddress("192.168.10.11"), proxyManagerService.extractHostFromPathInfo("/192.168.10.11//slave(1)/monitor/statistics"));
+        assertEquals(Node.fromAddress("192.168.10.11"), proxyManagerService.extractHostFromPathInfo("/192.168.10.11"));
     }
 
     @Test
@@ -168,13 +179,13 @@ public class ProxyManagerServiceTest {
     public void testServerForServiceManagemement_reproduceFlinkRuntimeProblem() throws Exception {
 
         logger.info (" ---- flink-runtime detected on 192.168.10.12");
-        proxyManagerService.updateServerForService ("flink-runtime", "192.168.10.12");
+        proxyManagerService.updateServerForService (Service.from ("flink-runtime"), Node.fromAddress("192.168.10.12"));
 
         logger.info (" ---- flink-runtime removed from 192.168.10.12");
-        proxyManagerService.removeServerForService("flink-runtime", "192.168.10.12");
+        proxyManagerService.removeServerForService(Service.from ("flink-runtime"), Node.fromAddress("192.168.10.12"));
 
         logger.info (" ---- now flink-runtime detected on 192.168.10.13");
-        proxyManagerService.updateServerForService ("flink-runtime", "192.168.10.13");
+        proxyManagerService.updateServerForService (Service.from ("flink-runtime"), Node.fromAddress("192.168.10.13"));
 
         assertEquals(2, connectionManagerServiceTest.getOpenedForwarders().size());
         assertEquals(1, connectionManagerServiceTest.getClosedForwarders().size());
@@ -197,7 +208,7 @@ public class ProxyManagerServiceTest {
         assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
 
-        proxyManagerService.updateServerForService("kubernetes-dashboard", "192.168.10.11");
+        proxyManagerService.updateServerForService(Service.from ("kubernetes-dashboard"), Node.fromAddress("192.168.10.11"));
 
         assertTrue(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertTrue(webSocketProxyServerTest.isRemoveForwardersCalled());
@@ -205,13 +216,13 @@ public class ProxyManagerServiceTest {
         connectionManagerServiceTest.reset();
         webSocketProxyServerTest.reset();
 
-        proxyManagerService.updateServerForService("kubernetes-dashboard", "192.168.10.11");
+        proxyManagerService.updateServerForService(Service.from ("kubernetes-dashboard"), Node.fromAddress("192.168.10.11"));
 
         // should not have been recreated
         assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
 
-        proxyManagerService.updateServerForService("kubernetes-dashboard", "192.168.10.13");
+        proxyManagerService.updateServerForService(Service.from ("kubernetes-dashboard"), Node.fromAddress("192.168.10.13"));
 
         // since kub service are redirected to poxy on kube master, no tunnel recreation should occur when service moves
         assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
@@ -225,7 +236,7 @@ public class ProxyManagerServiceTest {
         assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
 
-        proxyManagerService.updateServerForService("kibana", "192.168.10.11");
+        proxyManagerService.updateServerForService(Service.from ("kibana"), Node.fromAddress("192.168.10.11"));
 
         assertTrue(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertTrue(webSocketProxyServerTest.isRemoveForwardersCalled());
@@ -234,13 +245,13 @@ public class ProxyManagerServiceTest {
         connectionManagerServiceTest.dontConnect();
         webSocketProxyServerTest.reset();
 
-        proxyManagerService.updateServerForService("kibana", "192.168.10.11");
+        proxyManagerService.updateServerForService(Service.from ("kibana"), Node.fromAddress("192.168.10.11"));
 
         // should not have been recreated
         assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
 
-        proxyManagerService.updateServerForService("kibana", "192.168.10.13");
+        proxyManagerService.updateServerForService(Service.from ("kibana"), Node.fromAddress("192.168.10.13"));
 
         assertTrue(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertTrue(webSocketProxyServerTest.isRemoveForwardersCalled());
@@ -253,7 +264,7 @@ public class ProxyManagerServiceTest {
         assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
 
-        proxyManagerService.updateServerForService("gluster", "192.168.10.11");
+        proxyManagerService.updateServerForService(Service.from ("gluster"), Node.fromAddress("192.168.10.11"));
 
         assertTrue(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertTrue(webSocketProxyServerTest.isRemoveForwardersCalled());
@@ -262,13 +273,13 @@ public class ProxyManagerServiceTest {
         connectionManagerServiceTest.dontConnect();
         webSocketProxyServerTest.reset();
 
-        proxyManagerService.updateServerForService("gluster", "192.168.10.11");
+        proxyManagerService.updateServerForService(Service.from ("gluster"), Node.fromAddress("192.168.10.11"));
 
         // should not have been recreated
         assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
 
-        proxyManagerService.updateServerForService("gluster", "192.168.10.13");
+        proxyManagerService.updateServerForService(Service.from ("gluster"), Node.fromAddress("192.168.10.13"));
 
         assertTrue(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertTrue(webSocketProxyServerTest.isRemoveForwardersCalled());

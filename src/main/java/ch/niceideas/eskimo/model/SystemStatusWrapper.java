@@ -36,6 +36,8 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,6 +45,7 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -66,33 +69,35 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
         super(jsonString);
     }
 
-    public static String getServiceName (String serviceStatusFlag) {
+    public static Service getService (String serviceStatusFlag) {
         if (StringUtils.isBlank(serviceStatusFlag)) {
             return null;
         }
         if (serviceStatusFlag.startsWith(SERVICE_PREFIX)) {
-            return serviceStatusFlag.substring(SERVICE_PREFIX.length(), serviceStatusFlag.indexOf('_', SERVICE_PREFIX.length() + 1));
+            return Service.from(serviceStatusFlag.substring(
+                    SERVICE_PREFIX.length(), serviceStatusFlag.indexOf('_', SERVICE_PREFIX.length() + 1)));
         } else if (serviceStatusFlag.startsWith(NODE_ALIVE_FLAG)) {
-            return "Node Alive";
+            return Service.NODE_ALIVE;
         }
-        return serviceStatusFlag;
+        throw new IllegalArgumentException("getService shouldn't be called on " + serviceStatusFlag);
     }
 
-    public static String getNodeName (String serviceStatusFlag) {
+    public static Node getNode (String serviceStatusFlag) {
         if (StringUtils.isBlank(serviceStatusFlag)) {
             return null;
         }
-        return serviceStatusFlag.substring(serviceStatusFlag.indexOf('_', SERVICE_PREFIX.length() + 1) + 1);
+        return Node.fromName(serviceStatusFlag.substring(
+                serviceStatusFlag.indexOf('_', SERVICE_PREFIX.length() + 1) + 1));
     }
 
-    public static String buildStatusFlag (String serviceName, String nodeName) {
-        return SERVICE_PREFIX + serviceName + "_" + nodeName;
+    public static String buildStatusFlag (Service service, Node node) {
+        return SERVICE_PREFIX + service + "_" + node.getName();
     }
 
-    public Boolean isNodeAlive(String nodeName) {
+    public Boolean isNodeAlive(Node node) {
         String nodeAliveFlag;
         try {
-            nodeAliveFlag = (String) getValueForPath(NODE_ALIVE_FLAG + nodeName);
+            nodeAliveFlag = (String) getValueForPath(NODE_ALIVE_FLAG + node.getName());
         } catch (JSONException e) {
             logger.debug (e, e);
             // NOSONAR
@@ -116,39 +121,41 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
         }
     }
 
-    public List<String> getAllNodesForServiceRegardlessStatus (String service) {
+    public List<Node> getAllNodesForServiceRegardlessStatus (Service service) {
         return getRootKeys().stream()
                 .filter(key -> key.contains(SERVICE_PREFIX + service + "_"))
-                .map(SystemStatusWrapper::getNodeName)
+                .map(SystemStatusWrapper::getNode)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
-    public boolean isServiceOKOnNode(String serviceName, String node) {
-        String serviceStatus = getValueForPathAsString(SERVICE_PREFIX + serviceName  + "_" + node.replace(".", "-"));
+    public boolean isServiceOKOnNode(Service service, Node node) {
+        String serviceStatus = getValueForPathAsString(SERVICE_PREFIX + service  + "_" + node.getName());
         return StringUtils.isNotBlank(serviceStatus) && serviceStatus.equals("OK");
     }
 
 
-    public boolean isServiceAvailableOnNode(String serviceName, String nodeName) {
+    public boolean isServiceAvailableOnNode(Service service, Node node) {
         // make sure service for node name is found in new status
-        String serviceStatus = (String) getValueForPath(SERVICE_PREFIX + serviceName + "_" + nodeName);
+        String serviceStatus = (String) getValueForPath(SERVICE_PREFIX + service + "_" + node.getName());
 
         // if OK reset error count
         return StringUtils.isNotBlank(serviceStatus) && !serviceStatus.equals("NA");
     }
 
-    public Set<String> getNodes() {
+    public Set<Node> getNodes() {
         return getRootKeys().stream()
                 .filter(key -> key.contains(NODE_ALIVE_FLAG))
                 .map(key -> key.substring(key.indexOf(NODE_ALIVE_FLAG) + NODE_ALIVE_FLAG.length()))
-                .map(key -> key.replace("-", "."))
+                .map(Node::fromName)
                 .collect(Collectors.toSet());
     }
 
-    public String getFirstNodeName(String service) {
+    public Node getFirstNode(Service service) {
         return getRootKeys().stream()
                 .filter(key -> key.startsWith(SERVICE_PREFIX + service + "_"))
                 .map(key -> key.substring( (SERVICE_PREFIX + service + "_").length()))
+                .map(Node::fromName)
                 .findFirst().orElse(null);
     }
 }
