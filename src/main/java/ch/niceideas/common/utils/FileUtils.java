@@ -183,11 +183,8 @@ public class FileUtils {
     }
 
     /**
-     * Closes InputStream and/or OutputStream. It makes sure that both streams tried to be closed, even first throws
+     * Closes InputStream and/or OutputStream. It makes sure that both streams tried to be closed, even if first throws
      * an exception.
-     * 
-     * @throws IOException if stream (is not null and) cannot be closed.
-     * 
      */
     public static void close(InputStream iStream, OutputStream oStream) {
         StreamUtils.close(iStream);
@@ -209,7 +206,7 @@ public class FileUtils {
 
         StringBuilder resultBuilder = new StringBuilder();
         try (BufferedReader fileReader = new BufferedReader(new FileReader(file))) {
-            String line = null;
+            String line;
 
             boolean first = true;
             while ( (line = fileReader.readLine()) != null) {

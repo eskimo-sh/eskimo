@@ -32,74 +32,33 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.*;
-import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.model.service.*;
-import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
-import ch.niceideas.eskimo.types.Node;
-import ch.niceideas.eskimo.types.Service;
+package ch.niceideas.eskimo.model;
 
-import java.util.*;
+import ch.niceideas.eskimo.model.service.KubeRequest;
+import ch.niceideas.eskimo.services.ServiceDefinitionException;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public interface ServicesDefinition {
+public class KubeRequestTest {
 
-    String SERVICE_PREFIX = "Service ";
+    @Test
+    public void testSetCpu() throws Exception {
+        assertThrows(ServiceDefinitionException.class, () -> new KubeRequest().setCpu("A"));
+        assertThrows(ServiceDefinitionException.class, () -> new KubeRequest().setCpu("1 m"));
 
-    void executeInEnvironmentLock (EnvironmentOperation operation)
-            throws FileException, ServiceDefinitionException, SetupException;
+        new KubeRequest().setCpu("1m");
+        new KubeRequest().setCpu("2");
+    }
 
-    String getAllServicesString();
+    @Test
+    public void testSetRam() throws Exception {
+        assertThrows(ServiceDefinitionException.class, () -> new KubeRequest().setRam("A"));
+        assertThrows(ServiceDefinitionException.class, () -> new KubeRequest().setRam("1 m"));
 
-    Topology getTopology(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, Node currentNode)
-            throws ServiceDefinitionException, NodesConfigurationException;
-
-    ServiceDefinition getServiceDefinition(Service service);
-
-    Service[] listAllServices();
-
-    Service[] listAllNodesServices();
-
-    long countAllNodesServices();
-
-    Service[] listMultipleServicesNonKubernetes();
-
-    Service[] listMultipleServices();
-
-    Service[] listMandatoryServices();
-
-    Service[] listUniqueServices();
-
-    Service[] listKubernetesServices();
-
-    long countKubernetesServices();
-
-    Service[] listProxiedServices();
-
-    Service[] listUIServices();
-
-    Map<Service, UIConfig> getUIServicesConfig();
-
-    Service[] listServicesInOrder();
-
-    Service[] listServicesOrderedByDependencies();
-
-    Service[] listKubernetesServicesOrderedByDependencies();
-
-    int compareServices(ServiceDefinition one, ServiceDefinition other);
-
-    int compareServices(Service servOne, Service servOther);
-
-    Collection<Service> getDependentServices(Service service);
-
-    ServiceDefinition getKubeMasterServiceDef();
-
-    ServiceDefinition getKubeSlaveServiceDef();
-
-    interface EnvironmentOperation {
-        void call(JsonWrapper persistentEnvironment);
+        new KubeRequest().setRam("419430400");
+        new KubeRequest().setRam("400M");
+        new KubeRequest().setRam("2G");
     }
 }

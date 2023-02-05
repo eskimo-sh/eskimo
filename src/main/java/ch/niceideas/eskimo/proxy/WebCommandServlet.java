@@ -72,7 +72,6 @@ public class WebCommandServlet extends HttpServlet {
 
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse)
             throws ServletException, IOException {

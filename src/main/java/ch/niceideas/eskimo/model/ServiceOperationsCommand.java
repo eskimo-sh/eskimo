@@ -61,9 +61,6 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
 
     private static final Logger logger = Logger.getLogger(ServiceOperationsCommand.class);
 
-    // TODO remove
-    public static final String KUBERNETES_FLAG = "(kubernetes)";
-
     private final NodesConfigWrapper rawNodesConfig;
 
     public static ServiceOperationsCommand create (

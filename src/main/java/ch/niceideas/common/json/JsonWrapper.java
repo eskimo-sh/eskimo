@@ -34,11 +34,11 @@
 
 package ch.niceideas.common.json;
 
+import ch.niceideas.common.utils.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -254,9 +254,9 @@ public class JsonWrapper implements Serializable {
     }
 
     private Object setValueJSONArray(String path, Object current, String nextPath) {
-        int index = -1;
+        int index;
         if (Character.isDigit(nextPath.charAt(0))) {
-            index = Integer.valueOf(nextPath);
+            index = Integer.parseInt(nextPath);
         } else {
             throw new JSONException(path + PATH_NOT_INTEGER);
         }
@@ -355,9 +355,9 @@ public class JsonWrapper implements Serializable {
     Object handleArray(String path, Object current, String nextPath)  {
         if (current instanceof JSONArray) {
 
-            int index = -1;
+            int index;
             if (Character.isDigit(nextPath.charAt(0))) {
-                index = Integer.valueOf(nextPath);
+                index = Integer.parseInt(nextPath);
             } else {
                 throw new JSONException (path + PATH_NOT_INTEGER);
             }

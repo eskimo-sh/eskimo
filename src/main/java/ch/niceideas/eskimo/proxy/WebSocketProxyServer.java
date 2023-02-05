@@ -51,7 +51,7 @@ public interface WebSocketProxyServer extends WebSocketHandler {
     void handleMessage(WebSocketSession webSocketServerSession, WebSocketMessage<?> webSocketMessage) throws Exception;
 
     @Override
-    void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception;
+    void afterConnectionClosed(WebSocketSession session, CloseStatus status);
 
     void removeForwardersForService(ServiceWebId serviceId);
 

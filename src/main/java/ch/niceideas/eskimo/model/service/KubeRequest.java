@@ -46,8 +46,8 @@ import java.util.regex.Pattern;
 @Data
 public class KubeRequest {
 
-    public static final Pattern KUBE_REQUEST_CPU_RE = Pattern.compile("[0-9\\.]+[m]{0,1}");
-    public static final Pattern KUBE_REQUEST_RAM_RE = Pattern.compile("[0-9\\.]+[EPTGMk]{0,1}");
+    public static final Pattern KUBE_REQUEST_CPU_RE = Pattern.compile("[0-9\\.]+[m]?");
+    public static final Pattern KUBE_REQUEST_RAM_RE = Pattern.compile("[0-9\\.]+[EPTGMk]?");
 
     private String cpu;
     private String ram;

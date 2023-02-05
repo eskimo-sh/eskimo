@@ -46,5 +46,5 @@ public enum MasterDetectionStrategy {
     LOG_FILE(new LogFileStrategy());
 
     @Getter
-    private MdStrategy strategy;
+    private final MdStrategy strategy;
 }

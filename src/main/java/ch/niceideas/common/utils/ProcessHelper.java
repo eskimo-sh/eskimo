@@ -79,7 +79,7 @@ public class ProcessHelper {
     private static String execProc(Process proc, boolean throwExceptions) throws ProcessHelperException {
         try {
 
-            String line = null;
+            String line;
 
             /*- standard input -*/
             BufferedReader input = new BufferedReader(new InputStreamReader(proc.getInputStream()));

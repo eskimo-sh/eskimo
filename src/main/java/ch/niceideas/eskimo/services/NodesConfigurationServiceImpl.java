@@ -175,10 +175,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
                         if (nodesConfig.getAllNodes().contains(node) && liveNodes.contains(node)) {
 
                             systemOperationService.applySystemOperation(
-                                    new ServiceOperationsCommand.ServiceOperationId(
-                                            ServiceOperationsCommand.ServiceOperation.CHECK_INSTALL,
-                                            Service.BASE_SYSTEM,
-                                            node),
+                                    operation,
                                     ml -> {
 
                                         if (!operationsMonitoringService.isInterrupted() && error.get() == null) {
@@ -277,6 +274,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
     @Override
     public void installEskimoBaseSystem(MessageLogger ml, Node node) throws SSHCommandException {
+
         try (SSHConnection connection = connectionManagerService.getPrivateConnection(node)) {
 
             ml.addInfo(" - Calling install-eskimo-base-system.sh");
@@ -328,7 +326,6 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
     }
 
     private boolean isMissingOnNode(String installation, Node node) {
-
         try {
             String result = sshCommandService.runSSHCommand(node, "cat /etc/eskimo_flag_" + installation + "_installed");
             return StringUtils.isBlank(result) || !result.contains("OK");
@@ -511,7 +508,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
         try (SSHConnection connection = connectionManagerService.getPrivateConnection(node)) {
 
             ml.addInfo(" - Creating archive and copying it over");
-            File tmpArchiveFile = systemService.createRemotePackageFolder(ml, connection, node, service, imageName);
+            File tmpArchiveFile = systemService.createRemotePackageFolder(ml, connection, service, imageName);
 
             // 4. call setup script
             ml.addInfo(" - Calling setup script");

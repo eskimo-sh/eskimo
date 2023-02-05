@@ -223,7 +223,7 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public File createRemotePackageFolder(MessageLogger ml, SSHConnection connection, Node node, Service service, String imageName) {
+    public File createRemotePackageFolder(MessageLogger ml, SSHConnection connection, Service service, String imageName) {
         return null;
     }
 

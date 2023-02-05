@@ -43,5 +43,5 @@ public enum MasterElectionStrategy {
     RANDOM_NODE_AFTER,
     RANDOM_NODE_AFTER_OR_SAME,
     SAME_NODE,
-    ALL_NODES;
+    ALL_NODES
 }

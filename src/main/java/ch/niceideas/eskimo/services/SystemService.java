@@ -86,7 +86,7 @@ public interface SystemService {
 
     void callUninstallScript(MessageLogger ml, SSHConnection connection, Service service) throws SystemException;
 
-    File createRemotePackageFolder(MessageLogger ml, SSHConnection connection, Node node, Service service, String imageName) throws SystemException, IOException, SSHCommandException;
+    File createRemotePackageFolder(MessageLogger ml, SSHConnection connection, Service service, String imageName) throws SystemException, IOException, SSHCommandException;
 
     void installationSetup(MessageLogger ml, SSHConnection connection, Node node, Service service) throws SystemException;
 

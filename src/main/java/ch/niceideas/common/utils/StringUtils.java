@@ -254,10 +254,7 @@ public abstract class StringUtils {
         return defautValue;
     }
 
-    /**
-     * Pad the given value with the amount of spaces on the right.
-     */
-    public static String padRight(String value, int size) {
+    private static String handlePadEdgeCases(String value, int size) {
         if (isEmpty(value)) {
             return SPACES[size];
         }
@@ -266,6 +263,17 @@ public abstract class StringUtils {
         }
         if (value.length() > size) {
             return value.substring(0, size);
+        }
+        return null;
+    }
+
+    /**
+     * Pad the given value with the amount of spaces on the right.
+     */
+    public static String padRight(String value, int size) {
+        String edgeValue = handlePadEdgeCases(value, size);
+        if (StringUtils.isNotBlank(edgeValue)) {
+            return edgeValue;
         }
         return value + SPACES[size - value.length()];
     }
@@ -274,14 +282,9 @@ public abstract class StringUtils {
      * Pad the given value with the amount of spaces on the left.
      */
     public static String padLeft(String value, int size) {
-        if (isEmpty(value)) {
-            return SPACES[size];
-        }
-        if (value.length() == size) {
-            return value;
-        }
-        if (value.length() > size) {
-            return value.substring(0, size);
+        String edgeValue = handlePadEdgeCases(value, size);
+        if (StringUtils.isNotBlank(edgeValue)) {
+            return edgeValue;
         }
         return SPACES[size - value.length()] + value;
     }

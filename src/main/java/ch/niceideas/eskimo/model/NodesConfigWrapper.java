@@ -232,20 +232,12 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
     }
 
     public boolean shouldInstall(Service service, int nodeNbr) {
-
-        boolean shall = false;
-
-
-        if (
-            // First case : unique service
-            (getValueForPath(service.getName()) != null && getValueForPath(service.getName()).equals("" + nodeNbr))
-            ||
-            // second case multiple service
-            (getValueForPath(service.getName() + nodeNbr) != null && getValueForPath(service.getName() + nodeNbr).equals("on"))) {
-            shall = true;
-        }
-
-        return shall;
+        return
+                // First case : unique service
+                (getValueForPath(service.getName()) != null && getValueForPath(service.getName()).equals("" + nodeNbr))
+                ||
+                // second case multiple service
+                (getValueForPath(service.getName() + nodeNbr) != null && getValueForPath(service.getName() + nodeNbr).equals("on"));
     }
 
     public List<Node> getAllNodes() {

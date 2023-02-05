@@ -71,7 +71,7 @@ public interface ProxyManagerService {
 
     /** get a port number from 49152 to 65535 */
     static int generateLocalPort() {
-        int portNumber = -1;
+        int portNumber;
         int tryCount = 0;
         do {
             int randInc = ThreadLocalRandom.current().nextInt(65534 - LOCAL_PORT_RANGE_START);

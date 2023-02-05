@@ -885,7 +885,7 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public File createRemotePackageFolder(MessageLogger ml, SSHConnection connection, Node node, Service service, String imageName) throws SystemException, IOException, SSHCommandException {
+    public File createRemotePackageFolder(MessageLogger ml, SSHConnection connection, Service service, String imageName) throws SystemException, IOException, SSHCommandException {
         // 1. Find container folder, archive and copy there
 
         // 1.1 Make sure folder exist

@@ -89,7 +89,7 @@ public class JSONBackedUserDetailsManager implements UserDetailsManager, UserDet
 
     private final String jsonFilePath;
 
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     public JSONBackedUserDetailsManager(String jsonFilePath, PasswordEncoder passwordEncoder) throws FileException {
 

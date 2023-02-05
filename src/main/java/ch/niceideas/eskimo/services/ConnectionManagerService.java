@@ -91,7 +91,7 @@ public interface ConnectionManagerService {
 
         public void close() {
             try {
-                logger.info ("CLOSING tunnel for service " + toString());
+                logger.info ("CLOSING tunnel for service " + service);
                 if (forwarder != null) {
                     forwarder.close();
                 }
@@ -110,10 +110,6 @@ public interface ConnectionManagerService {
 
         public boolean matches(ProxyTunnelConfig config) {
             return matches(config.getService(), config.getLocalPort(), config.getNode(), config.getRemotePort());
-        }
-
-        public Service getService() {
-            return service;
         }
 
         @Override

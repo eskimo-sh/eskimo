@@ -36,7 +36,6 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.types.Node;
-import ch.niceideas.eskimo.types.Service;
 
 public interface SSHCommandService {
 

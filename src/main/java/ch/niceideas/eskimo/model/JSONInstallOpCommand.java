@@ -72,10 +72,6 @@ public abstract class JSONInstallOpCommand<T extends OperationId<?>> implements 
         return !getInstallations().isEmpty() || !getUninstallations().isEmpty() || !getRestarts().isEmpty();
     }
 
-    public void sortRestarts (Comparator<T> c) {
-        restarts.sort(c);
-    }
-
     protected Collection<Object> toJsonList(List<? extends AbstractStandardOperationId<?>> listOfPairs) {
         return listOfPairs.stream()
                 .map((Function<AbstractStandardOperationId<?>, Object>) id -> {

@@ -98,7 +98,7 @@ public class SystemAdminController extends AbstractOperationController {
         try {
             operation.performOperation(systemService);
             return ReturnStatusHelper.createOKStatus(map -> map.put("messages", message));
-        } catch (SSHCommandException | NodesConfigurationException | ServiceDefinitionException | SystemException e) {
+        } catch (NodesConfigurationException | SystemException e) {
             logger.error(e, e);
             return ReturnStatusHelper.createErrorStatus(e);
         }
@@ -250,7 +250,7 @@ public class SystemAdminController extends AbstractOperationController {
     }
 
     private interface SystemOperation {
-        void performOperation (SystemService systemService) throws SSHCommandException, NodesConfigurationException, ServiceDefinitionException, SystemException;
+        void performOperation (SystemService systemService) throws NodesConfigurationException, SystemException;
     }
 
     private interface KubernetesOperation {

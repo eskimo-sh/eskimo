@@ -245,8 +245,6 @@ public class KubernetesServiceImpl implements KubernetesService {
 
     private void proceedWithKubernetesServiceUninstallation(MessageLogger ml, Node kubeMasterNode, Service service)
             throws SSHCommandException {
-        ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
-
         try (SSHConnection connection = connectionManagerService.getPrivateConnection(kubeMasterNode)){
             sshCommandService.runSSHCommand(connection, "eskimo-kubectl uninstall " + service + " " + kubeMasterNode);
         } catch (ConnectionManagerException e) {
@@ -476,7 +474,7 @@ public class KubernetesServiceImpl implements KubernetesService {
             String imageName = servicesDefinition.getServiceDefinition(service).getImageName();
 
             ml.addInfo(" - Creating archive and copying it over to Kube Master node");
-            File tmpArchiveFile = systemService.createRemotePackageFolder(ml, connection, kubeMasterNode, service, imageName);
+            File tmpArchiveFile = systemService.createRemotePackageFolder(ml, connection, service, imageName);
 
             // 4. call setup script
             ml.addInfo(" - Calling setup script");

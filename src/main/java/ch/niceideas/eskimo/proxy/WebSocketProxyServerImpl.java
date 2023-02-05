@@ -134,7 +134,7 @@ public class WebSocketProxyServerImpl extends AbstractWebSocketHandler implement
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
 
         logger.info ("Dropping all forwarders for session ID " + session.getId() + "");
         forwarders.values()
