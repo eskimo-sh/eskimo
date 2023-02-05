@@ -36,7 +36,7 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
@@ -107,7 +107,7 @@ public class SystemAdminController extends AbstractOperationController {
     @GetMapping("/show-journal")
     @ResponseBody
     public String showJournal(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String nodeAddress) {
-        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(Service.from(serviceName));
+        ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(Service.from(serviceName));
         if (serviceDef.isKubernetes()) {
             return performKubernetesOperation(
                     kubernetesService -> kubernetesService.showJournal(serviceDef, Node.fromAddress(nodeAddress)),
@@ -124,7 +124,7 @@ public class SystemAdminController extends AbstractOperationController {
     @GetMapping("/start-service")
     @ResponseBody
     public String startService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String nodeAddress) {
-        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(Service.from(serviceName));
+        ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(Service.from(serviceName));
         if (serviceDef.isKubernetes()) {
             return performKubernetesOperation(
                     kubernetesService -> kubernetesService.startService(serviceDef, Node.fromAddress(nodeAddress)),
@@ -141,7 +141,7 @@ public class SystemAdminController extends AbstractOperationController {
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     public String stopService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String nodeAddress) {
-        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(Service.from(serviceName));
+        ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(Service.from(serviceName));
         if (serviceDef.isKubernetes()) {
             return performKubernetesOperation(
                     kubernetesService -> kubernetesService.stopService(serviceDef, Node.fromAddress(nodeAddress)),
@@ -158,7 +158,7 @@ public class SystemAdminController extends AbstractOperationController {
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     public String restartService(@RequestParam(name="service") String serviceName, @RequestParam(name="nodeAddress") String nodeAddress) {
-        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(Service.from(serviceName));
+        ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(Service.from(serviceName));
         if (serviceDef.isKubernetes()) {
             return performKubernetesOperation(
                     kubernetesService -> kubernetesService.restartService(serviceDef, Node.fromAddress(nodeAddress)),
@@ -195,7 +195,7 @@ public class SystemAdminController extends AbstractOperationController {
             }
 
             Service service = Service.from(serviceName);
-            ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
+            ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
 
             Node node;
             if (serviceDef.isKubernetes()) {

@@ -39,7 +39,7 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.Topology;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.model.service.UIConfig;
 import ch.niceideas.eskimo.services.ServiceDefinitionException;
 import ch.niceideas.eskimo.services.ServicesDefinition;
@@ -106,7 +106,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public ServiceDef getServiceDefinition(Service service) {
+    public ServiceDefinition getServiceDefinition(Service service) {
         if (error) {
             throw new JSONException("Test error");
         }
@@ -234,7 +234,7 @@ public class ServicesDefinitionTestImpl extends ServicesDefinitionImpl implement
     }
 
     @Override
-    public int compareServices(ServiceDef one, ServiceDef other) {
+    public int compareServices(ServiceDefinition one, ServiceDefinition other) {
         if (error) {
             throw new JSONException("Test error");
         }

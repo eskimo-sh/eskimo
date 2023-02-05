@@ -83,14 +83,14 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
     private final ReentrantLock persistEnvLock = new ReentrantLock();
 
-    private final Map<Service, ServiceDef> services = new HashMap<>();
+    private final Map<Service, ServiceDefinition> services = new HashMap<>();
 
-    private ServiceDef kubeMasterService;
-    private ServiceDef kubeSlaveService;
+    private ServiceDefinition kubeMasterServiceDef;
+    private ServiceDefinition kubeSlaveServiceDef;
 
     /** For tests only */
-    public void addService(ServiceDef service) {
-        this.services.put (service.toService(), service);
+    public void addService(ServiceDefinition serviceDef) {
+        this.services.put (serviceDef.toService(), serviceDef);
     }
     public void setSetupService(SetupService setupService) {
         this.setupService = setupService;
@@ -119,9 +119,9 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
         for (String serviceString : servicesConfig.getRootKeys()) {
 
-            ServiceDef service = new ServiceDef();
+            ServiceDefinition serviceDef = new ServiceDefinition();
 
-            service.setName(serviceString);
+            serviceDef.setName(serviceString);
 
             Integer configOrder = (Integer) servicesConfig.getValueForPath(serviceString+".config.order");
             if (configOrder == null) {
@@ -134,60 +134,60 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is defining order " + configOrder + " which is already used");
             }
 
-            service.setConfigOrder(configOrder);
+            serviceDef.setConfigOrder(configOrder);
 
             Boolean unique = (Boolean) servicesConfig.getValueForPath(serviceString+".config.unique");
-            service.setUnique(unique != null && unique); // false by default
+            serviceDef.setUnique(unique != null && unique); // false by default
 
             Boolean kubernetes = (Boolean) servicesConfig.getValueForPath(serviceString+".config.kubernetes");
-            service.setKubernetes(kubernetes != null && kubernetes); // false by default
+            serviceDef.setKubernetes(kubernetes != null && kubernetes); // false by default
 
             Boolean kubeMaster = (Boolean) servicesConfig.getValueForPath(serviceString+".config.kubeMaster");
             if (kubeMaster != null && kubeMaster) {
-                if (kubeMasterService != null) {
-                    throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is defined as kube master but another servce " + kubeMasterService.getName() + " is already");
+                if (kubeMasterServiceDef != null) {
+                    throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is defined as kube master but another servce " + kubeMasterServiceDef.getName() + " is already");
                 }
-                kubeMasterService = service;
+                kubeMasterServiceDef = serviceDef;
             }
 
             Boolean kubeSlave = (Boolean) servicesConfig.getValueForPath(serviceString+".config.kubeSlave");
             if (kubeSlave != null && kubeSlave) {
-                if (kubeSlaveService != null) {
-                    throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is defined as kube slave but another servce " + kubeSlaveService.getName() + " is already");
+                if (kubeSlaveServiceDef != null) {
+                    throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is defined as kube slave but another servce " + kubeSlaveServiceDef.getName() + " is already");
                 }
-                kubeSlaveService = service;
+                kubeSlaveServiceDef = serviceDef;
             }
 
             Boolean registryOnly = (Boolean) servicesConfig.getValueForPath(serviceString+".config.registryOnly");
-            service.setRegistryOnly(registryOnly != null && registryOnly); // false by default
+            serviceDef.setRegistryOnly(registryOnly != null && registryOnly); // false by default
 
             Boolean mandatory = (Boolean)  servicesConfig.getValueForPath(serviceString+".config.mandatory");
-            service.setMandatory(mandatory != null && mandatory);
+            serviceDef.setMandatory(mandatory != null && mandatory);
 
             String conditional = (String) servicesConfig.getValueForPath(serviceString+".config.conditional");
             if (StringUtils.isNotBlank(conditional)) {
-                service.setConditional(ConditionalInstallation.valueOf(conditional));
+                serviceDef.setConditional(ConditionalInstallation.valueOf(conditional));
             } else {
-                service.setConditional(ConditionalInstallation.NONE);
+                serviceDef.setConditional(ConditionalInstallation.NONE);
             }
 
             String imageName = (String) servicesConfig.getValueForPath(serviceString+".config.imageName");
-            service.setImageName (imageName);
+            serviceDef.setImageName (imageName);
 
             String group = (String) servicesConfig.getValueForPath(serviceString+".config.group");
             String name = (String) servicesConfig.getValueForPath(serviceString+".config.name");
 
-            service.setStatusGroup (group);
-            service.setStatusName (name);
+            serviceDef.setStatusGroup (group);
+            serviceDef.setStatusName (name);
 
             Integer selectionLayoutRow = (Integer) servicesConfig.getValueForPath(serviceString+".config.selectionLayout.row");
             if (selectionLayoutRow != null) {
-                service.setSelectionLayoutRow(selectionLayoutRow);
+                serviceDef.setSelectionLayoutRow(selectionLayoutRow);
             }
 
             Integer selectionLayoutCol = (Integer) servicesConfig.getValueForPath(serviceString+".config.selectionLayout.col");
             if (selectionLayoutCol != null) {
-                service.setSelectionLayoutCol(selectionLayoutCol);
+                serviceDef.setSelectionLayoutCol(selectionLayoutCol);
             } else if (selectionLayoutRow != null) {
                 throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " defined a Row for selection layout but no column");
             }
@@ -195,31 +195,31 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
             // find out if another service is already defined at same location
             //noinspection ConstantConditions
             if (services.values().stream()
-                    .filter(srv -> service.getSelectionLayoutCol() != -1)
+                    .filter(srv -> serviceDef.getSelectionLayoutCol() != -1)
                     .anyMatch(srv -> srv.getSelectionLayoutCol() == selectionLayoutCol && srv.getSelectionLayoutRow() == selectionLayoutRow)) {
                 throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " defines a row and col for selection layout already defined by another service");
             }
 
             String memoryConsumptionString = (String) servicesConfig.getValueForPath(serviceString+".config.memory");
-            service.setMemoryConsumptionSize(StringUtils.isBlank(memoryConsumptionString) ?
+            serviceDef.setMemoryConsumptionSize(StringUtils.isBlank(memoryConsumptionString) ?
                     MemoryConsumptionSize.NEGLIGIBLE :
                     MemoryConsumptionSize.valueOf(memoryConsumptionString.toUpperCase()));
 
-            service.setLogo((String) servicesConfig.getValueForPath(serviceString+".config.logo"));
-            service.setIcon((String) servicesConfig.getValueForPath(serviceString+".config.icon"));
+            serviceDef.setLogo((String) servicesConfig.getValueForPath(serviceString+".config.logo"));
+            serviceDef.setIcon((String) servicesConfig.getValueForPath(serviceString+".config.icon"));
 
             if (servicesConfig.hasPath(serviceString+".config.memoryAdditional")) {
                 JSONArray memAdditionalArray = servicesConfig.getSubJSONObject(serviceString).getJSONObject("config").getJSONArray("memoryAdditional");
                 for (int i = 0; i < memAdditionalArray.length(); i++) {
 
                     String memAdditionalService = memAdditionalArray.getString(i);
-                    service.addAdditionalMemory (Service.from(memAdditionalService));
+                    serviceDef.addAdditionalMemory (Service.from(memAdditionalService));
                 }
             }
 
             if (servicesConfig.hasPath(serviceString+".ui")) {
 
-                UIConfig uiConfig = new UIConfig(service);
+                UIConfig uiConfig = new UIConfig(serviceDef);
                 uiConfig.setUrlTemplate((String) servicesConfig.getValueForPath(serviceString+".ui.urlTemplate"));
                 Integer uiWaitTime = (Integer) servicesConfig.getValueForPath(serviceString+".ui.waitTime");
                 if (uiWaitTime != null) {
@@ -242,7 +242,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                     uiConfig.setApplyStandardProxyReplacements((Boolean)servicesConfig.getValueForPath(serviceString+".ui.applyStandardProxyReplacements"));
                 }
 
-                service.setUiConfig(uiConfig);
+                serviceDef.setUiConfig(uiConfig);
 
                 if (servicesConfig.hasPath(serviceString+".ui.pageScripters")) {
 
@@ -356,7 +356,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                         dependency.setConditionalDependency(Service.from(conditionalDependency));
                     }
 
-                    service.addDependency(dependency);
+                    serviceDef.addDependency(dependency);
                 }
             }
 
@@ -385,7 +385,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                     }
                     webCommandServices.put (command, Service.from(serviceName));
 
-                    service.addWebCommand (command);
+                    serviceDef.addWebCommand (command);
                 }
                 
             }
@@ -421,7 +421,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                     }
                     command.setCommandCall(commandCall);
 
-                    service.addCommand(command);
+                    serviceDef.addCommand(command);
                 }
             }
 
@@ -442,7 +442,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                     kubeConfig.setRequest(request);
                 }
 
-                service.setKubeConfig (kubeConfig);
+                serviceDef.setKubeConfig (kubeConfig);
 
             }
 
@@ -450,7 +450,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 JSONArray addEnvConf = servicesConfig.getSubJSONObject(serviceString).getJSONArray("additionalEnvironment");
                 for (int i = 0; i < addEnvConf.length(); i++) {
                     String additionalEnv = addEnvConf.getString(i);
-                    service.addAdditionalEnvironment(additionalEnv);
+                    serviceDef.addAdditionalEnvironment(additionalEnv);
                 }
             }
 
@@ -485,7 +485,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 SimpleDateFormat timeStampFormat = new SimpleDateFormat(timeStampFormatString);
 
                 MasterDetection masterDetection = new MasterDetection(detectionStrategy, logFile, grep, timeStampExtractRexp, timeStampFormat);
-                service.setMasterDetection (masterDetection);
+                serviceDef.setMasterDetection (masterDetection);
 
             }
 
@@ -501,7 +501,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                     String propertyFormat = conf.getString("propertyFormat");
                     String filesystemService = conf.getString("filesystemService");
 
-                    EditableSettings editableSettings = new EditableSettings(service, filename, propertyType, propertyFormat, filesystemService);
+                    EditableSettings editableSettings = new EditableSettings(serviceDef, filename, propertyType, propertyFormat, filesystemService);
 
                     if (conf.has("commentPrefix")) {
                         String commentPrefix = conf.getString("commentPrefix");
@@ -523,29 +523,29 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                         editableSettings.addProperty(property);
                     }
 
-                    service.addEditableSettings(editableSettings);
+                    serviceDef.addEditableSettings(editableSettings);
                 }
             }
 
-            services.put(service.toService(), service);
+            services.put(serviceDef.toService(), serviceDef);
         }
 
         // post-processing web commands
         webCommandServices.keySet().forEach(
-                command -> command.setService(getServiceDefinition(webCommandServices.get(command)))
+                command -> command.setServiceDef(getServiceDefinition(webCommandServices.get(command)))
         );
 
         try {
             services.values().stream()
-                    .filter(ServiceDef::isKubernetes)
+                    .filter(ServiceDefinition::isKubernetes)
                     .forEach(service -> {
                         // Kubernetes services have an implicit dependency on kubernetes
                             Dependency kubeDependency = new Dependency();
                             kubeDependency.setMes(MasterElectionStrategy.RANDOM);
-                            if (getKubeMasterService() == null) {
+                            if (getKubeMasterServiceDef() == null) {
                                 throw new IllegalArgumentException("No Kube Master service found !");
                             }
-                            kubeDependency.setMasterService(getKubeMasterService().toService());
+                            kubeDependency.setMasterService(getKubeMasterServiceDef().toService());
                             kubeDependency.setNumberOfMasters(1);
                             kubeDependency.setMandatory(true);
                             kubeDependency.setRestart(false);
@@ -562,7 +562,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
         // make sure there is no hole in order: sum of configOrder should be n(n+1) / 2
         int effSum = services.values().stream()
-                .map (ServiceDef::getConfigOrder)
+                .map (ServiceDefinition::getConfigOrder)
                 .reduce(0, Integer::sum);
 
         int nbr = services.keySet().size();
@@ -575,7 +575,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
         // make sure all master service exist
         try {
             services.values().stream()
-                    .map(ServiceDef::getDependencies)
+                    .map(ServiceDefinition::getDependencies)
                     .flatMap(Collection::stream)
                     .forEach(dep -> {
                         Service master = dep.getMasterService();
@@ -591,10 +591,10 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
         try {
             Arrays.stream(listUIServices())
                     .map(this::getServiceDefinition)
-                    .map (ServiceDef::getWebCommands)
+                    .map (ServiceDefinition::getWebCommands)
                     .flatMap(List::stream)
                     .forEach(webCommand -> {
-                        if (webCommand.getService() == null) {
+                        if (webCommand.getServiceDef() == null) {
                             throw new IllegalArgumentException("Web command" + webCommand.getId() + " didn't get its service injected");
                         }
                     });
@@ -649,14 +649,14 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
     }
 
     @Override
-    public ServiceDef getServiceDefinition(Service service) {
+    public ServiceDefinition getServiceDefinition(Service service) {
         return services.get (service);
     }
 
     @Override
     public Service[] listAllServices() {
         return services.values().stream()
-                .map(ServiceDef::toService)
+                .map(ServiceDefinition::toService)
                 .sorted().toArray(Service[]::new);
     }
 
@@ -664,7 +664,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
     public Service[] listAllNodesServices() {
         return services.values().stream()
                 .filter(service -> !service.isKubernetes())
-                .map(ServiceDef::toService)
+                .map(ServiceDefinition::toService)
                 .sorted().toArray(Service[]::new);
     }
 
@@ -679,7 +679,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
     public Service[] listMultipleServicesNonKubernetes() {
         return services.values().stream()
                 .filter(it -> !it.isUnique() && !it.isKubernetes())
-                .map(ServiceDef::toService)
+                .map(ServiceDefinition::toService)
                 .sorted().toArray(Service[]::new);
     }
 
@@ -687,15 +687,15 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
     public Service[] listMultipleServices() {
         return services.values().stream()
                 .filter(it -> !it.isUnique())
-                .map(ServiceDef::toService)
+                .map(ServiceDefinition::toService)
                 .sorted().toArray(Service[]::new);
     }
 
     @Override
     public Service[] listMandatoryServices() {
         return services.values().stream()
-                .filter(ServiceDef::isMandatory)
-                .map(ServiceDef::toService)
+                .filter(ServiceDefinition::isMandatory)
+                .map(ServiceDefinition::toService)
                 .sorted()
                 .toArray(Service[]::new);
     }
@@ -703,9 +703,9 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
     @Override
     public Service[] listUniqueServices() {
         return services.values().stream()
-                .filter(ServiceDef::isUnique)
-                .filter(ServiceDef::isNotKubernetes)
-                .map(ServiceDef::toService)
+                .filter(ServiceDefinition::isUnique)
+                .filter(ServiceDefinition::isNotKubernetes)
+                .map(ServiceDefinition::toService)
                 .sorted()
                 .toArray(Service[]::new);
     }
@@ -713,8 +713,8 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
     @Override
     public Service[] listKubernetesServices() {
         return services.values().stream()
-                .filter(ServiceDef::isKubernetes)
-                .map(ServiceDef::toService)
+                .filter(ServiceDefinition::isKubernetes)
+                .map(ServiceDefinition::toService)
                 .sorted()
                 .toArray(Service[]::new);
     }
@@ -722,40 +722,40 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
     @Override
     public long countKubernetesServices() {
         return services.values().stream()
-                .filter(ServiceDef::isKubernetes)
+                .filter(ServiceDefinition::isKubernetes)
                 .count();
     }
 
     @Override
     public Service[] listProxiedServices() {
         return services.values().stream()
-                .filter(ServiceDef::isProxied)
-                .sorted(Comparator.comparingInt(ServiceDef::getConfigOrder))
-                .map(ServiceDef::toService)
+                .filter(ServiceDefinition::isProxied)
+                .sorted(Comparator.comparingInt(ServiceDefinition::getConfigOrder))
+                .map(ServiceDefinition::toService)
                 .toArray(Service[]::new);
     }
 
     @Override
     public Service[] listUIServices() {
         return services.values().stream()
-                .filter(ServiceDef::isUiService)
-                .sorted(Comparator.comparingInt(ServiceDef::getConfigOrder))
-                .map(ServiceDef::toService)
+                .filter(ServiceDefinition::isUiService)
+                .sorted(Comparator.comparingInt(ServiceDefinition::getConfigOrder))
+                .map(ServiceDefinition::toService)
                 .toArray(Service[]::new);
     }
 
     @Override
     public Map<Service, UIConfig> getUIServicesConfig() {
         return services.values().stream()
-                .filter(ServiceDef::isUiService)
-                .collect(Collectors.toMap(ServiceDef::toService, ServiceDef::getUiConfig));
+                .filter(ServiceDefinition::isUiService)
+                .collect(Collectors.toMap(ServiceDefinition::toService, ServiceDefinition::getUiConfig));
     }
 
     @Override
     public Service[] listServicesInOrder() {
         return services.values().stream()
-                .sorted(Comparator.comparingInt(ServiceDef::getConfigOrder))
-                .map(ServiceDef::toService)
+                .sorted(Comparator.comparingInt(ServiceDefinition::getConfigOrder))
+                .map(ServiceDefinition::toService)
                 .toArray(Service[]::new);
     }
 
@@ -763,7 +763,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
     public Service[] listServicesOrderedByDependencies() {
         return services.values().stream()
                 .sorted(this::compareServices)
-                .map(ServiceDef::toService)
+                .map(ServiceDefinition::toService)
                 .toArray(Service[]::new);
     }
 
@@ -771,13 +771,13 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
     public Service[] listKubernetesServicesOrderedByDependencies() {
         return services.values().stream()
                 .sorted(this::compareServices) // dunno why, but if I sort after filtering, it's not working (copare not called)
-                .filter(ServiceDef::isKubernetes)
-                .map(ServiceDef::toService)
+                .filter(ServiceDefinition::isKubernetes)
+                .map(ServiceDefinition::toService)
                 .toArray(Service[]::new);
     }
 
     @Override
-    public int compareServices(ServiceDef one, ServiceDef other) {
+    public int compareServices(ServiceDefinition one, ServiceDefinition other) {
 
         // kubernetes services are always last
         if (one.isKubernetes() && !other.isKubernetes()) {
@@ -813,8 +813,8 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
     @Override
     public int compareServices(Service servOne, Service servOther) {
 
-        ServiceDef one = getServiceDefinition(servOne);
-        ServiceDef other = getServiceDefinition(servOther);
+        ServiceDefinition one = getServiceDefinition(servOne);
+        ServiceDefinition other = getServiceDefinition(servOther);
 
         return compareServices(one, other);
     }
@@ -834,13 +834,13 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
     }
 
     @Override
-    public ServiceDef getKubeMasterService() {
-        return kubeMasterService;
+    public ServiceDefinition getKubeMasterServiceDef() {
+        return kubeMasterServiceDef;
     }
 
     @Override
-    public ServiceDef getKubeSlaveService() {
-        return kubeSlaveService;
+    public ServiceDefinition getKubeSlaveServiceDef() {
+        return kubeSlaveServiceDef;
     }
 
     private Set<Service> getDependentServicesInner(Service service, Set<Service> currentSet) {
@@ -849,7 +849,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
         }
         List<Service> directDependentList = services.values().stream()
                 .filter(it -> it.dependsOn(service))
-                .map(ServiceDef::toService)
+                .map(ServiceDefinition::toService)
                 .collect(Collectors.toList());
         currentSet.addAll(directDependentList);
         for (Service depService: directDependentList) {

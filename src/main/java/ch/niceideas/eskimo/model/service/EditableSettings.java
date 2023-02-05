@@ -51,7 +51,7 @@ public class EditableSettings {
 
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private final ServiceDef service;
+    private final ServiceDefinition serviceDef;
 
     private final String filename;
     private final EditablePropertyType propertyType;
@@ -60,9 +60,9 @@ public class EditableSettings {
     private String commentPrefix = "";
     private final List<EditableProperty> properties = new ArrayList<>();
 
-    public EditableSettings(ServiceDef service, String filename, EditablePropertyType propertyType, String propertyFormat, String filesystemService) {
+    public EditableSettings(ServiceDefinition serviceDef, String filename, EditablePropertyType propertyType, String propertyFormat, String filesystemService) {
         this.filesystemService = filesystemService;
-        this.service = service;
+        this.serviceDef = serviceDef;
         this.filename = filename;
         this.propertyType = propertyType;
         this.propertyFormat = propertyFormat;
@@ -82,7 +82,7 @@ public class EditableSettings {
                 .collect(Collectors.toList())
         );
         return new JSONObject(new HashMap<String, Object>() {{
-            put("service", service.getName());
+            put("service", serviceDef.getName());
             put("filesystemService", getFilesystemService());
             put("filename", getFilename());
             put("propertyType", getPropertyType());

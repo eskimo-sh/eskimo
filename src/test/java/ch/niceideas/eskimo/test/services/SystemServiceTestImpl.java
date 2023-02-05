@@ -37,7 +37,7 @@ package ch.niceideas.eskimo.test.services;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.SSHCommandException;
 import ch.niceideas.eskimo.services.SystemException;
 import ch.niceideas.eskimo.services.SystemService;
@@ -120,31 +120,31 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public void showJournal(ServiceDef service, Node node) {
-        executedActions.add ("Show Journal - " + service + " - " + node);
+    public void showJournal(ServiceDefinition serviceDef, Node node) {
+        executedActions.add ("Show Journal - " + serviceDef + " - " + node);
     }
 
     @Override
-    public void startService(ServiceDef service, Node node) throws SystemException {
-        executedActions.add ("Start service - " + service + " - " + node);
+    public void startService(ServiceDefinition serviceDef, Node node) throws SystemException {
+        executedActions.add ("Start service - " + serviceDef + " - " + node);
         if (startServiceError) {
             throw new SystemException("Test Error");
         }
     }
 
     @Override
-    public void stopService(ServiceDef service, Node node) {
-        executedActions.add ("Stop service - " + service + " - " + node);
+    public void stopService(ServiceDefinition serviceDef, Node node) {
+        executedActions.add ("Stop service - " + serviceDef + " - " + node);
     }
 
     @Override
-    public void restartService(ServiceDef service, Node node) {
-        executedActions.add ("restart service - " + service + " - " + node);
+    public void restartService(ServiceDefinition serviceDef, Node node) {
+        executedActions.add ("restart service - " + serviceDef + " - " + node);
     }
 
     @Override
-    public void callCommand(String commandId, Service service, Node node) {
-        executedActions.add ("Call command  - " + commandId + " - " + service + " - " + node);
+    public void callCommand(String commandId, Service serviceDef, Node node) {
+        executedActions.add ("Call command  - " + commandId + " - " + serviceDef + " - " + node);
     }
 
     @Override

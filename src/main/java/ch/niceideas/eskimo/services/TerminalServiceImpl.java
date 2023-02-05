@@ -145,7 +145,7 @@ public class TerminalServiceImpl implements TerminalService {
 
        try {
 
-           String s = extractArgument (terminalBody, "s");
+           String sessionId = extractArgument (terminalBody, "s");
 
            String w = extractArgument (terminalBody, "w");
            String h = extractArgument (terminalBody, "h");
@@ -154,7 +154,7 @@ public class TerminalServiceImpl implements TerminalService {
                    terminalBody,
                    StringUtils.isBlank(w) ? defaultSessionWidth : Integer.parseInt(w),
                    StringUtils.isBlank(h) ? defaultSessionWHeight : Integer.parseInt(h),
-                   s);
+                   sessionId);
 
            String k = urlDecode(terminalBody);
            String c = extractArgument (terminalBody, "c");

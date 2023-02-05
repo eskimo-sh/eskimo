@@ -53,8 +53,6 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
 
     public static final String INSTALLED_ON_IP_FLAG = "_installed_on_IP_";
 
-    public static final String KUBERNETES_NODE = "KUBERNETES_NODE";
-
     private static final Logger logger = Logger.getLogger(ServicesInstallStatusWrapper.class);
 
     public ServicesInstallStatusWrapper(File statusFile) throws FileException {
@@ -167,7 +165,7 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
         return getRootKeys().stream()
                 .filter(key -> key.contains(INSTALLED_ON_IP_FLAG))
                 .map(key -> key.substring(key.indexOf(INSTALLED_ON_IP_FLAG) + INSTALLED_ON_IP_FLAG.length()))
-                .filter(key -> !key.equals(KUBERNETES_NODE))
+                .filter(key -> !key.equals(Node.KUBERNETES_NODE.getName()))
                 .map(Node::fromName)
                 .collect(Collectors.toSet());
     }

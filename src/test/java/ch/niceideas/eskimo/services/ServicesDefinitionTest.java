@@ -59,7 +59,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -426,7 +425,7 @@ public class ServicesDefinitionTest {
     @Test
     public void testEditableConfiguration() throws Exception {
 
-        ServiceDef sparkService = servicesDefinition.getServiceDefinition(Service.from("calculator-runtime"));
+        ServiceDefinition sparkService = servicesDefinition.getServiceDefinition(Service.from("calculator-runtime"));
         assertNotNull(sparkService);
 
         List<EditableSettings> confs = sparkService.getEditableSettings();
@@ -470,7 +469,7 @@ public class ServicesDefinitionTest {
 
     @Test
     public void testCommandFrameworkDefinition() throws Exception {
-        ServiceDef ntp = servicesDefinition.getServiceDefinition(Service.from ("distributed-time"));
+        ServiceDefinition ntp = servicesDefinition.getServiceDefinition(Service.from ("distributed-time"));
         assertNotNull (ntp.getCommands());
         assertEquals (1, ntp.getCommands().size());
 

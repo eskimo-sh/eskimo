@@ -37,9 +37,8 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
-import ch.niceideas.eskimo.types.LabelledOperation;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
 
@@ -56,15 +55,15 @@ public interface SystemService {
 
     void delegateApplyNodesConfig(ServiceOperationsCommand command) throws NodesConfigurationException;
 
-    void showJournal(ServiceDef service, Node node) throws SystemException;
+    void showJournal(ServiceDefinition serviceDef, Node node) throws SystemException;
 
-    void startService(ServiceDef service, Node node) throws SystemException;
+    void startService(ServiceDefinition serviceDef, Node node) throws SystemException;
 
-    void stopService(ServiceDef service, Node node) throws SystemException;
+    void stopService(ServiceDefinition serviceDef, Node node) throws SystemException;
 
-    void restartService(ServiceDef service, Node node) throws SystemException;
+    void restartService(ServiceDefinition serviceDef, Node node) throws SystemException;
 
-    void callCommand(String commandId, Service service, Node node) throws SystemException;
+    void callCommand(String commandId, Service serviceDef, Node node) throws SystemException;
 
     SystemStatusWrapper getStatus() throws StatusExceptionWrapperException;
 

@@ -38,7 +38,7 @@ package ch.niceideas.eskimo.test.services;
 import ch.niceideas.eskimo.model.KubernetesOperationsCommand;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.KubernetesService;
 import ch.niceideas.eskimo.services.SystemException;
 import ch.niceideas.eskimo.types.Node;
@@ -57,27 +57,27 @@ import java.util.Map;
 public class KubernetesServiceTestImpl implements KubernetesService {
 
     @Override
-    public void showJournal(ServiceDef service, Node node) {
+    public void showJournal(ServiceDefinition serviceDef, Node node) {
         // No-Op
     }
 
     @Override
-    public void startService(ServiceDef service, Node node) throws SystemException {
+    public void startService(ServiceDefinition serviceDef, Node node) throws SystemException {
         // No-Op
     }
 
     @Override
-    public void stopService(ServiceDef service, Node node) {
+    public void stopService(ServiceDefinition serviceDef, Node node) {
         // No-Op
     }
 
     @Override
-    public void restartService(ServiceDef service, Node node) {
+    public void restartService(ServiceDefinition serviceDef, Node node) {
         // No-Op
     }
 
     @Override
-    public String restartServiceInternal(ServiceDef service, Node node) {
+    public String restartServiceInternal(ServiceDefinition serviceDef, Node node) {
         return null;
     }
 

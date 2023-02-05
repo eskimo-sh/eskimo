@@ -33,22 +33,35 @@
  */
 
 
-package ch.niceideas.eskimo.services.mdstrategy;
+package ch.niceideas.eskimo.types;
 
-import ch.niceideas.eskimo.model.service.MasterDetection;
-import ch.niceideas.eskimo.model.service.ServiceDefinition;
-import ch.niceideas.eskimo.services.MasterDetectionException;
-import ch.niceideas.eskimo.services.MasterService;
-import ch.niceideas.eskimo.services.NotificationService;
-import ch.niceideas.eskimo.services.SSHCommandService;
-import ch.niceideas.eskimo.types.Node;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Date;
+@EqualsAndHashCode
+@RequiredArgsConstructor
+public final class ServiceWebId {
 
-public interface MdStrategy {
+    @Getter
+    private final Service service;
 
-    Date detectMaster(
-            ServiceDefinition serviceDef, Node node, MasterDetection masterDetection,
-            MasterService masterService, SSHCommandService sshCommandService,
-            NotificationService notificationService) throws MasterDetectionException;
+    @Getter
+    private final Node node;
+
+    public static ServiceWebId fromService(Service service) {
+        return new ServiceWebId(service, null);
+    }
+
+    public static ServiceWebId fromServiceAndNode(Service service, Node node) {
+        return new ServiceWebId(service, node);
+    }
+
+    public String toString() {
+        if (getNode() == null) {
+            return service.getName();
+        } else {
+            return service.getName() + "/" + getNode().getName();
+        }
+    }
 }

@@ -57,7 +57,7 @@ public interface ServicesDefinition {
     Topology getTopology(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, Node currentNode)
             throws ServiceDefinitionException, NodesConfigurationException;
 
-    ServiceDef getServiceDefinition(Service service);
+    ServiceDefinition getServiceDefinition(Service service);
 
     Service[] listAllServices();
 
@@ -89,15 +89,15 @@ public interface ServicesDefinition {
 
     Service[] listKubernetesServicesOrderedByDependencies();
 
-    int compareServices(ServiceDef one, ServiceDef other);
+    int compareServices(ServiceDefinition one, ServiceDefinition other);
 
     int compareServices(Service servOne, Service servOther);
 
     Collection<Service> getDependentServices(Service service);
 
-    ServiceDef getKubeMasterService();
+    ServiceDefinition getKubeMasterServiceDef();
 
-    ServiceDef getKubeSlaveService();
+    ServiceDefinition getKubeSlaveServiceDef();
 
     interface EnvironmentOperation {
         void call(JsonWrapper persistentEnvironment) throws ServiceDefinitionException;

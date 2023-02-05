@@ -37,7 +37,7 @@ package ch.niceideas.eskimo.utils;
 
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.KubernetesService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.types.Node;
@@ -166,15 +166,15 @@ public class KubeStatusParser {
                 .findAny().orElse(null) != null;
     }
 
-    public Pair<Node, String> getServiceRuntimeNode(ServiceDef service, Node kubeNode) {
+    public Pair<Node, String> getServiceRuntimeNode(ServiceDefinition serviceDef, Node kubeNode) {
 
-        List<Pair<Node, String>> podNodesAndStatus = getPodNodesAndStatus(service.toService());
-        Node serviceNode = getServiceNode(service.getName());
-        boolean serviceFound = serviceStatuses.get(service.getName()) != null;
+        List<Pair<Node, String>> podNodesAndStatus = getPodNodesAndStatus(serviceDef.toService());
+        Node serviceNode = getServiceNode(serviceDef.getName());
+        boolean serviceFound = serviceStatuses.get(serviceDef.getName()) != null;
 
         // 0. registryOnlyservices are a specific case
-        if (service.isRegistryOnly()) {
-            if (registryServices.stream().anyMatch(registrySrv -> registrySrv.equalsIgnoreCase(service.getName()))) {
+        if (serviceDef.isRegistryOnly()) {
+            if (registryServices.stream().anyMatch(registrySrv -> registrySrv.equalsIgnoreCase(serviceDef.getName()))) {
                 return new Pair<>(kubeNode, KubernetesService.STATUS_RUNNING);
             } else {
                 return new Pair<>(null, "NA");
@@ -183,7 +183,7 @@ public class KubeStatusParser {
 
         // 1. if at east one POD is running and service is OK, return running on kubeIp
         if (serviceFound
-                && (serviceNode != null || !service.isUnique())
+                && (serviceNode != null || !serviceDef.isUnique())
                 && !podNodesAndStatus.isEmpty()
                 && podNodesAndStatus.stream()
                     .map(Pair::getValue)

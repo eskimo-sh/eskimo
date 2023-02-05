@@ -36,6 +36,7 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
+import ch.niceideas.eskimo.types.ServiceWebId;
 import org.apache.log4j.Logger;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.WebSocketMessage;
@@ -58,7 +59,7 @@ public class WebSocketProxyForwarder {
 
     private final Logger logger = Logger.getLogger(this.getClass());
 
-    private final String serviceId;
+    private final ServiceWebId serviceId;
 
     private final String targetPath;
 
@@ -69,7 +70,7 @@ public class WebSocketProxyForwarder {
     private final ProxyManagerService proxyManagerService;
 
     public WebSocketProxyForwarder(
-            String serviceId, String targetPath, ProxyManagerService proxyManagerService, WebSocketSession webSocketServerSession) {
+            ServiceWebId serviceId, String targetPath, ProxyManagerService proxyManagerService, WebSocketSession webSocketServerSession) {
         this.serviceId = serviceId;
         this.targetPath = targetPath;
         this.proxyManagerService = proxyManagerService;

@@ -41,6 +41,7 @@ import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
 import ch.niceideas.eskimo.test.services.WebSocketProxyServerTestImpl;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
+import ch.niceideas.eskimo.types.ServiceWebId;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -156,22 +157,26 @@ public class ProxyManagerServiceTest {
     public void testGetServerURI() throws Exception {
         proxyManagerService.updateServerForService(Service.from("zeppelin"), Node.fromAddress("192.168.10.11"));
 
-        assertEquals("http://localhost:"+proxyManagerService.getTunnelConfig("zeppelin").getLocalPort()+"/", proxyManagerService.getServerURI(Service.from ("zeppelin"), "/zeppelin"));
-        assertEquals("http://localhost:"+proxyManagerService.getTunnelConfig("zeppelin").getLocalPort()+"/", proxyManagerService.getServerURI(Service.from ("zeppelin"), "/zeppelin/tugudu"));
+        assertEquals("http://localhost:"+proxyManagerService.getTunnelConfig(ServiceWebId.fromService(Service.from("zeppelin"))).getLocalPort()+"/",
+                proxyManagerService.getServerURI(Service.from ("zeppelin"), "/zeppelin"));
+        assertEquals("http://localhost:"+proxyManagerService.getTunnelConfig(ServiceWebId.fromService(Service.from("zeppelin"))).getLocalPort()+"/",
+                proxyManagerService.getServerURI(Service.from ("zeppelin"), "/zeppelin/tugudu"));
 
-        assertTrue (proxyManagerService.getTunnelConfig("zeppelin").getLocalPort() >= ProxyManagerService.LOCAL_PORT_RANGE_START && proxyManagerService.getTunnelConfig("zeppelin").getLocalPort() <= 65535);
+        assertTrue (
+                   proxyManagerService.getTunnelConfig(ServiceWebId.fromService(Service.from("zeppelin"))).getLocalPort() >= ProxyManagerService.LOCAL_PORT_RANGE_START
+                        && proxyManagerService.getTunnelConfig(ServiceWebId.fromService(Service.from("zeppelin"))).getLocalPort() <= 65535);
 
         proxyManagerService.updateServerForService(Service.from("gluster"), Node.fromAddress("192.168.10.11"));
 
-        String glusterServiceId  = servicesDefinition.getServiceDefinition(Service.from("gluster")).getServiceId(Node.fromAddress("192.168.10.11"));
+        ServiceWebId glusterServiceId  = servicesDefinition.getServiceDefinition(Service.from("gluster")).getServiceId(Node.fromAddress("192.168.10.11"));
         assertEquals("http://localhost:"+proxyManagerService.getTunnelConfig(glusterServiceId).getLocalPort()+"/", proxyManagerService.getServerURI(Service.from ("gluster"), "/192-168-10-11/test"));
     }
 
     @Test
     public void testExtractHostFromPathInfo() {
-        assertEquals(Node.fromAddress("192.168.10.11"), proxyManagerService.extractHostFromPathInfo("192.168.10.11//slave(1)/monitor/statistics"));
-        assertEquals(Node.fromAddress("192.168.10.11"), proxyManagerService.extractHostFromPathInfo("/192.168.10.11//slave(1)/monitor/statistics"));
-        assertEquals(Node.fromAddress("192.168.10.11"), proxyManagerService.extractHostFromPathInfo("/192.168.10.11"));
+        assertEquals(Node.fromAddress("192.168.10.11"), proxyManagerService.extractHostFromPathInfo("192-168-10-11//slave(1)/monitor/statistics"));
+        assertEquals(Node.fromAddress("192.168.10.11"), proxyManagerService.extractHostFromPathInfo("/192-168-10-11//slave(1)/monitor/statistics"));
+        assertEquals(Node.fromAddress("192.168.10.11"), proxyManagerService.extractHostFromPathInfo("/192-168-10-11"));
     }
 
     @Test

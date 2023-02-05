@@ -36,7 +36,7 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.SetupService;
@@ -105,7 +105,7 @@ public class SetupCommand implements JSONOpCommand {
                 .map(servicesDefinition::getServiceDefinition)
                 .filter(service -> missingServices.contains(service.getImageName()))
                 .sorted(servicesDefinition::compareServices)
-                .map(ServiceDef::getImageName)
+                .map(ServiceDefinition::getImageName)
                 .distinct()
                 .collect(Collectors.toList());
 

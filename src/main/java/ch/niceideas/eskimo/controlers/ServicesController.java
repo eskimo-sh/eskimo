@@ -34,7 +34,7 @@
 
 package ch.niceideas.eskimo.controlers;
 
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.model.service.UIConfig;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.types.Service;
@@ -161,7 +161,7 @@ public class ServicesController {
 
             Arrays.stream(servicesDefinition.listAllServices())
                     .map(service -> servicesDefinition.getServiceDefinition(service))
-                    .filter(ServiceDef::isKubernetes)
+                    .filter(ServiceDefinition::isKubernetes)
                     .forEach(serviceDef -> kubeServicesConfig.put (serviceDef.getName(), serviceDef.toConfigJSON()));
 
             map.put("kubernetesServices", new JSONArray(servicesDefinition.listKubernetesServices()));

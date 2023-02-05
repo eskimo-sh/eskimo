@@ -37,9 +37,9 @@ package ch.niceideas.eskimo.test.services;
 
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
-import ch.niceideas.eskimo.services.ConnectionManagerException;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
+import ch.niceideas.eskimo.types.ServiceWebId;
 import org.apache.hc.core5.http.HttpHost;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
@@ -72,7 +72,7 @@ public class ProxyManagerServiceTestImpl implements ProxyManagerService {
     }
 
     @Override
-    public HttpHost getServerHost(String serviceId) {
+    public HttpHost getServerHost(ServiceWebId serviceId) {
         return null;
     }
 
@@ -102,19 +102,19 @@ public class ProxyManagerServiceTestImpl implements ProxyManagerService {
     }
 
     @Override
-    public Collection<String> getAllTunnelConfigKeys() {
+    public Collection<ServiceWebId> getAllTunnelConfigKeys() {
         return null;
     }
 
     @Override
-    public ProxyTunnelConfig getTunnelConfig(String serviceName) {
-        if (serviceName.equals("cerebro")) {
+    public ProxyTunnelConfig getTunnelConfig(ServiceWebId serviceId) {
+        if (serviceId.getService().getName().equals("cerebro")) {
             return new ProxyTunnelConfig(Service.from("cerebro"), tomcatServerLocalPort, Node.fromName("dummy"), -1);
         }
-        if (serviceName.equals("grafana")) {
+        if (serviceId.getService().getName().equals("grafana")) {
             return new ProxyTunnelConfig(Service.from("grafana"), tomcatServerLocalPort, Node.fromName("dummy"), -1);
         }
-        return new ProxyTunnelConfig(Service.from (serviceName), 12345, Node.fromAddress("192.168.10.11"), 8080);
+        return new ProxyTunnelConfig(serviceId.getService(), 12345, Node.fromAddress("192.168.10.11"), 8080);
     }
 
 }

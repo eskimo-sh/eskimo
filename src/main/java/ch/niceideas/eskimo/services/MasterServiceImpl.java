@@ -38,7 +38,7 @@ import ch.niceideas.eskimo.model.MasterStatusWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import ch.niceideas.eskimo.model.service.MasterDetection;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.mdstrategy.MdStrategy;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
@@ -156,7 +156,7 @@ public class MasterServiceImpl implements MasterService {
 
     private void ensureDefaultMastersSet() throws SetupException, SystemException, NodesConfigurationException {
 
-        List<ServiceDef> missingMasterServices = Arrays.stream(servicesDefinition.listMultipleServices())
+        List<ServiceDefinition> missingMasterServices = Arrays.stream(servicesDefinition.listMultipleServices())
                 .map(service -> servicesDefinition.getServiceDefinition(service))
                 .filter(serviceDef -> serviceDef.getMasterDetection() != null)
                 .filter(serviceDef -> !serviceMasterNodes.containsKey(serviceDef.toService()))
@@ -170,11 +170,11 @@ public class MasterServiceImpl implements MasterService {
 
                 NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
 
-                for (ServiceDef serviceDef : missingMasterServices) {
+                for (ServiceDefinition serviceDef : missingMasterServices) {
 
                     List<Node> serviceNodes;
                     if (serviceDef.isKubernetes()) {
-                        serviceNodes = nodesConfig.getAllNodesWithService(servicesDefinition.getKubeMasterService().toService());
+                        serviceNodes = nodesConfig.getAllNodesWithService(servicesDefinition.getKubeMasterServiceDef().toService());
                     } else {
                         // get any node where it's supposed to be install (always the same one)
                         serviceNodes = nodesConfig.getAllNodesWithService(serviceDef.toService());
@@ -205,14 +205,14 @@ public class MasterServiceImpl implements MasterService {
                 NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
 
                 // 2. Browse all services that are multiple
-                List<ServiceDef> masterServices = Arrays.stream(servicesDefinition.listMultipleServices())
+                List<ServiceDefinition> masterServices = Arrays.stream(servicesDefinition.listMultipleServices())
                         .map(service -> servicesDefinition.getServiceDefinition(service))
                         .filter(serviceDef -> serviceDef.getMasterDetection() != null)
                         .collect(Collectors.toList());
 
                 SystemStatusWrapper lastStatus = systemService.getStatus();
 
-                for (ServiceDef serviceDef : masterServices) {
+                for (ServiceDefinition serviceDef : masterServices) {
 
                     // If service is available on a single node in anyway, don't bother going to master election
                     List<Node> serviceNodes = lastStatus.getAllNodesForServiceRegardlessStatus(serviceDef.toService());

@@ -37,7 +37,7 @@ package ch.niceideas.eskimo.proxy;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.model.service.proxy.PageScripter;
 import ch.niceideas.eskimo.model.service.proxy.ProxyReplacement;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
@@ -45,6 +45,7 @@ import ch.niceideas.eskimo.model.service.proxy.ReplacementContext;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
+import ch.niceideas.eskimo.types.ServiceWebId;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.io.entity.InputStreamEntity;
@@ -136,7 +137,7 @@ public class ServicesProxyServlet extends ProxyServlet {
 
     private String getPrefixPath(HttpServletRequest servletRequest, String contextPathPrefix) {
         Service service = Service.from(getServiceName(servletRequest));
-        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
+        ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
 
         if (serviceDef == null) {
             throw new IllegalStateException("Couldn't find service " + service + " in service definition.");
@@ -155,9 +156,9 @@ public class ServicesProxyServlet extends ProxyServlet {
     protected HttpHost getTargetHost(HttpServletRequest servletRequest) {
         Service service = Service.from(getServiceName(servletRequest));
 
-        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
+        ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
 
-        String serviceId = service.getName();
+        ServiceWebId serviceId = ServiceWebId.fromService(service);
         if (!serviceDef.isUnique()) {
             Node targetHost = proxyManagerService.extractHostFromPathInfo(servletRequest.getPathInfo());
             serviceId = serviceDef.getServiceId(targetHost);
@@ -176,7 +177,7 @@ public class ServicesProxyServlet extends ProxyServlet {
         StringBuilder uri = new StringBuilder(500);
 
         Service service = Service.from(getServiceName(servletRequest));
-        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
+        ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
 
         uri.append(getTargetUri(servletRequest));
 
@@ -281,7 +282,7 @@ public class ServicesProxyServlet extends ProxyServlet {
 
         if (proxyResponse instanceof HttpEntityContainer) {
             Service service = Service.from(getServiceName(servletRequest));
-            ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
+            ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
 
             HttpEntity entity = ((HttpEntityContainer)proxyResponse).getEntity();
 
@@ -334,8 +335,8 @@ public class ServicesProxyServlet extends ProxyServlet {
         }
     }
 
-    String performReplacements(ServiceDef service, String requestURI, ReplacementContext context, String input) {
-        if (service.getUiConfig().isApplyStandardProxyReplacements()) {
+    String performReplacements(ServiceDefinition serviceDef, String requestURI, ReplacementContext context, String input) {
+        if (serviceDef.getUiConfig().isApplyStandardProxyReplacements()) {
 
             input = input.replace("src=\"/", "src=\"/" + context.getPrefixPath() + "/");
             input = input.replace("action=\"/", "action=\"/" + context.getPrefixPath() + "/");
@@ -348,11 +349,11 @@ public class ServicesProxyServlet extends ProxyServlet {
             input = input.replace("\"/static/", "\"/" + context.getPrefixPath() + "/static/");
         }
 
-        for (ProxyReplacement replacement : service.getUiConfig().getProxyReplacements()) {
+        for (ProxyReplacement replacement : serviceDef.getUiConfig().getProxyReplacements()) {
             input = replacement.performReplacement(input, requestURI, context);
         }
 
-        for (PageScripter scripter : service.getUiConfig().getPageScripters()) {
+        for (PageScripter scripter : serviceDef.getUiConfig().getPageScripters()) {
             if (requestURI.endsWith(scripter.getResourceUrl())) {
                 logger.info ("Applying " + scripter.getResourceUrl());
                 String script = scripter.getScript();
@@ -361,7 +362,7 @@ public class ServicesProxyServlet extends ProxyServlet {
             }
         }
 
-        for (String key : proxyManagerService.getAllTunnelConfigKeys()) {
+        for (ServiceWebId key : proxyManagerService.getAllTunnelConfigKeys()) {
             ProxyTunnelConfig config = proxyManagerService.getTunnelConfig (key);
             if (config == null) {
                 throw new IllegalStateException("Asked for proxy for service " + key + " - but none has been configured !");

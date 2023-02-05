@@ -35,10 +35,11 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.eskimo.configurations.ProxyConfiguration;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
+import ch.niceideas.eskimo.types.ServiceWebId;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -71,10 +72,10 @@ public class WebSocketProxyServerImpl extends AbstractWebSocketHandler implement
     @Autowired
     private ServicesDefinition servicesDefinition;
 
-    protected final Map<String, Map<String, Map<String, WebSocketProxyForwarder>>> forwarders = new ConcurrentHashMap<>();
+    protected final Map<ServiceWebId, Map<String, Map<String, WebSocketProxyForwarder>>> forwarders = new ConcurrentHashMap<>();
 
     /* For tests */
-    protected Map<String, Map<String, Map<String, WebSocketProxyForwarder>>> getForwarders() {
+    protected Map<ServiceWebId, Map<String, Map<String, WebSocketProxyForwarder>>> getForwarders() {
         return Collections.unmodifiableMap(forwarders);
     }
 
@@ -97,10 +98,10 @@ public class WebSocketProxyServerImpl extends AbstractWebSocketHandler implement
 
         Service service = Service.from(uri.substring(indexOfWs + 4, indexOfSlash > -1 ? indexOfSlash : uri.length()));
 
-        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
+        ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
 
         String targetPath = indexOfSlash > -1 ? uri.substring(indexOfSlash) : "";
-        String serviceId = service.getName();
+        ServiceWebId serviceId = ServiceWebId.fromService(service);
         if (!serviceDef.isUnique()) {
             Node targetHost = proxyManagerService.extractHostFromPathInfo(uri.substring(indexOfSlash));
             serviceId = serviceDef.getServiceId(targetHost);
@@ -115,7 +116,7 @@ public class WebSocketProxyServerImpl extends AbstractWebSocketHandler implement
         }
     }
 
-    protected WebSocketProxyForwarder getForwarder(String serviceId, WebSocketSession webSocketServerSession, String targetPath) {
+    protected WebSocketProxyForwarder getForwarder(ServiceWebId serviceId, WebSocketSession webSocketServerSession, String targetPath) {
 
         Map<String, Map<String, WebSocketProxyForwarder>> forwardersForService = forwarders.computeIfAbsent(serviceId, k -> new HashMap<>());
 
@@ -127,7 +128,8 @@ public class WebSocketProxyServerImpl extends AbstractWebSocketHandler implement
         });
     }
 
-    public WebSocketProxyForwarder createForwarder(String serviceId, WebSocketSession webSocketServerSession, String targetPath) {
+    @Override
+    public WebSocketProxyForwarder createForwarder(ServiceWebId serviceId, WebSocketSession webSocketServerSession, String targetPath) {
         return new WebSocketProxyForwarder(serviceId, targetPath, proxyManagerService, webSocketServerSession);
     }
 
@@ -151,7 +153,7 @@ public class WebSocketProxyServerImpl extends AbstractWebSocketHandler implement
     }
 
     @Override
-    public void removeForwardersForService(String serviceId) {
+    public void removeForwardersForService(ServiceWebId serviceId) {
         logger.info ("Dropping all forwarders for service ID " + serviceId + " (will be recreated lazily)");
         forwarders.keySet().stream()
                 .filter(service -> service.equals(serviceId))

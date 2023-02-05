@@ -41,6 +41,7 @@ import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
+import ch.niceideas.eskimo.types.ServiceWebId;
 import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
@@ -245,11 +246,11 @@ public class WebSocketProxyTest {
             // The Eskimo websocket proxy infrastructure
             registry.addHandler(new WebSocketProxyServerImpl(new ProxyManagerServiceImpl() {
                             @Override
-                            public ProxyTunnelConfig getTunnelConfig(String serviceId) {
-                                if (serviceId.equals("cerebro")) {
+                            public ProxyTunnelConfig getTunnelConfig(ServiceWebId serviceId) {
+                                if (serviceId.getService().getName().equals("cerebro")) {
                                     return new ProxyTunnelConfig(Service.from("cerebro"), tomcatServerLocalPort, Node.fromName("dummy"), -1);
                                 }
-                                if (serviceId.equals("grafana")) {
+                                if (serviceId.getService().getName().equals("grafana")) {
                                     return new ProxyTunnelConfig(Service.from("grafana"), tomcatServerLocalPort, Node.fromName("dummy"), -1);
                                 }
                                 throw new IllegalStateException();

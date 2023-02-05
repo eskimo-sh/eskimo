@@ -37,7 +37,7 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.service.Dependency;
 import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.ServiceDefinitionException;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SystemException;
@@ -96,12 +96,12 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
             Service installedService = installationPairs.getKey();
             Node node = installationPairs.getValue();
 
-            ServiceDef service = servicesDefinition.getServiceDefinition(installedService);
-            if (service == null) {
+            ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(installedService);
+            if (serviceDef == null) {
                 throw new IllegalStateException("Cann find service " + installedService + " in services definition");
             }
 
-            if (!service.isKubernetes()) {
+            if (!serviceDef.isKubernetes()) {
 
                 try {
                     int nodeNbr = nodesConfig.getNodeNumber(node);
@@ -136,9 +136,9 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         //Set<String> restartedServices = new HashSet<>();
         changedServices.forEach(service -> servicesDefinition.getDependentServices(service).stream()
                 .filter(dependent -> {
-                    ServiceDef masterService = servicesDefinition.getServiceDefinition(service);
-                    Dependency dep = servicesDefinition.getServiceDefinition(dependent).getDependency(masterService).orElseThrow(
-                            () -> new IllegalStateException("Couldn't find dependency "  + masterService + " on " + dependent));
+                    ServiceDefinition masterServiceDef = servicesDefinition.getServiceDefinition(service);
+                    Dependency dep = servicesDefinition.getServiceDefinition(dependent).getDependency(masterServiceDef).orElseThrow(
+                            () -> new IllegalStateException("Couldn't find dependency "  + masterServiceDef + " on " + dependent));
                     return dep.isRestart();
                 })
                 .forEach(dependent -> {
@@ -154,11 +154,11 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
 
                             Node node = nodesConfig.getNode(nodeNumber);
 
-                            ServiceDef masterService = servicesDefinition.getServiceDefinition(service);
-                            Dependency dep = servicesDefinition.getServiceDefinition(dependent).getDependency(masterService).orElseThrow(IllegalStateException::new);
+                            ServiceDefinition masterServiceDef = servicesDefinition.getServiceDefinition(service);
+                            Dependency dep = servicesDefinition.getServiceDefinition(dependent).getDependency(masterServiceDef).orElseThrow(IllegalStateException::new);
 
                             // if dependency is same node, only restart if service on same node is impacted
-                            if (!dep.getMes().equals(MasterElectionStrategy.SAME_NODE) || isServiceImpactedOnSameNode(retCommand, masterService, node)) {
+                            if (!dep.getMes().equals(MasterElectionStrategy.SAME_NODE) || isServiceImpactedOnSameNode(retCommand, masterServiceDef, node)) {
                                 retCommand.addRestartIfNotInstalled(dependent, node);
                             }
                         }
@@ -184,9 +184,9 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         return retCommand;
     }
 
-    private static boolean isServiceImpactedOnSameNode(ServiceOperationsCommand retCommand, ServiceDef masterService, Node node) {
+    private static boolean isServiceImpactedOnSameNode(ServiceOperationsCommand retCommand, ServiceDefinition masterServiceDef, Node node) {
         return retCommand.getInstallations().stream()
-                .anyMatch (operationId -> operationId.getNode().equals(node) && operationId.getService().equals(masterService.toService()));
+                .anyMatch (operationId -> operationId.getNode().equals(node) && operationId.getService().equals(masterServiceDef.toService()));
     }
 
     static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, NodesConfigWrapper nodesConfig, Set<Service> restartedServices) {

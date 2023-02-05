@@ -38,7 +38,7 @@ package ch.niceideas.eskimo.proxy;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.model.service.proxy.WebCommand;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.types.Node;
@@ -90,16 +90,16 @@ public class WebCommandServlet extends HttpServlet {
             // 2. Find matching command
             WebCommand webCommand = Arrays.stream(servicesDefinition.listUIServices())
                     .map(servicesDefinition::getServiceDefinition)
-                    .map (ServiceDef::getWebCommands)
+                    .map (ServiceDefinition::getWebCommands)
                     .flatMap(List::stream)
                     .filter(wc -> wc.getId().equals(command))
                     .findFirst().orElseThrow(() -> new IllegalStateException("More than one webCommand found with ID " + command));
 
             // 3. Find node running target service
             ServicesInstallStatusWrapper installStatus = configurationService.loadServicesInstallationStatus();
-            Node serviceNode = installStatus.getFirstNode(webCommand.getService().toService());
+            Node serviceNode = installStatus.getFirstNode(webCommand.getServiceDef().toService());
             if (serviceNode == null) {
-                throw new IllegalStateException("Couldn't find any node running servuce " + webCommand.getService().getName());
+                throw new IllegalStateException("Couldn't find any node running servuce " + webCommand.getServiceDef().getName());
             }
 
             // 3. Execute command

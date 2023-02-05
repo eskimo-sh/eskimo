@@ -37,7 +37,7 @@ package ch.niceideas.eskimo.services.satellite;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.Dependency;
 import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
@@ -79,13 +79,13 @@ public class ServicesInstallationSorter {
         }
 
         // 2. Order by dependencies
-        List<ServiceDef> services = groupedOperations.keySet().stream()
+        List<ServiceDefinition> services = groupedOperations.keySet().stream()
                 .sorted((one, other) -> servicesDefinition.compareServices(one, other))
                 .map(service -> servicesDefinition.getServiceDefinition(service))
                 .collect(Collectors.toList());
 
         // sort installation first, uninstallation after, restarts in the end
-        for (ServiceDef serviceDef : services) {
+        for (ServiceDefinition serviceDef : services) {
             List<T> operationForService = groupedOperations.get(serviceDef.toService());
             if (operationForService != null) {
                 operationForService.sort((o1, o2) -> {
@@ -121,7 +121,7 @@ public class ServicesInstallationSorter {
 
         Topology topology = servicesDefinition.getTopology(nodesConfig, configurationService.loadKubernetesServicesConfig(), null);
 
-        for (ServiceDef serviceDef : services) {
+        for (ServiceDefinition serviceDef : services) {
 
             List<T> group = groupedOperations.get(serviceDef.toService());
 
@@ -177,25 +177,25 @@ public class ServicesInstallationSorter {
                 List<T> prev = orderedOperationsSteps.get(i - 1);
 
                 // Does any service in current have any dependency on any service in prev ?
-                Set<ServiceDef> currentServices = new HashSet<>();
+                Set<ServiceDefinition> currentServices = new HashSet<>();
                 for (OperationId<?> installation : current) {
                     currentServices.add(servicesDefinition.getServiceDefinition(installation.getService()));
                 }
 
-                Set<ServiceDef> prevServices = new HashSet<>();
+                Set<ServiceDefinition> prevServices = new HashSet<>();
                 for (OperationId<?> installation : prev) {
                     prevServices.add(servicesDefinition.getServiceDefinition(installation.getService()));
                 }
 
                 boolean hasDependency = false;
                 boolean mixUpKubernetes = false;
-                for (ServiceDef currentService : currentServices) {
-                    for (ServiceDef prevService : prevServices) {
-                        if (currentService.hasDependency(prevService)) {
+                for (ServiceDefinition currentServiceDef : currentServices) {
+                    for (ServiceDefinition prevService : prevServices) {
+                        if (currentServiceDef.hasDependency(prevService)) {
                             hasDependency = true;
                         }
-                        if (   (currentService.isKubernetes() && !prevService.isKubernetes())
-                            || (!currentService.isKubernetes() && prevService.isKubernetes())) {
+                        if (   (currentServiceDef.isKubernetes() && !prevService.isKubernetes())
+                            || (!currentServiceDef.isKubernetes() && prevService.isKubernetes())) {
                             mixUpKubernetes = true;
                         }
                     }

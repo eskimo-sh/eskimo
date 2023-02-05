@@ -39,11 +39,10 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
-import ch.niceideas.eskimo.types.LabelledOperation;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
 import ch.niceideas.eskimo.utils.SystemStatusParser;
@@ -165,47 +164,47 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public void showJournal(ServiceDef service, Node node) throws SystemException {
-        applyServiceOperation(service.toService(), node, SimpleOperationCommand.SimpleOperation.SHOW_JOURNAL, () -> {
-            if (service.isKubernetes()) {
-                throw new UnsupportedOperationException("Showing kubernetes service journal for " + service.getName() + SHOULD_NOT_HAPPEN_FROM_HERE);
+    public void showJournal(ServiceDefinition serviceDef, Node node) throws SystemException {
+        applyServiceOperation(serviceDef.toService(), node, SimpleOperationCommand.SimpleOperation.SHOW_JOURNAL, () -> {
+            if (serviceDef.isKubernetes()) {
+                throw new UnsupportedOperationException("Showing kubernetes service journal for " + serviceDef.getName() + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
-                return sshCommandService.runSSHCommand(node, "sudo journalctl -u " + service.getName());
+                return sshCommandService.runSSHCommand(node, "sudo journalctl -u " + serviceDef.getName());
             }
         });
     }
 
     @Override
-    public void startService(ServiceDef service, Node node) throws SystemException {
-        applyServiceOperation(service.toService(), node, SimpleOperationCommand.SimpleOperation.START, () -> {
-            if (service.isKubernetes()) {
-                throw new UnsupportedOperationException("Starting kubernetes service " + service.getName() + SHOULD_NOT_HAPPEN_FROM_HERE);
+    public void startService(ServiceDefinition serviceDef, Node node) throws SystemException {
+        applyServiceOperation(serviceDef.toService(), node, SimpleOperationCommand.SimpleOperation.START, () -> {
+            if (serviceDef.isKubernetes()) {
+                throw new UnsupportedOperationException("Starting kubernetes service " + serviceDef.getName() + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
-                return sshCommandService.runSSHCommand(node, "sudo bash -c 'systemctl reset-failed " + service.getName() + " && systemctl start " + service.getName() + "'");
-            }
-        });
-    }
-
-    @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public void stopService(ServiceDef service, Node node) throws SystemException{
-        applyServiceOperation(service.toService(), node, SimpleOperationCommand.SimpleOperation.STOP, () -> {
-            if (service.isKubernetes()) {
-                throw new UnsupportedOperationException("Stopping kubernetes service " + service.getName() + SHOULD_NOT_HAPPEN_FROM_HERE);
-            } else {
-                return sshCommandService.runSSHCommand(node, "sudo systemctl stop " + service.getName());
+                return sshCommandService.runSSHCommand(node, "sudo bash -c 'systemctl reset-failed " + serviceDef.getName() + " && systemctl start " + serviceDef.getName() + "'");
             }
         });
     }
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void restartService(ServiceDef service, Node node) throws SystemException {
-        applyServiceOperation(service.toService(), node, SimpleOperationCommand.SimpleOperation.RESTART, () -> {
-            if (service.isKubernetes()) {
-                throw new UnsupportedOperationException("Restarting kubernetes service " + service.getName() + SHOULD_NOT_HAPPEN_FROM_HERE);
+    public void stopService(ServiceDefinition serviceDef, Node node) throws SystemException{
+        applyServiceOperation(serviceDef.toService(), node, SimpleOperationCommand.SimpleOperation.STOP, () -> {
+            if (serviceDef.isKubernetes()) {
+                throw new UnsupportedOperationException("Stopping kubernetes service " + serviceDef.getName() + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
-                return sshCommandService.runSSHCommand(node, "sudo bash -c 'systemctl reset-failed " + service.getName() + " && systemctl restart " + service.getName());
+                return sshCommandService.runSSHCommand(node, "sudo systemctl stop " + serviceDef.getName());
+            }
+        });
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void restartService(ServiceDefinition serviceDef, Node node) throws SystemException {
+        applyServiceOperation(serviceDef.toService(), node, SimpleOperationCommand.SimpleOperation.RESTART, () -> {
+            if (serviceDef.isKubernetes()) {
+                throw new UnsupportedOperationException("Restarting kubernetes service " + serviceDef.getName() + SHOULD_NOT_HAPPEN_FROM_HERE);
+            } else {
+                return sshCommandService.runSSHCommand(node, "sudo bash -c 'systemctl reset-failed " + serviceDef.getName() + " && systemctl restart " + serviceDef.getName());
             }
         });
     }
@@ -213,7 +212,7 @@ public class SystemServiceImpl implements SystemService {
     @Override
     public void callCommand(String commandId, Service service, Node node) throws SystemException {
         applyServiceOperation(service, node, SimpleOperationCommand.SimpleOperation.COMMAND , () -> {
-            ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
+            ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
 
             Command command = serviceDef.getCommand (commandId);
             if (command == null) {
@@ -353,7 +352,7 @@ public class SystemServiceImpl implements SystemService {
                 } catch (KubernetesException e) {
                     logger.debug(e, e);
                     // workaround : flag all Kubernetes services as KO on kube node
-                    Node kubeNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterService().toService());
+                    Node kubeNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterServiceDef().toService());
                     if (kubeNode != null) {
                         KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
                         for (Service service : servicesDefinition.listKubernetesServices()) {
@@ -599,14 +598,14 @@ public class SystemServiceImpl implements SystemService {
                     if (node.equals(Node.KUBERNETES_NODE)) {
 
                         // if kubernetes is not available, don't do anything
-                        Node kubeNode = systemStatus.getFirstNode(servicesDefinition.getKubeMasterService().toService());
+                        Node kubeNode = systemStatus.getFirstNode(servicesDefinition.getKubeMasterServiceDef().toService());
                         if (kubeNode == null) { // if Kubernetes is not found, don't touch anything. Let's wait for it to come back.
                             //notificationService.addError("Kubernetes inconsistency.");
                             //logger.warn("Kubernetes could not be found - not potentially flagging kubernetes services as disappeared as long as kubernetes is not back.");
                             continue;
                         }
 
-                        if (!systemStatus.isServiceOKOnNode(servicesDefinition.getKubeMasterService().toService(), kubeNode)) {
+                        if (!systemStatus.isServiceOKOnNode(servicesDefinition.getKubeMasterServiceDef().toService(), kubeNode)) {
                             //logger.warn("Kubernetes is not OK - not potentially flagging kubernetes services as disappeared as long as kubernetes is not back.");
 
                             // reset missing counter on kubernetes services when kube is down

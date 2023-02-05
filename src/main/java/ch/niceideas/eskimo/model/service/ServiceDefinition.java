@@ -41,6 +41,7 @@ import ch.niceideas.eskimo.model.service.proxy.WebCommand;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
+import ch.niceideas.eskimo.types.ServiceWebId;
 import lombok.Data;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -50,7 +51,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Data
-public class ServiceDef {
+public class ServiceDefinition {
 
     private String name;
 
@@ -219,14 +220,14 @@ public class ServiceDef {
         return isProxied() && getUiConfig().isUsingKubeProxy();
     }
 
-    public boolean hasDependency(ServiceDef service) {
+    public boolean hasDependency(ServiceDefinition serviceDef) {
         return this.getDependencies().stream()
-                .anyMatch(dep -> dep.getMasterService().equals(service.toService()));
+                .anyMatch(dep -> dep.getMasterService().equals(serviceDef.toService()));
     }
 
-    public Optional<Dependency> getDependency(ServiceDef service) {
+    public Optional<Dependency> getDependency(ServiceDefinition serviceDef) {
         return this.getDependencies().stream()
-                .filter(dep -> dep.getMasterService().equals(service.toService()))
+                .filter(dep -> dep.getMasterService().equals(serviceDef.toService()))
                 .findFirst();
     }
 
@@ -234,11 +235,11 @@ public class ServiceDef {
         this.additionalMemoryServices.add(memAdditionalService);
     }
 
-    public String getServiceId(Node host) {
+    public ServiceWebId getServiceId(Node host) {
         if (isUnique()) {
-            return getName();
+            return ServiceWebId.fromService (toService());
         } else {
-            return getName() + "/" + host.getName();
+            return ServiceWebId.fromServiceAndNode (toService(), host);
         }
     }
 

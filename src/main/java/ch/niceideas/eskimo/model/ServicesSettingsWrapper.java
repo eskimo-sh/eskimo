@@ -37,7 +37,7 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -59,7 +59,7 @@ public class ServicesSettingsWrapper extends JsonWrapper implements Serializable
 
         List<JSONObject> allConfigurations = Arrays.stream(def.listAllServices())
                 .map(def::getServiceDefinition)
-                .map (ServiceDef::getEditableConfigurationsJSON)
+                .map (ServiceDefinition::getEditableConfigurationsJSON)
                 .collect(Collectors.toList());
 
         JSONObject configObject = new JSONObject(new HashMap<String, Object>() {{

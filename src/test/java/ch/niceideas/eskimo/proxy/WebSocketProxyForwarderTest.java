@@ -36,6 +36,8 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
+import ch.niceideas.eskimo.types.Service;
+import ch.niceideas.eskimo.types.ServiceWebId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.socket.WebSocketMessage;
@@ -65,7 +67,7 @@ public class WebSocketProxyForwarderTest {
 
         serverSession = HttpObjectsHelper.createWebSocketSession(serverMessages);
 
-        forwarder = new WebSocketProxyForwarder("zeppelin", "/zeppelin", null, serverSession) {
+        forwarder = new WebSocketProxyForwarder(ServiceWebId.fromService(Service.from("zeppelin")), "/zeppelin", null, serverSession) {
             @Override
             public WebSocketSession createWebSocketClientSession() {
                 return clientSession;

@@ -36,11 +36,12 @@ package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
+import ch.niceideas.eskimo.types.ServiceWebId;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +76,7 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
     @Autowired
     private ConfigurationService configurationService;
 
-    private final Map<String, ProxyTunnelConfig> proxyTunnelConfigs = new ConcurrentHashMap<>();
+    private final Map<ServiceWebId, ProxyTunnelConfig> proxyTunnelConfigs = new ConcurrentHashMap<>();
 
     private void __dumpProxyTunnelConfig() {
         proxyTunnelConfigs.keySet().forEach(key -> logger.debug(" - " + key + " -> " + proxyTunnelConfigs.get(key)));
@@ -83,7 +84,7 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
     }
 
     @Override
-    public HttpHost getServerHost(String serviceId) {
+    public HttpHost getServerHost(ServiceWebId serviceId) {
         ProxyTunnelConfig config =  proxyTunnelConfigs.get(serviceId);
         if (config == null) {
             throw new IllegalStateException("No config found for " + serviceId);
@@ -94,9 +95,9 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
     @Override
     public String getServerURI(Service service, String pathInfo) {
 
-        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
+        ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
 
-        String serviceId;
+        ServiceWebId serviceId;
         Node targetHost = null;
         if (!serviceDef.isUnique()) {
             targetHost = extractHostFromPathInfo(pathInfo);
@@ -120,7 +121,7 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
         if (lastIndex == -1) {
             lastIndex = pathInfo.length();
         }
-        return Node.fromAddress(pathInfo.substring(startIndex, lastIndex));
+        return Node.fromName(pathInfo.substring(startIndex, lastIndex));
     }
 
     @Override
@@ -133,11 +134,11 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
     @Override
     public void updateServerForService(Service service, Node runtimeNode) throws ConnectionManagerException {
 
-        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
+        ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
         if (serviceDef != null && serviceDef.isProxied()) {
 
             // need to make a distinction between unique and multiple services here !!
-            String serviceId = serviceDef.getServiceId(runtimeNode);
+            ServiceWebId serviceId = serviceDef.getServiceId(runtimeNode);
 
             Node effNode = getRuntimeNode(runtimeNode, serviceDef);
 
@@ -183,9 +184,9 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
         }
     }
 
-    private Node getRuntimeNode(Node runtimeNode, ServiceDef service) throws ConnectionManagerException {
+    private Node getRuntimeNode(Node runtimeNode, ServiceDefinition serviceDef) throws ConnectionManagerException {
         Node effNode = runtimeNode;
-        if (service.isUsingKubeProxy()) {
+        if (serviceDef.isUsingKubeProxy()) {
 
             // Kubernetes services are redirected to kubernetes master node if they are reached through the kubectl
             // proxy, this is mandatory
@@ -197,7 +198,7 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
                 logger.error(e, e);
                 throw new ConnectionManagerException(e.getMessage(), e);
             }
-            effNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterService().toService());
+            effNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterServiceDef().toService());
             if (effNode == null) {
                 throw new ConnectionManagerException("Asked for kube master runtime node, but it couldn't be found in installation status");
             }
@@ -213,9 +214,9 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
             __dumpProxyTunnelConfig();
         }
 
-        ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
+        ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
         if (serviceDef != null && serviceDef.isProxied()) {
-            String serviceId = serviceDef.getServiceId(runtimeNode);
+            ServiceWebId serviceId = serviceDef.getServiceId(runtimeNode);
 
             ProxyTunnelConfig prevConfig = proxyTunnelConfigs.get(serviceId);
 
@@ -234,12 +235,12 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
     }
 
     @Override
-    public Collection<String> getAllTunnelConfigKeys() {
+    public Collection<ServiceWebId> getAllTunnelConfigKeys() {
         return proxyTunnelConfigs.keySet();
     }
 
     @Override
-    public ProxyTunnelConfig getTunnelConfig(String serviceId) {
+    public ProxyTunnelConfig getTunnelConfig(ServiceWebId serviceId) {
         return proxyTunnelConfigs.get(serviceId);
     }
 }

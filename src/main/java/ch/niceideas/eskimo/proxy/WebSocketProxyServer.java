@@ -35,6 +35,7 @@
 
 package ch.niceideas.eskimo.proxy;
 
+import ch.niceideas.eskimo.types.ServiceWebId;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
@@ -52,7 +53,7 @@ public interface WebSocketProxyServer extends WebSocketHandler {
     @Override
     void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception;
 
-    void removeForwardersForService(String serviceId);
+    void removeForwardersForService(ServiceWebId serviceId);
 
-    WebSocketProxyForwarder createForwarder(String serviceId, WebSocketSession webSocketServerSession, String targetPath);
+    WebSocketProxyForwarder createForwarder(ServiceWebId serviceId, WebSocketSession webSocketServerSession, String targetPath);
 }

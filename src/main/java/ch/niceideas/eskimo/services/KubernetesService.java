@@ -38,7 +38,7 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.eskimo.model.KubernetesOperationsCommand;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
 
@@ -51,15 +51,15 @@ public interface KubernetesService {
     String STATUS_TERMINATING = "Terminating";
     String STATUS_CONTAINER_CREATING = "ContainerCreating";
 
-    void showJournal(ServiceDef service, Node node) throws SystemException;
+    void showJournal(ServiceDefinition serviceDef, Node node) throws SystemException;
 
-    void startService(ServiceDef service, Node node) throws SystemException;
+    void startService(ServiceDefinition serviceDef, Node node) throws SystemException;
 
-    void stopService(ServiceDef service, Node node) throws SystemException;
+    void stopService(ServiceDefinition serviceDef, Node node) throws SystemException;
 
-    void restartService(ServiceDef service, Node node) throws SystemException;
+    void restartService(ServiceDefinition serviceDef, Node node) throws SystemException;
 
-    String restartServiceInternal(ServiceDef service, Node node) throws KubernetesException, SSHCommandException;
+    String restartServiceInternal(ServiceDefinition serviceDef, Node node) throws KubernetesException, SSHCommandException;
 
     void fetchKubernetesServicesStatus
             (Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus)

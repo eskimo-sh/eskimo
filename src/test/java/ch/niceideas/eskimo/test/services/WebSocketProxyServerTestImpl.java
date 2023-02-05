@@ -40,6 +40,7 @@ import ch.niceideas.eskimo.proxy.WebSocketProxyForwarder;
 import ch.niceideas.eskimo.proxy.WebSocketProxyServer;
 import ch.niceideas.eskimo.proxy.WebSocketProxyServerImpl;
 import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.types.ServiceWebId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
@@ -82,7 +83,7 @@ public class WebSocketProxyServerTestImpl extends WebSocketProxyServerImpl imple
     }
 
     @Override
-    public WebSocketProxyForwarder createForwarder(String serviceId, WebSocketSession webSocketServerSession, String targetPath) {
+    public WebSocketProxyForwarder createForwarder(ServiceWebId serviceId, WebSocketSession webSocketServerSession, String targetPath) {
 
         return new WebSocketProxyForwarder(serviceId, targetPath, proxyManagerService, webSocketServerSession) {
             @Override
@@ -101,7 +102,7 @@ public class WebSocketProxyServerTestImpl extends WebSocketProxyServerImpl imple
     }
 
     @Override
-    public void removeForwardersForService(String serviceId) {
+    public void removeForwardersForService(ServiceWebId serviceId) {
         removeForwardersCalled.set(true);
         super.removeForwardersForService (serviceId);
     }

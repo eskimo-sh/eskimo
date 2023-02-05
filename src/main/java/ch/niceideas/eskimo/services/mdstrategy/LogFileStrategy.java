@@ -37,7 +37,7 @@ package ch.niceideas.eskimo.services.mdstrategy;
 
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.service.MasterDetection;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.types.Node;
 import org.apache.log4j.Logger;
@@ -52,7 +52,7 @@ public class LogFileStrategy implements MdStrategy {
 
     @Override
     public Date detectMaster(
-            ServiceDef service, Node node, MasterDetection masterDetection,
+            ServiceDefinition serviceDef, Node node, MasterDetection masterDetection,
             MasterService masterService, SSHCommandService sshCommandService,
             NotificationService notificationService) throws MasterDetectionException {
 

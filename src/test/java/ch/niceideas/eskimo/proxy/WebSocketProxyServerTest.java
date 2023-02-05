@@ -38,6 +38,8 @@ package ch.niceideas.eskimo.proxy;
 import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.configurations.ProxyConfiguration;
 import ch.niceideas.eskimo.test.services.WebSocketProxyServerTestImpl;
+import ch.niceideas.eskimo.types.Service;
+import ch.niceideas.eskimo.types.ServiceWebId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,7 +95,7 @@ public class WebSocketProxyServerTest {
 
         server.handleMessage(wss1, new TextMessage("hello"));
 
-        Map<String, Map<String, Map<String, WebSocketProxyForwarder>>>  forwarders = server.getForwarders();
+        Map<ServiceWebId, Map<String, Map<String, WebSocketProxyForwarder>>>  forwarders = server.getForwarders();
 
         assertEquals(1, forwarders.size());
 
@@ -103,11 +105,11 @@ public class WebSocketProxyServerTest {
 
         assertEquals(1, forwarders.size());
 
-        assertEquals(2, forwarders.get("cerebro").size());
+        assertEquals(2, forwarders.get(ServiceWebId.fromService(Service.from("cerebro"))).size());
 
-        assertEquals(1, forwarders.get("cerebro").get(wss2.getId()).size());
+        assertEquals(1, forwarders.get(ServiceWebId.fromService(Service.from("cerebro"))).get(wss2.getId()).size());
 
-        assertNotNull(forwarders.get("cerebro").get(wss2.getId()).get("/test"));
+        assertNotNull(forwarders.get(ServiceWebId.fromService(Service.from("cerebro"))).get(wss2.getId()).get("/test"));
     }
 
     @Test
@@ -115,9 +117,9 @@ public class WebSocketProxyServerTest {
 
         testHandleMessage();
 
-        server.removeForwardersForService("cerebro");
+        server.removeForwardersForService(ServiceWebId.fromService(Service.from("cerebro")));
 
-        Map<String, Map<String, Map<String, WebSocketProxyForwarder>>>  forwarders = server.getForwarders();
+        Map<ServiceWebId, Map<String, Map<String, WebSocketProxyForwarder>>>  forwarders = server.getForwarders();
 
         assertEquals(0, forwarders.size());
 
@@ -131,15 +133,15 @@ public class WebSocketProxyServerTest {
 
         server.afterConnectionClosed(wss2, CloseStatus.NORMAL);
 
-        Map<String, Map<String, Map<String, WebSocketProxyForwarder>>>  forwarders = server.getForwarders();
+        Map<ServiceWebId, Map<String, Map<String, WebSocketProxyForwarder>>>  forwarders = server.getForwarders();
 
         assertEquals(1, forwarders.size());
 
-        assertEquals(1, forwarders.get("cerebro").size());
+        assertEquals(1, forwarders.get(ServiceWebId.fromService(Service.from("cerebro"))).size());
 
-        assertEquals(1, forwarders.get("cerebro").get(wss1.getId()).size());
+        assertEquals(1, forwarders.get(ServiceWebId.fromService(Service.from("cerebro"))).get(wss1.getId()).size());
 
-        assertNotNull(forwarders.get("cerebro").get(wss1.getId()).get("/test"));
+        assertNotNull(forwarders.get(ServiceWebId.fromService(Service.from("cerebro"))).get(wss1.getId()).get("/test"));
 
         assertEquals(1, server.getClosedCallsCount());
     }

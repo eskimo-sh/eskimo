@@ -39,7 +39,7 @@ import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.Dependency;
 import ch.niceideas.eskimo.model.service.KubeRequest;
 import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
@@ -70,7 +70,7 @@ public class KubernetesServicesConfigChecker {
 
             // ensure only kubernetes services
             for (Service service : kubeServicesConfig.getEnabledServices()) {
-                ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
+                ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
                 if (!serviceDef.isKubernetes()) {
                     throw new KubernetesServicesConfigException("Inconsistency found : service " + service + " is not a kubernetes service");
                 }
@@ -79,7 +79,7 @@ public class KubernetesServicesConfigChecker {
             // enforce dependencies
             for (Service service : kubeServicesConfig.getEnabledServices()) {
 
-                ServiceDef serviceDef = servicesDefinition.getServiceDefinition(service);
+                ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
 
                 for (Dependency dependency : serviceDef.getDependencies()) {
 
@@ -97,8 +97,8 @@ public class KubernetesServicesConfigChecker {
                     // I want the dependency somewhere
                     else if (dependency.isMandatory(nodesConfig)) {
 
-                        ServiceDef depService = servicesDefinition.getServiceDefinition(dependency.getMasterService());
-                        if (depService.isKubernetes()) {
+                        ServiceDefinition depServiceDef = servicesDefinition.getServiceDefinition(dependency.getMasterService());
+                        if (depServiceDef.isKubernetes()) {
 
                             if (dependency.getNumberOfMasters() > 1) {
                                 throw new KubernetesServicesConfigException("Inconsistency found : Service " + service + " is a kubernetes service and defines a dependency with master count "

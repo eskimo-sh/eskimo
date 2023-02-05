@@ -42,7 +42,7 @@ import ch.niceideas.eskimo.model.NodesConfigWrapper.ParsedNodesConfigProperty;
 import ch.niceideas.eskimo.model.service.Dependency;
 import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
 import ch.niceideas.eskimo.model.service.MemoryModel;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.ServiceDefinitionException;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SetupException;
@@ -121,28 +121,28 @@ public class Topology {
 
                 ParsedNodesConfigProperty result = parseKeyToServiceConfig (key, nodesConfig);
 
-                ServiceDef service = servicesDefinition.getServiceDefinition(result.getService());
-                if (service == null) {
+                ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(result.getService());
+                if (serviceDef == null) {
                     throw new NodesConfigurationException("Could not find any service definition matching " + result.getService());
                 }
 
-                topology.defineMasters(servicesDefinition, service, result.getNodeNumber(), nodesConfig, kubeServicesConfig);
+                topology.defineMasters(servicesDefinition, serviceDef, result.getNodeNumber(), nodesConfig, kubeServicesConfig);
 
-                topology.defineAdditionalEnvionment(service, servicesDefinition, contextPath, result.getNodeNumber(), nodesConfig);
+                topology.defineAdditionalEnvionment(serviceDef, servicesDefinition, contextPath, result.getNodeNumber(), nodesConfig);
             }
 
             // Define master for kubernetes services
             if (currentNode != null && kubeServicesConfig != null) {
                 for (Service key : kubeServicesConfig.getEnabledServices()) {
 
-                    ServiceDef service = servicesDefinition.getServiceDefinition(key);
-                    if (service == null) {
+                    ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(key);
+                    if (serviceDef == null) {
                         throw new NodesConfigurationException("Could not find any service definition matching " + key);
                     }
 
                     int currentNodeNumber = nodesConfig.getNodeNumber(currentNode);
 
-                    topology.defineMasters(servicesDefinition, service, currentNodeNumber, nodesConfig, kubeServicesConfig);
+                    topology.defineMasters(servicesDefinition, serviceDef, currentNodeNumber, nodesConfig, kubeServicesConfig);
                 }
             }
 
@@ -155,20 +155,20 @@ public class Topology {
     }
 
     private void defineAdditionalEnvionment (
-            ServiceDef service, ServicesDefinition servicesDefinition, String contextPath, int nodeNbr, NodesConfigWrapper nodesConfig)
+            ServiceDefinition serviceDef, ServicesDefinition servicesDefinition, String contextPath, int nodeNbr, NodesConfigWrapper nodesConfig)
             throws ServiceDefinitionException, FileException, SetupException {
 
         Node node = nodesConfig.getNode (nodeNbr);
 
-        for (String addEnv : service.getAdditionalEnvironment()) {
-            Map<String, String> addEnvForService = additionalEnvironment.computeIfAbsent(service.toService(), k -> new HashMap<>());
+        for (String addEnv : serviceDef.getAdditionalEnvironment()) {
+            Map<String, String> addEnvForService = additionalEnvironment.computeIfAbsent(serviceDef.toService(), k -> new HashMap<>());
 
             if (addEnv.equals(SERVICE_NUMBER_0_BASED) || addEnv.equals(SERVICE_NUMBER_1_BASED)) {
 
                 servicesDefinition.executeInEnvironmentLock(persistentEnvironment -> {
 
                     String variableName = NODE_NBR_PREFIX
-                            + service.toService().getEnv()
+                            + serviceDef.toService().getEnv()
                             + "_"
                             + node.getEnv();
 
@@ -181,7 +181,7 @@ public class Topology {
                         do {
                             boolean alreadyTaken = false;
                             for (String key : persistentEnvironment.getRootKeys()) {
-                                if (key.startsWith(NODE_NBR_PREFIX + service.getName().toUpperCase().toUpperCase().replace("-", "_") + "_")) {
+                                if (key.startsWith(NODE_NBR_PREFIX + serviceDef.getName().toUpperCase().toUpperCase().replace("-", "_") + "_")) {
                                     int value = Integer.parseInt((String)persistentEnvironment.getValueForPath(key));
                                     if (value >= counter) {
                                         alreadyTaken = true;
@@ -230,22 +230,22 @@ public class Topology {
         }
     }
 
-    private void defineMasters(ServicesDefinition servicesDefinition, ServiceDef service, int nodeNbr, NodesConfigWrapper nodesConfig,
+    private void defineMasters(ServicesDefinition servicesDefinition, ServiceDefinition serviceDef, int nodeNbr, NodesConfigWrapper nodesConfig,
                                KubernetesServicesConfigWrapper kubeServicesConfig)
             throws NodesConfigurationException, ServiceDefinitionException {
-        for (Dependency dep : service.getDependencies()) {
+        for (Dependency dep : serviceDef.getDependencies()) {
 
-            ServiceDef masterService = servicesDefinition.getServiceDefinition(dep.getMasterService());
-            if (masterService.isKubernetes()) {
+            ServiceDefinition masterServiceDef = servicesDefinition.getServiceDefinition(dep.getMasterService());
+            if (masterServiceDef.isKubernetes()) {
 
-                if (!service.isKubernetes()) {
-                    throw new ServiceDefinitionException (SERVICE + " " + service.getName()
-                            + " defines a dependency on a kube service " + masterService.getName() + " which is not supported.");
+                if (!serviceDef.isKubernetes()) {
+                    throw new ServiceDefinitionException (SERVICE + " " + serviceDef.getName()
+                            + " defines a dependency on a kube service " + masterServiceDef.getName() + " which is not supported.");
                 }
 
-                if (kubeServicesConfig == null || !kubeServicesConfig.isServiceInstallRequired(masterService.toService())) {
-                    throw new ServiceDefinitionException (SERVICE + " " + service.getName()
-                            + " defines a dependency on another kube service " + masterService.getName() + " but that service is not going to be installed.");
+                if (kubeServicesConfig == null || !kubeServicesConfig.isServiceInstallRequired(masterServiceDef.toService())) {
+                    throw new ServiceDefinitionException (SERVICE + " " + serviceDef.getName()
+                            + " defines a dependency on another kube service " + masterServiceDef.getName() + " but that service is not going to be installed.");
                 }
                 // XXX Dependeny on Kube-master is enforced already, we're left with checking that the dependency definition is not crazy
                 switch (dep.getMes()) {
@@ -253,18 +253,18 @@ public class Topology {
                     case RANDOM_NODE_AFTER:
                     case RANDOM_NODE_AFTER_OR_SAME:
                     case SAME_NODE:
-                        throw new ServiceDefinitionException (SERVICE + " " + service.getName()
-                                + " defines a dependency on another kube service " + masterService.getName() + " if type " + dep.getMes() + " which is not suppored");
+                        throw new ServiceDefinitionException (SERVICE + " " + serviceDef.getName()
+                                + " defines a dependency on another kube service " + masterServiceDef.getName() + " if type " + dep.getMes() + " which is not suppored");
                     default:
                         break;
                 }
             } else {
-                defineMasters (dep, service, nodeNbr, nodesConfig);
+                defineMasters (dep, serviceDef, nodeNbr, nodesConfig);
             }
         }
 
     }
-    private void defineMasters(Dependency dep, ServiceDef service, int nodeNbr,
+    private void defineMasters(Dependency dep, ServiceDefinition serviceDef, int nodeNbr,
                                NodesConfigWrapper nodesConfig)
             throws ServiceDefinitionException, NodesConfigurationException {
 
@@ -276,7 +276,7 @@ public class Topology {
             case FIRST_NODE:
                 for (int i = 1; i <= dep.getNumberOfMasters(); i++) {
                     Node masterNode = findFirstOtherServiceNode(nodesConfig, dep.getMasterService(), otherMasters);
-                    masterNode = handleMissingMaster(nodesConfig, dep, service, masterNode, i);
+                    masterNode = handleMissingMaster(nodesConfig, dep, serviceDef, masterNode, i);
                     if (masterNode != null) {
                         definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + i, masterNode);
                         otherMasters.add(masterNode);
@@ -286,7 +286,7 @@ public class Topology {
 
             case SAME_NODE_OR_RANDOM:
                 if ( dep.getNumberOfMasters() > 1) {
-                    throw new ServiceDefinitionException (SERVICE + " " + service.getName() + " defined several master required. This is unsupported for SAME_NODE_OR_RANDOM");
+                    throw new ServiceDefinitionException (SERVICE + " " + serviceDef.getName() + " defined several master required. This is unsupported for SAME_NODE_OR_RANDOM");
                 }
 
                 String multiServiceValue = (String) nodesConfig.getValueForPath(dep.getMasterService().getName() + nodeNbr);
@@ -298,7 +298,7 @@ public class Topology {
                         definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep)+"_"+node.getEnv(), node);
                     } else {
                         Node masterNode = findFirstServiceNode(nodesConfig, dep.getMasterService());
-                        masterNode = handleMissingMaster(nodesConfig, dep, service, masterNode);
+                        masterNode = handleMissingMaster(nodesConfig, dep, serviceDef, masterNode);
                         if (masterNode != null) {
                             definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep) + "_" + node.getEnv(), masterNode);
                         }
@@ -309,7 +309,7 @@ public class Topology {
             case RANDOM:
                 for (int i = 1; i <= dep.getNumberOfMasters(); i++) {
                     Node masterNode = findRandomOtherServiceNode(nodesConfig, dep.getMasterService(), otherMasters);
-                    masterNode = handleMissingMaster(nodesConfig, dep, service, masterNode, i);
+                    masterNode = handleMissingMaster(nodesConfig, dep, serviceDef, masterNode, i);
                     if (masterNode != null) {
                         definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + i, masterNode);
                         otherMasters.add(masterNode);
@@ -319,12 +319,12 @@ public class Topology {
 
             case RANDOM_NODE_AFTER:
             case RANDOM_NODE_AFTER_OR_SAME:
-                if (service.isKubernetes()) {
-                    throw new ServiceDefinitionException (SERVICE + " " + service.getName()
+                if (serviceDef.isKubernetes()) {
+                    throw new ServiceDefinitionException (SERVICE + " " + serviceDef.getName()
                             + " defines a " + dep.getMes() + " dependency on " + dep.getMasterService()+ ", which is not supported for kubernetes services");
                 }
                 if (dep.getNumberOfMasters() > 1) {
-                    throw new ServiceDefinitionException (SERVICE + " " + service.getName() + " defined several master required. This is unsupported for RANDOM_NODE_AFTER");
+                    throw new ServiceDefinitionException (SERVICE + " " + serviceDef.getName() + " defined several master required. This is unsupported for RANDOM_NODE_AFTER");
                 }
 
                 Node masterNode = findRandomServiceNodeAfter(nodesConfig, dep.getMasterService(), nodeNbr);
@@ -333,14 +333,14 @@ public class Topology {
                     masterNode = findRandomOtherServiceNode(nodesConfig, dep.getMasterService(), otherMasters);
                 }
                 if (masterNode != null) {
-                    masterNode = handleMissingMaster(nodesConfig, dep, service, masterNode);
+                    masterNode = handleMissingMaster(nodesConfig, dep, serviceDef, masterNode);
                     definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + node.getEnv(), masterNode);
                 }
                 break;
 
             case SAME_NODE:
-                if (service.isKubernetes()) {
-                    throw new ServiceDefinitionException (SERVICE + " " + service.getName() + " defines a SAME_NODE dependency on "
+                if (serviceDef.isKubernetes()) {
+                    throw new ServiceDefinitionException (SERVICE + " " + serviceDef.getName() + " defines a SAME_NODE dependency on "
                             + dep.getMasterService() + ", which is not supported for kubernetes services");
                 }
                 break;
@@ -356,14 +356,14 @@ public class Topology {
         return dep.getMasterService().getEnv();
     }
 
-    private Node handleMissingMaster(ConfigurationOwner nodesConfig, Dependency dep, ServiceDef service, Node masterNode, int countOfMaster) throws NodesConfigurationException {
+    private Node handleMissingMaster(ConfigurationOwner nodesConfig, Dependency dep, ServiceDefinition serviceDef, Node masterNode, int countOfMaster) throws NodesConfigurationException {
         return handleMissingMasterInternal (nodesConfig, dep, masterNode,
-                "Dependency " + dep.getMasterService() + " for service " + service.getName() + " could not found occurence " + countOfMaster);
+                "Dependency " + dep.getMasterService() + " for service " + serviceDef.getName() + " could not found occurence " + countOfMaster);
     }
 
-    private Node handleMissingMaster(ConfigurationOwner nodesConfig, Dependency dep, ServiceDef service, Node masterNode) throws NodesConfigurationException {
+    private Node handleMissingMaster(ConfigurationOwner nodesConfig, Dependency dep, ServiceDefinition serviceDef, Node masterNode) throws NodesConfigurationException {
         return handleMissingMasterInternal (nodesConfig, dep, masterNode,
-                "Dependency " + dep.getMasterService() + " for service" + service.getName() + " could not be found");
+                "Dependency " + dep.getMasterService() + " for service" + serviceDef.getName() + " could not be found");
     }
 
     private Node handleMissingMasterInternal(ConfigurationOwner nodesConfig, Dependency dep, Node masterNode, String message) throws NodesConfigurationException {
@@ -460,9 +460,9 @@ public class Topology {
         return null;
     }
 
-    public Node[] getMasters(ServiceDef service) {
+    public Node[] getMasters(ServiceDefinition serviceDef) {
 
-        String variableName = service.getName().toUpperCase().replace("-", "_");
+        String variableName = serviceDef.getName().toUpperCase().replace("-", "_");
 
         List<Node> retMasters = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -572,10 +572,10 @@ public class Topology {
         appendExport(sb, ALL_NODES_LIST, allNodes);
 
         // Kubernetes Topology
-        if (servicesDefinition.getKubeMasterService() != null
-                && nodesConfig.hasServiceConfigured(servicesDefinition.getKubeMasterService().toService()) &&
-                (   nodesConfig.isServiceOnNode(servicesDefinition.getKubeMasterService().toService(), nodeNbr)
-                 || nodesConfig.isServiceOnNode(servicesDefinition.getKubeSlaveService().toService(), nodeNbr))) {
+        if (servicesDefinition.getKubeMasterServiceDef() != null
+                && nodesConfig.hasServiceConfigured(servicesDefinition.getKubeMasterServiceDef().toService()) &&
+                (   nodesConfig.isServiceOnNode(servicesDefinition.getKubeMasterServiceDef().toService(), nodeNbr)
+                 || nodesConfig.isServiceOnNode(servicesDefinition.getKubeSlaveServiceDef().toService(), nodeNbr))) {
 
             sb.append("\n#Kubernetes Topology\n");
 

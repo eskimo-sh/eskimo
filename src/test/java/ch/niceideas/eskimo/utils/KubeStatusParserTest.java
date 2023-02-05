@@ -36,7 +36,7 @@
 package ch.niceideas.eskimo.utils;
 
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
@@ -167,7 +167,7 @@ public class KubeStatusParserTest {
 
         KubeStatusParser parser = new KubeStatusParser(allPodStatus, allServicesStatus, registryServices, sd);
 
-        ServiceDef coreDnsSrv = new ServiceDef();
+        ServiceDefinition coreDnsSrv = new ServiceDefinition();
         coreDnsSrv.setName("coredns");
         coreDnsSrv.setUnique(true);
         Pair<Node, String> srnCoredns = parser.getServiceRuntimeNode(coreDnsSrv, Node.fromAddress("111.111.111.111"));
@@ -175,7 +175,7 @@ public class KubeStatusParserTest {
         assertNull(srnCoredns.getKey());
         assertEquals ("notOK", srnCoredns.getValue());
 
-        ServiceDef cerebroSrv = new ServiceDef();
+        ServiceDefinition cerebroSrv = new ServiceDefinition();
         cerebroSrv.setName("cerebro");
         cerebroSrv.setUnique(true);
         Pair<Node, String> srnCerebro = parser.getServiceRuntimeNode(cerebroSrv, Node.fromAddress("111.111.111.111"));
@@ -183,7 +183,7 @@ public class KubeStatusParserTest {
         assertEquals (Node.fromAddress("111.111.111.111"), srnCerebro.getKey());
         assertEquals ("notOK", srnCerebro.getValue());
 
-        ServiceDef elasticsearchSrv = new ServiceDef();
+        ServiceDefinition elasticsearchSrv = new ServiceDefinition();
         elasticsearchSrv.setName("elasticsearch");
         elasticsearchSrv.setUnique(false);
         Pair<Node, String> srnES = parser.getServiceRuntimeNode(elasticsearchSrv, Node.fromAddress("111.111.111.111"));
@@ -191,7 +191,7 @@ public class KubeStatusParserTest {
         assertEquals (Node.fromAddress("111.111.111.111"), srnES.getKey());
         assertEquals ("Running", srnES.getValue());
 
-        ServiceDef kubeDasboardSrv = new ServiceDef();
+        ServiceDefinition kubeDasboardSrv = new ServiceDefinition();
         kubeDasboardSrv.setName("kubernetes-dashboard");
         kubeDasboardSrv.setUnique(false);
         Pair<Node, String> srnKubeDasboardSrv = parser.getServiceRuntimeNode(kubeDasboardSrv, Node.fromAddress("111.111.111.111"));

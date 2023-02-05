@@ -38,7 +38,7 @@ import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.model.MessageLogger;
 import ch.niceideas.eskimo.model.SetupCommand;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -135,7 +135,7 @@ public class SetupServiceImpl implements SetupService {
     public String getPackagesToBuild() {
         return additionalPackagesToBuild + "," + Arrays.stream(servicesDefinition.listAllServices())
                 .map (serviceName -> servicesDefinition.getServiceDefinition(serviceName))
-                .map (ServiceDef::getImageName)
+                .map (ServiceDefinition::getImageName)
                 .filter(Objects::nonNull)
                 .sorted()
                 .distinct()

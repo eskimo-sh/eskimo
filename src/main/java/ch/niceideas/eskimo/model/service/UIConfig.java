@@ -51,7 +51,7 @@ public class UIConfig {
 
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private final ServiceDef service;
+    private final ServiceDefinition serviceDef;
 
     private boolean usingKubeProxy = false;
     private String urlTemplate;
@@ -66,23 +66,23 @@ public class UIConfig {
     private final List<UrlRewriting> urlRewritings = new ArrayList<>();
     private final List<PageScripter> pageScripters = new ArrayList<>();
 
-    public UIConfig (ServiceDef service) {
-        this.service = service;
+    public UIConfig (ServiceDefinition serviceDef) {
+        this.serviceDef = serviceDef;
     }
 
     public JSONObject toJSON () {
         return new JSONObject(new HashMap<String, Object>() {{
             put("urlTemplate", urlTemplate == null ? "" : urlTemplate);
-            put("proxyContext", "./"+service.getName()+"/");
+            put("proxyContext", "./"+ serviceDef.getName()+"/");
             put("waitTime", waitTime);
             put("title", title);
             put("role", requiredRole);
-            put("unique", service.isUnique());
+            put("unique", serviceDef.isUnique());
         }});
     }
 
     public String getServiceName() {
-        return service.getName();
+        return serviceDef.getName();
     }
 
     public void addProxyReplacement(ProxyReplacement pr) {

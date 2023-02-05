@@ -38,6 +38,7 @@ import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.services.ConnectionManagerException;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
+import ch.niceideas.eskimo.types.ServiceWebId;
 import org.apache.hc.core5.http.HttpHost;
 
 import java.io.IOException;
@@ -52,7 +53,7 @@ public interface ProxyManagerService {
 
     int PORT_GENERATION_MAX_ATTEMPT_COUNT = 10000;
 
-    HttpHost getServerHost(String serviceId);
+    HttpHost getServerHost(ServiceWebId serviceId);
 
     String getServerURI(Service serviceName, String pathInfo);
 
@@ -64,9 +65,9 @@ public interface ProxyManagerService {
 
     void removeServerForService(Service service, Node runtimeNode);
 
-    Collection<String> getAllTunnelConfigKeys();
+    Collection<ServiceWebId> getAllTunnelConfigKeys();
 
-    ProxyTunnelConfig getTunnelConfig(String serviceId);
+    ProxyTunnelConfig getTunnelConfig(ServiceWebId serviceId);
 
     /** get a port number from 49152 to 65535 */
     static int generateLocalPort() {

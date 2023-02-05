@@ -39,7 +39,7 @@ import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.NodesConfigWrapper.ParsedNodesConfigProperty;
 import ch.niceideas.eskimo.model.service.Dependency;
 import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.types.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,12 +87,12 @@ public class NodesConfigurationChecker {
 
                 int nodeNbr = Topology.getNodeNbr(key, nodesConfig, property);
 
-                ServiceDef serviceDef = servicesDefinition.getServiceDefinition(property.getService());
+                ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(property.getService());
 
                 for (Dependency dependency : serviceDef.getDependencies()) {
 
-                    ServiceDef otherService = servicesDefinition.getServiceDefinition(dependency.getMasterService());
-                    if (otherService.isKubernetes()) {
+                    ServiceDefinition otherServiceDef = servicesDefinition.getServiceDefinition(dependency.getMasterService());
+                    if (otherServiceDef.isKubernetes()) {
                         throw new NodesConfigurationException(
                                 "Inconsistency found : Service " + property.getService()
                                         + " is defining a dependency on a kubernetes service :  "
@@ -183,7 +183,7 @@ public class NodesConfigurationChecker {
         // enforce mandatory services
         for (Service mandatoryService : servicesDefinition.listMandatoryServices()) {
 
-            ServiceDef mandatoryServiceDef = servicesDefinition.getServiceDefinition(mandatoryService);
+            ServiceDefinition mandatoryServiceDef = servicesDefinition.getServiceDefinition(mandatoryService);
 
             ConditionalInstallation conditional = mandatoryServiceDef.getConditional();
 
@@ -222,7 +222,7 @@ public class NodesConfigurationChecker {
                     && (property.getService() != null)
                     && !property.getService().equals(Service.NODE_ID_FIELD)) {
 
-                ServiceDef serviceDef = servicesDefinition.getServiceDefinition(property.getService());
+                ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(property.getService());
                 if (serviceDef == null) {
                     throw new NodesConfigurationException("Inconsistency found : service " + property.getService()
                             + " doesn't exist in ServiceDefinition");

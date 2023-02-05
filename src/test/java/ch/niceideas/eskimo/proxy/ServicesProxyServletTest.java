@@ -35,7 +35,7 @@
 package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.eskimo.EskimoApplication;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.model.service.proxy.ReplacementContext;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
@@ -44,6 +44,7 @@ import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
 import ch.niceideas.eskimo.test.services.WebSocketProxyServerTestImpl;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
+import ch.niceideas.eskimo.types.ServiceWebId;
 import org.apache.catalina.ssi.ByteArrayServletOutputStream;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpHeaders;
@@ -122,7 +123,7 @@ public class ServicesProxyServletTest {
         pms.updateServerForService(Service.from("cerebro"), Node.fromAddress("192.168.10.11"));
 
         assertEquals ("http://localhost:"
-                + pms.getTunnelConfig("cerebro").getLocalPort()
+                + pms.getTunnelConfig(ServiceWebId.fromService(Service.from("cerebro"))).getLocalPort()
                 + "/",
                 servlet.getTargetUri(request));
     }
@@ -135,7 +136,7 @@ public class ServicesProxyServletTest {
         pms.updateServerForService(Service.from("cerebro"), Node.fromAddress("192.168.10.11"));
 
         assertEquals("http://localhost:"
-                + pms.getTunnelConfig("cerebro").getLocalPort()
+                + pms.getTunnelConfig(ServiceWebId.fromService(Service.from("cerebro"))).getLocalPort()
                 + "/cerebro/statistics?server=192.168.10.13",
                 servlet.rewriteUrlFromRequest(request));
     }
@@ -149,7 +150,7 @@ public class ServicesProxyServletTest {
 
         assertEquals("http://localhost:9090/cerebro/nodeStats/statistics=192.168.10.13",
                 servlet.rewriteUrlFromResponse(request, "http://localhost:" +
-                     pms.getTunnelConfig("cerebro").getLocalPort() +
+                     pms.getTunnelConfig(ServiceWebId.fromService(Service.from("cerebro"))).getLocalPort() +
                     "/nodeStats/statistics=192.168.10.13"));
     }
 
@@ -168,7 +169,7 @@ public class ServicesProxyServletTest {
     @Test
     public void testNominalReplacements() {
 
-        ServiceDef kafkaManagerService = servicesDefinition.getServiceDefinition(Service.from("kafka-manager"));
+        ServiceDefinition kafkaManagerService = servicesDefinition.getServiceDefinition(Service.from("kafka-manager"));
         assertNotNull(kafkaManagerService);
 
         String toReplace  = "\n <a href='/toto.txt'>\na/a>";
@@ -181,7 +182,7 @@ public class ServicesProxyServletTest {
 
     @Test
     public void testPageScripterInjection() {
-        ServiceDef kubeDashboardService = servicesDefinition.getServiceDefinition(Service.from("kubernetes-dashboard"));
+        ServiceDefinition kubeDashboardService = servicesDefinition.getServiceDefinition(Service.from("kubernetes-dashboard"));
         assertNotNull(kubeDashboardService);
 
         String toReplace  = ""+"" +
@@ -204,7 +205,7 @@ public class ServicesProxyServletTest {
     @Test
     public void testZeppelinReplacements() {
 
-        ServiceDef zeppelinService = servicesDefinition.getServiceDefinition(Service.from("zeppelin"));
+        ServiceDefinition zeppelinService = servicesDefinition.getServiceDefinition(Service.from("zeppelin"));
 
         String toReplace = "function(e, t, n) {\n" +
                 "    \"use strict\";\n" +

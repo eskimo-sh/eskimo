@@ -37,7 +37,7 @@ package ch.niceideas.eskimo.services.satellite;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.service.MemoryModel;
-import ch.niceideas.eskimo.model.service.ServiceDef;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.SSHCommandException;
 import ch.niceideas.eskimo.services.SSHCommandService;
 import ch.niceideas.eskimo.services.ServicesDefinition;
@@ -126,7 +126,7 @@ public class MemoryComputer {
                 // 3.2, Unique services sum is divided by number of nodes
                 long sumOfUniqueParts = (kubeServicesConfig.getEnabledServices().stream()
                         .map(serviceName -> servicesDefinition.getServiceDefinition(serviceName))
-                        .filter(ServiceDef::isUnique)
+                        .filter(ServiceDefinition::isUnique)
                         .map(service -> (long) service.getMemoryConsumptionParts(servicesDefinition))
                         .reduce(0L, Long::sum));
 
