@@ -42,8 +42,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @EqualsAndHashCode
-public class Service implements Comparable<Service> {
+public class Service implements Comparable<Service>, Serializable {
+
+    public static final String DUMMY_SERVICE_ERROR = "' dummy service should be obtained from static constant";
 
     public static final Service NODE_ALIVE = new Service("Node Alive");
     public static final Service TOPOLOGY_ALL_NODES = new Service ("Topology (All Nodes)");
@@ -69,23 +73,24 @@ public class Service implements Comparable<Service> {
             throw new IllegalArgumentException("Service name can't be blank");
         }
         if (name.equals(NODE_ALIVE.getName())) {
-            throw new IllegalArgumentException("'" + NODE_ALIVE.getName() + "' dummy service should be obtained from static constant");
+            throw new IllegalArgumentException("'" + NODE_ALIVE.getName() + DUMMY_SERVICE_ERROR);
         }
         if (name.equals(TOPOLOGY_ALL_NODES.getName())) {
-            throw new IllegalArgumentException("'" + TOPOLOGY_ALL_NODES.getName() + "' dummy service should be obtained from static constant");
+            throw new IllegalArgumentException("'" + TOPOLOGY_ALL_NODES.getName() + DUMMY_SERVICE_ERROR);
         }
         if (name.equals(BASE_SYSTEM.getName())) {
-            throw new IllegalArgumentException("'" + BASE_SYSTEM.getName() + "' dummy service should be obtained from static constant");
+            throw new IllegalArgumentException("'" + BASE_SYSTEM.getName() + DUMMY_SERVICE_ERROR);
         }
         if (name.equals(TOPOLOGY_FLAG.getName())) {
-            throw new IllegalArgumentException("'" + TOPOLOGY_FLAG.getName() + "' dummy service should be obtained from static constant");
+            throw new IllegalArgumentException("'" + TOPOLOGY_FLAG.getName() + DUMMY_SERVICE_ERROR);
         }
         if (name.equals(SERVICES_SETTINGS_FLAG.getName())) {
-            throw new IllegalArgumentException("'" + SERVICES_SETTINGS_FLAG.getName() + "' dummy service should be obtained from static constant");
+            throw new IllegalArgumentException("'" + SERVICES_SETTINGS_FLAG.getName() + DUMMY_SERVICE_ERROR);
         }
         return new Service(name);
     }
 
+    @Override
     public String toString() {
         return name;
     }

@@ -74,16 +74,18 @@ public class SystemStatusParser {
                     || contentLines[i].startsWith("○"))
                     && contentLines[i].contains(".service")) {
 
-                String foundService = contentLines[i].substring(
-                        (contentLines[i].indexOf('●') > -1 ? contentLines[i].indexOf('●') :
-                                (contentLines[i].contains("○") ? contentLines[i].indexOf("○") : contentLines[i].indexOf('×'))) + 2,
-                        contentLines[i].indexOf(".service"));
+                String foundService;
+                if (contentLines[i].contains("●")) {
+                    foundService = contentLines[i].substring(contentLines[i].indexOf('●') + 2, contentLines[i].indexOf(".service"));
+                } else if (contentLines[i].contains("○")) {
+                    foundService = contentLines[i].substring(contentLines[i].indexOf('○') + 2, contentLines[i].indexOf(".service"));
+                } else { // then it's obligatory '×'
+                    foundService = contentLines[i].substring(contentLines[i].indexOf('×') + 2, contentLines[i].indexOf(".service"));
+                }
 
                 handleServiceFound (Service.from(foundService), i, contentLines);
-
             }
         }
-
     }
 
     private void handleServiceFound(Service service, int position, String[] contentLines) {

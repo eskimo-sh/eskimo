@@ -51,7 +51,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SystemStatusParserTest {
 
     @Test
-    public void testPattern() throws Exception {
+    public void testPattern() {
 
         assertTrue (SystemStatusParser.pattern.matcher("Active: active (exited) since Fri 2019-05-31 13:55:26 UTC; 1 day 20h ago").matches());
         assertTrue (SystemStatusParser.pattern.matcher("Active: active (running) since Fri 2019-05-31 13:55:31 UTC; 1 day 20h ago").matches());

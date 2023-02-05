@@ -44,6 +44,8 @@ import java.io.Serializable;
 @EqualsAndHashCode
 public final class Node implements Comparable<Node>, Serializable {
 
+    public static final String DUMMY_NODE_ERROR = "' dummy node should be obtained from static constant";
+
     private static final String KUBERNETES_NODE_TAG = "KUBERNETES_NODE";
     public static final Node KUBERNETES_NODE = new Node (KUBERNETES_NODE_TAG, KUBERNETES_NODE_TAG);
 
@@ -72,10 +74,10 @@ public final class Node implements Comparable<Node>, Serializable {
             return KUBERNETES_NODE;
         }
         if (name.equals(KUBERNETES_FLAG.getName())) {
-            throw new IllegalArgumentException("'" + KUBERNETES_FLAG.getName() + "' dummy node should be obtained from static constant");
+            throw new IllegalArgumentException("'" + KUBERNETES_FLAG.getName() + DUMMY_NODE_ERROR);
         }
         if (name.equals(KUBE_NA_FLAG.getName())) {
-            throw new IllegalArgumentException("'" + KUBE_NA_FLAG.getName() + "' dummy node should be obtained from static constant");
+            throw new IllegalArgumentException("'" + KUBE_NA_FLAG.getName() + DUMMY_NODE_ERROR);
         }
         return new Node (name, name.replace("-", "."));
     }
@@ -85,17 +87,18 @@ public final class Node implements Comparable<Node>, Serializable {
             throw new IllegalArgumentException("Node Address can't be blank");
         }
         if (address.equals(KUBERNETES_NODE.getAddress())) {
-            throw new IllegalArgumentException("'" + KUBERNETES_NODE.getAddress() + "' dummy node should be obtained from static constant");
+            return KUBERNETES_NODE;
         }
         if (address.equals(KUBERNETES_FLAG.getAddress())) {
-            throw new IllegalArgumentException("'" + KUBERNETES_FLAG.getAddress() + "' dummy node should be obtained from static constant");
+            throw new IllegalArgumentException("'" + KUBERNETES_FLAG.getAddress() + DUMMY_NODE_ERROR);
         }
         if (address.equals(KUBE_NA_FLAG.getAddress())) {
-            throw new IllegalArgumentException("'" + KUBE_NA_FLAG.getAddress() + "' dummy node should be obtained from static constant");
+            throw new IllegalArgumentException("'" + KUBE_NA_FLAG.getAddress() + DUMMY_NODE_ERROR);
         }
         return new Node (address.replace(".", "-"), address);
     }
 
+    @Override
     public String toString() {
         return address;
     }

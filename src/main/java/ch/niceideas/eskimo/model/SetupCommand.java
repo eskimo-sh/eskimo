@@ -210,15 +210,18 @@ public class SetupCommand implements JSONOpCommand {
         private final SetupOperation operation;
         private final String pack;
 
+        @Override
         public Service getService() {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public boolean isOnNode(Node node) {
             return false;
         }
 
-        public boolean isSameNode(OperationId<?> other) {
+        @Override
+        public boolean isSameNode(OperationId<? extends Operation> other) {
             return false;
         }
 
@@ -247,6 +250,7 @@ public class SetupCommand implements JSONOpCommand {
         @Getter
         private final String type;
 
+        @Override
         public String toString () {
             return type;
         }

@@ -49,14 +49,17 @@ public class AbstractStandardOperationId<T extends Operation> implements Operati
     private final Service service;
     private final Node node;
 
+    @Override
     public boolean isOnNode(Node node) {
         return node.equals(this.node);
     }
 
-    public boolean isSameNode(OperationId<?> other) {
+    @Override
+    public boolean isSameNode(OperationId<? extends Operation> other) {
         return other.isOnNode(this.node);
     }
 
+    @Override
     public String getMessage() {
         return "Executing " + operation + " of " + getService() + " on " + getNode();
     }

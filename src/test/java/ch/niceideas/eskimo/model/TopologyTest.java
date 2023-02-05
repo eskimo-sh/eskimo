@@ -1190,6 +1190,7 @@ public class TopologyTest {
             put("node_id2", "192.168.10.12");
             put("service_a2", "on");
             put("node_id3", "192.168.10.13");
+            put("service_b3", "on");
         }});
 
         KubernetesServicesConfigWrapper kubeServicesConfig = createTestKubernetesConfig();

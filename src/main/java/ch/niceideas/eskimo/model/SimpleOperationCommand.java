@@ -43,6 +43,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -91,7 +92,7 @@ public class SimpleOperationCommand implements JSONOpCommand {
     }
 
     @RequiredArgsConstructor
-    public enum SimpleOperation implements LabelledOperation {
+    public enum SimpleOperation implements LabelledOperation, Serializable {
         SHOW_JOURNAL("show_journal", "Showing journal"),
         START("start", "Starting"),
         STOP ("stop", "Stopping"),
@@ -104,6 +105,7 @@ public class SimpleOperationCommand implements JSONOpCommand {
         @Getter
         private final String label;
 
+        @Override
         public String toString () {
             return type;
         }

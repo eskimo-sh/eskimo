@@ -50,5 +50,5 @@ public interface OperationId<T extends Operation> extends Serializable, Comparab
 
     boolean isOnNode(Node node);
 
-    boolean isSameNode(OperationId<?> other);
+    boolean isSameNode(OperationId<? extends Operation> other);
 }

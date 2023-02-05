@@ -318,6 +318,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         @Getter
         private final String type;
 
+        @Override
         public String toString () {
             return type;
         }

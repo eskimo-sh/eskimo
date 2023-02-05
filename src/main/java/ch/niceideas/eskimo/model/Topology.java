@@ -276,7 +276,7 @@ public class Topology {
             case FIRST_NODE:
                 for (int i = 1; i <= dep.getNumberOfMasters(); i++) {
                     Node masterNode = findFirstOtherServiceNode(nodesConfig, dep.getMasterService(), otherMasters);
-                    masterNode = handleMissingMaster(nodesConfig, dep, serviceDef, masterNode, i);
+                    handleMissingMaster(nodesConfig, dep, serviceDef, masterNode, i);
                     if (masterNode != null) {
                         definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + i, masterNode);
                         otherMasters.add(masterNode);
@@ -298,7 +298,7 @@ public class Topology {
                         definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep)+"_"+node.getEnv(), node);
                     } else {
                         Node masterNode = findFirstServiceNode(nodesConfig, dep.getMasterService());
-                        masterNode = handleMissingMaster(nodesConfig, dep, serviceDef, masterNode);
+                        handleMissingMaster(nodesConfig, dep, serviceDef, masterNode);
                         if (masterNode != null) {
                             definedMasters.put(SELF_MASTER_PREFIX + getVariableName(dep) + "_" + node.getEnv(), masterNode);
                         }
@@ -309,7 +309,7 @@ public class Topology {
             case RANDOM:
                 for (int i = 1; i <= dep.getNumberOfMasters(); i++) {
                     Node masterNode = findRandomOtherServiceNode(nodesConfig, dep.getMasterService(), otherMasters);
-                    masterNode = handleMissingMaster(nodesConfig, dep, serviceDef, masterNode, i);
+                    handleMissingMaster(nodesConfig, dep, serviceDef, masterNode, i);
                     if (masterNode != null) {
                         definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + i, masterNode);
                         otherMasters.add(masterNode);
@@ -332,8 +332,8 @@ public class Topology {
                 if (dep.getMes().equals(MasterElectionStrategy.RANDOM_NODE_AFTER_OR_SAME) && masterNode == null) {
                     masterNode = findRandomOtherServiceNode(nodesConfig, dep.getMasterService(), otherMasters);
                 }
+                handleMissingMaster(nodesConfig, dep, serviceDef, masterNode);
                 if (masterNode != null) {
-                    masterNode = handleMissingMaster(nodesConfig, dep, serviceDef, masterNode);
                     definedMasters.put(MASTER_PREFIX + getVariableName(dep) + "_" + node.getEnv(), masterNode);
                 }
                 break;
@@ -356,26 +356,22 @@ public class Topology {
         return dep.getMasterService().getEnv();
     }
 
-    private Node handleMissingMaster(ConfigurationOwner nodesConfig, Dependency dep, ServiceDefinition serviceDef, Node masterNode, int countOfMaster) throws NodesConfigurationException {
-        return handleMissingMasterInternal (nodesConfig, dep, masterNode,
+    private void handleMissingMaster(ConfigurationOwner nodesConfig, Dependency dep, ServiceDefinition serviceDef, Node masterNode, int countOfMaster) throws NodesConfigurationException {
+        handleMissingMasterInternal (nodesConfig, dep, masterNode,
                 "Dependency " + dep.getMasterService() + " for service " + serviceDef.getName() + " could not found occurence " + countOfMaster);
     }
 
-    private Node handleMissingMaster(ConfigurationOwner nodesConfig, Dependency dep, ServiceDefinition serviceDef, Node masterNode) throws NodesConfigurationException {
-        return handleMissingMasterInternal (nodesConfig, dep, masterNode,
-                "Dependency " + dep.getMasterService() + " for service" + serviceDef.getName() + " could not be found");
+    private void handleMissingMaster(ConfigurationOwner nodesConfig, Dependency dep, ServiceDefinition serviceDef, Node masterNode) throws NodesConfigurationException {
+        handleMissingMasterInternal (nodesConfig, dep, masterNode,
+                "Dependency " + dep.getMasterService() + " for service " + serviceDef.getName() + " could not be found");
     }
 
-    private Node handleMissingMasterInternal(ConfigurationOwner nodesConfig, Dependency dep, Node masterNode, String message) throws NodesConfigurationException {
+    private void handleMissingMasterInternal(ConfigurationOwner nodesConfig, Dependency dep, Node masterNode, String message) throws NodesConfigurationException {
         if (masterNode == null) {
-            if (!dep.isMandatory(nodesConfig)) {
-                // if none could be found, then well ... none could be found
-                return null;
-            } else {
+            if (dep.isMandatory(nodesConfig)) {
                 throw new NodesConfigurationException(message);
             }
         }
-        return masterNode;
     }
 
 

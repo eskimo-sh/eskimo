@@ -176,14 +176,17 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
         private final KuberneteOperation operation;
         private final Service service;
 
+        @Override
         public boolean isOnNode(Node node) {
             return node.equals(Node.KUBERNETES_NODE);
         }
 
-        public boolean isSameNode(OperationId<?> other) {
+        @Override
+        public boolean isSameNode(OperationId<? extends Operation> other) {
             return other.isOnNode(Node.KUBERNETES_NODE);
         }
 
+        @Override
         public String getMessage() {
             return operation + " of " + getService() + " on kubernetes";
         }
@@ -203,13 +206,14 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
 
     @RequiredArgsConstructor
     public enum KuberneteOperation implements Operation {
-        INSTALLATION("installation"),
-        UNINSTALLATION ("uninstallation"),
-        RESTART ("restart");
+        INSTALLATION(ServiceOperationsCommand.ServiceOperation.INSTALLATION.getType()),
+        UNINSTALLATION (ServiceOperationsCommand.ServiceOperation.UNINSTALLATION.getType()),
+        RESTART (ServiceOperationsCommand.ServiceOperation.RESTART.getType());
 
         @Getter
         private final String type;
 
+        @Override
         public String toString () {
             return type;
         }

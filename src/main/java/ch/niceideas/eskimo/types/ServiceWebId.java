@@ -39,9 +39,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.io.Serializable;
+
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public final class ServiceWebId {
+public final class ServiceWebId implements Serializable {
 
     @Getter
     private final Service service;
@@ -57,6 +59,7 @@ public final class ServiceWebId {
         return new ServiceWebId(service, node);
     }
 
+    @Override
     public String toString() {
         if (getNode() == null) {
             return service.getName();

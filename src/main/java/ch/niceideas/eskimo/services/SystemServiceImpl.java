@@ -610,11 +610,9 @@ public class SystemServiceImpl implements SystemService {
 
                             // reset missing counter on kubernetes services when kube is down
                             configuredNodesAndOtherLiveNodes.forEach(
-                                    effNode -> {
-                                        new ArrayList<>(serviceMissingCounter.keySet()).stream()
+                                    effNode -> new ArrayList<>(serviceMissingCounter.keySet()).stream()
                                                 .filter(flag -> flag.equals(savedService + "-" + effNode))
-                                                .forEach(serviceMissingCounter::remove);
-                                    }
+                                                .forEach(serviceMissingCounter::remove)
                             );
                             continue;
                         }
@@ -627,17 +625,14 @@ public class SystemServiceImpl implements SystemService {
                         }
                     }
 
-                    Boolean nodeAlive = node != null ? systemStatus.isNodeAlive (node) : Boolean.FALSE;
+                    Boolean nodeAlive = systemStatus.isNodeAlive (node);
 
                     // A. In case target node both configured and up, check services actual statuses before doing anything
                     if (    // nodes is configured and responding (up and running
 
                             nodeAlive != null && nodeAlive
-                            ) {
-
-                        if (handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, savedService, node, originalNode)) {
-                            changes = true;
-                        }
+                           && handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, savedService, node, originalNode)) {
+                        changes = true;
                     }
 
                     // B. node is not configured anymore (has been removed, but it is still up and responding and it runs services)

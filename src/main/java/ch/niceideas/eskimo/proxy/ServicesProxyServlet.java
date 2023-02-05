@@ -98,7 +98,7 @@ public class ServicesProxyServlet extends ProxyServlet {
 
     @Override
     public void init() throws ServletException {
-        // I am removing the possibility to change these. A lot of these settings mess up with most services
+        // XXX I am removing the possibility to change these. A lot of these settings mess up with most services
         /*
         super.init();
         */
@@ -191,10 +191,6 @@ public class ServicesProxyServlet extends ProxyServlet {
             if (!serviceDef.isUnique()) {
                 int slashIndex = pathInfo.indexOf('/');
                 pathInfo = slashIndex > -1 ? pathInfo.substring(slashIndex + 1)  : "";
-                /*
-                I added + 1 but it's not working !!!, still end up with double slash
-                Add a test for it !!!'
-                */
             }
 
             // getPathInfo() returns decoded string, so we need encodeUriQuery to encode "%" characters

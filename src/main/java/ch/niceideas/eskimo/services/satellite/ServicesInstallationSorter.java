@@ -40,6 +40,7 @@ import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
 import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.types.Operation;
 import ch.niceideas.eskimo.types.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -59,7 +60,7 @@ public class ServicesInstallationSorter {
     @Autowired
     private ConfigurationService configurationService;
 
-    public <T extends OperationId<?>> List<List<T>> orderOperations  (
+    public <T extends OperationId<? extends Operation>> List<List<T>> orderOperations  (
             List<T> operations,
             NodesConfigWrapper nodesConfig) throws NodesConfigurationException, ServiceDefinitionException, SystemException {
 
@@ -89,25 +90,26 @@ public class ServicesInstallationSorter {
             List<T> operationForService = groupedOperations.get(serviceDef.toService());
             if (operationForService != null) {
                 operationForService.sort((o1, o2) -> {
-                    if (o1.getOperation().getType().equals("installation")) {
-                        if (o2.getOperation().getType().equals("installation")) {
+                    // Unfortunately I can't compare Operations among themselves directly
+                    if (o1.getOperation().getType().equals(ServiceOperationsCommand.ServiceOperation.INSTALLATION.getType())) {
+                        if (o2.getOperation().getType().equals(ServiceOperationsCommand.ServiceOperation.INSTALLATION.getType())) {
                             return 0;
                         } else {
                             return -1;
                         }
                     }
 
-                    if (o1.getOperation().getType().equals("uninstallation")) {
-                        if (o2.getOperation().getType().equals("installation")) {
+                    if (o1.getOperation().getType().equals(ServiceOperationsCommand.ServiceOperation.UNINSTALLATION.getType())) {
+                        if (o2.getOperation().getType().equals(ServiceOperationsCommand.ServiceOperation.INSTALLATION.getType())) {
                             return 1;
-                        } else if (o2.getOperation().getType().equals("uninstallation")) {
+                        } else if (o2.getOperation().getType().equals(ServiceOperationsCommand.ServiceOperation.UNINSTALLATION.getType())) {
                             return 0;
                         } else {
                             return -1;
                         }
                     }
 
-                    if (o2.getOperation().getType().equals("restart")) {
+                    if (o2.getOperation().getType().equals(ServiceOperationsCommand.ServiceOperation.RESTART.getType())) {
                         return 0;
                     } else {
                         return 1;
@@ -203,8 +205,8 @@ public class ServicesInstallationSorter {
 
                 // Does any installation happen on same node ?
                 boolean hasSameNode = false;
-                for (OperationId<?> installCurrent : current) {
-                    for (OperationId<?> installPrev : prev) {
+                for (T installCurrent : current) {
+                    for (T installPrev : prev) {
                         if (installCurrent.isSameNode(installPrev)) {
                             hasSameNode = true;
                             break;
