@@ -47,6 +47,12 @@ parse_cli_docker_volume_mounts \
         single \
         "$@"
 
+parse_cli_docker_volume_mounts \
+        "-pyfs,--pyFiles" \
+        multiple \
+        "," \
+        "$@"
+
 # last parameter is file to execute
 last_param=${@:${#@}}
 # Only if last param is not an option starting with "-"

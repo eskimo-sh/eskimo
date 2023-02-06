@@ -86,7 +86,7 @@ sudo chmod -R 777 /var/lib/gluster/
 
 
 echo " - Simlinking flink binaries to /usr/local/bin"
-for i in `ls -1 /usr/local/lib/flink/bin`; do
+for i in $(ls -1 /usr/local/lib/flink/bin); do
     create_binary_wrapper /usr/local/lib/flink/bin/$i /usr/local/bin/$i
 done
 
