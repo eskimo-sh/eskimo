@@ -113,7 +113,7 @@ mv flink-shaded-hadoop-2-uber-$FLINK_HADOOP_VERSION.jar flink-$FLINK_VERSION/lib
 echo " - Creating a dummy pom.xml to proceed with downloading kafka, elasticsearch and kubernetes connectors"
 rm -Rf /tmp/flink_download_connectors
 mkdir /tmp/flink_download_connectors
-cd /tmp/flink_download_connectors
+cd /tmp/flink_download_connectors || exit 1
 echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
          xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
          xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">
@@ -179,13 +179,13 @@ mvn dependency:copy-dependencies > /tmp/flink_install_log 2>&1
 fail_if_error $? "/tmp/flink_install_log" -25
 
 echo " - Copying connectors with dependencies to flink distribution folder"
-cd target/dependency/
+cd target/dependency/  || exit 2
 #cp * /tmp/flink_setup/flink-$FLINK_VERSION/lib/
 # omiting log4j-api
 find ./ ! -name 'log4j-api*' -exec cp -t /tmp/flink_setup/flink-$FLINK_VERSION/lib/ {} + 2>/dev/null
 
 echo " - Changing directory back to flink setup"
-cd /tmp/flink_setup
+cd /tmp/flink_setup  || exit 3
 
 echo " - Installing flink"
 sudo chown root.staff -R flink-$FLINK_VERSION
@@ -193,6 +193,29 @@ sudo mv flink-$FLINK_VERSION /usr/local/lib/flink-$FLINK_VERSION
 
 echo " - symlinking /usr/local/lib/flink/ to /usr/local/lib/flink-$FLINK_VERSION"
 sudo ln -s /usr/local/lib/flink-$FLINK_VERSION /usr/local/lib/flink
+
+echo " - Extracting pyflink environment"
+if [[ -d /usr/local/lib/flink/opt/python/ ]]; then
+
+  cd /usr/local/lib/flink/opt/python/ || exit 4
+  for i in $(ls -1 *.zip); do
+      echo "   + Unzipping $i"
+      unzip $i > /tmp/flink_install_log 2>&1
+      rm $i
+  done
+  for i in $(find ./ -maxdepth 1 -mindepth 1 -type d); do
+      echo "   + Making script executable in $i"
+      for j in $(find $i -name '*.sh'); do
+          sudo chmod 755 $j
+      done
+  done
+
+
+else
+    echo "WARNING : environment /usr/local/lib/flink/opt/python/ not found"
+fi
+
+cd /tmp/flink_setup || exit 5
 
 echo " - Checking Flink Installation"
 /usr/local/lib/flink/bin/flink run /usr/local/lib/flink/examples/batch/WordCount.jar > /tmp/flink_run_log 2>&1 &
