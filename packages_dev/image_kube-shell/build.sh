@@ -39,68 +39,59 @@ echoerr() { echo "$@" 1>&2; }
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
-echo "Building Spark Image"
+echo "Building kube-shell Image"
 echo "--------------------------------------------------------------------------------"
 
 # reinitializing log
-rm -f /tmp/spark_build_log
+rm -f /tmp/kube-shell_build_log
 
-echo " - Building image spark"
-build_image spark_template /tmp/spark_build_log
+echo " - Building image kube-shell"
+build_image kube-shell_template /tmp/kube-shell_build_log
 
 echo " - Installing OpenJDK 11"
-docker exec -i spark_template apt-get install -y openjdk-11-jdk > /tmp/spark_build_log 2>&1
-fail_if_error $? "/tmp/spark_build_log" -3
+docker exec -i kube-shell_template apt-get install -y openjdk-11-jdk > /tmp/kube-shell_build_log 2>&1
+fail_if_error $? "/tmp/kube-shell_build_log" -3
 
 echo " - Installing scala"
-docker exec -i spark_template bash -c ". /common/common.sh && install_scala"  > /tmp/spark_build_log 2>&1
-fail_if_error $? "/tmp/spark_build_log" -4
+docker exec -i kube-shell_template bash -c ". /common/common.sh && install_scala"  > /tmp/kube-shell_build_log 2>&1
+fail_if_error $? "/tmp/kube-shell_build_log" -4
 
 echo " - Installing python"
-docker exec -i spark_template apt-get -y install  python3-dev python3-six python3-virtualenv python3-pip > /tmp/spark_build_log 2>&1
-fail_if_error $? "/tmp/spark_build_log" -5
+docker exec -i kube-shell_template apt-get -y install  python3-dev python3-six python3-virtualenv python3-pip > /tmp/kube-shell_build_log 2>&1
+fail_if_error $? "/tmp/kube-shell_build_log" -5
 
 echo " - Installing python elasticsearch and kafka clients and other utilities"
-docker exec -i spark_template pip3 install elasticsearch kafka-python > /tmp/spark_build_log 2>&1
-fail_if_error $? "/tmp/spark_build_log" -6
+docker exec -i kube-shell_template pip3 install elasticsearch kafka-python > /tmp/kube-shell_build_log 2>&1
+fail_if_error $? "/tmp/kube-shell_build_log" -6
 
 echo " - Installing other python packages"
-docker exec -i spark_template pip3 install requests filelock > /tmp/spark_build_log 2>&1
-fail_if_error $? "/tmp/spark_build_log" -11
+docker exec -i kube-shell_template pip3 install requests filelock > /tmp/kube-shell_build_log 2>&1
+fail_if_error $? "/tmp/kube-shell_build_log" -11
+
+#echo " - Installing python packages for datascience"
+#docker exec -i kube-shell_template apt-get -y install python3-sklearn python3-numpy python3-pandas python3-plotly python3-kafka python3-filelock python3-matplotlib python3-nltk python3-elasticsearch > /tmp/kube-shell_build_log 2>&1
+#fail_if_error $? "/tmp/kube-shell_build_log"
 
 echo " - Switching python default version to 3.x"
-docker exec -i spark_template update-alternatives --force --install /usr/bin/python python /usr/bin/python3.9 2 > /tmp/flink_build_log 2>&1
+docker exec -i kube-shell_template update-alternatives --force --install /usr/bin/python python /usr/bin/python3.9 2 > /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -5
 
 echo " - Installing GlusterFS client"
-docker exec -i spark_template apt-get -y install  glusterfs-client > /tmp/spark_build_log 2>&1
-fail_if_error $? "/tmp/spark_build_log" -10
+docker exec -i kube-shell_template apt-get -y install glusterfs-client > /tmp/kube-shell_build_log 2>&1
+fail_if_error $? "/tmp/kube-shell_build_log" -10
 
 echo " - Installing other dependencies"
-docker exec -i spark_template apt-get -y install tini > /tmp/spark_build_log 2>&1
-fail_if_error $? "/tmp/spark_build_log" -10
-
-
-echo " - Installing spark"
-docker exec -i spark_template bash /scripts/installSpark.sh | tee /tmp/spark_build_log 2>&1
-check_in_container_install_success /tmp/spark_build_log
-
-echo " - Installing ESHadoop connector"
-docker exec -i spark_template bash /scripts/installESHadoop.sh | tee  /tmp/spark_build_log 2>&1
-check_in_container_install_success /tmp/spark_build_log
-
-echo " - Installing Spark-Kafka connector"
-docker exec -i spark_template bash /scripts/installSparkKafkaConnector.sh  | tee /tmp/spark_build_log 2>&1
-check_in_container_install_success /tmp/spark_build_log
+docker exec -i kube-shell_template apt-get -y install tini vim less lynx > /tmp/kube-shell_build_log 2>&1
+fail_if_error $? "/tmp/kube-shell_build_log" -10
 
 
 #echo " - TODO"
-#docker exec -it spark_template bash
+#docker exec -it kube-shell_template bash
 
 
 echo " - Cleaning up image"
-docker exec -i spark_template apt-get remove -y git gcc adwaita-icon-theme >> /tmp/spark_build_log 2>&1
-docker exec -i spark_template apt-get -y auto-remove >> /tmp/spark_build_log 2>&1
+docker exec -i kube-shell_template apt-get remove -y git gcc adwaita-icon-theme >> /tmp/kube-shell_build_log 2>&1
+docker exec -i kube-shell_template apt-get -y auto-remove >> /tmp/kube-shell_build_log 2>&1
 
-echo " - Closing and saving image spark"
-close_and_save_image spark_template /tmp/spark_build_log $SPARK_VERSION
+echo " - Closing and saving image kube-shell"
+close_and_save_image kube-shell_template /tmp/kube-shell_build_log $ESKIMO_VERSION

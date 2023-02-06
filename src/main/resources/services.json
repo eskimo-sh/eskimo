@@ -530,10 +530,41 @@
 
 
 
+  "kube-shell" : {
+    "config": {
+      "imageName" : "kube-shell",
+      "order": 9,
+      "group" : "Kubernetes",
+      "name" : "Shell",
+      "kubernetes": true,
+      "kubeConfig": {
+        "request": {
+          "cpu": "0.1",
+          "ram": "100M"
+        }
+      },
+      "registryOnly": true,
+      "memory": "small",
+      "logo" : "images/eskimo-logo.png",
+      "icon" : "images/eskimo-icon.png"
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "FIRST_NODE",
+        "masterService": "kube-master",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": false
+      }
+    ]
+  },
+
+
+
   "kafka" : {
     "config": {
       "imageName" : "kafka",
-      "order": 9,
+      "order": 10,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -660,7 +691,7 @@
 
   "kafka-cli" : {
     "config": {
-      "order": 10,
+      "order": 11,
       "group": "Kafka",
       "name": "Client",
       "selectionLayout": {
@@ -686,7 +717,7 @@
   "kafka-manager": {
     "config": {
       "imageName" : "kafka-manager",
-      "order": 11,
+      "order": 12,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -755,7 +786,7 @@
   "spark-console" : {
     "config": {
       "imageName" : "spark",
-      "order": 12,
+      "order": 13,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -823,7 +854,7 @@
   "spark-runtime" : {
     "config": {
       "imageName" : "spark",
-      "order": 13,
+      "order": 14,
       "group" : "Spark",
       "name" : "Runtime",
       "kubernetes": true,
@@ -928,7 +959,7 @@
 
   "spark-cli" : {
     "config": {
-      "order": 14,
+      "order": 15,
       "group" : "Spark",
       "name": "Client",
       "selectionLayout": {
@@ -960,7 +991,7 @@
   "flink-runtime" : {
     "config": {
       "imageName" : "flink",
-      "order": 15,
+      "order": 16,
       "group" : "Flink",
       "name" : "Runtime",
       "unique": true,
@@ -1075,7 +1106,7 @@
 
   "flink-cli" : {
     "config": {
-      "order": 16,
+      "order": 17,
       "group" : "Flink",
       "name": "Client",
       "selectionLayout": {
@@ -1107,7 +1138,7 @@
   "logstash" : {
     "config": {
       "imageName" : "logstash",
-      "order": 17,
+      "order": 18,
       "kubernetes": true,
       "group" : "Elastic Stack",
       "name" : "Logstash",
@@ -1172,7 +1203,7 @@
 
   "logstash-cli" : {
     "config": {
-      "order": 18,
+      "order": 19,
       "group": "Elastic Stack",
       "name": "LS Client",
       "selectionLayout": {
@@ -1198,7 +1229,7 @@
   "cerebro" : {
     "config": {
       "imageName" : "cerebro",
-      "order": 19,
+      "order": 20,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -1255,7 +1286,7 @@
   "elasticsearch": {
     "config": {
       "imageName" : "elasticsearch",
-      "order": 20,
+      "order": 21,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -1370,7 +1401,7 @@
   "kibana" : {
     "config": {
       "imageName" : "kibana",
-      "order": 21,
+      "order": 22,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -1462,7 +1493,7 @@
   "zeppelin" : {
     "config": {
       "imageName" : "zeppelin",
-      "order": 22,
+      "order": 23,
       "unique": true,
       "kubernetes": true,
       "kubeConfig": {

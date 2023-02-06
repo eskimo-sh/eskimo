@@ -1447,7 +1447,7 @@ do_cleanup() {
 
     #echo_date "   + Delete berka-trans"
     echo_date " - Delete berka index berka-trans"
-    vagrant ssh -c "curl -XDELETE http://elasticsearch.default.svc.cluster.eskimo:9200/berka-trans" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "/usr/local/bin/eskimo-kube-exec curl -XDELETE http://elasticsearch.default.svc.cluster.eskimo:9200/berka-trans" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
 }
 
@@ -1520,7 +1520,7 @@ EOF
     fi
 
     sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
-            vagrant@$BOX_IP "sudo su -c '/usr/local/bin/flink run -py /tmp/flink-batch-example.py' eskimo" \
+            vagrant@$BOX_IP "sudo su -c '/usr/local/bin/flink run -pyfs /usr/local/lib/flink/opt/python/pyflink -py /tmp/flink-batch-example.py' eskimo" \
             2>&1 | tee /tmp/flink-batch-example.log  >> /tmp/integration-test.log
 
     if [[ `grep -F 'Job has been submitted with JobID' /tmp/flink-batch-example.log` == "" ]]; then

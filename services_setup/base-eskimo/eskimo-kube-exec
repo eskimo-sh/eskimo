@@ -87,7 +87,7 @@ docker run \
         -e NODE_NAME=$HOSTNAME \
         -e ADDITONAL_HOSTS_FILE=$KUBE_SERVICES_HOSTS_FILE \
         kubernetes.registry:5000/kube-shell \
-            /usr/local/bin/kube_do /bin/bash "$@"
+            /usr/local/bin/kube_do "$@"
 
 rm -Rf $KUBE_SERVICES_HOSTS_FILE
 

@@ -67,7 +67,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-setup"})
+@ActiveProfiles({"no-web-stack", "test-setup", "test-services"})
 public class SetupCommandTest {
 
     @Autowired
@@ -95,22 +95,17 @@ public class SetupCommandTest {
         assertEquals ("{\n" +
                 "  \"buildPackage\": [\n" +
                 "    \"base-eskimo\",\n" +
-                "    \"ntp\",\n" +
-                "    \"prometheus\",\n" +
-                "    \"zookeeper\",\n" +
-                "    \"gluster\",\n" +
-                "    \"kube-master\",\n" +
-                "    \"kubernetes-dashboard\",\n" +
-                "    \"elasticsearch\",\n" +
-                "    \"cerebro\",\n" +
-                "    \"grafana\",\n" +
-                "    \"spark\",\n" +
-                "    \"kafka\",\n" +
-                "    \"kafka-manager\",\n" +
-                "    \"kibana\",\n" +
-                "    \"logstash\",\n" +
-                "    \"flink\",\n" +
-                "    \"zeppelin\"\n" +
+                "    \"cluster-manager\",\n" +
+                "    \"distributed-time\",\n" +
+                "    \"distributed-filesystem\",\n" +
+                "    \"cluster-master\",\n" +
+                "    \"cluster-dashboard\",\n" +
+                "    \"calculator\",\n" +
+                "    \"database\",\n" +
+                "    \"database-manager\",\n" +
+                "    \"broker\",\n" +
+                "    \"broker-manager\",\n" +
+                "    \"user-console\"\n" +
                 "  ],\n" +
                 "  \"buildKube\": [\"kube\"],\n" +
                 "  \"downloadKube\": [],\n" +
@@ -146,7 +141,7 @@ public class SetupCommandTest {
 
         List<SetupCommand.SetupOperationId> opInOrder = setupCommand.getAllOperationsInOrder(null);
 
-        assertEquals ("Build_base-eskimo,Build_ntp,Build_prometheus,Build_zookeeper,Build_gluster,Build_kube-master,Build_kubernetes-dashboard,Build_elasticsearch,Build_cerebro,Build_grafana,Build_spark,Build_kafka,Build_kafka-manager,Build_kibana,Build_logstash,Build_flink,Build_zeppelin,Build_kube",
+        assertEquals ("Build_base-eskimo,Build_cluster-manager,Build_distributed-time,Build_distributed-filesystem,Build_cluster-master,Build_cluster-dashboard,Build_calculator,Build_database,Build_database-manager,Build_broker,Build_broker-manager,Build_user-console,Build_kube",
                 opInOrder.stream().map(SetupCommand.SetupOperationId::toString).collect(Collectors.joining(",")));
     }
 

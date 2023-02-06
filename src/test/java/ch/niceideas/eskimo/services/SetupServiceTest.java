@@ -68,7 +68,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "setup-under-test", "test-conf", "test-system", "test-operation", "test-operations", "test-app-status"})
+@ActiveProfiles({"no-web-stack", "setup-under-test", "test-conf", "test-system", "test-operation", "test-operations", "test-app-status", "test-services"})
 public class SetupServiceTest {
 
     private static final Logger logger = Logger.getLogger(SetupServiceTest.class);
@@ -87,6 +87,9 @@ public class SetupServiceTest {
 
     @Autowired
     private ConfigurationServiceTestImpl configurationServiceTest;
+
+    @Autowired
+    private NotificationService notificationService;
 
     private String setupConfig = null;
 
@@ -115,7 +118,7 @@ public class SetupServiceTest {
         tempPackagesDistribPath = File.createTempFile("test_setup_service_distrib", "folder");
         assertTrue (tempPackagesDistribPath.delete());
 
-        File tempPackagesDevPath = File.createTempFile("test_setup_service_dev", "folder");
+        tempPackagesDevPath = File.createTempFile("test_setup_service_dev", "folder");
         assertTrue (tempPackagesDevPath.delete());
         assertTrue (tempPackagesDevPath.mkdir());
 
@@ -177,10 +180,21 @@ public class SetupServiceTest {
         assertNotNull(command);
 
         assertEquals(1, command.getBuildKube().size());
-        assertEquals(17, command.getBuildPackage().size());
+        assertEquals(12, command.getBuildPackage().size());
 
         assertEquals("kube", String.join(",", command.getBuildKube()));
-        assertEquals("base-eskimo,ntp,prometheus,zookeeper,gluster,kube-master,kubernetes-dashboard,elasticsearch,cerebro,grafana,spark,kafka,kafka-manager,kibana,logstash,flink,zeppelin", String.join(",", command.getBuildPackage()));
+        assertEquals("base-eskimo," +
+                "cluster-manager," +
+                "distributed-time," +
+                "distributed-filesystem," +
+                "cluster-master," +
+                "cluster-dashboard," +
+                "calculator," +
+                "database," +
+                "database-manager," +
+                "broker," +
+                "broker-manager," +
+                "user-console", String.join(",", command.getBuildPackage()));
 
         assertEquals(0, command.getDownloadKube().size());
         assertEquals(0, command.getDownloadPackages().size());
@@ -211,10 +225,22 @@ public class SetupServiceTest {
         assertEquals(0, command.getBuildPackage().size());
 
         assertEquals(1, command.getDownloadKube().size());
-        assertEquals(17, command.getDownloadPackages().size());
+        assertEquals(12, command.getDownloadPackages().size());
 
         assertEquals("kube_1.23.5_1", String.join(",", command.getDownloadKube()));
-        assertEquals("base-eskimo_0.2_1,ntp_debian_09_stretch_1,prometheus_2.10.0_1,zookeeper_debian_09_stretch_1,gluster_debian_09_stretch_1,kube-master_1.8.1_1,kubernetes-dashboard_2.5.1_1,elasticsearch_6.8.3_1,cerebro_0.8.4_1,grafana_6.3.3_1,spark_2.4.4_1,kafka_2.2.0_1,kafka-manager_2.0.0.2_1,kibana_6.8.3_1,logstash_6.8.3_1,flink_1.9.1_1,zeppelin_0.9.0_1", String.join(",", command.getDownloadPackages()));
+        assertEquals("base-eskimo_0.2_1," +
+                "cluster-manager_debian_09_stretch_1," +
+                "distributed-time_debian_09_stretch_1," +
+                "distributed-filesystem_debian_09_stretch_1," +
+                "cluster-master_1.8.1_1," +
+                "cluster-dashboard_2.5.1_1," +
+                "calculator_2.4.4_1," +
+                "database_6.8.3_1," +
+                "database-manager_0.8.4_1," +
+                "broker_2.2.0_1," +
+                "broker-manager_2.0.0.2_1," +
+                "user-console_0.9.0_1",
+                String.join(",", command.getDownloadPackages()));
     }
 
     @Test
@@ -224,7 +250,20 @@ public class SetupServiceTest {
 
         SetupException exception = assertThrows(SetupException.class, setupService::ensureSetupCompleted);
         assertEquals(
-                "Following services are missing and need to be downloaded or built base-eskimo, cerebro, elasticsearch, flink, gluster, grafana, kafka, kafka-manager, kibana, kube, kube-master, kubernetes-dashboard, logstash, ntp, prometheus, spark, zeppelin, zookeeper",
+                "Following services are missing and need to be downloaded or built " +
+                        "base-eskimo, " +
+                        "broker, " +
+                        "broker-manager, " +
+                        "calculator, " +
+                        "cluster-dashboard, " +
+                        "cluster-manager, " +
+                        "cluster-master, " +
+                        "database, " +
+                        "database-manager, " +
+                        "distributed-filesystem, " +
+                        "distributed-time, " +
+                        "kube, " +
+                        "user-console",
                 exception.getMessage());
 
         // Create docker images packages
@@ -380,7 +419,7 @@ public class SetupServiceTest {
 
         setupService.prepareSetup(setupConfigWrapper, downloadPackages, buildPackage, downloadKube, buildKube, packageUpdate);
 
-        assertEquals(17, buildPackage.size());
+        assertEquals(12, buildPackage.size());
         assertEquals(1, buildKube.size());
 
         // 2. test download strategy
@@ -397,7 +436,7 @@ public class SetupServiceTest {
 
         setupService.prepareSetup(setupConfigWrapper, downloadPackages, buildPackage, downloadKube, buildKube, packageUpdate);
 
-        assertEquals(17, downloadPackages.size());
+        assertEquals(12, downloadPackages.size());
         assertEquals(1, downloadKube.size());
     }
 
@@ -446,16 +485,49 @@ public class SetupServiceTest {
 
         setupService.applySetup(SetupCommand.create(setupConfigWrapper, setupService, servicesDefinition));
 
-        // 13 updated packages
-        assertEquals(14, setupService.getDownloadPackageList().size()); // all software version below 1.0 are not updated (base-eskimo, etc.)
+        assertEquals(9, setupService.getDownloadPackageList().size()); // all software version below 1.0 are not updated (base-eskimo, etc.)
         assertEquals(0, setupService.getBuiltPackageList().size());
 
         Collections.sort(setupService.getDownloadPackageList());
         assertEquals(
-                "docker_template_elasticsearch_6.8.3_1.tar.gz, docker_template_flink_1.9.1_1.tar.gz, docker_template_gluster_debian_09_stretch_1.tar.gz, docker_template_grafana_6.3.3_1.tar.gz, docker_template_kafka-manager_2.0.0.2_1.tar.gz, docker_template_kafka_2.2.0_1.tar.gz, docker_template_kibana_6.8.3_1.tar.gz, docker_template_kube-master_1.8.1_1.tar.gz, docker_template_kubernetes-dashboard_2.5.1_1.tar.gz, docker_template_logstash_6.8.3_1.tar.gz, docker_template_ntp_debian_09_stretch_1.tar.gz, docker_template_prometheus_2.10.0_1.tar.gz, docker_template_spark_2.4.4_1.tar.gz, docker_template_zookeeper_debian_09_stretch_1.tar.gz",
+                "docker_template_broker-manager_2.0.0.2_1.tar.gz," +
+                        " docker_template_broker_2.2.0_1.tar.gz," +
+                        " docker_template_calculator_2.4.4_1.tar.gz," +
+                        " docker_template_cluster-dashboard_2.5.1_1.tar.gz," +
+                        " docker_template_cluster-manager_debian_09_stretch_1.tar.gz," +
+                        " docker_template_cluster-master_1.8.1_1.tar.gz," +
+                        " docker_template_database_6.8.3_1.tar.gz," +
+                        " docker_template_distributed-filesystem_debian_09_stretch_1.tar.gz," +
+                        " docker_template_distributed-time_debian_09_stretch_1.tar.gz",
             String.join(", ", setupService.getDownloadPackageList()));
     }
 
+    @Test
+    public void testApplySetupHandleUpdates_emptyVersionFile() throws Exception {
+
+        setupService.setPackagesVersionFile("{}");
+
+        setupService.tweakLastVersionForTests();
+
+        applicationStatusServiceTest.setSnapshot(true);
+
+        JsonWrapper setupConfigWrapper =  new JsonWrapper(setupConfig);
+        setupConfigWrapper.setValueForPath("setup-kube-origin", "download");
+        setupConfigWrapper.setValueForPath("setup-services-origin", "download");
+
+        setupService.setBuildVersion("2.0");
+
+        setupService.saveAndPrepareSetup(setupConfigWrapper.getFormattedValue());
+
+        setupService.applySetup(SetupCommand.create(setupConfigWrapper, setupService, servicesDefinition));
+
+        // 13 updated packages
+        assertEquals(0, setupService.getDownloadPackageList().size()); // all software version below 1.0 are not updated (base-eskimo, etc.)
+        assertEquals(0, setupService.getBuiltPackageList().size());
+
+        // the 13 warnings should have been posted
+        assertEquals (36, notificationService.fetchElements(0).getKey());
+    }
 
     @Test
     public void testApplySetupDownload_unsupportedSnapshot() throws Exception {
@@ -491,12 +563,24 @@ public class SetupServiceTest {
 
         setupService.applySetup(SetupCommand.create(setupConfigWrapper, setupService, servicesDefinition));
 
-        assertEquals(18, setupService.getDownloadPackageList().size());
+        assertEquals(13, setupService.getDownloadPackageList().size());
         assertEquals(0, setupService.getBuiltPackageList().size());
 
         Collections.sort(setupService.getDownloadPackageList());
         assertEquals(
-                    "docker_template_base-eskimo_0.2_1.tar.gz, docker_template_cerebro_0.8.4_1.tar.gz, docker_template_elasticsearch_6.8.3_1.tar.gz, docker_template_flink_1.9.1_1.tar.gz, docker_template_gluster_debian_09_stretch_1.tar.gz, docker_template_grafana_6.3.3_1.tar.gz, docker_template_kafka-manager_2.0.0.2_1.tar.gz, docker_template_kafka_2.2.0_1.tar.gz, docker_template_kibana_6.8.3_1.tar.gz, docker_template_kube-master_1.8.1_1.tar.gz, docker_template_kubernetes-dashboard_2.5.1_1.tar.gz, docker_template_logstash_6.8.3_1.tar.gz, docker_template_ntp_debian_09_stretch_1.tar.gz, docker_template_prometheus_2.10.0_1.tar.gz, docker_template_spark_2.4.4_1.tar.gz, docker_template_zeppelin_0.9.0_1.tar.gz, docker_template_zookeeper_debian_09_stretch_1.tar.gz, eskimo_kube_1.23.5_1.tar.gz",
+                    "docker_template_base-eskimo_0.2_1.tar.gz, " +
+                            "docker_template_broker-manager_2.0.0.2_1.tar.gz," +
+                            " docker_template_broker_2.2.0_1.tar.gz," +
+                            " docker_template_calculator_2.4.4_1.tar.gz," +
+                            " docker_template_cluster-dashboard_2.5.1_1.tar.gz," +
+                            " docker_template_cluster-manager_debian_09_stretch_1.tar.gz," +
+                            " docker_template_cluster-master_1.8.1_1.tar.gz," +
+                            " docker_template_database-manager_0.8.4_1.tar.gz," +
+                            " docker_template_database_6.8.3_1.tar.gz," +
+                            " docker_template_distributed-filesystem_debian_09_stretch_1.tar.gz," +
+                            " docker_template_distributed-time_debian_09_stretch_1.tar.gz," +
+                            " docker_template_user-console_0.9.0_1.tar.gz," +
+                            " eskimo_kube_1.23.5_1.tar.gz",
                 String.join(", ", setupService.getDownloadPackageList()));
     }
 
@@ -509,14 +593,14 @@ public class SetupServiceTest {
 
         setupService.applySetup(command);
 
-        assertEquals(18, setupService.getBuiltPackageList().size());
+        assertEquals(13, setupService.getBuiltPackageList().size());
         assertEquals(0, setupService.getDownloadPackageList().size());
 
         Collections.sort(setupService.getBuiltPackageList());
         assertEquals(
-                    "base-eskimo, cerebro, elasticsearch, flink, gluster, grafana, kafka, kafka-manager, " +
-                            "kibana, kube, kube-master, kubernetes-dashboard, logstash, ntp, prometheus, spark, " +
-                            "zeppelin, zookeeper",
+                    "base-eskimo, broker, broker-manager, calculator, cluster-dashboard, cluster-manager, " +
+                            "cluster-master, database, database-manager, distributed-filesystem, distributed-time, " +
+                            "kube, user-console",
                 String.join(", ", setupService.getBuiltPackageList()));
 
     }

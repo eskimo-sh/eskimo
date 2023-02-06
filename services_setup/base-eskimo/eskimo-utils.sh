@@ -344,10 +344,13 @@ parse_cli_docker_volume_mounts() {
                 else
                     DIR=$(dirname $argument)
                 fi
-                if [[ $(echo $DOCKER_VOLUMES_ARGS | grep "$DIR:$DIR:slave") == "" ]]; then
-                    export DOCKER_VOLUMES_ARGS=" -v $DIR:$DIR:slave $DOCKER_VOLUMES_ARGS"
-                fi
 
+                # only if dir exists in local
+                if [[ -d $DIR || ! -z $TEST_MODE ]]; then
+                    if [[ $(echo $DOCKER_VOLUMES_ARGS | grep "$DIR:$DIR:slave") == "" ]]; then
+                        export DOCKER_VOLUMES_ARGS=" -v $DIR:$DIR:slave $DOCKER_VOLUMES_ARGS"
+                    fi
+                fi
             else
 
                 # --files is a comma-separated list of files
@@ -358,8 +361,10 @@ parse_cli_docker_volume_mounts() {
                     else
                         DIR=$(dirname $i)
                     fi
-                    if [[ $(echo $DOCKER_VOLUMES_ARGS | grep "$DIR:$DIR:slave") == "" ]]; then
-                        export DOCKER_VOLUMES_ARGS=" -v $DIR:$DIR:slave $DOCKER_VOLUMES_ARGS"
+                    if [[ -d $DIR || ! -z $TEST_MODE ]]; then
+                        if [[ $(echo $DOCKER_VOLUMES_ARGS | grep "$DIR:$DIR:slave") == "" ]]; then
+                            export DOCKER_VOLUMES_ARGS=" -v $DIR:$DIR:slave $DOCKER_VOLUMES_ARGS"
+                        fi
                     fi
                 done
 

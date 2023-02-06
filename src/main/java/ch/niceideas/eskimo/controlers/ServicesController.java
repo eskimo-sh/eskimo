@@ -164,7 +164,7 @@ public class ServicesController {
                     .filter(ServiceDefinition::isKubernetes)
                     .forEach(serviceDef -> kubeServicesConfig.put (serviceDef.getName(), serviceDef.toConfigJSON()));
 
-            map.put("kubernetesServices", new JSONArray(servicesDefinition.listKubernetesServices()));
+            map.put("kubernetesServices", new JSONArray(Arrays.stream(servicesDefinition.listKubernetesServices()).map(Service::getName).collect(Collectors.toList())));
             map.put("kubernetesServicesConfigurations", new JSONObject(kubeServicesConfig));
         });
     }

@@ -432,6 +432,20 @@ public class SetupServiceImpl implements SetupService {
                     String newSoftwareVersion = (String) packagesVersion.getValueForPath(imageName + DOT_SOFTWARE);
                     String newDistributionVersion = (String) packagesVersion.getValueForPath(imageName + DOT_DISTRIBUTION);
 
+                    if (StringUtils.isBlank(newSoftwareVersion)) {
+                        String msg = "Can't find remote version for " + imageName + " (Software Version is not found)";
+                        notificationService.addError(msg);
+                        logger.warn(msg);
+                        continue;
+                    }
+
+                    if (StringUtils.isBlank(newDistributionVersion)) {
+                        String msg = "Can't find remote version for " + imageName + " (New distribution Version is not found)";
+                        notificationService.addError(msg);
+                        logger.warn(msg);
+                        continue;
+                    }
+
                     if (compareVersion (new Pair<> (newSoftwareVersion, newDistributionVersion),
                             lastVersionValues) > 0) {
                         updates.add(imageName);
@@ -480,6 +494,26 @@ public class SetupServiceImpl implements SetupService {
             logger.error (e, e);
             throw new SetupException(e);
         }
+    }
+
+    private Pair<String, String> getVersionFromRemote(JsonWrapper packagesVersion, String packageName) {
+        String softwareVersion = (String) packagesVersion.getValueForPath(packageName + DOT_SOFTWARE);
+        String distributionVersion = (String) packagesVersion.getValueForPath(packageName + DOT_DISTRIBUTION);
+        if (StringUtils.isBlank(softwareVersion)) {
+            String msg = "Can't find remote version for " + packageName + " (Software Version is not found)";
+            notificationService.addError(msg);
+            logger.warn(msg);
+            return null;
+        }
+
+        if (StringUtils.isBlank(distributionVersion)) {
+            String msg = "Can't find remote version for " + packageName + " (New distribution Version is not found)";
+            notificationService.addError(msg);
+            logger.warn(msg);
+            return null;
+        }
+
+        return new Pair<>(softwareVersion, distributionVersion);
     }
 
     @Override
@@ -534,12 +568,14 @@ public class SetupServiceImpl implements SetupService {
 
                     for (String packageName : sortedServices) {
 
-                        String softwareVersion = (String) packagesVersion.getValueForPath(packageName + DOT_SOFTWARE);
-                        String distributionVersion = (String) packagesVersion.getValueForPath(packageName + DOT_DISTRIBUTION);
+                        Pair<String, String> remoteVersion = getVersionFromRemote(packagesVersion, packageName);
+                        if (remoteVersion == null) {
+                            continue;
+                        }
 
                         downloadPackage(
-                                packageName + "_" + softwareVersion + "_" + distributionVersion,
-                                DOCKER_TEMPLATE_PREFIX + packageName + "_" + softwareVersion + "_" + distributionVersion + TAR_GZ_EXTENSION);
+                                packageName + "_" + remoteVersion.getKey() + "_" + remoteVersion.getValue(),
+                                DOCKER_TEMPLATE_PREFIX + packageName + "_" + remoteVersion.getKey() + "_" + remoteVersion.getValue() + TAR_GZ_EXTENSION);
                     }
                 }
             }
@@ -565,12 +601,14 @@ public class SetupServiceImpl implements SetupService {
 
                     for (String kubePackageName : missingKubePackages) {
 
-                        String softwareVersion = (String) packagesVersion.getValueForPath(kubePackageName + DOT_SOFTWARE);
-                        String distributionVersion = (String) packagesVersion.getValueForPath(kubePackageName + DOT_DISTRIBUTION);
+                        Pair<String, String> remoteVersion = getVersionFromRemote(packagesVersion, kubePackageName);
+                        if (remoteVersion == null) {
+                            continue;
+                        }
 
                         downloadPackage(
-                                kubePackageName + "_" + softwareVersion + "_" + distributionVersion,
-                                KUBE_PREFIX + kubePackageName + "_" + softwareVersion + "_" + distributionVersion + TAR_GZ_EXTENSION);
+                                kubePackageName + "_" + remoteVersion.getKey() + "_" + remoteVersion.getValue(),
+                                KUBE_PREFIX + kubePackageName + "_" + remoteVersion.getKey() + "_" + remoteVersion.getValue() + TAR_GZ_EXTENSION);
                     }
 
                 } else {
@@ -598,12 +636,13 @@ public class SetupServiceImpl implements SetupService {
                             packagesVersion = loadRemotePackagesVersionFile();
                         }
 
-                        String newSoftwareVersion = (String) packagesVersion.getValueForPath(imageName + DOT_SOFTWARE);
-                        String newDistributionVersion = (String) packagesVersion.getValueForPath(imageName + DOT_DISTRIBUTION);
+                        Pair<String, String> remoteVersion = getVersionFromRemote(packagesVersion, imageName);
+                        if (remoteVersion == null) {
+                            continue;
+                        }
 
-                        if (compareVersion (new Pair<> (newSoftwareVersion, newDistributionVersion),
-                                lastVersionValues) > 0) {
-                            downloadPackage(imageName, DOCKER_TEMPLATE_PREFIX + imageName + "_" + newSoftwareVersion + "_" + newDistributionVersion + TAR_GZ_EXTENSION);
+                        if (compareVersion (remoteVersion, lastVersionValues) > 0) {
+                            downloadPackage(imageName, DOCKER_TEMPLATE_PREFIX + imageName + "_" + remoteVersion.getKey() + "_" + remoteVersion.getValue() + TAR_GZ_EXTENSION);
                         }
                     }
                 }

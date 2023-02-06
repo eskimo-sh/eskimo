@@ -3,67 +3,47 @@
     "software" : "0.2",
     "distribution" : "1"
   },
-  "cerebro": {
+  "database-manager": {
     "software": "0.8.4",
     "distribution": "1"
   },
-  "elasticsearch" : {
+  "database" : {
     "software": "6.8.3",
     "distribution": "1"
   },
-  "flink" : {
-    "software" : "1.9.1",
-    "distribution": "1"
-  },
-  "gluster": {
+  "distributed-filesystem": {
     "software" : "debian_09_stretch",
     "distribution": "1"
   },
-  "grafana": {
-    "software" : "6.3.3",
-    "distribution": "1"
-  },
-  "kafka-manager": {
+  "broker-manager": {
     "software": "2.0.0.2",
     "distribution": "1"
   },
-  "kafka": {
+  "broker": {
     "software" : "2.2.0",
     "distribution": "1"
   },
-  "kibana": {
-    "software": "6.8.3",
-    "distribution": "1"
-  },
-  "logstash": {
-    "software": "6.8.3",
-    "distribution": "1"
-  },
-  "kube-master": {
+  "cluster-master": {
     "software": "1.8.1",
     "distribution": "1"
   },
-  "kubernetes-dashboard": {
+  "cluster-dashboard": {
     "software": "2.5.1",
     "distribution": "1"
   },
-  "ntp": {
+  "distributed-time": {
     "software" : "debian_09_stretch",
     "distribution": "1"
   },
-  "prometheus": {
-    "software": "2.10.0",
-    "distribution": "1"
-  },
-  "spark": {
+  "calculator": {
     "software" : "2.4.4",
     "distribution": "1"
   },
-  "zeppelin": {
+  "user-console": {
     "software": "0.9.0",
     "distribution": "1"
   },
-  "zookeeper": {
+  "cluster-manager": {
     "software": "debian_09_stretch",
     "distribution": "1"
   },

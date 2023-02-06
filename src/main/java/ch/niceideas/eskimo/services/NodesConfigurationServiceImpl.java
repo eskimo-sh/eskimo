@@ -283,8 +283,12 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             ml.addInfo(" - Copying jq program");
             copyCommand("jq-1.6-linux64", "/usr/local/bin/jq", connection);
 
-            ml.addInfo(" - Copying kube_do script");
-            copyCommand("kube_do", "/usr/local/bin/kube_do", connection);
+            for (String script : new String[]{
+                    "kube_do",
+                    "eskimo-kube-exec"}) {
+                ml.addInfo(" - Copying script " + script);
+                copyCommand(script, "/usr/local/bin/" + script, connection);
+            }
 
             for (String script : new String[] {
                     "gluster-mount.sh",

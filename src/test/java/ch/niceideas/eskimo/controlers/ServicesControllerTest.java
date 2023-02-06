@@ -169,9 +169,19 @@ public class ServicesControllerTest {
 
         String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesControllerTest/expecteConfigServices.json"), StandardCharsets.UTF_8);
 
-        System.err.println(sc.listConfigServices());
+        //System.err.println(sc.listConfigServices());
 
         assertTrue(new JSONObject(expectedResult).similar(new JSONObject(sc.listConfigServices())));
+    }
+
+    @Test
+    public void testGetKubernetesServices() throws Exception {
+
+        String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesControllerTest/expectedKubeServices.json"), StandardCharsets.UTF_8);
+
+        System.err.println(sc.getKubernetesServices());
+
+        assertTrue(new JSONObject(expectedResult).similar(new JSONObject(sc.getKubernetesServices())));
     }
 
 }

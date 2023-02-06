@@ -137,7 +137,8 @@ public class NodesConfigurationServiceTest {
 
         assertEquals (" - Calling install-eskimo-base-system.sh\n" +
                 " - Copying jq program\n" +
-                " - Copying kube_do script\n" +
+                " - Copying script kube_do\n" +
+                " - Copying script eskimo-kube-exec\n" +
                 " - Copying script gluster-mount.sh\n" +
                 " - Copying script eskimo-utils.sh\n" +
                 " - Copying script glusterMountChecker.sh\n" +
@@ -150,6 +151,7 @@ public class NodesConfigurationServiceTest {
 
         assertEquals ("192.168.10.11:./services_setup/base-eskimo/jq-1.6-linux64\n" +
                 "192.168.10.11:./services_setup/base-eskimo/kube_do\n" +
+                "192.168.10.11:./services_setup/base-eskimo/eskimo-kube-exec\n" +
                 "192.168.10.11:./services_setup/base-eskimo/gluster-mount.sh\n" +
                 "192.168.10.11:./services_setup/base-eskimo/eskimo-utils.sh\n" +
                 "192.168.10.11:./services_setup/base-eskimo/glusterMountChecker.sh\n" +
@@ -167,6 +169,9 @@ public class NodesConfigurationServiceTest {
                 "sudo mv kube_do /usr/local/bin/kube_do\n" +
                 "sudo chown root.root /usr/local/bin/kube_do\n" +
                 "sudo chmod 755 /usr/local/bin/kube_do\n" +
+                "sudo mv eskimo-kube-exec /usr/local/bin/eskimo-kube-exec\n" +
+                "sudo chown root.root /usr/local/bin/eskimo-kube-exec\n" +
+                "sudo chmod 755 /usr/local/bin/eskimo-kube-exec\n" +
                 "sudo mv gluster-mount.sh /usr/local/sbin/gluster-mount.sh\n" +
                 "sudo chown root.root /usr/local/sbin/gluster-mount.sh\n" +
                 "sudo chmod 755 /usr/local/sbin/gluster-mount.sh\n" +
