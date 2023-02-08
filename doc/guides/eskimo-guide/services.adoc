@@ -52,14 +52,26 @@ Eskimi provided services have descriptors placed in `/var/lib/eskimo/kube-servic
 
 ==== Commands wrappers for kafka, logstash, spark and flink
 
-Commands such as kafka `create-producer.sh` or spark's `spark-submit` work only from within the respective kafka or spark
+Since software components and services within Eskimo are packaged as docker images, command line tools such
+as kafka's `create-producer.sh` or spark's `spark-submit` work only from within the respective kafka or spark
 executor docker containers.
 
-For this reason, eskimo provides host-level wrappers in `/usr/local/bin` and `/usr/local/sbin` for most important
-commands. +
-These wrappers take care of calling the corresponding command in the required container.
+For this reason, eskimo provides for each of these command line tools a host-level wrapper in `/usr/local/bin`
+and `/usr/local/sbin`. +
+These wrappers take care of starting the required docker container and calling the corresponding command in it.
 
-The remaining of this chapter presents each and every pre-packaged service:
+Even further, since most analytics services within Eskimo run on Kubernetes, these wrappers take care of tampering at
+startup with the container `/etc/hosts` file to dynamically resolve each and every service deployed on Kubernetes based
+on the Kube topology at command invocation time.
+
+==== A specific generic wrapper
+
+A specific generic shell wrapper is available in the form of the `eskimo-kube-exec`command located in `/usr/local/bin`.
+
+This wrapper can be used to invoke a shell for instance with access to all Kubernetes services by their names with the
+following command call: `eskimo-kube-exec bash`. +
+This wrapper uses a generic container with a bunch of command line utilities available and is deployed with the
+`kube-shell` kubernetes service.
 
 ==== Reloading a Service UI IFrame
 
@@ -72,6 +84,7 @@ These wrapped UI applications are displayed as iframes in the Eskimo main UI win
 Whenever a service UI is being displayed by selecting the service from the menu, *clicking the service menu entry a
 second time will force refresh the service iframe*.
 
+Now the remaining of this chapter presents each and every pre-packaged service:
 
 === NTP
 
@@ -237,15 +250,13 @@ All kubernetes system Docker images such as CoreDNS, Pause, etc. are packaged by
 Last but not least, Eskimo defines required endpoints automatically to make gluster available as a volume provider to
 kubernetes services.
 
-===== kube-slave required on kube-master node
+===== Kubernetes services name resolution on host nodes
 
-The kube-slave service (eskimo specifics) takes care of setting up virtual networking and Name resolution (DNS) on host
-machines.
-For the time being (Eskimo V0.4.x) it is required to install the kube-slave service on the node running the kuber-master
-to setup virtual networking properly on that node as well.
+As of current version of Eskimo (V0.5), no ost-level DNS service is provided to provide service name resolution for
+nodes host level commands and components.
 
-Should one not want to run any kubernetes service or PODs on the kube-master node, one should declare PODs or
-deployments with the constraint on `node-role.kubernetes.io/master` as `NoSchedule`.
+Eskimo provides in place a command `eskimo-kube-exec` which invokes the passed command line within a container where
+kubernetes services are declared in `/etc/hosts`, thus making them available for command line programs.
 
 
 === Elastic Logstash
@@ -483,6 +494,29 @@ gluster shares created and mounted:
 
 * `/var/lib/flink/data flink` used to store data to be shared amoung flink workers.
 * `/var/lib/flink/completed_jobs` where flink completed jobs are stored.
+
+
+==== pyflink programs requirements on Eskimo
+
+Within Eskimo, the pyflink python environment is aailable as a virtual environment packaged at the following location:
+`/usr/local/lib/flink/`opt/python/venv.zip`.
+
+In order for this virtual environment to be available to user submitted pyflink jobs, the following configirations must
+be declared:
+
+----
+    # specify the Python virtual environment
+    t_env.add_python_archive("/usr/local/lib/flink/opt/python/venv.zip")
+    # specify the path of the python interpreter which is used to execute the python UDF workers
+    t_env.get_config().set_python_executable("venv.zip/venv/bin/python")
+----
+
+or using Python DataStream API as following:
+
+----
+    stream_execution_environment.add_python_archive("/usr/local/lib/flink/opt/python/venv.zip")
+    stream_execution_environment.set_python_executable("venv.zip/venv/bin/python")
+----
 
 ==== Other Flink specificities within Eskimo
 
