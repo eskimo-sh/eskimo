@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -42,12 +43,13 @@ set -e
 # ======================================================================================================================
 
 echo_date() {
+    # shellcheck disable=SC2145
     echo $(date +"%Y-%m-%d %H:%M:%S")" $@"
 }
 
 check_for_virtualbox() {
     if [ -x "$(command -v VBoxManage)" ]; then
-        echo_date "Found virtualbox : "$(VBoxManage -v)
+        echo_date "Found virtualbox : $(VBoxManage -v)"
     else
 
         if [[ -f /etc/debian_version ]]; then
@@ -67,7 +69,7 @@ check_for_virtualbox() {
 
 check_for_vagrant() {
     if [ -x "$(command -v vagrant)" ]; then
-        echo_date "Found vagrant : "$(vagrant -v)
+        echo_date "Found vagrant : $(vagrant -v)"
     else
         echo "Vagrant is not available on system"
         exit 100
@@ -76,14 +78,14 @@ check_for_vagrant() {
 
 check_for_ssh() {
     if [ -x "$(command -v ssh)" ]; then
-        echo_date "Found ssh : "$(which ssh)
+        echo_date "Found ssh : $(which ssh)"
     else
         echo "ssh is not available on system"
         exit 111
     fi
 
     if [ -x "$(command -v sshpass)" ]; then
-        echo_date "Found sshpass : "$(which sshpass)
+        echo_date "Found sshpass : $(which sshpass)"
     else
         echo "sshpass is not available on system"
         exit 112
@@ -92,7 +94,7 @@ check_for_ssh() {
 
 check_for_docker() {
     if [ -x "$(command -v docker)" ]; then
-        echo_date "Found docker : "$(docker -v)
+        echo_date "Found docker : $(docker -v)"
     else
         echo "Docker is not available on system"
         exit 101
@@ -101,7 +103,7 @@ check_for_docker() {
 
 check_for_maven() {
     if [ -x "$(command -v mvn)" ]; then
-        echo_date "Found mvn : "$(mvn -v)
+        echo_date "Found mvn : $(mvn -v)"
     else
         echo "Maven is not available on system"
         exit 102
@@ -110,7 +112,7 @@ check_for_maven() {
 
 check_for_java() {
     if [ -x "$(command -v java)" ]; then
-        echo_date "Found java : "$(java -version 2>&1)
+        echo_date "Found java : $(java -version 2>&1)"
     else
         echo "Java is not available on system"
         exit 103
@@ -134,7 +136,7 @@ restart_zeppelin_spark_executor() {
         exit 101
     fi
 
-    if [[ `cat eskimo-zeppelin-admin_call | grep "\"status\":\"OK\""` == "" ]]; then
+    if [[ $(grep -F "\"status\":\"OK\"" eskimo-zeppelin-admin_call) == "" ]]; then
         echo "Couldn't successfully check zeppelin spark interpreter restart"
         exit 102
     fi
@@ -212,7 +214,7 @@ call_eskimo() {
     fi
 
     # test result
-    if [[ $(cat eskimo-call-result | jq -r '.status') != "OK" ]]; then
+    if [[ $(jq -r '.status' < eskimo-call-result) != "OK" ]]; then
         echo_date "Couldn't successfully call eskimo URL : $URL"
         echo_date "Got result"
         cat eskimo-call-result
@@ -220,7 +222,7 @@ call_eskimo() {
     fi
 
     # Specific zeppelin case :
-    if [[ $(cat eskimo-call-result | grep '"code":"ERROR"') != "" ]]; then
+    if [[ $(grep -F '"code":"ERROR"' eskimo-call-result) != "" ]]; then
         echo_date "Couldn't successfully call eskimo URL (zeppelin notebook): $URL"
         echo_date "Got result"
         cat eskimo-call-result
@@ -726,6 +728,9 @@ setup_eskimo() {
               "kafka-manager_install": "on",
               "kafka-manager_cpu": "0.1",
               "kafka-manager_ram": "1G",
+              "kube-shell_install": "on",
+              "kube-shell_cpu": "0.1",
+              "kube-shell_ram": "100M",
               "kibana_install": "on",
               "kibana_cpu": "0.1",
               "kibana_ram": "1024M",
@@ -920,13 +925,13 @@ query_zeppelin_notebook () {
 
 run_all_zeppelin_pararaphs () {
     nb_path=$1
-    nb_id=`query_zeppelin_notebook "$nb_path"`
+    nb_id=$(query_zeppelin_notebook "$nb_path")
 
-    for i in `curl \
+    for i in $(curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
             -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
-            2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '`; do
+            2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '); do
 
         echo_date "  + running $i"
         call_eskimo \
@@ -937,7 +942,7 @@ run_all_zeppelin_pararaphs () {
 
 clear_zeppelin_results () {
     nb_path=$1
-    nb_id=`query_zeppelin_notebook "$nb_path"`
+    nb_id=$(query_zeppelin_notebook "$nb_path")
 
     call_eskimo \
         "zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id/clear" \
@@ -949,14 +954,14 @@ run_zeppelin_pararaph () {
     nb_path=$1
     par_nbr=$2
     params=$3
-    nb_id=`query_zeppelin_notebook "$nb_path"`
+    nb_id=$(query_zeppelin_notebook "$nb_path")
 
     cnt=0
-    for i in `curl \
+    for i in $(curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
             -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
-            2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '`; do
+            2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '); do
 
         cnt=$((cnt + 1))
 
@@ -972,14 +977,14 @@ run_zeppelin_pararaph () {
 get_zeppelin_paragraph_status () {
     nb_path=$1
     par_nbr=$2
-    nb_id=`query_zeppelin_notebook "$nb_path"`
+    nb_id=$(query_zeppelin_notebook "$nb_path")
 
     cnt=0
-    for i in `curl \
+    for i in $(curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
             -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
-            2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '`; do
+            2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '); do
 
         cnt=$((cnt + 1))
 
@@ -999,14 +1004,14 @@ get_zeppelin_paragraph_status () {
 start_zeppelin_pararaph () {
     nb_path=$1
     par_nbr=$2
-    nb_id=`query_zeppelin_notebook "$nb_path"`
+    nb_id=$(query_zeppelin_notebook "$nb_path")
 
     cnt=0
-    for i in `curl \
+    for i in $(curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
             -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
-            2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '`; do
+            2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '); do
 
         cnt=$((cnt + 1))
 
@@ -1022,14 +1027,14 @@ start_zeppelin_pararaph () {
 stop_zeppelin_pararaph () {
     nb_path=$1
     par_nbr=$2
-    nb_id=`query_zeppelin_notebook "$nb_path"`
+    nb_id=$(query_zeppelin_notebook "$nb_path")
 
     cnt=0
-    for i in `curl \
+    for i in $(curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
             -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
-            2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '`; do
+            2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '); do
 
         cnt=$((cnt + 1))
 
@@ -1221,7 +1226,7 @@ run_zeppelin_kafka_streams() {
     sleep 8
 
     # Check status
-    if [[ `get_zeppelin_paragraph_status "/Kafka Streams Demo" 5` != "RUNNING" ]]; then
+    if [[ $(get_zeppelin_paragraph_status "/Kafka Streams Demo" 5) != "RUNNING" ]]; then
 
         echo_date "Failed to start Kafka Streams Demo program"
 
@@ -1243,7 +1248,7 @@ run_zeppelin_kafka_streams() {
     sleep 5
 
     # Check status
-    if [[ `get_zeppelin_paragraph_status "/Kafka Streams Demo" 9` != "RUNNING" ]]; then
+    if [[ $(get_zeppelin_paragraph_status "/Kafka Streams Demo" 9) != "RUNNING" ]]; then
 
         echo_date "Failed to start Kafka Streams Demo program - console consummer paragraph"
 
@@ -1366,7 +1371,7 @@ run_zeppelin_flink_kafka() {
 get_ES_stack_version() {
 
     if [[ -f ../../packages_dev/common/common.sh ]]; then
-        eval `cat ../../packages_dev/common/common.sh | grep "ES_VERSION="`
+        eval "$(grep -F "ES_VERSION=" ../../packages_dev/common/common.sh)"
     fi
 
     if [[ "$ES_VERSION" != "" ]]; then
@@ -1447,7 +1452,7 @@ do_cleanup() {
 
     #echo_date "   + Delete berka-trans"
     echo_date " - Delete berka index berka-trans"
-    vagrant ssh -c "/usr/local/bin/eskimo-kube-exec curl -XDELETE http://elasticsearch.default.svc.cluster.eskimo:9200/berka-trans" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "sudo su -c '/usr/local/bin/eskimo-kube-exec curl -XDELETE http://elasticsearch.default.svc.cluster.eskimo:9200/berka-trans' eskimo" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
 }
 
@@ -1528,7 +1533,7 @@ EOF
             vagrant@$BOX_IP "sudo su -c '/usr/local/bin/flink run -py /tmp/flink-batch-example.py' eskimo" \
             2>&1 | tee /tmp/flink-batch-example.log  >> /tmp/integration-test.log
 
-    if [[ `grep -F 'Job has been submitted with JobID' /tmp/flink-batch-example.log` == "" ]]; then
+    if [[ $(grep -F 'Job has been submitted with JobID' /tmp/flink-batch-example.log) == "" ]]; then
         echo_date "Failed to run flink job"
         exit 102
     fi
@@ -1587,7 +1592,7 @@ EOF
             vagrant@$BOX_IP "sudo su -c '/usr/local/bin/spark-submit /tmp/spark-batch-example.py' eskimo" \
             2>&1 | tee /tmp/spark-batch-example-python.log  >> /tmp/integration-test.log
 
-    if [[ `grep -F '[Row(count(1)=5)]' /tmp/spark-batch-example-python.log` == "" ]]; then
+    if [[ $(grep -F '[Row(count(1)=5)]' /tmp/spark-batch-example-python.log) == "" ]]; then
         echo_date "Failed to run spark job"
         exit 103
     fi
@@ -1602,7 +1607,7 @@ EOF
           vagrant@$BOX_IP "sudo su -c '/usr/local/bin/pyspark' eskimo" \
           2>&1 | tee /tmp/spark-batch-example-python.log  >> /tmp/integration-test.log
 
-    if [[ `grep -F '[Row(count(1)=5)]' /tmp/spark-batch-example-python.log` == "" ]]; then
+    if [[ $(grep -F '[Row(count(1)=5)]' /tmp/spark-batch-example-python.log) == "" ]]; then
         echo_date "Failed to run pyspark job"
         exit 103
     fi
@@ -1647,7 +1652,7 @@ EOF
           vagrant@$BOX_IP "sudo su -c '/usr/local/bin/spark-shell' eskimo" \
           2>&1 | tee /tmp/spark-batch-example-scala.log  >> /tmp/integration-test.log
 
-    if [[ `grep -F 'res0: Long =' /tmp/spark-batch-example-scala.log` == "" ]]; then
+    if [[ $(grep -F 'res0: Long =' /tmp/spark-batch-example-scala.log) == "" ]]; then
         echo_date "Failed to run spark shell job"
         exit 104
     fi
@@ -1694,7 +1699,7 @@ EOF
           vagrant@$BOX_IP "sudo su -c '/usr/local/bin/logstash -f /tmp/csv-read.conf' eskimo" \
           2>&1 | tee /tmp/logstash-example.log  >> /tmp/integration-test.log
 
-    if [[ `grep -F 'Pipelines running' /tmp/logstash-example.log` == "" ]]; then
+    if [[ $(grep -F 'Pipelines running' /tmp/logstash-example.log) == "" ]]; then
         echo_date "Failed to run spark shell job"
         exit 104
     fi
@@ -1766,13 +1771,13 @@ test_doc(){
     # ----------------------------------------------------------------------------------------------------------------------
 
     echo_date " - Testing Eskimo user guide"
-    if [[ `query_eskimo "docs/eskimo-guide.html" | grep "<p>Eskimo is available under a dual licensing model"` == "" ]]; then
+    if [[ $(query_eskimo "docs/eskimo-guide.html" | grep "<p>Eskimo is available under a dual licensing model") == "" ]]; then
         echo "!! Couldnt get eskimo user guide"
         exit 111
     fi
 
     echo_date " - Testing Eskimo service dev guide"
-    if [[ `query_eskimo "docs/service-dev-guide.html" | grep "<p>Eskimo is available under a dual licensing model"` == "" ]]; then
+    if [[ $(query_eskimo "docs/service-dev-guide.html" | grep "<p>Eskimo is available under a dual licensing model") == "" ]]; then
         echo "!! Couldnt get eskimo service dev guide"
         exit 112
     fi
@@ -1799,7 +1804,7 @@ load_kibana_flight_data() {
 # http://192.168.56.41/kibana/api/sample_data/flights
 #77b6aa8e83065cde78d90d2519f3f836ef59808a2391341f6b43708ea199437e
 
-    if [[ `cat kibana-flight-import | grep "\"kibanaSavedObjectsLoaded\":11"` == "" ]]; then
+    if [[ $(grep -F "\"kibanaSavedObjectsLoaded\":11" kibana-flight-import) == "" ]]; then
         echo "!! Couldn't import kibana flights object"
         exit 113
     fi
@@ -1827,7 +1832,7 @@ prepare_demo() {
             > kibana-logs-import \
             2> kibana-logs-import-error
 
-    if [[ `cat kibana-logs-import | grep "\"kibanaSavedObjectsLoaded\":13"` == "" ]]; then
+    if [[ $(grep -F "\"kibanaSavedObjectsLoaded\":13" kibana-logs-import) == "" ]]; then
         echo "!! Couldn't import kibana logs object"
         exit 113
     fi
@@ -1849,7 +1854,7 @@ prepare_demo() {
             > kibana-ecommerce-import \
             2> kibana-ecommerce-import-error
 
-    if [[ `cat kibana-ecommerce-import | grep "\"kibanaSavedObjectsLoaded\":20"` == "" ]]; then
+    if [[ $(grep -F "\"kibanaSavedObjectsLoaded\":20" kibana-ecommerce-import) == "" ]]; then
         echo "!! Couldn't import kibana ecommerce object"
         exit 113
     fi
@@ -1878,22 +1883,22 @@ prepare_demo() {
 
     echo_date "   + Ensure all dashboards are found"
 
-    if [[ `cat kibana-dashboards | grep '\[eCommerce\] Revenue Dashboard'` == "" ]]; then
+    if [[ $(grep -F '\[eCommerce\] Revenue Dashboard' kibana-dashboards) == "" ]]; then
         echo "!! Cannot find [eCommerce] Revenue Dashboard"
         exit 121
     fi
 
-    if [[ `cat kibana-dashboards | grep 'berka-transactions'` == "" ]]; then
+    if [[ $(grep -F 'berka-transactions' kibana-dashboards) == "" ]]; then
         echo "!! Cannot find berka-transactions"
         exit 122
     fi
 
-    if [[ `cat kibana-dashboards | grep '\[Flights\] Global Flight Dashboard'` == "" ]]; then
+    if [[ $(grep -F '\[Flights\] Global Flight Dashboard' kibana-dashboards) == "" ]]; then
         echo "!! Cannot find [eCommerce] Revenue Dashboard"
         exit 123
     fi
 
-    if [[ `cat kibana-dashboards | grep '\[Logs\] Web Traffic'` == "" ]]; then
+    if [[ $(grep -F '\[Logs\] Web Traffic' kibana-dashboards) == "" ]]; then
         echo "!! Cannot find [eCommerce] Revenue Dashboard"
         exit 124
     fi
@@ -1955,7 +1960,7 @@ do_screenshots() {
     echo_date " - Generating screenshots"
 
      # running screenshot generator with maven
-     saved_dir=`pwd`
+     saved_dir=$(pwd)
      cd ../..
      export ESKIMO_NODE=$BOX_IP
      mvn exec:java -P screenshots  >> /tmp/integration-test.log 2>&1
