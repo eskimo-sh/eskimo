@@ -92,7 +92,6 @@ done
 
 echo " - Simlinking flink log to /var/log/"
 sudo rm -Rf /usr/local/lib/flink/log
-sudo mkdir /var/log/flink/log
 sudo ln -s /var/log/flink/log /usr/local/lib/flink/log
 
 

@@ -36,7 +36,9 @@
 
 package ch.niceideas.eskimo.types;
 
-public interface Operation {
+import java.io.Serializable;
+
+public interface Operation extends Serializable {
 
     String getType();
 }

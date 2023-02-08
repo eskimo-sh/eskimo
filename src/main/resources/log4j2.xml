@@ -72,13 +72,14 @@ Software.
         <Logger name="ch" level="info"/>
         <Logger name="org.apache.http.impl.execchain" level="warn"/>
 
-        <!--
         <Logger name="ch.niceideas.eskimo.proxy" level="debug" />
-        <Logger name="ch.niceideas.eskimo.services.ConnectionManagerService" level="debug" />
-        -->
+        <Logger name="ch.niceideas.eskimo.services.ConnectionManagerServiceImpl" level="debug" />
 
+        <!--
         <Logger name="ch.niceideas.eskimo.services" level="debug"/>
         <Logger name="ch.niceideas.eskimo.services.ConnectionManagerServiceImpl" level="info"/>
+        -->
+
         <Logger name="org.apache.juli" level="fatal"/>
 
         <!--Logger name="org.apache.http.impl.conn.PoolingHttpClientConnectionManager" level="debug"-->

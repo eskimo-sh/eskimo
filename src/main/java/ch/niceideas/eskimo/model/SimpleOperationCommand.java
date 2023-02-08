@@ -92,7 +92,7 @@ public class SimpleOperationCommand implements JSONOpCommand {
     }
 
     @RequiredArgsConstructor
-    public enum SimpleOperation implements LabelledOperation, Serializable {
+    public enum SimpleOperation implements LabelledOperation {
         SHOW_JOURNAL("show_journal", "Showing journal"),
         START("start", "Starting"),
         STOP ("stop", "Stopping"),
