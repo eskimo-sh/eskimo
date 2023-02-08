@@ -1484,6 +1484,11 @@ word_count_data = ["To be, or not to be,--that is the question:--",
 def word_count():
     t_env = TableEnvironment.create(EnvironmentSettings.in_streaming_mode())
 
+    # specify the Python virtual environment
+    t_env.add_python_archive("/usr/local/lib/flink/opt/python/venv.zip")
+    # specify the path of the python interpreter which is used to execute the python UDF workers
+    t_env.get_config().set_python_executable("venv.zip/venv/bin/python")
+
     tab = t_env.from_elements(map(lambda i: (i,), word_count_data),
                               DataTypes.ROW([DataTypes.FIELD('line', DataTypes.STRING())]))
 
@@ -1520,7 +1525,7 @@ EOF
     fi
 
     sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
-            vagrant@$BOX_IP "sudo su -c '/usr/local/bin/flink run -pyfs /usr/local/lib/flink/opt/python/pyflink -py /tmp/flink-batch-example.py' eskimo" \
+            vagrant@$BOX_IP "sudo su -c '/usr/local/bin/flink run -py /tmp/flink-batch-example.py' eskimo" \
             2>&1 | tee /tmp/flink-batch-example.log  >> /tmp/integration-test.log
 
     if [[ `grep -F 'Job has been submitted with JobID' /tmp/flink-batch-example.log` == "" ]]; then

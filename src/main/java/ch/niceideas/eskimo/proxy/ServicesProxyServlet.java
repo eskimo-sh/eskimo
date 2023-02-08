@@ -343,6 +343,7 @@ public class ServicesProxyServlet extends ProxyServlet {
             input = input.replace("url(/", "url(/" + context.getPrefixPath() + "/");
             input = input.replace("/api/v1", "/" + context.getPrefixPath() + "/api/v1");
             input = input.replace("\"/static/", "\"/" + context.getPrefixPath() + "/static/");
+
         }
 
         for (ProxyReplacement replacement : serviceDef.getUiConfig().getProxyReplacements()) {
