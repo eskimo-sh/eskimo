@@ -34,20 +34,36 @@
 # Software.
 #
 
+echo_usage() {
+    echo "eskimo-kubectl COMMAND SERVICE NODE"
+    echo "where "
+    echo "    COMMAND in [logs, start, stop, restart, uninstall]"
+    echo "    SERVICE is the target eskimo kubernetes service"
+    echo "    NODE the target node whwre the service is expected to run (to distinguish multiple instances services)"
+}
+
+if [[ $1 == "-h" ]]; then
+    echo_usage
+    exit 0
+fi
+
 if [[ $1 == "" ]]; then
     echo "Expecting Command first argument"
+    echo_usage
     exit 1
 fi
 export COMMAND=$1
 
 if [[ $2 == "" ]]; then
     echo "Expecting target service as second argument"
+    echo_usage
     exit 2
 fi
 export SERVICE=$2
 
 if [[ $3 == "" ]]; then
     echo "Expecting target node as third argument"
+    echo_usage
     exit 3
 fi
 export NODE=$3
@@ -281,6 +297,8 @@ function restart_service() {
 
         echo "   + (Re-)applying $SERVICE"
         envsubst < $SERVICE_FILE | call-kubectl apply -f -
+    else
+        echo "$SERVICE_FILE doesn't exist. Ignoring ..."
     fi
 }
 

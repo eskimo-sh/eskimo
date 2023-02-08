@@ -48,7 +48,7 @@ if [[ -f /usr/local/sbin/inContainerInjectTopology.sh ]]; then
 fi
 
 echo " - Making sure log dir exists"
-mkdir /var/log/flink/log
+mkdir -p /var/log/flink/log
 
 echo " - Inject settings (flink-runtime)"
 /usr/local/sbin/settingsInjector.sh flink-runtime

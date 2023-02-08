@@ -1533,6 +1533,22 @@ EOF
         exit 102
     fi
 
+    # testing pyflink batch result
+    for i in $(seq 1 60); do
+         sleep 3
+         task_manager_id=$(sshpass -p vagrant ssh vagrant@$BOX_IP "sudo su -c '/usr/local/bin/kubectl get pod | grep flink-runtime-taskmanager | cut -d \" \" -f 1' eskimo")
+         if [[ $task_manager_id != "" ]]; then
+             sshpass -p vagrant ssh vagrant@$BOX_IP "sudo su -c '/usr/local/bin/kubectl logs $task_manager_id' eskimo" > /tmp/pyflink-tm.log
+             if [[ $(grep -F '[consummation, 1]' /tmp/pyflink-tm.log) != "" ]]; then
+                 break;
+             fi
+         fi
+
+        if [[ $i == 60 ]]; then
+            echo_date "Couldn't find expected outcome in flink taskmanager log in 180 seconds"
+        fi
+    done
+
     rm -Rf /tmp/flink-batch-example.log
 
 

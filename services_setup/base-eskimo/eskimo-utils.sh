@@ -48,7 +48,7 @@ take_lock() {
 
     if [[ $1 == "" ]]; then
         echo "Expecting Unique lock identifier as argument"
-        exit 1
+        return 1
     fi
     local LOCK_NAME=$1
 
@@ -59,7 +59,7 @@ take_lock() {
         local LOCK_FOLDER=$2
         if [[ ! -d $LOCK_FOLDER ]]; then
             echo "Folder $LOCK_FOLDER doesn't exist"
-            exit 2
+            return 2
         fi
     fi
 
@@ -73,9 +73,9 @@ take_lock() {
     eval "exec $ESKIMO_LOCK_HANDLE>$ESKIMO_LOCK_FILE" || (echo "Couldn't take handle on lock file" && exit 3)
 
     if [[ "$NON_BLOCK" == "true" ]]; then
-        flock -n $ESKIMO_LOCK_HANDLE || (echo "Couldn't flock file handle" && exit 4)
+        flock -n $ESKIMO_LOCK_HANDLE || (echo "Couldn't flock file handle - $1 $2 $3" && exit 4)
     else
-        flock -w 300 $ESKIMO_LOCK_HANDLE || (echo "Couldn't flock file handle" && exit 4)
+        flock -w 300 $ESKIMO_LOCK_HANDLE || (echo "Couldn't flock file handle - $1 $2 $3" && exit 4)
     fi
 
     export LAST_LOCK_HANDLE="$ESKIMO_LOCK_HANDLE:$ESKIMO_LOCK_FILE"
@@ -98,12 +98,12 @@ release_lock() {
 
     if [[ "$ESKIMO_LOCK_HANDLE" == "" || "$ESKIMO_LOCK_HANDLE" == "$ESKIMO_HANDLE_REPR" ]]; then
         echo "Failed to parse HANDLE in lock handle representations $ESKIMO_HANDLE_REPR"
-        exit 2
+        return 2
     fi
 
     if [[ "$ESKIMO_LOCK_FILE" == "" || "$ESKIMO_LOCK_FILE" == "$ESKIMO_HANDLE_REPR" ]]; then
         echo "Failed to parse FILE in lock handle representations $ESKIMO_HANDLE_REPR"
-        exit 3
+        return 3
     fi
 
     flock -u $ESKIMO_LOCK_HANDLE || (echo "Couldn't UN-flock file handle" && exit 4)
@@ -113,7 +113,7 @@ __release_global_lock() {
 
     if [[ "$" == "$1" ]]; then
         echo "No passed global lock"
-        exit 1
+        return 1
     fi
     local GLOBAL_LOCK=$1
 
@@ -131,10 +131,10 @@ take_global_lock() {
 
     if [[ "$GLOBAL_LOCK" != "" ]]; then
         echo "Already has a global lock $GLOBAL_LOCK"
-        exit 1
+        return 1
     fi
 
-    take_lock $1 $2 $3 || (echo "Couldn't flock file handle" && exit 4)
+    take_lock $1 $2 $3 || (echo "Couldn't flock file handle - $1 $2 $3" && exit 4)
 
     export GLOBAL_LOCK=$LAST_LOCK_HANDLE
 
