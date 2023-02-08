@@ -57,9 +57,17 @@ echo " - Installing scala"
 docker exec -i flink_template bash -c ". /common/common.sh && install_scala" > /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -4
 
-echo " - Installing python"
-docker exec -i flink_template apt-get -y install  python3-dev python3-six python3-virtualenv python3-pip > /tmp/flink_build_log 2>&1
+#echo " - Installing python"
+#docker exec -i flink_template apt-get -y install  python3-dev python3-six python3-virtualenv python3-pip zip > /tmp/flink_build_log 2>&1
+#fail_if_error $? "/tmp/flink_build_log" -5
+
+echo " - Installing python 3.7 build dependencies"
+docker exec -i flink_template apt-get -y install zip libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev > /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -5
+
+echo " - Installing python 3.7"
+docker exec -i flink_template bash /scripts/installPython37.sh | tee -a /tmp/flink_build_log 2>&1
+check_in_container_install_success /tmp/flink_build_log
 
 echo " - Installing GlusterFS client"
 docker exec -i flink_template apt-get -y install  glusterfs-client > /tmp/flink_build_log 2>&1
@@ -69,16 +77,26 @@ fail_if_error $? "/tmp/flink_build_log" -10
 #docker exec -i flink pip install elasticsearch kafka-python > /tmp/flink_build_log 2>&1
 #fail_if_error $? "/tmp/flink_build_log" -6
 
-echo " - Switching python default version to 3.x"
-docker exec -i flink_template update-alternatives --force --install /usr/bin/python python /usr/bin/python3.9 2 > /tmp/flink_build_log 2>&1
+echo " - Switching python default version to 3.7"
+docker exec -i flink_template update-alternatives --force --install /usr/bin/python python /usr/bin/python3.9 1 > /tmp/flink_build_log 2>&1
+fail_if_error $? "/tmp/flink_build_log" -5
+docker exec -i flink_template update-alternatives --force --install /usr/bin/python python /usr/bin/python3.7 2 > /tmp/flink_build_log 2>&1
+fail_if_error $? "/tmp/flink_build_log" -5
+docker exec -i flink_template mv /usr/bin/python3.9 /usr/bin/python3.9-DISABLED > /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -5
 
 echo " - Installing other python packages"
 docker exec -i flink_template pip3 install requests filelock > /tmp/flink_build_log 2>&1
+fail_if_error $? "/tmp/flink_build_log" -6
 
 echo " - Installing flink"
 docker exec -i flink_template bash /scripts/installFlink.sh | tee -a /tmp/flink_build_log 2>&1
 check_in_container_install_success /tmp/flink_build_log
+
+echo " - Installing pyflink venv archive"
+docker exec -i flink_template bash /scripts/installPyFlinkVenv.sh | tee -a /tmp/flink_build_log 2>&1
+check_in_container_install_success /tmp/flink_build_log
+
 
 
 #echo " - TODO"

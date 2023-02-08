@@ -194,29 +194,6 @@ sudo mv flink-$FLINK_VERSION /usr/local/lib/flink-$FLINK_VERSION
 echo " - symlinking /usr/local/lib/flink/ to /usr/local/lib/flink-$FLINK_VERSION"
 sudo ln -s /usr/local/lib/flink-$FLINK_VERSION /usr/local/lib/flink
 
-echo " - Extracting pyflink environment"
-if [[ -d /usr/local/lib/flink/opt/python/ ]]; then
-
-  cd /usr/local/lib/flink/opt/python/ || exit 4
-  for i in $(ls -1 *.zip); do
-      echo "   + Unzipping $i"
-      unzip $i > /tmp/flink_install_log 2>&1
-      rm $i
-  done
-  for i in $(find ./ -maxdepth 1 -mindepth 1 -type d); do
-      echo "   + Making script executable in $i"
-      for j in $(find $i -name '*.sh'); do
-          sudo chmod 755 $j
-      done
-  done
-
-
-else
-    echo "WARNING : environment /usr/local/lib/flink/opt/python/ not found"
-fi
-
-cd /tmp/flink_setup || exit 5
-
 echo " - Checking Flink Installation"
 /usr/local/lib/flink/bin/flink run /usr/local/lib/flink/examples/batch/WordCount.jar > /tmp/flink_run_log 2>&1 &
 EXAMPLE_PID=$!
