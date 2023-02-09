@@ -44,9 +44,9 @@ if [ -z "$ZEPPELIN_VERSION" ]; then
     exit 1
 fi
 
-saved_dir=`pwd`
+saved_dir=$(pwd)
 function returned_to_saved_dir() {
-     cd $saved_dir
+     cd $saved_dir || true
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
@@ -55,7 +55,7 @@ trap returned_to_saved_dir ERR
 
 echo " - Changing to temp directory"
 mkdir -p /tmp/zeppelin_setup_java8/
-cd /tmp/zeppelin_setup_java8/
+cd /tmp/zeppelin_setup_java8/ || (echo "couldn't cd to /tmp/zeppelin_setup_java8/" && exit 1)
 
 
 wget https://builds.openlogic.com/downloadJDK/openlogic-openjdk/${OPENLOGIC_JDK_8_VERSION}/openlogic-openjdk-${OPENLOGIC_JDK_8_VERSION}-linux-x64.tar.gz  > /tmp/zeppelin_install_log 2>&1

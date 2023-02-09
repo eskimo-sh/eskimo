@@ -70,9 +70,9 @@ echo " - Installing EGMI"
 # Test if EGMI distributable are available in colocated folder and copy there to docker container if any
 if [[ -d "$SCRIPT_DIR/../../../EGMI/target" ]]; then
     echo "   + EGMI local installation found. Copying local files "
-    for i in `find $SCRIPT_DIR/../../../EGMI/target -name 'egmi*tar.gz'`; do
-        echo "   + Copying "`basename $i`
-        docker cp $i gluster_template:/tmp/`basename $i`  > /tmp/gluster_build_log 2>&1
+    for i in $(find $SCRIPT_DIR/../../../EGMI/target -name 'egmi*tar.gz'); do
+        echo "   + Copying $(basename $i)"
+        docker cp $i "gluster_template:/tmp/$(basename $i)"  > /tmp/gluster_build_log 2>&1
         fail_if_error $? "/tmp/gluster_build_log" 6
         break # stopping at first one
     done

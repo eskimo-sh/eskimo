@@ -42,9 +42,9 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo "-- INSTALLING GLUSTER (Mostly hacks) -------------------------------------------------"
 
 
-saved_dir=`pwd`
+saved_dir=$(pwd)
 function returned_to_saved_dir() {
-     cd $saved_dir
+     cd $saved_dir || true
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT

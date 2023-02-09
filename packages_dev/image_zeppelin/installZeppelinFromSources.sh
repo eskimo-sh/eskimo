@@ -66,9 +66,9 @@ if [ -z "$SCALA_VERSION" ]; then
     exit 1
 fi
 
-saved_dir=`pwd`
+saved_dir=$(pwd)
 function returned_to_saved_dir() {
-     cd $saved_dir
+     cd $saved_dir || return
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
@@ -122,7 +122,7 @@ chown -R $USER_TO_USE zeppelin
 fail_if_error $? "/tmp/zeppelin_install_log" -1
 
 echo " - update all pom.xml to use scala $SCALA_VERSION"
-cd zeppelin/
+cd zeppelin/ || (echo "Couldn't cd to zeppelin/" && exit 1)
 sudo -u $USER_TO_USE bash $PWD/dev/change_scala_version.sh $SCALA_VERSION > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -2
 
@@ -138,7 +138,7 @@ export PATH=$JAVA_HOME/bin:$PATH
 #ln -s /usr/lib/jvm/java-8-openjdk-amd64/bin/java /etc/alternatives/java
 
 echo " - build zeppelin with all interpreters"
-for i in `seq 1 2`; do  # 2 attempts since sometimes download of packages fails
+for i in $(seq 1 2); do  # 2 attempts since sometimes download of packages fails
     echo "   + attempt $i"
     sudo -u $USER_TO_USE mvn clean package -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr  > /tmp/zeppelin_install_log 2>&1
     if [[ $? == 0 ]]; then
@@ -164,7 +164,7 @@ cp zeppelin-distribution/target/zeppelin-$ZEPPELIN_VERSION_SNAPSHOT.tar.gz /tmp/
 fail_if_error $? "/tmp/zeppelin_install_log" -6
 
 echo " - Changing to setup temp directory"
-cd /tmp/zeppelin_setup/
+cd /tmp/zeppelin_setup/ || (cd "Couldn't cd to /tmp/zeppelin_setup/" && exit 1)
 
 echo " - Extracting zeppelin-$ZEPPELIN_VERSION"
 tar -xvf zeppelin-$ZEPPELIN_VERSION_SNAPSHOT.tar.gz > /tmp/zeppelin_install_log 2>&1
@@ -223,7 +223,7 @@ export ZEPPELIN_PROC_ID=$!
 
 echo " - Checking Zeppelin startup"
 sleep 30
-if [[ `ps -e | grep $ZEPPELIN_PROC_ID` == "" ]]; then
+if ! kill -0 $ZEPPELIN_PROC_ID > /dev/null 2>&1; then
     echo " !! Failed to start Zeppelin !!"
     exit 8
 fi

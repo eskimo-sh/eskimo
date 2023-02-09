@@ -48,7 +48,7 @@ rm -f /tmp/base_image_build_log
 
 
 echo " - Killing any previous containers"
-if [[ `docker ps -a -q -f name=base-eskimo_template` != "" ]]; then
+if [[ $(docker ps -a -q -f name=base-eskimo_template) != "" ]]; then
     docker stop base-eskimo_template > /dev/null 2>&1
     docker container rm base-eskimo_template > /dev/null 2>&1
 fi

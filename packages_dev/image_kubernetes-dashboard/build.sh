@@ -47,7 +47,7 @@ echo "--------------------------------------------------------------------------
 rm -f /tmp/kubernetes-dashboard_build_log
 
 mkdir -p /tmp/package-kubernetes-dashboard
-saved_dir=`pwd`
+saved_dir=$(pwd)
 cleanup() {
     #rm -f Vagrantfile
     #rm -f ssh_key
@@ -59,7 +59,7 @@ trap cleanup EXIT
 trap cleanup ERR
 
 
-cd /tmp/package-kubernetes-dashboard
+cd /tmp/package-kubernetes-dashboard || (echo "Couldn't cd to /tmp/package-kubernetes-dashboard" && exit 1)
 
 
 
@@ -90,8 +90,8 @@ echo " - Saving archive kubernetes-dashboard"
 tar cvfz $SCRIPT_DIR/../../packages_distrib/tmp_image_kubernetes-dashboard_TEMP.tar.gz * > /tmp/package-kubernetes-dashboard-log 2>&1
 fail_if_error $? "package-kubernetes-dashboard-log" -22
 
-echo " - versionning archive"
-for i in `seq 1 100`; do
+echo " - versioning archive"
+for i in $(seq 1 100); do
     if [[ ! -f "../../packages_distrib/docker_template_kubernetes-dashboard_""$K8S_DASHBOARD_VERSION""_$i.tar.gz" ]]; then
         mv $SCRIPT_DIR/../../packages_distrib/tmp_image_kubernetes-dashboard_TEMP.tar.gz \
            $SCRIPT_DIR/../../packages_distrib/docker_template_kubernetes-dashboard_"$K8S_DASHBOARD_VERSION"_$i.tar.gz

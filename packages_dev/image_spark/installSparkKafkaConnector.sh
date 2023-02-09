@@ -61,9 +61,9 @@ if [ -z "$SPARK_UNUSED_VERSION" ]; then
     exit 1
 fi
 
-saved_dir=`pwd`
+saved_dir=$(pwd)
 function returned_to_saved_dir() {
-     cd $saved_dir
+     cd $saved_dir || return
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
@@ -111,7 +111,7 @@ mvn dependency:copy-dependencies > /tmp/spark_kafka_install_log 2>&1
 fail_if_error $? "/tmp/spark_kafka_install_log" -25
 
 echo " - Copying connectors with dependencies to spark distribution folder"
-cd target/dependency/
+cd target/dependency/ || (echo "Couldn't cd to target/dependency/" && exit 1)
 # omiting log4j-api
 find ./ ! -name 'log4j-api*' -exec cp -t /usr/local/lib/spark/jars/ {} + 2>/dev/null
 

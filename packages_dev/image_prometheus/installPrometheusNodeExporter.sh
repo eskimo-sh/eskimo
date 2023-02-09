@@ -50,9 +50,9 @@ if [ -z "$PROMETHEUS_NODE_EXPORTER_VERSION" ]; then
     exit 1
 fi
 
-saved_dir=`pwd`
+saved_dir=$(pwd)
 function returned_to_saved_dir() {
-     cd $saved_dir
+     cd $saved_dir || return
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
@@ -116,7 +116,7 @@ export NODE_EXPORTER_PROC_ID=$!
 
 echo " - Checking Node Exporter startup"
 sleep 10
-if [[ `ps -e | grep $NODE_EXPORTER_PROC_ID` == "" ]]; then
+if ! kill -0 $NODE_EXPORTER_PROC_ID > /dev/null 2>&1; then
     echo " !! Failed to start Node Exporter !!"
     cat /tmp/prometheus_run_log
     exit 8

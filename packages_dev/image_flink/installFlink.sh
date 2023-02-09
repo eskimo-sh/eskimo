@@ -114,9 +114,10 @@ echo " - Creating a dummy pom.xml to proceed with downloading kafka, elasticsear
 rm -Rf /tmp/flink_download_connectors
 mkdir /tmp/flink_download_connectors
 cd /tmp/flink_download_connectors || exit 1
-echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
-         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
-         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">
+cat > pom.xml <<EOF
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ch.niceideas.flink</groupId>
@@ -139,8 +140,8 @@ echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-              <!--<artifactId>flink-connector-elasticsearch"$ES_VERSION_MAJOR_FOR_FLINK"</artifactId>-->
-              <artifactId>flink-connector-elasticsearch"$ES_VERSION_MAJOR_FOR_FLINK"_$SCALA_VERSION</artifactId>
+              <!--<artifactId>flink-connector-elasticsearch${ES_VERSION_MAJOR_FOR_FLINK}</artifactId>-->
+              <artifactId>flink-connector-elasticsearch${ES_VERSION_MAJOR_FOR_FLINK}_$SCALA_VERSION</artifactId>
             <version>$FLINK_VERSION</version>
             <scope>test</scope>
         </dependency>
@@ -165,7 +166,8 @@ echo "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"
             <version>$FLINK_ML_VERSION</version>
           </dependency>
     </dependencies>
-</project>" > pom.xml
+</project>
+EOF
 
 #        <dependency>
 #            <groupId>org.apache.flink</groupId>
@@ -199,7 +201,7 @@ echo " - Checking Flink Installation"
 EXAMPLE_PID=$!
 fail_if_error $? "/tmp/flink_run_log" -3
 sleep 5
-if [[ `ps | grep $EXAMPLE_PID` == "" ]]; then
+if ! kill -0 $EXAMPLE_PID > /dev/null 2>&1; then
     echo "Flink process not started successfully !"
     exit 10
 fi

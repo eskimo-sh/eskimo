@@ -60,9 +60,6 @@ mkdir -p /tmp/k8s_setup
 cd /tmp/k8s_setup || (echo "Couldn't change to /tmp/k8s_setup" && exit 200)
 
 
-# Reference
-# https://github.com/shawnsong/kubernetes-handbook
-
 echo " - Downloading cfssl_${CFSSL_VERSION}_linux_amd64"
 wget https://github.com/cloudflare/cfssl/releases/download/v$CFSSL_VERSION/cfssl_${CFSSL_VERSION}_linux_amd64  >> /tmp/k8s_install_log 2>&1
 if [[ $? != 0 ]]; then

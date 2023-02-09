@@ -97,7 +97,7 @@ docker-registry serve /etc/docker_registry/config.yml > /dev/null 2>&1 &
 sleep 5
 
 echo "   + checking startup"
-if [[ `ps -efl | grep docker-registry | grep -v grep` == "" ]]; then
+if [[ $(pgrep docker-registry) == "" ]]; then
     echo "Checking startup failed !!"
     exit 6
 fi

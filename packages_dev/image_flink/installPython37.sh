@@ -62,7 +62,7 @@ echo " - Extracting python"
 tar xvzf Python-$FLINK_PYTHON_VERSION.tgz > /tmp/python37_install_log 2>&1
 fail_if_error $? "/tmp/python37_install_log" -23
 
-cd Python-$FLINK_PYTHON_VERSION
+cd Python-$FLINK_PYTHON_VERSION || (echo "Couldn't cd to Python-$FLINK_PYTHON_VERSION" && exit 1)
 
 echo " - Configuring python"
 sudo ./configure --enable-optimizations --prefix=/usr > /tmp/python37_install_log 2>&1

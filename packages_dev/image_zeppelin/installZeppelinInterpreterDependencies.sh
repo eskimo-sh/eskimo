@@ -44,9 +44,9 @@ if [ -z "$ZEPPELIN_VERSION" ]; then
     exit 1
 fi
 
-saved_dir=`pwd`
+saved_dir=$(pwd)
 function returned_to_saved_dir() {
-     cd $saved_dir
+     cd $saved_dir || return
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
@@ -102,7 +102,7 @@ mkdir /usr/local/lib/zeppelin-$ZEPPELIN_VERSION_FULL-bin-all/local-repo
 chmod 755 /usr/local/lib/zeppelin-$ZEPPELIN_VERSION_FULL-bin-all/local-repo
 
 echo " - Copying connectors with dependencies to flink distribution folder"
-cd ~/.m2/repository/
+cd ~/.m2/repository/ || (echo "Couldn't cd to ~/.m2/repository/" && exit 1)
 cp -R * /usr/local/lib/zeppelin-$ZEPPELIN_VERSION_FULL-bin-all/local-repo/
 
 echo " - Cleaning up"

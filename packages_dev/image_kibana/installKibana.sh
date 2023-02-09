@@ -45,9 +45,9 @@ if [ -z "$ES_VERSION" ]; then
 fi
 
 
-saved_dir=`pwd`
+saved_dir=$(pwd)
 function returned_to_saved_dir() {
-     cd $saved_dir
+     cd $saved_dir || true
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
@@ -160,10 +160,10 @@ export KIBANA_PROC_ID=$!
 
 echo " - Checking Kibana startup"
 sleep 10
-if [[ `ps -e | grep $KIBANA_PROC_ID` == "" ]]; then
+if ! kill -0 $KIBANA_PROC_ID > /dev/null 2>&1; then
     echo " !! Failed to start Kibana !!"
     cat /tmp/kibana_run_log
-    exit -8
+    exit 8
 fi
 
 echo " - Stopping Kibana"

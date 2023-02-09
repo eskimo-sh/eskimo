@@ -47,9 +47,9 @@ if [ -z "$EGMI_VERSION" ]; then
 fi
 
 
-saved_dir=`pwd`
+saved_dir=$(pwd)
 function returned_to_saved_dir() {
-     cd $saved_dir
+     cd $saved_dir || true
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
@@ -63,7 +63,7 @@ cd /tmp/egmi_setup || (echo "Couldn't change to /tmp/egmi_setup" && exit 200)
 
 echo " - Testing if local EGMI is found "
 export EGMI_LOCAL_ARCHIVE=
-for i in `find /tmp -name 'egmi*tar.gz'`; do
+for i in $(find /tmp -name 'egmi*tar.gz'); do
     export EGMI_LOCAL_ARCHIVE=$i
 done
 if [[ $EGMI_LOCAL_ARCHIVE != "" ]]; then
@@ -77,7 +77,7 @@ if [[ $EGMI_LOCAL_ARCHIVE != "" ]]; then
     mv -f $EGMI_LOCAL_ARCHIVE egmi-$EGMI_VERSION-bin.tar.gz
 else
     echo " - Downloading archive egmi-$EGMI_VERSION"
-    wget "https://github.com/eskimo-sh/egmi/releases/download/$EGMI_VERSION/egmi-"$EGMI_VERSION"-bin.tar.gz" > /tmp/egmi_install_log 2>&1
+    wget "https://github.com/eskimo-sh/egmi/releases/download/$EGMI_VERSION/egmi-${EGMI_VERSION}-bin.tar.gz" > /tmp/egmi_install_log 2>&1
     fail_if_error $? "/tmp/egmi_install_log" -1
 fi
 
@@ -86,7 +86,7 @@ echo " - Extracting egmi-$EGMI_VERSION"
 tar -xvf egmi-$EGMI_VERSION-bin.tar.gz > /tmp/egmi_install_log 2>&1
 fail_if_error $? "/tmp/egmi_install_log" -2
 
-export EGMI_FOLDER=`ls -1 | grep -v tar.gz`
+export EGMI_FOLDER=$(ls -1 | grep -v tar.gz)
 
 echo " - Installing egmi"
 sudo chown root.staff -R $EGMI_FOLDER
@@ -119,7 +119,7 @@ fail_if_error $? "/tmp/egmi_run_log" -3
 sleep 12
 
 echo "   + Checking EGMI startup"
-if [[ `ps | grep $EXAMPLE_PID` == "" ]]; then
+if ! kill -0 $EXAMPLE_PID > /dev/null 2>&1; then
     echo "EGMI process not started successfully !"
     cat /tmp/egmi_run_log
     exit 10

@@ -49,9 +49,9 @@ if [ -z "$SCALA_VERSION" ]; then
     exit 2
 fi
 
-saved_dir=`pwd`
+saved_dir=$(pwd)
 function returned_to_saved_dir() {
-     cd $saved_dir
+     cd $saved_dir || true
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
@@ -101,7 +101,7 @@ echo " - Checking Kafka Installation"
 EXAMPLE_PID=$!
 fail_if_error $? "/tmp/kafka_run_log" -3
 sleep 5
-if [[ `ps | grep $EXAMPLE_PID` == "" ]]; then
+if ! kill -0 $EXAMPLE_PID > /dev/null 2>&1; then
     echo "Kafka process not started successfully !"
     exit 10
 fi

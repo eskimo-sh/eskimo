@@ -45,9 +45,9 @@ if [ -z "$ES_VERSION" ]; then
     exit 1
 fi
 
-saved_dir=`pwd`
+saved_dir=$(pwd)
 function returned_to_saved_dir() {
-     cd $saved_dir
+     cd $saved_dir || true
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
@@ -125,7 +125,7 @@ export ES_PROC_ID=$!
 
 echo " - Checking Elasticsearch startup"
 sleep 10
-if [[ `ps -e | grep $ES_PROC_ID` == "" ]]; then
+if ! kill -0 $ES_PROC_ID > /dev/null 2>&1; then
     echo " !! Failed to start Elasticsearch !!"
     exit 10
 fi

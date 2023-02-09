@@ -45,9 +45,9 @@ if [ -z "$PROMETHEUS_VERSION" ]; then
     exit 1
 fi
 
-saved_dir=`pwd`
+saved_dir=$(pwd)
 function returned_to_saved_dir() {
-     cd $saved_dir
+     cd $saved_dir || return
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
@@ -63,7 +63,7 @@ echo " - Downloading prometheus-$PROMETHEUS_VERSION"
 wget https://github.com/prometheus/prometheus/releases/download/v$PROMETHEUS_VERSION/prometheus-$PROMETHEUS_VERSION.linux-amd64.tar.gz > /tmp/prometheus_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad prometheus-$PROMETHEUS_VERSION from https://www.apache.org/. Trying to download from niceideas.ch"
-    exit -1
+    exit 1
     #wget http://niceideas.ch/mes/prometheus-$PROMETHEUS_VERSION.tar.gz >> /tmp/prometheus_install_log 2>&1
     #fail_if_error $? "/tmp/prometheus_install_log" -1
 fi
@@ -112,10 +112,10 @@ export PROMETHEUS_PROC_ID=$!
 
 echo " - Checking Prometheus startup"
 sleep 10
-if [[ `ps -e | grep $PROMETHEUS_PROC_ID` == "" ]]; then
+if ! kill -0 $PROMETHEUS_PROC_ID > /dev/null 2>&1; then
     echo " !! Failed to start Prometheus !!"
     cat /tmp/prometheus_run_log
-    exit -8
+    exit 8
 fi
 
 echo " - Stopping Prometheus"

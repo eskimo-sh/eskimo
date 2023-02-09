@@ -46,9 +46,9 @@ if [ -z "$KAFKA_MANAGER_VERSION" ]; then
 fi
 
 
-saved_dir=`pwd`
+saved_dir=$(pwd)
 function returned_to_saved_dir() {
-     cd $saved_dir
+     cd $saved_dir || true
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
@@ -75,7 +75,7 @@ echo " - Extracting CMAK-$KAFKA_MANAGER_VERSION"
 unzip CMAK-$KAFKA_MANAGER_VERSION.zip > /tmp/kafka_manager_install_log 2>&1
 fail_if_error $? "/tmp/kafka_manager_install_log" -2
 
-cd ./CMAK-$KAFKA_MANAGER_VERSION/
+cd ./CMAK-$KAFKA_MANAGER_VERSION/ || (echo "Couldn't cd to ./CMAK-$KAFKA_MANAGER_VERSION/" && exit 1)
 
 echo " - !! HACK : PATCHING build.sbt for zookeeper 3.4.x"
 patch < /scripts/patch-for-zookeeper-3.4.diff > /tmp/kafka_manager_install_log 2>&1
@@ -88,7 +88,7 @@ fail_if_error $? "/tmp/kafka_manager_install_log" -1
 
 mv /tmp/kafka_manager_source_setup/CMAK-$KAFKA_MANAGER_VERSION/target/universal/cmak-$KAFKA_MANAGER_VERSION.zip \
    /tmp/kafka_manager_setup/kafka-manager-$KAFKA_MANAGER_VERSION.zip
-cd /tmp/kafka_manager_setup
+cd /tmp/kafka_manager_setup || (echo "Couldn't cd to /tmp/kafka_manager_setup " && exit 1)
 
 
 echo " - Extracting kafka-manager-$KAFKA_MANAGER_VERSION"
@@ -103,9 +103,9 @@ echo " - symlinking /usr/local/lib/kafka-manager/ to /usr/local/lib/kafka-manage
 sudo ln -s /usr/local/lib/kafka-manager-$KAFKA_MANAGER_VERSION /usr/local/lib/kafka-manager
 
 echo " - symlinking kadka-manager to cmak exec"
-cd /usr/local/lib/kafka-manager/bin/
+cd /usr/local/lib/kafka-manager/bin/ || (echo "Couldn't cd to /usr/local/lib/kafka-manager/bin/" && exit 1)
 sudo ln -s cmak kafka-manager
-cd /tmp/kafka_manager_setup
+cd /tmp/kafka_manager_setup || (echo "Couldn't cd to /tmp/kafka_manager_setup" && exit 1)
 
 echo " - Build cleanup"
 sudo rm -Rf /root/.ivy2 >> /tmp/kafka_manager_install_log 2>&1
@@ -138,9 +138,9 @@ export KAFKA_MANAGER_PROC_ID=$!
 
 echo " - Checking Kafka Manager startup"
 sleep 3
-if [[ `ps -e | grep $KAFKA_MANAGER_PROC_ID` == "" ]]; then
+if ! kill -0 $KAFKA_MANAGER_PROC_ID > /dev/null 2>&1; then
     echo " !! Failed to start Kafka Manager!!"
-    exit -8
+    exit 8
 fi
 
 

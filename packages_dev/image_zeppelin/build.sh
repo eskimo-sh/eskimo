@@ -46,15 +46,15 @@ echo "--------------------------------------------------------------------------
 rm -f /tmp/zeppelin_build_log
 
 echo " - Checking if spark eskimo image is available"
-if [[ `docker images -q eskimo:spark_template 2>/dev/null` == "" ]]; then
+if [[ $(docker images -q eskimo:spark_template 2>/dev/null) == "" ]]; then
     echo " - Trying to loads spark image"
-    for i in `ls -rt ../../packages_distrib/docker_template_spark*.tar.gz | tail -1`; do
+    for i in $(ls -rt ../../packages_distrib/docker_template_spark*.tar.gz | tail -1); do
         echo "   + loading image $i"
         gunzip -c $i | docker load > /tmp/zeppelin_build_log 2>&1
         if [[ $? != 0 ]]; then
             echo "Could not load base image eskimo:spark_template"
             cat /tmp/zeppelin_build_log
-            exit -1
+            exit 1
         fi
     done
 fi
@@ -64,21 +64,21 @@ build_image zeppelin_template /tmp/zeppelin_build_log
 
 echo " - Installing a few utilities"
 docker exec -i zeppelin_template apt-get install -y zip netcat sshpass > /tmp/zeppelin_build_log 2>&1
-fail_if_error $? "/tmp/zeppelin_build_log" -11
+fail_if_error $? "/tmp/zeppelin_build_log" 11
 
 echo " - Installing python"
 docker exec -i zeppelin_template apt-get -y install  python3-dev python3-six python3-virtualenv python3-pip cython3 > /tmp/zeppelin_build_log 2>&1
-fail_if_error $? "/tmp/zeppelin_build_log" -5
+fail_if_error $? "/tmp/zeppelin_build_log" 5
 
 echo " - Switching python default version to 3.x"
 docker exec -i zeppelin_template update-alternatives --force --install /usr/bin/python python /usr/bin/python3.9 2 > /tmp/zeppelin_build_log 2>&1
-fail_if_error $? "/tmp/flink_build_log" -5
+fail_if_error $? "/tmp/flink_build_log" 6
 
 
 echo " - Installing python packages for datascience"
 docker exec -i zeppelin_template apt-get -y install python3-sklearn python3-numpy python3-pandas python3-plotly python3-kafka python3-filelock python3-matplotlib python3-nltk python3-elasticsearch > /tmp/zeppelin_build_log 2>&1
 #docker exec -i zeppelin_template pip3 install pandas numpy scikit-learn matplotlib nltk plotly filelock py4j kafka-python3 > /tmp/zeppelin_build_log 2>&1
-fail_if_error $? "/tmp/zeppelin_build_log" -12
+fail_if_error $? "/tmp/zeppelin_build_log" 12
 
 echo " - Installing GlusterFS client"
 docker exec -i zeppelin_template apt-get -y install glusterfs-client > /tmp/zeppelin_build_log 2>&1
@@ -134,7 +134,7 @@ fi
 
 echo " - Installing zeppelin Interpreters Java dependencies"
 docker exec -i zeppelin_template bash /scripts/installZeppelinInterpreterDependencies.sh | tee /tmp/zeppelin_build_log 2>&1
-if [[ `tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS"` == "" ]]; then
+if [[ $(tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCESS") == "" ]]; then
     echo " - In container install script ended up in error"
     cat /tmp/zeppelin_build_log
     exit 105

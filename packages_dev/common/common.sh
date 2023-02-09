@@ -231,9 +231,9 @@ function close_and_save_image() {
     set +e
 
     echo " - versioning image"
-    for i in `seq 1 100`; do
-        if [[ ! -f "../../packages_distrib/docker_template_"`echo $IMAGE | cut -d '_' -f 1`"_""$VERSION""_$i.tar.gz" ]]; then
-            mv ../../packages_distrib/tmp_image_"$IMAGE"_TEMP.tar.gz ../../packages_distrib/docker_template_"$(echo $IMAGE | cut -d '_' -f 1)"_"$VERSION"_$i.tar.gz
+    for i in $(seq 1 100); do
+        if [[ ! -f "../../packages_distrib/docker_template_$(echo $IMAGE | cut -d '_' -f 1)_${VERSION}_${i}.tar.gz" ]]; then
+            mv ../../packages_distrib/tmp_image_${IMAGE}_TEMP.tar.gz ../../packages_distrib/docker_template_"$(echo $IMAGE | cut -d '_' -f 1)"_${VERSION}_$i.tar.gz
             break;
         fi
     done
@@ -267,7 +267,7 @@ function build_image() {
         echo " - Checking if base eskimo image is available"
         if [[ $(docker images -q eskimo:base-eskimo_template 2>/dev/null) == "" ]]; then
             echo " - Trying to load base eskimo image"
-            for i in `ls -rt ../../packages_distrib/docker_template_base-eskimo*.tar.gz | tail -1`; do
+            for i in $(ls -rt ../../packages_distrib/docker_template_base-eskimo*.tar.gz | tail -1); do
                 echo "   + loading image $i"
                 gunzip -c $i | docker load > $LOG_FILE 2>&1
                 fail_if_error $? $LOG_FILE -10
@@ -313,9 +313,9 @@ function build_image() {
 
     echo " - Ensuring image was well started"
     if [[ -z $TEST_MODE ]]; then
-        for i in `seq 1 5`; do
+        for i in $(seq 1 5); do
             sleep 1
-            if [[ `docker ps -q -f name=$IMAGE` != "" ]]; then
+            if [[ $(docker ps -q -f name=$IMAGE) != "" ]]; then
                 break
             fi
             if [[ $i == 5 ]]; then
@@ -342,25 +342,26 @@ function create_binary_wrapper(){
     local TARGET=$1
     local WRAPPER=$2
 
-    touch $WRAPPER
-    chmod 777 $WRAPPER
-    echo -e '#!/bin/bash' > $WRAPPER
-    echo -e "" >> $WRAPPER
-    echo -e "if [[ -f /usr/local/sbin/inContainerInjectTopology.sh ]]; then" >> $WRAPPER
-    echo -e "    # Injecting topoloy" >> $WRAPPER
-    echo -e "    . /usr/local/sbin/inContainerInjectTopology.sh" >> $WRAPPER
-    echo -e "fi" >> $WRAPPER
-    echo -e "" >> $WRAPPER
-    echo -e "__tmp_saved_dir=`pwd`" >> $WRAPPER
-    echo -e "function __tmp_returned_to_saved_dir() {" >> $WRAPPER
-    echo -e '     cd $__tmp_saved_dir' >> $WRAPPER
-    echo -e "}" >> $WRAPPER
-    echo -e "trap __tmp_returned_to_saved_dir 15" >> $WRAPPER
-    echo -e "trap __tmp_returned_to_saved_dir EXIT" >> $WRAPPER
-    echo -e "" >> $WRAPPER
-    echo -e "$TARGET \"\$@\"" >> $WRAPPER
-    echo -e "" >> $WRAPPER
-    echo -e "__tmp_returned_to_saved_dir" >> $WRAPPER
+    cat > $WRAPPER <<EOF
+#!/bin/bash
+
+if [[ -f /usr/local/sbin/inContainerInjectTopology.sh ]]; then
+    # Injecting topoloy
+    . /usr/local/sbin/inContainerInjectTopology.sh
+fi
+
+__tmp_saved_dir=\$(pwd)
+function __tmp_returned_to_saved_dir() {
+     cd \$__tmp_saved_dir
+}
+trap __tmp_returned_to_saved_dir 15
+trap __tmp_returned_to_saved_dir EXIT
+
+$TARGET "\$@"
+
+__tmp_returned_to_saved_dir
+EOF
+
     chmod 755 $WRAPPER
 }
 
@@ -374,6 +375,38 @@ function fail_if_error(){
 }
 
 function get_ip_address(){
-    export IP_ADDRESS="$(cat /etc/network/interfaces | grep address | cut -d ' ' -f 8)"
+    export IP_ADDRESS="$(grep -F address /etc/network/interfaces | cut -d ' ' -f 8)"
 }
 
+
+function create_binary_wrapper(){
+
+    if [[ $1 == "" || $2 == "" ]]; then
+        echo "target and wrapper have to be passed as argument of the create_binary_wrapper function"
+        exit 2
+    fi
+    local TARGET=$1
+    local WRAPPER=$2
+
+    cat > $WRAPPER <<EOF
+#!/bin/bash
+
+if [[ -f /usr/local/sbin/inContainerInjectTopology.sh ]]; then
+    # Injecting topoloy
+    . /usr/local/sbin/inContainerInjectTopology.sh
+fi
+
+__tmp_saved_dir=$(pwd)
+function __tmp_returned_to_saved_dir() {
+     cd \$__tmp_saved_dir
+}
+trap __tmp_returned_to_saved_dir 15
+trap __tmp_returned_to_saved_dir EXIT
+
+$TARGET "\$@"
+
+__tmp_returned_to_saved_dir
+EOF
+
+    chmod 755 $WRAPPER
+}

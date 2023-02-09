@@ -53,9 +53,9 @@ if [ -z "$SCALA_VERSION" ]; then
     exit 1
 fi
 
-saved_dir=`pwd`
+saved_dir=$(pwd)
 function returned_to_saved_dir() {
-     cd $saved_dir
+     cd $saved_dir || true
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
@@ -99,7 +99,7 @@ mvn dependency:copy-dependencies > /tmp/esh_install_log 2>&1
 fail_if_error $? "/tmp/esh_install_log" -25
 
 echo " - Copying connectors with dependencies to spark distribution folder"
-cd target/dependency/
+cd target/dependency/ || (echo "Couldn't cd to target dependency directory" && exit 1)
 
 
 echo " - Installing eshadoop spark (to spark jar folder)"
