@@ -52,7 +52,7 @@ echo "-- SETTING UP KAFKA (Common part) ----------------------------------------
 
 echo " - Creating kafka user (if not exist) in container"
 set +e
-kafka_user_id=`id -u kafka 2>> /tmp/cerebro_kafka_log`
+kafka_user_id=$(id -u kafka 2>> /tmp/cerebro_kafka_log)
 set -e
 echo " - Found user with ID $kafka_user_id"
 if [[ $kafka_user_id == "" ]]; then

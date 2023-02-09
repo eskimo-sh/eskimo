@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 
 #
@@ -82,7 +81,7 @@ echo " - Adapting configuration in file elasticsearch.yml - enabling discovery o
 
 export number_of_es_nodes=$ESKIMO_NODE_COUNT
 export ES_MASTERS=""
-for i in `seq 0 $(($ESKIMO_NODE_COUNT-1))`; do
+for i in $(seq 0 $(($ESKIMO_NODE_COUNT-1))); do
     if [[ "$ES_MASTERS" == "" ]]; then
         export ES_MASTERS="\"elasticsearch-$i.elasticsearch.default.svc.cluster.eskimo\""
     else
@@ -121,8 +120,8 @@ if [ $number_of_es_nodes -gt 2 ]; then
     sed -i s/"#gateway.recover_after_nodes: "/"gateway.recover_after_nodes: $number_of_master_nodes"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
 
     # ES 8.x
-    if [[ `grep "discovery.zen.minimum_master_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml` == "" && \
-          `grep "gateway.recover_after_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml` == "" ]]; then
+    if [[ $(grep -F "discovery.zen.minimum_master_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml) == "" && \
+          $(grep -F "gateway.recover_after_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml) == "" ]]; then
 
         bash -c "echo \"gateway.recover_after_data_nodes: $number_of_master_nodes\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
     fi
@@ -141,8 +140,8 @@ else
     sed -i s/"#gateway.recover_after_nodes: "/"gateway.recover_after_nodes: 1"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
 
     # ES 8.x
-    if [[ `grep "discovery.zen.minimum_master_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml` == "" && \
-          `grep "gateway.recover_after_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml` == "" ]]; then
+    if [[ $(grep -F "discovery.zen.minimum_master_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml) == "" && \
+          $(grep -F "gateway.recover_after_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml) == "" ]]; then
 
         bash -c "echo \"gateway.recover_after_data_nodes: 1\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
     fi

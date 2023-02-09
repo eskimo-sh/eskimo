@@ -43,7 +43,7 @@ echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh gluster
 
 echo " - Cleaning all volume PID files before starting gluster"
-for i in `find /var/run/gluster/vols/ -name '*.pid'`; do
+for i in $(find /var/run/gluster/vols/ -name '*.pid'); do
     rm -f $i
 done
 

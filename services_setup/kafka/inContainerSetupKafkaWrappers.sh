@@ -41,8 +41,8 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo " - Creating kafka binaries wrappres to /usr/local/bin"
 
-for i in `ls -1 /usr/local/lib/kafka/bin/connect*`; do
-    create_binary_wrapper $i /usr/local/bin/kafka-`basename $i`
+for i in $(ls -1 /usr/local/lib/kafka/bin/connect*); do
+    create_binary_wrapper $i "/usr/local/bin/kafka-$(basename $i)"
 done
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-broker-api-versions.sh /usr/local/bin/kafka-broker-api-versions.sh
 create_binary_wrapper /usr/local/lib/kafka/bin/kafka-console-consumer.sh /usr/local/bin/kafka-console-consumer.sh

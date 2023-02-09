@@ -69,7 +69,7 @@ sleep 20
 
 
 echo " - Finding docker run process PID"
-container_process_PID=`ps -ef | grep "docker run" | grep "name gluster"  | tr -s ' ' | cut -d ' ' -f 2`
+container_process_PID=$(ps -ef | grep "docker run" | grep "name gluster"  | tr -s ' ' | cut -d ' ' -f 2)
 
 if [[ "$container_process_PID" == "" ]]; then
     echo " - Couldn't not get docker run command PID"
@@ -79,7 +79,7 @@ else
 fi
 
 echo " - Ensuring gluster container is well started"
-if [[ `ps -p $container_process_PID -f | grep "docker run"` != "" ]]; then
+if [[ $(ps -p $container_process_PID -f | grep "docker run") != "" ]]; then
     echo "   + process has been correctly started"
 else
     echo "   + Could not find running PID $container_process_PID"

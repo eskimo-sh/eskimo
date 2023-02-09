@@ -50,7 +50,7 @@ fi
 ###
 
 # The name of the node in the cluster
-export NODE_ID=`eval echo "\$"$(echo NODE_NBR_ETCD_$SELF_IP_ADDRESS | tr -d .)`
+export NODE_ID=`eval echo "\$""$(echo NODE_NBR_ETCD_$SELF_IP_ADDRESS | tr -d .)"`
 if [[ $NODE_ID != "" ]]; then
     export ESKIMO_ETCD_NODE_NAME=node$NODE_ID
 else
@@ -86,7 +86,7 @@ echo "   + Using ESKIMO_ETCD_INITIAL_CLUSTER_TOKEN=$ESKIMO_ETCD_INITIAL_CLUSTER_
 # i.e. they should match the value of initial-advertise-peer-urls on the respective nodes.
 export ESKIMO_ETCD_INITIAL_CLUSTER=
 for i in ${ALL_NODES_LIST_etcd//,/ }; do
-    export NODE_ID=`eval echo "\$"$(echo NODE_NBR_ETCD_$i | tr -d .)`
+    export NODE_ID=`eval echo "\$""$(echo NODE_NBR_ETCD_$i | tr -d .)"`
     if [[ "$ESKIMO_ETCD_INITIAL_CLUSTER" == "" ]]; then
         export ESKIMO_ETCD_INITIAL_CLUSTER="node$NODE_ID=http://$i:2380"
     else
@@ -101,7 +101,7 @@ fi
 echo "   + Using ESKIMO_ETCD_INITIAL_CLUSTER=$ESKIMO_ETCD_INITIAL_CLUSTER"
 
 # The initial cluster state - existing if there are already etcd nodes running
-if [[ `cat /etc/eskimo_topology.sh  | grep ESKIMO_INSTALLED_etcd` != "" ]]; then
+if [[ $(grep -F ESKIMO_INSTALLED_etcd /etc/eskimo_topology.sh) != "" ]]; then
     export ESKIMO_ETCD_INITIAL_CLUSTER_STATE="existing"
 else
     export ESKIMO_ETCD_INITIAL_CLUSTER_STATE="new"

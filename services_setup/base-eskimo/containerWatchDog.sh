@@ -102,7 +102,7 @@ while true; do
 
     sleep 10
 
-    if [[ `ps -o pid= -p $BACKGROUND_PID 2>>$LOG_FILE` == "" ]]; then
+    if [[ $(ps -o pid= -p $BACKGROUND_PID 2>>$LOG_FILE) == "" ]]; then
 
         echo "$(date +'%Y-%m-%d %H:%M:%S') - Process with PID $BACKGROUND_PID could not be found Killing $MAIN_PID" \
                 >> $LOG_FILE
@@ -112,7 +112,7 @@ while true; do
         break
     fi
 
-    if [[ `ps -o pid= -p $MAIN_PID 2>>$LOG_FILE` == "" ]]; then
+    if [[ $(ps -o pid= -p $MAIN_PID 2>>$LOG_FILE) == "" ]]; then
 
         echo "$(date +'%Y-%m-%d %H:%M:%S') - Process with PID $MAIN_PID could not be found Killing $BACKGROUND_PID" \
                 >> $LOG_FILE

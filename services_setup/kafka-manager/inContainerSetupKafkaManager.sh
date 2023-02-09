@@ -46,12 +46,12 @@ echo "-- SETTING UP KAFKA MANAGER-----------------------------------------------
 
 echo " - Getting kafka user ID"
 set +e
-kafka_user_id=`id -u kafka 2> kafka_install_log`
+kafka_user_id=$(id -u kafka 2> kafka_install_log)
 set -e
 echo " - Found user with ID $kafka_user_id"
 if [[ $kafka_user_id == "" ]]; then
     echo "Docker Kafka USER ID not found"
-    exit -2
+    exit 2
 fi
 
 echo " - Enabling kafka user to create kafka directories and chown them"

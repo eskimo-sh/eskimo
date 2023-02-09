@@ -56,4 +56,5 @@ fi
 sudo -E /bin/bash /usr/local/sbin/import-hosts.sh
 
 # Run command passed in argument
+# shellcheck disable=SC2068
 $@

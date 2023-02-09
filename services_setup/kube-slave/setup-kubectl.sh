@@ -238,11 +238,11 @@ if [[ ! -f /etc/k8s/shared/ssl/$USER.pem ]]; then
     sudo /usr/local/bin/cfssl gencert -ca=/etc/k8s/shared/ssl/ca.pem \
       -ca-key=/etc/k8s/shared/ssl/ca-key.pem \
       -config=/etc/k8s/shared/ssl/ca-config.json \
-      -profile=kubernetes /etc/k8s/shared/ssl/`echo $USER`-csr.json | cfssljson -bare `echo $USER`
+      -profile=kubernetes /etc/k8s/shared/ssl/$USER-csr.json | cfssljson -bare $USER
 
     echo "   + Install Admin certificates"
-    sudo mv `echo $USER`*.pem /etc/k8s/shared/ssl/
-    sudo mv `echo $USER`*csr* /etc/k8s/shared/ssl/
+    sudo mv $USER*.pem /etc/k8s/shared/ssl/
+    sudo mv $USER*csr* /etc/k8s/shared/ssl/
 fi
 
 if [[ ! -f /etc/k8s/serviceaccount-$USER.yaml  ]]; then

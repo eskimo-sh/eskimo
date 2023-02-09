@@ -48,10 +48,10 @@ parse_cli_docker_volume_mounts \
         "$@"
 
 # Add standard folders if not already part of it
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/log` == "" ]]; then
+if [[ $(echo $DOCKER_VOLUMES_ARGS | grep /var/log) == "" ]]; then
     export DOCKER_VOLUMES_ARGS=" -v /var/log:/var/log:shared $DOCKER_VOLUMES_ARGS"
 fi
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /home/eskimo` == "" ]]; then
+if [[ $(echo $DOCKER_VOLUMES_ARGS | grep /home/eskimo) == "" ]]; then
     export DOCKER_VOLUMES_ARGS=" -v /home/eskimo:/home/eskimo:shared $DOCKER_VOLUMES_ARGS"
 fi
 
@@ -65,10 +65,14 @@ if [[ $? != 0 ]]; then
     exit 21
 fi
 
-KUBE_SERVICES_HOSTS_FILE=`create_kube_services_hosts_file`
-if [[ ! -f $KUBE_SERVICES_HOSTS_FILE ]]; then
-    echo "Fail to create 'Kube services host file' with create_kube_services_hosts_file"
+KUBE_SERVICES_HOSTS_FILE=$(create_kube_services_hosts_file)
+if [[ $? == 0 ]]; then
+    echo "Failed to list kube services and create host file"
     exit 1
+fi
+if [[ ! -f $KUBE_SERVICES_HOSTS_FILE ]]; then
+    echo "Failed to create 'Kube services host file' with create_kube_services_hosts_file"
+    exit 2
 fi
 
 # Finding out if we have y TTY here

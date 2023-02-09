@@ -75,7 +75,7 @@ for i in $(seq 1 10); do
     if [[ -z "$NO_SLEEP" ]]; then sleep 5; fi
 
     echo "   + Attempt $i"
-    clusterSearch=`curl -XGET http://localhost:22080/clusters/Eskimo 2>&1`
+    clusterSearch=$(curl -XGET http://localhost:22080/clusters/Eskimo 2>&1)
     if [[ $? == 0 ]]; then
         break
     fi
@@ -87,7 +87,7 @@ done
 set -e
 
 
-if [[ `echo $clusterSearch | grep "Unknown cluster"` != "" ]]; then
+if [[ $(echo $clusterSearch | grep "Unknown cluster") != "" ]]; then
     echo " - Creating Eskimo Cluster in Kafka Manager"
     payload="name=Eskimo&zkHosts=$ZOOKEEPER_IP_ADDRESS%3A2181&kafkaVersion=2.2.0&jmxEnabled=true&jmxUser=&jmxPass=&pollConsumers=true"
     payload+='&filterConsumers=true&tuning.brokerViewUpdatePeriodSeconds=15&tuning.clusterManagerThreadPoolSize=2'

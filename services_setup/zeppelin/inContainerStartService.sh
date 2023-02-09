@@ -74,14 +74,14 @@ sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh spark_eventlog /var/li
 
 
 echo "   + Checking if needed to mount logstash shares ?"
-if [[ `curl -XGET "http://$MASTER_IP_ADDRESS:28901/egmi/command?command=volume&subcommand=list&options=" 2>/dev/null | grep "logstash"` != "" ]]; then
+if [[ $(curl -XGET "http://$MASTER_IP_ADDRESS:28901/egmi/command?command=volume&subcommand=list&options=" 2>/dev/null | grep "logstash") != "" ]]; then
     echo "   + mounting logstash shares"
     sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh logstash_data /var/lib/elasticsearch/logstash/data spark
 fi
 
 
 echo "   + Checking if needed to mount flink shares ?"
-if [[ `curl -XGET "http://$MASTER_IP_ADDRESS:28901/egmi/command?command=volume&subcommand=list&options=" 2>/dev/null | grep "flink"` != "" ]]; then
+if [[ $(curl -XGET "http://$MASTER_IP_ADDRESS:28901/egmi/command?command=volume&subcommand=list&options=" 2>/dev/null | grep "flink") != "" ]]; then
     echo "   + mounting flink shares"
     sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_data /var/lib/flink/data spark
     sudo /bin/bash /usr/local/sbin/inContainerMountGluster.sh flink_completed_jobs /var/lib/flink/completed_jobs spark
@@ -168,9 +168,9 @@ if [[ ! -f /var/lib/spark/data/zeppelin/samples_installed_flag.marker ]]; then
 
     echo " - Waiting for Zeppelin availability"
     function wait_forZeppelin() {
-        for i in `seq 0 1 120`; do
+        for i in $(seq 0 1 120); do
             sleep 2
-            eval `curl -w "\nZEPPELIN_HTTP_CODE=%{http_code}" "http://localhost:38080/api/notebook" 2>/dev/null | grep ZEPPELIN_HTTP_CODE`
+            eval "$(curl -w "\nZEPPELIN_HTTP_CODE=%{http_code}" "http://localhost:38080/api/notebook" 2>/dev/null | grep ZEPPELIN_HTTP_CODE)"
             if [[ $ZEPPELIN_HTTP_CODE == 200 ]]; then
                 echo " - Zeppelin is available."
                 break
@@ -186,7 +186,7 @@ if [[ ! -f /var/lib/spark/data/zeppelin/samples_installed_flag.marker ]]; then
     echo " - Importing Zeppelin Sample notebooks"
     set +e
     sleep 5 # wait a little more
-    for i in `find /usr/local/lib/zeppelin/eskimo_samples`; do
+    for i in $(find /usr/local/lib/zeppelin/eskimo_samples); do
         if [[ ! -d $i ]]; then
             echo "   + importing $i"
             curl -XPOST -H "Content-Type: application/json" \

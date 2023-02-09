@@ -52,9 +52,9 @@ function fail_if_error(){
 
 echo "-- INSTALLING KUBERNETES ------------------------------------------------------"
 
-saved_dir=`pwd`
+saved_dir=$(pwd)
 function returned_to_saved_dir() {
-     cd $saved_dir
+     cd $saved_dir || return
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT
@@ -165,7 +165,7 @@ fi
 
 if [[ -z $TEST_MODE ]]; then
     echo " - Create / update eskimo K8S version file"
-    sudo bash -c "echo K8S_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"k8s-*.*\" | cut -d '-' -f 2` > /etc/eskimo_k8s_environment"
+    sudo bash -c "echo K8S_VERSION=$(find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep 'k8s-*.*' | cut -d '-' -f 2) > /etc/eskimo_k8s_environment"
 
     echo " - Checking eskimo K8S version file"
     if [[ ! -f /etc/eskimo_k8s_environment ]]; then

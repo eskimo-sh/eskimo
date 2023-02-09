@@ -68,7 +68,7 @@ sudo rm -f k8s-master_install_log
 #preinstall_unmount_gluster_share /var/lib/kubernetes/data
 
 echo " - Getting kubernetes user"
-export kubernetes_user_id=`id -u kubernetes 2>> k8s-master_install_log`
+export kubernetes_user_id=$(id -u kubernetes 2>> k8s-master_install_log)
 if [[ $kubernetes_user_id == "" ]]; then
     echo "User kubernetes should have been added by eskimo-base-system setup script"
     exit 4
@@ -89,17 +89,17 @@ fi
 set -e
 
 echo " - Copying SystemD unit files to /lib/systemd/system"
-for i in `find ./service_files -mindepth 1`; do
+for i in $(find ./service_files -mindepth 1); do
     sudo cp $i $systemd_units_dir
-    filename=`echo $i | cut -d '/' -f 3`
+    filename=$(echo $i | cut -d '/' -f 3)
     sudo chmod 755 $systemd_units_dir$filename
 done
 
 echo " - Copying K8s service files to /etc/k8s/services"
 sudo mkdir -p /etc/k8s/services
-for i in `find ./k8s-service_files -mindepth 1`; do
+for i in $(find ./k8s-service_files -mindepth 1); do
     sudo cp $i /etc/k8s/services/
-    filename=`echo $i | cut -d '/' -f 3`
+    filename=$(echo $i | cut -d '/' -f 3)
     sudo chmod 755 /etc/k8s/services/$filename
 done
 
@@ -133,7 +133,7 @@ echo " - Copying kube-housekeeping.sh to /usr/local/sbin"
 sudo cp kube-housekeeping.sh /usr/local/sbin/
 sudo chmod 755 /usr/local/sbin/kube-housekeeping.sh
 
-if [[ `sudo crontab -u root -l 2>/dev/null | grep kube-housekeeping.sh` == "" ]]; then
+if [[ $(sudo crontab -u root -l 2>/dev/null | grep kube-housekeeping.sh) == "" ]]; then
     echo " - Scheduling periodic execution of kube-housekeeping.sh using crontab"
     sudo rm -f /tmp/crontab
     sudo bash -c "crontab -u root -l >> /tmp/crontab 2>/dev/null"

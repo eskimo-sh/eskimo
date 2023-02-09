@@ -114,7 +114,7 @@ kubeapi_pid=$!
 #--kubelet-https=$ESKIMO_KUBE_KUBELET_HTTPS \
 
 sleep 4
-if [[ `ps -e | grep $kubeapi_pid ` == "" ]]; then
+if ! kill -0 $kubeapi_pid > /dev/null 2>&1; then
     echo "   + Failed to start Kubernetes API server"
     cat /var/log/kubernetes/kubeapi.log 2>&1
     exit 44
@@ -147,7 +147,7 @@ echo "   + Starting kube Controler Manager"
 kubectrl_pid=$!
 
 sleep 4
-if [[ `ps -e | grep $kubectrl_pid ` == "" ]]; then
+if ! kill -0 $kubectrl_pid > /dev/null 2>&1; then
     echo "   + Failed to start Kubernetes Controller-Manager"
     cat /var/log/kubernetes/kubectrl.log 2>&1
     exit 46
@@ -172,7 +172,7 @@ echo "   + Starting Kube Scheduler"
 kubesched_pid=$!
 
 sleep 4
-if [[ `ps -e | grep $kubesched_pid ` == "" ]]; then
+if ! kill -0 $kubesched_pid > /dev/null 2>&1; then
     echo "   + Failed to start Kubernetes Scheduler"
     cat /var/log/kubernetes/kubesched.log 2>&1
     exit 48
@@ -197,7 +197,7 @@ echo "   + Starting Kube Proxy (through kubectl)"
 kubectlproxy_pid=$!
 
 sleep 4
-if [[ `ps -e | grep $kubectlproxy_pid ` == "" ]]; then
+if ! kill -0 $kubectlproxy_pid > /dev/null 2>&1; then
     echo "   + Failed to start Kube Proxy (through Kubectl)"
     cat /var/log/kubernetes/kubectlproxy.log 2>&1
     exit 50
@@ -218,28 +218,27 @@ release_lock $lock_handle
 
 
 echo "   + Entering monitoring / remediation loop"
-ping_cnt=0
 while : ; do
 
-    if [[ `ps -e | grep $kubeapi_pid ` == "" ]]; then
+    if ! kill -0 $kubeapi_pid > /dev/null 2>&1; then
         echo "   + Failed to run Kubernetes API server"
         tail -n 50 /var/log/kubernetes/kubeapi.log 2>&1
         exit 44
     fi
 
-    if [[ `ps -e | grep $kubectrl_pid ` == "" ]]; then
+    if ! kill -0 $kubectrl_pid > /dev/null 2>&1; then
         echo "   + Failed to run Kubernetes Controller-Manager"
         tail -n 50 /var/log/kubernetes/kubectrl.log 2>&1
         exit 46
     fi
 
-    if [[ `ps -e | grep $kubesched_pid ` == "" ]]; then
+    if ! kill -0 $kubesched_pid > /dev/null 2>&1; then
         echo "   + Failed to run Kubernetes Scheduler"
         tail -n 50 /var/log/kubernetes/kubesched.log 2>&1
         exit 49
     fi
 
-    if [[ `ps -e | grep $kubectlproxy_pid ` == "" ]]; then
+    if ! kill -0 $kubectlproxy_pid > /dev/null 2>&1; then
         echo "   + Failed to run Kube Proxy (through Kubectl)"
         cat /var/log/kubernetes/kubectlproxy.log 2>&1
         exit 50

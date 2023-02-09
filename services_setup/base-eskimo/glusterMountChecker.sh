@@ -63,7 +63,7 @@ if command -v docker &> /dev/null ; then
     echo "$(date +'%Y-%m-%d %H:%M:%S') - Checking whether gluster container is running" \
         >> /var/log/gluster/gluster-mount-checker.log
 
-    if [[ `docker ps --filter "name=gluster" | grep -v CREATED` == "" ]]; then
+    if [[ $(docker ps --filter "name=gluster" | grep -v CREATED) == "" ]]; then
         echo "$(date +'%Y-%m-%d %H:%M:%S') - gluster container is NOT running. Skipping ..."  \
             >> /var/log/gluster/gluster-mount-checker.log
         exit 0
@@ -71,9 +71,9 @@ if command -v docker &> /dev/null ; then
 fi
 
 
-for MOUNT_POINT in `cat /etc/fstab | grep glusterfs | cut -d ' ' -f 2`; do
+for MOUNT_POINT in $(cat /etc/fstab | grep glusterfs | cut -d ' ' -f 2); do
 
-    VOLUME=`cat /etc/fstab | grep glusterfs | grep $MOUNT_POINT | cut -d ' ' -f 1 | cut -d '/' -f 2 `
+    VOLUME=$(cat /etc/fstab | grep glusterfs | grep $MOUNT_POINT | cut -d ' ' -f 1 | cut -d '/' -f 2)
         
     echo "$(date +'%Y-%m-%d %H:%M:%S') - Handling $VOLUME"  \
         >> /var/log/gluster/gluster-mount-checker.log
@@ -82,7 +82,7 @@ for MOUNT_POINT in `cat /etc/fstab | grep glusterfs | cut -d ' ' -f 2`; do
     rm -Rf /tmp/gluster_mount_checker_error
 
     # check if working only if it is supposed to be mounted
-    if [[ `grep $MOUNT_POINT /etc/mtab | grep glusterfs` != "" ]]; then
+    if [[ $(grep $MOUNT_POINT /etc/mtab | grep glusterfs) != "" ]]; then
 
         # give it a try
         ls -la $MOUNT_POINT >/dev/null 2>/tmp/gluster_mount_checker_error
@@ -90,9 +90,9 @@ for MOUNT_POINT in `cat /etc/fstab | grep glusterfs | cut -d ' ' -f 2`; do
         # unmount if it's not working
         if [[ $? != 0 ]]; then
 
-            if [[ `grep "Transport endpoint is not connected" /tmp/gluster_mount_checker_error` != "" \
-                 || `grep "Too many levels of symbolic links" /tmp/gluster_mount_checker_error` != "" \
-                 || `grep "No such device" /tmp/gluster_mount_checker_error` != "" ]]; then
+            if [[ $(grep "Transport endpoint is not connected" /tmp/gluster_mount_checker_error) != "" \
+                 || $(grep "Too many levels of symbolic links" /tmp/gluster_mount_checker_error) != "" \
+                 || $(grep "No such device" /tmp/gluster_mount_checker_error) != "" ]]; then
 
                 echo "$(date +'%Y-%m-%d %H:%M:%S') - There is an issue with $MOUNT_POINT. Unmounting" \
                     >> /var/log/gluster/gluster-mount-checker.log
@@ -123,7 +123,7 @@ for MOUNT_POINT in `cat /etc/fstab | grep glusterfs | cut -d ' ' -f 2`; do
     fi
 
     # try to mount / remount
-    if [[ `grep $MOUNT_POINT /etc/mtab | grep glusterfs` == "" ]]; then
+    if [[ $(grep $MOUNT_POINT /etc/mtab | grep glusterfs) == "" ]]; then
 
         echo "$(date +'%Y-%m-%d %H:%M:%S') - $MOUNT_POINT is not mounted, remounting" \
             >> /var/log/gluster/gluster-mount-checker.log

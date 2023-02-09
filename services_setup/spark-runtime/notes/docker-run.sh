@@ -24,7 +24,7 @@ docker run \
           /tmp/test-es-spark.py
 
 
-KUBE_SERVICES_HOSTS_FILE=`create_kube_services_hosts_file`
+KUBE_SERVICES_HOSTS_FILE=$(create_kube_services_hosts_file)
 docker run \
     -it \
     --rm \

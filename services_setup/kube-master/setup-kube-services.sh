@@ -52,7 +52,7 @@ fi
 
 sudo rm -Rf /tmp/kube_services_setup
 mkdir /tmp/kube_services_setup
-cd /tmp/kube_services_setup
+cd /tmp/kube_services_setup || (echo "Couldn't cd to /tmp/kube_services_setup" && exit 1)
 
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
@@ -67,10 +67,10 @@ fi
 
 
 echo " - Deploying k8s.gcr.io/pause in registry"
-deploy_image_in_registry `ls -1 /usr/local/lib/k8s/images/k8s.gcr.io_pause*` k8s.gcr.io/pause
+deploy_image_in_registry "$(ls -1 /usr/local/lib/k8s/images/k8s.gcr.io_pause*)" k8s.gcr.io/pause
 
 echo " - Deploying coredns/coredns in registry"
-deploy_image_in_registry `ls -1 /usr/local/lib/k8s/images/coredns_coredns*` coredns/coredns
+deploy_image_in_registry "$(ls -1 /usr/local/lib/k8s/images/coredns_coredns*)" coredns/coredns
 
 
 rm -Rf /tmp/kube_services_setup

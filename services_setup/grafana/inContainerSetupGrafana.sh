@@ -53,7 +53,7 @@ echo "-- SETTING UP GRAFANA ----------------------------------------------------
 
 echo " - Creating grafana user (if not exist) in container"
 set +e
-grafana_user_id=`id -u grafana 2>> /tmp/grafana_install_log`
+grafana_user_id=$(id -u grafana 2>> /tmp/grafana_install_log)
 set -e
 echo " - Found user with ID $grafana_user_id"
 if [[ $grafana_user_id == "" ]]; then

@@ -43,10 +43,10 @@ echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh kafka
 
 # we rely on settings injector to add overriden memory setting in /usr/local/lib/kafka/config/eskimo-memory.opts
-if [[ -f /usr/local/lib/kafka/config/eskimo-memory.opts && `cat /usr/local/lib/kafka/config/eskimo-memory.opts` != "" ]]; then
+if [[ -f /usr/local/lib/kafka/config/eskimo-memory.opts && $(cat /usr/local/lib/kafka/config/eskimo-memory.opts) != "" ]]; then
 
     export KAFKA_HEAP_OPTS=""
-    for line in `cat /usr/local/lib/kafka/config/eskimo-memory.opts`; do
+    for line in $(cat /usr/local/lib/kafka/config/eskimo-memory.opts); do
         export KAFKA_HEAP_OPTS="$KAFKA_HEAP_OPTS -$line"
     done
 
@@ -80,22 +80,22 @@ echo $KAFKA_PID > /var/run/kafka/Kafka.pid
 
 echo " - Entering corruption and error detection loop"
 # trying for 100 seconds
-for i in `seq 1 20`; do
+for i in $(seq 1 20); do
 
     # Ensure process is still up otherwise crash with exit code != 0
-    if [[ `ps -e | grep $KAFKA_PID` == "" ]]; then
+    if [[ $(ps -e | grep $KAFKA_PID) == "" ]]; then
         echo " - ! Couldn't successfully start kafka"
         exit 10
     fi
 
     sleep 5
 
-    if [[ `tail -800 /var/log/kafka/server.log  | grep -E "Registered broker [0-9]+ at path"` != "" ]]; then
+    if [[ $(tail -800 /var/log/kafka/server.log  | grep -E "Registered broker [0-9]+ at path") != "" ]]; then
         echo " - Kafka started successfully, now waiting on kafka process to exit"
         break
     fi
 
-    if [[ `tail -800 /var/log/kafka/server.log  | grep -E "doesn't match stored clusterId"` != "" ]]; then
+    if [[ $(tail -800 /var/log/kafka/server.log  | grep -E "doesn't match stored clusterId") != "" ]]; then
         echo " - Detected cluster mismatch. Wiping out kafka folder !!!"
         rm -Rf /var/lib/kafka/$ESKIMO_POD_NAME/*
         mv /var/log/kafka/server.log /var/log/kafka/server.log.backup-post-wipeout

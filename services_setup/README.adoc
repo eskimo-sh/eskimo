@@ -829,7 +829,7 @@ are searched, respectively injected, in the text stream:
 * `CONTEXT_PATH` will be resolved by the context root at which the eskimo web application is deployed, such as for
 instance `eskimo`
 * `PREFIX_PATH` will be resolved by the specific context path of the service web console context, such as for instance
-for kibana `{CONTEXT_PATH}/kibana`, e.g. `eskimo/kibana` or `kibana` if no context root is used.
+for kibana `\{CONTEXT_PATH\}/kibana`, e.g. `eskimo/kibana` or `kibana` if no context root is used.
 * `APP_ROOT_URL` will be resolved to the full URL used to reach eskimo, e.g. `http://localhost:9191/eskimo`
 
 

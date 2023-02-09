@@ -174,7 +174,7 @@ echo " - waiting for transport to connect ..."
 sleep 4
 
 echo " - checking owner of $MOUNT_POINT"
-if [[ `stat -c '%U' $MOUNT_POINT` != "$OWNER" ]]; then
+if [[ $(stat -c '%U' $MOUNT_POINT) != "$OWNER" ]]; then
     echo " - Changing owner and rights of $MOUNT_POINT"
     chown -R $OWNER $MOUNT_POINT
 fi

@@ -48,7 +48,7 @@ loadTopology
 sudo rm -Rf k8s-registry_install_log
 
 echo " - Getting kubernetes user"
-export kubernetes_user_id=`id -u kubernetes 2>> k8s-registry_install_log`
+export kubernetes_user_id=$(id -u kubernetes 2>> k8s-registry_install_log)
 if [[ $kubernetes_user_id == "" ]]; then
     echo "User kubernetes should have been added by eskimo-base-system setup script"
     exit 4

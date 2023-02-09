@@ -98,7 +98,7 @@ echo "   + Starting cri-dockerd"
 cri_dockerd_pid=$!
 
 sleep 4
-if [[ `ps -e | grep $cri_dockerd_pid ` == "" ]]; then
+if ! kill -0 $cri_dockerd_pid > /dev/null 2>&1; then
     echo "   + Failed to start cri-dockerd"
     cat /var/log/kubernetes/cri-dockerd.log 2>&1
     exit 61
@@ -127,7 +127,7 @@ kubelet_pid=$!
 #--port=$ESKIMO_KUBELET_PORT
 
 sleep 4
-if [[ `ps -e | grep $kubelet_pid ` == "" ]]; then
+if ! kill -0 $kubelet_pid > /dev/null 2>&1; then
     echo "   + Failed to start Kubernetes Kubelet"
     cat /var/log/kubernetes/kubelet.log 2>&1
     exit 46
@@ -156,7 +156,7 @@ kuberouter_pid=$!
 #--port=$ESKIMO_KUBELET_PORT
 
 sleep 4
-if [[ `ps -e | grep $kuberouter_pid ` == "" ]]; then
+if ! kill -0 $kuberouter_pid > /dev/null 2>&1; then
     echo "   + Failed to start Kubernetes Router"
     cat /var/log/kubernetes/kuberouter.log 2>&1
     exit 48
@@ -180,19 +180,19 @@ release_lock $lock_handle
 echo "   + Entering monitoring loop"
 while : ; do
 
-  if [[ `ps -e | grep $cri_dockerd_pid ` == "" ]]; then
+    if ! kill -0 $cri_dockerd_pid > /dev/null 2>&1; then
         echo "   + Failed to run cri-dockerd"
         tail -n 50 /var/log/kubernetes/cri-dockerd.log 2>&1
         exit 62
     fi
 
-    if [[ `ps -e | grep $kubelet_pid ` == "" ]]; then
+    if ! kill -0 $kubelet_pid > /dev/null 2>&1; then
         echo "   + Failed to run Kubernetes Kubelet"
         tail -n 50 /var/log/kubernetes/kubelet.log 2>&1
         exit 44
     fi
 
-    if [[ `ps -e | grep $kuberouter_pid ` == "" ]]; then
+    if ! kill -0 $kuberouter_pid > /dev/null 2>&1; then
         echo "   + Failed to run Kubernetes Kube-Router"
         cat /var/log/kubernetes/kuberouter.log 2>&1
         exit 48

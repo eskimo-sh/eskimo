@@ -53,7 +53,7 @@ echo " - Building container grafana"
 build_container grafana grafana grafana_install_log
 
 echo " - Creating grafana user (if not exist)"
-grafana_user_id=`id -u grafana 2>> grafana_install_log`
+grafana_user_id=$(id -u grafana 2>> grafana_install_log)
 if [[ $grafana_user_id == "" ]]; then
     echo "User grafana should have been added by eskimo-base-system setup script"
     exit 4

@@ -41,12 +41,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "-- SETTING UP ELASTICSEARCH ----------------------------------------------------"
 
-
-echo " - Getting elasticsearch user_id"
-set +e
-elasticsearch_user_id=`id -u elasticsearch`
-set -e
-
 # These should be mounted properly by docker
 #echo " - Creating elasticsearch data directory in /var/lib/elasticsearch"
 #mkdir -p /var/lib/elasticsearch
@@ -86,8 +80,8 @@ echo " - Addressing issue with multiple interfaces but only one global"
 bash -c "echo -e \"\n# The following settings control the fault detection process\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
 
 # ES 8.x
-if [[ `grep "discovery.zen.minimum_master_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml` == "" && \
-      `grep "gateway.recover_after_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml` == "" ]]; then
+if [[ $(grep -F "discovery.zen.minimum_master_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml) == "" && \
+      $(grep -F "gateway.recover_after_nodes" /usr/local/lib/elasticsearch/config/elasticsearch.yml) == "" ]]; then
     bash -c "echo \"discovery.find_peers_interval: 1s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
     bash -c "echo \"discovery.probe.connect_timeout: 80s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"
     bash -c "echo \"discovery.request_peers_timeout: 5s\" >> /usr/local/lib/elasticsearch/config/elasticsearch.yml"

@@ -53,7 +53,9 @@ echo " - Creating / checking eskimo kubernetes Scheduler config"
 
 echo "   + create temp folder"
 tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
-cd $tmp_dir
+cd $tmp_dir || (echo "Couldn't cd $tmp_dir" && exit 1)
+
+set -e
 
 echo "   + Configure the cluster parameters"
 kubectl config set-cluster eskimo \

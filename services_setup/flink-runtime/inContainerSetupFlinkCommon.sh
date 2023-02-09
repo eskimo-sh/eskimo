@@ -50,7 +50,7 @@ echo "-- SETTING UP FLINK (COMMON PART) --------------------------------------"
 
 echo " - Creating flink user (if not exist) in container"
 set +e
-flink_user_id=`id -u flink 2>/dev/null`
+flink_user_id=$(id -u flink 2>/dev/null)
 set -e
 if [[ $flink_user_id == "" ]]; then
     useradd -u $FLINK_USER_ID flink

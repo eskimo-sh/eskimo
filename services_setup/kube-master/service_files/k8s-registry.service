@@ -41,6 +41,10 @@ After=gluster.service
 After=eskimo-startup-checks.service
 PartOf=kube-master.service
 
+StartLimitBurst=6
+StartLimitIntervaSecl=100
+
+
 [Service]
 TimeoutStartSec=0
 RemainAfterExit=false
@@ -76,11 +80,10 @@ ExecStop=/usr/bin/docker stop k8s-registry
 Type=simple
 
 Restart=always
-StartLimitBurst=6
-StartLimitInterval=100
 
 StandardOutput=syslog
 StandardError=syslog
+
 
 [Install]
 WantedBy=multi-user.target

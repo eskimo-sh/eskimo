@@ -80,17 +80,17 @@ if [[ ! -L /etc/k8s ]]; then
 fi
 
 echo " - Copying kubernetes env files to /etc/k8s"
-for i in `find ./etc_k8s -mindepth 1`; do
+for i in $(find ./etc_k8s -mindepth 1); do
     sudo cp $i /etc/k8s/
-    filename=`echo $i | cut -d '/' -f 3`
+    filename=$(echo $i | cut -d '/' -f 3)
     sudo chmod 755 /etc/k8s/$filename
 done
 
 echo " - Copying runtime configuration scripts to /etc/k8s/runtime_config"
 sudo mkdir -p /etc/k8s/runtime_config
-for i in `find ./runtime_config -mindepth 1`; do
+for i in $(find ./runtime_config -mindepth 1); do
     sudo cp $i /etc/k8s/runtime_config/
-    filename=`echo $i | cut -d '/' -f 3`
+    filename=$(echo $i | cut -d '/' -f 3)
     sudo chmod 755 /etc/k8s/runtime_config/$filename
 done
 
@@ -107,7 +107,7 @@ sudo cp $SCRIPT_DIR/register-kubernetes-registry.sh /usr/local/sbin/
 sudo chmod 754 /usr/local/sbin/register-kubernetes-registry.sh
 
 echo " - Create / update eskimo K8S version file"
-sudo bash -c "echo K8S_VERSION=`find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep \"k8s-*.*\" | cut -d '-' -f 2` > /etc/eskimo_k8s_environment"
+sudo bash -c "echo K8S_VERSION=$(find /usr/local/lib/ -mindepth 1 -maxdepth 1 ! -type l | grep 'k8s-*.*' | cut -d '-' -f 2) > /etc/eskimo_k8s_environment"
 
 echo " - Checking eskimo KUBERNETES version file"
 if [[ -z $TEST_MODE && ! -f /etc/eskimo_k8s_environment ]]; then

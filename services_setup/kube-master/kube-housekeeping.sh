@@ -43,7 +43,7 @@ echoerr() { echo "$@" 1>&2; }
 mkdir -p /var/lib/kubernetes/
 take_global_lock kube_houskeeping_lock /var/lib/kubernetes/ nonblock
 if [[ $? != 0 ]]; then
-    echo `date +"%Y-%m-%d %H:%M:%S"`" - kube-housekeeping.sh is in execution already. Skipping ..."
+    echo "$(date +"%Y-%m-%d %H:%M:%S") - kube-housekeeping.sh is in execution already. Skipping ..."
     exit 0
 fi
 
@@ -56,21 +56,21 @@ export HOME=/root
 export PATH=/usr/local/bin:$PATH
 
 
-echo `date +"%Y-%m-%d %H:%M:%S"`"   + Searching for failed PODs" \
+echo "$(date +"%Y-%m-%d %H:%M:%S")   + Searching for failed PODs" \
       >> /var/log/kubernetes/kube-houskeeping.log
 
-for failedPod in `kubectl get pods --all-namespaces --field-selector 'status.phase=Failed' -o name`; do
+for failedPod in $(kubectl get pods --all-namespaces --field-selector 'status.phase=Failed' -o name); do
 
-      echo `date +"%Y-%m-%d %H:%M:%S"`"Found failed POD $failedPod" \
+      echo "$(date +"%Y-%m-%d %H:%M:%S") Found failed POD $failedPod" \
             >> /var/log/kubernetes/kube-houskeeping.log
 
-      echo `date +"%Y-%m-%d %H:%M:%S"`"------------- POD $failedPod details are as follows : ---------------"  \
+      echo "$(date +"%Y-%m-%d %H:%M:%S") ------------- POD $failedPod details are as follows : ---------------"  \
             >> /var/log/kubernetes/kube-houskeeping.log
 
       kubectl get $failedPod -o json \
             >> /var/log/kubernetes/kube-houskeeping.log
 
-      echo `date +"%Y-%m-%d %H:%M:%S"`"Now deleting POD $failedPod" \
+      echo "$(date +"%Y-%m-%d %H:%M:%S") Now deleting POD $failedPod" \
             >> /var/log/kubernetes/kube-houskeeping.log
 
       kubectl delete $failedPod \

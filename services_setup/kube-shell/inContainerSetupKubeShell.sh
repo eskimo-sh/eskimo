@@ -55,7 +55,7 @@ fi
 
 echo " - Creating eskimo user (if not exist) in container"
 set +e
-eskimo_user_id=`id -u $ESKIMO_USER 2> es_common_install_log`
+eskimo_user_id=$(id -u $ESKIMO_USER 2> es_common_install_log)
 set -e
 echo " - Found user with ID $eskimo_user_id"
 if [[ $eskimo_user_id == "" ]]; then

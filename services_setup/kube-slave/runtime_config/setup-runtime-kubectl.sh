@@ -17,7 +17,9 @@ echo " - Creating kube config file for user eskimo"
 
 echo "   + create temp folder"
 tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
-cd $tmp_dir
+cd $tmp_dir || (echo "Couldn't cd $tmp_dir" && exit 1)
+
+set -e
 
 echo "   + Configure the cluster and the certificates"
 kubectl config set-cluster eskimo \
@@ -26,7 +28,7 @@ kubectl config set-cluster eskimo \
   --server=$ESKIMO_KUBE_APISERVER \
   --kubeconfig=temp.kubeconfig
 
-export ADMIN_USER=`cat /etc/eskimo_user`
+export ADMIN_USER=$(cat /etc/eskimo_user)
 
 echo "   + Configure client side user and certificates"
 kubectl config set-credentials $ADMIN_USER \
@@ -59,13 +61,13 @@ sudo chown root /root/.kube/config
 
 echo "   + Checking kube config file"
 if [[ ! -f /home/$ADMIN_USER/.kube/config ]]; then
-    echo "Couldn't find file /home/"$ADMIN_USER"/.kube/config"
+    echo "Couldn't find file /home/$ADMIN_USER/.kube/config"
     exit 101
 fi
 
 kube_config_file=/home/$ADMIN_USER/.kube/config
-if [[ `cat $kube_config_file | grep "name: eskimo" | wc -l` -lt 2 ]]; then
-    echo "Missing config in file /home/"$ADMIN_USER"/.kube/config"
+if [[ $(grep -F "name: eskimo" $kube_config_file | wc -l) -lt 2 ]]; then
+    echo "Missing config in file /home/$ADMIN_USER/.kube/config"
     exit 101
 fi
 

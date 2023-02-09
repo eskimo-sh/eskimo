@@ -53,11 +53,11 @@ export KIBANA_PID=$!
 
 echo " - Waiting for Kibana to be up and running"
 set +e
-for i in `seq 1 90`; do
+for i in $(seq 1 90); do
 
     sleep 5
 
-    if [[ `ps -p $KIBANA_PID -o comm=` == "" ]]; then
+    if [[ $(ps -p $KIBANA_PID -o comm=) == "" ]]; then
         echo "!!! Kibana process not detected up anymore. Crashing."
         exit 1
     fi
@@ -65,7 +65,7 @@ for i in `seq 1 90`; do
     echo "   + Querying kibana - attempt $i"
     curl -XGET http://localhost:5601/api/features > /tmp/kibana_features 2>&1
     if [[ $? == 0 ]]; then
-        if [[ `grep \"id\" /tmp/kibana_features` != "" ]]; then
+        if [[ $(grep \"id\" /tmp/kibana_features) != "" ]]; then
             break;
         fi
     fi
@@ -81,11 +81,11 @@ echo " - Provisioning sample files"
 
 for sample in $(find /usr/local/lib/kibana/samples/); do
 
-    if [[ `echo $sample | grep ndjson` != "" ]]; then
+    if [[ $(echo $sample | grep ndjson) != "" ]]; then
 
         echo "   + checking $sample"
         dashboard_name="${sample%.*}"
-        exist=`curl -XGET "http://localhost:5601/api/saved_objects/_find?type=dashboard&search_fields=title&search=$dashboard_name*" 2>/dev/null | jq -r " .total"`
+        exist=$(curl -XGET "http://localhost:5601/api/saved_objects/_find?type=dashboard&search_fields=title&search=$dashboard_name*" 2>/dev/null | jq -r " .total")
 
         if [[ $exist == 0 ]]; then
             curl -X POST "http://localhost:5601/api/saved_objects/_import" -H "kbn-xsrf: true" --form file=@"$sample" > /tmp/kibana_provision 2>&1

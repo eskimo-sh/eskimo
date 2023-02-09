@@ -48,7 +48,7 @@ fi
 
 
 if [[ "$ESKIMO_POD_NAME" != "" ]]; then
-    export BROKER_ID=`echo $ESKIMO_POD_NAME | cut -d '-' -f 2`
+    export BROKER_ID=$(echo $ESKIMO_POD_NAME | cut -d '-' -f 2)
     if [[ $BROKER_ID == "" ]]; then
         echo " - No broker ID found could be exracted from $ESKIMO_POD_NAME"
         exit 3

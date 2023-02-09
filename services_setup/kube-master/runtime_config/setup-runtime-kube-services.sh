@@ -53,7 +53,7 @@ echo " - Deploying Kubernetes services"
 
 echo "   + create temp folder"
 tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
-cd $tmp_dir
+cd $tmp_dir || (echo "Couldn't cd to $tmp_dir" && exit 1)
 
 # Making /root/.kube/config available
 export HOME=/root
@@ -66,7 +66,7 @@ echo "   + Creating runtime resolv.conf"
 cat /etc/resolv.conf | sed s/'nameserver 127.0.0.*'//g > /etc/k8s/shared/resolv.conf
 
 # if no nameserver remains, add 8.8.8.8
-if [[ `cat /etc/k8s/shared/resolv.conf | grep nameserver` == "" ]]; then
+if [[ $(grep nameserver /etc/k8s/shared/resolv.conf) == "" ]]; then
   echo "nameserver 8.8.8.8" >> /etc/k8s/shared/resolv.conf
 fi
 

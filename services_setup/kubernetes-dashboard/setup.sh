@@ -46,7 +46,7 @@ cd $SCRIPT_DIR || exit 199
 loadTopology
 
 if [[ -z "$TEST_MODE" ]]; then
-    k8s_dashboard_archive=`ls -1 docker_template_kubernetes-dashboard*.tar.gz`
+    k8s_dashboard_archive=$(ls -1 docker_template_kubernetes-dashboard*.tar.gz)
     if [[ ! -f $k8s_dashboard_archive ]]; then
         echo "Couldn't find k8s-dashboard archive"
         exit 1
@@ -61,10 +61,10 @@ fi
 
 
 echo " - Deploying kubernetesui/dashboard in registry"
-deploy_image_in_registry `ls -1 kubernetesui_dashboard*` kubernetesui/dashboard
+deploy_image_in_registry "$(ls -1 kubernetesui_dashboard*)" kubernetesui/dashboard
 
 echo " - Deploying kubernetesui/metrics-scraper in registry"
-deploy_image_in_registry `ls -1 kubernetesui_metrics-scraper*` kubernetesui/metrics-scraper
+deploy_image_in_registry "$(ls -1 kubernetesui_metrics-scraper*)" kubernetesui/metrics-scraper
 
 
 echo " - Starting Kubernetes deployment"

@@ -40,7 +40,7 @@ echo " - Loading Topology"
 . /etc/eskimo_topology.sh
 
 echo " - Configuring runtime properties in egmi.properties"
-export zookeeper_url=`echo $MASTER_ZOOKEEPER_1 | sed "s/,/:2181,/g"`
+export zookeeper_url=$(echo $MASTER_ZOOKEEPER_1 | sed "s/,/:2181,/g")
 export zookeeper_url=$zookeeper_url:2181
 
 

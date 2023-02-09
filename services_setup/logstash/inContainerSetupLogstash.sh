@@ -42,11 +42,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "-- SETTING UP LOGSTASH -----------------------------------------------------------"
 
-echo " - Getting elasticsearch user_id"
-set +e
-elasticsearch_user_id=`id -u elasticsearch 2> /tmp/logstash_install_log`
-set -e
-
 echo " - creating logstash required directory"
 sudo mkdir -p /var/lib/elasticsearch/logstash/data
 sudo chmod -R 777 /var/lib/elasticsearch/

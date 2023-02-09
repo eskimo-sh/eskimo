@@ -37,13 +37,13 @@
 # extract path arguments and create volume mount command part
 export DOCKER_VOLUMES_ARGS=""
 
-# No need to process any specifc parameter
+# No need to process any specific parameter
 
 # Add standard folders if not already part of it
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/lib/zookeeper` == "" ]]; then
+if [[ $(echo $DOCKER_VOLUMES_ARGS | grep /var/lib/zookeeper) == "" ]]; then
     export DOCKER_VOLUMES_ARGS=" -v /var/lib/zookeeper:/var/lib/zookeeper:shared $DOCKER_VOLUMES_ARGS"
 fi
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/log/zookeeper` == "" ]]; then
+if [[ $(echo $DOCKER_VOLUMES_ARGS | grep /var/log/zookeeper) == "" ]]; then
     export DOCKER_VOLUMES_ARGS=" -v /var/log/zookeeper:/var/log/zookeeper:shared $DOCKER_VOLUMES_ARGS"
 fi
 

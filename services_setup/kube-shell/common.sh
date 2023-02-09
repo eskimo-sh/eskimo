@@ -71,7 +71,7 @@ docker_cp_script() {
     echo " - Copying $SCRIPT to $CONTAINER"
     if [[ -f $SCRIPT ]]; then
         FULL_LOCAL_PATH=$SCRIPT
-        SCRIPT=`basename $SCRIPT`
+        SCRIPT=$(basename $SCRIPT)
     else
         FULL_LOCAL_PATH=$SCRIPT_DIR/$SCRIPT
         if [[ -f $FULL_LOCAL_PATH ]]; then
@@ -195,23 +195,23 @@ function deploy_image_in_registry() {
     fi
     export IMAGE_NAME=$2
 
-    IMAGE_FILE=`basename $IMAGE_FULL_PATH`
-    IMAGE_TAR=`echo $IMAGE_FILE | sed 's/\.gz//'`
-    IMAGE_VERSION=`echo $IMAGE_FILE | cut -d ':' -f 2 | sed 's/\.tar\.gz//'`
+    IMAGE_FILE=$(basename $IMAGE_FULL_PATH)
+    IMAGE_TAR=${IMAGE_FILE//\.gz/}
+    IMAGE_VERSION=$(echo $IMAGE_FILE | cut -d ':' -f 2 | sed 's/\.tar\.gz//')
 
-    if [[ `echo "$IMAGE_FULL_PATH" | sed -n -e 's/^\(\/\).*/\1/p'` != "" ]]; then
+    if [[ $(echo "$IMAGE_FULL_PATH" | sed -n -e 's/^\(\/\).*/\1/p') != "" ]]; then
         echo "   + Copying $IMAGE_FULL_PATH to $PWD"
         /bin/cp -f $IMAGE_FULL_PATH .
     fi
 
     echo "   + Deleting previous docker template for $IMAGE_NAME:$IMAGE_VERSION if exist"
-    if [[ `docker images -q $IMAGE_NAME:$IMAGE_VERSION 2>/dev/null` != "" ]]; then
+    if [[ $(docker images -q $IMAGE_NAME:$IMAGE_VERSION 2>/dev/null) != "" ]]; then
         docker image rm $IMAGE_NAME:$IMAGE_VERSION >> /tmp/kube_services_setup_log 2>&1
         fail_if_error $? "/tmp/kube_services_setup_log" 5
     fi
 
     echo "   + Deleting previous docker template for $IMAGE_NAME:$IMAGE_VERSION IN REPOSITORY if exist"
-    if [[ `docker images -q kubernetes.registry:5000/$IMAGE_NAME:$IMAGE_VERSION 2>/dev/null` != "" ]]; then
+    if [[ $(docker images -q kubernetes.registry:5000/$IMAGE_NAME:$IMAGE_VERSION 2>/dev/null) != "" ]]; then
         docker image rm kubernetes.registry:5000/$IMAGE_NAME:$IMAGE_VERSION >> /tmp/kube_services_setup_log 2>&1
         fail_if_error $? "/tmp/kube_services_setup_log" 5
     fi
@@ -279,7 +279,7 @@ function deploy_registry() {
         export FLAGS="$3"
     fi
 
-    if [[ `echo $FLAGS | grep "NO_CONTAINER"` == "" ]]; then
+    if [[ $(echo $FLAGS | grep "NO_CONTAINER") == "" ]]; then
         echo " - Deploying $CONTAINER Service in docker registry for kubernetes"
         docker tag eskimo:$CONTAINER kubernetes.registry:5000/$CONTAINER >> $LOG_FILE 2>&1
         if [[ $? != 0 ]]; then
@@ -345,27 +345,27 @@ function deploy_kubernetes_only() {
     fi
 
     echo " - Removing any previously deployed $CONTAINER service from kubernetes"
-    kubectl delete -f $CONTAINER.k8s.yaml >> $LOG_FILE"_kubernetes_deploy" 2>&1
+    kubectl delete -f $CONTAINER.k8s.yaml >> "${LOG_FILE}_kubernetes_deploy" 2>&1
     if [[ $? != 0 ]]; then
-        if [[ `cat "$LOG_FILE"_kubernetes_deploy` != "" && `grep "not found" "$LOG_FILE"_kubernetes_deploy` != "" ]]; then
+        if [[ $(cat "${LOG_FILE}_kubernetes_deploy") != "" && $(grep "not found" "${LOG_FILE}_kubernetes_deploy") != "" ]]; then
             echo "   + Some elements were not found. Moving on ..."
         else
             echo "   + Could not delete deployment from kubernetes"
-            cat "$LOG_FILE"_kubernetes_deploy
+            cat "${LOG_FILE}_kubernetes_deploy"
             exit 7
         fi
     fi
 
-    if [[ `grep "deleted" "$LOG_FILE"_kubernetes_deploy` != "" ]]; then
+    if [[ $(grep "deleted" "${LOG_FILE}_kubernetes_deploy") != "" ]]; then
         echo "   + Previous instance removed"
         if [[ -z "$NO_SLEEP" ]]; then sleep 5; fi
     fi
 
     echo " - Deploying $CONTAINER service in kubernetes"
-    /bin/bash -c "envsubst < $CONTAINER.k8s.yaml | kubectl apply -f -" >> $LOG_FILE"_kubernetes_deploy" 2>&1
+    /bin/bash -c "envsubst < $CONTAINER.k8s.yaml | kubectl apply -f -" >> "${LOG_FILE}_kubernetes_deploy" 2>&1
     if [[ $? != 0 ]]; then
         echo "   + Could not deploy $CONTAINER application in kubernetes"
-        cat "$LOG_FILE"_kubernetes_deploy
+        cat "${LOG_FILE}_kubernetes_deploy"
         exit 8
     fi
 
@@ -420,7 +420,7 @@ function install_and_check_service_file() {
     fi
     export LOG_FILE=$2
 
-    if [[ `echo $3 | grep "SKIP_COPY"` == "" ]]; then
+    if [[ $(echo $3 | grep "SKIP_COPY") == "" ]]; then
         if [[ -d /lib/systemd/system/ ]]; then
             export systemd_units_dir=/lib/systemd/system/
         elif [[ -d /usr/lib/systemd/system/ ]]; then
@@ -445,7 +445,7 @@ function install_and_check_service_file() {
     if [[ -z "$NO_SLEEP" ]]; then sleep 2; fi # hacky hack - I get weird and unexplainable errors here sometimes.
 
     echo " - Checking Systemd file"
-    if [[ `sudo systemctl status $CONTAINER | grep 'could not be found'` != "" ]]; then
+    if [[ $(sudo systemctl status $CONTAINER | grep 'could not be found') != "" ]]; then
         echo "$CONTAINER systemd file installation failed"
         exit 26
     fi
@@ -455,7 +455,7 @@ function install_and_check_service_file() {
         exit 27
     fi
 
-    if [[ `echo $3 | grep "RESTART"` == "" ]]; then
+    if [[ $(echo $3 | grep "RESTART") == "" ]]; then
         echo " - Testing systemd startup - starting $CONTAINER"
         sudo systemctl start $CONTAINER >> $LOG_FILE 2>&1
         fail_if_error $? "$LOG_FILE" 28
@@ -478,7 +478,7 @@ function install_and_check_service_file() {
 
     if [[ $3 != "NO_CHECK" ]]; then
         echo " - Testing systemd startup - Make sure service is really running"
-        if [[ `systemctl show -p SubState $CONTAINER | grep exited` != "" ]]; then
+        if [[ $(systemctl show -p SubState $CONTAINER | grep exited) != "" ]]; then
             echo "$CONTAINER service is actually not really running"
             exit 30
         fi
@@ -556,7 +556,7 @@ function build_container() {
     export LOG_FILE=$3
 
     echo " - Deleting previous docker template for $IMAGE if exist"
-    if [[ `docker images -q eskimo:$IMAGE"_template" 2>/dev/null` != "" ]]; then
+    if [[ $(docker images -q eskimo:$IMAGE"_template" 2>/dev/null) != "" ]]; then
         docker image rm eskimo:$IMAGE"_template" >> $LOG_FILE 2>&1
         fail_if_error $? "$LOG_FILE" 5
     fi
@@ -580,7 +580,7 @@ function build_container() {
 
     echo " - Killing any previous containers"
     sudo systemctl stop $CONTAINER > /dev/null 2>&1
-    if [[ `docker ps -a -q -f name=$CONTAINER` != "" ]]; then
+    if [[ $(docker ps -a -q -f name=$CONTAINER) != "" ]]; then
 
         echo "   + Forcing stop of previous containers"
         docker stop $CONTAINER > /dev/null 2>&1
@@ -608,25 +608,26 @@ function create_binary_wrapper(){
     TARGET=$1
     WRAPPER=$2
 
-    touch $WRAPPER
-    chmod 777 $WRAPPER
-    echo -e '#!/bin/bash' > $WRAPPER
-    echo -e "" >> $WRAPPER
-    echo -e "if [[ -f /usr/local/sbin/inContainerInjectTopology.sh ]]; then" >> $WRAPPER
-    echo -e "    # Injecting topoloy" >> $WRAPPER
-    echo -e "    . /usr/local/sbin/inContainerInjectTopology.sh" >> $WRAPPER
-    echo -e "fi" >> $WRAPPER
-    echo -e "" >> $WRAPPER
-    echo -e "__tmp_saved_dir=`pwd`" >> $WRAPPER
-    echo -e "function __tmp_returned_to_saved_dir() {" >> $WRAPPER
-    echo -e '     cd $__tmp_saved_dir' >> $WRAPPER
-    echo -e "}" >> $WRAPPER
-    echo -e "trap __tmp_returned_to_saved_dir 15" >> $WRAPPER
-    echo -e "trap __tmp_returned_to_saved_dir EXIT" >> $WRAPPER
-    echo -e "" >> $WRAPPER
-    echo -e "$TARGET \"\$@\"" >> $WRAPPER
-    echo -e "" >> $WRAPPER
-    echo -e "__tmp_returned_to_saved_dir" >> $WRAPPER
+    cat > $WRAPPER <<EOF
+#!/bin/bash
+
+if [[ -f /usr/local/sbin/inContainerInjectTopology.sh ]]; then
+    # Injecting topoloy
+    . /usr/local/sbin/inContainerInjectTopology.sh
+fi
+
+__tmp_saved_dir=\$(pwd)
+function __tmp_returned_to_saved_dir() {
+     cd \$__tmp_saved_dir
+}
+trap __tmp_returned_to_saved_dir 15
+trap __tmp_returned_to_saved_dir EXIT
+
+$TARGET "\$@"
+
+__tmp_returned_to_saved_dir
+EOF
+
     chmod 755 $WRAPPER
 }
 
@@ -642,7 +643,7 @@ check_in_container_config_success() {
     fi
     export LOG_FILE=$1
 
-    if [[ `tail -n 1 $LOG_FILE` != "$IN_CONTAINER_CONFIG_SUCESS_MESSAGE" ]]; then
+    if [[ $(tail -n 1 $LOG_FILE) != "$IN_CONTAINER_CONFIG_SUCESS_MESSAGE" ]]; then
         echo " - In container setup script ended up in error"
         cat $LOG_FILE
         exit 100
@@ -660,10 +661,10 @@ function fail_if_error(){
 }
 
 function preinstall_unmount_gluster_share () {
-    if [[ `grep $1 /etc/mtab` != "" ]]; then
+    if [[ $(grep $1 /etc/mtab) != "" ]]; then
         echo " - preinstallation : need to unmount gluster share $1 before proceeding with installation"
         i=0
-        while [[ `grep $1 /etc/mtab` != "" ]]; do
+        while [[ $(grep $1 /etc/mtab) != "" ]]; do
             sudo umount $1
             if [[ -z "$NO_SLEEP" ]]; then sleep 1; fi
             i=$((i+1))

@@ -40,6 +40,10 @@ After=network-online.target
 After=eskimo-startup-checks.service
 Wants=network-online.target
 
+StartLimitBurst=6
+StartLimitIntervalSec=100
+
+
 [Service]
 Type=simple
 TimeoutStartSec=300sec
@@ -60,8 +64,7 @@ ExecStart=/bin/bash -c ". /etc/etcd/etcd.env.sh && /usr/local/bin/etcd \
 RestartSec=5
 LimitNOFILE=65536
 Restart=always
-StartLimitBurst=6
-StartLimitInterval=100
+
 
 [Install]
 WantedBy=multi-user.target

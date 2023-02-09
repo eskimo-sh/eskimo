@@ -56,16 +56,16 @@ fi
 
 # make sure systemd is installed
 echo "  - checking if systemd is running"
-pidof_command=`which pidof`
+pidof_command=$(which pidof)
 if [[ -f "/etc/debian_version" ]]; then
-    systemd_command=`which systemd`
-    if [[ ! `$pidof_command $systemd_command` ]]; then
+    systemd_command=$(which systemd)
+    if [[ ! $($pidof_command $systemd_command) ]]; then
         echoerr "Systemd is not running on node !"
         exit 101
     fi
 else
     # works for both suse and RHEL
-    if [[ ! `$pidof_command /usr/lib/systemd/systemd` ]]; then
+    if [[ ! $($pidof_command /usr/lib/systemd/systemd) ]]; then
         echoerr "Systemd is not running on node !"
         exit 102
     fi
@@ -305,7 +305,7 @@ function install_debian_eskimo_dependencies() {
 rm -Rf /tmp/setup_log
 
 # Extract Linux distribution
-export LINUX_DISTRIBUTION=$(cat /etc/os-release | grep -e "^ID="  | cut -d '=' -f 2 | sed s/'"'//g)
+export LINUX_DISTRIBUTION=$(grep -e "^ID=" /etc/os-release | cut -d '=' -f 2 | sed s/'"'//g)
 echo "  - Linux distribution is $LINUX_DISTRIBUTION"
 
 if [[ "$LINUX_DISTRIBUTION" == "rhel" ]]; then
@@ -441,7 +441,7 @@ echo "  - Enabling docker"
 enable_docker
 
 # Docker is likely running on systemd cgroup driver or cgroup2, need to bring it back to using systemd as cgroup driver
-if [[ `grep native.cgroupdriver=systemd /etc/docker/daemon.json` == "" ]]; then
+if [[ $(grep native.cgroupdriver=systemd /etc/docker/daemon.json) == "" ]]; then
 
     sudo sed -i -n '1h;1!H;${;g;s/'\
 '{\n'\
@@ -465,21 +465,21 @@ if [[ -d "/proc/sys/net/ipv6" ]]; then
     sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1  >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
-    for i in `/sbin/ip -o -4 address | awk '{print $2}'`; do
+    for i in $(/sbin/ip -o -4 address | awk '{print $2}'); do
         sudo sysctl -w net.ipv6.conf.$i.disable_ipv6=1  >> /tmp/setup_log 2>&1
         fail_if_error $? "/tmp/setup_log" -1
     done
 
-    if [[ `grep net.ipv6.conf.all.disable_ipv6=1 /etc/sysctl.conf` == "" ]]; then
+    if [[ $(grep net.ipv6.conf.all.disable_ipv6=1 /etc/sysctl.conf) == "" ]]; then
         sudo bash -c 'echo -e "\nnet.ipv6.conf.all.disable_ipv6=1" >>  /etc/sysctl.conf'
     fi
 
-    if [[ `grep net.ipv6.conf.default.disable_ipv6=1 /etc/sysctl.conf` == "" ]]; then
+    if [[ $(grep net.ipv6.conf.default.disable_ipv6=1 /etc/sysctl.conf) == "" ]]; then
         sudo bash -c 'echo -e "net.ipv6.conf.default.disable_ipv6=1" >>  /etc/sysctl.conf'
     fi
 
-    for i in `/sbin/ip -o -4 address | awk '{print $2}'`; do
-        if [[ `grep net.ipv6.conf.$i.disable_ipv6=1 /etc/sysctl.conf` == "" ]]; then
+    for i in $(/sbin/ip -o -4 address | awk '{print $2}'); do
+        if [[ $(grep net.ipv6.conf.$i.disable_ipv6=1 /etc/sysctl.conf) == "" ]]; then
             sudo bash -c "echo -e \"net.ipv6.conf.$i.disable_ipv6=1\" >>  /etc/sysctl.conf"
         fi
     done
@@ -497,14 +497,14 @@ if [[ -f /etc/selinux/config ]]; then
     sudo setenforce 0 2>/dev/null # ignoring errors
 fi
 
-if [[ `mount | grep /sys/fs/cgroup/systemd` == "" ]]; then
+if [[ $(mount | grep /sys/fs/cgroup/systemd) == "" ]]; then
     echo " - cgroup creation hack"
     sudo mkdir /sys/fs/cgroup/systemd
     sudo mount -t cgroup -o none,name=systemd cgroup /sys/fs/cgroup/systemd
 fi
 
 echo "  - Create group eskimoservices"
-sudo /usr/bin/getent group eskimoservices 2>&1 > /dev/null || sudo /usr/sbin/groupadd eskimoservices
+sudo /usr/bin/getent group eskimoservices > /dev/null 2>&1 || sudo /usr/sbin/groupadd eskimoservices
 
 echo "  - Creating common system users"
 

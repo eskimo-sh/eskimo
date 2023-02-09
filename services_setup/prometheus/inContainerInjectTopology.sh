@@ -51,7 +51,7 @@ if [[ "$SELF_IP_ADDRESS" == "$MASTER_PROMETHEUS_1" ]]; then
     echo " - fetching from all other node exporters"
     bash -c "echo -e \"    # targets come from /etc/eskimo_topology.sh - ALL_NODES_LIST_prometheus\" >> /usr/local/lib/prometheus/prometheus.yml"
     bash -c "echo -e \"    - targets:\" >> /usr/local/lib/prometheus/prometheus.yml"
-    for i in `echo "$ALL_NODES_LIST_prometheus"  | tr "," "\n"`; do
+    for i in $(echo "$ALL_NODES_LIST_prometheus"  | tr "," "\n"); do
         bash -c "echo -e \"      - $i:9100\" >> /usr/local/lib/prometheus/prometheus.yml"
     done
 else

@@ -42,11 +42,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "-- SETTING UP CEREBRO ----------------------------------------------------------"
 
-echo " - Getting elasticsearch user_id"
-set +e
-elasticsearch_user_id=`id -u elasticsearch 2> /tmp/cerebro_install_log`
-set -e
-
 echo " - Simlinking logs to /var/log/cerebro/"
 sudo rm -Rf /usr/local/lib/cerebro/logs
 sudo ln -s /var/log/elasticsearch/cerebro /usr/local/lib/cerebro/logs

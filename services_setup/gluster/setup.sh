@@ -105,27 +105,20 @@ check_in_container_config_success gluster_install_log
 echo " - Handling topology infrastructure"
 handle_topology_infrastructure gluster gluster_install_log
 
-echo " - Copying commonGlusterFunctions.sh Script"
-docker_cp_script commonGlusterFunctions.sh sbin gluster gluster_install_log
-
 echo " - Copying inContainerStopService.sh"
 docker_cp_script inContainerStopService.sh sbin gluster gluster_install_log
 
 echo " - Committing changes to local template and exiting container gluster"
 commit_container gluster gluster_install_log
 
-echo " - Copying gluster common functions script to /usr/local/sbin"
-sudo cp commonGlusterFunctions.sh /usr/local/sbin
-sudo chmod 755 /usr/local/sbin/commonGlusterFunctions.sh
-
 echo " - Copying gluster command line programs docker wrappers to /usr/local/sbin"
-for i in `find ./gluster_wrappers -mindepth 1`; do
+for i in $(find ./gluster_wrappers -mindepth 1); do
     sudo cp $i /usr/local/sbin
-    filename=`echo $i | cut -d '/' -f 3`
+    filename=$(echo $i | cut -d '/' -f 3)
     sudo chmod 755 /usr/local/sbin/$filename
 done
 
-if [[ `sudo crontab -u root -l 2>/dev/null | grep glusterMountChecker.sh` == "" ]]; then
+if [[ $(sudo crontab -u root -l 2>/dev/null | grep glusterMountChecker.sh) == "" ]]; then
     echo " - Scheduling periodic execution of glusterMountChecker.sh using crontab"
     sudo rm -f /tmp/crontab
     sudo bash -c "crontab -u root -l >> /tmp/crontab 2>/dev/null"

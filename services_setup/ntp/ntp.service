@@ -39,6 +39,10 @@ After=docker.service
 After=eskimo-startup-checks.service
 Requires=docker.service
 
+StartLimitBurst=3
+StartLimitIntervalSec=30
+
+
 [Service]
 TimeoutStartSec=0
 RemainAfterExit=false
@@ -65,11 +69,10 @@ ExecStop=/usr/bin/docker stop ntp
 
 Type=simple
 Restart=always
-StartLimitBurst=3
-StartLimitInterval=5
 
 StandardOutput=syslog
 StandardError=syslog
+
 
 [Install]
 WantedBy=multi-user.target

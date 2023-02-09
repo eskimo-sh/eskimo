@@ -49,7 +49,7 @@ fi
 
 echo " - Creating elasticsearch user (if not exist) in container"
 set +e
-elasticsearch_user_id=`id -u elasticsearch 2> es_common_install_log`
+elasticsearch_user_id=$(id -u elasticsearch 2> es_common_install_log)
 set -e
 echo " - Found user with ID $elasticsearch_user_id"
 if [[ $elasticsearch_user_id == "" ]]; then

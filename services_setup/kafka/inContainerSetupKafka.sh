@@ -59,7 +59,7 @@ echo "-- SETTING UP KAFKA ------------------------------------------------------
 
 echo " - Getting kafka user ID"
 set +e
-kafka_user_id=`id -u kafka 2>kafka_install_log`
+kafka_user_id=$(id -u kafka 2>kafka_install_log)
 set -e
 echo " - Found user with ID $kafka_user_id"
 if [[ $kafka_user_id == "" ]]; then

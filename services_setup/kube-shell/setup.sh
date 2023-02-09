@@ -60,7 +60,7 @@ fi
 sudo rm -f kube-shell_install_log
 
 echo " - Checking eskimo user"
-eskimo_user_id=`id -u $USER 2>> kube-shell_install_log`
+eskimo_user_id=$(id -u $USER 2>> kube-shell_install_log)
 if [[ $eskimo_user_id == "" ]]; then
     echo "User eskimo should have been added by eskimo-base-system setup script"
     exit 4

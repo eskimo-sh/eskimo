@@ -42,12 +42,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "-- SETTING UP KIBANA -----------------------------------------------------------"
 
-
-echo " - Getting elasticsearch user_id"
-set +e
-elasticsearch_user_id=`id -u elasticsearch 2> /tmp/cerebro_install_log`
-set -e
-
 echo " - Simlinking Kibana config to /usr/local/etc/kibana"
 sudo ln -s /usr/local/lib/kibana/config /usr/local/etc/kibana
 

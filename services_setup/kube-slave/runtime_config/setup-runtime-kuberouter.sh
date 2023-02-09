@@ -54,7 +54,7 @@ echo " - Installing / configuring / checking kube-router "
 
 echo "   + create temp folder"
 tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
-cd $tmp_dir
+cd $tmp_dir || (echo "Couldn't cd $tmp_dir" && exit 1)
 
 echo "   + Configure the cluster parameters"
 kubectl config set-cluster eskimo \

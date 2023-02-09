@@ -51,7 +51,7 @@ echo "-- SETTING UP SPARK (COMMON PART) --------------------------------------"
 
 echo " - Creating spark user (if not exist) in container"
 set +e
-spark_user_id=`id -u spark 2>/dev/null`
+spark_user_id=$(id -u spark 2>/dev/null)
 set -e
 if [[ $spark_user_id == "" ]]; then
     useradd -u $SPARK_USER_ID spark
@@ -93,20 +93,21 @@ sudo chmod -R 777 /var/lib/gluster/
 
 
 echo " - Simlinking spark binaries to /usr/local/bin"
+# shellcheck disable=SC2006
 for i in `ls -1 /usr/local/lib/spark/bin`; do
     create_binary_wrapper /usr/local/lib/spark/bin/$i /usr/local/bin/$i
 done
 
 echo " - Simlinking spark system binaries to /usr/local/sbin"
 sudo ln -s /usr/local/lib/spark/sbin/slaves.sh /usr/local/sbin/slaves.sh
-for i in `ls -1 /usr/local/lib/spark/sbin/spark*`; do
-    create_binary_wrapper $i /usr/local/sbin/`basename $i`
+for i in $(ls -1 /usr/local/lib/spark/sbin/spark*); do
+    create_binary_wrapper $i "/usr/local/sbin/$(basename $i)"
 done
-for i in `ls -1 /usr/local/lib/spark/sbin/start*`; do
-    create_binary_wrapper $i /usr/local/sbin/spark-`basename $i`
+for i in $(ls -1 /usr/local/lib/spark/sbin/start*); do
+    create_binary_wrapper $i "usr/local/sbin/spark-$(basename $i)"
 done
-for i in `ls -1 /usr/local/lib/spark/sbin/stop*`; do
-    create_binary_wrapper $i /usr/local/sbin/spark-`basename $i`
+for i in $(ls -1 /usr/local/lib/spark/sbin/stop*); do
+    create_binary_wrapper $i "/usr/local/sbin/spark-$(basename $i)"
 done
 
 echo " - Simlinking spark logs to /var/log/"

@@ -50,10 +50,9 @@ fi
 
 echo " - Creating / checking eskimo kubelet config"
 
-if [[ `/usr/local/bin/kubectl get clusterrolebinding kubelet-bootstrap | grep system:node-bootstrapper` == "" ]]; then
+if [[ $(/usr/local/bin/kubectl get clusterrolebinding kubelet-bootstrap | grep system:node-bootstrapper) == "" ]]; then
 
     echo "   + Create cluster role system:node-bootstrapper in the cluster for kubelet-bootstrap"
-
     kubectl create clusterrolebinding kubelet-bootstrap \
      --clusterrole=system:node-bootstrapper \
      --user=kubelet-bootstrap
@@ -61,7 +60,9 @@ fi
 
 echo "   + create temp folder"
 tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
-cd $tmp_dir
+cd $tmp_dir || (echo "Couldn't cd $tmp_dir" && exit 1)
+
+set -e
 
 echo "   + Configure the cluster parameters"
 kubectl config set-cluster eskimo \

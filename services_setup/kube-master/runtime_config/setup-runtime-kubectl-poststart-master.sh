@@ -67,7 +67,7 @@ fi
 
 set -e
 
-export ADMIN_USER=`cat /etc/eskimo_user`
+export ADMIN_USER=$(cat /etc/eskimo_user)
 
 # Unfortunately, system doesn't pass me any environment variable, so I have to set them here
 # I am ensuring I run as root before messing with it
@@ -80,7 +80,7 @@ fi
 export HOME=/root
 
 # recreating on master
-if [[ `kubectl get serviceaccount | grep $ADMIN_USER` != "" ]]; then
+if [[ $(kubectl get serviceaccount | grep $ADMIN_USER) != "" ]]; then
     echo "   + Deleting serviceaccount-$ADMIN_USER"
     kubectl delete serviceaccount $ADMIN_USER
     sleep 3
@@ -91,11 +91,11 @@ kubectl apply -f /etc/k8s/serviceaccount-$ADMIN_USER.yaml
 # checking creation for 15 seconds
 for i in $(seq 1 15); do
     sleep 1
-    if [[ `kubectl get serviceaccount | grep $ADMIN_USER` != "" ]]; then
+    if [[ $(kubectl get serviceaccount | grep $ADMIN_USER) != "" ]]; then
         break
     fi
 done
-if [[ `kubectl get serviceaccount | grep $ADMIN_USER` == "" ]]; then
+if [[ $(kubectl get serviceaccount | grep $ADMIN_USER) == "" ]]; then
     echo "Could not successfully find serviceaccount for $ADMIN_USER after 10 seconds"
     exit 61
 fi
@@ -126,12 +126,12 @@ if [[ $(kubectl get secret | grep $ADMIN_USER) == "" ]]; then
 fi
 
 
-if [[ `kubectl get ClusterRoleBinding | grep default-$ADMIN_USER` == "" ]]; then
+if [[ $(kubectl get ClusterRoleBinding | grep default-$ADMIN_USER) == "" ]]; then
     echo "   + Creating ClusterRoleBinding default-$ADMIN_USER"
     kubectl apply -f /etc/k8s/clusterrolebinding-default-$ADMIN_USER.yaml
 fi
 
-if [[ `kubectl get ClusterRoleBinding | grep kubernetes-dashboard-$ADMIN_USER` == "" ]]; then
+if [[ $(kubectl get ClusterRoleBinding | grep kubernetes-dashboard-$ADMIN_USER) == "" ]]; then
     echo "   + Creating ClusterRoleBinding kubernetes-dashboard-$ADMIN_USER"
     kubectl apply -f /etc/k8s/clusterrolebinding-kubernetes-dashboard-$ADMIN_USER.yaml
 fi
@@ -140,12 +140,12 @@ fi
 echo "   + Getting token"
 for i in $(seq 1 15); do
     sleep 1
-    NEW_TOKEN=`kubectl describe secret $ADMIN_USER-secret | grep token: | sed 's/token: *\(.*\)/\1/'`
+    NEW_TOKEN=$(kubectl describe secret $ADMIN_USER-secret | grep token: | sed 's/token: *\(.*\)/\1/')
     if [[ "$NEW_TOKEN" != "" ]]; then
         break
     fi
 done
-NEW_TOKEN=`kubectl describe secret $ADMIN_USER-secret | grep token: | sed 's/token: *\(.*\)/\1/'`
+NEW_TOKEN=$(kubectl describe secret $ADMIN_USER-secret | grep token: | sed 's/token: *\(.*\)/\1/')
 if [[ "$NEW_TOKEN" == "" ]]; then
     echo " !! Failed to get new token (tried for 15 seconds)"
     echo "  -> this is the output of 'kubectl get secrets'"

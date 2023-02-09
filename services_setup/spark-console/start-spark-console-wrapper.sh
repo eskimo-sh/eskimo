@@ -39,7 +39,7 @@
 # Keep the calling thread / process waiting
 export do_loop=1
 while [[ $do_loop == 1 ]] ; do
-    dispatcher_pid=`ps -efl | grep org.apache.spark.deploy.history.HistoryServer | grep java | awk '{ print $4 }'`
+    dispatcher_pid=$(ps -efl | grep org.apache.spark.deploy.history.HistoryServer | grep java | awk '{ print $4 }')
     if [[ $dispatcher_pid != "" ]]; then
         sleep 5
     else

@@ -134,7 +134,7 @@ take_global_lock() {
         return 1
     fi
 
-    take_lock $1 $2 $3 || (echo "Couldn't flock file handle - $1 $2 $3" && exit 4)
+    take_lock $1 $2 $3 || (echo "Couldn't flock file handle - $1 $2 $3" && return 4)
 
     export GLOBAL_LOCK=$LAST_LOCK_HANDLE
 
@@ -150,6 +150,14 @@ get_kube_domain_names() {
         PATH=$PATH:/usr/local/bin
     fi
     local DOMAIN_NAMES=" "
+
+    # ensuring access to kube
+    kubectl get cm coredns -n kube-system > /dev/null 2>&1
+    if [[ $? != 0 ]]; then
+        echo "Access to kube failed. Do you have proper kube credentials ?"
+        return 1
+    fi
+
     for i in $(kubectl get cm coredns -n kube-system -o jsonpath="{.data.Corefile}" | grep ".local "); do
         if [[ "$i" != "{" ]]; then
             DOMAIN_NAMES="$i $DOMAIN_NAMES "
@@ -176,7 +184,7 @@ __get_kube_service_IP() {
         PATH=$PATH:/usr/local/bin
     fi
 
-    if [[ `echo $1 | grep '.'` == "" ]]; then
+    if [[ $(echo $1 | grep '.') == "" ]]; then
         echo "Expecting service in format NAME.NAMESPACE"
         return 1
     fi
@@ -222,7 +230,12 @@ __dump_service_ip_dns() {
     fi
 
     if [[ "$ESKIMO_DOMAINS" == "" ]]; then
-        local ESKIMO_DOMAINS=$(get_kube_domain_names)
+        local ESKIMO_DOMAINS
+        ESKIMO_DOMAINS=$(get_kube_domain_names)
+        if [[ $? != 0 ]]; then
+            echo "Fail to access kube domain"
+            return 5
+        fi
     fi
 
     for eskimo_domain in $(echo $ESKIMO_DOMAINS); do
@@ -245,7 +258,13 @@ get_kube_services_IPs() {
         unset gks_format
     fi
 
-    local ESKIMO_DOMAINS=$(get_kube_domain_names)
+    ESKIMO_DOMAINS=$(get_kube_domain_names)
+    if [[ $? != 0 ]]; then
+        echo "Fail to get kube domains list"
+        return 5
+    fi
+    # Need to export that one to make it available to further calls
+    export ESKIMO_DOMAINS
 
     local KUBE_SERVICES
     KUBE_SERVICES=$(get_kube_services)
@@ -254,7 +273,7 @@ get_kube_services_IPs() {
         return 1
     fi
     for service in $KUBE_SERVICES; do
-        if [[ $(echo $service  | sed 's/ *$//g') != "" ]]; then
+        if [[ ${service/ *$//} != "" ]]; then
 
             local SERVICE=$(echo $service | cut -d '.' -f 1)
             local NAMESPACE=$(echo $service | cut -d '.' -f 2)
@@ -265,7 +284,7 @@ get_kube_services_IPs() {
                 HOST=$(echo $endpoint | cut -d '/' -f 1)
                 IP=$(echo $endpoint | cut -d '/' -f 2)
 
-                if [[ $(echo $HOST | sed 's/ *$//g') == "" ]]; then
+                if [[ ${HOST/ *$//} == "" ]]; then
                     __dump_service_ip_dns $SERVICE:$NAMESPACE:$IP $gks_format
                 else
                     type=many

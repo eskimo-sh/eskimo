@@ -53,7 +53,7 @@ if [[ $MASTER_PROMETHEUS_1 == $SELF_IP_ADDRESS ]]; then
 
     echo " - Checking Prometheus startup"
     sleep 5
-    if [[ `ps -e | grep $PROMETHEUS_PROC_ID` == "" ]]; then
+    if ! kill -0 $PROMETHEUS_PROC_ID > /dev/null 2>&1; then
         echo " !! Failed to start Prometheus !!"
         cat /var/log/prometheus/prometheus.log
         exit 8
@@ -75,7 +75,7 @@ export NODE_EXPORTER_PROC_ID=$!
 
 echo " - Checking Node exporter startup"
 sleep 5
-if [[ `ps -e | grep $NODE_EXPORTER_PROC_ID` == "" ]]; then
+if ! kill -0 $NODE_EXPORTER_PROC_ID > /dev/null 2>&1; then
     echo " !! Failed to start Node exporter !!"
     cat /var/log/prometheus/node-exporter.log
     exit 9

@@ -37,7 +37,7 @@
 set -e
 
 #echo " - Handling default indices settings (before framworked settings injection) "
-if [[ `echo $ALL_NODES_LIST_kube_slave | grep ','` == "" ]]; then
+if [[ $(echo $ALL_NODES_LIST_kube_slave | grep ',') == "" ]]; then
     export HAS_MASTER=0
 else
     export HAS_MASTER=1
@@ -49,10 +49,10 @@ fi
 #index.number_of_replicas=2
 #index.refresh_interval=10s
 
-for property in `cat /usr/local/lib/elasticsearch/config/elasticsearch-index-defaults.properties | grep =`; do
+for property in $(grep -F "=" /usr/local/lib/elasticsearch/config/elasticsearch-index-defaults.properties); do
 
-    key=`echo $property | cut -d '=' -f 1`
-    value=`echo $property | cut -d '=' -f 2`
+    key=$(echo $property | cut -d '=' -f 1)
+    value=$(echo $property | cut -d '=' -f 2)
 
     #echo $key:$value
 
@@ -94,11 +94,11 @@ fi
 # use jq to parse !
 
 
-default_template=`curl -XGET 'http://localhost:9200/_template/index_defaults?pretty' 2>/dev/null`
+default_template=$(curl -XGET 'http://localhost:9200/_template/index_defaults?pretty' 2>/dev/null)
 
-CURRENT_NUMBER_OF_SHARDS=`echo $default_template | jq -r ".index_defaults | .settings | .index | .number_of_shards"`
-CURRENT_NUMBER_OF_REPLICAS=`echo $default_template | jq -r ".index_defaults | .settings | .index | .number_of_replicas"`
-CURRENT_REFRESH_INTERVAL=`echo $default_template | jq -r ".index_defaults | .settings | .index | .refresh_interval"`
+CURRENT_NUMBER_OF_SHARDS=$(echo $default_template | jq -r ".index_defaults | .settings | .index | .number_of_shards")
+CURRENT_NUMBER_OF_REPLICAS=$(echo $default_template | jq -r ".index_defaults | .settings | .index | .number_of_replicas")
+CURRENT_REFRESH_INTERVAL=$(echo $default_template | jq -r ".index_defaults | .settings | .index | .refresh_interval")
 
 if [[ $CURRENT_NUMBER_OF_SHARDS != $NUMBER_OF_SHARDS ]]; then
     echo "    + Need to change default number of shards from $CURRENT_NUMBER_OF_SHARDS to $NUMBER_OF_SHARDS"

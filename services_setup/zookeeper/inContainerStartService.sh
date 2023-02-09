@@ -51,14 +51,14 @@ sleep 5
 
 # First checking if process is up and running
 echo " - Ensuring that zookeeper started successfully"
-if [[ `ps -p $zk_pid -o comm=` == "" ]]; then
+if [[ $(ps -p $zk_pid -o comm=) == "" ]]; then
     echo "Could not find any process running with PID $zk_pid". Will be exiting
 
     echo " - Searching for specific error conditions"
-    if [[ `tail -n 50 /var/log/zookeeper/zookeeper.log | grep "Unexpected exception, exiting abnormally"` != "" ]]; then
+    if [[ $(tail -n 50 /var/log/zookeeper/zookeeper.log | grep "Unexpected exception, exiting abnormally") != "" ]]; then
 
 
-        if [[ `tail -n 50 /var/log/zookeeper/zookeeper.log | grep "Last transaction was partial"` != "" ]]; then
+        if [[ $(tail -n 50 /var/log/zookeeper/zookeeper.log | grep "Last transaction was partial") != "" ]]; then
 
             echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
             echo "Detected a data corruption situation (log reported below). Will wipe out the data for next restart"
@@ -73,7 +73,7 @@ if [[ `ps -p $zk_pid -o comm=` == "" ]]; then
     fi
 
     echo " - EXITING ABNORMALLY !"
-    exit -5
+    exit 5
 fi
 
 wait $zk_pid

@@ -45,9 +45,9 @@ if [[ $MASTER_IP_ADDRESS == "" ]]; then
     exit 2
 fi
 
-export ZOOKEEPER_ID=`eval echo "\$"$(echo NODE_NBR_ZOOKEEPER_$SELF_IP_ADDRESS | tr -d .)`
-if [[ ZOOKEEPER_ID == "" ]]; then
-    echo " - No Zookeeper ID found in topology for ip address $SELF_IP_ADDRESS"
+export ZOOKEEPER_ID=`eval echo "\$""$(echo NODE_NBR_ZOOKEEPER_$SELF_IP_ADDRESS | tr -d '.')"`
+if [[ $ZOOKEEPER_ID == "" ]]; then
+    echo " - No Zookeeper Node Number (ID) found in topology for ip address $SELF_IP_ADDRESS"
     exit 3
 fi
 

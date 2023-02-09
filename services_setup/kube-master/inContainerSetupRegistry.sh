@@ -63,7 +63,7 @@ fi
 
 echo " - Creating kubernetes user (if not exist) in container"
 set +e
-kubernetes_user_id=`id -u kubernetes 2>/dev/null`
+kubernetes_user_id=$(id -u kubernetes 2>/dev/null)
 set -e
 if [[ $kubernetes_user_id == "" ]]; then
     useradd -u $KUBERNETES_USER_ID kubernetes

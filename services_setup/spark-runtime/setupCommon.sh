@@ -41,7 +41,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
 echo " - Checking spark user"
-export spark_user_id=`id -u spark 2>> /tmp/spark_executor_install.log`
+export spark_user_id=$(id -u spark 2>> /tmp/spark_executor_install.log)
 if [[ $spark_user_id == "" ]]; then
     echo "User spark should have been added by eskimo-base-system setup script"
     exit 4

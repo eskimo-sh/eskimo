@@ -43,7 +43,7 @@ echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh elasticsearch
 
 echo " - Filling elasticsearch logs"
-for i in `seq 1 21`; do
+for i in $(seq 1 21); do
     echo "(Pre-start log filler $i)" >> /var/log/elasticsearch/eskimo.log
 done
 
@@ -53,12 +53,12 @@ ES_PID=$!
 
 echo " - Waiting for ElasticSearch to be successfuly started"
 sleep 10
-for i in `seq 1 240`; do
+for i in $(seq 1 240); do
     sleep 1
-    if [[ `tail -20 /var/log/elasticsearch/eskimo.log  | grep Node | grep started` != "" ]]; then
+    if [[ $(tail -20 /var/log/elasticsearch/eskimo.log  | grep Node | grep started) != "" ]]; then
         break
     fi
-    if [[ `ps -o pid= -p $ES_PID` == "" ]]; then
+    if [[ $(ps -o pid= -p $ES_PID) == "" ]]; then
         echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
         echo "Elasticsearch process seems dead"
         exit 2

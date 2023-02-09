@@ -52,7 +52,7 @@ fi
 
 sudo rm -Rf /tmp/kubelet_setup
 mkdir /tmp/kubelet_setup
-cd /tmp/kubelet_setup
+cd /tmp/kubelet_setup || (echo "Couldn't cd to /tmp/kubelet_setup" && exit 1)
 
 # Defining topology variables
 if [[ $SELF_NODE_NUMBER == "" ]]; then
