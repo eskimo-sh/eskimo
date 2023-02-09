@@ -52,9 +52,9 @@ sudo rm -f flink_install_log
 # build
 
 echo " - Copying flink command line programs docker wrappers to /usr/local/bin"
-for i in `find ./flink_wrappers -mindepth 1`; do
+for i in $(find ./flink_wrappers -mindepth 1); do
     sudo cp $i /usr/local/bin
-    filename=`echo $i | cut -d '/' -f 3`
+    filename=$(echo $i | cut -d '/' -f 3)
     sudo chmod 755 /usr/local/bin/$filename
 done
 

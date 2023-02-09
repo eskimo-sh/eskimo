@@ -91,13 +91,13 @@ fi
 
 #cat /tmp/call_out.log | grep -v HTTP_CODE
 
-eval `cat /tmp/call_out.log | grep HTTP_CODE`
+eval "$(grep HTTP_CODE /tmp/call_out.log)"
 if [[ $HTTP_CODE != "200" ]]; then
     echo "!! logstash command server called failed !!"
     echo "--------------------------------------------------------------------------------"
     cat /tmp/call_error.log
     cat /tmp/call_result.log
-    exit -1
+    exit 1
 else
     echo "- logstash command server called suceeded. Result displayed hereunder."
     echo "--------------------------------------------------------------------------------"

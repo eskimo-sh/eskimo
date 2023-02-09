@@ -40,6 +40,10 @@ Requires=docker.service
 After=gluster.service
 After=eskimo-startup-checks.service
 
+StartLimitBurst=4
+StartLimitIntervalSec=50
+
+
 [Service]
 TimeoutStartSec=0
 RemainAfterExit=false
@@ -53,13 +57,12 @@ ExecStart=/bin/bash -c 'while [[ 1 ]]; do if [[ `ls -1 /usr/local/bin | grep -e 
 Type=simple
 
 Restart=always
-StartLimitBurst=4
 # Giving a little time to gluster to recover in case of issues
 RestartSec=3
-StartLimitInterval=50
 
 StandardOutput=syslog
 StandardError=syslog
+
 
 [Install]
 WantedBy=multi-user.target

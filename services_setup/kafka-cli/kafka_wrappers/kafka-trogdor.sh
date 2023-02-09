@@ -40,19 +40,23 @@ fi
 . eskimo-utils.sh
 
 # Add standard folders if not already part of it
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/lib/kafka` == "" ]]; then
+if [[ $(echo $DOCKER_VOLUMES_ARGS | grep /var/lib/kafka) == "" ]]; then
     export DOCKER_VOLUMES_ARGS=" -v /var/lib/kafka:/var/lib/kafka:shared $DOCKER_VOLUMES_ARGS"
 fi
-if [[ `echo $DOCKER_VOLUMES_ARGS | grep /var/log/kafka` == "" ]]; then
+if [[ $(echo $DOCKER_VOLUMES_ARGS | grep /var/log/kafka) == "" ]]; then
     export DOCKER_VOLUMES_ARGS=" -v /var/log/kafka:/var/log/kafka:shared $DOCKER_VOLUMES_ARGS"
 fi
 
 #echo $DOCKER_VOLUMES_ARGS
 
-KUBE_SERVICES_HOSTS_FILE=`create_kube_services_hosts_file`
-if [[ ! -f $KUBE_SERVICES_HOSTS_FILE ]]; then
-    echo "Fail to create 'Kube services host file' with create_kube_services_hosts_file"
+KUBE_SERVICES_HOSTS_FILE=$(create_kube_services_hosts_file)
+if [[ $? != 0 ]]; then
+    echo "Failed to list kube services and create host file"
     exit 1
+fi
+if [[ ! -f $KUBE_SERVICES_HOSTS_FILE ]]; then
+    echo "Failed to create 'Kube services host file' with create_kube_services_hosts_file"
+    exit 2
 fi
 
 tty -s && USE_TTY="-t"
