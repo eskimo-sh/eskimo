@@ -38,10 +38,10 @@ echoerr() { echo "$@" 1>&2; }
 
 echo " - Stopping K8s Eskimo Slave"
 
-SERVICE_TO_STOP=kube-proxy,kubelet,cri-dockerd
+SERVICE_TO_STOP=kube-router,kubelet,cri-dockerd
 
 for i in ${SERVICE_TO_STOP//,/ }; do
-    PID_TO_KILL=$(ps -e | grep $i | sed 's/ *\([0-9]*\).*/\1/')
+    PID_TO_KILL=$(pgrep $i)
     if [[ "$PID_TO_KILL" != "" ]]; then
         echo "   + Killing $i"
         kill $PID_TO_KILL
