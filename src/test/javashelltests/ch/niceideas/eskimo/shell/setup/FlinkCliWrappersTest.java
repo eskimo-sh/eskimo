@@ -63,6 +63,9 @@ public class FlinkCliWrappersTest extends AbstractSetupShellTest {
             // I need some real commands
             assertTrue (new File (jailPath + "/bash").delete());
             assertTrue (new File (jailPath + "/sed").delete());
+
+            createDummyExecutable("kubectl", jailPath);
+
             initialized = true;
         }
         File dockerLogs = new File (getJailPath() + "/.log_docker");
@@ -143,8 +146,9 @@ public class FlinkCliWrappersTest extends AbstractSetupShellTest {
         createScript(jailPath, "test-pyflink-shell.sh",
                 "pyflink-shell.sh remote flink.svc.cluster.eskimo 8080");
 
-        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/test-pyflink-shell.sh"}, true);
+        String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/test-pyflink-shell.sh"}, false);
         logger.debug (result);
+        System.err.println (result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = extractKubeNSFile(dockerLogs);

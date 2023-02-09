@@ -1,5 +1,8 @@
-pool ntp1.hetzner.de iburst
+#pool ntp1.hetzner.de iburst
 
-pool ntp2.hetzner.com iburst
+#pool ntp2.hetzner.com iburst
 
-pool ntp3.hetzner.net iburst
+#pool ntp3.hetzner.net iburst
+
+
+server 192.168.10.11 burst iburst

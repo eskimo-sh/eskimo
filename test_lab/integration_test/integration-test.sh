@@ -44,7 +44,7 @@ set -e
 
 echo_date() {
     # shellcheck disable=SC2145
-    echo $(date +"%Y-%m-%d %H:%M:%S")" $@"
+    echo "$(date +"%Y-%m-%d %H:%M:%S") $@"
 }
 
 check_for_virtualbox() {
@@ -119,7 +119,7 @@ check_for_java() {
     fi
 }
 
-restart_zeppelin_spark_executor() {
+restart_zeppelin_spark_interpreter() {
 
     set +e
     curl \
@@ -127,7 +127,7 @@ restart_zeppelin_spark_executor() {
         -H 'Content-Type: application/json' \
         -m 3600 \
         -XPUT \
-        http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/interpreter/setting/restart/spark \
+        http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/interpreter/setting/restart/spark \
         -d "$data" \
         > eskimo-zeppelin-admin_call \
         2> eskimo-zeppelin-call-error
@@ -162,7 +162,7 @@ query_eskimo() {
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
             -m 3600 \
-            -X$method http://$BOX_IP/$URL \
+            -X$method http://$ESKIMO_ROOT/$URL \
             -d "$data" \
             > eskimo-call-success \
             2> eskimo-call-error
@@ -170,7 +170,7 @@ query_eskimo() {
         curl \
             -b $SCRIPT_DIR/cookies \
             -m 3600 \
-            -X$method http://$BOX_IP/$URL \
+            -X$method http://$ESKIMO_ROOT/$URL \
             > eskimo-call-success \
             2> eskimo-call-error
     fi
@@ -201,7 +201,7 @@ call_eskimo() {
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
             -m 3600 \
-            -X$method http://$BOX_IP/$URL \
+            -X$method http://$ESKIMO_ROOT/$URL \
             -d "$data" \
             > eskimo-call-result 2> /dev/null
     else
@@ -209,7 +209,7 @@ call_eskimo() {
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
             -m 3600 \
-            -X$method http://$BOX_IP/$URL \
+            -X$method http://$ESKIMO_ROOT/$URL \
             > eskimo-call-result 2> /dev/null
     fi
 
@@ -238,10 +238,9 @@ wait_for_taskmanager_registered() {
     for attempt in $(seq 1 60); do
         sleep 10
         set +e
-        spark_exec_status=$(vagrant ssh -c \
-                "sudo /usr/local/bin/kubectl get pod 2>/dev/null" \
-                $TARGET_MASTER_VM \
-                | grep 'flink-runtime-taskmanager' | grep Running)
+        spark_exec_status=$(sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
+                vagrant@$BOX_IP "sudo /usr/local/bin/kubectl get pod 2>/dev/null" \
+                2>/dev/null | grep 'flink-runtime-taskmanager' | grep Running)
         set -e
         if [[ $spark_exec_status != "" ]]; then
             echo_date "   + Found zeppelin flink taskmanager running"
@@ -263,10 +262,9 @@ wait_for_taskmanager_unregistered() {
     for attempt in $(seq 1 60); do
         sleep 10
         set +e
-        spark_exec_status=$(vagrant ssh -c \
-                    "sudo /usr/local/bin/kubectl get pod" \
-                    $TARGET_MASTER_VM \
-                    | grep 'flink-runtime-taskmanager' | grep Running  )
+        spark_exec_status=$(sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
+                    vagrant@$BOX_IP "sudo /usr/local/bin/kubectl get pod" \
+                    2>/dev/null | grep 'flink-runtime-taskmanager' | grep Running  )
         set -e
         if [[ $spark_exec_status == "" ]]; then
             echo_date "   + No Zeppelin Flink taskmanager found anymore, can continue ..."
@@ -285,10 +283,9 @@ wait_for_executor_registered() {
     for attempt in $(seq 1 60); do
         sleep 10
         set +e
-        spark_exec_status=$(vagrant ssh -c \
-                  "sudo /usr/local/bin/kubectl get pod 2>/dev/null" \
-                  $TARGET_MASTER_VM \
-                  | grep -E 'zeppelin-spark|spark-integration' | grep Running  )
+        spark_exec_status=$(sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
+                  vagrant@$BOX_IP "sudo /usr/local/bin/kubectl get pod 2>/dev/null" \
+                  2>/dev/null | grep -E 'zeppelin-spark|spark-integration' | grep Running  )
         set -e
         if [[ $spark_exec_status != "" ]]; then
             echo_date "   + Found zeppelin spark executor running"
@@ -310,10 +307,9 @@ wait_for_executor_unregistered() {
     for attempt in $(seq 1 60); do
         sleep 10
         set +e
-        spark_exec_status=$(vagrant ssh -c \
-                  "sudo /usr/local/bin/kubectl get pod" \
-                  $TARGET_MASTER_VM \
-                  | grep -E 'zeppelin-spark|spark-integration' | grep Running  )
+        spark_exec_status=$(sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
+                  vagrant@$BOX_IP "sudo /usr/local/bin/kubectl get pod" \
+                  2>/dev/null | grep -E 'zeppelin-spark|spark-integration' | grep Running  )
         set -e
         if [[ $spark_exec_status == "" ]]; then
             echo_date "   + No Zeppelin Spark executor found anymore, can continue ..."
@@ -496,10 +492,11 @@ install_eskimo() {
 login_eskimo() {
       # login
       echo_date " - CALL performing login"
+
       curl \
           -c $SCRIPT_DIR/cookies \
           -H 'Content-Type: application/x-www-form-urlencoded' \
-          -XPOST http://$BOX_IP/login \
+          -XPOST http://$ESKIMO_ROOT/login \
           -d 'eskimo-username=admin&eskimo-password=password' \
           >> /tmp/integration-test.log 2>&1
 }
@@ -511,7 +508,7 @@ initial_setup_eskimo() {
 
     # fetch status now and test it
     echo_date " - CALL Fetching status"
-    status=$(curl -b $SCRIPT_DIR/cookies http://$BOX_IP/get-status 2> /dev/null)
+    status=$(curl -b $SCRIPT_DIR/cookies http://$ESKIMO_ROOT/get-status 2> /dev/null)
     if [[ $(echo $status | jq -r '.status') != "OK" ]]; then
         echo "Couldn't successfuly fetch status !"
         echo "Got status : $status"
@@ -548,7 +545,7 @@ setup_eskimo() {
 
 #    # fetch status now and test it
 #    echo_date " - CALL Fetching status"
-#    status=$(curl -b $SCRIPT_DIR/cookies http://$BOX_IP/get-status 2> /dev/null)
+#    status=$(curl -b $SCRIPT_DIR/cookies http://$ESKIMO_ROOT/get-status 2> /dev/null)
 #    if [[ $(echo $status | jq -r '.status') != "OK" ]]; then
 #        echo "Couldn't successfuly fetch status !"
 #        echo "Got status : $status"
@@ -896,7 +893,7 @@ wait_all_services_up() {
 
     echo_date " - CALL ensuring services are up and OK"
 
-    for i in seq 1 60; do
+    for i in $(seq 1 60); do
 
         all_service_status=$(check_all_services_up)
         if [[ $all_service_status == "OK" ]]; then
@@ -918,7 +915,7 @@ query_zeppelin_notebook () {
     curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook \
+            -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook \
             2> /dev/null |
             jq -r " .body | .[] | select (.path == \"$nb_path\") | .id"
 }
@@ -930,7 +927,7 @@ run_all_zeppelin_pararaphs () {
     for i in $(curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
+            -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
             2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '); do
 
         echo_date "  + running $i"
@@ -960,7 +957,7 @@ run_zeppelin_pararaph () {
     for i in $(curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
+            -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
             2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '); do
 
         cnt=$((cnt + 1))
@@ -983,7 +980,7 @@ get_zeppelin_paragraph_status () {
     for i in $(curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
+            -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
             2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '); do
 
         cnt=$((cnt + 1))
@@ -993,7 +990,7 @@ get_zeppelin_paragraph_status () {
             curl \
                 -b $SCRIPT_DIR/cookies \
                 -H 'Content-Type: application/json' \
-                -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
+                -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
                 2> /dev/null | jq -r " .body | .paragraphs | .[] | select(.id==\"$i\") | .status "
 
             break
@@ -1010,7 +1007,7 @@ start_zeppelin_pararaph () {
     for i in $(curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
+            -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
             2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '); do
 
         cnt=$((cnt + 1))
@@ -1033,7 +1030,7 @@ stop_zeppelin_pararaph () {
     for i in $(curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XGET http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
+            -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
             2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '); do
 
         cnt=$((cnt + 1))
@@ -1044,7 +1041,7 @@ stop_zeppelin_pararaph () {
             curl \
                     -b $SCRIPT_DIR/cookies \
                     -H 'Content-Type: application/json' \
-                    -XDELETE http://$BOX_IP/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/job/$nb_id/$i \
+                    -XDELETE http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/job/$nb_id/$i \
                     >> /tmp/integration-test.log 2>&1
 
 
@@ -1062,10 +1059,9 @@ run_zeppelin_data_load() {
     echo_date " - Waiting for Zeppelin to be up and running (querying kubernetes)"
     for attempt in $(seq 1 30); do
         sleep 10
-        zeppelin_status=$(vagrant ssh -c \
-                "sudo /usr/local/bin/kubectl get pod -o wide" \
-                $TARGET_MASTER_VM \
-                | grep zeppelin | grep Running | sed s/'  *'/' '/g | cut -d ' ' -f 7)
+        zeppelin_status=$(sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
+                vagrant@$BOX_IP  "sudo /usr/local/bin/kubectl get pod -o wide" \
+                2>/dev/null | grep zeppelin | grep Running | sed s/'  *'/' '/g | cut -d ' ' -f 7)
         if [[ $zeppelin_status != "" ]]; then
             echo_date "   + Found zeppelin running on $zeppelin_status"
             break
@@ -1075,8 +1071,8 @@ run_zeppelin_data_load() {
             exit 21
         fi
     done
-    # Giving it a little more time to really start
 
+    # Giving it a little more time to really start
     sleep 40
 
     echo_date " - ZEPPELIN logstash demo"
@@ -1088,27 +1084,10 @@ run_zeppelin_data_load() {
 
     echo_date " - ZEPPELIN Spark ES demo "
     run_all_zeppelin_pararaphs "/Spark Integration ES"
+    
+    wait_for_executor_unregistered
 
-    echo_date " - Waiting for kubernetes to unregister spark executor (not to compromise other tests)"
-    for attempt in $(seq 1 60); do
-        sleep 10
-        set +e
-        spark_exec_status=$(vagrant ssh -c \
-                "sudo /usr/local/bin/kubectl get pod" \
-                $TARGET_MASTER_VM \
-                | grep -E 'zeppelin-spark|spark-integration' | grep Running )
-        set -e
-        if [[ $spark_exec_status == "" ]]; then
-            echo_date "   + No Zeppelin Spark executor found anymore, can continue ..."
-            break
-        fi
-        if [[ $attempt == 60 ]]; then
-            echo_date "Kubernetes did not unregister executor within 600 seconds. Crashing"
-            exit 41
-        fi
-    done
-
-    restart_zeppelin_spark_executor
+    restart_zeppelin_spark_interpreter
 }
 
 create_kafka_topics() {
@@ -1122,16 +1101,16 @@ create_kafka_topics() {
     # ----------------------------------------------------------------------------------------------------------------------
 
     echo_date " - Creating topic berka-payments"
-    vagrant ssh -c \
-        "sudo su -c '/usr/local/bin/kafka-topics.sh --create --if-not-exists --replication-factor 1 --partitions $NBR_PARTITIONS --zookeeper localhost:2181 --topic berka-payments' eskimo" \
-        $TARGET_MASTER_VM \
-        >> /tmp/integration-test.log 2>&1
+    sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
+            vagrant@$BOX_IP \
+            "sudo su -c '/usr/local/bin/kafka-topics.sh --create --if-not-exists --replication-factor 1 --partitions $NBR_PARTITIONS --zookeeper localhost:2181 --topic berka-payments' eskimo" \
+            >> /tmp/integration-test.log 2>&1
 
     echo_date " - Creating topic berka-payments-aggregate"
-    vagrant ssh -c \
-        "sudo su -c '/usr/local/bin/kafka-topics.sh --create --if-not-exists --replication-factor 1 --partitions $NBR_PARTITIONS --zookeeper localhost:2181 --topic berka-payments-aggregate' eskimo" \
-        $TARGET_MASTER_VM \
-        >> /tmp/integration-test.log 2>&1
+    sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
+            vagrant@$BOX_IP \
+            "sudo su -c '/usr/local/bin/kafka-topics.sh --create --if-not-exists --replication-factor 1 --partitions $NBR_PARTITIONS --zookeeper localhost:2181 --topic berka-payments-aggregate' eskimo" \
+            >> /tmp/integration-test.log 2>&1
 }
 
 run_zeppelin_spark_kafka() {
@@ -1163,10 +1142,10 @@ run_zeppelin_spark_kafka() {
     start_zeppelin_pararaph "/Spark Integration Kafka" 5
 
     echo_date " - ZEPPELIN spark Kafka demo - Now expecting some result on kafka topic berka-payments-aggregate"
-    vagrant ssh -c \
-        "sudo su -c '/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.default.svc.cluster.eskimo:9092 --topic berka-payments-aggregate --timeout-ms 150000 --max-messages 100' eskimo" \
-        $TARGET_MASTER_VM \
-        > kafka-berka-payments-aggregate-results 2> /dev/null
+    sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
+            vagrant@$BOX_IP \
+            "sudo su -c '/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.default.svc.cluster.eskimo:9092 --topic berka-payments-aggregate --timeout-ms 150000 --max-messages 100' eskimo" \
+            > kafka-berka-payments-aggregate-results 2> /dev/null
 
     if [[ $(wc -l kafka-berka-payments-aggregate-results | cut -d ' ' -f 1) -lt 100 ]]; then
         echo_date "Failed to fetch at least 100 aggregated payments from result topic"
@@ -1207,7 +1186,7 @@ run_zeppelin_spark_kafka() {
 
     run_zeppelin_pararaph "/Spark Integration Kafka" 6
 
-    restart_zeppelin_spark_executor
+    restart_zeppelin_spark_interpreter
 }
 
 run_zeppelin_kafka_streams() {
@@ -1281,10 +1260,10 @@ run_zeppelin_kafka_streams() {
 
     # Now check results
     echo_date " - ZEPPELIN Kafka Streams demo - Checking results"
-    vagrant ssh -c \
-        "sudo su -c '/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.default.svc.cluster.eskimo:9092 --topic streams-wordcount-output --timeout-ms 20000 --from-beginning --max-messages 100' eskimo" \
-        $TARGET_MASTER_VM \
-        > streams-wordcount-output-results 2> /dev/null
+    sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
+            vagrant@$BOX_IP \
+            "sudo su -c '/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.default.svc.cluster.eskimo:9092 --topic streams-wordcount-output --timeout-ms 20000 --from-beginning --max-messages 100' eskimo" \
+            > streams-wordcount-output-results 2> /dev/null
 
     if [[ $(wc -l streams-wordcount-output-results | cut -d ' ' -f 1) -lt 4 ]]; then
         echo_date "Failed to fetch at least 4 word counts from result topic"
@@ -1294,7 +1273,7 @@ run_zeppelin_kafka_streams() {
 
     rm -f streams-wordcount-output-results
 
-    restart_zeppelin_spark_executor
+    restart_zeppelin_spark_interpreter
 }
 
 run_zeppelin_flink_kafka() {
@@ -1325,10 +1304,10 @@ run_zeppelin_flink_kafka() {
     start_zeppelin_pararaph "/Flink Integration Kafka" 5
 
     echo_date " - ZEPPELIN flink Kafka demo - Now expecting some result on kafka topic berka-payments-aggregate"
-    vagrant ssh -c \
-        "sudo su -c '/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.default.svc.cluster.eskimo:9092 --topic berka-payments-aggregate --timeout-ms 150000 --max-messages 100' eskimo" \
-        $TARGET_MASTER_VM \
-        > kafka-berka-payments-aggregate-results 2> /dev/null
+    sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
+            vagrant@$BOX_IP \
+            "sudo su -c '/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.default.svc.cluster.eskimo:9092 --topic berka-payments-aggregate --timeout-ms 150000 --max-messages 100' eskimo" \
+            > kafka-berka-payments-aggregate-results 2> /dev/null
 
     if [[ $(wc -l kafka-berka-payments-aggregate-results | cut -d ' ' -f 1) -lt 100 ]]; then
         echo_date "Failed to fetch at least 100 aggregated payments from result topic"
@@ -1794,10 +1773,10 @@ load_kibana_flight_data() {
             -H "kbn-version: $ES_VERSION" \
             -H "Content-Length: 0" \
             -H "Content-Type: application/json" \
-            -H "Host: $BOX_IP" \
-            -H "Origin: $BOX_IP" \
-            -H "Referer: http://$BOX_IP/kibana/app/kibana" \
-            -XPOST http://$BOX_IP/kibana/api/sample_data/flights \
+            -H "Host: ${ESKIMO_ROOT//:[0-9]*/}" \
+            -H "Origin: ${ESKIMO_ROOT//:[0-9]*/}" \
+            -H "Referer: http://$ESKIMO_ROOT/kibana/app/kibana" \
+            -XPOST http://$ESKIMO_ROOT/kibana/api/sample_data/flights \
             > kibana-flight-import \
             2> kibana-flight-import-error
 
@@ -1825,10 +1804,10 @@ prepare_demo() {
             -H "kbn-version: $ES_VERSION" \
             -H "Content-Length: 0" \
             -H "Content-Type: application/json" \
-            -H "Host: $BOX_IP" \
-            -H "Origin: $BOX_IP" \
-            -H "Referer: http://$BOX_IP/kibana/app/kibana" \
-            -XPOST http://$BOX_IP/kibana/api/sample_data/logs \
+            -H "Host: ${ESKIMO_ROOT//:[0-9]*/}" \
+            -H "Origin: ${ESKIMO_ROOT//:[0-9]*/}" \
+            -H "Referer: http://$ESKIMO_ROOT/kibana/app/kibana" \
+            -XPOST http://$ESKIMO_ROOT/kibana/api/sample_data/logs \
             > kibana-logs-import \
             2> kibana-logs-import-error
 
@@ -1847,10 +1826,10 @@ prepare_demo() {
             -H "kbn-version: $ES_VERSION" \
             -H "Content-Length: 0" \
             -H "Content-Type: application/json" \
-            -H "Host: $BOX_IP" \
-            -H "Origin: $BOX_IP" \
-            -H "Referer: http://$BOX_IP/kibana/app/kibana" \
-            -XPOST http://$BOX_IP/kibana/api/sample_data/ecommerce \
+            -H "Host: ${ESKIMO_ROOT//:[0-9]*/}" \
+            -H "Origin: ${ESKIMO_ROOT//:[0-9]*/}" \
+            -H "Referer: http://$ESKIMO_ROOT/kibana/app/kibana" \
+            -XPOST http://$ESKIMO_ROOT/kibana/api/sample_data/ecommerce \
             > kibana-ecommerce-import \
             2> kibana-ecommerce-import-error
 
@@ -1871,10 +1850,10 @@ prepare_demo() {
             -H "kbn-version: $ES_VERSION" \
             -H "Content-Length: 0" \
             -H "Content-Type: application/json" \
-            -H "Host: $BOX_IP" \
-            -H "Origin: $BOX_IP" \
-            -H "Referer: http://$BOX_IP/kibana/app/kibana" \
-            -XGET http://$BOX_IP/kibana/api/saved_objects/_find?default_search_operator=AND\&page=1\&per_page=1000\&search_fields=title%5E3\&search_fields=description\&type=dashboard \
+            -H "Host: ${ESKIMO_ROOT//:[0-9]*/}" \
+            -H "Origin: ${ESKIMO_ROOT//:[0-9]*/}" \
+            -H "Referer: http://$ESKIMO_ROOT/kibana/app/kibana" \
+            -XGET http://$ESKIMO_ROOT/kibana/api/saved_objects/_find?default_search_operator=AND\&page=1\&per_page=1000\&search_fields=title%5E3\&search_fields=description\&type=dashboard \
             > kibana-dashboard-check \
             2> kibana-dashboard-check-error
 
@@ -1962,7 +1941,7 @@ do_screenshots() {
      # running screenshot generator with maven
      saved_dir=$(pwd)
      cd ../..
-     export ESKIMO_NODE=$BOX_IP
+     export ESKIMO_NODE=$ESKIMO_ROOT
      mvn exec:java -P screenshots  >> /tmp/integration-test.log 2>&1
      cd $saved_dir
 }
@@ -2018,8 +1997,9 @@ do_overwrite_sc() {
 #vagrant ssh -c "sudo journalctl -u eskimo" integration-test
 
 usage() {
-    echo "Usage: integration-test.sh [Options] [Target Box IP]"
-    echo "  where [Target Box IP] is optional IP address of box to target tests at"
+    echo "Usage: integration-test.sh [Options] [Eskimo Root URL] [Target Box IP]"
+    echo "  where [Eskimo Root URL] is optional location root (only server : port) where to find eskimo"
+    echo "  where [Target Box IP] is optional IP address of box to target cluster nodes commands at"
     echo "  where [Options] in"
     echo "    -h  Display this help message."
     echo "    -p  Rebuild eskimo service packages"
@@ -2044,6 +2024,7 @@ usage() {
 export EXPECTED_NBR_APPS_kubernetes=6
 
 export BOX_IP=192.168.56.41
+export ESKIMO_ROOT=192.168.56.41
 export DOCKER_LOCAL=192.168.56.41
 export TARGET_MASTER_VM="integration-test"
 
@@ -2138,6 +2119,7 @@ while getopts ":hpnrfbeslztcowadmi" opt; do
             export MULTIPLE_NODE=multiple
             export TARGET_MASTER_VM="integration-test1"
             export BOX_IP=192.168.56.51
+            export ESKIMO_ROOT=192.168.56.51
             ;;
         \?)
             echo "Invalid Option: -$OPTARG" 1>&2
@@ -2146,18 +2128,24 @@ while getopts ":hpnrfbeslztcowadmi" opt; do
             ;;
     esac
 done
-shift $(expr $OPTIND - 1 )
+shift $(expr $OPTIND - 1)
 
 if [[ "$1" != "" ]]; then
     if [[ "$RECREATE_BOX" == "do" ]]; then
-        echo "Passing a [Target Box IP] is incompatible with '-b  Recreate box(es)'"
+        echo "Passing a [Eskimo Rot URL] is incompatible with '-b  Recreate box(es)'"
         exit 201
     fi
     if [[ "$MULTIPLE_NODE" == "multiple" ]]; then
-        echo "Passing a [Target Box IP] is incompatible with '-m  Test on multiple nodes'"
+        echo "Passing a [Eskimo Rot URL] is incompatible with '-m  Test on multiple nodes'"
         exit 201
     fi
-    export BOX_IP=$1
+    export ESKIMO_ROOT=$1
+    echo_date " - Using ESKIMO_ROOT=$ESKIMO_ROOT"
+
+    if [[ $2 != "" ]]; then
+        export BOX_IP=$2
+        echo_date " - Using BOX_IP=$BOX_IP"
+    fi
 fi
 
 trap __dump_error 15
@@ -2222,7 +2210,10 @@ if [[ "$SETUP_ESKIMO" != "" ]]; then
 fi
 
 if [[ "$RUN_DATA_LOAD" != "" || "$RUN_NOTEBOOK_TESTS" != "" || "$RUN_OTHER_TESTS" != "" || "$RUN_CLEANUP" != "" || "$RUN_SCREENSHOTS" != "" ]]; then
-    wait_all_services_up
+    # Hack (assuming the caller knows what he's doing if not called as part of integration test)
+    if [[ $BOX_IP == "192.168.56.51" || $BOX_IP == "192.168.56.51" ]]; then
+        wait_all_services_up
+    fi
 fi
 
 if [[ "$RUN_DATA_LOAD" != "" ]]; then

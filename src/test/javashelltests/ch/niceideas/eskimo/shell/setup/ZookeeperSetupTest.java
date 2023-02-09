@@ -115,9 +115,9 @@ public class ZookeeperSetupTest extends AbstractSetupShellTest {
         String bashLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_bash"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(bashLogs)) {
 
-            //System.err.println (bashLogs);
+            System.err.println (bashLogs);
 
-            assertTrue(bashLogs.contains("-c echo  > /etc/zookeeper/conf/myid"));
+            assertTrue(bashLogs.contains("-c echo 1 > /etc/zookeeper/conf/myid"));
         } else {
             fail ("Expected to find bash logs in .log_bash");
         }

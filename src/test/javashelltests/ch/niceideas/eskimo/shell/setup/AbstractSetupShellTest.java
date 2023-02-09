@@ -89,7 +89,7 @@ public abstract class AbstractSetupShellTest {
         // Enhance common script
         String commonScript = FileUtils.readFile(new File("./services_setup/" + serviceName + "/common.sh"));
 
-        // inject custom topology loading
+        // use mock wrappers
         commonScript = commonScript.replace(
                 "function create_binary_wrapper(){",
                 "function create_binary_wrapper(){\n" +
@@ -110,11 +110,11 @@ public abstract class AbstractSetupShellTest {
         def.setSetupService(setupService);
         def.afterPropertiesSet();
 
-        Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, Node.fromAddress("192.168.10.11"));
+        Topology topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, Node.fromAddress("192.168.10.13"));
 
         FileUtils.writeFile(new File (jailPath + "/eskimo-topology.sh"),
                 topology.getTopologyScriptForNode(
-                        nodesConfig, kubeServicesConfig, StandardSetupHelpers.getStandard2NodesInstallStatus(), def, new MemoryModel(new HashMap<>()), 1));
+                        nodesConfig, kubeServicesConfig, StandardSetupHelpers.getStandard2NodesInstallStatus(), def, new MemoryModel(new HashMap<>()), 2));
         ProcessHelper.exec(new String[]{"chmod", "755", jailPath + "/eskimo-topology.sh"}, true);
 
         String testFileConf = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getCamelCaseServiceName()+"SetupShellTest/testFile.conf"), StandardCharsets.UTF_8);
@@ -172,7 +172,7 @@ public abstract class AbstractSetupShellTest {
 
             scriptContent = scriptContent.replace(". /host_etc/eskimo_topology.sh", ". " + jailPath + "/eskimo-topology.sh");
 
-            scriptContent = scriptContent.replace("/etc/eskimo_mesos_environment", jailPath + "/eskimo_mesos_environment");
+            scriptContent = scriptContent.replace("/etc/eskimo_k8s_environment", jailPath + "/eskimo_k8s_environment");
 
             copyResource(scriptToExecute, jailPath, scriptContent);
         }
@@ -255,6 +255,7 @@ public abstract class AbstractSetupShellTest {
         createDummyExecutable("sed", tempFile.getAbsolutePath());
         createDummyExecutable("sudo", tempFile.getAbsolutePath());
         createDummyExecutable("pidof", tempFile.getAbsolutePath());
+        createDummyExecutable("kubectl", tempFile.getAbsolutePath());
 
         File var = new File (tempFile, "var");
         assertTrue (var.mkdirs());
@@ -279,7 +280,7 @@ public abstract class AbstractSetupShellTest {
         ProcessHelper.exec("chmod 755 " + targetPath, true);
     }
 
-    private static void createDummyExecutable(String script, String targetDir) throws Exception {
+    public static void createDummyExecutable(String script, String targetDir) throws Exception {
         File targetPath = createResourceFile(script, targetDir);
         ProcessHelper.exec("chmod 755 " + targetPath, true);
     }
