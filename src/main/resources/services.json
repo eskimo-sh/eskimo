@@ -96,6 +96,13 @@
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": true
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "ntp",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": false
       }
     ],
     "additionalEnvironment": [
@@ -231,7 +238,6 @@
     "config": {
       "imageName" : "gluster",
       "order": 4,
-      "mandatory": true,
       "name" : "Gluster / EGMI",
       "selectionLayout" : { "row" : 2, "col" : 1},
       "memory": "negligible",
@@ -259,6 +265,13 @@
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": true
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "ntp",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": false
       }
     ],
     "additionalEnvironment": [
@@ -330,10 +343,10 @@
     "dependencies": [
       {
         "masterElectionStrategy": "SAME_NODE",
-        "masterService": "gluster",
+        "masterService": "ntp",
         "numberOfMasters": 1,
-        "mandatory": false,
-        "restart": true
+        "mandatory": true,
+        "restart": false
       }
     ],
     "additionalEnvironment": [
@@ -378,6 +391,13 @@
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": false
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "ntp",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": false
       }
     ]
   },
@@ -409,6 +429,13 @@
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": true
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "ntp",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": false
       }
     ],
     "additionalEnvironment": [
@@ -592,6 +619,14 @@
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": true
+      },
+      {
+        "__comment": "this is to force restart of container in case gluster evolves",
+        "masterElectionStrategy": "RANDOM",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": true
       }
     ],
     "editableSettings": [
@@ -702,6 +737,15 @@
       "logo" : "images/kafka-logo.png",
       "icon" : "images/kafka-icon.png"
     },
+    "dependencies" : [
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": true
+      }
+    ],
     "commands" : [
       {
         "id" : "mount_kafka_data_kafkacli",
@@ -823,7 +867,7 @@
         "masterElectionStrategy": "RANDOM",
         "masterService": "gluster",
         "numberOfMasters": 1,
-        "mandatory": false,
+        "mandatory": true,
         "restart": true
       }
     ],
@@ -871,11 +915,11 @@
     },
     "dependencies": [
       {
-        "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "kube-master",
+        "masterElectionStrategy": "RANDOM",
+        "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": true,
-        "restart": false
+        "restart": true
       }
     ],
     "editableSettings": [
@@ -970,6 +1014,15 @@
       "logo" : "images/spark-runtime-logo.png",
       "icon" : "images/spark-runtime-icon.png"
     },
+    "dependencies" : [
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": false
+      }
+    ],
     "commands" : [
       {
         "id" : "mount_spark_eventlog_sparkcli",
@@ -1025,17 +1078,11 @@
         "restart": true
       },
       {
-        "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "kube-master",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": false
-      },
-      {
+        "__comment": "this is to force restart of container in case gluster evolves",
         "masterElectionStrategy": "RANDOM",
         "masterService": "gluster",
         "numberOfMasters": 1,
-        "mandatory": false,
+        "mandatory": true,
         "restart": true
       }
     ],
@@ -1117,6 +1164,15 @@
       "logo" : "images/flink-logo.png",
       "icon" : "images/flink-icon.png"
     },
+    "dependencies" : [
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": false
+      }
+    ],
     "commands" : [
       {
         "id" : "mount_flink_data_flinkcli",
@@ -1151,7 +1207,7 @@
         "masterElectionStrategy": "RANDOM",
         "masterService": "gluster",
         "numberOfMasters": 1,
-        "mandatory": false,
+        "mandatory": true,
         "restart": true
       },
       {
@@ -1214,6 +1270,15 @@
       "logo": "images/logstash-logo.png",
       "icon": "images/logstash-icon.png"
     },
+    "dependencies" : [
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "gluster",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": false
+      }
+    ],
     "commands" : [
       {
         "id" : "mount_logstash_data_logstashcli",
@@ -1452,13 +1517,6 @@
         "masterService": "elasticsearch",
         "numberOfMasters": 1,
         "mandatory": true,
-        "restart": true
-      },
-      {
-        "masterElectionStrategy": "FIRST_NODE",
-        "masterService": "kube-master",
-        "numberOfMasters": 1,
-        "mandatory": true,
         "restart": false
       }
     ],
@@ -1575,7 +1633,7 @@
         "masterElectionStrategy": "RANDOM",
         "masterService": "gluster",
         "numberOfMasters": 1,
-        "mandatory": false,
+        "mandatory": true,
         "restart": true
       },
       {
@@ -1588,6 +1646,20 @@
       {
         "masterElectionStrategy": "RANDOM",
         "masterService": "kafka",
+        "numberOfMasters": 1,
+        "mandatory": false,
+        "restart": false
+      },
+      {
+        "masterElectionStrategy": "RANDOM",
+        "masterService": "flink-runtime",
+        "numberOfMasters": 1,
+        "mandatory": false,
+        "restart": false
+      },
+      {
+        "masterElectionStrategy": "RANDOM",
+        "masterService": "spark-runtime",
         "numberOfMasters": 1,
         "mandatory": false,
         "restart": false
