@@ -121,9 +121,9 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
     }
 
     private void __dumpPortForwardersMap () {
-        portForwardersMap.keySet().forEach(sshConnection -> {
-           logger.debug(" - " + sshConnection.getHostname());
-           portForwardersMap.get(sshConnection).forEach(forwarder -> logger.debug("   + " + forwarder.toString()));
+        new HashSet<>(portForwardersMap.entrySet()).forEach(entry -> {
+           logger.debug(" - " + entry.getKey().getHostname());
+           entry.getValue().forEach(forwarder -> logger.debug("   + " + forwarder.toString()));
         });
         logger.debug("");
     }

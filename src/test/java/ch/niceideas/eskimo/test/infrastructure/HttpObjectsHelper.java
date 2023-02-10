@@ -35,6 +35,7 @@
 
 package ch.niceideas.eskimo.test.infrastructure;
 
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.controlers.NodesConfigController;
 import ch.niceideas.eskimo.proxy.ProxyServlet;
 import ch.niceideas.eskimo.proxy.ServicesProxyServletTest;
@@ -93,6 +94,10 @@ public class HttpObjectsHelper {
     }
 
     public static HttpServletRequest createHttpServletRequest(String service) {
+        return createHttpServletRequest (service, "");
+    }
+
+    public static HttpServletRequest createHttpServletRequest(String service, String context) {
         return (HttpServletRequest) Proxy.newProxyInstance(
                 ServicesProxyServletTest.class.getClassLoader(),
                 new Class[] { HttpServletRequest.class },
@@ -100,11 +105,11 @@ public class HttpObjectsHelper {
                     switch (method.getName()) {
                         case "getRequestURI":
                             if ("cerebro".equals(service)) {
-                                return "/cerebro/statistics?server=192.168.10.13";
+                                return context + "/cerebro/statistics?server=192.168.10.13";
                             } else if ("spark-console".equals(service)) {
-                                return "/spark-console/history/spark-application-1653861510346/jobs/";
+                                return context + "/spark-console/history/spark-application-1653861510346/jobs/";
                             } else if ("eskimo-command".equals(service)) {
-                                return "/eskimo-command/kubeDashboardLoginToken";
+                                return context + "/eskimo-command/kubeDashboardLoginToken";
                             }else {
                                 throw new UnsupportedOperationException(
                                         "Unsupported method: " + method.getName());
@@ -120,9 +125,9 @@ public class HttpObjectsHelper {
                             }
                         case "getRequestURL":
                             if ("cerebro".equals(service)) {
-                                return new StringBuffer("http://localhost:9090/cerebro/statistics");
+                                return new StringBuffer("http://localhost:9090" + context + "/cerebro/statistics");
                             } else if ("spark-console".equals(service)) {
-                                return new StringBuffer("http://localhost:9191/history/spark-application-1652639268719/jobs/");
+                                return new StringBuffer("http://localhost:9191" + context + "/history/spark-application-1652639268719/jobs/");
                             } else {
                                 throw new UnsupportedOperationException(
                                         "Unsupported method: " + method.getName());
@@ -142,7 +147,7 @@ public class HttpObjectsHelper {
                                         "Unsupported method: " + method.getName());
                             }
                         case "getContextPath":
-                            return null;
+                            return StringUtils.isNotBlank(context) ? context : null;
                         case "getScheme":
                             return "http";
                         case "getServerName":

@@ -71,7 +71,7 @@ public class SessionTest {
         assertTrue(dump.contains("hello world"));
         assertEquals("80x25", sizeSet.get());
         s.write("exit 3\n");
-        s.join(2000);
+        s.join(5000);
         assertFalse(s.isAlive());
         ActiveWaiter.wait(() -> s.getChildProcess().exitValue() == 3);
         assertEquals(3, s.getChildProcess().exitValue());

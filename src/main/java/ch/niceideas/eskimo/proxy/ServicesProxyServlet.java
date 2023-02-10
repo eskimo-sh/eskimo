@@ -116,6 +116,9 @@ public class ServicesProxyServlet extends ProxyServlet {
             return uri.substring(1, indexOfSlash);
         } else {
             int indexOfContextPath = uri.indexOf(configuredContextPath);
+            if (indexOfContextPath <= -1) {
+                throw new IllegalStateException("Couldn't find configured context " + configuredContextPath + " in URI " + uri);
+            }
             int startIndex = indexOfContextPath + configuredContextPath.length();
             if (!configuredContextPath.endsWith("/")) {
                 startIndex = startIndex + 1;
