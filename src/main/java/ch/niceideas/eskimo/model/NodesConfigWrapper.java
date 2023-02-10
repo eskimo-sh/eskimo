@@ -38,6 +38,7 @@ import ch.niceideas.common.exceptions.CommonRTException;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.SystemException;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.types.Node;
@@ -271,6 +272,10 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
                 .filter (value -> value != -1)
                 .sorted()
                 .collect(Collectors.toList());
+    }
+
+    public Node getFirstNode(ServiceDefinition serviceDef) {
+        return getFirstNode(serviceDef.toService());
     }
 
     public Node getFirstNode(Service service) {

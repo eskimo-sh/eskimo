@@ -1,10 +1,6 @@
 {
   "result": "OK",
   "messages": {
-    "restart_kafka_kubernetes": {
-      "lines": "LS0+IERvbmUgOiBFeGVjdXRpbmcgcmVzdGFydCBvZiBrYWZrYSBvbiAoa3ViZXJuZXRlcykKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQotLT4gQ29tcGxldGVkIFN1Y2Nlc3NmdWx5Lgo=",
-      "lastLine": 3
-    },
     "installation_spark-console_192-168-10-15": {
       "lines": "LS0+IERvbmUgOiBFeGVjdXRpbmcgaW5zdGFsbGF0aW9uIG9mIHNwYXJrLWNvbnNvbGUgb24gMTkyLjE2OC4xMC4xNQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCi0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",
       "lastLine": 3
@@ -12,6 +8,10 @@
     "Check--Install_Base-System_192-168-10-13": {
       "lines": "Q2hlY2tpbmcgLyBJbnN0YWxsaW5nIEJhc2Ugc3lzdGVtCkluc3RhbGxpbmcgVG9wb2xvZ3kgYW5kIHNldHRpbmdzCkNoZWNraW5nIC8gSW5zdGFsbGluZyBLdWJlcm5ldGVzCi0tPiBEb25lIDogRXhlY3V0aW5nIENoZWNrIC8gSW5zdGFsbCBvZiBCYXNlIFN5c3RlbSBvbiAxOTIuMTY4LjEwLjEzCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KLS0+IENvbXBsZXRlZCBTdWNjZXNzZnVseS4K",
       "lastLine": 6
+    },
+    "restart_kafka_kubernetes": {
+      "lines": "LS0+IERvbmUgOiBFeGVjdXRpbmcgcmVzdGFydCBvZiBrYWZrYSBvbiAoa3ViZXJuZXRlcykKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQotLT4gQ29tcGxldGVkIFN1Y2Nlc3NmdWx5Lgo=",
+      "lastLine": 3
     },
     "Check--Install_Base-System_192-168-10-15": {
       "lines": "Q2hlY2tpbmcgLyBJbnN0YWxsaW5nIEJhc2Ugc3lzdGVtCkluc3RhbGxpbmcgVG9wb2xvZ3kgYW5kIHNldHRpbmdzCkNoZWNraW5nIC8gSW5zdGFsbGluZyBLdWJlcm5ldGVzCi0tPiBEb25lIDogRXhlY3V0aW5nIENoZWNrIC8gSW5zdGFsbCBvZiBCYXNlIFN5c3RlbSBvbiAxOTIuMTY4LjEwLjE1Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KLS0+IENvbXBsZXRlZCBTdWNjZXNzZnVseS4K",
@@ -39,10 +39,6 @@
     },
     "installation_elasticsearch_192-168-10-13": {
       "lines": "LS0+IERvbmUgOiBFeGVjdXRpbmcgaW5zdGFsbGF0aW9uIG9mIGVsYXN0aWNzZWFyY2ggb24gMTkyLjE2OC4xMC4xMwotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCi0tPiBDb21wbGV0ZWQgU3VjY2Vzc2Z1bHkuCg==",
-      "lastLine": 3
-    },
-    "restart_kibana_kubernetes": {
-      "lines": "LS0+IERvbmUgOiBFeGVjdXRpbmcgcmVzdGFydCBvZiBraWJhbmEgb24gKGt1YmVybmV0ZXMpCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KLS0+IENvbXBsZXRlZCBTdWNjZXNzZnVseS4K",
       "lastLine": 3
     },
     "installation_elasticsearch_192-168-10-15": {
@@ -104,16 +100,12 @@
       "label": "Executing installation of spark-console on 192.168.10.15"
     },
     {
-      "operation": "restart_kafka_kubernetes",
-      "label": "Executing restart of kafka on (kubernetes)"
-    },
-    {
-      "operation": "restart_kibana_kubernetes",
-      "label": "Executing restart of kibana on (kubernetes)"
-    },
-    {
       "operation": "restart_logstash_kubernetes",
       "label": "Executing restart of logstash on (kubernetes)"
+    },
+    {
+      "operation": "restart_kafka_kubernetes",
+      "label": "Executing restart of kafka on (kubernetes)"
     },
     {
       "operation": "installation_zeppelin_192-168-10-15",
@@ -121,9 +113,9 @@
     }
   ],
   "status": {
-    "restart_kafka_kubernetes": "COMPLETE",
     "installation_spark-console_192-168-10-15": "COMPLETE",
     "Check--Install_Base-System_192-168-10-13": "COMPLETE",
+    "restart_kafka_kubernetes": "COMPLETE",
     "Check--Install_Base-System_192-168-10-15": "COMPLETE",
     "installation_zeppelin_192-168-10-15": "COMPLETE",
     "installation_kube-slave_192-168-10-13": "COMPLETE",
@@ -131,7 +123,6 @@
     "installation_spark-runtime_192-168-10-13": "COMPLETE",
     "installation_kube-master_192-168-10-15": "COMPLETE",
     "installation_elasticsearch_192-168-10-13": "COMPLETE",
-    "restart_kibana_kubernetes": "COMPLETE",
     "installation_elasticsearch_192-168-10-15": "COMPLETE",
     "restart_logstash_kubernetes": "COMPLETE",
     "installation_spark-runtime_192-168-10-15": "COMPLETE"

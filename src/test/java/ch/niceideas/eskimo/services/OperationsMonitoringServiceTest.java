@@ -287,7 +287,6 @@ public class OperationsMonitoringServiceTest {
         assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_spark-runtime_192-168-10-13"));
         assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_kube-master_192-168-10-15"));
         assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_elasticsearch_192-168-10-13"));
-        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.restart_kibana_kubernetes"));
         assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_elasticsearch_192-168-10-15"));
         assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.restart_logstash_kubernetes"));
         assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_spark-runtime_192-168-10-15"));

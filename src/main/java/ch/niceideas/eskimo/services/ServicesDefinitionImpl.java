@@ -348,9 +348,6 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                     Boolean depRestart = depObj.has("restart") ? depObj.getBoolean("restart") : null;
                     dependency.setRestart(depRestart == null || depRestart);
 
-                    Boolean dependentInstalledFirst = depObj.has("dependentInstalledFirst") ? depObj.getBoolean("dependentInstalledFirst") : null;
-                    dependency.setDependentInstalledFirst(dependentInstalledFirst != null && dependentInstalledFirst); // false by default
-
                     String conditionalDependency = depObj.has("conditional") ? depObj.getString("conditional") : null;
                     if (StringUtils.isNotBlank(conditionalDependency)) {
                         dependency.setConditionalDependency(Service.from(conditionalDependency));
@@ -787,27 +784,17 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
             return -1;
         }
 
-        // compare based on dependencies
-        if (one.getRelevantDependenciesCount() > other.getRelevantDependenciesCount()) {
+        // need to browse dependencies
+        if (one.hasInDependencyTree(other, this)) {
             return 1;
         }
-        if (one.getRelevantDependenciesCount() < other.getRelevantDependenciesCount()) {
+        if (other.hasInDependencyTree(one, this)) {
             return -1;
         }
 
-        // need to browse dependencies
-        for (Dependency dep : one.getDependencies()) {
-            if (dep.getMasterService().equals(other.toService()) && !dep.isDependentInstalledFirst()) {
-                return 1;
-            }
-        }
-        for (Dependency dep : other.getDependencies()) {
-            if (dep.getMasterService().equals(one.toService()) && !dep.isDependentInstalledFirst()) {
-                return -1;
-            }
-        }
+        // compare based on dependencies
+        return Integer.compare(one.getRelevantDependenciesCount(), other.getRelevantDependenciesCount());
 
-        return 0;
     }
 
     @Override

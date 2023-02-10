@@ -88,7 +88,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
 
         // 2. Find out about services that need to be uninstalled
 
-        for (Pair<Service, Node> installationPairs : servicesInstallStatus.getAllServiceAndNodeNameInstallationPairs()) {
+        for (Pair<Service, Node> installationPairs : servicesInstallStatus.getAllServiceNodeInstallationPairs()) {
 
             Service installedService = installationPairs.getKey();
             Node node = installationPairs.getValue();

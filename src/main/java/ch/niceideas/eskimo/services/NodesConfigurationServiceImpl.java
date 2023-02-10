@@ -218,7 +218,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
                         if (restart.getNode().equals(Node.KUBERNETES_FLAG)) {
                             node = Node.KUBERNETES_NODE;
                         }
-                        servicesInstallationStatus.setInstallationFlag(restart.getService(), node, "restart");
+                        servicesInstallationStatus.setInstallationFlagRestart(restart.getService(), node);
                     });
                 } catch (FileException | SetupException e) {
                     logger.error(e, e);
@@ -439,7 +439,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
     public void installService(AbstractStandardOperationId<?> operationId) throws SystemException {
         systemOperationService.applySystemOperation(operationId,
                 ml -> proceedWithServiceInstallation(ml, operationId.getNode(), operationId.getService()),
-                status -> status.setInstallationFlag(operationId.getService(), operationId.getNode(), "OK"));
+                status -> status.setInstallationFlagOK(operationId.getService(), operationId.getNode()));
     }
 
     @Override
@@ -455,13 +455,13 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
                             throw new SystemException (e);
                         }
                     },
-                    status -> status.setInstallationFlag(operationId.getService(), Node.KUBERNETES_NODE, "OK") );
+                    status -> status.setInstallationFlagOK(operationId.getService(), Node.KUBERNETES_NODE) );
 
         } else {
             systemOperationService.applySystemOperation(operationId,
                     ml -> ml.addInfo(sshCommandService.runSSHCommand(operationId.getNode(),
                             "sudo bash -c 'systemctl reset-failed " + operationId.getService() + " && systemctl restart " + operationId.getService() + "'")),
-                    status -> status.setInstallationFlag(operationId.getService(), operationId.getNode(), "OK"));
+                    status -> status.setInstallationFlagOK(operationId.getService(), operationId.getNode()));
         }
     }
 

@@ -97,32 +97,20 @@ public class ServiceInstallationSorterTest {
                 sis, StandardSetupHelpers.getStandard2NodesSetup()
         );
 
-        List<ServiceOperationsCommand.ServiceOperationId> group1 = orderedRestart.get(0);
-        assertEquals(2, group1.size());
-        assertEquals(Service.from("gluster"), group1.get(0).getService());
-        assertEquals(Node.fromAddress("192.168.10.11"), group1.get(0).getNode());
+        StringBuilder resultBuilder = new StringBuilder();
+        orderedRestart.forEach(
+                restartGroup -> restartGroup.forEach(
+                        serviceOpId -> resultBuilder.append (serviceOpId.toString()).append("\n"))
+        );
 
-        assertEquals(Service.from("gluster"), group1.get(1).getService());
-        assertEquals(Node.fromAddress("192.168.10.13"), group1.get(1).getNode());
 
-        List<ServiceOperationsCommand.ServiceOperationId> group2 = orderedRestart.get(1);
-        assertEquals(1, group2.size());
-        assertEquals(Service.from("kube-master"), group2.get(0).getService());
-        assertEquals(Node.fromAddress("192.168.10.11"), group2.get(0).getNode());
-
-        List<ServiceOperationsCommand.ServiceOperationId> group3 = orderedRestart.get(2);
-        assertEquals(2, group3.size());
-        assertEquals(Service.from("kube-slave"), group3.get(0).getService());
-        assertEquals(Node.fromAddress("192.168.10.11"), group3.get(0).getNode());
-
-        assertEquals(Service.from("kube-slave"), group3.get(1).getService());
-        assertEquals(Node.fromAddress("192.168.10.13"), group3.get(1).getNode());
-
-        List<ServiceOperationsCommand.ServiceOperationId> group4 = orderedRestart.get(3);
-        assertEquals(1, group4.size());
-        assertEquals(Service.from("cerebro"), group4.get(0).getService());
-        assertEquals(Node.KUBERNETES_FLAG, group4.get(0).getNode());
-
+        assertEquals("restart_gluster_192-168-10-11\n" +
+                "restart_gluster_192-168-10-13\n" +
+                "restart_kube-master_192-168-10-11\n" +
+                "restart_kube-slave_192-168-10-11\n" +
+                "restart_kube-slave_192-168-10-13\n" +
+                "restart_kibana_kubernetes\n" +
+                "restart_cerebro_kubernetes\n", resultBuilder.toString());
     }
 
     @Test
@@ -140,10 +128,7 @@ public class ServiceInstallationSorterTest {
         StringBuilder resultBuilder = new StringBuilder();
         orderedInstall.forEach(
                 installGroup -> installGroup.forEach(
-                        serviceOpId -> {
-                            resultBuilder.append (serviceOpId.toString()).append("\n");
-                        }
-                )
+                        serviceOpId -> resultBuilder.append (serviceOpId.toString()).append("\n"))
         );
 
         System.err.println (resultBuilder);
@@ -153,10 +138,10 @@ public class ServiceInstallationSorterTest {
         assertEquals("installation_ntp_192-168-10-11\n" +
                 "installation_ntp_192-168-10-13\n" +
                 "installation_zookeeper_192-168-10-13\n" +
-                "installation_gluster_192-168-10-11\n" +
-                "installation_gluster_192-168-10-13\n" +
                 "installation_etcd_192-168-10-11\n" +
                 "installation_etcd_192-168-10-13\n" +
+                "installation_gluster_192-168-10-11\n" +
+                "installation_gluster_192-168-10-13\n" +
                 "installation_kube-master_192-168-10-11\n" +
                 "installation_kube-slave_192-168-10-11\n" +
                 "installation_kube-slave_192-168-10-13\n", resultBuilder.toString());

@@ -47,10 +47,6 @@ import java.util.Map;
 
 public interface KubernetesService {
 
-    String STATUS_RUNNING = "Running";
-    String STATUS_TERMINATING = "Terminating";
-    String STATUS_CONTAINER_CREATING = "ContainerCreating";
-
     void showJournal(ServiceDefinition serviceDef, Node node) throws SystemException;
 
     void startService(ServiceDefinition serviceDef, Node node) throws SystemException;

@@ -189,7 +189,7 @@ public class KubernetesServiceTest {
 
         assertEquals(5, installList.size());
         assertEquals("" +
-                "spark-console,cerebro,kibana,kafka-manager,zeppelin", installList.stream().map(Service::getName).collect(Collectors.joining(",")));
+                "kibana,spark-console,cerebro,kafka-manager,zeppelin", installList.stream().map(Service::getName).collect(Collectors.joining(",")));
 
         List<Service> uninstallList = getUninstallations();
 

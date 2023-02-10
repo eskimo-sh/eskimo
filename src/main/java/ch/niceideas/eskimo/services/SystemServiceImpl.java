@@ -169,7 +169,7 @@ public class SystemServiceImpl implements SystemService {
             if (serviceDef.isKubernetes()) {
                 throw new UnsupportedOperationException("Showing kubernetes service journal for " + serviceDef.getName() + SHOULD_NOT_HAPPEN_FROM_HERE);
             } else {
-                return sshCommandService.runSSHCommand(node, "sudo journalctl -u " + serviceDef.getName());
+                return sshCommandService.runSSHCommand(node, "sudo journalctl -u " + serviceDef.getName() +" --no-pager");
             }
         });
     }
@@ -352,7 +352,7 @@ public class SystemServiceImpl implements SystemService {
                 } catch (KubernetesException e) {
                     logger.debug(e, e);
                     // workaround : flag all Kubernetes services as KO on kube node
-                    Node kubeNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterServiceDef().toService());
+                    Node kubeNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterServiceDef());
                     if (kubeNode != null) {
                         KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
                         for (Service service : servicesDefinition.listKubernetesServices()) {
@@ -588,7 +588,7 @@ public class SystemServiceImpl implements SystemService {
 
                 boolean changes = false;
 
-                for (Pair<Service, Node> installationPairs : servicesInstallationStatus.getAllServiceAndNodeNameInstallationPairs()) {
+                for (Pair<Service, Node> installationPairs : servicesInstallationStatus.getAllServiceNodeInstallationPairs()) {
 
                     Service savedService = installationPairs.getKey();
                     Node node = installationPairs.getValue();

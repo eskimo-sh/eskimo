@@ -45,7 +45,7 @@ import java.util.Arrays;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class MessagingManager extends AbstractInformationHolder<String, String> {
 
-    private static final int MAX_HISTORY_SIZE = 10000;
+    private static final int MAX_HISTORY_SIZE = 50000;
 
     @Override
     protected int getMaxHistorySize() {

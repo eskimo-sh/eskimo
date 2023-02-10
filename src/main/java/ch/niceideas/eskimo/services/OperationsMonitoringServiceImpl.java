@@ -163,11 +163,11 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
 
     @Override
     public void endCommand(boolean success) {
-        setLastOperationSuccess(success);
-        systemActionLock.unlock();
+        lastOperationSuccess = success;
         interruption.set(false);
         interruptionNotified.set(false);
 
+        systemActionLock.unlock();
         currentOperation = null;
     }
 
@@ -204,10 +204,6 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
     @Override
     public boolean getLastOperationSuccess() {
         return lastOperationSuccess;
-    }
-
-    private void setLastOperationSuccess(boolean success) {
-        lastOperationSuccess = success;
     }
 
     @Override
@@ -281,6 +277,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
         if (!isProcessingPending()) {
             throw new IllegalStateException(NO_OPERATION_GROUP_ERROR_MESSAGE);
         }
+        // only if not already completed in error
         if (!operationStatus.get(operationId).equals(OperationStatus.ERROR)) {
             operationStatus.put(operationId, OperationStatus.COMPLETE);
         }

@@ -244,19 +244,22 @@ public class Topology {
                 }
 
                 if (kubeServicesConfig == null || !kubeServicesConfig.isServiceInstallRequired(masterServiceDef.toService())) {
-                    throw new ServiceDefinitionException (SERVICE + " " + serviceDef.getName()
-                            + " defines a dependency on another kube service " + masterServiceDef.getName() + " but that service is not going to be installed.");
-                }
-                // XXX Dependeny on Kube-master is enforced already, we're left with checking that the dependency definition is not crazy
-                switch (dep.getMes()) {
-                    case SAME_NODE_OR_RANDOM:
-                    case RANDOM_NODE_AFTER:
-                    case RANDOM_NODE_AFTER_OR_SAME:
-                    case SAME_NODE:
-                        throw new ServiceDefinitionException (SERVICE + " " + serviceDef.getName()
-                                + " defines a dependency on another kube service " + masterServiceDef.getName() + " if type " + dep.getMes() + " which is not suppored");
-                    default:
-                        break;
+                    if (dep.isMandatory()) {
+                        throw new ServiceDefinitionException(SERVICE + " " + serviceDef.getName()
+                                + " defines a dependency on another kube service " + masterServiceDef.getName() + " but that service is not going to be installed.");
+                    }
+                } else {
+                    // XXX Dependeny on Kube-master is enforced already, we're left with checking that the dependency definition is not crazy
+                    switch (dep.getMes()) {
+                        case SAME_NODE_OR_RANDOM:
+                        case RANDOM_NODE_AFTER:
+                        case RANDOM_NODE_AFTER_OR_SAME:
+                        case SAME_NODE:
+                            throw new ServiceDefinitionException(SERVICE + " " + serviceDef.getName()
+                                    + " defines a dependency on another kube service " + masterServiceDef.getName() + " if type " + dep.getMes() + " which is not suppored");
+                        default:
+                            break;
+                    }
                 }
             } else {
                 defineMasters (dep, serviceDef, nodeNbr, nodesConfig);

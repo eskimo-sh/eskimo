@@ -248,6 +248,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
         Exception exception = assertThrows(Exception.class, () -> {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
+                put("gluster1", "on");
                 put("ntp1", "on");
             }});
 
@@ -258,7 +259,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
             js("callCheckKubernetesSetup(" + nodesConfig + "," + kubernetesConfig + ")");
         });
 
-        //logger.debug (exception.getMessage());
+        System.err.println (exception.getMessage());
 
         assertTrue(exception.getMessage().contains("Inconsistency found : Service spark-runtime expects 1 kube-master instance(s). But only 0 has been found !"));
     }

@@ -184,7 +184,7 @@ public class NodesConfigurationCheckerTest {
     }
 
     @Test
-    public void testMissingGluster() {
+    public void testMissingPrometheus() {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
@@ -203,7 +203,7 @@ public class NodesConfigurationCheckerTest {
             nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
-        assertEquals("Inconsistency found : service gluster is mandatory on all nodes but some nodes are lacking it.", exception.getMessage());
+        assertEquals("Inconsistency found : service prometheus is mandatory on all nodes but some nodes are lacking it.", exception.getMessage());
     }
 
     @Test
@@ -284,7 +284,7 @@ public class NodesConfigurationCheckerTest {
             nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
-        assertEquals("Inconsistency found : service gluster is mandatory on all nodes but some nodes are lacking it.", exception.getMessage());
+        assertEquals("Inconsistency found : Service kube-slave was expecting a service gluster on same node, but none were found !", exception.getMessage());
     }
 
     @Test

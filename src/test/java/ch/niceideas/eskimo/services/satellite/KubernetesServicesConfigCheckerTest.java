@@ -123,6 +123,7 @@ public class KubernetesServicesConfigCheckerTest {
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("ntp1", "on");
+            put("gluster1", "on");
             put("prometheus1", "on");
 
         }});

@@ -92,7 +92,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
     @Test
     public void testGetService() {
         assertJavascriptEquals("ntp", "eskimoServicesSelection.getService(1, 1).name");
-        assertJavascriptEquals("spark-runtime", "eskimoServicesSelection.getService(3, 3).name");
+        assertJavascriptEquals("spark-cli", "eskimoServicesSelection.getService(3, 3).name");
     }
 
     @Test
@@ -137,7 +137,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         js("eskimoServicesSelection.validateServicesSelection();");
 
-        assertJavascriptEquals("{\"ntp1\":\"on\",\"zookeeper\":\"1\",\"kube-slave1\":\"on\",\"gluster1\":\"on\",\"prometheus1\":\"on\",\"etcd1\":\"on\",\"kube-master\":\"1\"}", "JSON.stringify (result)");
+        assertJavascriptEquals("{\"ntp1\":\"on\",\"zookeeper\":\"1\",\"gluster1\":\"on\",\"kube-master\":\"1\",\"prometheus1\":\"on\",\"etcd1\":\"on\",\"kube-slave1\":\"on\"}", "JSON.stringify (result)");
     }
 
     @Test
@@ -153,6 +153,6 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         js("eskimoServicesSelection.validateServicesSelection();");
 
-        assertJavascriptEquals("{\"ntp\":\"on\",\"zookeeper\":\"on\",\"kube-slave\":\"on\",\"gluster\":\"on\",\"prometheus\":\"on\",\"etcd\":\"on\",\"kube-master\":\"on\"}", "JSON.stringify (result)");
+        assertJavascriptEquals("{\"ntp\":\"on\",\"zookeeper\":\"on\",\"gluster\":\"on\",\"kube-master\":\"on\",\"prometheus\":\"on\",\"etcd\":\"on\",\"kube-slave\":\"on\"}", "JSON.stringify (result)");
     }
 }

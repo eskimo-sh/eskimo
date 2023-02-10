@@ -149,12 +149,7 @@ public class ServiceDefinition {
 
     public int getRelevantDependenciesCount() {
         return (int) dependencies.stream()
-                .filter(dep ->
-                           !dep.getMasterService().equals(this.toService())
-                        // FIXME WTF ?!?
-                        //&& !dep.getMasterService().equals(NodesConfigWrapper.NODE_ID_FIELD)
-                        && !dep.isDependentInstalledFirst()
-                )
+                .filter(dep -> !dep.getMasterService().equals(this.toService()) )
                 .count();
     }
 
@@ -245,5 +240,23 @@ public class ServiceDefinition {
 
     public boolean isUiService() {
         return getUiConfig() != null && StringUtils.isNotBlank(getUiConfig().getTitle());
+    }
+
+    public boolean hasInDependencyTree(ServiceDefinition other, ServicesDefinition servicesDefinition) {
+        return hasInDependencyTree(other, servicesDefinition, new HashSet<>());
+    }
+
+    private boolean hasInDependencyTree(ServiceDefinition other, ServicesDefinition servicesDefinition, Set<Service> serviceSet) {
+        serviceSet.add (this.toService());
+        for (Dependency dep : getDependencies()) {
+            if (dep.getMasterService().equals(other.toService())) {
+                return true;
+            }
+            if (!serviceSet.contains(dep.getMasterService())
+                && servicesDefinition.getServiceDefinition(dep.getMasterService()).hasInDependencyTree(other, servicesDefinition, serviceSet)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

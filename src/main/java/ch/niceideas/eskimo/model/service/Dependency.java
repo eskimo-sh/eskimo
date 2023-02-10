@@ -59,9 +59,6 @@ public class Dependency {
     @Getter @Setter
     private boolean restart = true; // default is true
 
-    @Getter @Setter
-    private boolean dependentInstalledFirst = false; // false by default
-
     private Service conditionalDependency = null;
 
     public boolean isMandatory(ConfigurationOwner wrapper) {

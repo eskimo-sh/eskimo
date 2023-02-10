@@ -96,7 +96,7 @@ public class WebCommandServlet extends HttpServlet {
 
             // 3. Find node running target service
             ServicesInstallStatusWrapper installStatus = configurationService.loadServicesInstallationStatus();
-            Node serviceNode = installStatus.getFirstNode(webCommand.getServiceDef().toService());
+            Node serviceNode = installStatus.getFirstNode(webCommand.getServiceDef());
             if (serviceNode == null) {
                 throw new IllegalStateException("Couldn't find any node running servuce " + webCommand.getServiceDef().getName());
             }

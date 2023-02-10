@@ -251,10 +251,10 @@ public class KubernetesServicesConfigControllerTest {
                         "    \"uninstallations\": [],\n" +
                         "    \"restarts\": [\n" +
                         "      \"elasticsearch\",\n" +
+                        "      \"kibana\",\n" +
                         "      \"spark-runtime\",\n" +
                         "      \"spark-console\",\n" +
                         "      \"cerebro\",\n" +
-                        "      \"kibana\",\n" +
                         "      \"logstash\",\n" +
                         "      \"kafka\",\n" +
                         "      \"kafka-manager\",\n" +

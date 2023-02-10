@@ -173,8 +173,8 @@ public class NodesConfigControllerTest {
         HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
         ServicesInstallStatusWrapper serviceInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        serviceInstallStatus.setInstallationFlag(Service.from("kafka-cli"), Node.fromName("192-168-10-11"), "OK");
-        serviceInstallStatus.setInstallationFlag(Service.from("kafka-cli"), Node.fromName("192-168-10-13"), "OK");
+        serviceInstallStatus.setInstallationFlagOK(Service.from("kafka-cli"), Node.fromName("192-168-10-11"));
+        serviceInstallStatus.setInstallationFlagOK(Service.from("kafka-cli"), Node.fromName("192-168-10-13"));
         configurationServiceTest.saveServicesInstallationStatus(serviceInstallStatus);
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
@@ -219,15 +219,17 @@ public class NodesConfigControllerTest {
                 "      {\"kube-slave\": \"192.168.10.11\"},\n" +
                 "      {\"kube-slave\": \"192.168.10.13\"},\n" +
                 "      {\"spark-console\": \"(kubernetes)\"},\n" +
+                "      {\"spark-runtime\": \"(kubernetes)\"},\n" +
                 "      {\"logstash\": \"(kubernetes)\"},\n" +
+                "      {\"kafka\": \"(kubernetes)\"},\n" +
                 "      {\"zeppelin\": \"(kubernetes)\"}\n" +
                 "    ],\n" +
                 "    \"uninstallations\": [],\n" +
                 "    \"installations\": [\n" +
-                "      {\"gluster\": \"192.168.10.11\"},\n" +
-                "      {\"gluster\": \"192.168.10.13\"},\n" +
                 "      {\"etcd\": \"192.168.10.11\"},\n" +
-                "      {\"etcd\": \"192.168.10.13\"}\n" +
+                "      {\"etcd\": \"192.168.10.13\"},\n" +
+                "      {\"gluster\": \"192.168.10.11\"},\n" +
+                "      {\"gluster\": \"192.168.10.13\"}\n" +
                 "    ]\n" +
                 "  },\n" +
                 "  \"status\": \"OK\"\n" +

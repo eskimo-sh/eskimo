@@ -198,7 +198,7 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
                 logger.error(e, e);
                 throw new ConnectionManagerException(e.getMessage(), e);
             }
-            effNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterServiceDef().toService());
+            effNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterServiceDef());
             if (effNode == null) {
                 throw new ConnectionManagerException("Asked for kube master runtime node, but it couldn't be found in installation status");
             }

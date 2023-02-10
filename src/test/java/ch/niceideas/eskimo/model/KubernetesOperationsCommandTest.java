@@ -147,8 +147,8 @@ public class KubernetesOperationsCommandTest {
                 "    \"zeppelin\"\n" +
                 "  ],\n" +
                 "  \"installations\": [\n" +
-                "    \"cerebro\",\n" +
-                "    \"kibana\"\n" +
+                "    \"kibana\",\n" +
+                "    \"cerebro\"\n" +
                 "  ]\n" +
                 "}", moc.toJSON().toString(2));
     }
@@ -179,17 +179,17 @@ public class KubernetesOperationsCommandTest {
 
         List<KubernetesOperationsCommand.KubernetesOperationId> opInOrder = moc.getAllOperationsInOrder(null);
 
-        assertEquals ("installation_Topology-All-Nodes," +
-                        "installation_cerebro," +
-                        "installation_kibana," +
-                        "uninstallation_kafka-manager," +
-                        "uninstallation_zeppelin," +
-                        "restart_elasticsearch," +
-                        "restart_spark-runtime," +
-                        "restart_spark-console," +
-                        "restart_logstash," +
+        assertEquals ("installation_Topology-All-Nodes\n" +
+                        "installation_kibana\n" +
+                        "installation_cerebro\n" +
+                        "uninstallation_kafka-manager\n" +
+                        "uninstallation_zeppelin\n" +
+                        "restart_elasticsearch\n" +
+                        "restart_spark-runtime\n" +
+                        "restart_spark-console\n" +
+                        "restart_logstash\n" +
                         "restart_kafka",
-                opInOrder.stream().map(KubernetesOperationsCommand.KubernetesOperationId::toString).collect(Collectors.joining(",")));
+                opInOrder.stream().map(KubernetesOperationsCommand.KubernetesOperationId::toString).collect(Collectors.joining("\n")));
     }
 
     @Test

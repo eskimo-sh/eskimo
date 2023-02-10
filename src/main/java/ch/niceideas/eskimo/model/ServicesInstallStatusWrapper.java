@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.*;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
@@ -145,7 +146,7 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
         );
     }
 
-    public List<Pair<Service, Node>> getAllServiceAndNodeNameInstallationPairs() {
+    public List<Pair<Service, Node>> getAllServiceNodeInstallationPairs() {
         return getRootKeys().stream()
                 .filter(key -> key.contains(INSTALLED_ON_IP_FLAG))
                 .map(ServicesInstallStatusWrapper::parseInstallStatusFlag)
@@ -157,7 +158,15 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
         removeRootKey(service + INSTALLED_ON_IP_FLAG + node.getName());
     }
 
-    public void setInstallationFlag (Service service, Node node, String flag) {
+    public void setInstallationFlagOK (Service service, Node node) {
+        setValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName(), "OK");
+    }
+
+    public void setInstallationFlagRestart (Service service, Node node) {
+        setValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName(), "restart");
+    }
+
+    private void setInstallationFlag (Service service, Node node, String flag) {
         setValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName(), flag);
     }
 
@@ -168,6 +177,10 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
                 .filter(key -> !key.equals(Node.KUBERNETES_NODE.getName()))
                 .map(Node::fromName)
                 .collect(Collectors.toSet());
+    }
+
+    public Node getFirstNode(ServiceDefinition serviceDef) {
+        return getFirstNode(serviceDef.toService());
     }
 
     public Node getFirstNode(Service service) {

@@ -120,7 +120,7 @@ public class SystemServiceTest {
     @Test
     public void testShowJournal() throws Exception {
         systemService.showJournal(servicesDefinition.getServiceDefinition(Service.from("ntp")), Node.fromAddress("192.168.10.11"));
-        assertEquals ("sudo journalctl -u ntp", sshCommandServiceTest.getExecutedCommands().trim());
+        assertEquals ("sudo journalctl -u ntp --no-pager", sshCommandServiceTest.getExecutedCommands().trim());
     }
 
     @Test

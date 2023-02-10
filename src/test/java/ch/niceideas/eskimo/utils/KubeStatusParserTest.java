@@ -145,19 +145,19 @@ public class KubeStatusParserTest {
 
         KubeStatusParser parser = new KubeStatusParser(allPodStatus, allServicesStatus, registryServices, sd);
 
-        List<Pair<Node, String>>  kafkaNodes = parser.getPodNodesAndStatus(Service.from("kafka"));
+        List<Pair<Node, KubeStatusParser.KubernetesServiceStatus>>  kafkaNodes = parser.getPodNodesAndStatus(Service.from("kafka"));
         assertEquals (4, kafkaNodes.size());
 
         assertEquals(Node.fromAddress("192.168.56.24"), kafkaNodes.get(0).getKey());
-        assertEquals("CrashLoopBackOff", kafkaNodes.get(0).getValue());
+        assertEquals(KubeStatusParser.KubernetesServiceStatus.__STATUS_CRASH_LOOP_BACK_OFF, kafkaNodes.get(0).getValue());
 
         assertEquals(Node.fromAddress("192.168.56.22"), kafkaNodes.get(1).getKey());
-        assertEquals("Running", kafkaNodes.get(1).getValue());
+        assertEquals(KubeStatusParser.KubernetesServiceStatus.RUNNING, kafkaNodes.get(1).getValue());
 
         assertEquals(Node.fromAddress("192.168.56.21"), kafkaNodes.get(3).getKey());
-        assertEquals("Error", kafkaNodes.get(3).getValue());
+        assertEquals(KubeStatusParser.KubernetesServiceStatus.__STATUS_ERROR, kafkaNodes.get(3).getValue());
 
-        List<Pair<Node, String>>  kafkaManagerNodes = parser.getPodNodesAndStatus(Service.from("kafka-manager"));
+        List<Pair<Node, KubeStatusParser.KubernetesServiceStatus>>  kafkaManagerNodes = parser.getPodNodesAndStatus(Service.from("kafka-manager"));
         assertEquals (1, kafkaManagerNodes.size());
 
     }
@@ -170,34 +170,34 @@ public class KubeStatusParserTest {
         ServiceDefinition coreDnsSrv = new ServiceDefinition();
         coreDnsSrv.setName("coredns");
         coreDnsSrv.setUnique(true);
-        Pair<Node, String> srnCoredns = parser.getServiceRuntimeNode(coreDnsSrv, Node.fromAddress("111.111.111.111"));
+        Pair<Node, KubeStatusParser.KubernetesServiceStatus> srnCoredns = parser.getServiceRuntimeNode(coreDnsSrv, Node.fromAddress("111.111.111.111"));
         assertNotNull (srnCoredns);
         assertNull(srnCoredns.getKey());
-        assertEquals ("notOK", srnCoredns.getValue());
+        assertEquals (KubeStatusParser.KubernetesServiceStatus.NOT_OK, srnCoredns.getValue());
 
         ServiceDefinition cerebroSrv = new ServiceDefinition();
         cerebroSrv.setName("cerebro");
         cerebroSrv.setUnique(true);
-        Pair<Node, String> srnCerebro = parser.getServiceRuntimeNode(cerebroSrv, Node.fromAddress("111.111.111.111"));
+        Pair<Node, KubeStatusParser.KubernetesServiceStatus> srnCerebro = parser.getServiceRuntimeNode(cerebroSrv, Node.fromAddress("111.111.111.111"));
         assertNotNull (srnCerebro);
         assertEquals (Node.fromAddress("111.111.111.111"), srnCerebro.getKey());
-        assertEquals ("notOK", srnCerebro.getValue());
+        assertEquals (KubeStatusParser.KubernetesServiceStatus.NOT_OK, srnCerebro.getValue());
 
         ServiceDefinition elasticsearchSrv = new ServiceDefinition();
         elasticsearchSrv.setName("elasticsearch");
         elasticsearchSrv.setUnique(false);
-        Pair<Node, String> srnES = parser.getServiceRuntimeNode(elasticsearchSrv, Node.fromAddress("111.111.111.111"));
+        Pair<Node, KubeStatusParser.KubernetesServiceStatus> srnES = parser.getServiceRuntimeNode(elasticsearchSrv, Node.fromAddress("111.111.111.111"));
         assertNotNull (srnES);
         assertEquals (Node.fromAddress("111.111.111.111"), srnES.getKey());
-        assertEquals ("Running", srnES.getValue());
+        assertEquals (KubeStatusParser.KubernetesServiceStatus.RUNNING, srnES.getValue());
 
         ServiceDefinition kubeDasboardSrv = new ServiceDefinition();
         kubeDasboardSrv.setName("kubernetes-dashboard");
         kubeDasboardSrv.setUnique(false);
-        Pair<Node, String> srnKubeDasboardSrv = parser.getServiceRuntimeNode(kubeDasboardSrv, Node.fromAddress("111.111.111.111"));
+        Pair<Node, KubeStatusParser.KubernetesServiceStatus> srnKubeDasboardSrv = parser.getServiceRuntimeNode(kubeDasboardSrv, Node.fromAddress("111.111.111.111"));
         assertNotNull (srnKubeDasboardSrv);
         assertEquals (Node.fromAddress("111.111.111.111"), srnKubeDasboardSrv.getKey());
-        assertEquals ("Running", srnKubeDasboardSrv.getValue());
+        assertEquals (KubeStatusParser.KubernetesServiceStatus.RUNNING, srnKubeDasboardSrv.getValue());
     }
 
 
@@ -206,29 +206,29 @@ public class KubeStatusParserTest {
 
         KubeStatusParser parser = new KubeStatusParser(allPodStatus, allServicesStatus, registryServices, sd);
 
-        List<Pair<Node, String>> coreDnsNodes = parser.getServiceRuntimeNodes(Service.from("coredns"));
+        List<Pair<Node, KubeStatusParser.KubernetesServiceStatus>> coreDnsNodes = parser.getServiceRuntimeNodes(Service.from("coredns"));
         assertNotNull (coreDnsNodes);
         assertEquals (1, coreDnsNodes.size());
         assertEquals (Node.fromAddress("192.168.56.23"), coreDnsNodes.get(0).getKey());
-        assertEquals ("Running", coreDnsNodes.get(0).getValue());
+        assertEquals (KubeStatusParser.KubernetesServiceStatus.RUNNING, coreDnsNodes.get(0).getValue());
 
-        List<Pair<Node, String>> cerebroNodes = parser.getServiceRuntimeNodes(Service.from("cerebro"));
+        List<Pair<Node, KubeStatusParser.KubernetesServiceStatus>> cerebroNodes = parser.getServiceRuntimeNodes(Service.from("cerebro"));
         assertNotNull (cerebroNodes);
         assertEquals (1, cerebroNodes.size());
         assertEquals (Node.fromAddress("192.168.56.23"), cerebroNodes.get(0).getKey());
-        assertEquals ("Error", cerebroNodes.get(0).getValue());
+        assertEquals (KubeStatusParser.KubernetesServiceStatus.__STATUS_ERROR, cerebroNodes.get(0).getValue());
 
-        List<Pair<Node, String>> esNodes = parser.getServiceRuntimeNodes(Service.from("elasticsearch"));
+        List<Pair<Node, KubeStatusParser.KubernetesServiceStatus>> esNodes = parser.getServiceRuntimeNodes(Service.from("elasticsearch"));
         assertNotNull (esNodes);
         assertEquals (3, esNodes.size());
         assertEquals (Node.fromAddress("192.168.56.21"), esNodes.get(0).getKey());
-        assertEquals ("Error", esNodes.get(0).getValue());
+        assertEquals (KubeStatusParser.KubernetesServiceStatus.__STATUS_ERROR, esNodes.get(0).getValue());
 
         assertEquals (Node.fromAddress("192.168.56.22"), esNodes.get(1).getKey());
-        assertEquals ("Running", esNodes.get(1).getValue());
+        assertEquals (KubeStatusParser.KubernetesServiceStatus.RUNNING, esNodes.get(1).getValue());
 
         assertEquals (Node.fromAddress("192.168.56.23"), esNodes.get(2).getKey());
-        assertEquals ("Running", esNodes.get(2).getValue());
+        assertEquals (KubeStatusParser.KubernetesServiceStatus.RUNNING, esNodes.get(2).getValue());
     }
 
 
