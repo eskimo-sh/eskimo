@@ -51,7 +51,7 @@ fi
 
 saved_dir=$(pwd)
 function returned_to_saved_dir() {
-     cd $saved_dir || true
+     cd $saved_dir || return
 }
 trap returned_to_saved_dir 15
 trap returned_to_saved_dir EXIT

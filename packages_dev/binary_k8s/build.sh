@@ -51,7 +51,7 @@ cleanup() {
     #rm -f Vagrantfile
     #rm -f ssh_key
     #rm -f ssh_key.pub
-    cd $saved_dir
+    cd $saved_dir || return
 }
 trap cleanup 15
 trap cleanup EXIT
