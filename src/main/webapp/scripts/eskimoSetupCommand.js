@@ -189,8 +189,8 @@ eskimo.SetupCommand = function() {
                 },
 
                 error: (jqXHR, status) => {
-                    errorHandler(jqXHR, status);
                     that.eskimoMain.scheduleStopOperationInProgress(false);
+                    errorHandler(jqXHR, status);
                 }
             });
         }

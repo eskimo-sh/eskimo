@@ -393,8 +393,8 @@ eskimo.SystemStatus = function() {
                 console.log(data);
 
                 if (!data || data.error) {
-                    console.error(data.error);
                     that.eskimoMain.scheduleStopOperationInProgress (false);
+                    console.error(data.error);
                 } else {
                     that.eskimoMain.scheduleStopOperationInProgress (true);
 
@@ -405,8 +405,8 @@ eskimo.SystemStatus = function() {
             },
 
             error: (jqXHR, status) => {
-                errorHandler (jqXHR, status);
                 that.eskimoMain.scheduleStopOperationInProgress (false);
+                errorHandler (jqXHR, status);
             }
         });
     }
@@ -1129,7 +1129,7 @@ eskimo.SystemStatus = function() {
 
                 } else {                         // if backend says there is nothing going on
                     if (that.eskimoMain.isOperationInProgress()  // but frontend still things there is ...
-                            && that.eskimoMain.isOperationInProgressOwner()) {  // ... and if that is my fault
+                            && that.eskimoMain.isOperationInProgressRecovery()) {  // ... and if that is my fault (because of the above)
                         that.fetchOperationResult();
                     }
                 }

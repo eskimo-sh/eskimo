@@ -68,7 +68,7 @@ eskimo.Main = function() {
     let eskimoAlert = null;
 
     let operationInProgress = false;
-    let operationInProgressOwner = false;
+    let operationInProgressRecovery = false;
 
     let userRoles = [];
     let userId = "";
@@ -295,10 +295,10 @@ eskimo.Main = function() {
     }
     this.isOperationInProgress = isOperationInProgress;
 
-    function isOperationInProgressOwner() {
-        return operationInProgressOwner;
+    function isOperationInProgressRecovery() {
+        return operationInProgressRecovery;
     }
-    this.isOperationInProgressOwner = isOperationInProgressOwner;
+    this.isOperationInProgressRecovery = isOperationInProgressRecovery;
 
     function setOperationInProgress (pendingOp) {
         operationInProgress = pendingOp;
@@ -326,7 +326,7 @@ eskimo.Main = function() {
     function recoverOperationInProgress() {
         if (!isOperationInProgress()) { // but frontend has no clue
             startOperationInProgress();
-            operationInProgressOwner = true;
+            operationInProgressRecovery = true;
             eskimoOperations.showOperations();
         }
     }

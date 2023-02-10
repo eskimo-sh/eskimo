@@ -311,6 +311,8 @@ eskimo.Operations = function() {
         $("#operations-table-body").html("");
         $("#operations-global-messages").html("");
 
+        messagesStore = {};
+
         $("#operations-title").html("<h3>Operations pending ....</h3>");
 
         operationsPollingHandle = setTimeout(

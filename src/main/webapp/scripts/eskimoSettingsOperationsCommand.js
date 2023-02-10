@@ -164,16 +164,16 @@ eskimo.SettingsOperationsCommand = function() {
                     }
 
                     if (!data || data.error) {
-                        console.error(atob(data.error));
                         that.eskimoMain.scheduleStopOperationInProgress(false);
+                        console.error(atob(data.error));
                     } else {
                         that.eskimoMain.scheduleStopOperationInProgress(true);
                     }
                 },
 
                 error: (jqXHR, status) => {
-                    errorHandler(jqXHR, status);
                     that.eskimoMain.scheduleStopOperationInProgress(false);
+                    errorHandler(jqXHR, status);
                 }
             });
         }
