@@ -70,12 +70,12 @@ take_lock() {
     local ESKIMO_LOCK_HANDLE=$(shuf -i 600-1023 -n 1)
     local ESKIMO_LOCK_FILE="$LOCK_FOLDER/""$LOCK_NAME""_.lock"
 
-    eval "exec $ESKIMO_LOCK_HANDLE>$ESKIMO_LOCK_FILE" || (echo "Couldn't take handle on lock file" && exit 3)
+    eval "exec $ESKIMO_LOCK_HANDLE>$ESKIMO_LOCK_FILE" || (echo "Couldn't take handle on lock file" && return 3)
 
     if [[ "$NON_BLOCK" == "true" ]]; then
-        flock -n $ESKIMO_LOCK_HANDLE || (echo "Couldn't flock file handle - $1 $2 $3" && exit 4)
+        flock -n $ESKIMO_LOCK_HANDLE || (echo "Couldn't flock file handle - $1 $2 $3" && return 4)
     else
-        flock -w 300 $ESKIMO_LOCK_HANDLE || (echo "Couldn't flock file handle - $1 $2 $3" && exit 4)
+        flock -w 300 $ESKIMO_LOCK_HANDLE || (echo "Couldn't flock file handle - $1 $2 $3" && return 5)
     fi
 
     export LAST_LOCK_HANDLE="$ESKIMO_LOCK_HANDLE:$ESKIMO_LOCK_FILE"
@@ -106,7 +106,7 @@ release_lock() {
         return 3
     fi
 
-    flock -u $ESKIMO_LOCK_HANDLE || (echo "Couldn't UN-flock file handle" && exit 4)
+    flock -u $ESKIMO_LOCK_HANDLE || (echo "Couldn't UN-flock file handle" && return 4)
 }
 
 __release_global_lock() {

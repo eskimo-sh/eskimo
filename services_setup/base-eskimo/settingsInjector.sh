@@ -82,20 +82,20 @@ function injectRegexProperty () {
 
     echoDebug "injectRegexProperty $SERVICE $filename $propertyFormat $commentPrefix $name"
 
-    export sedName=$(echo $name | sed -e 's/\[\]\/\-$*^/\\&/g')
+    local sedName=$(echo $name | sed -e 's/\[\]\/\-$*^/\\&/g')
     echoDebug "sedName=$sedName"
 
-    export sedValue=$(echo $value | sed -e 's/\[\]\/\-$*^/\\&/g')
+    local sedValue=$(echo $value | sed -e 's/\[\]\/\-$*^/\\&/g')
     echoDebug "sedValue=$sedValue"
 
-    export sedPattern=$(echo $propertyFormat | sed s/"{value}"/"[a-zA-Z0-9"'\\'"\-]*"/ | sed s/"{name}"/'\\'"\("$sedName'\\'"\)"/)
+    local sedPattern=$(echo $propertyFormat | sed s/"{value}"/"[a-zA-Z0-9"'\\'"\-]*"/ | sed s/"{name}"/'\\'"\("$sedName'\\'"\)"/)
     echoDebug "sedPattern=$sedPattern"
 
     # XXX Dunno why $() notation doesn't work here
-    export sedReplace=`echo $propertyFormat | sed s/"{value}"// | sed s/"{name}"/'\\''\1'/`
+    local sedReplace=`echo $propertyFormat | sed s/"{value}"// | sed s/"{name}"/'\\''\1'/`
     echoDebug "sedReplace=$sedReplace"
 
-    export searchedResult=$(echo $propertyFormat | sed "s/{value}/$value/g" | sed "s/{name}/$name/g")
+    local searchedResult=$(echo $propertyFormat | sed "s/{value}/$value/g" | sed "s/{name}/$name/g")
     echoDebug "searchedResult=$searchedResult"
 
     # Search for $filename under /usr/local/lib/$SERVICE
@@ -133,7 +133,7 @@ function injectRegexProperty () {
 
         fi
 
-        export freeValue=$(echo $searchedResult | sed -e 's/[]\/$*^[]/\\&/g')
+        local freeValue=$(echo $searchedResult | sed -e 's/[]\/$*^[]/\\&/g')
         echoDebug "freeValue=$freeValue"
 
         # Assess it's found as expected (using propertyFormat)
@@ -150,24 +150,24 @@ function injectRegexProperty () {
 
 
 function injectVariableProperty () {
-    SERVICE=$1
-    filename=$2
-    propertyFormat=$3
-    commentPrefix=$4
-    filesystemService=$5
-    name=$6
-    value=$7
+    local SERVICE=$1
+    local filename=$2
+    local propertyFormat=$3
+    local commentPrefix=$4
+    local filesystemService=$5
+    local name=$6
+    local value=$7
 
     echoDebug "injectVariableProperty $SERVICE $filename $propertyFormat $commentPrefix $name"
 
-    export sedValue=$(echo $value | sed -e 's/[]\/$*^[]/\\&/g')
+    local sedValue=$(echo $value | sed -e 's/[]\/$*^[]/\\&/g')
     echoDebug "sedValue=$sedValue"
 
     # Search for $filename under /usr/local/lib/$SERVICE
     for i in $(find $SETTING_ROOT_FOLDER/$filesystemService/ -name $filename ); do
         echo "     == processing $i"
 
-        export searchedResult=""
+        local searchedResult=""
         # replace variable if found
         found=0
 
@@ -232,7 +232,7 @@ function injectVariableProperty () {
 
         fi
 
-        export freeValue=`echo $searchedResult | sed -e 's/[]\/$*^[]/\\&/g'`
+        local freeValue=`echo $searchedResult | sed -e 's/[]\/$*^[]/\\&/g'`
 
         # Assess it's found as expected (using propertyFormat)
         if [[ $(grep "^$freeValue" $i) == "" ]]; then

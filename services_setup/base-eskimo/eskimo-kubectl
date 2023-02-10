@@ -121,17 +121,17 @@ function get_multiple_service_pod() {
         echo "ERROR: get_multiple_service_pod takes service as first argument"
         exit 1
     fi
-    SERVICE=$1
+    local SERVICE=$1
 
     if [[ "$2" == "" ]]; then
         echo "ERROR: get_multiple_service_pod takes node as second argument"
         exit 2
     fi
-    NODE=$2
+    local NODE=$2
 
-    export IS_MULTIPLE=
+    local IS_MULTIPLE=""
     if [[ $(echo "$MULTIPLE_SERVICES_NAMES" | grep $SERVICE) ]]; then
-        export IS_MULTIPLE=true
+        IS_MULTIPLE=true
     fi
 
     if [[ ! $IS_MULTIPLE ]] ; then
@@ -167,19 +167,20 @@ function get_pod() {
         echo "ERROR: get_pod takes service as first argument"
         exit 1
     fi
-    SERVICE=$1
+    local SERVICE=$1
 
     if [[ "$2" == "" ]]; then
         echo "ERROR: get_pod takes node as second argument"
         exit 2
     fi
-    NODE=$2
+    local NODE=$2
 
-    IS_MULTIPLE=
+    local IS_MULTIPLE=""
     if [[ $(echo "$MULTIPLE_SERVICES_NAMES" | grep $SERVICE) ]]; then
         IS_MULTIPLE=true
     fi
 
+    local POD
     if [[ $IS_MULTIPLE ]]; then
         POD=$(get_multiple_service_pod $SERVICE $NODE)
     else
@@ -201,7 +202,7 @@ function get_namespace() {
         echo "ERROR: get_namespace takes pod as first argument"
         exit 1
     fi
-    POD=$1
+    local POD=$1
 
     NAMESPACE=$(call-kubectl get pod --all-namespaces -o custom-columns=NAME:metadata.name,NAMESPACE:metadata.namespace | grep $POD | sed 's/  \+/ /g' | cut -d ' ' -f 2)
     if [[ "$NAMESPACE" == "" ]]; then
@@ -219,17 +220,17 @@ function show_log() {
         echo "show_log takes service as first argument"
         exit 1
     fi
-    SERVICE=$1
+    local SERVICE=$1
 
     if [[ "$2" == "" ]]; then
         echo "show_log takes node as second argument"
         exit 1
     fi
-    NODE=$2
+    local NODE=$2
 
     echo " - Showing logs for Service $SERVICE on $NODE"
 
-    POD=$(get_pod $SERVICE $NODE)
+    local POD=$(get_pod $SERVICE $NODE)
     if [[ $POD == "" || $(echo $POD | grep "ERROR") != "" ]]; then
         echo "ERROR: Couldn't get POD"
         echo "$POD"
@@ -238,7 +239,7 @@ function show_log() {
 
     echo "   + POD is $POD"
 
-    NAMESPACE=$(get_namespace $POD)
+    local NAMESPACE=$(get_namespace $POD)
     if [[ $NAMESPACE == "" || $(echo $NAMESPACE | grep "ERROR") != "" ]]; then
         echo "ERROR: Couldn't get NAMESPACE"
         echo "$NAMESPACE"
@@ -257,11 +258,11 @@ function uninstall_service() {
         echo "uninstall_service takes service as first argument"
         exit 1
     fi
-    SERVICE=$1
+    local SERVICE=$1
 
     echo " - Uninstall Service $SERVICE"
 
-    SERVICE_FILE=/var/lib/eskimo/kube-services/$SERVICE.k8s.yaml
+    local SERVICE_FILE=/var/lib/eskimo/kube-services/$SERVICE.k8s.yaml
     if [[ $TEST_MODE != "true" && ! -f $SERVICE_FILE ]]; then
         echo "File $SERVICE_FILE can't be found !";
         exit 2
@@ -281,11 +282,11 @@ function restart_service() {
         echo "restart_service takes service as first argument"
         exit 1
     fi
-    SERVICE=$1
+    local SERVICE=$1
 
     echo " - Restart Service $SERVICE"
 
-    SERVICE_FILE=/var/lib/eskimo/kube-services/$SERVICE.k8s.yaml
+    local SERVICE_FILE=/var/lib/eskimo/kube-services/$SERVICE.k8s.yaml
 
     if [[ $TEST_MODE == "true" || -f $SERVICE_FILE ]]; then
         echo "   + Deleting $SERVICE"
@@ -309,16 +310,16 @@ function stop_service() {
         echo "show_log takes service as first argument"
         exit 1
     fi
-    SERVICE=$1
+    local SERVICE=$1
 
     echo " - Stopping Service $SERVICE"
 
-    IS_MULTIPLE=
+    local IS_MULTIPLE=""
     if [[ $(echo "$MULTIPLE_SERVICES_NAMES" | grep $SERVICE) ]]; then
         IS_MULTIPLE=true
     fi
 
-    POD=$(get_pod $SERVICE $NODE)
+    local POD=$(get_pod $SERVICE $NODE)
     if [[ $POD == "" || $(echo $POD | grep "ERROR") != "" ]]; then
         echo "ERROR: Couldn't get POD"
         echo "$POD"
@@ -327,7 +328,7 @@ function stop_service() {
 
     echo "   + POD is $POD"
 
-    NAMESPACE=$(get_namespace $POD)
+    local NAMESPACE=$(get_namespace $POD)
     if [[ $NAMESPACE == "" || $(echo $NAMESPACE | grep "ERROR") != "" ]]; then
         echo "ERROR: Couldn't get NAMESPACE"
         echo "$NAMESPACE"
@@ -353,11 +354,11 @@ function start_service() {
         echo "show_log takes service as first argument"
         exit 1
     fi
-    SERVICE=$1
+    local SERVICE=$1
 
     echo " - Starting Service $SERVICE"
 
-    SERVICE_FILE=/var/lib/eskimo/kube-services/$SERVICE.k8s.yaml
+    local SERVICE_FILE=/var/lib/eskimo/kube-services/$SERVICE.k8s.yaml
     if [[ $TEST_MODE != "true" && ! -f $SERVICE_FILE ]]; then
         echo "File $SERVICE_FILE can't be found !";
         exit 2
