@@ -70,16 +70,32 @@ take_lock() {
     local ESKIMO_LOCK_HANDLE=$(shuf -i 600-1023 -n 1)
     local ESKIMO_LOCK_FILE="$LOCK_FOLDER/""$LOCK_NAME""_.lock"
 
-    eval "exec $ESKIMO_LOCK_HANDLE>$ESKIMO_LOCK_FILE" || (echo "Couldn't take handle on lock file" && return 3)
+    eval "exec $ESKIMO_LOCK_HANDLE>$ESKIMO_LOCK_FILE"
+    local result=$?
+    if [[ $result != 0 ]]; then
+        echo "Couldn't take handle on lock file"
+        return 3
+    fi
 
     if [[ "$NON_BLOCK" == "true" ]]; then
-        flock -n $ESKIMO_LOCK_HANDLE || (echo "Couldn't flock file handle - $1 $2 $3" && return 4)
+        flock -n $ESKIMO_LOCK_HANDLE
+        result=$?
+        if [[ $result != 0 ]]; then
+            echo "Couldn't flock file handle (immediate / non-block) - $1 $2 $3"
+            return 4
+        fi
     else
-        flock -w 300 $ESKIMO_LOCK_HANDLE || (echo "Couldn't flock file handle - $1 $2 $3" && return 5)
+        flock -w 300 $ESKIMO_LOCK_HANDLE
+        result=$?
+        if [[ $result != 0 ]]; then
+            echo "Couldn't flock file handle after 300 seconds waiting - $1 $2 $3"
+            return 4
+        fi
     fi
 
     export LAST_LOCK_HANDLE="$ESKIMO_LOCK_HANDLE:$ESKIMO_LOCK_FILE"
     #echo "New Lock handle : $LAST_LOCK_HANDLE"
+    return 0
 }
 
 # Release the lock identified with the handle passed as argument.
@@ -106,7 +122,12 @@ release_lock() {
         return 3
     fi
 
-    flock -u $ESKIMO_LOCK_HANDLE || (echo "Couldn't UN-flock file handle" && return 4)
+    flock -u $ESKIMO_LOCK_HANDLE
+    local result=$?
+    if [[ $result != 0 ]]; then
+        echo "Couldn't UN-flock file handle"
+        return 4
+    fi
 }
 
 __release_global_lock() {
@@ -134,7 +155,12 @@ take_global_lock() {
         return 1
     fi
 
-    take_lock $1 $2 $3 || (echo "Couldn't flock file handle - $1 $2 $3" && return 4)
+    take_lock $1 $2 $3
+    local result=$?
+    if [[ $result != 0 ]]; then
+        echo "Couldn't flock global file handle - $1 $2 $3"
+        return 4
+    fi
 
     export GLOBAL_LOCK=$LAST_LOCK_HANDLE
 
