@@ -34,18 +34,22 @@
 
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.common.exceptions.CommonBusinessException;
 import ch.niceideas.common.exceptions.CommonRTException;
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
+import ch.niceideas.eskimo.test.infrastructure.TestMessageLogger;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
+import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SSHCommandServiceTestImpl;
 import ch.niceideas.eskimo.test.testwrappers.SystemServiceUnderTest;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
+import org.hamcrest.object.HasToString;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,7 +63,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -95,12 +101,16 @@ public class SystemServiceTest {
     @Autowired
     private SSHCommandServiceTestImpl sshCommandServiceTest;
 
+    @Autowired
+    private ConnectionManagerServiceTestImpl connectionManagerServiceTest;
+
     @BeforeEach
     public void setUp() throws Exception {
         SecurityContextHelper.loginAdmin();
         configurationServiceTest.reset();
         sshCommandServiceTest.reset();
         notificationService.clear();
+        connectionManagerServiceTest.dontConnect();
         systemStatusTest = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/systemStatusTest.log"), StandardCharsets.UTF_8);
         expectedFullStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedFullStatus.json"), StandardCharsets.UTF_8);
         expectedFullStatusNoKubernetes = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedFullStatusNoKubernetes.json"), StandardCharsets.UTF_8);
@@ -118,27 +128,54 @@ public class SystemServiceTest {
     }
 
     @Test
+    public void testCallUninstallScript() {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testInstallationSetup() {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testInstallationCleanup() {
+        fail ("To Be Implemented");
+    }
+
+    @Test
     public void testShowJournal() throws Exception {
         systemService.showJournal(servicesDefinition.getServiceDefinition(Service.from("ntp")), Node.fromAddress("192.168.10.11"));
         assertEquals ("sudo journalctl -u ntp --no-pager", sshCommandServiceTest.getExecutedCommands().trim());
+
+        assertThrows(UnsupportedOperationException.class,
+                () -> systemService.showJournal(servicesDefinition.getServiceDefinition(Service.from("grafana")), Node.fromAddress("192.168.10.11")));
     }
 
     @Test
     public void testStartService() throws Exception {
         systemService.startService(servicesDefinition.getServiceDefinition(Service.from("ntp")), Node.fromAddress("192.168.10.11"));
         assertEquals ("sudo bash -c 'systemctl reset-failed ntp && systemctl start ntp'", sshCommandServiceTest.getExecutedCommands().trim());
+
+        assertThrows(UnsupportedOperationException.class,
+                () -> systemService.startService(servicesDefinition.getServiceDefinition(Service.from("grafana")), Node.fromAddress("192.168.10.11")));
     }
 
     @Test
     public void testStopService() throws Exception {
         systemService.stopService(servicesDefinition.getServiceDefinition(Service.from("ntp")), Node.fromAddress("192.168.10.11"));
         assertEquals ("sudo systemctl stop ntp", sshCommandServiceTest.getExecutedCommands().trim());
+
+        assertThrows(UnsupportedOperationException.class,
+                () -> systemService.stopService(servicesDefinition.getServiceDefinition(Service.from("grafana")), Node.fromAddress("192.168.10.11")));
     }
 
     @Test
     public void testRestartService() throws Exception {
         systemService.restartService(servicesDefinition.getServiceDefinition(Service.from("ntp")), Node.fromAddress("192.168.10.11"));
         assertEquals ("sudo bash -c 'systemctl reset-failed ntp && systemctl restart ntp", sshCommandServiceTest.getExecutedCommands().trim());
+
+        assertThrows(UnsupportedOperationException.class,
+                () -> systemService.restartService(servicesDefinition.getServiceDefinition(Service.from("grafana")), Node.fromAddress("192.168.10.11")));
     }
 
     @Test
@@ -151,6 +188,132 @@ public class SystemServiceTest {
 
         systemService.callCommand("show_log", Service.from("ntp"), Node.fromAddress("192.168.10.11"));
         assertEquals ("cat /var/log/ntp/ntp.log", sshCommandServiceTest.getExecutedCommands().trim());
+    }
+
+    @Test
+    public void testGetStatus() throws Exception {
+        systemService.setLastStatusForTest(null);
+        systemService.setLastStatusExceptionForTest(null);
+
+        assertEquals("{\"clear\": \"initializing\"}", systemService.getStatus().getFormattedValue());
+
+        systemService.setLastStatusExceptionForTest(new CommonBusinessException("test"));
+
+        assertThrows(SystemService.StatusExceptionWrapperException.class,
+                () -> systemService.getStatus().getFormattedValue(),
+                "ch.niceideas.common.exceptions.CommonBusinessException: test");
+    }
+
+    @Test
+    public void testPerformPooledOperation() throws Exception {
+
+        Set<String> result = new ConcurrentSkipListSet<>();
+        systemService.performPooledOperation(
+                new ArrayList<>(){{
+                        add("test1");
+                        add("test2");
+                        add("test3");
+                        add("test4");
+                    }},
+                2,
+                100000,
+                (SystemService.PooledOperation<String>) (operation, error) -> result.add(operation)
+        );
+
+        assertTrue (result.contains("test1"));
+        assertTrue (result.contains("test2"));
+        assertTrue (result.contains("test3"));
+        assertTrue (result.contains("test4"));
+    }
+
+    @Test
+    public void testCreateRemotePackageFolder() throws Exception {
+        //fail ("To Be Implemented");
+
+        // create service setip temp foler
+        File temp = File.createTempFile("setup_service_test", "folder");
+        assertTrue(temp.delete());
+        assertTrue(temp.mkdirs());
+        temp.deleteOnExit();
+
+        File serviceFolder = new File (temp, "cerebro");
+        assertTrue (serviceFolder.mkdirs());
+
+        FileUtils.writeFile(new File (serviceFolder, "build.sh"), "#!/bin/bash\necho OK");
+
+        systemService.setServicesSetupPath(temp.getAbsolutePath());
+
+        File tempPackageDist = File.createTempFile("setup_service_test", "package_dist");
+        assertTrue(tempPackageDist.delete());
+        assertTrue(tempPackageDist.mkdirs());
+        tempPackageDist.deleteOnExit();
+
+        FileUtils.writeFile(new File (tempPackageDist, "cerebro_1.0_1.tar.gz"), "#!/bin/bash\necho OK");
+
+        systemService.setPackageDistributionPath(tempPackageDist.getAbsolutePath());
+
+        MessageLogger ml = new TestMessageLogger(new StringBuilder());
+        File result = systemService.createRemotePackageFolder(ml,
+                connectionManagerServiceTest.getPrivateConnection(Node.fromAddress("192.168.56.11")),
+                Service.from("cerebro"),
+                "cerebro");
+
+        assertTrue(sshCommandServiceTest.getExecutedScpCommands().contains("192.168.56.11:/tmp/cerebro"));
+        assertTrue(sshCommandServiceTest.getExecutedScpCommands().contains("192.168.56.11:/tmp/setup_service_test"));
+
+        //System.err.println (sshCommandServiceTest.getExecutedCommands());
+
+        assertTrue (sshCommandServiceTest.getExecutedCommands().contains(
+                "rm -Rf /tmp/cerebro\n" +
+                "rm -f /tmp/cerebro.tgz"));
+
+        assertTrue (sshCommandServiceTest.getExecutedCommands().contains(
+                "tar xfz /tmp/cerebro.tgz --directory=/tmp/\n" +
+                "chmod 755 /tmp/cerebro/setup.sh\n" +
+                "mv cerebro_1.0_1.tar.gz /tmp/cerebro/\n" +
+                "mv /tmp/cerebro/cerebro_1.0_1.tar.gz /tmp/cerebro/docker_template_cerebro.tar.gz"));
+    }
+
+    @Test
+    public void testDiscoverAliveAndDeadNodes() {
+
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
+            if (script.equals("echo OK")) {
+                if (node.equals(Node.fromAddress("192.168.10.11"))) {
+                    throw new SSHCommandException("test");
+                } else if (node.equals(Node.fromAddress("192.168.10.12"))) {
+                    return "KO";
+                } else {
+                    return "OK";
+                }
+            }
+            return "";
+        });
+
+        Set<Node> liveNodes = new HashSet<>();
+        Set<Node> deadNodes = new HashSet<>();
+
+        List<Pair<String, Node>> nodesSetup = systemService.discoverAliveAndDeadNodes(
+                new HashSet<>(){{
+                      add (Node.fromAddress("192.168.10.11"));
+                      add (Node.fromAddress("192.168.10.12"));
+                  }},
+                StandardSetupHelpers.getStandard2NodesSetup(),
+                liveNodes,
+                deadNodes);
+
+        assertTrue(liveNodes.contains(Node.fromAddress("192.168.10.13")));
+
+        assertTrue(deadNodes.contains(Node.fromAddress("192.168.10.11")));
+        assertTrue(deadNodes.contains(Node.fromAddress("192.168.10.12")));
+
+        StringBuilder resultBuilder = new StringBuilder();
+        nodesSetup.forEach(
+                nodeSetup -> resultBuilder.append(nodeSetup.getKey()).append("-").append(nodeSetup.getValue()).append("\n")
+        );
+        assertEquals("node_setup-192.168.10.13\n" +
+                "node_setup-192.168.10.12\n" +
+                "node_setup-192.168.10.11\n", resultBuilder.toString());
     }
 
     @Test

@@ -115,10 +115,10 @@ public class SystemServiceImpl implements SystemService {
     private int parallelismStatusThreadCount = 10;
 
     @Value("${system.packageDistributionPath}")
-    private String packageDistributionPath = "./packages_distrib";
+    protected String packageDistributionPath = "./packages_distrib";
 
     @Value("${system.servicesSetupPath}")
-    private String servicesSetupPath = "./services_setup";
+    protected String servicesSetupPath = "./services_setup";
 
     @Value("${system.statusUpdatePeriodSeconds}")
     private int statusUpdatePeriodSeconds = 5;
@@ -803,7 +803,7 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public List<Pair<String, Node>> buildDeadIps(Set<Node> allNodes, NodesConfigWrapper nodesConfig, Set<Node> liveNodes, Set<Node> deadNodes) {
+    public List<Pair<String, Node>> discoverAliveAndDeadNodes(Set<Node> allNodes, NodesConfigWrapper nodesConfig, Set<Node> liveNodes, Set<Node> deadNodes) {
         List<Pair<String, Node>> nodesSetup = new ArrayList<>();
 
         // Find out about dead IPs

@@ -45,6 +45,7 @@ import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
+import ch.niceideas.eskimo.test.infrastructure.TestMessageLogger;
 import ch.niceideas.eskimo.test.services.*;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
@@ -115,23 +116,7 @@ public class NodesConfigurationServiceTest {
     public void testInstallEskimoBaseSystem() throws Exception {
 
         StringBuilder sb = new StringBuilder();
-        MessageLogger ml = new MessageLogger() {
-            @Override
-            public void addInfo(String message) {
-                if (StringUtils.isNotBlank(message)) {
-                    sb.append(message).append("\n");
-                }
-            }
-
-            @Override
-            public void addInfo(String[] messages) {
-                if (messages != null && messages.length > 0) {
-                    for (String message : messages) {
-                        sb.append(message).append("\n");
-                    }
-                }
-            }
-        };
+        MessageLogger ml = new TestMessageLogger(sb);
         nodesConfigurationService.installEskimoBaseSystem(ml, Node.fromAddress("192.168.10.11"));
 
 

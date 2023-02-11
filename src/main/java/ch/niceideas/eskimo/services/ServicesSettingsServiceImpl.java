@@ -137,7 +137,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                     Set<Node> liveNodes = new HashSet<>();
                     Set<Node> deadNodes = new HashSet<>();
 
-                    List<Pair<String, Node>> nodeSetupPairs = systemService.buildDeadIps(
+                    List<Pair<String, Node>> nodeSetupPairs = systemService.discoverAliveAndDeadNodes(
                             restartCommand.getAllNodes(),
                             nodesConfig,
                             liveNodes, deadNodes);

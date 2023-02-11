@@ -36,6 +36,7 @@
 package ch.niceideas.eskimo.test.services;
 
 import ch.niceideas.eskimo.model.SSHConnection;
+import ch.niceideas.eskimo.services.SSHCommandException;
 import ch.niceideas.eskimo.services.SSHCommandService;
 import ch.niceideas.eskimo.types.Node;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -67,7 +68,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     public interface NodeResultBuilder {
-        String build (Node node, String script);
+        String build (Node node, String script) throws SSHCommandException;
     }
 
     public String getExecutedCommands() {
@@ -119,7 +120,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHScript(Node node, String script) {
+    public String runSSHScript(Node node, String script) throws SSHCommandException {
         synchronized (executedCommandsMonitor) {
             executedCommands.append(script);
             executedCommands.append("\n");
@@ -155,7 +156,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHScriptPath(Node node, String scriptName) {
+    public String runSSHScriptPath(Node node, String scriptName) throws SSHCommandException {
         synchronized (executedCommandsMonitor) {
             executedCommands.append(scriptName);
             executedCommands.append("\n");
@@ -167,7 +168,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHScript(Node node, String script, boolean throwsException) {
+    public String runSSHScript(Node node, String script, boolean throwsException) throws SSHCommandException {
         synchronized (executedCommandsMonitor) {
             executedCommands.append(script);
             executedCommands.append("\n");
@@ -191,7 +192,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHCommand(Node node, String command) {
+    public String runSSHCommand(Node node, String command) throws SSHCommandException {
         synchronized (executedCommandsMonitor) {
             executedCommands.append(command);
             executedCommands.append("\n");

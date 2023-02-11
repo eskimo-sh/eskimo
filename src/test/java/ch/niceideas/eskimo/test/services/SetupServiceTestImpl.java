@@ -159,6 +159,8 @@ public class SetupServiceTestImpl extends SetupServiceImpl implements SetupServi
     public String findLastPackageFile(String prefix, String packageName) {
         if (packageName.equals("kube")) {
             return "eskimo_kube_1.23.5_1.tar.gz";
+        } else if (packageName.equals("cerebro")) {
+            return "cerebro_1.0_1.tar.gz";
         }
         return prefix+"_"+packageName+"_dummy_1.dummy";
     }

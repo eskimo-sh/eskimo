@@ -438,4 +438,9 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
                         "",
                 "$('#serviceContextMenuTemplate').html()");
     }
+
+    @Test
+    public void testServiceAction() {
+        fail ("To Be Implemented");
+    }
 }

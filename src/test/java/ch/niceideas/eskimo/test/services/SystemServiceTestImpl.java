@@ -174,7 +174,7 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public List<Pair<String, Node>> buildDeadIps(Set<Node> allNodes, NodesConfigWrapper nodesConfig, Set<Node> liveNodes, Set<Node> deadNodes) {
+    public List<Pair<String, Node>> discoverAliveAndDeadNodes(Set<Node> allNodes, NodesConfigWrapper nodesConfig, Set<Node> liveNodes, Set<Node> deadNodes) {
         liveNodes.addAll(nodesConfig.getAllNodes());
 
         List<Pair<String, Node>> nodesSetup = new ArrayList<>();

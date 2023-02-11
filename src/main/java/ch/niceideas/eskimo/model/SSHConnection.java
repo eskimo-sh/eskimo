@@ -78,40 +78,12 @@ public class SSHConnection implements Closeable {
         return readTimeout;
     }
 
-    public boolean authenticateWithKeyboardInteractive(String user, InteractiveCallback cb) throws IOException {
-        return under.authenticateWithKeyboardInteractive(user, cb);
-    }
-
-    public boolean authenticateWithAgent(String user, AgentProxy proxy) throws IOException {
-        return under.authenticateWithAgent(user, proxy);
-    }
-
-    public boolean authenticateWithKeyboardInteractive(String user, String[] submethods, InteractiveCallback cb) throws IOException {
-        return under.authenticateWithKeyboardInteractive(user, submethods, cb);
-    }
-
-    public boolean authenticateWithPassword(String user, String password) throws IOException {
-        return under.authenticateWithPassword(user, password);
-    }
-
-    public boolean authenticateWithGssapiWithMic(String user) throws IOException {
-        return under.authenticateWithGssapiWithMic(user);
-    }
-
-    public boolean authenticateWithNone(String user) throws IOException {
-        return under.authenticateWithNone(user);
-    }
-
     public boolean authenticateWithPublicKey(String user, char[] pemPrivateKey, String password) throws IOException {
         return under.authenticateWithPublicKey(user, pemPrivateKey, password);
     }
 
     public boolean authenticateWithPublicKey(String user, File pemFile, String password) throws IOException {
         return under.authenticateWithPublicKey(user, pemFile, password);
-    }
-
-    public void addConnectionMonitor(ConnectionMonitor cmon) {
-        under.addConnectionMonitor(cmon);
     }
 
     public void close() {
@@ -138,16 +110,8 @@ public class SSHConnection implements Closeable {
         return under.createLocalPortForwarder(addr, hostToConnect, portToConnect);
     }
 
-    public LocalStreamForwarder createLocalStreamForwarder(String hostToConnect, int portToConnect) throws IOException {
-        return under.createLocalStreamForwarder(hostToConnect, portToConnect);
-    }
-
     public SCPClient createSCPClient() throws IOException {
         return under.createSCPClient();
-    }
-
-    public void forceKeyExchange() throws IOException {
-        under.forceKeyExchange();
     }
 
     public String getHostname() {
@@ -158,28 +122,8 @@ public class SSHConnection implements Closeable {
         return under.getPort();
     }
 
-    public ConnectionInfo getConnectionInfo() throws IOException {
-        return under.getConnectionInfo();
-    }
-
-    public ClientServerHello getVersionInfo() throws IOException {
-        return under.getVersionInfo();
-    }
-
-    public String[] getRemainingAuthMethods(String user) throws IOException {
-        return under.getRemainingAuthMethods(user);
-    }
-
     public boolean isAuthenticationComplete() {
         return under.isAuthenticationComplete();
-    }
-
-    public boolean isAuthenticationPartialSuccess() {
-        return under.isAuthenticationPartialSuccess();
-    }
-
-    public boolean isAuthMethodAvailable(String user, String method) throws IOException {
-        return under.isAuthMethodAvailable(user, method);
     }
 
     public Session openSession() throws IOException {
@@ -190,52 +134,8 @@ public class SSHConnection implements Closeable {
         under.sendIgnorePacket();
     }
 
-    public void sendIgnorePacket(byte[] data) throws IOException {
-        under.sendIgnorePacket(data);
-    }
-
-    public void setClient2ServerCiphers(String[] ciphers) {
-        under.setClient2ServerCiphers(ciphers);
-    }
-
-    public void setClient2ServerMACs(String[] macs) {
-        under.setClient2ServerMACs(macs);
-    }
-
-    public void setDHGexParameters(DHGexParameters dgp) {
-        under.setDHGexParameters(dgp);
-    }
-
-    public void setServer2ClientCiphers(String[] ciphers) {
-        under.setServer2ClientCiphers(ciphers);
-    }
-
-    public void setServer2ClientMACs(String[] macs) {
-        under.setServer2ClientMACs(macs);
-    }
-
-    public void setServerHostKeyAlgorithms(String[] algos) {
-        under.setServerHostKeyAlgorithms(algos);
-    }
-
     public void setTCPNoDelay(boolean enable) throws IOException {
         under.setTCPNoDelay(enable);
-    }
-
-    public void setProxyData(ProxyData proxyData) {
-        under.setProxyData(proxyData);
-    }
-
-    public void requestRemotePortForwarding(String bindAddress, int bindPort, String targetAddress, int targetPort) throws IOException {
-        under.requestRemotePortForwarding(bindAddress, bindPort, targetAddress, targetPort);
-    }
-
-    public void cancelRemotePortForwarding(int bindPort) throws IOException {
-        under.cancelRemotePortForwarding(bindPort);
-    }
-
-    public void setSecureRandom(SecureRandom rnd) {
-        under.setSecureRandom(rnd);
     }
 
     public void ping() throws IOException {

@@ -146,7 +146,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             Set<Node> liveNodes = new HashSet<>();
             Set<Node> deadNodes = new HashSet<>();
 
-            List<Pair<String, Node>> nodeSetupPairs = systemService.buildDeadIps(command.getAllNodes(), nodesConfig, liveNodes, deadNodes);
+            List<Pair<String, Node>> nodeSetupPairs = systemService.discoverAliveAndDeadNodes(command.getAllNodes(), nodesConfig, liveNodes, deadNodes);
             if (nodeSetupPairs == null) {
                 return;
             }

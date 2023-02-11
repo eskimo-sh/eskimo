@@ -128,7 +128,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
                 }}));
 
             put("status", new JSONObject(new HashMap<>() {{
-                for (OperationId<?> opId : operationLogs.keySet()) {
+                for (OperationId<?> opId : new HashSet<>(operationLogs.keySet())) {
                     put(opId.toString(), operationStatus.computeIfAbsent(opId, op -> OperationStatus.INIT).toString());
                 }
             }}));

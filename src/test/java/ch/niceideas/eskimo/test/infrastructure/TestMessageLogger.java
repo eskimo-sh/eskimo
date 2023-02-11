@@ -33,57 +33,33 @@
  */
 
 
-package ch.niceideas.eskimo.test.testwrappers;
+package ch.niceideas.eskimo.test.infrastructure;
 
-import ch.niceideas.common.utils.Pair;
-import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
-import ch.niceideas.eskimo.model.SystemStatusWrapper;
-import ch.niceideas.eskimo.services.SystemException;
-import ch.niceideas.eskimo.services.SystemService;
-import ch.niceideas.eskimo.services.SystemServiceImpl;
-import ch.niceideas.eskimo.types.Node;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.stereotype.Component;
+import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.MessageLogger;
+import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Map;
+@RequiredArgsConstructor
+public class TestMessageLogger implements MessageLogger {
 
-@Component
-@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
-@Profile({"system-under-test"})
-public class SystemServiceUnderTest extends SystemServiceImpl implements SystemService {
+    @Getter
+    private final StringBuilder sb;
 
-    public SystemServiceUnderTest() {
-        super (false);
+    @Override
+    public void addInfo(String message) {
+        if (StringUtils.isNotBlank(message)) {
+            sb.append(message).append("\n");
+        }
     }
 
-    public void setServicesSetupPath (String path) {
-        this.servicesSetupPath = path;
-    }
-
-    public void setPackageDistributionPath (String path) {
-        this.packageDistributionPath = path;
-    }
-
-    public void setLastStatusForTest(SystemStatusWrapper lastStatusForTest) {
-        this.lastStatus.set (lastStatusForTest);
-    }
-
-    public void setLastStatusExceptionForTest (Exception e) {
-        this.lastStatusException.set(e);
-    }
-
-    public void fetchNodeStatus
-            (NodesConfigWrapper nodesConfig, Map<String, String> statusMap, Pair<Integer, Node> nbrAndPair,
-             ServicesInstallStatusWrapper servicesInstallationStatus)
-            throws SystemException {
-        super.fetchNodeStatus(nodesConfig, statusMap, nbrAndPair, servicesInstallationStatus);
-    }
-
-    public void checkServiceDisappearance(SystemStatusWrapper systemStatus) {
-        super.checkServiceDisappearance(systemStatus);
+    @Override
+    public void addInfo(String[] messages) {
+        if (messages != null && messages.length > 0) {
+            for (String message : messages) {
+                sb.append(message).append("\n");
+            }
+        }
     }
 }

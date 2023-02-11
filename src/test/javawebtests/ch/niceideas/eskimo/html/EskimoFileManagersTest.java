@@ -41,8 +41,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EskimoFileManagersTest extends AbstractWebTest {
 
@@ -240,5 +239,25 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         assertCssValue ("#file-managers-file-manager-192-168-10-13", "visibility", "hidden");
         assertCssValue ("#file-managers-file-manager-192-168-10-13", "display", "none");
+    }
+
+    @Test
+    public void testOpenFile() {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testDeletePath() {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testCreateFile() {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testRegisterSubmitFormFileUpload() {
+        fail ("To Be Implemented");
     }
 }

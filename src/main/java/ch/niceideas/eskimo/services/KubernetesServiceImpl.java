@@ -400,7 +400,7 @@ public class KubernetesServiceImpl implements KubernetesService {
             NodesConfigWrapper rawNodesConfig = configurationService.loadNodesConfig();
             NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
 
-            List<Pair<String, Node>> nodesSetup = systemService.buildDeadIps(new HashSet<>(){{add(kubeMasterNode);}}, nodesConfig, liveIps, deadIps);
+            List<Pair<String, Node>> nodesSetup = systemService.discoverAliveAndDeadNodes(new HashSet<>(){{add(kubeMasterNode);}}, nodesConfig, liveIps, deadIps);
 
             if (deadIps.contains(kubeMasterNode)) {
                 notificationService.addError("The Kube Master node is dead. cannot proceed any further with installation.");
