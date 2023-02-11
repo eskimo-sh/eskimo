@@ -319,17 +319,16 @@ public class SystemServiceImpl implements SystemService {
                 final ConcurrentHashMap<String, String> statusMap = new ConcurrentHashMap<>();
                 final ExecutorService threadPool = Executors.newFixedThreadPool(parallelismStatusThreadCount);
 
-                for (Pair<Integer, Node> nbrAndPair : nodesConfig.getNodes()) {
+                for (Pair<Integer, Node> numberedNode : nodesConfig.getNodes()) {
 
-                    int nodeNbr = nbrAndPair.getKey();
-                    Node node = nbrAndPair.getValue();
+                    Node node = numberedNode.getValue();
 
-                    statusMap.put(("node_nbr_" + node.getName()), "" + nodeNbr);
+                    statusMap.put(("node_nbr_" + node.getName()), "" + numberedNode.getKey());
                     statusMap.put(("node_address_" + node.getName()), node.getAddress());
 
                     threadPool.execute(() -> {
                         try {
-                            fetchNodeStatus(nodesConfig, statusMap, nbrAndPair, servicesInstallationStatus);
+                            fetchNodeStatus(nodesConfig, statusMap, numberedNode, servicesInstallationStatus);
                         } catch (SystemException e) {
                             logger.error(e, e);
                             throw new PooledOperationException(e);
@@ -364,9 +363,7 @@ public class SystemServiceImpl implements SystemService {
                 }
 
                 // fill in systemStatus
-                for (Map.Entry<String, String> entry : statusMap.entrySet()) {
-                    systemStatus.setValueForPath(entry.getKey(), entry.getValue());
-                }
+                systemStatus = new SystemStatusWrapper(Collections.unmodifiableMap(statusMap));
             }
 
             // 4. If a service disappeared, post notification
@@ -598,14 +595,14 @@ public class SystemServiceImpl implements SystemService {
                     if (node.equals(Node.KUBERNETES_NODE)) {
 
                         // if kubernetes is not available, don't do anything
-                        Node kubeNode = systemStatus.getFirstNode(servicesDefinition.getKubeMasterServiceDef().toService());
+                        Node kubeNode = systemStatus.getFirstNode(servicesDefinition.getKubeMasterServiceDef());
                         if (kubeNode == null) { // if Kubernetes is not found, don't touch anything. Let's wait for it to come back.
                             //notificationService.addError("Kubernetes inconsistency.");
                             //logger.warn("Kubernetes could not be found - not potentially flagging kubernetes services as disappeared as long as kubernetes is not back.");
                             continue;
                         }
 
-                        if (!systemStatus.isServiceOKOnNode(servicesDefinition.getKubeMasterServiceDef().toService(), kubeNode)) {
+                        if (!systemStatus.isServiceOKOnNode(servicesDefinition.getKubeMasterServiceDef(), kubeNode)) {
                             //logger.warn("Kubernetes is not OK - not potentially flagging kubernetes services as disappeared as long as kubernetes is not back.");
 
                             // reset missing counter on kubernetes services when kube is down

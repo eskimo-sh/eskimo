@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
@@ -129,6 +130,10 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
                 .collect(Collectors.toList());
     }
 
+    public boolean isServiceOKOnNode(ServiceDefinition serviceDef, Node node) {
+        return isServiceOKOnNode(serviceDef.toService(), node);
+    }
+
     public boolean isServiceOKOnNode(Service service, Node node) {
         String serviceStatus = getValueForPathAsString(SERVICE_PREFIX + service  + "_" + node.getName());
         return StringUtils.isNotBlank(serviceStatus) && serviceStatus.equals("OK");
@@ -149,6 +154,10 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
                 .map(key -> key.substring(key.indexOf(NODE_ALIVE_FLAG) + NODE_ALIVE_FLAG.length()))
                 .map(Node::fromName)
                 .collect(Collectors.toSet());
+    }
+
+    public Node getFirstNode(ServiceDefinition serviceDef) {
+        return  getFirstNode(serviceDef.toService());
     }
 
     public Node getFirstNode(Service service) {

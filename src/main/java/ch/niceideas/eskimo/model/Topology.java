@@ -243,7 +243,7 @@ public class Topology {
                             + " defines a dependency on a kube service " + masterServiceDef.getName() + " which is not supported.");
                 }
 
-                if (kubeServicesConfig == null || !kubeServicesConfig.isServiceInstallRequired(masterServiceDef.toService())) {
+                if (kubeServicesConfig == null || !kubeServicesConfig.isServiceInstallRequired(masterServiceDef)) {
                     if (dep.isMandatory()) {
                         throw new ServiceDefinitionException(SERVICE + " " + serviceDef.getName()
                                 + " defines a dependency on another kube service " + masterServiceDef.getName() + " but that service is not going to be installed.");
@@ -572,9 +572,9 @@ public class Topology {
 
         // Kubernetes Topology
         if (servicesDefinition.getKubeMasterServiceDef() != null
-                && nodesConfig.hasServiceConfigured(servicesDefinition.getKubeMasterServiceDef().toService()) &&
-                (   nodesConfig.isServiceOnNode(servicesDefinition.getKubeMasterServiceDef().toService(), nodeNbr)
-                 || nodesConfig.isServiceOnNode(servicesDefinition.getKubeSlaveServiceDef().toService(), nodeNbr))) {
+                && nodesConfig.hasServiceConfigured(servicesDefinition.getKubeMasterServiceDef()) &&
+                (   nodesConfig.isServiceOnNode(servicesDefinition.getKubeMasterServiceDef(), nodeNbr)
+                 || nodesConfig.isServiceOnNode(servicesDefinition.getKubeSlaveServiceDef(), nodeNbr))) {
 
             sb.append("\n#Kubernetes Topology\n");
 

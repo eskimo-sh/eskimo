@@ -174,10 +174,10 @@ public class MasterServiceImpl implements MasterService {
 
                     List<Node> serviceNodes;
                     if (serviceDef.isKubernetes()) {
-                        serviceNodes = nodesConfig.getAllNodesWithService(servicesDefinition.getKubeMasterServiceDef().toService());
+                        serviceNodes = nodesConfig.getAllNodesWithService(servicesDefinition.getKubeMasterServiceDef());
                     } else {
                         // get any node where it's supposed to be install (always the same one)
-                        serviceNodes = nodesConfig.getAllNodesWithService(serviceDef.toService());
+                        serviceNodes = nodesConfig.getAllNodesWithService(serviceDef);
                     }
 
                     if (!serviceNodes.isEmpty()) {
@@ -230,11 +230,11 @@ public class MasterServiceImpl implements MasterService {
                         // 3. If service is installed on multiple node, attempt to detect master
                         List<Node> nodes = serviceDef.isKubernetes() ?
                                 nodesConfig.getAllNodes() :
-                                nodesConfig.getAllNodesWithService(serviceDef.toService());
+                                nodesConfig.getAllNodesWithService(serviceDef);
 
                         for (Node node : nodes) {
 
-                            if (lastStatus.isServiceOKOnNode(serviceDef.toService(), node)) {
+                            if (lastStatus.isServiceOKOnNode(serviceDef, node)) {
 
                                 try {
                                     Date masterElectedDate = strategy.detectMaster(

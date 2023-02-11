@@ -112,7 +112,7 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
             try {
                 SystemStatusWrapper lastStatus = systemService.getStatus();
 
-                Node kubeNode = lastStatus.getFirstNode(servicesDefinition.getKubeMasterServiceDef().toService());
+                Node kubeNode = lastStatus.getFirstNode(servicesDefinition.getKubeMasterServiceDef());
                 if (kubeNode == null) {
                     retCommand.setWarnings("Kubernetes is not available. The changes in kubernetes services configuration and " +
                             "deployments will be saved but they will <strong>need to be applied again</strong> another time when " +
@@ -120,7 +120,7 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
 
                 } else {
 
-                    if (!lastStatus.isServiceOKOnNode(servicesDefinition.getKubeMasterServiceDef().toService(), kubeNode)) {
+                    if (!lastStatus.isServiceOKOnNode(servicesDefinition.getKubeMasterServiceDef(), kubeNode)) {
 
                         retCommand.setWarnings("Kubernetes is not properly running. The changes in kubernetes services configuration and " +
                                 "deployments will be saved but they will <strong>need to be applied again</strong> another time when " +

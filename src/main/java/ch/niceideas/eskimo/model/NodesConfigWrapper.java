@@ -76,8 +76,16 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
         super(jsonString);
     }
 
+    public boolean isServiceOnNode(ServiceDefinition serviceDef, int nodeNbr) {
+        return  isServiceOnNode(serviceDef.toService(), nodeNbr);
+    }
+
     public boolean isServiceOnNode(Service service, int nodeNbr) {
         return getNodeNumbers(service).contains(nodeNbr);
+    }
+
+    public boolean hasServiceConfigured(ServiceDefinition serviceDef) {
+        return hasServiceConfigured(serviceDef.toService());
     }
 
     public boolean hasServiceConfigured(Service service) {
@@ -126,6 +134,10 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
             throw new IllegalArgumentException("No node with number " + nodeNbr);
         }
         return Node.fromAddress(nodeAddress);
+    }
+
+    public List<Node> getAllNodesWithService(ServiceDefinition serviceDef) {
+        return getAllNodesWithService(serviceDef.toService());
     }
 
     public List<Node> getAllNodesWithService(Service service) {
@@ -255,6 +267,10 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
                 .map(Node::fromAddress)
                 .sorted()
                 .collect(Collectors.toList());
+    }
+
+    public List<Integer> getNodeNumbers(ServiceDefinition serviceDef) {
+        return getNodeNumbers(serviceDef.toService());
     }
 
     public List<Integer> getNodeNumbers(Service service) {

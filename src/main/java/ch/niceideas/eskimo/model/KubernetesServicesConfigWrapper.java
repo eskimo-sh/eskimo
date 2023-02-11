@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.types.Service;
 import org.json.JSONObject;
 
@@ -85,6 +86,10 @@ public class KubernetesServicesConfigWrapper extends JsonWrapper implements Seri
 
     public String getRamSetting(Service service) {
         return getValueForPathAsString(service + RAM_FLAG);
+    }
+
+    public boolean isServiceInstallRequired(ServiceDefinition serviceDef) {
+        return isServiceInstallRequired(serviceDef.toService());
     }
 
     public boolean isServiceInstallRequired(Service service) {

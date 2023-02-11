@@ -313,13 +313,13 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                 List<Service> dirtyServices) {
             dirtyServices.stream()
                     .map (servicesDefinition::getServiceDefinition)
-                    .forEach(service -> {
-                        if (service.isKubernetes()) {
-                            addRestart(new ServiceOperationsCommand.ServiceOperationId(ServiceOperationsCommand.ServiceOperation.RESTART, service.toService(), Node.KUBERNETES_FLAG));
+                    .forEach(serviceDef -> {
+                        if (serviceDef.isKubernetes()) {
+                            addRestart(new ServiceOperationsCommand.ServiceOperationId(ServiceOperationsCommand.ServiceOperation.RESTART, serviceDef.toService(), Node.KUBERNETES_FLAG));
                         } else {
-                            nodesConfig.getNodeNumbers(service.toService()).stream()
+                            nodesConfig.getNodeNumbers(serviceDef).stream()
                                     .map (nodesConfig::getNode)
-                                    .forEach(node -> addRestart(new ServiceOperationsCommand.ServiceOperationId(ServiceOperationsCommand.ServiceOperation.RESTART, service.toService(), node)));
+                                    .forEach(node -> addRestart(new ServiceOperationsCommand.ServiceOperationId(ServiceOperationsCommand.ServiceOperation.RESTART, serviceDef.toService(), node)));
                         }
                     });
             //

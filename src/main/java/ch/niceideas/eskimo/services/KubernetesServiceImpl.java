@@ -372,7 +372,7 @@ public class KubernetesServiceImpl implements KubernetesService {
                 // special case : if some Kubernetes services are getting uninstalled, and Kubernetes is nowhere installed or anything, let's force flag them as uninstalled
                 try {
                     SystemStatusWrapper lastStatus = systemService.getStatus();
-                    Node lastKubeMasterNode = lastStatus.getFirstNode(servicesDefinition.getKubeMasterServiceDef().toService());
+                    Node lastKubeMasterNode = lastStatus.getFirstNode(servicesDefinition.getKubeMasterServiceDef());
                     if (lastKubeMasterNode == null && !command.getUninstallations().isEmpty()) {
                         logger.warn("Uninstalled Kubernetes services will be flagged as uninstalled even though no operation can be performed in kubernetes.");
                         configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
