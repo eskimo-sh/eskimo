@@ -1607,7 +1607,7 @@ import java.nio.charset.Charset
 // load bank data
 val bankText = sc.parallelize(
     IOUtils.toString(
-        new URL("https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv"),
+        new URL("https://www.niceideas.ch/mes/bank.csv"),
         Charset.forName("utf8")).split("\n"))
 
 case class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)

@@ -1,7 +1,7 @@
 {
   "paragraphs": [
     {
-      "text": "%md\n\n## Spark SQL Demo\n##### This is a live tutorial, you can run the code yourself. (Shift-Enter to Run or click on run icon on the top-right of each panel)\n##### This demo shows Spark SQL functions and principles.\n\nThe data used is a bank dataset from Zeppelin samples available at https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv",
+      "text": "%md\n\n## Spark SQL Demo\n##### This is a live tutorial, you can run the code yourself. (Shift-Enter to Run or click on run icon on the top-right of each panel)\n##### This demo shows Spark SQL functions and principles.\n\nThe data used is a bank dataset from Zeppelin samples available at https://www.niceideas.ch/mes/bank.csv",
       "user": "anonymous",
       "dateUpdated": "2019-12-30 08:44:25.488",
       "config": {
@@ -39,7 +39,7 @@
         "msg": [
           {
             "type": "HTML",
-            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch2\u003eSpark SQL Demo\u003c/h2\u003e\n\u003ch5\u003eThis is a live tutorial, you can run the code yourself. (Shift-Enter to Run or click on run icon on the top-right of each panel)\u003c/h5\u003e\n\u003ch5\u003eThis demo shows Spark SQL functions and principles.\u003c/h5\u003e\n\u003cp\u003eThe data used is a bank dataset from Zeppelin samples available at \u003ca href\u003d\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\"\u003ehttps://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\u003c/a\u003e\u003c/p\u003e\n\n\u003c/div\u003e"
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch2\u003eSpark SQL Demo\u003c/h2\u003e\n\u003ch5\u003eThis is a live tutorial, you can run the code yourself. (Shift-Enter to Run or click on run icon on the top-right of each panel)\u003c/h5\u003e\n\u003ch5\u003eThis demo shows Spark SQL functions and principles.\u003c/h5\u003e\n\u003cp\u003eThe data used is a bank dataset from Zeppelin samples available at \u003ca href\u003d\"https://www.niceideas.ch/mes/bank.csv\"\u003ehttps://www.niceideas.ch/mes/bank.csv\u003c/a\u003e\u003c/p\u003e\n\n\u003c/div\u003e"
           }
         ]
       },
@@ -54,7 +54,7 @@
     },
     {
       "title": "Load data into table",
-      "text": "import org.apache.commons.io.IOUtils\nimport java.net.URL\nimport java.nio.charset.Charset\n\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\n// So you don\u0027t need create them manually\n\n// load bank data\nval bankText \u003d sc.parallelize(\n    IOUtils.toString(\n        new URL(\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\"),\n        Charset.forName(\"utf8\")).split(\"\\n\"))\n\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\n\nval bank \u003d bankText.map(s \u003d\u003e s.split(\";\")).filter(s \u003d\u003e s(0) !\u003d \"\\\"age\\\"\").map(\n    s \u003d\u003e Bank(s(0).toInt, \n            s(1).replaceAll(\"\\\"\", \"\"),\n            s(2).replaceAll(\"\\\"\", \"\"),\n            s(3).replaceAll(\"\\\"\", \"\"),\n            s(5).replaceAll(\"\\\"\", \"\").toInt\n        )\n).toDF()\nbank.registerTempTable(\"bank\")",
+      "text": "import org.apache.commons.io.IOUtils\nimport java.net.URL\nimport java.nio.charset.Charset\n\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\n// So you don\u0027t need create them manually\n\n// load bank data\nval bankText \u003d sc.parallelize(\n    IOUtils.toString(\n        new URL(\"https://www.niceideas.ch/mes/bank.csv\"),\n        Charset.forName(\"utf8\")).split(\"\\n\"))\n\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\n\nval bank \u003d bankText.map(s \u003d\u003e s.split(\";\")).filter(s \u003d\u003e s(0) !\u003d \"\\\"age\\\"\").map(\n    s \u003d\u003e Bank(s(0).toInt, \n            s(1).replaceAll(\"\\\"\", \"\"),\n            s(2).replaceAll(\"\\\"\", \"\"),\n            s(3).replaceAll(\"\\\"\", \"\"),\n            s(5).replaceAll(\"\\\"\", \"\").toInt\n        )\n).toDF()\nbank.registerTempTable(\"bank\")",
       "user": "anonymous",
       "dateUpdated": "2019-11-06 08:59:51.335",
       "config": {
