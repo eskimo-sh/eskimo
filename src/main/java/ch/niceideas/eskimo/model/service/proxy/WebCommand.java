@@ -36,9 +36,10 @@
 package ch.niceideas.eskimo.model.service.proxy;
 
 import ch.niceideas.eskimo.model.service.ServiceDefinition;
-import ch.niceideas.eskimo.types.Service;
-import lombok.*;
-import org.apache.commons.lang3.builder.ToStringExclude;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @EqualsAndHashCode
