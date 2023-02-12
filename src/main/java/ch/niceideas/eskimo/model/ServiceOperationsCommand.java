@@ -47,6 +47,7 @@ import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Operation;
 import ch.niceideas.eskimo.types.Service;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
@@ -301,6 +302,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
     }
 
 
+    @EqualsAndHashCode(callSuper = true)
     public static class ServiceOperationId extends AbstractStandardOperationId<ServiceOperation> implements OperationId<ServiceOperation> {
 
         public ServiceOperationId (ServiceOperation operation, Service service, Node node) {

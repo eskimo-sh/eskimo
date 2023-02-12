@@ -39,9 +39,12 @@ import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Operation;
 import ch.niceideas.eskimo.types.Service;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Data
+@Getter
+@EqualsAndHashCode
 @RequiredArgsConstructor
 public class AbstractStandardOperationId<T extends Operation> implements OperationId<T> {
 

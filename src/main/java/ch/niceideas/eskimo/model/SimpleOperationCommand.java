@@ -39,6 +39,7 @@ import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.types.LabelledOperation;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
@@ -84,6 +85,7 @@ public class SimpleOperationCommand implements JSONOpCommand {
     }
 
 
+    @EqualsAndHashCode(callSuper = true)
     public static class SimpleOperationId extends AbstractStandardOperationId<SimpleOperation> implements OperationId<SimpleOperation> {
 
         public SimpleOperationId (SimpleOperation operation, Service service, Node node) {

@@ -43,7 +43,7 @@ import ch.niceideas.eskimo.services.SetupService;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Operation;
 import ch.niceideas.eskimo.types.Service;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
@@ -189,7 +189,8 @@ public class SetupCommand implements JSONOpCommand {
         return allOpList;
     }
 
-    @Data
+    @Getter
+    @EqualsAndHashCode
     @RequiredArgsConstructor
     public static class SetupOperationId implements OperationId<SetupOperation> {
 

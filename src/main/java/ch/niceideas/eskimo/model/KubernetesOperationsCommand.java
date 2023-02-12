@@ -40,10 +40,7 @@ import ch.niceideas.eskimo.services.SystemService;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Operation;
 import ch.niceideas.eskimo.types.Service;
-import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -169,7 +166,8 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
         return allOpList;
     }
 
-    @Data
+    @Getter
+    @EqualsAndHashCode
     @RequiredArgsConstructor
     public static class KubernetesOperationId implements OperationId<KuberneteOperation> {
 

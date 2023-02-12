@@ -34,10 +34,7 @@
 
 package ch.niceideas.eskimo.model.service;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -47,29 +44,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@EqualsAndHashCode
 @Getter
 @Setter
+@RequiredArgsConstructor
 public class EditableSettings {
 
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
     private final ServiceDefinition serviceDef;
 
     private final String filename;
     private final EditablePropertyType propertyType;
     private final String propertyFormat;
     private final String filesystemService;
+
     private String commentPrefix = "";
     private final List<EditableProperty> properties = new ArrayList<>();
-
-    public EditableSettings(ServiceDefinition serviceDef, String filename, EditablePropertyType propertyType, String propertyFormat, String filesystemService) {
-        this.filesystemService = filesystemService;
-        this.serviceDef = serviceDef;
-        this.filename = filename;
-        this.propertyType = propertyType;
-        this.propertyFormat = propertyFormat;
-    }
 
     public List<EditableProperty> getProperties() {
         return Collections.unmodifiableList(properties);

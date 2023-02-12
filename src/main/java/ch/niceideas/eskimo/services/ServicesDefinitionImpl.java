@@ -249,19 +249,17 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
                         JSONObject pageScripterObj = pageScripters.getJSONObject(i);
 
-                        PageScripter pageScriper = new PageScripter();
-
                         String resourceUrl = pageScripterObj.getString("resourceUrl");
                         if (StringUtils.isBlank(resourceUrl)) {
                             throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " ui config is declaring a pageScripter without a resourceUrl");
                         }
-                        pageScriper.setResourceUrl(resourceUrl);
 
                         String script = pageScripterObj.getString("script");
                         if (StringUtils.isBlank(script)) {
                             throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " ui config is declaring a pageScripter without a script");
                         }
-                        pageScriper.setScript(script);
+
+                        PageScripter pageScriper = new PageScripter(resourceUrl, script);
 
                         uiConfig.addPageScripter (pageScriper);
                     }

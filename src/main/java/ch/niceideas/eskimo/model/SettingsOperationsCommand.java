@@ -40,8 +40,8 @@ import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.services.ServicesSettingsService;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.types.Service;
-import lombok.Data;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -114,7 +114,8 @@ public class SettingsOperationsCommand implements Serializable {
         return new JSONObject(retAsMap);
     }
 
-    @Data
+    @RequiredArgsConstructor
+    @Getter
     public static class ChangedSettings implements Serializable {
 
         private final Service service;
@@ -122,14 +123,6 @@ public class SettingsOperationsCommand implements Serializable {
         private final String key;
         private final String value;
         private final String oldValue;
-
-        public ChangedSettings(Service service, String configFile, String key, String value, String oldValue) {
-            this.service = service;
-            this.configFile = configFile;
-            this.key = key;
-            this.value = value;
-            this.oldValue = oldValue;
-        }
 
         public JSONObject toJSON() {
             return new JSONObject(new HashMap<String, Object>(){{
