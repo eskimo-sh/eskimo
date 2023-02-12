@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.*;
+import ch.niceideas.eskimo.model.IgnoreMessageLogger;
 import ch.niceideas.eskimo.model.MessageLogger;
 import ch.niceideas.eskimo.model.SetupCommand;
 import ch.niceideas.eskimo.model.service.ServiceDefinition;
@@ -474,17 +475,7 @@ public class SetupServiceImpl implements SetupService {
 
             URL downloadUrl = new URL(packagesDownloadUrlRoot + "/" + ESKIMO_PACKAGES_VERSIONS_JSON);
 
-            dowloadFile(new MessageLogger() {
-                @Override
-                public void addInfo(String message) {
-                    // ignored
-                }
-
-                @Override
-                public void addInfo(String[] messages) {
-                    // ignored
-                }
-            }, tempPackagesVersionFile, downloadUrl, "");
+            dowloadFile(new IgnoreMessageLogger(), tempPackagesVersionFile, downloadUrl, "");
 
             JsonWrapper packagesVersion = new JsonWrapper(FileUtils.readFile(tempPackagesVersionFile));
             Files.delete(tempPackagesVersionFile.toPath());

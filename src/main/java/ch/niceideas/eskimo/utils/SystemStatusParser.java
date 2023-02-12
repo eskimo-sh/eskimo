@@ -116,16 +116,13 @@ public class SystemStatusParser {
 
     public String getDebugLog () {
         StringBuilder builder = new StringBuilder();
-        for(Service service : serviceStatus.keySet()) {
-            builder.append(service).append(" : ").append(serviceStatus.get(service));
+        for(Map.Entry<Service, String> entry : serviceStatus.entrySet()) {
+            builder.append(entry.getKey()).append(" : ").append(entry.getValue());
         }
         return builder.toString();
     }
 
     public String getServiceStatus(Service service) {
-        if (serviceStatus.containsKey(service)) {
-            return serviceStatus.get(service);
-        }
-        return "NA";
+        return serviceStatus.computeIfAbsent(service, (key) -> "NA");
     }
 }

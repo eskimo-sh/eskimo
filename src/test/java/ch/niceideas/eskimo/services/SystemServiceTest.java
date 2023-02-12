@@ -36,7 +36,10 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.exceptions.CommonBusinessException;
 import ch.niceideas.common.exceptions.CommonRTException;
-import ch.niceideas.common.utils.*;
+import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
@@ -49,7 +52,6 @@ import ch.niceideas.eskimo.test.testwrappers.SystemServiceUnderTest;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
-import org.hamcrest.object.HasToString;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,7 +67,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -121,25 +122,81 @@ public class SystemServiceTest {
     public static String createTempStoragePath() throws Exception {
         File dtempFileName = File.createTempFile("test_systemservice_", "config_storage");
         FileUtils.delete (dtempFileName); // delete file to create directory below
+        assertTrue (dtempFileName.mkdirs());
+        return dtempFileName.getAbsolutePath();
+    }
 
-        File configStoragePathFile = new File (dtempFileName.getAbsolutePath() + "/");
-        assertTrue (configStoragePathFile.mkdirs());
-        return configStoragePathFile.getAbsolutePath();
+
+    @Test
+    public void testInstallationCleanup() throws Exception {
+        systemService.installationCleanup(new TestMessageLogger(new StringBuilder()),
+                connectionManagerServiceTest.getPrivateConnection(Node.fromAddress("192.168.56.11")),
+                Service.from("cerebro"),
+                "cerebro",
+                File.createTempFile("test_cleanup", "test"));
+
+        assertEquals ("rm -Rf /tmp/cerebro\n" +
+                "rm -f /tmp/cerebro.tgz\n" +
+                "docker image rm eskimo:cerebro_template || true\n", sshCommandServiceTest.getExecutedCommands());
     }
 
     @Test
-    public void testCallUninstallScript() {
-        fail ("To Be Implemented");
+    public void testInstallationSetup() throws Exception{
+
+        String tempStorage = createTempStoragePath();
+
+        File serviceFolder = new File (tempStorage, "cerebro");
+        assertTrue (serviceFolder.mkdirs());
+
+        FileUtils.writeFile(new File (serviceFolder, "setup.sh"), "#!/bin/bash\necho OK");
+
+        sshCommandServiceTest.setConnectionResultBuilder((node, script) -> {
+            throw new SSHCommandException("test error");
+        });
+
+        assertThrows(SystemException.class,
+                () -> systemService.installationSetup(new TestMessageLogger(new StringBuilder()),
+                        connectionManagerServiceTest.getPrivateConnection(Node.fromAddress("192.168.56.11")),
+                        Node.fromAddress("192.168.56.11"),
+                        Service.from("cerebro")));
+
+        sshCommandServiceTest.setConnectionResultBuilder((node, script) -> "");
+
+        systemService.installationSetup(new TestMessageLogger(new StringBuilder()),
+                connectionManagerServiceTest.getPrivateConnection(Node.fromAddress("192.168.56.11")),
+                Node.fromAddress("192.168.56.11"),
+                Service.from("cerebro"));
+
+        assertEquals(
+                "bash /tmp/cerebro/setup.sh 192.168.56.11\n" +
+                "bash /tmp/cerebro/setup.sh 192.168.56.11\n",
+                sshCommandServiceTest.getExecutedCommands());
     }
 
     @Test
-    public void testInstallationSetup() {
-        fail ("To Be Implemented");
-    }
+    public void testCallUninstallScript() throws Exception {
 
-    @Test
-    public void testInstallationCleanup() {
-        fail ("To Be Implemented");
+        String tempStorage = createTempStoragePath();
+
+        File serviceFolder = new File (tempStorage, "cerebro");
+        assertTrue (serviceFolder.mkdirs());
+
+        FileUtils.writeFile(new File (serviceFolder, "uninstall.sh"), "#!/bin/bash\necho OK");
+
+        systemService.setServicesSetupPath(tempStorage);
+
+        assertThrows (SystemException.class,
+                () -> systemService.callUninstallScript(
+                    new TestMessageLogger(new StringBuilder()),
+                    connectionManagerServiceTest.getPrivateConnection(Node.fromAddress("192.168.56.11")),
+                    Service.from("grafana")));
+
+        systemService.callUninstallScript(
+                new TestMessageLogger(new StringBuilder()),
+                connectionManagerServiceTest.getPrivateConnection(Node.fromAddress("192.168.56.11")),
+                Service.from("cerebro"));
+
+        assertTrue(sshCommandServiceTest.getExecutedCommands().contains("/cerebro/uninstall.sh"));
     }
 
     @Test
@@ -228,20 +285,15 @@ public class SystemServiceTest {
 
     @Test
     public void testCreateRemotePackageFolder() throws Exception {
-        //fail ("To Be Implemented");
 
-        // create service setip temp foler
-        File temp = File.createTempFile("setup_service_test", "folder");
-        assertTrue(temp.delete());
-        assertTrue(temp.mkdirs());
-        temp.deleteOnExit();
+        String tempStorage = createTempStoragePath();
 
-        File serviceFolder = new File (temp, "cerebro");
+        File serviceFolder = new File (tempStorage, "cerebro");
         assertTrue (serviceFolder.mkdirs());
 
         FileUtils.writeFile(new File (serviceFolder, "build.sh"), "#!/bin/bash\necho OK");
 
-        systemService.setServicesSetupPath(temp.getAbsolutePath());
+        systemService.setServicesSetupPath(tempStorage);
 
         File tempPackageDist = File.createTempFile("setup_service_test", "package_dist");
         assertTrue(tempPackageDist.delete());
@@ -253,7 +305,7 @@ public class SystemServiceTest {
         systemService.setPackageDistributionPath(tempPackageDist.getAbsolutePath());
 
         MessageLogger ml = new TestMessageLogger(new StringBuilder());
-        File result = systemService.createRemotePackageFolder(ml,
+        systemService.createRemotePackageFolder(ml,
                 connectionManagerServiceTest.getPrivateConnection(Node.fromAddress("192.168.56.11")),
                 Service.from("cerebro"),
                 "cerebro");

@@ -160,14 +160,9 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                             (operation, error) -> {
                                 Node node = operation.getNode();
                                 if (nodesConfig.getAllNodes().contains(node) && liveNodes.contains(node)) {
-
                                     systemOperationService.applySystemOperation(
-                                            new ServiceOperationsCommand.ServiceOperationId(
-                                                    ServiceOperationsCommand.ServiceOperation.CHECK_INSTALL,
-                                                    Service.SETTINGS,
-                                                    node),
+                                            operation,
                                             ml -> {
-
                                                 // topology
                                                 if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
                                                     operationsMonitoringService.addInfo(operation, "Installing Topology and settings");
@@ -188,6 +183,8 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                                     }
                                 });
                     }
+
+                    success = true;
 
                 } finally {
                     operationsMonitoringService.endCommand(success);

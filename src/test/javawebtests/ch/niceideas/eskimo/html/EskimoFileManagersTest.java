@@ -54,6 +54,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         loadScript ("eskimoUtils.js");
         loadScript ("eskimoFileManagers.js");
+        loadScript("vendor/bootstrap-5.2.0.js");
 
         waitForDefinition("window.eskimo");
         waitForDefinition("window.eskimo.FileManagers");
@@ -69,7 +70,8 @@ public class EskimoFileManagersTest extends AbstractWebTest {
         js("eskimoFileManagers.eskimoMain = {" +
                 "        isSetupDone: function() { return true; }," +
                 "        showOnlyContent: function() {}," +
-                "        hideProgressbar: function() {}" +
+                "        hideProgressbar: function() {}," +
+                "        alert: function(level, msg) {window.alertLevel = level; window.alertMsg = msg; }" +
                 "    };");
         js("eskimoFileManagers.initialize()");
 
@@ -190,7 +192,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
     }
 
     @Test
-    public void testCloseFileManager() throws Exception {
+    public void testCloseFileManager() {
 
         js("eskimoFileManagers.showFileManagers()");
 
@@ -243,7 +245,64 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
     @Test
     public void testOpenFile() {
-        fail ("To Be Implemented");
+
+        js("$.ajaxGet = function (dataObj) {" +
+                "    if (dataObj.url == 'file-manager-open-file?nodeAddress=192.168.56.11&folder=/tmp&file=a.bin') {" +
+                "        dataObj.success({" +
+                "            'status' : 'OK'," +
+                "            'accessible' : false" +
+                "        });" +
+                "    } else if (dataObj.url == 'file-manager-open-file?nodeAddress=192.168.56.11&folder=/tmp&file=b.bin') {" +
+                "        dataObj.success({" +
+                "            'status' : 'OK'," +
+                "            'accessible' : true," +
+                "            'fileViewable' : false" +
+                "        });" +
+                "    } else if (dataObj.url == 'file-manager-open-file?nodeAddress=192.168.56.11&folder=/tmp&file=c.txt') {" +
+                "        dataObj.success({" +
+                "            'status' : 'OK'," +
+                "            'accessible' : true," +
+                "            'fileViewable' : true," +
+                "            'fileContent' : btoa('abcd')" +
+                "        });" +
+                "    } else if (dataObj.url == 'file-manager-open-file?nodeAddress=192.168.56.11&folder=/tmp&file=d') {" +
+                "        dataObj.success({" +
+                "            'status' : 'OK'," +
+                "            'folder' : 'folder'" +
+                "        });" +
+                "    } else { " +
+                "        dataObj.success({" +
+                "            'status' : 'NOK'," +
+                "            'error' : 'test error'" +
+                "        });" +
+                "    } " +
+                "}");
+
+        js("eskimoFileManagers.openFile('192.168.56.11', '192-168-56-11', '/tmp', 'd.x')");
+
+        assertJavascriptEquals("3", "window.alertLevel");
+        assertJavascriptEquals("test error", "window.alertMsg");
+
+        js("eskimoFileManagers.listFolder = function() {window.listFolderCalled = true;}");
+
+        js("eskimoFileManagers.openFile('192.168.56.11', '192-168-56-11', '/tmp', 'd')");
+
+        assertJavascriptEquals("true", "window.listFolderCalled");
+
+        js("eskimoFileManagers.openFile('192.168.56.11', '192-168-56-11', '/tmp', 'a.bin')");
+
+        assertJavascriptEquals("3", "window.alertLevel");
+        assertJavascriptEquals("User used by eskimo has no read permission to this file", "window.alertMsg");
+
+        js("eskimoFileManagers.downloadFile = function() {window.downloadFileCalled = true;}");
+
+        js("eskimoFileManagers.openFile('192.168.56.11', '192-168-56-11', '/tmp', 'b.bin')");
+
+        assertJavascriptEquals("true", "window.downloadFileCalled");
+
+        js("eskimoFileManagers.openFile('192.168.56.11', '192-168-56-11', '/tmp', 'c.txt')");
+
+        assertJavascriptEquals("abcd", "$(\"#file-viewer-content\").html()");
     }
 
     @Test

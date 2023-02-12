@@ -389,8 +389,8 @@ public class KubernetesServiceImpl implements KubernetesService {
                 throw new SystemException(message);
             }
 
-            Set<Node> liveIps = new HashSet<>();
-            Set<Node> deadIps = new HashSet<>();
+            Set<Node> liveNodes = new HashSet<>();
+            Set<Node> deadNodes = new HashSet<>();
 
             // handle potential interruption request
             if (operationsMonitoringService.isInterrupted()) {
@@ -400,9 +400,9 @@ public class KubernetesServiceImpl implements KubernetesService {
             NodesConfigWrapper rawNodesConfig = configurationService.loadNodesConfig();
             NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
 
-            List<Pair<String, Node>> nodesSetup = systemService.discoverAliveAndDeadNodes(new HashSet<>(){{add(kubeMasterNode);}}, nodesConfig, liveIps, deadIps);
+            List<Pair<String, Node>> nodesSetup = systemService.discoverAliveAndDeadNodes(new HashSet<>(){{add(kubeMasterNode);}}, nodesConfig, liveNodes, deadNodes);
 
-            if (deadIps.contains(kubeMasterNode)) {
+            if (deadNodes.contains(kubeMasterNode)) {
                 notificationService.addError("The Kube Master node is dead. cannot proceed any further with installation.");
                 String message = "The Kube Master node is dead. cannot proceed any further with installation. Kubernetes services configuration is saved but will need to be re-applied when k8s-master is available.";
                 operationsMonitoringService.addGlobalInfo(message);
@@ -417,7 +417,7 @@ public class KubernetesServiceImpl implements KubernetesService {
                 return;
             }
 
-            MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, command.getRawConfig(), deadIps);
+            MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, command.getRawConfig(), deadNodes);
 
             if (operationsMonitoringService.isInterrupted()) {
                 return;
@@ -426,7 +426,7 @@ public class KubernetesServiceImpl implements KubernetesService {
             // Nodes re-setup (topology)
             systemOperationService.applySystemOperation(new KubernetesOperationsCommand.KubernetesOperationId(
                     KubernetesOperationsCommand.KuberneteOperation.INSTALLATION, Service.TOPOLOGY_ALL_NODES),
-                    ml -> systemService.performPooledOperation (new ArrayList<>(liveIps), parallelismInstallThreadCount, baseInstallWaitTimout,
+                    ml -> systemService.performPooledOperation (new ArrayList<>(liveNodes), parallelismInstallThreadCount, baseInstallWaitTimout,
                             (operation, error) -> {
                                 // topology
                                 if (error.get() == null) {

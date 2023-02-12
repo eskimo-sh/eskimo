@@ -54,7 +54,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
@@ -113,7 +112,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
             }}));
 
             put("messages", new JSONObject(new HashMap<>() {{
-                    for (OperationId<?> opId : operationLogs.keySet()) {
+                    for (OperationId<?> opId : new HashSet<>(operationLogs.keySet())) {
                         MessagingManager mgr = operationLogs.computeIfAbsent(opId, op -> {
                             throw new IllegalStateException();
                         });

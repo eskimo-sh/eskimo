@@ -64,7 +64,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     private NodeResultBuilder nodeResultBuilder = null;
 
     public interface ConnectionResultBuilder {
-        String build (SSHConnection connection, String script);
+        String build (SSHConnection connection, String script) throws SSHCommandException;
     }
 
     public interface NodeResultBuilder {
@@ -108,7 +108,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHScript(SSHConnection connection, String script) {
+    public String runSSHScript(SSHConnection connection, String script) throws SSHCommandException {
         synchronized (executedCommandsMonitor) {
             executedCommands.append(script);
             executedCommands.append("\n");
@@ -132,7 +132,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHCommand(SSHConnection connection, String[] command) {
+    public String runSSHCommand(SSHConnection connection, String[] command) throws SSHCommandException {
         synchronized (executedCommandsMonitor) {
             executedCommands.append(String.join(" ", command));
             executedCommands.append("\n");
@@ -144,7 +144,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHScriptPath(SSHConnection connection, String scriptName) {
+    public String runSSHScriptPath(SSHConnection connection, String scriptName) throws SSHCommandException {
         synchronized (executedCommandsMonitor) {
             executedCommands.append(scriptName);
             executedCommands.append("\n");
@@ -180,7 +180,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHScript(SSHConnection connection, String script, boolean throwsException) {
+    public String runSSHScript(SSHConnection connection, String script, boolean throwsException) throws SSHCommandException {
         synchronized (executedCommandsMonitor) {
             executedCommands.append(script);
             executedCommands.append("\n");
@@ -204,7 +204,7 @@ public class SSHCommandServiceTestImpl implements SSHCommandService {
     }
 
     @Override
-    public String runSSHCommand(SSHConnection connection, String command) {
+    public String runSSHCommand(SSHConnection connection, String command) throws SSHCommandException {
         synchronized (executedCommandsMonitor) {
             executedCommands.append(command);
             executedCommands.append("\n");
