@@ -34,21 +34,19 @@
 
 package ch.niceideas.eskimo.model.service;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class MasterDetection {
 
-    private MasterDetectionStrategy detectionStrategy;
-    private String logFile;
-    private String grep;
-    private Pattern timeStampExtractRexp;
-    private SimpleDateFormat timeStampFormat;
+    private final MasterDetectionStrategy detectionStrategy;
+    private final String logFile;
+    private final String grep;
+    private final Pattern timeStampExtractRexp;
+    private final SimpleDateFormat timeStampFormat;
 }

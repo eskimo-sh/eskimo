@@ -167,32 +167,28 @@ public class KubeStatusParserTest {
 
         KubeStatusParser parser = new KubeStatusParser(allPodStatus, allServicesStatus, registryServices, sd);
 
-        ServiceDefinition coreDnsSrv = new ServiceDefinition();
-        coreDnsSrv.setName("coredns");
+        ServiceDefinition coreDnsSrv = new ServiceDefinition("coredns");
         coreDnsSrv.setUnique(true);
         Pair<Node, KubeStatusParser.KubernetesServiceStatus> srnCoredns = parser.getServiceRuntimeNode(coreDnsSrv, Node.fromAddress("111.111.111.111"));
         assertNotNull (srnCoredns);
         assertNull(srnCoredns.getKey());
         assertEquals (KubeStatusParser.KubernetesServiceStatus.NOT_OK, srnCoredns.getValue());
 
-        ServiceDefinition cerebroSrv = new ServiceDefinition();
-        cerebroSrv.setName("cerebro");
+        ServiceDefinition cerebroSrv = new ServiceDefinition("cerebro");
         cerebroSrv.setUnique(true);
         Pair<Node, KubeStatusParser.KubernetesServiceStatus> srnCerebro = parser.getServiceRuntimeNode(cerebroSrv, Node.fromAddress("111.111.111.111"));
         assertNotNull (srnCerebro);
         assertEquals (Node.fromAddress("111.111.111.111"), srnCerebro.getKey());
         assertEquals (KubeStatusParser.KubernetesServiceStatus.NOT_OK, srnCerebro.getValue());
 
-        ServiceDefinition elasticsearchSrv = new ServiceDefinition();
-        elasticsearchSrv.setName("elasticsearch");
+        ServiceDefinition elasticsearchSrv = new ServiceDefinition("elasticsearch");
         elasticsearchSrv.setUnique(false);
         Pair<Node, KubeStatusParser.KubernetesServiceStatus> srnES = parser.getServiceRuntimeNode(elasticsearchSrv, Node.fromAddress("111.111.111.111"));
         assertNotNull (srnES);
         assertEquals (Node.fromAddress("111.111.111.111"), srnES.getKey());
         assertEquals (KubeStatusParser.KubernetesServiceStatus.RUNNING, srnES.getValue());
 
-        ServiceDefinition kubeDasboardSrv = new ServiceDefinition();
-        kubeDasboardSrv.setName("kubernetes-dashboard");
+        ServiceDefinition kubeDasboardSrv = new ServiceDefinition("kubernetes-dashboard");
         kubeDasboardSrv.setUnique(false);
         Pair<Node, KubeStatusParser.KubernetesServiceStatus> srnKubeDasboardSrv = parser.getServiceRuntimeNode(kubeDasboardSrv, Node.fromAddress("111.111.111.111"));
         assertNotNull (srnKubeDasboardSrv);

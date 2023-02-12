@@ -37,10 +37,10 @@ package ch.niceideas.eskimo.model.service.proxy;
 
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
-import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Data
+@Getter
 @RequiredArgsConstructor
 public class ProxyTunnelConfig {
 

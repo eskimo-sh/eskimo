@@ -35,15 +35,15 @@
 
 package ch.niceideas.eskimo.model.service.proxy;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-@Data
-@NoArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class UrlRewriting {
 
-    private String startUrl;
-    private String replacement;
+    private final String startUrl;
+    private final String replacement;
 
     public boolean matches(String theUrl, ReplacementContext context) {
         String effStartUrl = context.getResolved(startUrl);

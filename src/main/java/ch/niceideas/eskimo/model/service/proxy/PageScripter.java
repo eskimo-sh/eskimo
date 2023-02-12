@@ -35,11 +35,13 @@
 
 package ch.niceideas.eskimo.model.service.proxy;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
 @NoArgsConstructor
+@Data
 public class PageScripter {
 
     private String resourceUrl;

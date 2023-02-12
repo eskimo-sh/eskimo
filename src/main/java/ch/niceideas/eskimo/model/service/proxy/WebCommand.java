@@ -36,15 +36,21 @@
 package ch.niceideas.eskimo.model.service.proxy;
 
 import ch.niceideas.eskimo.model.service.ServiceDefinition;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import ch.niceideas.eskimo.types.Service;
+import lombok.*;
+import org.apache.commons.lang3.builder.ToStringExclude;
 
-@Data
-@NoArgsConstructor
+@Getter
+@EqualsAndHashCode
+@RequiredArgsConstructor
 public class WebCommand {
 
-    private String id;
-    private ServiceDefinition serviceDef;
-    private String command;
+    private final ServiceDefinition owner;
+    private final String id;
+    private final String command;
+
+    @Setter
+    @EqualsAndHashCode.Exclude
+    private ServiceDefinition target;
 
 }

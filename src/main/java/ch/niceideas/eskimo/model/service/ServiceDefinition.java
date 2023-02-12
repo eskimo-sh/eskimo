@@ -42,7 +42,9 @@ import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
 import ch.niceideas.eskimo.types.ServiceWebId;
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -50,10 +52,12 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-@Data
+@RequiredArgsConstructor
+@Getter
+@Setter
 public class ServiceDefinition {
 
-    private String name;
+    private final String name;
 
     private final List<Dependency> dependencies = new ArrayList<>();
 

@@ -35,20 +35,20 @@
 package ch.niceideas.eskimo.model.service;
 
 import ch.niceideas.common.utils.StringUtils;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 
-@Data
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class EditableProperty {
 
     private final String name;
     private final String comment;
     private final String defaultValue;
-    private String value;
+    private final String value;
 
     public JSONObject toJSON() {
         return new JSONObject(new HashMap<String, Object>() {{

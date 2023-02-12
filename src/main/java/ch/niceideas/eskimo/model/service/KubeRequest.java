@@ -37,13 +37,17 @@
 package ch.niceideas.eskimo.model.service;
 
 import ch.niceideas.eskimo.services.ServiceDefinitionException;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-@Data
+@NoArgsConstructor
+@Getter
+@Setter
 public class KubeRequest {
 
     public static final Pattern KUBE_REQUEST_CPU_RE = Pattern.compile("[0-9\\.]+[m]?");

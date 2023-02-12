@@ -119,9 +119,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
         for (String serviceString : servicesConfig.getRootKeys()) {
 
-            ServiceDefinition serviceDef = new ServiceDefinition();
-
-            serviceDef.setName(serviceString);
+            ServiceDefinition serviceDef = new ServiceDefinition(serviceString);
 
             Integer configOrder = (Integer) servicesConfig.getValueForPath(serviceString+".config.order");
             if (configOrder == null) {
@@ -276,19 +274,17 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
                         JSONObject urlRewritingsObj = urlRewritings.getJSONObject(i);
 
-                        UrlRewriting urlRewriting = new UrlRewriting();
-
                         String startUrl = urlRewritingsObj.getString("startUrl");
                         if (StringUtils.isBlank(startUrl)) {
                             throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring an urlRewriting without a startUrl");
                         }
-                        urlRewriting.setStartUrl(startUrl);
 
                         String replacement = urlRewritingsObj.getString("replacement");
                         if (StringUtils.isBlank(replacement)) {
                             throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring an urlRewriting without a replacement");
                         }
-                        urlRewriting.setReplacement(replacement);
+
+                        UrlRewriting urlRewriting = new UrlRewriting(startUrl, replacement);
 
                         uiConfig.addUrlRewriting(urlRewriting);
                     }
@@ -305,11 +301,8 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                         String target = proxyReplacement.getString("target");
                         String urlPattern = proxyReplacement.has("urlPattern") ? proxyReplacement.getString("urlPattern") : null;
 
-                        ProxyReplacement pr = new ProxyReplacement();
-                        pr.setType(ProxyReplacement.ProxyReplacementType.valueOf(typeAsString));
-                        pr.setSource(source);
-                        pr.setTarget(target);
-                        pr.setUrlPattern(urlPattern);
+                        ProxyReplacement pr = new ProxyReplacement(
+                                ProxyReplacement.ProxyReplacementType.valueOf(typeAsString), source, target, urlPattern);
 
                         uiConfig.addProxyReplacement (pr);
                     }
@@ -362,24 +355,22 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 for (int i = 0; i < webCommandsConf.length(); i++) {
 
                     JSONObject webCommandObj = webCommandsConf.getJSONObject(i);
-                    WebCommand command = new WebCommand();
 
                     String commandId = webCommandObj.getString("id");
                     if (StringUtils.isBlank(commandId)) {
                         throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a command without an id");
                     }
-                    command.setId(commandId);
 
                     String commandCall = webCommandObj.getString("command");
                     if (StringUtils.isBlank(commandCall)) {
                         throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a command without a command");
                     }
-                    command.setCommand(commandCall);
 
                     String serviceName = webCommandObj.getString("service");
                     if (StringUtils.isBlank(serviceName)) {
                         throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a Web command without a service name");
                     }
+                    WebCommand command = new WebCommand(serviceDef, commandId, commandCall);
                     webCommandServices.put (command, Service.from(serviceName));
 
                     serviceDef.addWebCommand (command);
@@ -392,31 +383,28 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                 for (int i = 0; i < commandsConf.length(); i++) {
 
                     JSONObject commandObj = commandsConf.getJSONObject(i);
-                    Command command = new Command();
 
                     String commandId = commandObj.getString("id");
                     if (StringUtils.isBlank(commandId)) {
                         throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a command without an id");
                     }
-                    command.setId(commandId);
 
                     String commandName = commandObj.getString("name");
                     if (StringUtils.isBlank(commandName)) {
                         throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a command without a name");
                     }
-                    command.setName(commandName);
 
                     String commandIcon = commandObj.getString("icon");
                     if (StringUtils.isBlank(commandIcon)) {
                         throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a command without an icon");
                     }
-                    command.setIcon(commandIcon);
 
                     String commandCall = commandObj.getString("command");
                     if (StringUtils.isBlank(commandCall)) {
                         throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a command without a command");
                     }
-                    command.setCommandCall(commandCall);
+
+                    Command command = new Command(commandId, commandName, commandIcon, commandCall);
 
                     serviceDef.addCommand(command);
                 }
@@ -529,7 +517,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
         // post-processing web commands
         webCommandServices.keySet().forEach(
-                command -> command.setServiceDef(getServiceDefinition(webCommandServices.get(command)))
+                command -> command.setTarget(getServiceDefinition(webCommandServices.get(command)))
         );
 
         try {
@@ -591,7 +579,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                     .map (ServiceDefinition::getWebCommands)
                     .flatMap(List::stream)
                     .forEach(webCommand -> {
-                        if (webCommand.getServiceDef() == null) {
+                        if (webCommand.getOwner() == null) {
                             throw new IllegalArgumentException("Web command" + webCommand.getId() + " didn't get its service injected");
                         }
                     });

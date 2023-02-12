@@ -37,16 +37,16 @@ package ch.niceideas.eskimo.model.service;
 import ch.niceideas.eskimo.model.service.proxy.PageScripter;
 import ch.niceideas.eskimo.model.service.proxy.ProxyReplacement;
 import ch.niceideas.eskimo.model.service.proxy.UrlRewriting;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
 public class UIConfig {
 
     @EqualsAndHashCode.Exclude

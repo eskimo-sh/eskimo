@@ -83,8 +83,7 @@ public class TopologyTest {
 
     public void initFirstNodeDependencies() {
 
-        ServiceDefinition serviceA = new ServiceDefinition();
-        serviceA.setName("service_a");
+        ServiceDefinition serviceA = new ServiceDefinition("service_a");
         Dependency depA = new Dependency();
         depA.setMes(MasterElectionStrategy.FIRST_NODE);
         depA.setMasterService(Service.from("service_b"));
@@ -92,8 +91,7 @@ public class TopologyTest {
         serviceA.addDependency (depA);
         def.addService(serviceA);
 
-        ServiceDefinition serviceB = new ServiceDefinition();
-        serviceB.setName("service_b");
+        ServiceDefinition serviceB = new ServiceDefinition("service_b");
         Dependency depB = new Dependency();
         depB.setMes(MasterElectionStrategy.FIRST_NODE);
         depB.setMasterService(Service.from("service_c"));
@@ -101,12 +99,10 @@ public class TopologyTest {
         serviceB.addDependency (depB);
         def.addService(serviceB);
 
-        ServiceDefinition serviceC = new ServiceDefinition();
-        serviceC.setName("service_c");
+        ServiceDefinition serviceC = new ServiceDefinition("service_c");
         def.addService(serviceC);
 
-        ServiceDefinition serviceD = new ServiceDefinition();
-        serviceD.setName("service_d");
+        ServiceDefinition serviceD = new ServiceDefinition("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
@@ -119,8 +115,7 @@ public class TopologyTest {
 
     public void initConditionalDependency() {
 
-        ServiceDefinition serviceA = new ServiceDefinition();
-        serviceA.setName("service_a");
+        ServiceDefinition serviceA = new ServiceDefinition("service_a");
         Dependency depA = new Dependency();
         depA.setMes(MasterElectionStrategy.FIRST_NODE);
         depA.setMasterService(Service.from("service_b"));
@@ -128,8 +123,7 @@ public class TopologyTest {
         serviceA.addDependency (depA);
         def.addService(serviceA);
 
-        ServiceDefinition serviceB = new ServiceDefinition();
-        serviceB.setName("service_b");
+        ServiceDefinition serviceB = new ServiceDefinition("service_b");
         Dependency depB = new Dependency();
         depB.setMes(MasterElectionStrategy.FIRST_NODE);
         depB.setMasterService(Service.from("service_c"));
@@ -138,30 +132,16 @@ public class TopologyTest {
         serviceB.addDependency (depB);
         def.addService(serviceB);
 
-        ServiceDefinition serviceC = new ServiceDefinition();
-        serviceC.setName("service_c");
+        ServiceDefinition serviceC = new ServiceDefinition("service_c");
         def.addService(serviceC);
 
-        ServiceDefinition serviceD = new ServiceDefinition();
-        serviceD.setName("service_d");
+        ServiceDefinition serviceD = new ServiceDefinition("service_d");
         def.addService(serviceD);
     }
 
-    /*
-    public void initConditionalMandatory() {
-
-        Service serviceA = new Service();
-        serviceA.setName("service_a");
-        serviceA.setMandatory(true);
-        serviceA.setConditional(ConditionalInstallation.MULTIPLE_NODES);
-        def.addService(serviceA);
-    }
-    */
-
     public void initSameNodeOrRandomDependencies() {
 
-        ServiceDefinition serviceA = new ServiceDefinition();
-        serviceA.setName("service_a");
+        ServiceDefinition serviceA = new ServiceDefinition("service_a");
         Dependency depA = new Dependency();
         depA.setMes(MasterElectionStrategy.SAME_NODE_OR_RANDOM);
         depA.setMasterService(Service.from("service_b"));
@@ -169,8 +149,7 @@ public class TopologyTest {
         serviceA.addDependency (depA);
         def.addService(serviceA);
 
-        ServiceDefinition serviceB = new ServiceDefinition();
-        serviceB.setName("service_b");
+        ServiceDefinition serviceB = new ServiceDefinition("service_b");
         Dependency depB = new Dependency();
         depB.setMes(MasterElectionStrategy.SAME_NODE_OR_RANDOM);
         depB.setMasterService(Service.from("service_c"));
@@ -178,12 +157,10 @@ public class TopologyTest {
         serviceB.addDependency (depB);
         def.addService(serviceB);
 
-        ServiceDefinition serviceC = new ServiceDefinition();
-        serviceC.setName("service_c");
+        ServiceDefinition serviceC = new ServiceDefinition("service_c");
         def.addService(serviceC);
 
-        ServiceDefinition serviceD = new ServiceDefinition();
-        serviceD.setName("service_d");
+        ServiceDefinition serviceD = new ServiceDefinition("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
@@ -196,8 +173,7 @@ public class TopologyTest {
 
     public void initRandomDependencies() {
 
-        ServiceDefinition serviceA = new ServiceDefinition();
-        serviceA.setName("service_a");
+        ServiceDefinition serviceA = new ServiceDefinition("service_a");
         Dependency depA = new Dependency();
         depA.setMes(MasterElectionStrategy.RANDOM);
         depA.setMasterService(Service.from("service_b"));
@@ -205,8 +181,7 @@ public class TopologyTest {
         serviceA.addDependency (depA);
         def.addService(serviceA);
 
-        ServiceDefinition serviceB = new ServiceDefinition();
-        serviceB.setName("service_b");
+        ServiceDefinition serviceB = new ServiceDefinition("service_b");
         Dependency depB = new Dependency();
         depB.setMes(MasterElectionStrategy.RANDOM);
         depB.setMasterService(Service.from("service_c"));
@@ -214,12 +189,10 @@ public class TopologyTest {
         serviceB.addDependency (depB);
         def.addService(serviceB);
 
-        ServiceDefinition serviceC = new ServiceDefinition();
-        serviceC.setName("service_c");
+        ServiceDefinition serviceC = new ServiceDefinition("service_c");
         def.addService(serviceC);
 
-        ServiceDefinition serviceD = new ServiceDefinition();
-        serviceD.setName("service_d");
+        ServiceDefinition serviceD = new ServiceDefinition("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
@@ -232,12 +205,10 @@ public class TopologyTest {
 
     public void initRandomDependenciesFewer() {
 
-        ServiceDefinition serviceA = new ServiceDefinition();
-        serviceA.setName("service_a");
+        ServiceDefinition serviceA = new ServiceDefinition("service_a");
         def.addService(serviceA);
 
-        ServiceDefinition serviceB = new ServiceDefinition();
-        serviceB.setName("service_b");
+        ServiceDefinition serviceB = new ServiceDefinition("service_b");
         Dependency depB = new Dependency();
         depB.setMes(MasterElectionStrategy.RANDOM);
         depB.setMasterService(Service.from("service_c"));
@@ -245,12 +216,10 @@ public class TopologyTest {
         serviceB.addDependency (depB);
         def.addService(serviceB);
 
-        ServiceDefinition serviceC = new ServiceDefinition();
-        serviceC.setName("service_c");
+        ServiceDefinition serviceC = new ServiceDefinition("service_c");
         def.addService(serviceC);
 
-        ServiceDefinition serviceD = new ServiceDefinition();
-        serviceD.setName("service_d");
+        ServiceDefinition serviceD = new ServiceDefinition("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
@@ -263,8 +232,7 @@ public class TopologyTest {
 
     public void initRandomNodeAfterOrSameDependencies() {
 
-        ServiceDefinition serviceA = new ServiceDefinition();
-        serviceA.setName("service_a");
+        ServiceDefinition serviceA = new ServiceDefinition("service_a");
         Dependency depA = new Dependency();
         depA.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER_OR_SAME);
         depA.setMasterService(Service.from("service_b"));
@@ -272,8 +240,7 @@ public class TopologyTest {
         serviceA.addDependency (depA);
         def.addService(serviceA);
 
-        ServiceDefinition serviceB = new ServiceDefinition();
-        serviceB.setName("service_b");
+        ServiceDefinition serviceB = new ServiceDefinition("service_b");
         Dependency depB = new Dependency();
         depB.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER_OR_SAME);
         depB.setMasterService(Service.from("service_c"));
@@ -281,12 +248,10 @@ public class TopologyTest {
         serviceB.addDependency (depB);
         def.addService(serviceB);
 
-        ServiceDefinition serviceC = new ServiceDefinition();
-        serviceC.setName("service_c");
+        ServiceDefinition serviceC = new ServiceDefinition("service_c");
         def.addService(serviceC);
 
-        ServiceDefinition serviceD = new ServiceDefinition();
-        serviceD.setName("service_d");
+        ServiceDefinition serviceD = new ServiceDefinition("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
@@ -299,8 +264,7 @@ public class TopologyTest {
 
     public void initRandomNodeAfterDependencies() {
 
-        ServiceDefinition serviceA = new ServiceDefinition();
-        serviceA.setName("service_a");
+        ServiceDefinition serviceA = new ServiceDefinition("service_a");
         Dependency depA = new Dependency();
         depA.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER);
         depA.setMasterService(Service.from("service_b"));
@@ -308,8 +272,7 @@ public class TopologyTest {
         serviceA.addDependency (depA);
         def.addService(serviceA);
 
-        ServiceDefinition serviceB = new ServiceDefinition();
-        serviceB.setName("service_b");
+        ServiceDefinition serviceB = new ServiceDefinition("service_b");
         Dependency depB = new Dependency();
         depB.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER);
         depB.setMasterService(Service.from("service_c"));
@@ -317,12 +280,10 @@ public class TopologyTest {
         serviceB.addDependency (depB);
         def.addService(serviceB);
 
-        ServiceDefinition serviceC = new ServiceDefinition();
-        serviceC.setName("service_c");
+        ServiceDefinition serviceC = new ServiceDefinition("service_c");
         def.addService(serviceC);
 
-        ServiceDefinition serviceD = new ServiceDefinition();
-        serviceD.setName("service_d");
+        ServiceDefinition serviceD = new ServiceDefinition("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
@@ -335,47 +296,39 @@ public class TopologyTest {
 
     public void initAdditionalEnvironment() {
 
-        ServiceDefinition serviceA = new ServiceDefinition();
-        serviceA.setName("service_a");
+        ServiceDefinition serviceA = new ServiceDefinition("service_a");
         serviceA.addAdditionalEnvironment("SERVICE_NUMBER_0_BASED");
         def.addService(serviceA);
 
-        ServiceDefinition serviceB = new ServiceDefinition();
-        serviceB.setName("service_b");
+        ServiceDefinition serviceB = new ServiceDefinition("service_b");
         def.addService(serviceB);
 
-        ServiceDefinition serviceC = new ServiceDefinition();
-        serviceC.setName("service_c");
+        ServiceDefinition serviceC = new ServiceDefinition("service_c");
         serviceC.addAdditionalEnvironment("SERVICE_NUMBER_1_BASED");
         def.addService(serviceC);
 
-        ServiceDefinition serviceD = new ServiceDefinition();
-        serviceD.setName("service_d");
+        ServiceDefinition serviceD = new ServiceDefinition("service_d");
         serviceD.setKubernetes(true);
         def.addService(serviceD);
     }
 
     public void initAdditionalNodeList() {
 
-        ServiceDefinition serviceA = new ServiceDefinition();
-        serviceA.setName("service_a");
+        ServiceDefinition serviceA = new ServiceDefinition("service_a");
         serviceA.addAdditionalEnvironment("ALL_NODES_LIST_service_a");
         serviceA.setMemoryConsumptionSize(MemoryConsumptionSize.LARGE);
         def.addService(serviceA);
 
-        ServiceDefinition serviceB = new ServiceDefinition();
-        serviceB.setName("service_b");
+        ServiceDefinition serviceB = new ServiceDefinition("service_b");
         serviceB.setMemoryConsumptionSize(MemoryConsumptionSize.MEDIUM);
         def.addService(serviceB);
 
-        ServiceDefinition serviceC = new ServiceDefinition();
-        serviceC.setName("service_c");
+        ServiceDefinition serviceC = new ServiceDefinition("service_c");
         serviceC.addAdditionalEnvironment("ALL_NODES_LIST_service_b");
         serviceC.setMemoryConsumptionSize(MemoryConsumptionSize.NEGLIGIBLE);
         def.addService(serviceC);
 
-        ServiceDefinition serviceD = new ServiceDefinition();
-        serviceD.setName("service_d");
+        ServiceDefinition serviceD = new ServiceDefinition("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
@@ -389,26 +342,22 @@ public class TopologyTest {
 
     public void initAdditionalNodeListWithAdditionalMemory() {
 
-        ServiceDefinition serviceA = new ServiceDefinition();
-        serviceA.setName("service_a");
+        ServiceDefinition serviceA = new ServiceDefinition("service_a");
         serviceA.addAdditionalEnvironment("ALL_NODES_LIST_service_a");
         serviceA.setMemoryConsumptionSize(MemoryConsumptionSize.LARGE);
         def.addService(serviceA);
 
-        ServiceDefinition serviceB = new ServiceDefinition();
-        serviceB.setName("service_b");
+        ServiceDefinition serviceB = new ServiceDefinition("service_b");
         serviceB.setMemoryConsumptionSize(MemoryConsumptionSize.MEDIUM);
         serviceB.addAdditionalMemory(Service.from("service_c"));
         def.addService(serviceB);
 
-        ServiceDefinition serviceC = new ServiceDefinition();
-        serviceC.setName("service_c");
+        ServiceDefinition serviceC = new ServiceDefinition("service_c");
         serviceC.addAdditionalEnvironment("ALL_NODES_LIST_service_b");
         serviceC.setMemoryConsumptionSize(MemoryConsumptionSize.NEGLIGIBLE);
         def.addService(serviceC);
 
-        ServiceDefinition serviceD = new ServiceDefinition();
-        serviceD.setName("service_d");
+        ServiceDefinition serviceD = new ServiceDefinition("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
@@ -592,8 +541,7 @@ public class TopologyTest {
         def = new ServicesDefinitionImpl();
         def.setSetupService (setupService);
 
-        ServiceDefinition serviceA = new ServiceDefinition();
-        serviceA.setName("gluster");
+        ServiceDefinition serviceA = new ServiceDefinition("gluster");
         Dependency depA = new Dependency();
         depA.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER);
         depA.setMasterService(Service.from ("gluster"));
@@ -1160,8 +1108,7 @@ public class TopologyTest {
     @Test
     public void testKubernetesServiceUnsupportedDependencies() {
 
-        ServiceDefinition serviceA = new ServiceDefinition();
-        serviceA.setName("service_a");
+        ServiceDefinition serviceA = new ServiceDefinition("service_a");
         Dependency depA = new Dependency();
         depA.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER);
         depA.setMasterService(Service.from("service_b"));
@@ -1169,12 +1116,10 @@ public class TopologyTest {
         serviceA.addDependency (depA);
         def.addService(serviceA);
 
-        ServiceDefinition serviceB = new ServiceDefinition();
-        serviceB.setName("service_b");
+        ServiceDefinition serviceB = new ServiceDefinition("service_b");
         def.addService(serviceB);
 
-        ServiceDefinition serviceD = new ServiceDefinition();
-        serviceD.setName("service_d");
+        ServiceDefinition serviceD = new ServiceDefinition("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();
@@ -1218,17 +1163,14 @@ public class TopologyTest {
     @Test
     public void testKubernetesOnKubernetesDependencies() throws Exception {
 
-        ServiceDefinition serviceA = new ServiceDefinition();
-        serviceA.setName("service_a");
+        ServiceDefinition serviceA = new ServiceDefinition("service_a");
         def.addService(serviceA);
 
-        ServiceDefinition serviceB = new ServiceDefinition();
+        ServiceDefinition serviceB = new ServiceDefinition("service_b");
         serviceB.setKubernetes(true);
-        serviceB.setName("service_b");
         def.addService(serviceB);
 
-        ServiceDefinition serviceD = new ServiceDefinition();
-        serviceD.setName("service_d");
+        ServiceDefinition serviceD = new ServiceDefinition("service_d");
 
         serviceD.setKubernetes(true);
         Dependency depD = new Dependency();

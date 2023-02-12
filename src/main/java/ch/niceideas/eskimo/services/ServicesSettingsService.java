@@ -48,7 +48,7 @@ public interface ServicesSettingsService {
 
     ServicesSettingsWrapper prepareSaveSettings (
             String settingsFormAsString,
-            Map<String, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
+            Map<Service, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
             List<Service> restartedServices) throws FileException, SetupException;
 
 }

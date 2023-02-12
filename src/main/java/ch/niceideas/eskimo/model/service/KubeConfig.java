@@ -35,14 +35,18 @@
 
 package ch.niceideas.eskimo.model.service;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 
-@Data
+@NoArgsConstructor
 public class KubeConfig {
 
+    @Getter
+    @Setter
     private KubeRequest request;
 
     public JSONObject toJSON() {

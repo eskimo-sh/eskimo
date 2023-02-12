@@ -34,8 +34,9 @@
 
 package ch.niceideas.eskimo.model.service;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -46,7 +47,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Data
+@EqualsAndHashCode
+@Getter
+@Setter
 public class EditableSettings {
 
     @EqualsAndHashCode.Exclude

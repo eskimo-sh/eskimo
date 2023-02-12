@@ -54,7 +54,8 @@ import java.util.stream.Collectors;
 
 import static ch.niceideas.eskimo.model.SimpleOperationCommand.standardizeOperationMember;
 
-@Data
+@Getter
+@RequiredArgsConstructor
 public class SetupCommand implements JSONOpCommand {
 
     public static final String BASE_ESKIMO_PACKAGE = "base-eskimo";
@@ -137,21 +138,6 @@ public class SetupCommand implements JSONOpCommand {
             return packageName;
         }
         return packageName.substring(0, packageName.indexOf("_"));
-    }
-
-    SetupCommand(JsonWrapper rawSetup, String packageDownloadUrl,
-                 List<String> downloadPackages,
-                 List<String> buildPackage,
-                 List<String> downloadKube,
-                 List<String> buildKube,
-                 List<String> packageUpdates) {
-        this.rawSetup = rawSetup;
-        this.packageDownloadUrl = packageDownloadUrl;
-        this.downloadPackages = downloadPackages;
-        this.buildPackage = buildPackage;
-        this.downloadKube = downloadKube;
-        this.buildKube = buildKube;
-        this.packageUpdates = packageUpdates;
     }
 
     public JSONObject toJSON () {

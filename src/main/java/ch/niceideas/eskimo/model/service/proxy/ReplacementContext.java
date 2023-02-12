@@ -36,9 +36,9 @@
 package ch.niceideas.eskimo.model.service.proxy;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class ReplacementContext {
 

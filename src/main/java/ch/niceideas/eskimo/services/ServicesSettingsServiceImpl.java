@@ -205,7 +205,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ServicesSettingsWrapper prepareSaveSettings (
             String settingsFormAsString,
-            Map<String, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
+            Map<Service, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
             List<Service> restartedServices) throws FileException, SetupException  {
 
         ServicesSettingsWrapper servicesSettings = configurationService.loadServicesSettings();
@@ -217,7 +217,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
         return servicesSettings;
     }
 
-    protected Service[] fillInEditedConfigs(Map<String, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
+    protected Service[] fillInEditedConfigs(Map<Service, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
                                  JSONObject settingsForm, JSONArray configArrayForService) {
 
         Set<Service> dirtyServices = new HashSet<>();
@@ -267,7 +267,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                                             dirtyServices.add(service);
 
                                             Map<String, List<SettingsOperationsCommand.ChangedSettings>> changedSettingsforService =
-                                                    changedSettings.computeIfAbsent(serviceName, ser -> new HashMap<>());
+                                                    changedSettings.computeIfAbsent(service, ser -> new HashMap<>());
 
                                             List<SettingsOperationsCommand.ChangedSettings> changeSettingsForFile =
                                                     changedSettingsforService.computeIfAbsent(filename, fn -> new ArrayList<>());

@@ -38,18 +38,20 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.eskimo.services.SSHCommandException;
 import ch.niceideas.eskimo.services.SSHCommandService;
 import ch.niceideas.eskimo.types.Node;
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 
-@Data
+@RequiredArgsConstructor
+@Getter
 public class Command {
 
-    private String id = null;
-    private String name = null;
-    private String commandCall = null;
-    private String icon = null;
+    private final String id;
+    private final String name;
+    private final String icon;
+    private final String commandCall;
 
     public JSONObject toStatusConfigJSON () {
         return new JSONObject(new HashMap<String, Object>() {{

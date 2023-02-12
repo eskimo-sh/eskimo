@@ -41,6 +41,8 @@ import ch.niceideas.eskimo.services.ServicesSettingsService;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.types.Service;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -51,10 +53,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Data
+@Setter
+@Getter
 public class SettingsOperationsCommand implements Serializable {
 
-    private Map<String, Map<String, List<ChangedSettings>>> changedSettings = null;
+    private Map<Service, Map<String, List<ChangedSettings>>> changedSettings = null;
     private List<Service> restartedServices = null;
     private ServicesSettingsWrapper newSettings;
 
@@ -62,7 +65,7 @@ public class SettingsOperationsCommand implements Serializable {
             String settingsFormAsString, ServicesSettingsService servicesSettingsService)
             throws FileException, SetupException {
 
-        Map<String, Map<String, List<ChangedSettings>>> changedSettings = new HashMap<>();
+        Map<Service, Map<String, List<ChangedSettings>>> changedSettings = new HashMap<>();
         List<Service> restartedServices = new ArrayList<>();
 
         ServicesSettingsWrapper newSettings = servicesSettingsService.prepareSaveSettings(settingsFormAsString, changedSettings, restartedServices);
@@ -80,14 +83,14 @@ public class SettingsOperationsCommand implements Serializable {
         Map<String, Object> retAsMap = new HashMap<>();
 
         // 1. settings changes
-        Map<String, Object> settingsMap = new HashMap<>();
+        Map<String, Map<String, JSONArray>> settingsMap = new HashMap<>();
 
-        for (Map.Entry<String, Map<String, List<ChangedSettings>>> entry : changedSettings.entrySet()) {
+        for (Map.Entry<Service, Map<String, List<ChangedSettings>>> entry : changedSettings.entrySet()) {
 
-            String service = entry.getKey();
+            Service service = entry.getKey();
             Map<String, List<ChangedSettings>> changedSettingsForService = entry.getValue();
 
-            Map<String, Object> fileSettingsMap = new HashMap<>();
+            Map<String, JSONArray> fileSettingsMap = new HashMap<>();
 
             for (Map.Entry<String, List<ChangedSettings>> fileEntry : changedSettingsForService.entrySet())  {
 
@@ -100,7 +103,7 @@ public class SettingsOperationsCommand implements Serializable {
                 fileSettingsMap.put (filename, settingsArray);
             }
 
-            settingsMap.put (service, fileSettingsMap);
+            settingsMap.put (service.getName(), fileSettingsMap);
         }
 
         retAsMap.put("settings", new JSONObject(settingsMap));

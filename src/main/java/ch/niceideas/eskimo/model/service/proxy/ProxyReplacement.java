@@ -36,19 +36,21 @@
 package ch.niceideas.eskimo.model.service.proxy;
 
 import ch.niceideas.common.utils.StringUtils;
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-@Data
+@Getter
+@RequiredArgsConstructor
 public class ProxyReplacement {
 
     public enum ProxyReplacementType {
         PLAIN
     }
 
-    private ProxyReplacementType type;
-    private String source;
-    private String target;
-    private String urlPattern;
+    private final ProxyReplacementType type;
+    private final String source;
+    private final String target;
+    private final String urlPattern;
 
     public String performReplacement(String input, String requestURI, ReplacementContext context) {
 
