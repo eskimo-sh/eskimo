@@ -39,6 +39,7 @@ import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.terminal.ScreenImage;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
+import ch.niceideas.eskimo.utils.OSDetector;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.junit.jupiter.api.Assumptions;
@@ -66,7 +67,7 @@ public class TerminalServiceTest extends AbstractBaseSSHTest {
     /** Run Test on Linux only */
     @BeforeEach
     public void beforeMethod() {
-        Assumptions.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
+        Assumptions.assumeTrue(OSDetector.isPosix());
     }
 
     @Autowired

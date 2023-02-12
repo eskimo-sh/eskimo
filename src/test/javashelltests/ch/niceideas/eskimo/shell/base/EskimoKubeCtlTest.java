@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.shell.base;
 
 import ch.niceideas.common.utils.*;
 import ch.niceideas.eskimo.shell.setup.AbstractSetupShellTest;
+import ch.niceideas.eskimo.utils.OSDetector;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +56,7 @@ public class EskimoKubeCtlTest {
     /** Run Test on Linux only */
     @BeforeEach
     public void beforeMethod() {
-        Assumptions.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
+        Assumptions.assumeTrue(OSDetector.isPosix());
     }
 
     @AfterEach

@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo;
 
 import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.eskimo.utils.OSDetector;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
@@ -62,7 +63,7 @@ public class SSHTestInfrastructureTest extends AbstractBaseSSHTest {
     /** Run Test on Linux only */
     @BeforeEach
     public void beforeMethod() {
-        Assumptions.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
+        Assumptions.assumeTrue(OSDetector.isPosix());
     }
 
     @Test

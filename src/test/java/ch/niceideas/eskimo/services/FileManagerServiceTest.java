@@ -43,6 +43,7 @@ import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import ch.niceideas.eskimo.test.services.ConnectionManagerServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SSHCommandServiceTestImpl;
 import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.utils.OSDetector;
 import com.trilead.ssh2.SFTPv3Client;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
@@ -81,7 +82,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
     /** Run Test on Linux only */
     @BeforeEach
     public void beforeMethod() {
-        Assumptions.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
+        Assumptions.assumeTrue(OSDetector.isPosix());
     }
 
     @Autowired

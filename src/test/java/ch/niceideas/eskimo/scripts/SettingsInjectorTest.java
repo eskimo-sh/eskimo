@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.scripts;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.ProcessHelper;
 import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.eskimo.utils.OSDetector;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
@@ -68,7 +69,7 @@ public class SettingsInjectorTest {
     /** Run Test on Linux only */
     @BeforeEach
     public void beforeMethod() {
-        Assumptions.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
+        Assumptions.assumeTrue(OSDetector.isPosix());
     }
     
     public static String getCmdPathFileStr(String command) {

@@ -36,6 +36,7 @@
 package ch.niceideas.eskimo.terminal;
 
 import ch.niceideas.eskimo.utils.ActiveWaiter;
+import ch.niceideas.eskimo.utils.OSDetector;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,7 +57,7 @@ public class SessionTest {
     /** Run Test on Linux only */
     @BeforeEach
     public void beforeMethod() {
-        Assumptions.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
+        Assumptions.assumeTrue(OSDetector.isPosix());
     }
 
     @Test

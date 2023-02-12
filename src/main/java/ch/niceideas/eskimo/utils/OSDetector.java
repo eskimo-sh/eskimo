@@ -36,6 +36,10 @@ package ch.niceideas.eskimo.utils;
 
 public class OSDetector {
 
+    public enum OSType {
+        WIN, OSX, UNIX, SOLARIS, UNKNOWN,
+    }
+
     private OSDetector() {}
 
     private static final String OS = System.getProperty("os.name").toLowerCase();
@@ -56,17 +60,21 @@ public class OSDetector {
         return OS.contains("sunos");
     }
 
-    public static String getOS(){
+    public static boolean isPosix() {
+        return isUnix() || isSolaris() || isMac();
+    }
+
+    public static OSType getOS(){
         if (isWindows()) {
-            return "win";
+            return OSType.WIN;
         } else if (isMac()) {
-            return "osx";
+            return OSType.OSX;
         } else if (isUnix()) {
-            return "uni";
+            return OSType.UNIX;
         } else if (isSolaris()) {
-            return "sol";
+            return OSType.SOLARIS;
         } else {
-            return "err";
+            return OSType.UNKNOWN;
         }
     }
 }

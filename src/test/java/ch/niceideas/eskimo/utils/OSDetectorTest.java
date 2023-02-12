@@ -37,8 +37,7 @@ package ch.niceideas.eskimo.utils;
 import ch.niceideas.common.utils.StringUtils;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class OSDetectorTest {
 
@@ -69,7 +68,7 @@ public class OSDetectorTest {
 
     @Test
     public void testGetOS() {
-        assertTrue(StringUtils.isNotBlank(OSDetector.getOS()));
+        assertNotNull(OSDetector.getOS());
     }
 
 }
