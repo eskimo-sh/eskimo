@@ -307,16 +307,73 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
     @Test
     public void testDeletePath() {
-        fail ("To Be Implemented");
+
+        js("eskimoFileManagers.eskimoMain.confirm = function (msg, callback) { callback(); };");
+
+        js("$.ajaxGet = function (dataObj) {" +
+                "    if (dataObj.url == 'file-manager-delete?nodeAddress=192.168.56.11&folder=/tmp&file=a.bin') {" +
+                "        dataObj.success({" +
+                "            'status' : 'OK'" +
+                "        });" +
+                "    } else { " +
+                "        dataObj.success({" +
+                "            'status' : 'NOK'," +
+                "            'error' : 'test error'" +
+                "        });" +
+                "    } " +
+                "}");
+
+        js("eskimoFileManagers.deletePath('192.168.56.11', '192-168-56-11', '/tmp', 'b.bin')");
+
+        assertJavascriptEquals("3", "window.alertLevel");
+        assertJavascriptEquals("test error", "window.alertMsg");
+
+        js("eskimoFileManagers.openFolder = function() {window.openFolderCalled = true;}");
+
+        js("eskimoFileManagers.deletePath('192.168.56.11', '192-168-56-11', '/tmp', 'a.bin')");
+
+        assertJavascriptEquals("true", "window.openFolderCalled");
     }
 
     @Test
-    public void testCreateFile() {
-        fail ("To Be Implemented");
-    }
+    public void testCreateFile() throws Exception {
 
-    @Test
-    public void testRegisterSubmitFormFileUpload() {
-        fail ("To Be Implemented");
+        js("$.ajaxGet = function (dataObj) {" +
+                "    if (dataObj.url == 'file-manager-create-file?nodeAddress=192.168.10.11&folder=/&fileName=a.bin') {" +
+                "        dataObj.success({" +
+                "            'status' : 'OK'," +
+                "            'folder': '/'," +
+                "            'content' : " + dirContent + " " +
+                "        });" +
+                "    } else { " +
+                "        dataObj.success({" +
+                "            'status' : 'NOK'," +
+                "            'error' : 'test error'" +
+                "        });" +
+                "    } " +
+                "}");
+
+        js("eskimoFileManagers.openFileManager('192.168.10.11', '192-168-10-11');");
+
+        js("eskimoFileManagers.createFile('192.168.10.11', '192-168-10-11')");
+
+        js("$(\"#filename-input-input\").val('test_file')");
+
+        js("$('#file-manager-input-button-validate').click();");
+
+        assertJavascriptEquals("3", "window.alertLevel");
+        assertJavascriptEquals("test error", "window.alertMsg");
+
+        js("eskimoFileManagers.createFile('192.168.10.11', '192-168-10-11')");
+
+        js("$(\"#filename-input-input\").val('a.bin')");
+
+        js("window.dirContent = " + dirContent + "");
+
+        js("$('#file-manager-input-button-validate').click();");
+
+        String htmlContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoFileManagersTest/expectedContent.rawhtml"), StandardCharsets.UTF_8);
+
+        assertJavascriptEquals(htmlContent.replaceAll("\r", ""), "$('#file-manager-folder-content-192-168-10-11').html()");
     }
 }
