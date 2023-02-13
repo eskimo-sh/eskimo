@@ -803,82 +803,90 @@ check_all_services_up() {
     #echo $eskimo_status | jq -r " .nodeServicesStatus"
 
     if [[ -z $MULTIPLE_NODE ]]; then
-        for i in "service_kubernetes_192-168-56-41" \
-            "service_mesos-agent_192-168-56-41" \
-            "service_prometheus_192-168-56-41" \
-            "service_flink-runtime_192-168-56-41" \
-            "service_kibana_192-168-56-41" \
-            "service_zookeeper_192-168-56-41" \
-            "service_spark-runtime_192-168-56-41" \
-            "service_mesos-master_192-168-56-41" \
-            "service_zeppelin_192-168-56-41" \
-            "service_spark-console_192-168-56-41" \
-            "service_elasticsearch_192-168-56-41" \
-            "service_logstash_192-168-56-41" \
-            "service_cerebro_192-168-56-41" \
-            "service_kafka_192-168-56-41" \
-            "service_ntp_192-168-56-41" \
-            "service_kafka-manager_192-168-56-41" \
-            "service_gluster_192-168-56-41" \
-            "node_alive_192-168-56-41" \
-            "service_flink-app-master_192-168-56-41" \
-            "service_grafana_192-168-56-41"; do
+        for i in "service_flink-runtime_" \
+                 "service_ntp_192-168-56-41" \
+                 "service_cerebro_" \
+                 "service_kibana_" \
+                 "service_spark-console_" \
+                 "service_kafka_" \
+                 "service_zookeeper_192-168-56-41" \
+                 "service_kubernetes-dashboard_" \
+                 "service_kube-slave_192-168-56-41" \
+                 "service_elasticsearch_" \
+                 "service_logstash_" \
+                 "service_spark-runtime_" \
+                 "service_flink-cli_192-168-56-41" \
+                 "service_zeppelin_" \
+                 "node_alive_192-168-56-41" \
+                 "service_grafana_" \
+                 "service_prometheus_192-168-56-41" \
+                 "service_gluster_192-168-56-41" \
+                 "service_kube-master_192-168-56-41" \
+                 "service_kafka-manager_" \
+                 "service_kafka-cli_192-168-56-41" \
+                 "service_spark-cli_192-168-56-41" \
+                 "service_logstash-cli_192-168-56-41" \
+                 "service_etcd_192-168-56-41" ; do
             if [[ $(echo $eskimo_status | jq -r ".nodeServicesStatus" | grep "$i" | cut -d ':' -f 2 | grep "OK") == "" ]]; then
                 echo "not found $i"
                 return
             fi
         done
     else
-        for i in "service_kubernetes_192-168-56-52" \
-            "service_mesos-agent_192-168-56-51" \
-            "service_mesos-agent_192-168-56-52" \
-            "service_mesos-agent_192-168-56-53" \
-            "service_mesos-agent_192-168-56-54" \
-            "service_prometheus_192-168-56-51" \
-            "service_prometheus_192-168-56-52" \
-            "service_prometheus_192-168-56-53" \
-            "service_prometheus_192-168-56-54" \
-            "service_flink-runtime_192-168-56-51" \
-            "service_flink-runtime_192-168-56-52" \
-            "service_flink-runtime_192-168-56-53" \
-            "service_flink-runtime_192-168-56-54" \
-            "service_kibana_" \
-            "service_zookeeper_192-168-56-51" \
-            "service_spark-runtime_192-168-56-51" \
-            "service_spark-runtime_192-168-56-52" \
-            "service_spark-runtime_192-168-56-53" \
-            "service_spark-runtime_192-168-56-54" \
-            "service_mesos-master_192-168-56-51" \
-            "service_zeppelin_" \
-            "service_spark-console_" \
-            "service_elasticsearch_192-168-56-51" \
-            "service_elasticsearch_192-168-56-52" \
-            "service_elasticsearch_192-168-56-53" \
-            "service_elasticsearch_192-168-56-54" \
-            "service_logstash_192-168-56-51" \
-            "service_logstash_192-168-56-52" \
-            "service_logstash_192-168-56-53" \
-            "service_logstash_192-168-56-54" \
-            "service_cerebro_" \
-            "service_kafka_192-168-56-51" \
-            "service_kafka_192-168-56-52" \
-            "service_kafka_192-168-56-53" \
-            "service_kafka_192-168-56-54" \
-            "service_ntp_192-168-56-51" \
-            "service_ntp_192-168-56-52" \
-            "service_ntp_192-168-56-53" \
-            "service_ntp_192-168-56-54" \
-            "service_kafka-manager_" \
-            "service_gluster_192-168-56-51" \
-            "service_gluster_192-168-56-52" \
-            "service_gluster_192-168-56-53" \
-            "service_gluster_192-168-56-54" \
-            "node_alive_192-168-56-51" \
-            "node_alive_192-168-56-52" \
-            "node_alive_192-168-56-53" \
-            "node_alive_192-168-56-54" \
-            "service_flink-app-master_192-168-56-52" \
-            "service_grafana_"; do
+        for i in "service_flink-runtime_" \
+                 "service_ntp_192-168-56-51" \
+                 "service_ntp_192-168-56-52" \
+                 "service_ntp_192-168-56-53" \
+                 "service_ntp_192-168-56-54" \
+                 "service_cerebro_" \
+                 "service_kibana_" \
+                 "service_kube-slave_192-168-56-54" \
+                 "service_spark-console_" \
+                 "service_kafka_" \
+                 "service_zookeeper_192-168-56-51" \
+                 "service_kubernetes-dashboard_" \
+                 "service_kube-slave_192-168-56-51" \
+                 "service_kube-slave_192-168-56-53" \
+                 "service_kube-slave_192-168-56-52" \
+                 "service_elasticsearch_" \
+                 "service_logstash_" \
+                 "service_flink-cli_192-168-56-54" \
+                 "service_spark-runtime_" \
+                 "service_flink-cli_192-168-56-51" \
+                 "service_zeppelin_" \
+                 "service_flink-cli_192-168-56-53" \
+                 "service_flink-cli_192-168-56-52" \
+                 "node_alive_192-168-56-51" \
+                 "node_alive_192-168-56-52" \
+                 "node_alive_192-168-56-53" \
+                 "node_alive_192-168-56-54" \
+                 "service_gluster_192-168-56-54" \
+                 "service_prometheus_192-168-56-52" \
+                 "service_grafana_" \
+                 "service_gluster_192-168-56-53" \
+                 "service_prometheus_192-168-56-51" \
+                 "service_prometheus_192-168-56-54" \
+                 "service_gluster_192-168-56-52" \
+                 "service_prometheus_192-168-56-53" \
+                 "service_gluster_192-168-56-51" \
+                 "service_kube-master_192-168-56-51" \
+                 "service_kafka-cli_192-168-56-53" \
+                 "service_kafka-cli_192-168-56-52" \
+                 "service_kafka-manager_" \
+                 "service_kafka-cli_192-168-56-54" \
+                 "service_kafka-cli_192-168-56-51" \
+                 "service_logstash-cli_192-168-56-53" \
+                 "service_spark-cli_192-168-56-51" \
+                 "service_logstash-cli_192-168-56-54" \
+                 "service_spark-cli_192-168-56-52" \
+                 "service_spark-cli_192-168-56-53" \
+                 "service_logstash-cli_192-168-56-51" \
+                 "service_spark-cli_192-168-56-54" \
+                 "service_logstash-cli_192-168-56-52" \
+                 "service_etcd_192-168-56-54" \
+                 "service_etcd_192-168-56-53" \
+                 "service_etcd_192-168-56-52" \
+                 "service_etcd_192-168-56-51" ; do
             if [[ $(echo $eskimo_status | jq -r ".nodeServicesStatus" | grep "$i" | cut -d ':' -f 2 | grep "OK") == "" ]]; then
                 echo "not found $i"
                 return
@@ -900,8 +908,8 @@ wait_all_services_up() {
             return
         fi
 
-        if [[ $i == 30 ]]; then
-            echo_date "No all services managed to come up in 600 seconds - $all_service_status no found."
+        if [[ $i == 60 ]]; then
+            echo_date "No all services managed to come up in 600 seconds - $all_service_status"
             exit 50
         fi
 
