@@ -42,7 +42,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class FixedSizeList<T> extends AbstractWrappingList<T> implements List<T> {
 
     private final int maxSize;
-    private List<T> buffer = new CopyOnWriteArrayList<T>();
+    private List<T> buffer = new CopyOnWriteArrayList<>();
 
     public FixedSizeList(int maxSize) {
         setUnderlying (buffer);

@@ -908,11 +908,11 @@ wait_all_services_up() {
 
         all_service_status=$(check_all_services_up)
         if [[ $all_service_status == "OK" ]]; then
-            return
+            return 0
         fi
 
         if [[ $i == 60 ]]; then
-            echo_date "No all services managed to come up in 600 seconds - $all_service_status"
+            echo_date "Not all services managed to come up in 600 seconds - $all_service_status"
             exit 50
         fi
 

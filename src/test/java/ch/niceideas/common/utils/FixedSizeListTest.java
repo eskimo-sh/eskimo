@@ -97,6 +97,50 @@ public class FixedSizeListTest {
     }
 
     @Test
+    public void testEqualsTestList() {
+        List<String> oneList = new ArrayList<>(){{
+            add("0");
+            add("1");
+            add("2");
+            add("3");
+            add("4");
+            add("5");
+            add("6");
+            add("7");
+            add("8");
+            add("9");
+            add("10");
+        }};
+
+        testList.addAll(oneList);
+
+        FixedSizeList<String> testList2  = new FixedSizeList<>(10);
+        testList2.addAll(oneList);
+
+        assertEquals(testList2, testList);
+    }
+
+    @Test
+    public void testAddWithIndex() {
+
+        testList.add(0, "10");
+        testList.add(0, "9");
+        testList.add(0, "8");
+        testList.add(0, "7");
+        testList.add(0, "6");
+        testList.add(0, "5");
+        testList.add(0, "4");
+        testList.add(0, "3");
+        testList.add(0, "2");
+        testList.add(0, "1");
+        testList.add(0, "0");
+
+        // should have remove first element
+        assertEquals("10", testList.get(9));
+        assertEquals("1", testList.get(0));
+    }
+
+    @Test
     public void testEquals() {
         List<String> oneList = new ArrayList<>(){{
             add("0");

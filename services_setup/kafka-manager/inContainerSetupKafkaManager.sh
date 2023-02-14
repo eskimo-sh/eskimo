@@ -63,11 +63,11 @@ bash -c "echo \"kafka  ALL = NOPASSWD: /bin/mkdir -p /var/log/kafka/kafka-manage
 bash -c "echo \"kafka  ALL = NOPASSWD: /bin/chown kafka /var/log/kafka/kafka-manager\" >> /etc/sudoers.d/kafka"
 
 
-echo " - Chaning owner of /var/run/kafka-manager/"
+echo " - Changing owner of /var/run/kafka-manager/"
 sudo mkdir -p /var/run/kafka/kafka-manager
 sudo chown -R kafka /var/run/kafka/kafka-manager
 
-echo " - Simlinking logs to /var/log/kafka-manager/"
+echo " - Symlinking logs to /var/log/kafka-manager/"
 sudo mkdir -p /var/log/kafka/kafka-manager
 sudo chown kafka /var/log/kafka/kafka-manager
 

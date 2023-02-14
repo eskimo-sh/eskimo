@@ -566,6 +566,52 @@ function commit_container() {
 
 }
 
+function __delete_registry_repository() {
+
+    if [[ $1 == "" ]]; then
+        echo "Container needs to be passed in argument"
+        exit 2
+    fi
+    export CONTAINER=$1
+
+    if [[ $2 == "" ]]; then
+        echo "Tag needs to be passed as argument"
+        exit 3
+    fi
+    LAST_TAG=$2
+
+    if [[ -d "/var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/$CONTAINER/" ]]; then
+
+        echo " - Deleting previous container image tag $LAST_TAG from registry"
+
+        if [[ -d "/var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/$CONTAINER/_manifests/tags/$LAST_TAG/index/sha256/" ]]; then
+
+            local TAG_REF=$(ls -1 "/var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/$CONTAINER/_manifests/tags/$LAST_TAG/index/sha256/")
+            echo "   + Tag reference is $TAG_REF"
+
+            local layers=$(curl -XGET -H "Accept: application/vnd.docker.distribution.manifest.v2+json~" http://kubernetes.registry:5000/v2/$CONTAINER/manifests/$LAST_TAG  2>/dev/null \
+                    | /usr/local/bin/jq -r -c  ".fsLayers | .[] | .blobSum" \
+                    | cut -d ":" -f 2)
+
+            if [[ $layers != "" ]]; then
+                echo "   + Deleting layers and blobs"
+                for layer in $layers; do
+
+                    layer_index=${layer:0:2}
+
+                    sudo rm -Rf /var/lib/kubernetes/docker_registry/docker/registry/v2/blobs/sha256/$layer_index/$layer/
+
+                    sudo rm -Rf /var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/$CONTAINER/_layers/sha256/$layer
+                done
+            fi
+
+            echo "   + Deleting manifest"
+            sudo rm -Rf /var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/$CONTAINER/_manifests/revisions/sha256/$TAG_REF
+            sudo rm -Rf /var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/$CONTAINER/_manifests/tags/$LAST_TAG/
+        fi
+    fi
+}
+
 # Commit a container from its docker image and start it
 # Arguments:
 # - $1 the name of the container
@@ -633,7 +679,10 @@ function build_container() {
         fail_if_error $? "$LOG_FILE" 7
 
         echo " - Attempting to delete it with registry tag as well"
-        docker image rm kubernetes.registry:5000//$CONTAINER:$LAST_TAG --force >> $LOG_FILE 2>&1
+        docker image rm kubernetes.registry:5000/$CONTAINER:$LAST_TAG --force >> $LOG_FILE 2>&1
+
+        echo " - Searching for previous image tag $LAST_TAG in registry to delete it (if appliable)"
+        __delete_registry_repository $CONTAINER $LAST_TAG
     fi
 
     # build

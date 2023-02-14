@@ -299,6 +299,7 @@ public class CommonSetupShellTest {
                 " - Finding new tag for container image\n" +
                 " - Deleting previous container image tag 1\n" +
                 " - Attempting to delete it with registry tag as well\n" +
+                " - Searching for previous image tag 1 in registry to delete it (if appliable)\n" +
                 " - Building docker container from image eskimo/cerebro:2\n", result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"), StandardCharsets.UTF_8);

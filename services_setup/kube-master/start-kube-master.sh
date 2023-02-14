@@ -50,7 +50,7 @@ export lock_handle=$LAST_LOCK_HANDLE
 
 export HOME=/root
 
-echo "   + Mounting Kubernetes Eskimo Gluster shares"
+echo "   + Mounting Eskimo Gluster share for docker registry"
 /usr/local/sbin/setupK8sGlusterShares.sh > /var/log/kubernetes/start_k8s_master.log 2>&1
 if [[ $? != 0 ]]; then
     echo "   + Failed to mount gluster shares"

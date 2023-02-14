@@ -42,7 +42,7 @@ After=eskimo-startup-checks.service
 PartOf=kube-master.service
 
 StartLimitBurst=6
-StartLimitIntervaSecl=100
+StartLimitIntervalSec=100
 
 
 [Service]
