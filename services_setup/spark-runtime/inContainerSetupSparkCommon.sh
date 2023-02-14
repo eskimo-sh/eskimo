@@ -186,17 +186,19 @@ sudo bash -c "echo -e \"spark.local.dir=/var/lib/spark/tmp/\"  >> /usr/local/lib
 
 if [[ $SPARK_CONTAINER_TAG == "" ]]; then
     echo " - Finding last spark-runtime container tag"
-    TAGS=$(curl -XGET http://kubernetes.registry:5000/v2/spark-runtime/tags/list 2>/dev/null | jq -r -c  ".tags | .[]" 2>/dev/null)
+    . /etc/eskimo_topology.sh
+    SPARK_CONTAINER_TAG=0
+    TAGS=$(curl -XGET http://$MASTER_KUBE_MASTER_1:5000/v2/spark-runtime/tags/list 2>/dev/null | jq -r -c  ".tags | .[]" 2>/dev/null)
     if [[ $? == 0 ]]; then
         for tag in $TAGS; do
             if [[ $tag != "latest" ]]; then
-                if [[ $(__vercomp $last $tag) == 2 ]]; then
+                if [[ "$SPARK_CONTAINER_TAG" -lt "$tag" ]]; then
                     export SPARK_CONTAINER_TAG=$tag
                 fi
             fi
         done
     fi
-    if [[ $SPARK_CONTAINER_TAG == ""  && -n $TEST ]]; then
+    if [[ ( $SPARK_CONTAINER_TAG == "" || $SPARK_CONTAINER_TAG == 0 ) && -z $TEST_MODE ]]; then
         echo "Couldn't find last spark-runtime image tag "
         exit 1
     fi

@@ -107,7 +107,7 @@ public class UnboundListTest {
 
         assertNotNull (testList.get(4));
         IndexOutOfBoundsException exception = assertThrows(IndexOutOfBoundsException.class, () -> testList.get(5));
-        assertEquals("Index: 5, Size: 5", exception.getMessage());
+        assertEquals("Index 5 out of bounds for length 5", exception.getMessage());
 
         addElementsSecond();
         assertNotNull (testList.get(10));

@@ -123,7 +123,7 @@ public class SparkRuntimeSetupTest extends AbstractSetupShellTest {
     public void testConfigurationFileUpdate() throws Exception {
         String configEchoed = FileUtils.readFile(new File (getJailPath() + "/.log_bash"));
 
-        System.err.println (configEchoed);
+        //System.err.println (configEchoed);
 
         // test a few essential ones
         assertTrue (configEchoed.contains("spark.master=k8s://https://192.168.10.11:6443\""));
@@ -133,7 +133,8 @@ public class SparkRuntimeSetupTest extends AbstractSetupShellTest {
         assertTrue (configEchoed.contains("spark.driver.bindAddress=192.168.10.13\""));
 
         configEchoed = FileUtils.readFile(new File (getJailPath() + "/.log_sudo"));
-        System.err.println (configEchoed);
+
+        //System.err.println (configEchoed);
 
         // test a few essential ones
         assertTrue (configEchoed.contains("echo -e \"export SPARK_CONF_DIR=/usr/local/lib/spark/conf\"  >> /usr/local/lib/spark/conf/spark-env.sh"));
@@ -141,7 +142,7 @@ public class SparkRuntimeSetupTest extends AbstractSetupShellTest {
         assertTrue (configEchoed.contains("echo -e \"export KUBECONFIG=/home/spark/.kube/config\"  >> /usr/local/lib/spark/conf/spark-env.sh"));
         assertTrue (configEchoed.contains("echo -e \"spark.eventLog.dir=/var/lib/spark/eventlog\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"));
         assertTrue (configEchoed.contains("echo -e \"spark.dynamicAllocation.enabled=true\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"));
-        assertTrue (configEchoed.contains("echo -e \"spark.kubernetes.container.image=kubernetes.registry:5000/spark-runtime:\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"));
+        assertTrue (configEchoed.contains("echo -e \"spark.kubernetes.container.image=kubernetes.registry:5000/spark-runtime:0\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"));
         assertTrue (configEchoed.contains("echo -e \"spark.kubernetes.file.upload.path=/var/lib/spark/data\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"));
         assertTrue (configEchoed.contains("echo -e \"spark.kubernetes.driver.podTemplateFile=/usr/local/lib/spark/conf/spark-pod-template.yaml\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"));
         assertTrue (configEchoed.contains("echo -e \"spark.kubernetes.executor.podTemplateFile=/usr/local/lib/spark/conf/spark-pod-template.yaml\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"));

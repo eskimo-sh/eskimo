@@ -121,8 +121,9 @@ docker run \
         -v /var/run/spark:/var/run/spark \
         -v /var/lib/spark:/var/lib/spark:rshared \
         -v /usr/local/lib:/usr/local/host_lib:ro \
-        -i \
-        -t eskimo/zeppelin:$CONTAINER_TAG bash >> zeppelin_install_log 2>&1
+        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
+        -it \
+        eskimo/zeppelin:$CONTAINER_TAG bash >> zeppelin_install_log 2>&1
 fail_if_error $? "zeppelin_install_log" -2
 
 #        -v /var/lib/zeppelin:/var/lib/zeppelin \

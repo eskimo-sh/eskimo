@@ -91,14 +91,18 @@ echo " - Running docker container to configure spark"
 docker run \
         -v $PWD:/scripts \
         -v $PWD/../common:/common \
+        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         -d \
         --name spark \
-        -i \
-        -t eskimo/spark:$COMMON_CONTAINER_TAG bash >> spark_executor_install_log 2>&1
+        -it \
+        eskimo/spark:$COMMON_CONTAINER_TAG bash >> spark_executor_install_log 2>&1
 fail_if_error $? "spark_executor_install_log" -2
 
+echo " - Getting in advance next spark-runtime tag"
+NEXT_SPARK_RUNTIME_TAG=$(($(get_last_tag spark-runtime) + 1))
+
 echo " - Configuring spark container (config script)"
-docker exec spark bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id $COMMON_CONTAINER_TAG \
+docker exec spark bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id $NEXT_SPARK_RUNTIME_TAG \
         | tee -a spark_executor_install_log 2>&1
 check_in_container_config_success spark_executor_install_log
 

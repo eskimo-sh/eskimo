@@ -34,12 +34,15 @@
 
 package ch.niceideas.common.utils;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class FixedSizeList<T> extends AbstractWrappingList<T> implements List<T> {
 
     private final int maxSize;
-    private final LinkedList<T> buffer = new LinkedList<>();
+    private List<T> buffer = new CopyOnWriteArrayList<T>();
 
     public FixedSizeList(int maxSize) {
         setUnderlying (buffer);
@@ -61,8 +64,10 @@ public class FixedSizeList<T> extends AbstractWrappingList<T> implements List<T>
     }
 
     void resize() {
-        while (buffer.size() > maxSize) {
-            buffer.removeFirst();
+        int diff = buffer.size() - maxSize;
+        if (diff > 0) {
+            buffer = buffer.subList(diff, buffer.size());
+            setUnderlying (buffer);
         }
     }
 

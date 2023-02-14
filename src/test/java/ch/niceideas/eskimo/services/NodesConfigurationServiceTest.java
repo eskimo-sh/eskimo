@@ -358,7 +358,7 @@ public class NodesConfigurationServiceTest {
                 "if [[ -d /lib/systemd/system/ ]]; then echo found_standard; fi\n" +
                 "sudo rm -f  /usr/lib/systemd/system/zookeeper.service\n" +
                 "sudo docker rm -f zookeeper || true \n" +
-                "sudo bash -c '/usr/local/sbin/eskimo-utils.sh && docker image rm -f eskimo/zookeeper:$(get_last_tag zookeeper)\n" +
+                "sudo bash -c '. /usr/local/sbin/eskimo-utils.sh && docker image rm -f eskimo/zookeeper:$(get_last_tag zookeeper)'\n" +
                 "sudo systemctl daemon-reload\n" +
                 "sudo systemctl reset-failed\n"));
 

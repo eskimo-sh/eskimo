@@ -90,9 +90,10 @@ docker run \
         -d \
         -v /var/log/spark:/var/log/spark \
         -v /var/lib/spark:/var/lib/spark \
+        --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --name spark-console \
-        -i \
-        -t eskimo/spark-console:$CONTAINER_TAG bash >> spark_console_install_log 2>&1
+        -it \
+        eskimo/spark-console:$CONTAINER_TAG bash >> spark_console_install_log 2>&1
 fail_if_error $? "spark_console_install_log" -2
 
 echo " - Configuring spark-console container (config script)"

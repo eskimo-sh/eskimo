@@ -293,7 +293,8 @@ function restart_service() {
 
     if [[ $TEST_MODE == "true" || -f $SERVICE_FILE ]]; then
         echo "   + Deleting $SERVICE"
-        envsubst < $SERVICE_FILE | call-kubectl delete -f -
+        # shellcheck disable=SC1090
+        . $SERVICE_FILE | call-kubectl delete -f -
 
         if [[ $TEST_MODE != "true" ]]; then
             sleep 10

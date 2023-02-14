@@ -2222,7 +2222,7 @@ fi
 
 if [[ "$RUN_DATA_LOAD" != "" || "$RUN_NOTEBOOK_TESTS" != "" || "$RUN_OTHER_TESTS" != "" || "$RUN_CLEANUP" != "" || "$RUN_SCREENSHOTS" != "" ]]; then
     # Hack (assuming the caller knows what he's doing if not called as part of integration test)
-    if [[ $BOX_IP == "192.168.56.51" || $BOX_IP == "192.168.56.51" ]]; then
+    if [[ $BOX_IP == "192.168.56.41" || $BOX_IP == "192.168.56.51" ]]; then
         wait_all_services_up
     fi
 fi

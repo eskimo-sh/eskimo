@@ -161,17 +161,19 @@ sudo bash -c "echo -e \"kubernetes.context: default\"  >> /usr/local/lib/flink/c
 
 if [[ $FLINK_CONTAINER_TAG == "" ]]; then
     echo " - Finding last flink-runtime container tag"
-    TAGS=$(curl -XGET http://kubernetes.registry:5000/v2/flink-runtime/tags/list 2>/dev/null | jq -r -c  ".tags | .[]" 2>/dev/null)
+    . /etc/eskimo_topology.sh
+    FLINK_CONTAINER_TAG=0
+    TAGS=$(curl -XGET http://$MASTER_KUBE_MASTER_1:5000/v2/flink-runtime/tags/list 2>/dev/null | jq -r -c  ".tags | .[]" 2>/dev/null)
     if [[ $? == 0 ]]; then
         for tag in $TAGS; do
             if [[ $tag != "latest" ]]; then
-                if [[ $(__vercomp $last $tag) == 2 ]]; then
+                if [[ "$FLINK_CONTAINER_TAG" -lt "$tag" ]]; then
                     export FLINK_CONTAINER_TAG=$tag
                 fi
             fi
         done
     fi
-    if [[ $FLINK_CONTAINER_TAG == "" && -n $TEST ]]; then
+    if [[ ( $FLINK_CONTAINER_TAG == "" || $FLINK_CONTAINER_TAG == 0 ) && -z $TEST_MODE ]]; then
         echo "Couldn't find last flink-runtime image tag "
         exit 1
     fi

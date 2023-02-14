@@ -97,12 +97,15 @@ docker run \
         -v /var/lib/flink:/var/lib/flink \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --name flink \
-        -i \
-        -t eskimo/flink:$COMMON_CONTAINER_TAG bash >> flink_install_log 2>&1
+        -it \
+        eskimo/flink:$COMMON_CONTAINER_TAG bash >> flink_install_log 2>&1
 fail_if_error $? "flink_install_log" -2
 
+echo " - Getting in advance next flink-runtime tag"
+NEXT_FLINK_RUNTIME_TAG=$(($(get_last_tag flink-runtime) + 1))
+
 echo " - Configuring flink container (config script)"
-docker exec flink bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id $COMMON_CONTAINER_TAG | tee -a flink_install_log 2>&1
+docker exec flink bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id $NEXT_FLINK_RUNTIME_TAG | tee -a flink_install_log 2>&1
 check_in_container_config_success flink_install_log
 
 echo " - Copying Flink entrypoint script"

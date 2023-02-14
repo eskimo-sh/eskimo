@@ -229,7 +229,7 @@ public class SystemServiceTest {
     @Test
     public void testRestartService() throws Exception {
         systemService.restartService(servicesDefinition.getServiceDefinition(Service.from("ntp")), Node.fromAddress("192.168.10.11"));
-        assertEquals ("sudo bash -c 'systemctl reset-failed ntp && systemctl restart ntp", sshCommandServiceTest.getExecutedCommands().trim());
+        assertEquals ("sudo bash -c 'systemctl reset-failed ntp && systemctl restart ntp'", sshCommandServiceTest.getExecutedCommands().trim());
 
         assertThrows(UnsupportedOperationException.class,
                 () -> systemService.restartService(servicesDefinition.getServiceDefinition(Service.from("grafana")), Node.fromAddress("192.168.10.11")));
