@@ -51,6 +51,8 @@ sudo rm -f ntp_install_log
 
 echo " - Building container ntp"
 build_container ntp ntp ntp_install_log
+#save tag
+CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 echo " - Creating shared lib"
 sudo mkdir -p /var/lib/ntp/
@@ -72,7 +74,7 @@ docker run \
         --cap-add SYS_TIME\
         -d --name ntp \
         -i \
-        -t eskimo:ntp bash >> ntp_install_log 2>&1
+        -t eskimo/ntp:$CONTAINER_TAG bash >> ntp_install_log 2>&1
 fail_if_error $? "ntp_install_log" -2
 
 echo " - Configuring ntp container"
@@ -86,7 +88,7 @@ echo " - Handling topology infrastructure"
 handle_topology_infrastructure ntp ntp_install_log
 
 echo " - Committing changes to local template and exiting container ntp"
-commit_container ntp ntp_install_log
+commit_container ntp $CONTAINER_TAG ntp_install_log
 
 echo " - Installing and checking systemd service file"
 install_and_check_service_file ntp ntp_install_log

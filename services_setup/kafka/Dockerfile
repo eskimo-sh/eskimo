@@ -1,4 +1,4 @@
-FROM eskimo:kafka_template
+FROM eskimo/kafka_template:latest
 
 MAINTAINER eskimo <eskimoapp@gmail.com>
 

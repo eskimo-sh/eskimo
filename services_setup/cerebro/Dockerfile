@@ -1,4 +1,4 @@
-FROM eskimo:cerebro_template
+FROM eskimo/cerebro_template:latest
 
 MAINTAINER eskimo <eskimoapp@gmail.com>
 

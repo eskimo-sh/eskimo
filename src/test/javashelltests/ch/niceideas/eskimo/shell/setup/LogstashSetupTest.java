@@ -80,7 +80,7 @@ public class LogstashSetupTest extends AbstractSetupShellTest {
         // setup.sh and common.sh are automatic
         copyFile(jailPath, "setupESCommon.sh");
         copyFile(jailPath, "setupLogstashCommon.sh");
-        copyFile(jailPath, "logstash.k8s.yaml");
+        copyFile(jailPath, "logstash.k8s.yaml.sh");
         copyFile(jailPath, "inContainerSetupLogstash.sh");
         copyFile(jailPath, "inContainerSetupESCommon.sh");
         copyFile(jailPath, "inContainerStartService.sh");

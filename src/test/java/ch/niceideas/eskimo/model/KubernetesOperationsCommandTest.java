@@ -138,9 +138,9 @@ public class KubernetesOperationsCommandTest {
                 "  \"restarts\": [\n" +
                 "    \"elasticsearch\",\n" +
                 "    \"spark-runtime\",\n" +
-                "    \"spark-console\",\n" +
                 "    \"logstash\",\n" +
-                "    \"kafka\"\n" +
+                "    \"kafka\",\n" +
+                "    \"spark-console\"\n" +
                 "  ],\n" +
                 "  \"uninstallations\": [\n" +
                 "    \"kafka-manager\",\n" +
@@ -186,9 +186,9 @@ public class KubernetesOperationsCommandTest {
                         "uninstallation_zeppelin\n" +
                         "restart_elasticsearch\n" +
                         "restart_spark-runtime\n" +
-                        "restart_spark-console\n" +
                         "restart_logstash\n" +
-                        "restart_kafka",
+                        "restart_kafka\n" +
+                        "restart_spark-console",
                 opInOrder.stream().map(KubernetesOperationsCommand.KubernetesOperationId::toString).collect(Collectors.joining("\n")));
     }
 

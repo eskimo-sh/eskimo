@@ -1,4 +1,4 @@
-FROM eskimo:kibana_template
+FROM eskimo/kibana_template:latest
 
 MAINTAINER eskimo <eskimoapp@gmail.com>
 

@@ -61,6 +61,8 @@ sudo rm -f es_install_log
 
 echo " - Building container elasticsearch"
 build_container elasticsearch elasticsearch es_install_log
+#save tag
+CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 echo " - Configuring host elasticsearch common part"
 . ./setupESCommon.sh
@@ -86,7 +88,7 @@ docker run \
         -e NODE_NAME=$HOSTNAME \
         -d --name elasticsearch \
         -i \
-        -t eskimo:elasticsearch bash >> es_install_log 2>&1
+        -t eskimo/elasticsearch:$CONTAINER_TAG bash >> es_install_log 2>&1
 fail_if_error $? es_install_log -2
 
 echo " - Configuring elasticsearch container (common part)"
@@ -107,10 +109,10 @@ echo " - Copying inContainerInjectIndexSettings.sh Script"
 docker_cp_script inContainerInjectIndexSettings.sh sbin elasticsearch es_install_log
 
 echo " - Committing changes to local template and exiting container elasticsearch"
-commit_container elasticsearch es_install_log
+commit_container elasticsearch $CONTAINER_TAG es_install_log
 
 echo " - Starting Kubernetes deployment"
-deploy_kubernetes elasticsearch es_install_log
+deploy_kubernetes elasticsearch $CONTAINER_TAG es_install_log
 
 
 

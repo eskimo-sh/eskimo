@@ -52,7 +52,7 @@ PermissionsStartOnly=true
 
 ExecStartPre=-/usr/bin/docker kill prometheus
 ExecStartPre=-/usr/bin/docker rm -f prometheus
-ExecStart=/bin/bash -c "/usr/bin/docker run \
+ExecStart=/bin/bash -c ". /usr/local/sbin/eskimo-utils.sh && /usr/bin/docker run \
         -i \
         --name prometheus \
         --network host \
@@ -64,7 +64,7 @@ ExecStart=/bin/bash -c "/usr/bin/docker run \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
         -e NODE_NAME=$HOSTNAME \
-        eskimo:prometheus \
+        eskimo/prometheus:$(get_last_tag prometheus) \
         /usr/local/sbin/inContainerStartService.sh"
 ExecStop=/usr/bin/docker stop prometheus
 Type=simple

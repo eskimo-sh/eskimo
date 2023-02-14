@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -32,55 +33,78 @@
 # Software.
 #
 
+. /usr/local/sbin/eskimo-utils.sh
+
+TEMP_FILE=$(mktemp)
+
+cat > $TEMP_FILE <<EOF
 kind: Service
 apiVersion: v1
 metadata:
   labels:
-    k8s-app: kafka-manager
-  name: kafka-manager
+    k8s-app: spark-console
+  name: spark-console
   namespace: default
 spec:
   ports:
-    - port: 31220
-      targetPort: 22080
+    - port: 31810
+      targetPort: 18080
   selector:
-    k8s-app: kafka-manager
+    k8s-app: spark-console
 
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: spark-console
+  name: spark-console-node
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+    - port: 31811
+      targetPort: 18080
+      nodePort: 31811
+  selector:
+    k8s-app: spark-console
+    
 ---
 
 kind: Deployment
 apiVersion: apps/v1
 metadata:
   labels:
-    k8s-app: kafka-manager
-  name: kafka-manager
+    k8s-app: spark-console
+  name: spark-console
   namespace: default
 spec:
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      k8s-app: kafka-manager
+      k8s-app: spark-console
   template:
     metadata:
       labels:
-        k8s-app: kafka-manager
+        k8s-app: spark-console
     spec:
       #securityContext:
       #  seccompProfile:
       #    type: RuntimeDefault
       enableServiceLinks: false
       containers:
-        - name: kafka-manager
-          image: kubernetes.registry:5000/kafka-manager
+        - name: spark-console
+          image: kubernetes.registry:5000/spark-console:$(get_last_tag spark-console)
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 22080
+            - containerPort: 18080
               protocol: TCP
           command: ["/usr/local/sbin/inContainerStartService.sh"]
           volumeMounts:
-            - name: var-log-kafka
-              mountPath: /var/log/kafka
+            - name: var-log-spark
+              mountPath: /var/log/spark
             - name: etc-eskimo-topology
               mountPath: /etc/eskimo_topology.sh
             - name: etc-eskimo-services-settings
@@ -89,23 +113,23 @@ spec:
             httpGet:
               scheme: HTTP
               path: /
-              port: 22080
+              port: 18080
             initialDelaySeconds: 60
             timeoutSeconds: 30
           securityContext:
             privileged: true
             allowPrivilegeEscalation: true
             readOnlyRootFilesystem: false
-            runAsUser: 3303
-            runAsGroup: 3303
+            runAsUser: 3302
+            runAsGroup: 3302
           resources:
             requests:
-              cpu: "$ESKIMO_KUBE_REQUEST_KAFKA_MANAGER_CPU"
-              memory: "$ESKIMO_KUBE_REQUEST_KAFKA_MANAGER_RAM"
+              cpu: "$ESKIMO_KUBE_REQUEST_SPARK_CONSOLE_CPU"
+              memory: "$ESKIMO_KUBE_REQUEST_SPARK_CONSOLE_RAM"
       volumes:
-        - name: var-log-kafka
+        - name: var-log-spark
           hostPath:
-            path: /var/log/kafka
+            path: /var/log/spark
             type: Directory
         - name: etc-eskimo-topology
           hostPath:
@@ -122,3 +146,6 @@ spec:
       tolerations:
         - key: node-role.kubernetes.io/master
           effect: NoSchedule
+EOF
+cat $TEMP_FILE
+rm -Rf $TEMP_FILE

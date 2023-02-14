@@ -869,6 +869,13 @@
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": true
+      },
+      {
+        "masterElectionStrategy": "RANDOM",
+        "masterService": "spark-runtime",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": false
       }
     ],
     "commands" : [

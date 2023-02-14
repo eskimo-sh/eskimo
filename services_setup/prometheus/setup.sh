@@ -51,6 +51,8 @@ sudo rm -f prometheus_install_log
 
 echo " - Building container prometheus"
 build_container prometheus prometheus prometheus_install_log
+#save tag
+CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 echo " - Creating shared directory"
 # TODO
@@ -63,7 +65,7 @@ docker run \
         -v /var/log/prometheus:/var/log/prometheus \
         -d --name prometheus \
         -i \
-        -t eskimo:prometheus bash >> prometheus_install_log 2>&1
+        -t eskimo/prometheus:$CONTAINER_TAG bash >> prometheus_install_log 2>&1
 fail_if_error $? "prometheus_install_log" -2
 
 echo " - Configuring prometheus container"
@@ -77,7 +79,7 @@ echo " - Handling topology infrastructure"
 handle_topology_infrastructure prometheus prometheus_install_log
 
 echo " - Committing changes to local template and exiting container prometheus"
-commit_container prometheus prometheus_install_log
+commit_container prometheus $CONTAINER_TAG prometheus_install_log
 
 echo " - Installing and checking systemd service file"
 install_and_check_service_file prometheus prometheus_install_log

@@ -71,6 +71,8 @@ sudo chmod 755 /usr/local/sbin/setupKubernetesRegistryGlusterShares.sh
 
 echo "   + Building container k8s-registry"
 build_container k8s-registry kube-master k8s-registry_install_log
+#save tag
+CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 #sudo mkdir -p /usr/local/etc/kubernetes
 #sudo chown -R kubernetes/usr/local/etc/kubernetes
@@ -87,8 +89,9 @@ docker run \
         -v /var/lib/docker_registry:/var/lib/docker_registry \
         -v /var/log/docker_registry:/var/log/docker_registry \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
-        -i \
-        -t eskimo:k8s-registry bash >> k8s-registry_install_log 2>&1
+        -it \
+        "eskimo/k8s-registry:$CONTAINER_TAG" \
+            bash >> k8s-registry_install_log 2>&1
 fail_if_error $? "k8s-registry_install_log" -2
 
 
@@ -106,7 +109,7 @@ echo "   + Handling topology infrastructure"
 handle_topology_infrastructure k8s-registry k8s-registry_install_log
 
 echo "   + Committing changes to local template and exiting container kubernetes"
-commit_container k8s-registry k8s-registry_install_log
+commit_container k8s-registry $CONTAINER_TAG k8s-registry_install_log
 
 echo "   + Installing and checking systemd service file"
 install_and_check_service_file k8s-registry k8s_install_log SKIP_COPY,RESTART

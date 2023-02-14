@@ -34,6 +34,10 @@
 # Software.
 #
 
+if [[ -f /usr/local/sbin/eskimo-utils.sh ]]; then
+    . /usr/local/sbin/eskimo-utils.sh
+fi
+
 export IN_CONTAINER_CONFIG_SUCESS_MESSAGE=" - In container config SUCCESS"
 
 # Copy a script to the docker container
@@ -204,19 +208,19 @@ function deploy_image_in_registry() {
         /bin/cp -f $IMAGE_FULL_PATH .
     fi
 
-    echo "   + Deleting previous docker template for $IMAGE_NAME:$IMAGE_VERSION if exist"
+    echo "   + Deleting previous docker image for $IMAGE_NAME:$IMAGE_VERSION if exist"
     if [[ $(docker images -q $IMAGE_NAME:$IMAGE_VERSION 2>/dev/null) != "" ]]; then
         docker image rm $IMAGE_NAME:$IMAGE_VERSION >> /tmp/kube_services_setup_log 2>&1
         fail_if_error $? "/tmp/kube_services_setup_log" 5
     fi
 
-    echo "   + Deleting previous docker template for $IMAGE_NAME:$IMAGE_VERSION IN REPOSITORY if exist"
+    echo "   + Deleting previous docker image for $IMAGE_NAME:$IMAGE_VERSION IN REPOSITORY if exist"
     if [[ $(docker images -q kubernetes.registry:5000/$IMAGE_NAME:$IMAGE_VERSION 2>/dev/null) != "" ]]; then
         docker image rm kubernetes.registry:5000/$IMAGE_NAME:$IMAGE_VERSION >> /tmp/kube_services_setup_log 2>&1
         fail_if_error $? "/tmp/kube_services_setup_log" 5
     fi
 
-    echo "   + Importing latest docker template for $IMAGE_NAME:$IMAGE_VERSION"
+    echo "   + Importing latest docker image for $IMAGE_NAME:$IMAGE_VERSION"
     gunzip -f $IMAGE_FILE > /tmp/kube_services_setup_log 2>&1
     fail_if_error $? "/tmp/kube_services_setup_log" 5
 
@@ -259,7 +263,8 @@ function deploy_image_in_registry() {
 # Arguments:
 # - $1 the name of the container image and service
 # - $2 the lof file to dump command outputs to
-# - $3 a set of runtime flags
+# - $3 the tag to use
+# - $4 a set of runtime flags
 function deploy_registry() {
 
     if [[ $1 == "" ]]; then
@@ -269,26 +274,32 @@ function deploy_registry() {
     export CONTAINER=$1
 
     if [[ $2 == "" ]]; then
+        echo "New tag needs to be passed in argument"
+        exit 4
+    fi
+    export NEW_TAG=$2
+
+    if [[ $3 == "" ]]; then
         echo "Log file path needs to be passed in argument"
         exit 3
     fi
-    export LOG_FILE=$2
+    export LOG_FILE=$3
 
     export FLAGS=""
-    if [[ $3 != "" ]]; then
-        export FLAGS="$3"
+    if [[ $4 != "" ]]; then
+        export FLAGS="$4"
     fi
 
     if [[ $(echo $FLAGS | grep "NO_CONTAINER") == "" ]]; then
         echo " - Deploying $CONTAINER Service in docker registry for kubernetes"
-        docker tag eskimo:$CONTAINER kubernetes.registry:5000/$CONTAINER >> $LOG_FILE 2>&1
+        docker tag eskimo/$CONTAINER:$NEW_TAG kubernetes.registry:5000/$CONTAINER:$NEW_TAG >> $LOG_FILE 2>&1
         if [[ $? != 0 ]]; then
             echo "   + Could not re-tag kubernetes container image for $CONTAINER"
             cat $LOG_FILE
             exit 4
         fi
 
-        docker push kubernetes.registry:5000/$CONTAINER >> $LOG_FILE 2>&1
+        docker push kubernetes.registry:5000/$CONTAINER:$NEW_TAG >> $LOG_FILE 2>&1
         if [[ $? != 0 ]]; then
             echo "Image push in docker registry failed !"
             cat $LOG_FILE
@@ -296,7 +307,7 @@ function deploy_registry() {
         fi
 
         echo " - removing local image"
-        docker image rm eskimo:$CONTAINER  >> $LOG_FILE 2>&1
+        docker image rm eskimo/$CONTAINER:$NEW_TAG  >> $LOG_FILE 2>&1
         if [[ $? != 0 ]]; then
             echo "local image removal failed !"
             cat $LOG_FILE
@@ -310,7 +321,8 @@ function deploy_registry() {
 # Arguments:
 # - $1 the name of the container image and service
 # - $2 the lof file to dump command outputs to
-# - $3 a set of runtime flags
+# - $3 the tag to use
+# - $4 a set of runtime flags
 function deploy_kubernetes_only() {
 
     if [[ $1 == "" ]]; then
@@ -320,18 +332,24 @@ function deploy_kubernetes_only() {
     export CONTAINER=$1
 
     if [[ $2 == "" ]]; then
+        echo "New tag needs to be passed in argument"
+        exit 4
+    fi
+    export NEW_TAG=$2
+
+    if [[ $3 == "" ]]; then
         echo "Log file path needs to be passed in argument"
         exit 3
     fi
-    export LOG_FILE=$2
+    export LOG_FILE=$3
 
     export FLAGS=""
-    if [[ $3 != "" ]]; then
-        export FLAGS="$3"
+    if [[ $4 != "" ]]; then
+        export FLAGS="$4"
     fi
 
-    if [[ ! -f $CONTAINER.k8s.yaml ]]; then
-        echo "Kubernetes deployment file $CONTAINER.k8s.yaml not found"
+    if [[ ! -f $CONTAINER.k8s.yaml.sh ]]; then
+        echo "Kubernetes deployment file $CONTAINER.k8s.yaml.sh not found"
         exit 16
     fi
 
@@ -340,12 +358,13 @@ function deploy_kubernetes_only() {
     if [[ -z "$TEST_MODE" ]]; then
         echo " - Saving Kube deployment file $CONTAINER.k8s.yml in /var/lib/eskimo/kube-services"
         mkdir -p /var/lib/eskimo/kube-services/
-        /bin/cp -f $CONTAINER.k8s.yaml /var/lib/eskimo/kube-services/  >> $LOG_FILE 2>&1
+        /bin/cp -f $CONTAINER.k8s.yaml.sh /var/lib/eskimo/kube-services/  >> $LOG_FILE 2>&1
         fail_if_error $? "$LOG_FILE" 25
     fi
 
     echo " - Removing any previously deployed $CONTAINER service from kubernetes"
-    kubectl delete -f $CONTAINER.k8s.yaml >> "${LOG_FILE}_kubernetes_deploy" 2>&1
+    # shellcheck disable=SC1090
+    . $CONTAINER.k8s.yaml.sh | kubectl delete -f -  >> "${LOG_FILE}_kubernetes_deploy" 2>&1
     if [[ $? != 0 ]]; then
         if [[ $(cat "${LOG_FILE}_kubernetes_deploy") != "" && $(grep "not found" "${LOG_FILE}_kubernetes_deploy") != "" ]]; then
             echo "   + Some elements were not found. Moving on ..."
@@ -362,7 +381,7 @@ function deploy_kubernetes_only() {
     fi
 
     echo " - Deploying $CONTAINER service in kubernetes"
-    /bin/bash -c "envsubst < $CONTAINER.k8s.yaml | kubectl apply -f -" >> "${LOG_FILE}_kubernetes_deploy" 2>&1
+    /bin/bash -c ". $CONTAINER.k8s.yaml.sh | kubectl apply -f -" >> "${LOG_FILE}_kubernetes_deploy" 2>&1
     if [[ $? != 0 ]]; then
         echo "   + Could not deploy $CONTAINER application in kubernetes"
         cat "${LOG_FILE}_kubernetes_deploy"
@@ -376,7 +395,8 @@ function deploy_kubernetes_only() {
 # Arguments:
 # - $1 the name of the container image and service
 # - $2 the lof file to dump command outputs to
-# - $3 a set of runtime flags
+# - $3 the tag to use
+# - $4 a set of runtime flags
 function deploy_kubernetes() {
 
     if [[ $1 == "" ]]; then
@@ -386,14 +406,20 @@ function deploy_kubernetes() {
     export CONTAINER=$1
 
     if [[ $2 == "" ]]; then
+        echo "New tag needs to be passed in argument"
+        exit 4
+    fi
+    export NEW_TAG=$2
+
+    if [[ $3 == "" ]]; then
         echo "Log file path needs to be passed in argument"
         exit 3
     fi
-    export LOG_FILE=$2
+    export LOG_FILE=$3
 
     export FLAGS=""
-    if [[ $3 != "" ]]; then
-        export FLAGS="$3"
+    if [[ $4 != "" ]]; then
+        export FLAGS="$4"
     fi
 
     deploy_registry "$@"
@@ -502,6 +528,7 @@ function install_and_check_service_file() {
 # Arguments:
 # - $1 the name of the container
 # - $2 the log file to dump command output to
+# - $3 the tag to use
 function commit_container() {
 
     if [[ $1 == "" ]]; then
@@ -511,15 +538,23 @@ function commit_container() {
     export CONTAINER=$1
 
     if [[ $2 == "" ]]; then
+        echo "New tag needs to be passed in argument"
+        exit 4
+    fi
+    export NEW_TAG=$2
+
+    if [[ $3 == "" ]]; then
         echo "Log file path needs to be passed in argument"
         exit 72
     fi
-    export LOG_FILE=$2
+    export LOG_FILE=$3
+
+    # Find container latest version
 
     # Exit the container and commit the changes
     # Now that we've modified the container we have to commit the changes.
-    echo " - Commiting the changes to the local template"
-    docker commit $CONTAINER eskimo:$CONTAINER  >> $LOG_FILE 2>&1
+    echo " - Commiting the changes to the container"
+    docker commit $CONTAINER eskimo/$CONTAINER:$NEW_TAG  >> $LOG_FILE 2>&1
     fail_if_error $? "$LOG_FILE" 73
 
     # Stop setup container and and delete it
@@ -535,6 +570,7 @@ function commit_container() {
 # Arguments:
 # - $1 the name of the container
 # - $2 the log file to dump command output to
+# - return new tag to use as exported variable CONTAINER_NEW_TAG
 function build_container() {
 
     if [[ $1 == "" ]]; then
@@ -556,25 +592,25 @@ function build_container() {
     export LOG_FILE=$3
 
     echo " - Deleting previous docker template for $IMAGE if exist"
-    if [[ $(docker images -q eskimo:$IMAGE"_template" 2>/dev/null) != "" ]]; then
-        docker image rm eskimo:$IMAGE"_template" >> $LOG_FILE 2>&1
+    if [[ $(docker images -q "eskimo/${IMAGE}_template:latest" 2>/dev/null) != "" ]]; then
+        docker image rm "eskimo/${IMAGE}_template:latest" >> $LOG_FILE 2>&1
         fail_if_error $? "$LOG_FILE" 5
     fi
 
     echo " - Importing latest docker template for $IMAGE"
 
-    if [[ ! -f ${SCRIPT_DIR}/docker_template_"$IMAGE".tar ]]; then
+    if [[ ! -f ${SCRIPT_DIR}/docker_template_$IMAGE.tar ]]; then
         echo "   + Decompressing archive"
-        gunzip ${SCRIPT_DIR}/docker_template_"$IMAGE".tar.gz > $LOG_FILE 2>&1
+        gunzip ${SCRIPT_DIR}/docker_template_$IMAGE.tar.gz > $LOG_FILE 2>&1
         fail_if_error $? "$LOG_FILE" 16
     fi
 
     echo "   + Docker loading archive"
-    docker load -i ${SCRIPT_DIR}/docker_template_"$IMAGE".tar >> $LOG_FILE 2>&1
+    docker load -i ${SCRIPT_DIR}/docker_template_$IMAGE.tar >> $LOG_FILE 2>&1
     if [[ $? != 0 ]]; then
         # dunno why but docker load is randomly failing from times to times
         echo "   + Second attempt"
-        docker load -i ${SCRIPT_DIR}/docker_template_"$IMAGE".tar >> $LOG_FILE 2>&1
+        docker load -i ${SCRIPT_DIR}/docker_template_$IMAGE.tar >> $LOG_FILE 2>&1
         fail_if_error $? "$LOG_FILE" 6
     fi
 
@@ -587,10 +623,25 @@ function build_container() {
         docker container rm $CONTAINER > /dev/null 2>&1
     fi
 
+    echo " - Finding new tag for container image"
+    local LAST_TAG=$(get_last_tag $CONTAINER)
+    local NEW_TAG=$(($LAST_TAG+1))
+
+    if [[ $NEW_TAG != 1 ]]; then
+        echo " - Deleting previous container image tag $LAST_TAG"
+        docker image rm eskimo/$CONTAINER:$LAST_TAG --force >> $LOG_FILE 2>&1
+        fail_if_error $? "$LOG_FILE" 7
+
+        echo " - Attempting to delete it with registry tag as well"
+        docker image rm kubernetes.registry:5000//$CONTAINER:$LAST_TAG --force >> $LOG_FILE 2>&1
+    fi
+
     # build
-    echo " - Building docker container from image eskimo:$CONTAINER"
-    docker build --iidfile id_file --tag eskimo:$CONTAINER . >> $LOG_FILE 2>&1
+    echo " - Building docker container from image eskimo/$CONTAINER:$NEW_TAG"
+    docker build --iidfile id_file --tag eskimo/$CONTAINER:$NEW_TAG . >> $LOG_FILE 2>&1
     fail_if_error $? "$LOG_FILE" 7
+
+    export CONTAINER_NEW_TAG=$NEW_TAG
 }
 
 # This is used to create a command wrapper around a binary command in order to

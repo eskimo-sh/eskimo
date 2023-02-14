@@ -108,7 +108,8 @@ fi
 
 echo " - Building container zeppelin"
 build_container zeppelin zeppelin zeppelin_install_log
-
+#save tag
+CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 # create and start container
 echo " - Running docker container"
@@ -121,7 +122,7 @@ docker run \
         -v /var/lib/spark:/var/lib/spark:rshared \
         -v /usr/local/lib:/usr/local/host_lib:ro \
         -i \
-        -t eskimo:zeppelin bash >> zeppelin_install_log 2>&1
+        -t eskimo/zeppelin:$CONTAINER_TAG bash >> zeppelin_install_log 2>&1
 fail_if_error $? "zeppelin_install_log" -2
 
 #        -v /var/lib/zeppelin:/var/lib/zeppelin \
@@ -188,11 +189,11 @@ fail_if_error $? "zeppelin_install_log" -40
 
 
 echo " - Committing changes to local template and exiting container zeppelin"
-commit_container zeppelin zeppelin_install_log
+commit_container zeppelin $CONTAINER_TAG zeppelin_install_log
 
 
 echo " - Starting Kubernetes deployment"
-deploy_kubernetes zeppelin zeppelin_install_log
+deploy_kubernetes zeppelin $CONTAINER_TAG zeppelin_install_log
 
 
 

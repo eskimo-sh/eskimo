@@ -92,6 +92,10 @@ public class CommonSetupShellTest {
                 "export PATH=$SCRIPT_DIR:$PATH\n" +
                 "\n" +
                 ". $SCRIPT_DIR/common.sh\n" +
+                "\n"+
+                "get_last_tag() { \n" +
+                "    echo 1 \n" +
+                "}\n" +
                 "\n" +
                 "# Call command\n" +
                 command;
@@ -160,8 +164,8 @@ public class CommonSetupShellTest {
 
     @Test
     public void testDeployKubernetes() throws Exception {
-        createTestScript("cerebro.k8s.yaml", "dummy");
-        createTestScript("deploy_kubernetes.sh", "deploy_kubernetes cerebro /tmp/test.log");
+        createTestScript("cerebro.k8s.yaml.sh", "echo ''");
+        createTestScript("deploy_kubernetes.sh", "deploy_kubernetes cerebro 1 /tmp/test.log");
 
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/deploy_kubernetes.sh"}, true);
 
@@ -174,15 +178,15 @@ public class CommonSetupShellTest {
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(dockerLogs)) {
 
-            //System.err.println (dockerLogs);
+            System.err.println (dockerLogs);
 
-            int indexOfTag = dockerLogs.indexOf("tag eskimo:cerebro kubernetes.registry:5000/cerebro");
+            int indexOfTag = dockerLogs.indexOf("tag eskimo/cerebro:1 kubernetes.registry:5000/cerebro:1");
             assertTrue(indexOfTag > -1);
 
-            int indexOfPush = dockerLogs.indexOf("push kubernetes.registry:5000/cerebro", indexOfTag);
+            int indexOfPush = dockerLogs.indexOf("push kubernetes.registry:5000/cerebro:1", indexOfTag);
             assertTrue(indexOfPush > -1);
 
-            int indexOfImage = dockerLogs.indexOf("image rm eskimo:cerebro", indexOfPush);
+            int indexOfImage = dockerLogs.indexOf("image rm eskimo/cerebro:1", indexOfPush);
             assertTrue(indexOfImage > -1);
 
         } else {
@@ -192,7 +196,7 @@ public class CommonSetupShellTest {
         String kubeCtlLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_kubectl"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(kubeCtlLogs)) {
 
-            int indexOfDelete = kubeCtlLogs.indexOf("delete -f cerebro.k8s.yaml");
+            int indexOfDelete = kubeCtlLogs.indexOf("delete -f -");
             assertTrue(indexOfDelete > -1);
 
             int indexOfApply = kubeCtlLogs.indexOf("apply -f -", indexOfDelete);
@@ -254,19 +258,19 @@ public class CommonSetupShellTest {
 
     @Test
     public void testCommitContainer() throws Exception {
-        createTestScript("commit_container.sh", "commit_container cerebro /tmp/test.log");
+        createTestScript("commit_container.sh", "commit_container cerebro 1 /tmp/test.log");
 
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/commit_container.sh"}, true);
 
         // no error reported
-        assertEquals (" - Commiting the changes to the local template\n", result);
+        assertEquals (" - Commiting the changes to the container\n", result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(dockerLogs)) {
 
             //System.err.println (dockerLogs);
 
-            int indexOfCommit = dockerLogs.indexOf("commit cerebro eskimo:cerebro");
+            int indexOfCommit = dockerLogs.indexOf("commit cerebro eskimo/cerebro:1");
             assertTrue(indexOfCommit > -1);
 
             int indexOfStop = dockerLogs.indexOf("stop cerebro", indexOfCommit);
@@ -292,14 +296,17 @@ public class CommonSetupShellTest {
                 "   + Decompressing archive\n" +
                 "   + Docker loading archive\n" +
                 " - Killing any previous containers\n" +
-                " - Building docker container from image eskimo:cerebro\n", result);
+                " - Finding new tag for container image\n" +
+                " - Deleting previous container image tag 1\n" +
+                " - Attempting to delete it with registry tag as well\n" +
+                " - Building docker container from image eskimo/cerebro:2\n", result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(dockerLogs)) {
 
             //System.err.println (dockerLogs);
 
-            int indexOfImages = dockerLogs.indexOf("images -q eskimo:cerebro_template");
+            int indexOfImages = dockerLogs.indexOf("images -q eskimo/cerebro_template:latest");
             assertTrue(indexOfImages > -1);
 
             int indexOfLoad = dockerLogs.indexOf("load", indexOfImages);
@@ -308,7 +315,7 @@ public class CommonSetupShellTest {
             int indexOfPs = dockerLogs.indexOf("ps -a -q -f name=cerebro", indexOfLoad);
             assertTrue(indexOfPs > -1);
 
-            int indexOfBuild = dockerLogs.indexOf("build --iidfile id_file --tag eskimo:cerebro .", indexOfPs);
+            int indexOfBuild = dockerLogs.indexOf("build --iidfile id_file --tag eskimo/cerebro:2 .", indexOfPs);
             assertTrue(indexOfBuild > -1);
 
         } else {

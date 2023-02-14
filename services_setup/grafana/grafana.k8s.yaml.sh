@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -32,37 +33,26 @@
 # Software.
 #
 
+. /usr/local/sbin/eskimo-utils.sh
+
+TEMP_FILE=$(mktemp)
+
+cat > $TEMP_FILE <<EOF
 kind: Service
 apiVersion: v1
 metadata:
   labels:
-    k8s-app: kibana
-  name: kibana
-  namespace: default
-spec:
-  ports:
-    - port: 31561
-      targetPort: 5601
-  selector:
-    k8s-app: kibana
-
----
-
-kind: Service
-apiVersion: v1
-metadata:
-  labels:
-    k8s-app: kibana
-  name: kibana-node
+    k8s-app: grafana
+  name: grafana
   namespace: default
 spec:
   type: NodePort
   ports:
-    - port: 31562
-      targetPort: 5601
-      nodePort: 31562
+    - port: 31300
+      targetPort: 3000
+      nodePort: 31300
   selector:
-    k8s-app: kibana
+    k8s-app: grafana
 
 ---
 
@@ -70,63 +60,65 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   labels:
-    k8s-app: kibana
-  name: kibana
+    k8s-app: grafana
+  name: grafana
   namespace: default
 spec:
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      k8s-app: kibana
+      k8s-app: grafana
   template:
     metadata:
       labels:
-        k8s-app: kibana
+        k8s-app: grafana
     spec:
       #securityContext:
       #  seccompProfile:
       #    type: RuntimeDefault
       enableServiceLinks: false
       containers:
-        - name: kibana
-          image: kubernetes.registry:5000/kibana
+        - name: grafana
+          image: kubernetes.registry:5000/grafana:$(get_last_tag grafana)
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 5601
+            - containerPort: 3000
               protocol: TCP
           command: ["/usr/local/sbin/inContainerStartService.sh"]
           volumeMounts:
-            - name: var-log-elasticsearch
-              mountPath: /var/log/elasticsearch
-            - name: var-run-elasticsearch
-              mountPath: /var/run/elasticsearch
+            - name: var-log-grafana
+              mountPath: /var/log/grafana
+            - name: var-run-grafana
+              mountPath: /var/run/grafana
             - name: etc-eskimo-topology
               mountPath: /etc/eskimo_topology.sh
             - name: etc-eskimo-services-settings
               mountPath: /etc/eskimo_services-settings.json
           livenessProbe:
-            tcpSocket:
-              port: 5601
-            initialDelaySeconds: 180
-            timeoutSeconds: 45
+            httpGet:
+              scheme: HTTP
+              path: /
+              port: 3000
+            initialDelaySeconds: 60
+            timeoutSeconds: 30
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
-            runAsUser: 3301
-            runAsGroup: 3301
+            runAsUser: 3304
+            runAsGroup: 3304
           resources:
             requests:
-              cpu: "$ESKIMO_KUBE_REQUEST_KIBANA_CPU"
-              memory: "$ESKIMO_KUBE_REQUEST_KIBANA_RAM"
+              cpu: "$ESKIMO_KUBE_REQUEST_GRAFANA_CPU"
+              memory: "$ESKIMO_KUBE_REQUEST_GRAFANA_RAM"
       volumes:
-        - name: var-log-elasticsearch
+        - name: var-log-grafana
           hostPath:
-            path: /var/log/elasticsearch
+            path: /var/log/grafana
             type: Directory
-        - name: var-run-elasticsearch
+        - name: var-run-grafana
           hostPath:
-            path: /var/run/elasticsearch
+            path: /var/run/grafana
             type: Directory
         - name: etc-eskimo-topology
           hostPath:
@@ -143,3 +135,6 @@ spec:
       tolerations:
         - key: node-role.kubernetes.io/master
           effect: NoSchedule
+EOF
+cat $TEMP_FILE
+rm -Rf $TEMP_FILE

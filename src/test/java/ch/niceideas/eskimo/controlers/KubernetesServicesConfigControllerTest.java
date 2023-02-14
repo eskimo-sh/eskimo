@@ -253,11 +253,11 @@ public class KubernetesServicesConfigControllerTest {
                         "      \"elasticsearch\",\n" +
                         "      \"kibana\",\n" +
                         "      \"spark-runtime\",\n" +
-                        "      \"spark-console\",\n" +
                         "      \"cerebro\",\n" +
                         "      \"logstash\",\n" +
                         "      \"kafka\",\n" +
                         "      \"kafka-manager\",\n" +
+                        "      \"spark-console\",\n" +
                         "      \"zeppelin\"\n" +
                         "    ],\n" +
                         "    \"installations\": [],\n" +

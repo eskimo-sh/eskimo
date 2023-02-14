@@ -45,6 +45,8 @@ if [[ $FLINK_USER_ID == "" ]]; then
     exit 1
 fi
 
+FLINK_CONTAINER_TAG=$2
+
 
 echo "-- SETTING UP FLINK (COMMON PART) --------------------------------------"
 
@@ -156,7 +158,26 @@ sudo bash -c "echo -e \"#=======================================================
 
 # FIXME
 sudo bash -c "echo -e \"kubernetes.context: default\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-sudo bash -c "echo -e \"kubernetes.container.image: kubernetes.registry:5000/flink-runtime\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+
+if [[ $FLINK_CONTAINER_TAG == "" ]]; then
+    echo " - Finding last flink-runtime container tag"
+    TAGS=$(curl -XGET http://kubernetes.registry:5000/v2/flink-runtime/tags/list 2>/dev/null | jq -r -c  ".tags | .[]" 2>/dev/null)
+    if [[ $? == 0 ]]; then
+        for tag in $TAGS; do
+            if [[ $tag != "latest" ]]; then
+                if [[ $(__vercomp $last $tag) == 2 ]]; then
+                    export FLINK_CONTAINER_TAG=$tag
+                fi
+            fi
+        done
+    fi
+    if [[ $FLINK_CONTAINER_TAG == "" && -n $TEST ]]; then
+        echo "Couldn't find last flink-runtime image tag "
+        exit 1
+    fi
+fi
+
+sudo bash -c "echo -e \"kubernetes.container.image: kubernetes.registry:5000/flink-runtime:$FLINK_CONTAINER_TAG\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
 sudo bash -c "echo -e \"kubernetes.jobmanager.replicas: 1\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 

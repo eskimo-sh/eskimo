@@ -46,13 +46,13 @@ echo "--------------------------------------------------------------------------
 rm -f /tmp/zeppelin_build_log
 
 echo " - Checking if spark eskimo image is available"
-if [[ $(docker images -q eskimo:spark_template 2>/dev/null) == "" ]]; then
+if [[ $(docker images -q eskimo/spark_template:latest 2>/dev/null) == "" ]]; then
     echo " - Trying to loads spark image"
     for i in $(ls -rt ../../packages_distrib/docker_template_spark*.tar.gz | tail -1); do
         echo "   + loading image $i"
         gunzip -c $i | docker load > /tmp/zeppelin_build_log 2>&1
         if [[ $? != 0 ]]; then
-            echo "Could not load base image eskimo:spark_template"
+            echo "Could not load base image eskimo/spark_template:latest"
             cat /tmp/zeppelin_build_log
             exit 1
         fi

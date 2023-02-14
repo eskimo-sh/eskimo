@@ -115,7 +115,7 @@ docker run \
         -v /etc/k8s:/etc/k8s:ro \
         -e NODE_NAME=$HOSTNAME \
         -e ADDITONAL_HOSTS_FILE=$KUBE_SERVICES_HOSTS_FILE \
-        kubernetes.registry:5000/spark \
+        "kubernetes.registry:5000/spark:$(get_last_tag spark)" \
             /usr/local/bin/kube_do /usr/local/bin/spark-submit "$@" $FILENAME_ARG
 
 rm -Rf $KUBE_SERVICES_HOSTS_FILE

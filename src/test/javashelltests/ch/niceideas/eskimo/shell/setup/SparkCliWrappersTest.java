@@ -122,7 +122,8 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -140,7 +141,7 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
                 "-v /etc/k8s:/etc/k8s:ro " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/spark " +
+                "kubernetes.registry:5000/spark:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/sparkR --properties-file /tmp/test.properties -driver-class-path /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar --py-files /usr/local/lib/python-eskimo/test.py\n", dockerLogs);
     }
 
@@ -153,7 +154,8 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -171,7 +173,7 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
                 "-v /etc/k8s:/etc/k8s:ro " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/spark " +
+                "kubernetes.registry:5000/spark:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/spark-submit --properties-file /tmp/test.properties -driver-class-path /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar --py-files /usr/local/lib/python-eskimo/test.py /usr/lib/spark/example.jar\n", dockerLogs);
     }
 
@@ -184,7 +186,8 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -202,7 +205,7 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
                 "-v /etc/k8s:/etc/k8s:ro " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/spark " +
+                "kubernetes.registry:5000/spark:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/spark-sql --properties-file /tmp/test.properties -driver-class-path /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar --py-files /usr/local/lib/python-eskimo/test.py\n", dockerLogs);
     }
 
@@ -215,7 +218,8 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -233,7 +237,7 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
                 "-v /etc/k8s:/etc/k8s:ro " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/spark " +
+                "kubernetes.registry:5000/spark:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/spark-shell --properties-file /tmp/test.properties -driver-class-path /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar --py-files /usr/local/lib/python-eskimo/test.py\n", dockerLogs);
     }
 
@@ -246,7 +250,8 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -262,7 +267,7 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
                 "-v /etc/k8s:/etc/k8s:ro " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/spark " +
+                "kubernetes.registry:5000/spark:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/spark-class --jar /tmp/test.jar -classpath /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar\n", dockerLogs);
     }
 
@@ -275,7 +280,8 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -293,7 +299,7 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
                 "-v /etc/k8s:/etc/k8s:ro " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/spark " +
+                "kubernetes.registry:5000/spark:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/run-example --properties-file /tmp/test.properties -driver-class-path /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar --py-files /usr/local/lib/python-eskimo/test.py\n", dockerLogs);
     }
 
@@ -306,7 +312,8 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -324,7 +331,7 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
                 "-v /etc/k8s:/etc/k8s:ro " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/spark " +
+                "kubernetes.registry:5000/spark:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/pyspark --properties-file /tmp/test.properties -driver-class-path /var/lib/eskimo/test.jar:/var/lib/spark/spark.jar --py-files /usr/local/lib/python-eskimo/test.py\n", dockerLogs);
     }
 
@@ -337,7 +344,8 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -353,7 +361,7 @@ public class SparkCliWrappersTest extends AbstractSetupShellTest {
                 "-v /etc/k8s:/etc/k8s:ro " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/spark " +
+                "kubernetes.registry:5000/spark:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/beeline -f /tmp/test.json -w /var/lib/eskimo/test.json\n", dockerLogs);
     }
 

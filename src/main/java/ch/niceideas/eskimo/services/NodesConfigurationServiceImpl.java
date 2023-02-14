@@ -492,7 +492,8 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
             // 5. Delete docker image
             ml.addInfo(" - Removing docker image");
-            sshCommandService.runSSHCommand(connection, "sudo docker image rm -f eskimo:" + servicesDefinition.getServiceDefinition(service).getImageName());
+            String image = servicesDefinition.getServiceDefinition(service).getImageName();
+            sshCommandService.runSSHCommand(connection, "sudo bash -c '/usr/local/sbin/eskimo-utils.sh && docker image rm -f eskimo/" + image + ":$(get_last_tag " + image + ")");
 
             // 6. Reloading systemd daemon
             ml.addInfo(" - Reloading systemd daemon");

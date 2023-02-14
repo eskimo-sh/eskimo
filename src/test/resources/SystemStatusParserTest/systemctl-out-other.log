@@ -123,7 +123,7 @@
              │ ├─ 1330 /bin/bash -c while [[ 1 ]]; do sleep 5 ; if [[ `docker image ls -a | grep eskimo | grep logstash_template` == "" ]]; then echo "BAD"; exit; fi; done
              │ └─28025 sleep 5
              ├─ntp.service
-             │ └─1698 /usr/bin/docker run -i --name ntp -p 123:123/udp --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo:ntp /usr/sbin/nt
+             │ └─1698 /usr/bin/docker run -i --name ntp -p 123:123/udp --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo/ntp /usr/sbin/nt
              ├─systemd-remount-fs.service
              ├─system-getty.slice
              │ └─getty@tty1.service
@@ -162,7 +162,7 @@
              ├─system-lvm2\x2dpvscan.slice
              │ └─lvm2-pvscan@8:1.service
              ├─spark-console.service
-             │ └─13581 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared eskimo:spark-histo
+             │ └─13581 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared eskimo/spark-histo
              ├─systemd-tmpfiles-setup-dev.service
              ├─atd.service
              │ └─638 /usr/sbin/atd -f
@@ -1776,7 +1776,7 @@ May 31 13:55:25 deb-node1 systemd[1]: Started Preprocess NFS configuration.
  Main PID: 1698 (docker)
     Tasks: 10 (limit: 4915)
    CGroup: /system.slice/ntp.service
-           └─1698 /usr/bin/docker run -i --name ntp -p 123:123/udp --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo:ntp /usr/sbin/ntpd -
+           └─1698 /usr/bin/docker run -i --name ntp -p 123:123/udp --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo/ntp /usr/sbin/ntpd -
 
 Jun 02 09:19:18 deb-node1 docker[1698]:  2 Jun 09:19:18 ntpd[1]: frequency file /var/lib/ntp/ntp.drift.TEMP: Permission denied
 Jun 02 10:20:28 deb-node1 docker[1698]:  2 Jun 10:20:28 ntpd[1]: 213.239.239.166 102a 8a sys_peer
@@ -1982,7 +1982,7 @@ May 31 13:55:44 deb-node1 bash[1670]: full log in /usr/local/lib/spark-2.4.3/log
  Main PID: 13581 (docker)
     Tasks: 9 (limit: 4915)
    CGroup: /system.slice/spark-console.service
-           └─13581 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared eskimo:spark-history-s
+           └─13581 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared eskimo/spark-history-s
 
 Jun 02 10:13:32 deb-node1 systemd[1]: Starting Spark History Server...
 Jun 02 10:13:32 deb-node1 docker[13549]: Error response from daemon: Cannot kill container: spark-console: Container 2b74749e6792fd8b78ab7a1dc154c24548af52c0ea6a6de74827d1583fdd8491 is no
@@ -2564,7 +2564,7 @@ May 31 14:12:37 deb-node1 docker[5794]: Using config: /etc/zookeeper/conf/zoo.cf
            │ ├─networkd-dispatcher.service
            │ │ └─646 /usr/bin/python3 /usr/bin/networkd-dispatcher --run-startup-triggers
            │ ├─ntp.service
-           │ │ └─1698 /usr/bin/docker run -i --name ntp -p 123:123/udp --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo:ntp /usr/sbin/nt
+           │ │ └─1698 /usr/bin/docker run -i --name ntp -p 123:123/udp --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo/ntp /usr/sbin/nt
            │ ├─polkit.service
            │ │ └─807 /usr/lib/policykit-1/polkitd --no-debug
            │ ├─rpcbind.service
@@ -2576,7 +2576,7 @@ May 31 14:12:37 deb-node1 docker[5794]: Using config: /etc/zookeeper/conf/zoo.cf
            │ ├─spark-executor.service
            │ │ └─1670 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared -v /usr/local/
            │ ├─spark-console.service
-           │ │ └─13581 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared eskimo:spark-histo
+           │ │ └─13581 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared eskimo/spark-histo
            │ ├─ssh.service
            │ │ └─969 /usr/sbin/sshd -D
            │ ├─system-getty.slice
@@ -2754,7 +2754,7 @@ May 31 13:55:27 deb-node1 lvm[780]:   2 logical volume(s) in volume group "vagra
            ├─networkd-dispatcher.service
            │ └─646 /usr/bin/python3 /usr/bin/networkd-dispatcher --run-startup-triggers
            ├─ntp.service
-           │ └─1698 /usr/bin/docker run -i --name ntp -p 123:123/udp --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo:ntp /usr/sbin/ntpd
+           │ └─1698 /usr/bin/docker run -i --name ntp -p 123:123/udp --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo/ntp /usr/sbin/ntpd
            ├─polkit.service
            │ └─807 /usr/lib/policykit-1/polkitd --no-debug
            ├─rpcbind.service
@@ -2766,7 +2766,7 @@ May 31 13:55:27 deb-node1 lvm[780]:   2 logical volume(s) in volume group "vagra
            ├─spark-executor.service
            │ └─1670 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared -v /usr/local/li
            ├─spark-console.service
-           │ └─13581 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared eskimo:spark-history
+           │ └─13581 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark:rshared eskimo/spark-history
            ├─ssh.service
            │ └─969 /usr/sbin/sshd -D
            ├─system-getty.slice

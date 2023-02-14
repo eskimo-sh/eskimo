@@ -218,9 +218,9 @@ public class NodesConfigControllerTest {
                 "      {\"kube-master\": \"192.168.10.11\"},\n" +
                 "      {\"kube-slave\": \"192.168.10.11\"},\n" +
                 "      {\"kube-slave\": \"192.168.10.13\"},\n" +
-                "      {\"spark-console\": \"(kubernetes)\"},\n" +
                 "      {\"spark-runtime\": \"(kubernetes)\"},\n" +
                 "      {\"logstash\": \"(kubernetes)\"},\n" +
+                "      {\"spark-console\": \"(kubernetes)\"},\n" +
                 "      {\"kafka\": \"(kubernetes)\"},\n" +
                 "      {\"zeppelin\": \"(kubernetes)\"}\n" +
                 "    ],\n" +

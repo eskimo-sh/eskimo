@@ -65,7 +65,8 @@ fi
 
 echo " - Building container kafka-manager"
 build_container kafka-manager kafka-manager kafka-manager_install_log
-
+#save tag
+CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 # create and start container
 echo " - Running docker container"
@@ -79,7 +80,7 @@ docker run \
         -p 22000:22000 \
         -d --name kafka-manager \
         -i \
-        -t eskimo:kafka-manager bash >> kafka-manager_install_log 2>&1
+        -t eskimo/kafka-manager:$CONTAINER_TAG bash >> kafka-manager_install_log 2>&1
 fail_if_error $? "kafka-manager_install_log" -2
 
 echo " - Configuring kafka container (common part)"
@@ -97,8 +98,7 @@ echo " - Handling topology infrastructure"
 handle_topology_infrastructure kafka-manager kafka-manager_install_log
 
 echo " - Committing changes to local template and exiting container kafka-manager"
-commit_container kafka-manager kafka-manager_install_log
-
+commit_container kafka-manager $CONTAINER_TAG kafka-manager_install_log
 
 echo " - Starting Kubernetes deployment"
-deploy_kubernetes kafka-manager kafka-manager_install_log
+deploy_kubernetes kafka-manager $CONTAINER_TAG kafka-manager_install_log

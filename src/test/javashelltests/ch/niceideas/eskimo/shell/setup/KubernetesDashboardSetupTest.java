@@ -85,7 +85,7 @@ public class KubernetesDashboardSetupTest extends AbstractSetupShellTest {
     @Override
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
-        copyFile(jailPath, "kubernetes-dashboard.k8s.yaml");
+        copyFile(jailPath, "kubernetes-dashboard.k8s.yaml.sh");
 
         assertTrue (new File (jailPath + "/kubernetesui_dashboard.tar.gz").createNewFile());
         assertTrue (new File (jailPath + "/kubernetesui_metrics-scraper.tar.gz").createNewFile());

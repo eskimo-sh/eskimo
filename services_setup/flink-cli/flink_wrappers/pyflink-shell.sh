@@ -76,7 +76,7 @@ docker run \
         -v /etc/k8s:/etc/k8s:ro \
         -e NODE_NAME=$HOSTNAME \
         -e ADDITONAL_HOSTS_FILE=$KUBE_SERVICES_HOSTS_FILE \
-        kubernetes.registry:5000/flink \
+        "kubernetes.registry:5000/flink:$(get_last_tag flink)" \
             /usr/local/bin/kube_do /usr/local/bin/pyflink-shell.sh "$@"
 
 rm -Rf $KUBE_SERVICES_HOSTS_FILE

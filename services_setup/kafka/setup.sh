@@ -74,6 +74,8 @@ fi
 
 echo " - Building container kafka"
 build_container kafka kafka kafka_install_log
+#save tag
+CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 # create and start container
 echo " - Running docker container"
@@ -88,7 +90,7 @@ docker run \
         -p 9999:9999 \
         -d --name kafka \
         -i \
-        -t eskimo:kafka bash >> kafka_install_log 2>&1
+        -t eskimo/kafka:$CONTAINER_TAG bash >> kafka_install_log 2>&1
 fail_if_error $? "kafka_install_log" -2
 
 # connect to container
@@ -113,8 +115,8 @@ echo " - Handling topology infrastructure"
 handle_topology_infrastructure kafka kafka_install_log
 
 echo " - Committing changes to local template and exiting container kafka"
-commit_container kafka kafka_install_log
+commit_container kafka $CONTAINER_TAG kafka_install_log
 
 echo " - Starting Kubernetes deployment"
-deploy_kubernetes kafka kafka_install_log
+deploy_kubernetes kafka $CONTAINER_TAG kafka_install_log
 

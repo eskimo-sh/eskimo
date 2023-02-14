@@ -79,6 +79,8 @@ fi
 
 echo " - Building docker container for spark history server"
 build_container spark-console spark spark_console_install_log
+#save tag
+CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 # create and start container
 echo " - Running docker container to configure spark executor"
@@ -90,7 +92,7 @@ docker run \
         -v /var/lib/spark:/var/lib/spark \
         --name spark-console \
         -i \
-        -t eskimo:spark-console bash >> spark_console_install_log 2>&1
+        -t eskimo/spark-console:$CONTAINER_TAG bash >> spark_console_install_log 2>&1
 fail_if_error $? "spark_console_install_log" -2
 
 echo " - Configuring spark-console container (config script)"
@@ -111,7 +113,7 @@ echo " - Copying Topology Injection Script (Spark Console)"
 docker_cp_script inContainerInjectTopologySparkHistory.sh sbin spark-console spark_console_install_log
 
 echo " - Committing changes to local template and exiting container spark"
-commit_container spark-console spark_console_install_log
+commit_container spark-console $CONTAINER_TAG spark_console_install_log
 
 echo " - Starting Kubernetes deployment"
-deploy_kubernetes spark-console spark_console_install_log
+deploy_kubernetes spark-console $CONTAINER_TAG spark_console_install_log

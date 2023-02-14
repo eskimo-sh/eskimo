@@ -135,7 +135,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -148,7 +149,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/kafka-verifiable-producer.sh --producer.config /tmp/producer.json\n", dockerLogs);
     }
 
@@ -161,7 +162,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -174,7 +176,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/kafka-verifiable-consumer.sh --consumer.config /tmp/consumer.json\n", dockerLogs);
     }
 
@@ -187,7 +189,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -199,7 +202,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/kafka-trogdor.sh\n", dockerLogs);
     }
 
@@ -212,7 +215,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -225,7 +229,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/kafka-topics.sh --command-config /tmp/test.json\n", dockerLogs);
     }
 
@@ -238,7 +242,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -251,7 +256,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/sbin/kafka-streams-application-reset.sh --config-file /tmp/config.json\n", dockerLogs);
     }
 
@@ -264,7 +269,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -279,7 +285,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/kafka-run-class.sh -jar /home/eskimo/test.jar -classpath /tmp/test.jar:/var/lib/spark/spark.jar\n", dockerLogs);
     }
 
@@ -292,7 +298,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -304,7 +311,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/sbin/kafka-replica-verification.sh\n", dockerLogs);
     }
 
@@ -317,7 +324,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -331,7 +339,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/sbin/kafka-reassign-partitions.sh --topics-to-move-json-file /tmp/topics.json --reassignment-json-file /var/lib/eskimo/default.assign.json\n", dockerLogs);
     }
 
@@ -344,7 +352,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -358,7 +367,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/kafka-producer-perf-test.sh --producer.config /tmp/producer.json --payload-file /var/lib/test/payload.bin\n", dockerLogs);
     }
 
@@ -371,7 +380,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -384,7 +394,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/sbin/kafka-preferred-replica-election.sh --path-to-json-file /var/lib/eskimo/eskimo.json\n", dockerLogs);
     }
 
@@ -397,7 +407,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -411,7 +422,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/sbin/kafka-mirror-maker.sh --consumer.config /tmp/consum.json --producer.config /var/lib/eskimo/produc,json\n", dockerLogs);
     }
 
@@ -424,7 +435,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -436,7 +448,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do kafka-dump-log.sh\n", dockerLogs);
     }
 
@@ -449,7 +461,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -462,7 +475,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do kafka-dump-log.sh --files /tmp/test\n", dockerLogs);
     }
 
@@ -475,7 +488,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -488,7 +502,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do kafka-delete-records.sh --command-config /tmp/config.json --offset-json-file /var/lib/kafka/offset.json\n", dockerLogs);
     }
 
@@ -501,7 +515,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -514,7 +529,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/kafka-delegation-tokens.sh --command-config /tmp/config.json\n", dockerLogs);
     }
 
@@ -527,7 +542,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -540,7 +556,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/kafka-consumer-perf-test.sh --consumer.config /tmp/config.json\n", dockerLogs);
     }
 
@@ -553,7 +569,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -567,7 +584,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/kafka-consumer-groups.sh --command-config /tmp/config.json --from-file /var/lib/eskimo/kafka/test.json\n", dockerLogs);
     }
 
@@ -580,7 +597,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -593,7 +611,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/kafka-console-producer.sh --producer.config /var/lib/eskimo/config,json\n", dockerLogs);
     }
 
@@ -606,7 +624,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -619,7 +638,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/kafka-console-consumer.sh --consumer.config /var/lib/eskimo/config,json\n", dockerLogs);
     }
 
@@ -632,7 +651,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -645,7 +665,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/sbin/kafka-configs.sh --command-config /tmp/command.json\n", dockerLogs);
     }
 
@@ -658,7 +678,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -671,7 +692,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/bin/kafka-broker-api-versions.sh --command-config /tmp/command.json\n", dockerLogs);
     }
 
@@ -684,7 +705,8 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getJailPath() + "/.log_docker"), StandardCharsets.UTF_8);
         String kubeNSFile = FlinkCliWrappersTest.extractKubeNSFile(dockerLogs);
-        assertEquals ("run " +
+        assertEquals ("image ls -a\n" +
+                "run " +
                 "-i " +
                 "--rm " +
                 "--network host " +
@@ -697,7 +719,7 @@ public class KafkaCliWrappersTest extends AbstractSetupShellTest {
                 "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/kafka " +
+                "kubernetes.registry:5000/kafka:0 " +
                     "/usr/local/bin/kube_do /usr/local/sbin/kafka-acls.sh --command-config /tmp/command.json\n", dockerLogs);
     }
 

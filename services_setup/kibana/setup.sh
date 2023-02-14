@@ -51,6 +51,8 @@ sudo rm -f kibana_install_log
 
 echo " - Building container kibana"
 build_container kibana kibana kibana_install_log
+#save tag
+CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 echo " - Configuring host elasticsearch config part"
 . ./setupESCommon.sh
@@ -70,7 +72,7 @@ docker run \
         -v $SCRIPT_DIR/samples:/eskimo/samples \
         -d --name kibana \
         -i \
-        -t eskimo:kibana bash >> kibana_install_log 2>&1
+        -t eskimo/kibana:$CONTAINER_TAG bash >> kibana_install_log 2>&1
 fail_if_error $? "kibana_install_log" -2
 
 # connect to container
@@ -91,7 +93,7 @@ echo " - Handling topology infrastructure"
 handle_topology_infrastructure kibana kibana_install_log
 
 echo " - Committing changes to local template and exiting container kibana"
-commit_container kibana kibana_install_log
+commit_container kibana $CONTAINER_TAG kibana_install_log
 
 echo " - Starting Kubernetes deployment"
-deploy_kubernetes kibana kibana_install_log
+deploy_kubernetes kibana $CONTAINER_TAG kibana_install_log

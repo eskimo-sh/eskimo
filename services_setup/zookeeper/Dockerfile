@@ -1,4 +1,4 @@
-FROM eskimo:zookeeper_template
+FROM eskimo/zookeeper_template:latest
 
 MAINTAINER eskimo <eskimoapp@gmail.com>
 

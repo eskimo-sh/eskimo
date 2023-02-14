@@ -165,6 +165,10 @@ public abstract class AbstractSetupShellTest {
                     "# Set test mode\n" +
                     "export TEST_MODE=true\n" +
                     "\n"+
+                    "get_last_tag() {\n"+
+                    "echo 1\n"+
+                    "}\n"+
+                    "\n"+
                     "# Using local commands\n" +
                     "export PATH=$SCRIPT_DIR:$PATH\n");
 
@@ -309,7 +313,7 @@ public abstract class AbstractSetupShellTest {
 
         if (StringUtils.isNotBlank(kubeCtlLogs)) {
 
-            int indexOfDelete = kubeCtlLogs.indexOf("delete -f " + getServiceName() + ".k8s.yaml");
+            int indexOfDelete = kubeCtlLogs.indexOf("delete -f ");
             assertTrue(indexOfDelete > -1);
 
             int indexOfApply = kubeCtlLogs.indexOf("apply -f -", indexOfDelete);
@@ -370,7 +374,7 @@ public abstract class AbstractSetupShellTest {
 
             //System.err.println (dockerLogs);
 
-            int indexOfImagesQ = dockerLogs.indexOf("images -q eskimo:" + getTemplateName() + "_template");
+            int indexOfImagesQ = dockerLogs.indexOf("images -q eskimo/" + getTemplateName() + "_template");
             assertTrue(indexOfImagesQ > -1);
 
             int indexOfLoad = dockerLogs.indexOf("load", indexOfImagesQ + 1);
@@ -379,10 +383,10 @@ public abstract class AbstractSetupShellTest {
             int indexOfPs = dockerLogs.indexOf("ps -a -q -f name=" + getServiceName(), indexOfLoad + 1);
             assertTrue(indexOfPs > -1);
 
-            int indexOfBuild = dockerLogs.indexOf("build --iidfile id_file --tag eskimo:" + getServiceName() + " .", indexOfPs + 1);
+            int indexOfBuild = dockerLogs.indexOf("build --iidfile id_file --tag eskimo/" + getServiceName() + ":2 .", indexOfPs + 1);
             assertTrue(indexOfBuild > -1);
 
-            int indexOfCommit = dockerLogs.indexOf("commit " + getServiceName() + " eskimo:" + getServiceName(), indexOfBuild + 1);
+            int indexOfCommit = dockerLogs.indexOf("commit " + getServiceName() + " eskimo/" + getServiceName() + ":2", indexOfBuild + 1);
             assertTrue(indexOfCommit > -1);
 
             int indexOfStop = dockerLogs.indexOf("stop " + getServiceName(), indexOfCommit + 1);
@@ -405,9 +409,9 @@ public abstract class AbstractSetupShellTest {
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(currentFolder + "/.log_docker"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(dockerLogs)) {
 
-            //System.err.println (dockerLogs);
+            System.err.println (dockerLogs);
 
-            int indexOfImagesQ = dockerLogs.indexOf("images -q eskimo:" + getTemplateName() + "_template");
+            int indexOfImagesQ = dockerLogs.indexOf("images -q eskimo/" + getTemplateName() + "_template");
             assertTrue(indexOfImagesQ > -1);
 
             int indexOfLoad = dockerLogs.indexOf("load", indexOfImagesQ + 1);
@@ -416,12 +420,12 @@ public abstract class AbstractSetupShellTest {
             int indexOfPs = dockerLogs.indexOf("ps -a -q -f name=" + imageName, indexOfLoad + 1);
             assertTrue(indexOfPs > -1);
 
-            int indexOfBuild = dockerLogs.indexOf("build --iidfile id_file --tag eskimo:" + imageName + " .", indexOfPs + 1);
+            int indexOfBuild = dockerLogs.indexOf("build --iidfile id_file --tag eskimo/" + imageName + ":2 .", indexOfPs + 1);
             assertTrue(indexOfBuild > -1);
 
             int indexOfRm = indexOfBuild;
             if (!simplified) {
-                int indexOfCommit = dockerLogs.indexOf("commit " + imageName + " eskimo:" + imageName, indexOfBuild + 1);
+                int indexOfCommit = dockerLogs.indexOf("commit " + imageName + " eskimo/" + imageName + ":2", indexOfBuild + 1);
                 assertTrue(indexOfCommit > -1);
 
                 int indexOfStop = dockerLogs.indexOf("stop " + imageName, indexOfCommit + 1);
@@ -431,13 +435,13 @@ public abstract class AbstractSetupShellTest {
                 assertTrue(indexOfRm > -1);
             }
 
-            int indexOfTag = dockerLogs.indexOf("tag eskimo:" + imageName + " kubernetes.registry:5000/" + imageName, indexOfRm + 1);
+            int indexOfTag = dockerLogs.indexOf("tag eskimo/" + imageName + ":2 kubernetes.registry:5000/" + imageName + ":2", indexOfRm + 1);
             assertTrue(indexOfTag > -1);
 
             int indexOfPush = dockerLogs.indexOf("push kubernetes.registry:5000/" + imageName, indexOfTag + 1);
             assertTrue(indexOfPush > -1);
 
-            int indexOfImageRm = dockerLogs.indexOf("image rm eskimo:" + imageName, indexOfTag + 1);
+            int indexOfImageRm = dockerLogs.indexOf("image rm eskimo/" + imageName + ":2", indexOfTag + 1);
             assertTrue(indexOfImageRm > -1);
 
 

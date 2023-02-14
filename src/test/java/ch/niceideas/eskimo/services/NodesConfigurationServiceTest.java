@@ -351,12 +351,14 @@ public class NodesConfigurationServiceTest {
                 Service.from("zookeeper"),
                 Node.fromAddress("192.168.10.11")));
 
+        //System.err.println (sshCommandServiceTest.getExecutedCommands());
+
         assertTrue(sshCommandServiceTest.getExecutedCommands().contains(
                 "sudo systemctl stop zookeeper\n" +
                 "if [[ -d /lib/systemd/system/ ]]; then echo found_standard; fi\n" +
                 "sudo rm -f  /usr/lib/systemd/system/zookeeper.service\n" +
                 "sudo docker rm -f zookeeper || true \n" +
-                "sudo docker image rm -f eskimo:zookeeper\n" +
+                "sudo bash -c '/usr/local/sbin/eskimo-utils.sh && docker image rm -f eskimo/zookeeper:$(get_last_tag zookeeper)\n" +
                 "sudo systemctl daemon-reload\n" +
                 "sudo systemctl reset-failed\n"));
 

@@ -79,7 +79,7 @@ public class KibanaSetupTest extends AbstractSetupShellTest {
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
         copyFile(jailPath, "setupESCommon.sh");
-        copyFile(jailPath, "kibana.k8s.yaml");
+        copyFile(jailPath, "kibana.k8s.yaml.sh");
         copyFile(jailPath, "inContainerSetupKibana.sh");
         copyFile(jailPath, "inContainerSetupESCommon.sh");
         copyFile(jailPath, "inContainerStartService.sh");

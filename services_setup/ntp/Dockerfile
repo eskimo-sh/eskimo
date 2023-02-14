@@ -1,4 +1,4 @@
-FROM eskimo:ntp_template
+FROM eskimo/ntp_template:latest
 
 MAINTAINER eskimo <eskimoapp@gmail.com>
 

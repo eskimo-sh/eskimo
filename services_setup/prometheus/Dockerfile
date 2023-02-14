@@ -1,4 +1,4 @@
-FROM eskimo:prometheus_template
+FROM eskimo/prometheus_template:latest
 
 MAINTAINER eskimo <eskimoapp@gmail.com>
 

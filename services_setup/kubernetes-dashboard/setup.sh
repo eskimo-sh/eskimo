@@ -68,5 +68,5 @@ deploy_image_in_registry "$(ls -1 kubernetesui_metrics-scraper*)" kubernetesui/m
 
 
 echo " - Starting Kubernetes deployment"
-deploy_kubernetes kubernetes-dashboard kubernetes_dashboard_install_log NO_CONTAINER
+deploy_kubernetes_only kubernetes-dashboard latest kubernetes_dashboard_install_log NO_CONTAINER
 

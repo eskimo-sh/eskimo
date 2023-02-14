@@ -1,4 +1,4 @@
-FROM eskimo:zeppelin_template
+FROM eskimo/zeppelin_template:latest
 
 MAINTAINER eskimo <eskimoapp@gmail.com>
 

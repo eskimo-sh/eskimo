@@ -85,7 +85,7 @@ public class ElasticSearchSetupTest extends AbstractSetupShellTest {
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
         copyFile(jailPath, "setupESCommon.sh");
-        copyFile(jailPath, "elasticsearch.k8s.yaml");
+        copyFile(jailPath, "elasticsearch.k8s.yaml.sh");
         copyFile(jailPath, "inContainerSetupElasticSearch.sh");
         copyFile(jailPath, "inContainerSetupESCommon.sh");
         copyFile(jailPath, "inContainerStartService.sh");

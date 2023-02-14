@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -39,6 +40,11 @@
 # /usr/local/lib/flink/bin/kubernetes-session.sh
 #  -> Then export yaml files frm dashboard (servces + deployment)
 
+. /usr/local/sbin/eskimo-utils.sh
+
+TEMP_FILE=$(mktemp)
+
+cat > $TEMP_FILE <<EOF
 kind: Service
 apiVersion: v1
 metadata:
@@ -76,7 +82,7 @@ data:
     spec:
       containers:
       - name: flink-main-container # this has to be this name !!!
-        image: kubernetes.registry:5000/flink-runtime
+        image: kubernetes.registry:5000/flink-runtime:$(get_last_tag flink-runtime)
         securityContext:
           privileged: true
           allowPrivilegeEscalation: true
@@ -225,7 +231,7 @@ spec:
             defaultMode: 420
       containers:
         - name: flink-main-container
-          image: kubernetes.registry:5000/flink-runtime
+          image: kubernetes.registry:5000/flink-runtime:$(get_last_tag flink-runtime)
           command:
             - /docker-entrypoint.sh
           args:
@@ -295,3 +301,6 @@ spec:
       maxSurge: 25%
   revisionHistoryLimit: 10
   progressDeadlineSeconds: 600
+EOF
+cat $TEMP_FILE
+rm -Rf $TEMP_FILE

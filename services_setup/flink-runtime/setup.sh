@@ -84,6 +84,8 @@ echo " ---> Flink common template part -----------------------------------------
 
 echo " - Building docker container for flink worker"
 build_container flink flink flink_install_log
+#save tag
+export COMMON_CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 # create and start container
 echo " - Running docker container to configure flink worker"
@@ -96,11 +98,11 @@ docker run \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --name flink \
         -i \
-        -t eskimo:flink bash >> flink_install_log 2>&1
+        -t eskimo/flink:$COMMON_CONTAINER_TAG bash >> flink_install_log 2>&1
 fail_if_error $? "flink_install_log" -2
 
 echo " - Configuring flink container (config script)"
-docker exec flink bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id | tee -a flink_install_log 2>&1
+docker exec flink bash /scripts/inContainerSetupFlinkCommon.sh $flink_user_id $COMMON_CONTAINER_TAG | tee -a flink_install_log 2>&1
 check_in_container_config_success flink_install_log
 
 echo " - Copying Flink entrypoint script"
@@ -114,16 +116,16 @@ docker_cp_script inContainerInjectTopology.sh sbin flink flink_install_log
 
 
 echo " - Committing changes to local template and exiting container flink"
-commit_container flink flink_install_log
+commit_container flink $COMMON_CONTAINER_TAG flink_install_log
 
 echo " - Deploying flink Service in docker registry for kubernetes"
-docker tag eskimo:flink kubernetes.registry:5000/flink >> flink_worker_install_log 2>&1
+docker tag eskimo/flink:$COMMON_CONTAINER_TAG kubernetes.registry:5000/flink:$COMMON_CONTAINER_TAG >> flink_worker_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo "   + Could not re-tag kubernetes container image for flink"
     exit 4
 fi
 
-docker push kubernetes.registry:5000/flink >> flink_worker_install_log 2>&1
+docker push kubernetes.registry:5000/flink:$COMMON_CONTAINER_TAG >> flink_worker_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo "Image push in docker registry failed !"
     exit 5
@@ -142,7 +144,7 @@ echo " - Creating sub-setup dir for flink-worker"
 /bin/mkdir flink_worker_setup
 
 echo " - Copying specific docker file to flink-worker setup"
-cp Dockerfile.flink-runtime flink_worker_setup/Dockerfile
+envsubst < Dockerfile.flink-runtime > flink_worker_setup/Dockerfile
 
 echo " - Changing dir to flink-worker setup"
 cd flink_worker_setup/
@@ -151,14 +153,16 @@ set +e
 
 echo " - Building docker container for flink worker (specific)"
 build_container flink-runtime flink flink_worker_install_log
+#save tag
+RUNTIME_CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 echo " - Deploying flink worker in docker registry for kubernetes"
-deploy_registry flink-runtime flink_worker_install_log
+deploy_registry flink-runtime $RUNTIME_CONTAINER_TAG flink_worker_install_log
 
 cd ..
 
 echo " - Removing local image for common part"
-docker image rm eskimo:flink  >> flink_worker_install_log 2>&1
+docker image rm eskimo/flink:$COMMON_CONTAINER_TAG  >> flink_worker_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo "local image removal failed !"
     exit 6
@@ -177,4 +181,4 @@ kubectl create configmap flink-config-flink-runtime \
         --from-file=/var/lib/flink/config/logback-console.xml
 
 echo " - Start kubernetes deployment"
-deploy_kubernetes_only flink-runtime flink_worker_install_log
+deploy_kubernetes_only flink-runtime $RUNTIME_CONTAINER_TAG flink_worker_install_log

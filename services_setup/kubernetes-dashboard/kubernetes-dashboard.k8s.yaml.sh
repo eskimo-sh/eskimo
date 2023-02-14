@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -32,6 +33,11 @@
 # Software.
 #
 
+. /usr/local/sbin/eskimo-utils.sh
+
+TEMP_FILE=$(mktemp)
+
+cat > $TEMP_FILE <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -210,7 +216,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: kubernetes-dashboard
-          image: kubernetes.registry:5000/kubernetesui/dashboard
+          image: kubernetes.registry:5000/kubernetesui/dashboard:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8443
@@ -301,7 +307,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: dashboard-metrics-scraper
-          image: kubernetes.registry:5000/kubernetesui/metrics-scraper
+          image: kubernetes.registry:5000/kubernetesui/metrics-scraper:latest
           ports:
             - containerPort: 8000
               protocol: TCP
@@ -335,4 +341,6 @@ spec:
       volumes:
         - name: tmp-volume
           emptyDir: {}
-
+EOF
+cat $TEMP_FILE
+rm -Rf $TEMP_FILE

@@ -74,6 +74,8 @@ sudo mkdir -p /var/lib/gluster
 
 echo " - Building container gluster"
 build_container gluster gluster gluster_install_log
+#save tag
+CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 # create and start container
 echo " - Running docker container"
@@ -88,7 +90,7 @@ docker run \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         -d --name gluster \
         -i \
-        -t eskimo:gluster bash >> gluster_install_log 2>&1
+        -t eskimo/gluster:$CONTAINER_TAG bash >> gluster_install_log 2>&1
 fail_if_error $? "gluster_install_log" -2
 
 echo " - Handling Eskimo Base Infrastructure"
@@ -109,7 +111,7 @@ echo " - Copying inContainerStopService.sh"
 docker_cp_script inContainerStopService.sh sbin gluster gluster_install_log
 
 echo " - Committing changes to local template and exiting container gluster"
-commit_container gluster gluster_install_log
+commit_container gluster $CONTAINER_TAG gluster_install_log
 
 echo " - Copying gluster command line programs docker wrappers to /usr/local/sbin"
 for i in $(find ./gluster_wrappers -mindepth 1); do

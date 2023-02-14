@@ -49,7 +49,7 @@ RemainAfterExit=false
 ExecStartPre=-/usr/bin/docker kill ntp
 ExecStartPre=-/usr/bin/docker rm -f ntp
 
-ExecStart=/bin/bash -c "/usr/bin/docker run \
+ExecStart=/bin/bash -c ". /usr/local/sbin/eskimo-utils.sh && /usr/bin/docker run \
         -i \
         --name ntp \
         -p 123:123/udp \
@@ -62,7 +62,7 @@ ExecStart=/bin/bash -c "/usr/bin/docker run \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
         -e NODE_NAME=$HOSTNAME \
-        eskimo:ntp \
+        eskimo/ntp:$(get_last_tag ntp) \
         /usr/local/sbin/inContainerStartService.sh"
 
 ExecStop=/usr/bin/docker stop ntp

@@ -71,7 +71,7 @@ docker run \
         --mount type=bind,source=$KUBE_SERVICES_HOSTS_FILE,target=$KUBE_SERVICES_HOSTS_FILE \
         -e NODE_NAME=$HOSTNAME \
         -e ADDITONAL_HOSTS_FILE=$KUBE_SERVICES_HOSTS_FILE \
-        kubernetes.registry:5000/kafka \
+        "kubernetes.registry:5000/kafka:$(get_last_tag kafka)" \
             /usr/local/bin/kube_do /usr/local/bin/kafka-trogdor.sh "$@"
 
 rm -Rf $KUBE_SERVICES_HOSTS_FILE

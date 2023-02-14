@@ -55,12 +55,12 @@ fi
 
 # build
 echo " - Building docker image"
-docker build --iidfile id_file --tag eskimo:base-eskimo_template . > /tmp/base_image_build_log 2>&1
+docker build --iidfile id_file --tag eskimo/base-eskimo_template:latest . > /tmp/base_image_build_log 2>&1
 fail_if_error $? "/tmp/base_image_build_log" -2
 
 # create and start container
 echo " - Starting setup docker container"
-docker run -d --name base-eskimo_template -i -t eskimo:base-eskimo_template bash > /tmp/base_image_build_log 2>&1
+docker run -d --name base-eskimo_template -i -t eskimo/base-eskimo_template:latest bash > /tmp/base_image_build_log 2>&1
 fail_if_error $? "/tmp/base_image_build_log" -2
 
 echo " - (Hack) Creating missing directory /usr/share/man/man1/"

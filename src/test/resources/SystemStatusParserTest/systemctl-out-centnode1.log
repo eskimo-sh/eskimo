@@ -36,9 +36,9 @@
            └─system.slice
              ├─var-lib-docker-overlay2-9b637c88144040bca7cae7dac6600b58e2bd849465b9935651e26d0bdf00f309-merged.mount
              ├─kibana.service
-             │ └─18473 /usr/bin/docker run -i --name kibana --user elasticsearch -p 5601:5601 -v /var/log/kibana:/var/log/kibana -v /var/run/kibana:/var/run/kibana -v /usr/local/etc/kibana:/usr/local/etc/kibana eskimo:kibana /usr/local/lib/kibana/bin/kibana
+             │ └─18473 /usr/bin/docker run -i --name kibana --user elasticsearch -p 5601:5601 -v /var/log/kibana:/var/log/kibana -v /var/run/kibana:/var/run/kibana -v /usr/local/etc/kibana:/usr/local/etc/kibana eskimo/kibana:latest /usr/local/lib/kibana/bin/kibana
              ├─elasticsearch.service
-             │ └─18443 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo:elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+             │ └─18443 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo/elasticsearch:latest /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
              ├─run-user-1000.mount
              ├─run-user-0.mount
              ├─NetworkManager-wait-online.service
@@ -53,12 +53,12 @@
              ├─var-lib-docker-overlay2-a25464240a5d98a673d7e02b3cb91db051108e41c915c912082028d0475e8375-merged.mount
              ├─spark-nfs-master.service
              ├─ntp.service
-             │ └─3223 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo:ntp /usr/sbin/ntpd -n -g
+             │ └─3223 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo/ntp:latest /usr/sbin/ntpd -n -g
              ├─cerebro.service
-             │ └─3202 /usr/bin/docker run -i --name cerebro --user elasticsearch -p 9000:9000 -v /var/log/cerebro:/var/log/cerebro -v /var/run/cerebro:/var/run/cerebro -v /usr/local/etc/cerebro:/usr/local/etc/cerebro eskimo:cerebro /usr/local/lib/cerebro/bin/cerebro -Dhttp.port=9000 -Dhttp.address=0.0.0.0
+             │ └─3202 /usr/bin/docker run -i --name cerebro --user elasticsearch -p 9000:9000 -v /var/log/cerebro:/var/log/cerebro -v /var/run/cerebro:/var/run/cerebro -v /usr/local/etc/cerebro:/usr/local/etc/cerebro eskimo/cerebro:latest /usr/local/lib/cerebro/bin/cerebro -Dhttp.port=9000 -Dhttp.address=0.0.0.0
              ├─spark-executor.service
-             │ ├─3284 /bin/bash -c . /run/eskimo_k8s_environment && /usr/bin/docker run          -i          --name spark-mesos-shuffle-service          --user spark          -p 7337:7337          -v /var/log/spark:/var/log/spark         -v /var/lib/spark:/var/lib/spark         -v /usr/local/lib/mesos/:/usr/local/lib/mesos/          -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/          eskimo:spark-mesos-shuffle-service          /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
-             │ └─3286 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo:spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+             │ ├─3284 /bin/bash -c . /run/eskimo_k8s_environment && /usr/bin/docker run          -i          --name spark-mesos-shuffle-service          --user spark          -p 7337:7337          -v /var/log/spark:/var/log/spark         -v /var/lib/spark:/var/lib/spark         -v /usr/local/lib/mesos/:/usr/local/lib/mesos/          -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/          eskimo/spark-mesos-shuffle-service:latest          /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+             │ └─3286 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo/spark-mesos-shuffle-service:latest /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
              ├─docker.service
              │ ├─ 2725 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
              │ ├─ 3393 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9000 -container-ip 172.17.0.2 -container-port 9000
@@ -645,7 +645,7 @@ Condition: start condition failed at Fri 2019-05-03 06:58:52 UTC; 49min ago
     Tasks: 10
    Memory: 36.3M
    CGroup: /system.slice/cerebro.service
-           └─3202 /usr/bin/docker run -i --name cerebro --user elasticsearch -p 9000:9000 -v /var/log/cerebro:/var/log/cerebro -v /var/run/cerebro:/var/run/cerebro -v /usr/local/etc/cerebro:/usr/local/etc/cerebro eskimo:cerebro /usr/local/lib/cerebro/bin/cerebro -Dhttp.port=9000 -Dhttp.address=0.0.0.0
+           └─3202 /usr/bin/docker run -i --name cerebro --user elasticsearch -p 9000:9000 -v /var/log/cerebro:/var/log/cerebro -v /var/run/cerebro:/var/run/cerebro -v /usr/local/etc/cerebro:/usr/local/etc/cerebro eskimo/cerebro /usr/local/lib/cerebro/bin/cerebro -Dhttp.port=9000 -Dhttp.address=0.0.0.0
 
 May 03 07:48:19 cent-node1 docker[3202]: at sun.nio.ch.IOUtil.readIntoNativeBuffer(IOUtil.java:223)
 May 03 07:48:19 cent-node1 docker[3202]: at sun.nio.ch.IOUtil.read(IOUtil.java:192)
@@ -796,7 +796,7 @@ May 03 07:48:23 cent-node1 dockerd[2725]: time="2019-05-03T07:48:23.493324671Z" 
     Tasks: 8
    Memory: 22.0M
    CGroup: /system.slice/elasticsearch.service
-           └─18443 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo:elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+           └─18443 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo/elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
 
 May 03 07:48:23 cent-node1 systemd[1]: elasticsearch.service holdoff time over, scheduling restart.
 May 03 07:48:23 cent-node1 systemd[1]: Stopped Elasticsearch Server.
@@ -861,7 +861,7 @@ May 03 06:58:57 cent-node1 systemd[1]: Started irqbalance daemon.
     Tasks: 8
    Memory: 19.7M
    CGroup: /system.slice/kibana.service
-           └─18473 /usr/bin/docker run -i --name kibana --user elasticsearch -p 5601:5601 -v /var/log/kibana:/var/log/kibana -v /var/run/kibana:/var/run/kibana -v /usr/local/etc/kibana:/usr/local/etc/kibana eskimo:kibana /usr/local/lib/kibana/bin/kibana
+           └─18473 /usr/bin/docker run -i --name kibana --user elasticsearch -p 5601:5601 -v /var/log/kibana:/var/log/kibana -v /var/run/kibana:/var/run/kibana -v /usr/local/etc/kibana:/usr/local/etc/kibana eskimo/kibana /usr/local/lib/kibana/bin/kibana
 
 May 03 07:48:23 cent-node1 systemd[1]: kibana.service holdoff time over, scheduling restart.
 May 03 07:48:23 cent-node1 systemd[1]: Stopped Kibana UI.
@@ -1044,7 +1044,7 @@ May 03 06:58:24 cent-node1 systemd[1]: nfs-server.service failed.
     Tasks: 8
    Memory: 27.6M
    CGroup: /system.slice/ntp.service
-           └─3223 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo:ntp /usr/sbin/ntpd -n -g
+           └─3223 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo/ntp /usr/sbin/ntpd -n -g
 
 May 03 07:45:20 cent-node1 docker[3223]: 3 May 07:45:20 ntpd[1]: Soliciting pool server 2a01:4f8:0:a0a1::2:1
 May 03 07:45:23 cent-node1 docker[3223]: 3 May 07:45:23 ntpd[1]: Soliciting pool server 2a01:4f8:0:a112::2:2
@@ -1219,8 +1219,8 @@ May 03 06:58:56 cent-node1 systemd[1]: selinux-policy-migrate-local-changes@targ
     Tasks: 9
    Memory: 22.4M
    CGroup: /system.slice/spark-executor.service
-           ├─3284 /bin/bash -c . /run/eskimo_k8s_environment && /usr/bin/docker run          -i          --name spark-mesos-shuffle-service          --user spark          -p 7337:7337          -v /var/log/spark:/var/log/spark         -v /var/lib/spark:/var/lib/spark         -v /usr/local/lib/mesos/:/usr/local/lib/mesos/          -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/          eskimo:spark-mesos-shuffle-service          /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
-           └─3286 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo:spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+           ├─3284 /bin/bash -c . /run/eskimo_k8s_environment && /usr/bin/docker run          -i          --name spark-mesos-shuffle-service          --user spark          -p 7337:7337          -v /var/log/spark:/var/log/spark         -v /var/lib/spark:/var/lib/spark         -v /usr/local/lib/mesos/:/usr/local/lib/mesos/          -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/          eskimo/spark-mesos-shuffle-service          /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+           └─3286 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo/spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
 
 May 03 06:58:19 cent-node1 systemd[1]: Starting Mesos Shuffle Service for Spark executors...
 May 03 06:58:21 cent-node1 docker[3120]: Error response from daemon: Cannot kill container: spark-mesos-shuffle-service: Container c77f08559061fe206ef23f7f0d329f98b7e68c0cc3c6a42f85936e161de29d1e is not running
@@ -1642,9 +1642,9 @@ May 03 06:58:23 cent-node1 systemd[1]: Created slice Mesos Executors Slice.
    CGroup: /system.slice
            ├─var-lib-docker-overlay2-9b637c88144040bca7cae7dac6600b58e2bd849465b9935651e26d0bdf00f309-merged.mount
            ├─kibana.service
-           │ └─18473 /usr/bin/docker run -i --name kibana --user elasticsearch -p 5601:5601 -v /var/log/kibana:/var/log/kibana -v /var/run/kibana:/var/run/kibana -v /usr/local/etc/kibana:/usr/local/etc/kibana eskimo:kibana /usr/local/lib/kibana/bin/kibana
+           │ └─18473 /usr/bin/docker run -i --name kibana --user elasticsearch -p 5601:5601 -v /var/log/kibana:/var/log/kibana -v /var/run/kibana:/var/run/kibana -v /usr/local/etc/kibana:/usr/local/etc/kibana eskimo/kibana /usr/local/lib/kibana/bin/kibana
            ├─elasticsearch.service
-           │ └─18443 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo:elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+           │ └─18443 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo/elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
            ├─run-user-1000.mount
            ├─run-user-0.mount
            ├─NetworkManager-wait-online.service
@@ -1659,12 +1659,12 @@ May 03 06:58:23 cent-node1 systemd[1]: Created slice Mesos Executors Slice.
            ├─var-lib-docker-overlay2-a25464240a5d98a673d7e02b3cb91db051108e41c915c912082028d0475e8375-merged.mount
            ├─spark-nfs-master.service
            ├─ntp.service
-           │ └─3223 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo:ntp /usr/sbin/ntpd -n -g
+           │ └─3223 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo/ntp /usr/sbin/ntpd -n -g
            ├─cerebro.service
-           │ └─3202 /usr/bin/docker run -i --name cerebro --user elasticsearch -p 9000:9000 -v /var/log/cerebro:/var/log/cerebro -v /var/run/cerebro:/var/run/cerebro -v /usr/local/etc/cerebro:/usr/local/etc/cerebro eskimo:cerebro /usr/local/lib/cerebro/bin/cerebro -Dhttp.port=9000 -Dhttp.address=0.0.0.0
+           │ └─3202 /usr/bin/docker run -i --name cerebro --user elasticsearch -p 9000:9000 -v /var/log/cerebro:/var/log/cerebro -v /var/run/cerebro:/var/run/cerebro -v /usr/local/etc/cerebro:/usr/local/etc/cerebro eskimo/cerebro /usr/local/lib/cerebro/bin/cerebro -Dhttp.port=9000 -Dhttp.address=0.0.0.0
            ├─spark-executor.service
-           │ ├─3284 /bin/bash -c . /run/eskimo_k8s_environment && /usr/bin/docker run          -i          --name spark-mesos-shuffle-service          --user spark          -p 7337:7337          -v /var/log/spark:/var/log/spark         -v /var/lib/spark:/var/lib/spark         -v /usr/local/lib/mesos/:/usr/local/lib/mesos/          -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/          eskimo:spark-mesos-shuffle-service          /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
-           │ └─3286 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo:spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+           │ ├─3284 /bin/bash -c . /run/eskimo_k8s_environment && /usr/bin/docker run          -i          --name spark-mesos-shuffle-service          --user spark          -p 7337:7337          -v /var/log/spark:/var/log/spark         -v /var/lib/spark:/var/lib/spark         -v /usr/local/lib/mesos/:/usr/local/lib/mesos/          -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/          eskimo/spark-mesos-shuffle-service          /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+           │ └─3286 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo/spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
            ├─docker.service
            │ ├─ 2725 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
            │ ├─ 3393 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9000 -container-ip 172.17.0.2 -container-port 9000

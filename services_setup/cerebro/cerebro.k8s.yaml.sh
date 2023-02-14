@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -32,141 +33,87 @@
 # Software.
 #
 
+. /usr/local/sbin/eskimo-utils.sh
+  
+TEMP_FILE=$(mktemp)
 
-apiVersion: v1
+cat > $TEMP_FILE <<EOF
 kind: Service
+apiVersion: v1
 metadata:
-  name: elasticsearch
-  namespace: default
   labels:
-    service: elasticsearch
+    k8s-app: cerebro
+  name: cerebro
+  namespace: default
 spec:
-  clusterIP: None
   ports:
-    - port: 9200
-      name: serving
-    - port: 9300
-      name: node-to-node
+    - port: 31900
+      targetPort: 9000
   selector:
-    service: elasticsearch
+    k8s-app: cerebro
 
 ---
 
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: es-var-lib-volume
-  labels:
-    type: local
-spec:
-  storageClassName: es-local-storage
-  volumeMode: Filesystem
-  capacity:
-    storage: 20Gi
-  accessModes:
-    - ReadWriteOnce
-  local:
-    path: "/var/lib/elasticsearch"
-  nodeAffinity: # dummy node affinity since one is required.
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/os
-              operator: In
-              values:
-                - linux
-
----
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: es-var-lib-claim
-spec:
-  storageClassName: es-local-storage
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
-
----
-
+kind: Deployment
 apiVersion: apps/v1
-kind: StatefulSet
 metadata:
-  name: elasticsearch
-  namespace: default
   labels:
-    service: elasticsearch
+    k8s-app: cerebro
+  name: cerebro
+  namespace: default
 spec:
-  serviceName: elasticsearch
-  replicas: $ESKIMO_NODE_COUNT
+  replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      service: elasticsearch
+      k8s-app: cerebro
   template:
     metadata:
       labels:
-        service: elasticsearch
+        k8s-app: cerebro
     spec:
-      # Force all replicas on different nodes
-      topologySpreadConstraints:
-        - maxSkew: 1
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: DoNotSchedule
-          labelSelector:
-            matchLabels:
-              service: elasticsearch
-      tolerations:
-        # this toleration is to have the daemonset runnable on master nodes
-        # remove it if your masters can't run pods
-        - key: node-role.kubernetes.io/master
-          operator: Exists
-          effect: NoSchedule
+      #securityContext:
+      #  seccompProfile:
+      #    type: RuntimeDefault
+      enableServiceLinks: false
       containers:
-        - name: elasticsearch
-          image: kubernetes.registry:5000/elasticsearch
-          resources:
-            requests:
-              cpu: "$ESKIMO_KUBE_REQUEST_ELASTICSEARCH_CPU"
-              memory: "$ESKIMO_KUBE_REQUEST_ELASTICSEARCH_RAM"
+        - name: cerebro
+          image: kubernetes.registry:5000/cerebro:$(get_last_tag cerebro)
+          imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 9200
-              name: http
-            - containerPort: 9300
-              name: tcp
+            - containerPort: 9000
+              protocol: TCP
           command: ["/usr/local/sbin/inContainerStartService.sh"]
           volumeMounts:
             - name: var-log-elasticsearch
               mountPath: /var/log/elasticsearch
-            - name: var-lib-elasticsearch
-              mountPath: /var/lib/elasticsearch
             - name: var-run-elasticsearch
               mountPath: /var/run/elasticsearch
             - name: etc-eskimo-topology
               mountPath: /etc/eskimo_topology.sh
             - name: etc-eskimo-services-settings
               mountPath: /etc/eskimo_services-settings.json
-          env:
-            - name: ESKIMO_NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /
+              port: 9000
+            initialDelaySeconds: 60
+            timeoutSeconds: 30
           securityContext:
-            allowPrivilegeEscalation: true
+            allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
             runAsUser: 3301
             runAsGroup: 3301
-      terminationGracePeriodSeconds: 60
+          resources:
+            requests:
+              cpu: "$ESKIMO_KUBE_REQUEST_CEREBRO_CPU"
+              memory: "$ESKIMO_KUBE_REQUEST_CEREBRO_RAM"
       volumes:
         - name: var-log-elasticsearch
           hostPath:
             path: /var/log/elasticsearch
             type: Directory
-        - name: var-lib-elasticsearch
-          persistentVolumeClaim:
-            claimName: es-var-lib-claim
         - name: var-run-elasticsearch
           hostPath:
             path: /var/run/elasticsearch
@@ -180,3 +127,12 @@ spec:
             path: /etc/eskimo_services-settings.json
             type: File
       #hostNetwork: true
+      nodeSelector:
+        "kubernetes.io/os": linux
+      # Comment the following tolerations if app must not be deployed on master
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+EOF
+cat $TEMP_FILE
+rm -Rf $TEMP_FILE

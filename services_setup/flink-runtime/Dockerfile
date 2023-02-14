@@ -1,4 +1,4 @@
-FROM eskimo:flink_template
+FROM eskimo/flink_template:latest
 
 MAINTAINER eskimo <eskimoapp@gmail.com>
 

@@ -83,6 +83,8 @@ echo " ---> Spark common template part -----------------------------------------
 
 echo " - Building docker container for spark"
 build_container spark spark spark_executor_install_log
+#save tag
+export COMMON_CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 # create and start container
 echo " - Running docker container to configure spark"
@@ -92,11 +94,11 @@ docker run \
         -d \
         --name spark \
         -i \
-        -t eskimo:spark bash >> spark_executor_install_log 2>&1
+        -t eskimo/spark:$COMMON_CONTAINER_TAG bash >> spark_executor_install_log 2>&1
 fail_if_error $? "spark_executor_install_log" -2
 
 echo " - Configuring spark container (config script)"
-docker exec spark bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id $SELF_IP_ADDRESS \
+docker exec spark bash /scripts/inContainerSetupSparkCommon.sh $spark_user_id $COMMON_CONTAINER_TAG \
         | tee -a spark_executor_install_log 2>&1
 check_in_container_config_success spark_executor_install_log
 
@@ -114,16 +116,16 @@ echo " - Copying Topology Injection Script (common)"
 docker_cp_script inContainerInjectTopology.sh sbin spark spark_executor_install_log
 
 echo " - Committing changes to local template and exiting container spark"
-commit_container spark spark_executor_install_log
+commit_container spark $COMMON_CONTAINER_TAG spark_executor_install_log
 
 echo " - Deploying spark Service in docker registry for kubernetes"
-docker tag eskimo:spark kubernetes.registry:5000/spark >> spark_executor_install_log 2>&1
+docker tag eskimo/spark:$COMMON_CONTAINER_TAG kubernetes.registry:5000/spark:$COMMON_CONTAINER_TAG >> spark_executor_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo "   + Could not re-tag kubernetes container image for spark"
     exit 4
 fi
 
-docker push kubernetes.registry:5000/spark >> spark_executor_install_log 2>&1
+docker push kubernetes.registry:5000/spark:$COMMON_CONTAINER_TAG >> spark_executor_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo "Image push in docker registry failed !"
     exit 5
@@ -140,7 +142,7 @@ echo " - Creating sub-setup dir for spark-executor"
 /bin/mkdir spark_executor_setup
 
 echo " - Copying specific docker file to spark-executor setup"
-cp Dockerfile.spark-runtime spark_executor_setup/Dockerfile
+envsubst < Dockerfile.spark-runtime > spark_executor_setup/Dockerfile
 
 echo " - Changing dir to spark-executor setup"
 cd spark_executor_setup/
@@ -149,14 +151,16 @@ set +e
 
 echo " - Building docker container for spark runtime (specific)"
 build_container spark-runtime spark spark_executor_install_log
+#save tag
+RUNTIME_CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 echo " - Deploying spark runtime in docker registry for kubernetes"
-deploy_registry spark-runtime spark_executor_install_log
+deploy_registry spark-runtime $RUNTIME_CONTAINER_TAG spark_executor_install_log
 
 cd ..
 
 echo " - removing local image for common part"
-docker image rm eskimo:spark  >> spark_executor_install_log 2>&1
+docker image rm eskimo/spark:$COMMON_CONTAINER_TAG  >> spark_executor_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo "local image removal failed !"
     exit 6

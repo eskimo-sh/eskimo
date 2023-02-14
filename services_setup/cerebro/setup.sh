@@ -47,6 +47,8 @@ loadTopology
 
 echo " - Building container cerebro"
 build_container cerebro cerebro cerebro_install_log
+#save tag
+CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 echo " - Configuring host elasticsearch config part"
 . ./setupESCommon.sh
@@ -72,7 +74,7 @@ docker run \
         -e NODE_NAME=$HOSTNAME \
         -d --name cerebro \
         -i \
-        -t eskimo:cerebro bash >> cerebro_install_log 2>&1
+        -t eskimo/cerebro:$CONTAINER_TAG bash >> cerebro_install_log 2>&1
 fail_if_error $? "cerebro_install_log" -2
 
 echo " - Configuring cerebro container (common part)"
@@ -90,9 +92,9 @@ echo " - Handling topology infrastructure"
 handle_topology_infrastructure cerebro cerebro_install_log
 
 echo " - Committing changes to local template and exiting container cerebro"
-commit_container cerebro cerebro_install_log
+commit_container cerebro $CONTAINER_TAG cerebro_install_log
 
 echo " - Starting Kubernetes deployment"
-deploy_kubernetes cerebro cerebro_install_log
+deploy_kubernetes cerebro $CONTAINER_TAG cerebro_install_log
 
 

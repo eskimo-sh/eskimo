@@ -1,4 +1,4 @@
-FROM eskimo:elasticsearch_template
+FROM eskimo/elasticsearch_template:latest
 
 MAINTAINER eskimo <eskimoapp@gmail.com>
 

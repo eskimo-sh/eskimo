@@ -53,7 +53,7 @@ May 18 20:38:49 test-node4 systemd[1]: /usr/lib/systemd/system/flink-cli.service
      Memory: 18.0M
         CPU: 241ms
      CGroup: /system.slice/gluster.service
-             ├─202894 /usr/bin/docker run -i --name gluster --privileged=true --network host -v /var/lib/gluster:/var/lib/gluster -v /var/log/gluster:/var/log/gluster -v /var/run/gluster:/var/run/gluster --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json -e NODE_NAME=test-node4 eskimo:gluster /usr/local/sbin/inContainerStartService.sh
+             ├─202894 /usr/bin/docker run -i --name gluster --privileged=true --network host -v /var/lib/gluster:/var/lib/gluster -v /var/log/gluster:/var/log/gluster -v /var/run/gluster:/var/run/gluster --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json -e NODE_NAME=test-node4 eskimo/gluster:latest /usr/local/sbin/inContainerStartService.sh
              └─202895 tee /var/log/gluster/gluster-container-out-log
 
 May 19 08:46:50 test-node4 bash[202895]: [30m2022-05-19T08:46:50,598[m [32mINFO  [m[[1;34mpool-2-thread-1[m] [1;33mc.n.e.e.m.ManagementService[m: - Updating System Status
@@ -139,7 +139,7 @@ May 18 20:38:49 test-node4 systemd[1]: /usr/lib/systemd/system/logstash-cli.serv
      Memory: 17.6M
         CPU: 457ms
      CGroup: /system.slice/ntp.service
-             └─104528 /usr/bin/docker run -i --name ntp -p 123:123/udp -p 123:123/tcp --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp -v /var/lib/ntp:/var/lib/ntp --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json -e NODE_NAME=test-node4 eskimo:ntp /usr/local/sbin/inContainerStartService.sh
+             └─104528 /usr/bin/docker run -i --name ntp -p 123:123/udp -p 123:123/tcp --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp -v /var/lib/ntp:/var/lib/ntp --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json -e NODE_NAME=test-node4 eskimo/ntp:latest /usr/local/sbin/inContainerStartService.sh
 
 May 18 20:36:42 test-node4 systemd[1]: /usr/lib/systemd/system/ntp.service:72: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
 May 18 20:36:56 test-node4 systemd[1]: /usr/lib/systemd/system/ntp.service:71: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
@@ -160,7 +160,7 @@ May 18 21:37:04 test-node4 bash[104528]: 18 May 21:37:04 ntpd[35]: 192.168.56.21
      Memory: 17.4M
         CPU: 475ms
      CGroup: /system.slice/prometheus.service
-             └─103109 /usr/bin/docker run -i --name prometheus --network host --privileged -v /var/log/prometheus:/var/log/prometheus -v /proc:/host/proc -v /sys:/host/sys -v /:/rootfs --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json -e NODE_NAME=test-node4 eskimo:prometheus /usr/local/sbin/inContainerStartService.sh
+             └─103109 /usr/bin/docker run -i --name prometheus --network host --privileged -v /var/log/prometheus:/var/log/prometheus -v /proc:/host/proc -v /sys:/host/sys -v /:/rootfs --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json -e NODE_NAME=test-node4 eskimo/prometheus:latest /usr/local/sbin/inContainerStartService.sh
 
 May 18 20:36:40 test-node4 systemd[1]: /usr/lib/systemd/system/prometheus.service:72: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
 May 18 20:36:40 test-node4 systemd[1]: /usr/lib/systemd/system/prometheus.service:73: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.

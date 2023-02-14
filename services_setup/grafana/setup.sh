@@ -51,6 +51,8 @@ sudo rm -f grafana_install_log
 
 echo " - Building container grafana"
 build_container grafana grafana grafana_install_log
+#save tag
+CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 echo " - Creating grafana user (if not exist)"
 grafana_user_id=$(id -u grafana 2>> grafana_install_log)
@@ -69,7 +71,7 @@ docker run \
         -v $SCRIPT_DIR/provisioning:/eskimo/provisioning \
         -d --name grafana \
         -i \
-        -t eskimo:grafana bash >> grafana_install_log 2>&1
+        -t eskimo/grafana:$CONTAINER_TAG bash >> grafana_install_log 2>&1
 fail_if_error $? "grafana_install_log" -2
 
 # connect to container
@@ -86,8 +88,8 @@ echo " - Handling topology infrastructure"
 handle_topology_infrastructure grafana grafana_install_log
 
 echo " - Committing changes to local template and exiting container grafana"
-commit_container grafana grafana_install_log
+commit_container grafana $CONTAINER_TAG grafana_install_log
 
 echo " - Starting Kubernetes deployment"
-deploy_kubernetes grafana grafana_install_log
+deploy_kubernetes grafana $CONTAINER_TAG grafana_install_log
 

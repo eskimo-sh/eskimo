@@ -120,7 +120,8 @@ public class LogstashCliWrappersTest extends AbstractSetupShellTest {
 
         // on my laptop, /var/lib/eskimo/data exists and is a directory
         assertTrue (
-                dockerLogs.equals("run " +
+                dockerLogs.equals("image ls -a\n" +
+                        "run " +
                         "-i " +
                         "--rm " +
                         "--network host " +
@@ -135,10 +136,11 @@ public class LogstashCliWrappersTest extends AbstractSetupShellTest {
                         "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                         "-e NODE_NAME=testhost " +
                         "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                        "kubernetes.registry:5000/logstash " +
+                        "kubernetes.registry:5000/logstash:0 " +
                             "/usr/local/bin/kube_do /usr/local/bin/logstash --path.config /tmp/import.json --path.data /var/lib/eskimo/data --path.logs /var/log/eskimo\n")
                 ||
-                dockerLogs.equals("run " +
+                dockerLogs.equals("image ls -a\n" +
+                        "run " +
                         "-i " +
                         "--rm " +
                         "--network host " +
@@ -153,7 +155,7 @@ public class LogstashCliWrappersTest extends AbstractSetupShellTest {
                         "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                         "-e NODE_NAME=testhost " +
                         "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                        "kubernetes.registry:5000/logstash " +
+                        "kubernetes.registry:5000/logstash:0 " +
                         "/usr/local/bin/kube_do /usr/local/bin/logstash --path.config /tmp/import.json --path.data /var/lib/eskimo/data --path.logs /var/log/eskimo\n"));
 
     }

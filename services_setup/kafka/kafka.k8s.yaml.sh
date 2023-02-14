@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -32,98 +33,106 @@
 # Software.
 #
 
-kind: Service
+. /usr/local/sbin/eskimo-utils.sh
+
+TEMP_FILE=$(mktemp)
+
+cat > $TEMP_FILE <<EOF
 apiVersion: v1
+kind: Service
 metadata:
-  labels:
-    k8s-app: spark-console
-  name: spark-console
+  name: kafka
   namespace: default
+  labels:
+    service: kafka
 spec:
+  clusterIP: None
   ports:
-    - port: 31810
-      targetPort: 18080
+    - port: 9092
+      name: serving
+    - port: 9093
+      name: serving-other
+    - port: 9999
+      name: control
   selector:
-    k8s-app: spark-console
+    service: kafka
 
 ---
 
-kind: Service
-apiVersion: v1
-metadata:
-  labels:
-    k8s-app: spark-console
-  name: spark-console-node
-  namespace: default
-spec:
-  type: NodePort
-  ports:
-    - port: 31811
-      targetPort: 18080
-      nodePort: 31811
-  selector:
-    k8s-app: spark-console
-    
----
-
-kind: Deployment
 apiVersion: apps/v1
+kind: StatefulSet
 metadata:
-  labels:
-    k8s-app: spark-console
-  name: spark-console
+  name: kafka
   namespace: default
+  labels:
+    service: kafka
 spec:
-  replicas: 1
-  revisionHistoryLimit: 10
+  serviceName: kafka
+  replicas: $ESKIMO_NODE_COUNT
   selector:
     matchLabels:
-      k8s-app: spark-console
+      service: kafka
   template:
     metadata:
       labels:
-        k8s-app: spark-console
+        service: kafka
     spec:
-      #securityContext:
-      #  seccompProfile:
-      #    type: RuntimeDefault
-      enableServiceLinks: false
+      # Force all replicas on different nodes
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              service: kafka
+      tolerations:
+        # this toleration is to have the daemonset runnable on master nodes
+        # remove it if your masters can't run pods
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
       containers:
-        - name: spark-console
-          image: kubernetes.registry:5000/spark-console
-          imagePullPolicy: IfNotPresent
+        - name: kafka
+          image: kubernetes.registry:5000/kafka:$(get_last_tag kafka)
+          resources:
+            requests:
+              cpu: "$ESKIMO_KUBE_REQUEST_KAFKA_CPU"
+              memory: "$ESKIMO_KUBE_REQUEST_KAFKA_RAM"
           ports:
-            - containerPort: 18080
-              protocol: TCP
+            - containerPort: 9200
+              name: http
+            - containerPort: 9300
+              name: tcp
           command: ["/usr/local/sbin/inContainerStartService.sh"]
           volumeMounts:
-            - name: var-log-spark
-              mountPath: /var/log/spark
+            - name: var-log-kafka
+              mountPath: /var/log/kafka
+            - name: var-run-kafka
+              mountPath: /var/run/kafka
             - name: etc-eskimo-topology
               mountPath: /etc/eskimo_topology.sh
             - name: etc-eskimo-services-settings
               mountPath: /etc/eskimo_services-settings.json
-          livenessProbe:
-            httpGet:
-              scheme: HTTP
-              path: /
-              port: 18080
-            initialDelaySeconds: 60
-            timeoutSeconds: 30
+          env:
+            - name: ESKIMO_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
           securityContext:
             privileged: true
             allowPrivilegeEscalation: true
             readOnlyRootFilesystem: false
-            runAsUser: 3302
-            runAsGroup: 3302
-          resources:
-            requests:
-              cpu: "$ESKIMO_KUBE_REQUEST_SPARK_CONSOLE_CPU"
-              memory: "$ESKIMO_KUBE_REQUEST_SPARK_CONSOLE_RAM"
+            runAsUser: 3303
+            runAsGroup: 3303
+      terminationGracePeriodSeconds: 60
       volumes:
-        - name: var-log-spark
+        - name: var-log-kafka
           hostPath:
-            path: /var/log/spark
+            path: /var/log/kafka
+            type: Directory
+        - name: var-run-kafka
+          hostPath:
+            path: /var/run/kafka
             type: Directory
         - name: etc-eskimo-topology
           hostPath:
@@ -134,9 +143,6 @@ spec:
             path: /etc/eskimo_services-settings.json
             type: File
       #hostNetwork: true
-      nodeSelector:
-        "kubernetes.io/os": linux
-      # Comment the following tolerations if app must not be deployed on master
-      tolerations:
-        - key: node-role.kubernetes.io/master
-          effect: NoSchedule
+EOF
+cat $TEMP_FILE
+rm -Rf $TEMP_FILE

@@ -1,4 +1,4 @@
-FROM eskimo:grafana_template
+FROM eskimo/grafana_template:latest
 
 MAINTAINER eskimo <eskimoapp@gmail.com>
 

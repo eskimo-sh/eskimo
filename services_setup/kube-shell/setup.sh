@@ -68,6 +68,8 @@ fi
 
 echo " - Building docker container for kube-shell"
 build_container kube-shell kube-shell kube-shell_install_log
+#save tag
+CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 # create and start container
 echo " - Running docker container to configure kube-shell"
@@ -77,7 +79,7 @@ docker run \
         -d \
         --name kube-shell \
         -i \
-        -t eskimo:kube-shell bash >> kube-shell_install_log 2>&1
+        -t eskimo/kube-shell:$CONTAINER_TAG bash >> kube-shell_install_log 2>&1
 fail_if_error $? "kube-shell_install_log" -2
 
 echo " - Configuring kube-shell container"
@@ -91,9 +93,9 @@ echo " - Copying Topology Injection Script (common)"
 docker_cp_script inContainerInjectTopology.sh sbin kube-shell kube-shell_install_log
 
 echo " - Committing changes to local template and exiting container kube-shell"
-commit_container kube-shell kube-shell_install_log
+commit_container kube-shell $CONTAINER_TAG kube-shell_install_log
 
 echo " - Deploying kube-shell in docker registry for kubernetes"
-deploy_registry kube-shell kube-shell_install_log
+deploy_registry kube-shell $CONTAINER_TAG kube-shell_install_log
 
 

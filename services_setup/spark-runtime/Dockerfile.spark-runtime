@@ -1,4 +1,4 @@
-FROM eskimo:spark
+FROM eskimo/spark:$COMMON_CONTAINER_TAG
 
 MAINTAINER eskimo <eskimoapp@gmail.com>
 

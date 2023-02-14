@@ -46,6 +46,8 @@ if [[ $SPARK_USER_ID == "" ]]; then
     exit 2
 fi
 
+SPARK_CONTAINER_TAG=$2
+
 
 echo "-- SETTING UP SPARK (COMMON PART) --------------------------------------"
 
@@ -182,10 +184,28 @@ sudo bash -c "echo -e \"\n# Directory to use for scratch space in Spark, includi
 sudo bash -c "echo -e \"# Spark Mesos Shuffle service and spark executors need to have access to the same folder there cross containers. \"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.local.dir=/var/lib/spark/tmp/\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
+if [[ $SPARK_CONTAINER_TAG == "" ]]; then
+    echo " - Finding last spark-runtime container tag"
+    TAGS=$(curl -XGET http://kubernetes.registry:5000/v2/spark-runtime/tags/list 2>/dev/null | jq -r -c  ".tags | .[]" 2>/dev/null)
+    if [[ $? == 0 ]]; then
+        for tag in $TAGS; do
+            if [[ $tag != "latest" ]]; then
+                if [[ $(__vercomp $last $tag) == 2 ]]; then
+                    export SPARK_CONTAINER_TAG=$tag
+                fi
+            fi
+        done
+    fi
+    if [[ $SPARK_CONTAINER_TAG == ""  && -n $TEST ]]; then
+        echo "Couldn't find last spark-runtime image tag "
+        exit 1
+    fi
+fi
+
 
 echo " - Defining Eskimo Spark docker container"
 sudo bash -c "echo -e \"\n#Defining docker image to be used for spark executors\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-sudo bash -c "echo -e \"spark.kubernetes.container.image=kubernetes.registry:5000/spark-runtime\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.container.image=kubernetes.registry:5000/spark-runtime:$SPARK_CONTAINER_TAG\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 sudo bash -c "echo -e \"spark.kubernetes.file.upload.path=/var/lib/spark/data\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.kubernetes.driver.podTemplateFile=/usr/local/lib/spark/conf/spark-pod-template.yaml\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"

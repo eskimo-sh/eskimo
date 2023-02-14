@@ -38,6 +38,8 @@ echoerr() { echo "$@" 1>&2; }
 
 rm -f /tmp/gluster_container_pid
 
+. /usr/local/sbin/eskimo-utils.sh
+
 echo " - Launching docker container"
 # capturing docker PID
 nohup /usr/bin/docker run \
@@ -51,7 +53,7 @@ nohup /usr/bin/docker run \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
         -e NODE_NAME=$HOSTNAME \
-        eskimo:gluster \
+        "eskimo/gluster:$(get_last_tag gluster)" \
         /usr/local/sbin/inContainerStartService.sh | tee /var/log/gluster/gluster-container-out-log &
 
 #         -p 111:111 \ # RPC Bind is not supported in docker container since in use on the host in anyway

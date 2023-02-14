@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -32,41 +33,87 @@
 # Software.
 #
 
+. /usr/local/sbin/eskimo-utils.sh
 
+TEMP_FILE=$(mktemp)
+
+cat > $TEMP_FILE <<EOF
 apiVersion: v1
 kind: Service
 metadata:
-  name: logstash
+  name: elasticsearch
   namespace: default
   labels:
-    service: logstash
+    service: elasticsearch
 spec:
   clusterIP: None
   ports:
-    - port: 28999
-      name: logstash-cli
+    - port: 9200
+      name: serving
+    - port: 9300
+      name: node-to-node
   selector:
-    service: logstash
+    service: elasticsearch
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: es-var-lib-volume
+  labels:
+    type: local
+spec:
+  storageClassName: es-local-storage
+  volumeMode: Filesystem
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  local:
+    path: "/var/lib/elasticsearch"
+  nodeAffinity: # dummy node affinity since one is required.
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/os
+              operator: In
+              values:
+                - linux
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: es-var-lib-claim
+spec:
+  storageClassName: es-local-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
 
 ---
 
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: logstash
+  name: elasticsearch
   namespace: default
   labels:
-    service: logstash
+    service: elasticsearch
 spec:
-  serviceName: logstash
+  serviceName: elasticsearch
   replicas: $ESKIMO_NODE_COUNT
   selector:
     matchLabels:
-      service: logstash
+      service: elasticsearch
   template:
     metadata:
       labels:
-        service: logstash
+        service: elasticsearch
     spec:
       # Force all replicas on different nodes
       topologySpreadConstraints:
@@ -75,7 +122,7 @@ spec:
           whenUnsatisfiable: DoNotSchedule
           labelSelector:
             matchLabels:
-              service: logstash
+              service: elasticsearch
       tolerations:
         # this toleration is to have the daemonset runnable on master nodes
         # remove it if your masters can't run pods
@@ -83,19 +130,23 @@ spec:
           operator: Exists
           effect: NoSchedule
       containers:
-        - name: logstash
-          image: kubernetes.registry:5000/logstash
+        - name: elasticsearch
+          image: kubernetes.registry:5000/elasticsearch:$(get_last_tag elasticsearch)
           resources:
             requests:
-              cpu: "$ESKIMO_KUBE_REQUEST_LOGSTASH_CPU"
-              memory: "$ESKIMO_KUBE_REQUEST_LOGSTASH_RAM"
+              cpu: "$ESKIMO_KUBE_REQUEST_ELASTICSEARCH_CPU"
+              memory: "$ESKIMO_KUBE_REQUEST_ELASTICSEARCH_RAM"
           ports:
-            - containerPort: 28999
+            - containerPort: 9200
               name: http
+            - containerPort: 9300
+              name: tcp
           command: ["/usr/local/sbin/inContainerStartService.sh"]
           volumeMounts:
             - name: var-log-elasticsearch
               mountPath: /var/log/elasticsearch
+            - name: var-lib-elasticsearch
+              mountPath: /var/lib/elasticsearch
             - name: var-run-elasticsearch
               mountPath: /var/run/elasticsearch
             - name: etc-eskimo-topology
@@ -108,7 +159,6 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
           securityContext:
-            privileged: true
             allowPrivilegeEscalation: true
             readOnlyRootFilesystem: false
             runAsUser: 3301
@@ -119,6 +169,9 @@ spec:
           hostPath:
             path: /var/log/elasticsearch
             type: Directory
+        - name: var-lib-elasticsearch
+          persistentVolumeClaim:
+            claimName: es-var-lib-claim
         - name: var-run-elasticsearch
           hostPath:
             path: /var/run/elasticsearch
@@ -131,3 +184,7 @@ spec:
           hostPath:
             path: /etc/eskimo_services-settings.json
             type: File
+      #hostNetwork: true
+EOF
+cat $TEMP_FILE
+rm -Rf $TEMP_FILE

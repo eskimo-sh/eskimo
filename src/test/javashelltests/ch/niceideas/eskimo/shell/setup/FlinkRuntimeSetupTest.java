@@ -89,7 +89,8 @@ public class FlinkRuntimeSetupTest extends AbstractSetupShellTest {
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
         copyFile(jailPath, "setupCommon.sh");
-        copyFile(jailPath, "flink-runtime.k8s.yaml");
+        copyFile(jailPath, "flink-runtime.k8s.yaml.sh");
+        copyFile(jailPath, "Dockerfile.flink-runtime");
         copyFile(jailPath, "inContainerSetupFlinkCommon.sh");
         copyFile(jailPath, "inContainerInjectTopology.sh");
     }

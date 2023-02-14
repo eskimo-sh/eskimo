@@ -67,6 +67,8 @@ fi
 
 echo " - Building docker container for logstash"
 build_container logstash logstash logstash_install_log
+#save tag
+CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 # create and start container
 echo " - Running docker container to configure logstash executor"
@@ -78,7 +80,7 @@ docker run \
         -v /var/run/elasticsearch:/var/run/elasticsearch \
         --name logstash \
         -i \
-        -t eskimo:logstash bash >> logstash_install_log 2>&1
+        -t eskimo/logstash:$CONTAINER_TAG bash >> logstash_install_log 2>&1
 fail_if_error $? "logstash_install_log" -2
 
 echo " - Logstash Remote Server Scripts"
@@ -107,7 +109,7 @@ echo " - Handling topology infrastructure"
 handle_topology_infrastructure logstash logstash_install_log
 
 echo " - Committing changes to local template and exiting container logstash"
-commit_container logstash logstash_install_log
+commit_container logstash $CONTAINER_TAG logstash_install_log
 
 echo " - Starting Kubernetes deployment"
-deploy_kubernetes logstash logstash_install_log
+deploy_kubernetes logstash $CONTAINER_TAG logstash_install_log

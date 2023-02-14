@@ -426,3 +426,72 @@ parse_cli_docker_volume_mounts() {
     done
 
 }
+
+
+# private function to compare two version numbers
+function __vercomp () {
+    if [[ "$1" == "$2" ]]; then
+        return 0
+    fi
+    local IFS=.
+    local i ver1=($1) ver2=($2)
+    # fill empty fields in ver1 with zeros
+    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++)); do
+        ver1[i]=0
+    done
+    for ((i=0; i<${#ver1[@]}; i++)); do
+        if [[ -z ${ver2[i]} ]]; then
+            # fill empty fields in ver2 with zeros
+            ver2[i]=0
+        fi
+        if ((10#${ver1[i]} > 10#${ver2[i]})); then
+            return 1
+        fi
+        if ((10#${ver1[i]} < 10#${ver2[i]})); then
+            return 2
+        fi
+    done
+    return 0
+}
+
+
+# Find out if a container is already installed as image on the system (docker) and return its tag plus 1 or 1
+# Arguments:
+# - $1 the name of the container
+# - return (echo !) new tag number for container
+function get_last_tag() {
+    if [[ $1 == "" ]]; then
+        echo "Image needs to be passed in argument"
+        exit 71
+    fi
+    export IMAGE=$1
+
+    local last=0
+
+    local TAGS
+    TAGS=$(docker image ls -a | grep $IMAGE | grep -v template | sed s/'  *'/' '/g | cut -d ' ' -f 2)
+    for tag in $TAGS; do
+        if [[ $tag != "latest" ]]; then
+            __vercomp $last $tag
+            ret=$?
+            if [[ $ret == 2 ]]; then
+                last=$tag
+            fi
+        fi
+    done
+
+    if [[ $last == 0 ]]; then # try to get it drom registry
+        TAGS=$(curl -XGET http://kubernetes.registry:5000/v2/$IMAGE/tags/list 2>/dev/null | jq -r -c  ".tags | .[]" 2>/dev/null)
+        if [[ $? == 0 ]]; then
+            for tag in $TAGS; do
+                if [[ $tag != "latest" ]]; then
+                    if [[ $(__vercomp $last $tag) == 2 ]]; then
+                        last=$tag
+                    fi
+                fi
+            done
+        fi
+    fi
+
+    echo $last
+}

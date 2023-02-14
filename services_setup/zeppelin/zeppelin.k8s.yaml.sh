@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -32,21 +33,28 @@
 # Software.
 #
 
+. /usr/local/sbin/eskimo-utils.sh
+
+TEMP_FILE=$(mktemp)
+
+cat > $TEMP_FILE <<EOF
 kind: Service
 apiVersion: v1
 metadata:
   labels:
-    k8s-app: grafana
-  name: grafana
+    k8s-app: zeppelin
+  name: zeppelin
   namespace: default
 spec:
-  type: NodePort
   ports:
-    - port: 31300
-      targetPort: 3000
-      nodePort: 31300
+    - name: httpzeppelin1
+      port: 31008
+      targetPort: 38080
+    - name: httpzeppelin2
+      port: 31009
+      targetPort: 38081
   selector:
-    k8s-app: grafana
+    k8s-app: zeppelin
 
 ---
 
@@ -54,37 +62,48 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   labels:
-    k8s-app: grafana
-  name: grafana
+    k8s-app: zeppelin
+  name: zeppelin
   namespace: default
 spec:
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      k8s-app: grafana
+      k8s-app: zeppelin
   template:
     metadata:
       labels:
-        k8s-app: grafana
+        k8s-app: zeppelin
     spec:
       #securityContext:
       #  seccompProfile:
       #    type: RuntimeDefault
       enableServiceLinks: false
       containers:
-        - name: grafana
-          image: kubernetes.registry:5000/grafana
+        - name: zeppelin
+          image: kubernetes.registry:5000/zeppelin:$(get_last_tag zeppelin)
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3000
+            - containerPort: 38080
+              protocol: TCP
+            - containerPort: 38081
               protocol: TCP
           command: ["/usr/local/sbin/inContainerStartService.sh"]
+          env:
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
           volumeMounts:
-            - name: var-log-grafana
-              mountPath: /var/log/grafana
-            - name: var-run-grafana
-              mountPath: /var/run/grafana
+            - name: home-spark-kube
+              mountPath: /home/spark/.kube
+            - name: etc-k8s
+              mountPath: /etc/k8s
+            - name: var-log-spark
+              mountPath: /var/log/spark
+            - name: var-run-spark
+              mountPath: /var/run/spark
             - name: etc-eskimo-topology
               mountPath: /etc/eskimo_topology.sh
             - name: etc-eskimo-services-settings
@@ -93,26 +112,35 @@ spec:
             httpGet:
               scheme: HTTP
               path: /
-              port: 3000
+              port: 38080
             initialDelaySeconds: 60
             timeoutSeconds: 30
           securityContext:
-            allowPrivilegeEscalation: false
+            privileged: true
+            allowPrivilegeEscalation: true
             readOnlyRootFilesystem: false
-            runAsUser: 3304
-            runAsGroup: 3304
+            runAsUser: 3302
+            runAsGroup: 3302
           resources:
             requests:
-              cpu: "$ESKIMO_KUBE_REQUEST_GRAFANA_CPU"
-              memory: "$ESKIMO_KUBE_REQUEST_GRAFANA_RAM"
+              cpu: "$ESKIMO_KUBE_REQUEST_ZEPPELIN_CPU"
+              memory: "$ESKIMO_KUBE_REQUEST_ZEPPELIN_RAM"
       volumes:
-        - name: var-log-grafana
+        - name: home-spark-kube
           hostPath:
-            path: /var/log/grafana
+            path: /home/spark/.kube
             type: Directory
-        - name: var-run-grafana
+        - name: etc-k8s
           hostPath:
-            path: /var/run/grafana
+            path: /etc/k8s
+            type: Directory
+        - name: var-log-spark
+          hostPath:
+            path: /var/log/spark
+            type: Directory
+        - name: var-run-spark
+          hostPath:
+            path: /var/run/spark
             type: Directory
         - name: etc-eskimo-topology
           hostPath:
@@ -129,3 +157,6 @@ spec:
       tolerations:
         - key: node-role.kubernetes.io/master
           effect: NoSchedule
+EOF
+cat $TEMP_FILE
+rm -Rf $TEMP_FILE

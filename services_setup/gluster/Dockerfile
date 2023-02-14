@@ -1,4 +1,4 @@
-FROM eskimo:gluster_template
+FROM eskimo/gluster_template:latest
 
 MAINTAINER eskimo <eskimoapp@gmail.com>
 

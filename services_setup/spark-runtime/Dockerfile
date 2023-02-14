@@ -1,4 +1,4 @@
-FROM eskimo:spark_template
+FROM eskimo/spark_template:latest
 
 MAINTAINER eskimo <eskimoapp@gmail.com>
 

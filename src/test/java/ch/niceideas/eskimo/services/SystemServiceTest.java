@@ -137,7 +137,7 @@ public class SystemServiceTest {
 
         assertEquals ("rm -Rf /tmp/cerebro\n" +
                 "rm -f /tmp/cerebro.tgz\n" +
-                "docker image rm eskimo:cerebro_template || true\n", sshCommandServiceTest.getExecutedCommands());
+                "docker image rm eskimo/cerebro_template:latest || true\n", sshCommandServiceTest.getExecutedCommands());
     }
 
     @Test

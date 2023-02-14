@@ -87,7 +87,7 @@
              ├─ifup@eth0.service
              │ └─407 /sbin/dhclient -4 -v -pf /run/dhclient.eth0.pid -lf /var/lib/dhcp/dhclient.eth0.leases -I -df /var/lib/dhcp/dhclient6.eth0.leases eth0
              ├─ntp.service
-             │ └─1504 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo:ntp /usr/sbin/ntpd -n -g
+             │ └─1504 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo/ntp /usr/sbin/ntpd -n -g
              ├─var-lib-docker-containers-aa51a67d112f8d483d97bb07201449765657e8fd94acb97abfb0620c80679f34-mounts-shm.mount
              ├─systemd-remount-fs.service
              ├─system-getty.slice
@@ -100,7 +100,7 @@
              ├─dev-disk-by\x2duuid-c089e8c6\x2d8d86\x2d42ce\x2d9642\x2d6be125441ee9.swap
              ├─keyboard-setup.service
              ├─spark-executor.service
-             │ └─1566 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo:spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+             │ └─1566 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo/spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
              ├─rpcbind.service
              │ └─339 /sbin/rpcbind -f -w
              ├─dev-disk-by\x2dpartuuid-ddf9cebf\x2d05.swap
@@ -115,7 +115,7 @@
              │ └─1133 /usr/lib/packagekit/packagekitd
              ├─run-docker-netns-default.mount
              ├─mesos-master.service
-             │ └─3020 /usr/bin/docker run -i --name mesos-master --network host -v /var/lib/mesos:/var/lib/mesos -v /var/log/mesos:/var/log/mesos -v /var/run/mesos:/var/run/mesos -v /usr/local/bin:/usr/local/bin -v /usr/local/sbin:/usr/local/sbin -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ -v /usr/local/etc/mesos:/usr/local/etc/mesos eskimo:mesos-master /usr/local/sbin/mesos-init-wrapper.sh master
+             │ └─3020 /usr/bin/docker run -i --name mesos-master --network host -v /var/lib/mesos:/var/lib/mesos -v /var/log/mesos:/var/log/mesos -v /var/run/mesos:/var/run/mesos -v /usr/local/bin:/usr/local/bin -v /usr/local/sbin:/usr/local/sbin -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ -v /usr/local/etc/mesos:/usr/local/etc/mesos eskimo/mesos-master /usr/local/sbin/mesos-init-wrapper.sh master
              ├─polkit.service
              │ └─1157 /usr/lib/policykit-1/polkitd --no-debug
              ├─var-lib-docker-overlay2-b06ce37581a582356f4e9b4eb4dd81dae21d140cc9301cddb0bd8549291a8578-merged.mount
@@ -129,17 +129,17 @@
              ├─dev-disk-by\x2did-ata\x2dVBOX_HARDDISK_VBce7c2943\x2ddf2d5608\x2dpart5.swap
              ├─var-lib-docker-overlay2-f7d91997db43692b95993c87498aa9929b2798d31e86a86a906a266b9fa59e40-merged.mount
              ├─spark-console.service
-             │ └─1586 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark eskimo:spark-console /usr/local/lib/spark/sbin/start-history-server-wrapper.sh
+             │ └─1586 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark eskimo/spark-console /usr/local/lib/spark/sbin/start-history-server-wrapper.sh
              ├─networking.service
              ├─systemd-tmpfiles-setup-dev.service
              ├─systemd-journald.service
              │ └─184 /lib/systemd/systemd-journald
              ├─zookeeper.service
-             │ └─1542 /usr/bin/docker run -i --name zookeeper --user zookeeper -p 2181:2181 -p 2888:2888 -p 3888:3888 -v /var/log/zookeeper:/var/log/zookeeper -v /var/run/zookeeper:/var/run/zookeeper eskimo:zookeeper /usr/share/zookeeper/bin/zkServer.sh start-foreground
+             │ └─1542 /usr/bin/docker run -i --name zookeeper --user zookeeper -p 2181:2181 -p 2888:2888 -p 3888:3888 -v /var/log/zookeeper:/var/log/zookeeper -v /var/run/zookeeper:/var/run/zookeeper eskimo/zookeeper /usr/share/zookeeper/bin/zkServer.sh start-foreground
              ├─console-setup.service
              ├─kmod-static-nodes.service
              ├─elasticsearch.service
-             │ └─32152 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo:elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+             │ └─32152 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo/elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
              ├─systemd-sysctl.service
              ├─-.mount
              ├─run-docker-netns-86131c73ea7d.mount
@@ -971,7 +971,7 @@ May 03 07:49:02 deb-node1 dockerd[421]: time="2019-05-03T07:49:02.546601169Z" le
    Memory: 20.0M
       CPU: 195ms
    CGroup: /system.slice/elasticsearch.service
-           └─32152 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo:elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+           └─32152 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo/elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
 
 May 03 07:49:02 deb-node1 systemd[1]: elasticsearch.service: Service hold-off time over, scheduling restart.
 May 03 07:49:02 deb-node1 systemd[1]: Stopped Elasticsearch Server.
@@ -1079,7 +1079,7 @@ May 03 07:48:13 deb-node1 mesos-slave[7270]: I0503 07:48:13.445180  7285 slave.c
    Memory: 19.9M
       CPU: 570ms
    CGroup: /system.slice/mesos-master.service
-           └─3020 /usr/bin/docker run -i --name mesos-master --network host -v /var/lib/mesos:/var/lib/mesos -v /var/log/mesos:/var/log/mesos -v /var/run/mesos:/var/run/mesos -v /usr/local/bin:/usr/local/bin -v /usr/local/sbin:/usr/local/sbin -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ -v /usr/local/etc/mesos:/usr/local/etc/mesos eskimo:mesos-master /usr/local/sbin/mesos-init-wrapper.sh master
+           └─3020 /usr/bin/docker run -i --name mesos-master --network host -v /var/lib/mesos:/var/lib/mesos -v /var/log/mesos:/var/log/mesos -v /var/run/mesos:/var/run/mesos -v /usr/local/bin:/usr/local/bin -v /usr/local/sbin:/usr/local/sbin -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ -v /usr/local/etc/mesos:/usr/local/etc/mesos eskimo/mesos-master /usr/local/sbin/mesos-init-wrapper.sh master
 
 Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
 
@@ -1115,7 +1115,7 @@ Warning: Journal has been rotated since unit was started. Log output is incomple
    Memory: 19.9M
       CPU: 494ms
    CGroup: /system.slice/ntp.service
-           └─1504 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo:ntp /usr/sbin/ntpd -n -g
+           └─1504 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo/ntp /usr/sbin/ntpd -n -g
 
 Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
 
@@ -1205,7 +1205,7 @@ Warning: Journal has been rotated since unit was started. Log output is incomple
    Memory: 20.5M
       CPU: 509ms
    CGroup: /system.slice/spark-executor.service
-           └─1566 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo:spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+           └─1566 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo/spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
 
 Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
 
@@ -1217,7 +1217,7 @@ Warning: Journal has been rotated since unit was started. Log output is incomple
    Memory: 20.1M
       CPU: 562ms
    CGroup: /system.slice/spark-console.service
-           └─1586 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark eskimo:spark-console /usr/local/lib/spark/sbin/start-history-server-wrapper.sh
+           └─1586 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark eskimo/spark-console /usr/local/lib/spark/sbin/start-history-server-wrapper.sh
 
 Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
 
@@ -1570,7 +1570,7 @@ May 03 07:45:43 deb-node1 systemd[1]: Started User Manager for UID 1000.
    Memory: 20.1M
       CPU: 546ms
    CGroup: /system.slice/zookeeper.service
-           └─1542 /usr/bin/docker run -i --name zookeeper --user zookeeper -p 2181:2181 -p 2888:2888 -p 3888:3888 -v /var/log/zookeeper:/var/log/zookeeper -v /var/run/zookeeper:/var/run/zookeeper eskimo:zookeeper /usr/share/zookeeper/bin/zkServer.sh start-foreground
+           └─1542 /usr/bin/docker run -i --name zookeeper --user zookeeper -p 2181:2181 -p 2888:2888 -p 3888:3888 -v /var/log/zookeeper:/var/log/zookeeper -v /var/run/zookeeper:/var/run/zookeeper eskimo/zookeeper /usr/share/zookeeper/bin/zkServer.sh start-foreground
 
 Warning: Journal has been rotated since unit was started. Log output is incomplete or unavailable.
 
@@ -1625,7 +1625,7 @@ Warning: Journal has been rotated since unit was started. Log output is incomple
            │ │ ├─32179 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9300 -container-ip 172.17.0.5 -container-port 9300
            │ │ └─32192 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9200 -container-ip 172.17.0.5 -container-port 9200
            │ ├─elasticsearch.service
-           │ │ └─32152 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo:elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+           │ │ └─32152 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo/elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
            │ ├─ifup@eth0.service
            │ │ └─407 /sbin/dhclient -4 -v -pf /run/dhclient.eth0.pid -lf /var/lib/dhcp/dhclient.eth0.leases -I -df /var/lib/dhcp/dhclient6.eth0.leases eth0
            │ ├─irqbalance.service
@@ -1635,9 +1635,9 @@ Warning: Journal has been rotated since unit was started. Log output is incomple
            │ │ ├─7269 logger -p user info -t mesos-slave[7260]
            │ │ └─7270 logger -p user err -t mesos-slave[7260]
            │ ├─mesos-master.service
-           │ │ └─3020 /usr/bin/docker run -i --name mesos-master --network host -v /var/lib/mesos:/var/lib/mesos -v /var/log/mesos:/var/log/mesos -v /var/run/mesos:/var/run/mesos -v /usr/local/bin:/usr/local/bin -v /usr/local/sbin:/usr/local/sbin -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ -v /usr/local/etc/mesos:/usr/local/etc/mesos eskimo:mesos-master /usr/local/sbin/mesos-init-wrapper.sh master
+           │ │ └─3020 /usr/bin/docker run -i --name mesos-master --network host -v /var/lib/mesos:/var/lib/mesos -v /var/log/mesos:/var/log/mesos -v /var/run/mesos:/var/run/mesos -v /usr/local/bin:/usr/local/bin -v /usr/local/sbin:/usr/local/sbin -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ -v /usr/local/etc/mesos:/usr/local/etc/mesos eskimo/mesos-master /usr/local/sbin/mesos-init-wrapper.sh master
            │ ├─ntp.service
-           │ │ └─1504 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo:ntp /usr/sbin/ntpd -n -g
+           │ │ └─1504 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo/ntp /usr/sbin/ntpd -n -g
            │ ├─packagekit.service
            │ │ └─1133 /usr/lib/packagekit/packagekitd
            │ ├─polkit.service
@@ -1647,9 +1647,9 @@ Warning: Journal has been rotated since unit was started. Log output is incomple
            │ ├─rsyslog.service
            │ │ └─381 /usr/sbin/rsyslogd -n
            │ ├─spark-executor.service
-           │ │ └─1566 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo:spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+           │ │ └─1566 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo/spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
            │ ├─spark-console.service
-           │ │ └─1586 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark eskimo:spark-console /usr/local/lib/spark/sbin/start-history-server-wrapper.sh
+           │ │ └─1586 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark eskimo/spark-console /usr/local/lib/spark/sbin/start-history-server-wrapper.sh
            │ ├─ssh.service
            │ │ └─7259 /usr/sbin/sshd -D
            │ ├─system-getty.slice
@@ -1664,7 +1664,7 @@ Warning: Journal has been rotated since unit was started. Log output is incomple
            │ ├─systemd-udevd.service
            │ │ └─6060 /lib/systemd/systemd-udevd
            │ └─zookeeper.service
-           │   └─1542 /usr/bin/docker run -i --name zookeeper --user zookeeper -p 2181:2181 -p 2888:2888 -p 3888:3888 -v /var/log/zookeeper:/var/log/zookeeper -v /var/run/zookeeper:/var/run/zookeeper eskimo:zookeeper /usr/share/zookeeper/bin/zkServer.sh start-foreground
+           │   └─1542 /usr/bin/docker run -i --name zookeeper --user zookeeper -p 2181:2181 -p 2888:2888 -p 3888:3888 -v /var/log/zookeeper:/var/log/zookeeper -v /var/run/zookeeper:/var/run/zookeeper eskimo/zookeeper /usr/share/zookeeper/bin/zkServer.sh start-foreground
            └─user.slice
              └─user-1000.slice
                ├─session-9626.scope
@@ -1743,7 +1743,7 @@ Warning: Journal has been rotated since unit was started. Log output is incomple
            │ ├─32179 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9300 -container-ip 172.17.0.5 -container-port 9300
            │ └─32192 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9200 -container-ip 172.17.0.5 -container-port 9200
            ├─elasticsearch.service
-           │ └─32152 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo:elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+           │ └─32152 /usr/bin/docker run -i --name elasticsearch --user elasticsearch -p 9200:9200 -p 9300:9300 -v /var/lib/elasticsearch:/var/lib/elasticsearch -v /var/log/elasticsearch:/var/log/elasticsearch -v /var/run/elasticsearch:/var/run/elasticsearch -v /usr/local/etc/elasticsearch:/usr/local/etc/elasticsearch eskimo/elasticsearch /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
            ├─ifup@eth0.service
            │ └─407 /sbin/dhclient -4 -v -pf /run/dhclient.eth0.pid -lf /var/lib/dhcp/dhclient.eth0.leases -I -df /var/lib/dhcp/dhclient6.eth0.leases eth0
            ├─irqbalance.service
@@ -1753,9 +1753,9 @@ Warning: Journal has been rotated since unit was started. Log output is incomple
            │ ├─7269 logger -p user info -t mesos-slave[7260]
            │ └─7270 logger -p user err -t mesos-slave[7260]
            ├─mesos-master.service
-           │ └─3020 /usr/bin/docker run -i --name mesos-master --network host -v /var/lib/mesos:/var/lib/mesos -v /var/log/mesos:/var/log/mesos -v /var/run/mesos:/var/run/mesos -v /usr/local/bin:/usr/local/bin -v /usr/local/sbin:/usr/local/sbin -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ -v /usr/local/etc/mesos:/usr/local/etc/mesos eskimo:mesos-master /usr/local/sbin/mesos-init-wrapper.sh master
+           │ └─3020 /usr/bin/docker run -i --name mesos-master --network host -v /var/lib/mesos:/var/lib/mesos -v /var/log/mesos:/var/log/mesos -v /var/run/mesos:/var/run/mesos -v /usr/local/bin:/usr/local/bin -v /usr/local/sbin:/usr/local/sbin -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ -v /usr/local/etc/mesos:/usr/local/etc/mesos eskimo/mesos-master /usr/local/sbin/mesos-init-wrapper.sh master
            ├─ntp.service
-           │ └─1504 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo:ntp /usr/sbin/ntpd -n -g
+           │ └─1504 /usr/bin/docker run -i --name ntp -p 123:123 --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp eskimo/ntp /usr/sbin/ntpd -n -g
            ├─packagekit.service
            │ └─1133 /usr/lib/packagekit/packagekitd
            ├─polkit.service
@@ -1765,9 +1765,9 @@ Warning: Journal has been rotated since unit was started. Log output is incomple
            ├─rsyslog.service
            │ └─381 /usr/sbin/rsyslogd -n
            ├─spark-executor.service
-           │ └─1566 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo:spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
+           │ └─1566 /usr/bin/docker run -i --name spark-mesos-shuffle-service --user spark -p 7337:7337 -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ eskimo/spark-mesos-shuffle-service /usr/local/lib/spark/sbin/start-mesos-shuffle-service-wrapper.sh
            ├─spark-console.service
-           │ └─1586 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark eskimo:spark-console /usr/local/lib/spark/sbin/start-history-server-wrapper.sh
+           │ └─1586 /usr/bin/docker run -i --name spark-console --user spark --network host -v /var/log/spark:/var/log/spark -v /var/lib/spark:/var/lib/spark eskimo/spark-console /usr/local/lib/spark/sbin/start-history-server-wrapper.sh
            ├─ssh.service
            │ └─7259 /usr/sbin/sshd -D
            ├─system-getty.slice
@@ -1782,7 +1782,7 @@ Warning: Journal has been rotated since unit was started. Log output is incomple
            ├─systemd-udevd.service
            │ └─6060 /lib/systemd/systemd-udevd
            └─zookeeper.service
-             └─1542 /usr/bin/docker run -i --name zookeeper --user zookeeper -p 2181:2181 -p 2888:2888 -p 3888:3888 -v /var/log/zookeeper:/var/log/zookeeper -v /var/run/zookeeper:/var/run/zookeeper eskimo:zookeeper /usr/share/zookeeper/bin/zkServer.sh start-foreground
+             └─1542 /usr/bin/docker run -i --name zookeeper --user zookeeper -p 2181:2181 -p 2888:2888 -p 3888:3888 -v /var/log/zookeeper:/var/log/zookeeper -v /var/run/zookeeper:/var/run/zookeeper eskimo/zookeeper /usr/share/zookeeper/bin/zkServer.sh start-foreground
 
 May 03 07:49:02 deb-node1 docker[31624]: Refer to the log for complete error details.
 May 03 07:49:02 deb-node1 containerd[418]: time="2019-05-03T07:49:02.536560225Z" level=info msg="shim reaped" id=e607b3588dc1e91cf97f69399b8e7dd0cba6306804fcd5ef9ba7c8fd6be2f2da

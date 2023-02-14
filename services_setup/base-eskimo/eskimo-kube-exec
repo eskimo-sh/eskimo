@@ -90,7 +90,7 @@ docker run \
         -v /etc/k8s:/etc/k8s:ro \
         -e NODE_NAME=$HOSTNAME \
         -e ADDITONAL_HOSTS_FILE=$KUBE_SERVICES_HOSTS_FILE \
-        kubernetes.registry:5000/kube-shell \
+        "kubernetes.registry:5000/kube-shell:$(get_last_tag kube-shell)" \
             /usr/local/bin/kube_do "$@"
 
 rm -Rf $KUBE_SERVICES_HOSTS_FILE

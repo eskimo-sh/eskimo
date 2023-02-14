@@ -764,7 +764,7 @@ public class SystemServiceImpl implements SystemService {
         if (StringUtils.isNotBlank(imageName)) {
             try {
                 ml.addInfo(" - Deleting docker template image");
-                exec(connection, new IgnoreMessageLogger(), "docker image rm eskimo:" + imageName + "_template || true");
+                exec(connection, new IgnoreMessageLogger(), "docker image rm eskimo/" + imageName + "_template:latest || true");
             } catch (SSHCommandException e) {
                 logger.error(e, e);
                 ml.addInfo(e.getMessage());

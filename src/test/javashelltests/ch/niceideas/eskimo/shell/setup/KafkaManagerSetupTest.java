@@ -80,7 +80,7 @@ public class KafkaManagerSetupTest extends AbstractSetupShellTest {
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
         copyFile(jailPath, "setupCommon.sh");
-        copyFile(jailPath, "kafka-manager.k8s.yaml");
+        copyFile(jailPath, "kafka-manager.k8s.yaml.sh");
         //copyFile(jailPath, "inContainerSetupKafkaManager.sh");
         copyFile(jailPath, "inContainerSetupKafkaCommon.sh");
         copyFile(jailPath, "inContainerStartService.sh");

@@ -18,7 +18,7 @@
    Memory: 19.7M
       CPU: 260ms
    CGroup: /system.slice/prometheus.service
-           └─24395 /usr/bin/docker run -i --name prometheus --network host --privileged -v /var/log/prometheus:/var/log/prometheus -v /proc:/host/proc -v /sys:/host/sys -v /:/rootfs --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh -e NODE_NAME=deb-node2 eskimo:prometheus /usr/local/sbin/inContainerStartService.sh
+           └─24395 /usr/bin/docker run -i --name prometheus --network host --privileged -v /var/log/prometheus:/var/log/prometheus -v /proc:/host/proc -v /sys:/host/sys -v /:/rootfs --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh -e NODE_NAME=deb-node2 eskimo/prometheus /usr/local/sbin/inContainerStartService.sh
 
 Jun 18 16:04:25 deb-node2 bash[24395]: time="2019-06-18T16:04:24Z" level=info msg=" - sockstat" source="node_exporter.go:104"
 Jun 18 16:04:25 deb-node2 bash[24395]: time="2019-06-18T16:04:24Z" level=info msg=" - stat" source="node_exporter.go:104"
@@ -59,7 +59,7 @@ Jun 18 16:04:25 deb-node2 bash[24395]: time="2019-06-18T16:04:24Z" level=info ms
    Memory: 19.7M
       CPU: 223ms
    CGroup: /system.slice/zookeeper.service
-           └─23328 /usr/bin/docker run -i --name zookeeper --user zookeeper -p 2181:2181 -p 2888:2888 -p 3888:3888 -v /var/log/zookeeper:/var/log/zookeeper -v /var/run/zookeeper:/var/run/zookeeper -v /var/lib/zookeeper:/var/lib/zookeeper --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh -e NODE_NAME=deb-node2 eskimo:zookeeper /usr/local/sbin/inContainerStartService.sh
+           └─23328 /usr/bin/docker run -i --name zookeeper --user zookeeper -p 2181:2181 -p 2888:2888 -p 3888:3888 -v /var/log/zookeeper:/var/log/zookeeper -v /var/run/zookeeper:/var/run/zookeeper -v /var/lib/zookeeper:/var/lib/zookeeper --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh -e NODE_NAME=deb-node2 eskimo/zookeeper /usr/local/sbin/inContainerStartService.sh
 
 Jun 18 16:03:11 deb-node2 docker[23304]: Error response from daemon: Cannot kill container: zookeeper: Container 326158672abd14c689e0b482c17a714f6c60f844da322fa8444fea77090e2388 is not running
 Jun 18 16:03:11 deb-node2 docker[23315]: zookeeper
@@ -86,8 +86,8 @@ Jun 18 16:03:16 deb-node2 bash[23328]: Using config: /etc/zookeeper/conf/zoo.cfg
    Memory: 19.8M
       CPU: 166ms
    CGroup: /system.slice/mesos-master.service
-           ├─25617 /bin/bash -c . /run/eskimo_k8s_environment && /usr/bin/docker run          -i         --name mesos-master          --network host          -v /var/lib/mesos:/var/lib/mesos          -v /var/log/mesos:/var/log/mesos          -v /var/run/mesos:/var/run/mesos          -v /usr/local/bin:/usr/local/bin          -v /usr/local/sbin:/usr/local/sbin          -v /usr/local/lib/mesos/:/usr/local/lib/mesos/          -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/          -v /usr/local/etc/mesos:/usr/local/etc/mesos          --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh          -e NODE_NAME=$HOSTNAME          eskimo:mesos-master          /usr/local/sbin/inContainerStartService.sh
-           └─25619 /usr/bin/docker run -i --name mesos-master --network host -v /var/lib/mesos:/var/lib/mesos -v /var/log/mesos:/var/log/mesos -v /var/run/mesos:/var/run/mesos -v /usr/local/bin:/usr/local/bin -v /usr/local/sbin:/usr/local/sbin -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ -v /usr/local/etc/mesos:/usr/local/etc/mesos --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh -e NODE_NAME=deb-node2 eskimo:mesos-master /usr/local/sbin/inContainerStartService.sh
+           ├─25617 /bin/bash -c . /run/eskimo_k8s_environment && /usr/bin/docker run          -i         --name mesos-master          --network host          -v /var/lib/mesos:/var/lib/mesos          -v /var/log/mesos:/var/log/mesos          -v /var/run/mesos:/var/run/mesos          -v /usr/local/bin:/usr/local/bin          -v /usr/local/sbin:/usr/local/sbin          -v /usr/local/lib/mesos/:/usr/local/lib/mesos/          -v /usr/local/lib/mesos-$AMESOS_VERSION/:/usr/local/lib/mesos-$AMESOS_VERSION/          -v /usr/local/etc/mesos:/usr/local/etc/mesos          --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh          -e NODE_NAME=$HOSTNAME          eskimo/mesos-master          /usr/local/sbin/inContainerStartService.sh
+           └─25619 /usr/bin/docker run -i --name mesos-master --network host -v /var/lib/mesos:/var/lib/mesos -v /var/log/mesos:/var/log/mesos -v /var/run/mesos:/var/run/mesos -v /usr/local/bin:/usr/local/bin -v /usr/local/sbin:/usr/local/sbin -v /usr/local/lib/mesos/:/usr/local/lib/mesos/ -v /usr/local/lib/mesos-1.7.2/:/usr/local/lib/mesos-1.7.2/ -v /usr/local/etc/mesos:/usr/local/etc/mesos --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh -e NODE_NAME=deb-node2 eskimo/mesos-master /usr/local/sbin/inContainerStartService.sh
 
 Jun 18 16:05:26 deb-node2 systemd[1]: Starting Mesos Master...
 Jun 18 16:05:26 deb-node2 docker[25584]: Error response from daemon: Cannot kill container: mesos-master: Container 68e0c402990b00a713f5dd2eb57b0a2596f71089d298973edbc9b3b99bd6b2ca is not running
@@ -106,7 +106,7 @@ Jun 18 16:05:27 deb-node2 bash[25617]:  - Starting service
    Memory: 19.3M
       CPU: 240ms
    CGroup: /system.slice/ntp.service
-           └─20573 /usr/bin/docker run -i --name ntp -p 123:123/udp --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp -v /var/lib/ntp:/var/lib/ntp --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh -e NODE_NAME=deb-node2 eskimo:ntp /usr/local/sbin/inContainerStartService.sh
+           └─20573 /usr/bin/docker run -i --name ntp -p 123:123/udp --cap-add SYS_RESOURCE --cap-add SYS_TIME -v /var/log/ntp:/var/log/ntp -v /var/run/ntp:/var/run/ntp -v /var/lib/ntp:/var/lib/ntp --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh -e NODE_NAME=deb-node2 eskimo/ntp /usr/local/sbin/inContainerStartService.sh
 
 Jun 18 16:00:51 deb-node2 bash[20573]: 18 Jun 16:00:51 ntpd[27]: 192.168.10.11 8014 84 reachable
 Jun 18 16:00:57 deb-node2 bash[20573]: 18 Jun 16:00:57 ntpd[27]: 192.168.10.11 901a 8a sys_peer
@@ -127,7 +127,7 @@ Jun 18 16:07:51 deb-node2 bash[20573]: 18 Jun 16:07:51 ntpd[27]: 192.168.10.11 9
    Memory: 19.5M
       CPU: 205ms
    CGroup: /system.slice/gluster.service
-           └─21982 /usr/bin/docker run -i --name gluster --network host --privileged=true -v /var/lib/gluster:/var/lib/gluster -v /var/log/gluster:/var/log/gluster -v /var/run/gluster:/var/run/gluster --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh -e NODE_NAME=deb-node2 eskimo:gluster /usr/local/sbin/inContainerStartService.sh
+           └─21982 /usr/bin/docker run -i --name gluster --network host --privileged=true -v /var/lib/gluster:/var/lib/gluster -v /var/log/gluster:/var/log/gluster -v /var/run/gluster:/var/run/gluster --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh -e NODE_NAME=deb-node2 eskimo/gluster /usr/local/sbin/inContainerStartService.sh
 
 Jun 18 16:02:13 deb-node2 systemd[1]: Starting Gluster FS Server...
 Jun 18 16:02:13 deb-node2 docker[21962]: Error response from daemon: Cannot kill container: gluster: Container 9acb4ce7a65a834f663bba85b424a19a3dc9043d31a87a9f8aa97d6982d41a80 is not running

@@ -70,6 +70,8 @@ export NODE=$3
 
 export PATH=$PATH:/usr/local/bin
 
+. /usr/local/sbin/eskimo-utils.sh
+
 if [[ $TEST_MODE != "true" ]]; then
     . /etc/eskimo_topology.sh
 fi
@@ -262,14 +264,15 @@ function uninstall_service() {
 
     echo " - Uninstall Service $SERVICE"
 
-    local SERVICE_FILE=/var/lib/eskimo/kube-services/$SERVICE.k8s.yaml
+    local SERVICE_FILE=/var/lib/eskimo/kube-services/$SERVICE.k8s.yaml.sh
     if [[ $TEST_MODE != "true" && ! -f $SERVICE_FILE ]]; then
         echo "File $SERVICE_FILE can't be found !";
         exit 2
     fi
 
     echo "   + Deleting $SERVICE"
-    envsubst < $SERVICE_FILE | call-kubectl delete -f -
+    # shellcheck disable=SC1090
+    . $SERVICE_FILE | call-kubectl delete -f -
 
     echo "   + Deleting service file"
     sudo rm -f $SERVICE_FILE
@@ -286,7 +289,7 @@ function restart_service() {
 
     echo " - Restart Service $SERVICE"
 
-    local SERVICE_FILE=/var/lib/eskimo/kube-services/$SERVICE.k8s.yaml
+    local SERVICE_FILE=/var/lib/eskimo/kube-services/$SERVICE.k8s.yaml.sh
 
     if [[ $TEST_MODE == "true" || -f $SERVICE_FILE ]]; then
         echo "   + Deleting $SERVICE"
@@ -297,7 +300,8 @@ function restart_service() {
         fi
 
         echo "   + (Re-)applying $SERVICE"
-        envsubst < $SERVICE_FILE | call-kubectl apply -f -
+        # shellcheck disable=SC1090
+        . $SERVICE_FILE | call-kubectl apply -f -
     else
         echo "$SERVICE_FILE doesn't exist. Ignoring ..."
     fi
@@ -358,14 +362,15 @@ function start_service() {
 
     echo " - Starting Service $SERVICE"
 
-    local SERVICE_FILE=/var/lib/eskimo/kube-services/$SERVICE.k8s.yaml
+    local SERVICE_FILE=/var/lib/eskimo/kube-services/$SERVICE.k8s.yaml.sh
     if [[ $TEST_MODE != "true" && ! -f $SERVICE_FILE ]]; then
         echo "File $SERVICE_FILE can't be found !";
         exit 2
     fi
 
     echo "   + (Re-)applying $SERVICE"
-    envsubst < $SERVICE_FILE | call-kubectl apply -f -
+    # shellcheck disable=SC1090
+    . $SERVICE_FILE | call-kubectl apply -f -
 }
 
 

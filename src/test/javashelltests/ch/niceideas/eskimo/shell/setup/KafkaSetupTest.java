@@ -85,7 +85,7 @@ public class KafkaSetupTest extends AbstractSetupShellTest {
     protected void copyScripts(String jailPath) throws IOException {
         // setup.sh and common.sh are automatic
         copyFile(jailPath, "setupCommon.sh");
-        copyFile(jailPath, "kafka.k8s.yaml");
+        copyFile(jailPath, "kafka.k8s.yaml.sh");
         copyFile(jailPath, "inContainerSetupKafka.sh");
         copyFile(jailPath, "inContainerSetupKafkaCommon.sh");
         copyFile(jailPath, "inContainerStartService.sh");

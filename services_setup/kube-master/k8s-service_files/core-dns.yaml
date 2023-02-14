@@ -153,7 +153,7 @@ spec:
               topologyKey: kubernetes.io/hostname
       containers:
         - name: coredns
-          image: kubernetes.registry:5000/coredns/coredns
+          image: kubernetes.registry:5000/coredns/coredns:latest
           imagePullPolicy: IfNotPresent
           resources:
             limits:

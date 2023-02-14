@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -32,19 +33,24 @@
 # Software.
 #
 
+. /usr/local/sbin/eskimo-utils.sh
+
+TEMP_FILE=$(mktemp)
+
+cat > $TEMP_FILE <<EOF
 kind: Service
 apiVersion: v1
 metadata:
   labels:
-    k8s-app: cerebro
-  name: cerebro
+    k8s-app: kafka-manager
+  name: kafka-manager
   namespace: default
 spec:
   ports:
-    - port: 31900
-      targetPort: 9000
+    - port: 31220
+      targetPort: 22080
   selector:
-    k8s-app: cerebro
+    k8s-app: kafka-manager
 
 ---
 
@@ -52,37 +58,35 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   labels:
-    k8s-app: cerebro
-  name: cerebro
+    k8s-app: kafka-manager
+  name: kafka-manager
   namespace: default
 spec:
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      k8s-app: cerebro
+      k8s-app: kafka-manager
   template:
     metadata:
       labels:
-        k8s-app: cerebro
+        k8s-app: kafka-manager
     spec:
       #securityContext:
       #  seccompProfile:
       #    type: RuntimeDefault
       enableServiceLinks: false
       containers:
-        - name: cerebro
-          image: kubernetes.registry:5000/cerebro
+        - name: kafka-manager
+          image: kubernetes.registry:5000/kafka-manager:$(get_last_tag kafka-manager)
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 9000
+            - containerPort: 22080
               protocol: TCP
           command: ["/usr/local/sbin/inContainerStartService.sh"]
           volumeMounts:
-            - name: var-log-elasticsearch
-              mountPath: /var/log/elasticsearch
-            - name: var-run-elasticsearch
-              mountPath: /var/run/elasticsearch
+            - name: var-log-kafka
+              mountPath: /var/log/kafka
             - name: etc-eskimo-topology
               mountPath: /etc/eskimo_topology.sh
             - name: etc-eskimo-services-settings
@@ -91,26 +95,23 @@ spec:
             httpGet:
               scheme: HTTP
               path: /
-              port: 9000
+              port: 22080
             initialDelaySeconds: 60
             timeoutSeconds: 30
           securityContext:
-            allowPrivilegeEscalation: false
+            privileged: true
+            allowPrivilegeEscalation: true
             readOnlyRootFilesystem: false
-            runAsUser: 3301
-            runAsGroup: 3301
+            runAsUser: 3303
+            runAsGroup: 3303
           resources:
             requests:
-              cpu: "$ESKIMO_KUBE_REQUEST_CEREBRO_CPU"
-              memory: "$ESKIMO_KUBE_REQUEST_CEREBRO_RAM"
+              cpu: "$ESKIMO_KUBE_REQUEST_KAFKA_MANAGER_CPU"
+              memory: "$ESKIMO_KUBE_REQUEST_KAFKA_MANAGER_RAM"
       volumes:
-        - name: var-log-elasticsearch
+        - name: var-log-kafka
           hostPath:
-            path: /var/log/elasticsearch
-            type: Directory
-        - name: var-run-elasticsearch
-          hostPath:
-            path: /var/run/elasticsearch
+            path: /var/log/kafka
             type: Directory
         - name: etc-eskimo-topology
           hostPath:
@@ -127,3 +128,6 @@ spec:
       tolerations:
         - key: node-role.kubernetes.io/master
           effect: NoSchedule
+EOF
+cat $TEMP_FILE
+rm -Rf $TEMP_FILE

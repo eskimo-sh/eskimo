@@ -169,11 +169,11 @@ public class CommonDevShellTest {
                     "exec -i cerebro_template apt-get clean -q\n" +
                     "exec -i cerebro_template rm -Rf /usr/share/doc/ /usr/share/man /usr/share/doc-base/ /usr/share/info/\n" +
                     "exec -i cerebro_template mkdir -p /usr/share/man/man1/\n" +
-                    "commit cerebro_template eskimo:cerebro_template\n" +
+                    "commit cerebro_template eskimo/cerebro_template:latest\n" +
                     "stop cerebro_template\n" +
                     "container rm cerebro_template\n" +
-                    "save eskimo:cerebro_template\n" +
-                    "image rm eskimo:cerebro_template\n", dockerLogs);
+                    "save eskimo/cerebro_template:latest\n" +
+                    "image rm eskimo/cerebro_template:latest\n", dockerLogs);
 
         } else {
             fail ("No docker manipulations found");
@@ -201,7 +201,7 @@ public class CommonDevShellTest {
             int indexOfPs = dockerLogs.indexOf("ps -a -q -f name=cerebro");
             assertTrue(indexOfPs > -1);
 
-            int indexOfBuild = dockerLogs.indexOf("build --iidfile id_file --tag eskimo:cerebro_template", indexOfPs);
+            int indexOfBuild = dockerLogs.indexOf("build --iidfile id_file --tag eskimo/cerebro_template:latest", indexOfPs);
             assertTrue(indexOfBuild > -1);
 
             int indexOfRun = dockerLogs.indexOf("run --privileged -v", indexOfBuild);

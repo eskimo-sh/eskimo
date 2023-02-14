@@ -212,7 +212,7 @@ function close_and_save_image() {
     # Now that we've modified the container we have to commit the changes. First exit the container with the command exit.
     # To commit the changes and create a new image based on said changes, issue the command:
     echo " - Comitting changes on container $IMAGE"
-    docker commit $IMAGE eskimo:"$IMAGE" > $LOG_FILE 2>&1
+    docker commit $IMAGE eskimo/"$IMAGE":latest > $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -3
 
     # Stop container and delete image
@@ -227,7 +227,7 @@ function close_and_save_image() {
     # save base image
     echo " - Saving image ""$IMAGE"
     if [[ -z $TEST_MODE ]]; then set -e; fi
-    docker save eskimo:"$IMAGE" | gzip >  ../../packages_distrib/tmp_image_"$IMAGE"_TEMP.tar.gz
+    docker save eskimo/"$IMAGE":latest | gzip >  ../../packages_distrib/tmp_image_"$IMAGE"_TEMP.tar.gz
     set +e
 
     echo " - versioning image"
@@ -240,7 +240,7 @@ function close_and_save_image() {
 
     #docker image rm `cat id_file`
     echo " - removing image "$IMAGE
-    docker image rm eskimo:$IMAGE > $LOG_FILE 2>&1
+    docker image rm eskimo/$IMAGE:latest > $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -6
 
 }
@@ -265,7 +265,7 @@ function build_image() {
 
     if [[ -z "$NO_BASE_IMAGE" ]]; then
         echo " - Checking if base eskimo image is available"
-        if [[ $(docker images -q eskimo:base-eskimo_template 2>/dev/null) == "" ]]; then
+        if [[ $(docker images -q eskimo/base-eskimo_template 2>/dev/null) == "" ]]; then
             echo " - Trying to load base eskimo image"
             for i in $(ls -rt ../../packages_distrib/docker_template_base-eskimo*.tar.gz | tail -1); do
                 echo "   + loading image $i"
@@ -283,7 +283,7 @@ function build_image() {
 
     # build
     echo " - building docker image $IMAGE"
-    docker build --iidfile id_file --tag eskimo:"$IMAGE" .  > $LOG_FILE 2>&1
+    docker build --iidfile id_file --tag eskimo/"$IMAGE":latest .  > $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -11
 
     local TMP_FOLDER=/tmp
@@ -308,7 +308,7 @@ function build_image() {
             -v $TMP_FOLDER:/tmp \
             -d --name $IMAGE \
             -i \
-            -t eskimo:"$IMAGE" bash  > $LOG_FILE 2>&1
+            -t eskimo/"$IMAGE":latest bash  > $LOG_FILE 2>&1
     fail_if_error $? $LOG_FILE -12
 
     echo " - Ensuring image was well started"

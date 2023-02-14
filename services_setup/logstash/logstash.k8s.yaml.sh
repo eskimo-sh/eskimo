@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -32,109 +33,100 @@
 # Software.
 #
 
-kind: Service
+. /usr/local/sbin/eskimo-utils.sh
+
+TEMP_FILE=$(mktemp)
+
+cat > $TEMP_FILE <<EOF
 apiVersion: v1
+kind: Service
 metadata:
-  labels:
-    k8s-app: zeppelin
-  name: zeppelin
+  name: logstash
   namespace: default
+  labels:
+    service: logstash
 spec:
+  clusterIP: None
   ports:
-    - name: httpzeppelin1
-      port: 31008
-      targetPort: 38080
-    - name: httpzeppelin2
-      port: 31009
-      targetPort: 38081
+    - port: 28999
+      name: logstash-cli
   selector:
-    k8s-app: zeppelin
+    service: logstash
 
 ---
 
-kind: Deployment
 apiVersion: apps/v1
+kind: StatefulSet
 metadata:
-  labels:
-    k8s-app: zeppelin
-  name: zeppelin
+  name: logstash
   namespace: default
+  labels:
+    service: logstash
 spec:
-  replicas: 1
-  revisionHistoryLimit: 10
+  serviceName: logstash
+  replicas: $ESKIMO_NODE_COUNT
   selector:
     matchLabels:
-      k8s-app: zeppelin
+      service: logstash
   template:
     metadata:
       labels:
-        k8s-app: zeppelin
+        service: logstash
     spec:
-      #securityContext:
-      #  seccompProfile:
-      #    type: RuntimeDefault
-      enableServiceLinks: false
+      # Force all replicas on different nodes
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              service: logstash
+      tolerations:
+        # this toleration is to have the daemonset runnable on master nodes
+        # remove it if your masters can't run pods
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
       containers:
-        - name: zeppelin
-          image: kubernetes.registry:5000/zeppelin
-          imagePullPolicy: IfNotPresent
+        - name: logstash
+          image: kubernetes.registry:5000/logstash:$(get_last_tag logstash)
+          resources:
+            requests:
+              cpu: "$ESKIMO_KUBE_REQUEST_LOGSTASH_CPU"
+              memory: "$ESKIMO_KUBE_REQUEST_LOGSTASH_RAM"
           ports:
-            - containerPort: 38080
-              protocol: TCP
-            - containerPort: 38081
-              protocol: TCP
+            - containerPort: 28999
+              name: http
           command: ["/usr/local/sbin/inContainerStartService.sh"]
-          env:
-            - name: MY_POD_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.podIP
           volumeMounts:
-            - name: home-spark-kube
-              mountPath: /home/spark/.kube
-            - name: etc-k8s
-              mountPath: /etc/k8s
-            - name: var-log-spark
-              mountPath: /var/log/spark
-            - name: var-run-spark
-              mountPath: /var/run/spark
+            - name: var-log-elasticsearch
+              mountPath: /var/log/elasticsearch
+            - name: var-run-elasticsearch
+              mountPath: /var/run/elasticsearch
             - name: etc-eskimo-topology
               mountPath: /etc/eskimo_topology.sh
             - name: etc-eskimo-services-settings
               mountPath: /etc/eskimo_services-settings.json
-          livenessProbe:
-            httpGet:
-              scheme: HTTP
-              path: /
-              port: 38080
-            initialDelaySeconds: 60
-            timeoutSeconds: 30
+          env:
+            - name: ESKIMO_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
           securityContext:
             privileged: true
             allowPrivilegeEscalation: true
             readOnlyRootFilesystem: false
-            runAsUser: 3302
-            runAsGroup: 3302
-          resources:
-            requests:
-              cpu: "$ESKIMO_KUBE_REQUEST_ZEPPELIN_CPU"
-              memory: "$ESKIMO_KUBE_REQUEST_ZEPPELIN_RAM"
+            runAsUser: 3301
+            runAsGroup: 3301
+      terminationGracePeriodSeconds: 60
       volumes:
-        - name: home-spark-kube
+        - name: var-log-elasticsearch
           hostPath:
-            path: /home/spark/.kube
+            path: /var/log/elasticsearch
             type: Directory
-        - name: etc-k8s
+        - name: var-run-elasticsearch
           hostPath:
-            path: /etc/k8s
-            type: Directory
-        - name: var-log-spark
-          hostPath:
-            path: /var/log/spark
-            type: Directory
-        - name: var-run-spark
-          hostPath:
-            path: /var/run/spark
+            path: /var/run/elasticsearch
             type: Directory
         - name: etc-eskimo-topology
           hostPath:
@@ -144,10 +136,6 @@ spec:
           hostPath:
             path: /etc/eskimo_services-settings.json
             type: File
-      #hostNetwork: true
-      nodeSelector:
-        "kubernetes.io/os": linux
-      # Comment the following tolerations if app must not be deployed on master
-      tolerations:
-        - key: node-role.kubernetes.io/master
-          effect: NoSchedule
+EOF
+cat $TEMP_FILE
+rm -Rf $TEMP_FILE

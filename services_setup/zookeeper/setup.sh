@@ -69,6 +69,8 @@ sudo rm -f zk_install_log
 # build
 echo " - Building docker container"
 build_container zookeeper zookeeper zk_install_log
+#save tag
+CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 # Create shared dir
 sudo mkdir -p /var/log/zookeeper
@@ -90,7 +92,7 @@ docker run \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         -d --name zookeeper \
         -i \
-        -t eskimo:zookeeper bash >> zk_install_log 2>&1
+        -t eskimo/zookeeper:$CONTAINER_TAG bash >> zk_install_log 2>&1
 fail_if_error $? "zk_install_log" -2
 
 echo " - Configuring zookeeper container"
@@ -104,7 +106,7 @@ echo " - Handling topology infrastructure"
 handle_topology_infrastructure zookeeper zk_install_log
 
 echo " - Committing changes to local template and exiting container zookeeper"
-commit_container zookeeper zk_install_log
+commit_container zookeeper $CONTAINER_TAG zk_install_log
 
 echo " - Copying zookeeper command line programs docker wrappers to /usr/local/bin"
 for i in $(find ./zookeeper_wrappers -mindepth 1); do

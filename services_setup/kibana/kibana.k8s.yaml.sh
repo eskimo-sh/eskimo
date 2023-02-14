@@ -1,5 +1,4 @@
-
-
+#!/bin/bash
 #
 # This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 # well to this individual file than to the Eskimo Project as a whole.
@@ -34,102 +33,106 @@
 # Software.
 #
 
+. /usr/local/sbin/eskimo-utils.sh
 
-apiVersion: v1
+TEMP_FILE=$(mktemp)
+
+cat > $TEMP_FILE <<EOF
 kind: Service
+apiVersion: v1
 metadata:
-  name: kafka
-  namespace: default
   labels:
-    service: kafka
+    k8s-app: kibana
+  name: kibana
+  namespace: default
 spec:
-  clusterIP: None
   ports:
-    - port: 9092
-      name: serving
-    - port: 9093
-      name: serving-other
-    - port: 9999
-      name: control
+    - port: 31561
+      targetPort: 5601
   selector:
-    service: kafka
+    k8s-app: kibana
 
 ---
 
-apiVersion: apps/v1
-kind: StatefulSet
+kind: Service
+apiVersion: v1
 metadata:
-  name: kafka
-  namespace: default
   labels:
-    service: kafka
+    k8s-app: kibana
+  name: kibana-node
+  namespace: default
 spec:
-  serviceName: kafka
-  replicas: $ESKIMO_NODE_COUNT
+  type: NodePort
+  ports:
+    - port: 31562
+      targetPort: 5601
+      nodePort: 31562
+  selector:
+    k8s-app: kibana
+
+---
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  labels:
+    k8s-app: kibana
+  name: kibana
+  namespace: default
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      service: kafka
+      k8s-app: kibana
   template:
     metadata:
       labels:
-        service: kafka
+        k8s-app: kibana
     spec:
-      # Force all replicas on different nodes
-      topologySpreadConstraints:
-        - maxSkew: 1
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: DoNotSchedule
-          labelSelector:
-            matchLabels:
-              service: kafka
-      tolerations:
-        # this toleration is to have the daemonset runnable on master nodes
-        # remove it if your masters can't run pods
-        - key: node-role.kubernetes.io/master
-          operator: Exists
-          effect: NoSchedule
+      #securityContext:
+      #  seccompProfile:
+      #    type: RuntimeDefault
+      enableServiceLinks: false
       containers:
-        - name: kafka
-          image: kubernetes.registry:5000/kafka
-          resources:
-            requests:
-              cpu: "$ESKIMO_KUBE_REQUEST_KAFKA_CPU"
-              memory: "$ESKIMO_KUBE_REQUEST_KAFKA_RAM"
+        - name: kibana
+          image: kubernetes.registry:5000/kibana:$(get_last_tag kibana)
+          imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 9200
-              name: http
-            - containerPort: 9300
-              name: tcp
+            - containerPort: 5601
+              protocol: TCP
           command: ["/usr/local/sbin/inContainerStartService.sh"]
           volumeMounts:
-            - name: var-log-kafka
-              mountPath: /var/log/kafka
-            - name: var-run-kafka
-              mountPath: /var/run/kafka
+            - name: var-log-elasticsearch
+              mountPath: /var/log/elasticsearch
+            - name: var-run-elasticsearch
+              mountPath: /var/run/elasticsearch
             - name: etc-eskimo-topology
               mountPath: /etc/eskimo_topology.sh
             - name: etc-eskimo-services-settings
               mountPath: /etc/eskimo_services-settings.json
-          env:
-            - name: ESKIMO_POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
+          livenessProbe:
+            tcpSocket:
+              port: 5601
+            initialDelaySeconds: 180
+            timeoutSeconds: 45
           securityContext:
-            privileged: true
-            allowPrivilegeEscalation: true
+            allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
-            runAsUser: 3303
-            runAsGroup: 3303
-      terminationGracePeriodSeconds: 60
+            runAsUser: 3301
+            runAsGroup: 3301
+          resources:
+            requests:
+              cpu: "$ESKIMO_KUBE_REQUEST_KIBANA_CPU"
+              memory: "$ESKIMO_KUBE_REQUEST_KIBANA_RAM"
       volumes:
-        - name: var-log-kafka
+        - name: var-log-elasticsearch
           hostPath:
-            path: /var/log/kafka
+            path: /var/log/elasticsearch
             type: Directory
-        - name: var-run-kafka
+        - name: var-run-elasticsearch
           hostPath:
-            path: /var/run/kafka
+            path: /var/run/elasticsearch
             type: Directory
         - name: etc-eskimo-topology
           hostPath:
@@ -140,3 +143,12 @@ spec:
             path: /etc/eskimo_services-settings.json
             type: File
       #hostNetwork: true
+      nodeSelector:
+        "kubernetes.io/os": linux
+      # Comment the following tolerations if app must not be deployed on master
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+EOF
+cat $TEMP_FILE
+rm -Rf $TEMP_FILE
