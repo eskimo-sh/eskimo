@@ -58,9 +58,9 @@ if [[ "$ESKIMO_POD_NAME" != "" ]]; then
 
     sed -i s/"log.dirs=\/tmp\/kafka-logs"/"log.dirs=\/var\/lib\/kafka\/$ESKIMO_POD_NAME"/g /usr/local/etc/kafka/server.properties
 
-    sed -i s/"#advertised.listeners=PLAINTEXT:\/\/your.host.name:9092"/"advertised.listeners=PLAINTEXT:\/\/$ESKIMO_POD_NAME.kafka.default.svc.cluster.eskimo:9092"/g /usr/local/etc/kafka/server.properties
+    sed -i s/"#advertised.listeners=PLAINTEXT:\/\/your.host.name:9092"/"advertised.listeners=PLAINTEXT:\/\/$ESKIMO_POD_NAME.kafka.eskimo.svc.cluster.eskimo:9092"/g /usr/local/etc/kafka/server.properties
 
-    echo "   + Using advertised.listeners=$ESKIMO_POD_NAME.kafka.default.svc.cluster.eskimo"
+    echo "   + Using advertised.listeners=$ESKIMO_POD_NAME.kafka.eskimo.svc.cluster.eskimo"
 fi
 
 # silent

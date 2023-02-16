@@ -79,6 +79,12 @@ fi
 # Making /root/.kube/config available
 export HOME=/root
 
+if [[ $(kubectl get namespace | grep eskimo) == "" ]]; then
+    echo "   + Creating namespace eskimo"
+    kubectl create namespace eskimo
+    sleep 2
+fi
+
 # recreating on master
 if [[ $(kubectl get serviceaccount | grep $ADMIN_USER) != "" ]]; then
     echo "   + Deleting serviceaccount-$ADMIN_USER"

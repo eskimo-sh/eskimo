@@ -48,7 +48,7 @@ sed -i -n '1h;1!H;${;g;s/'\
 '  #}'\
 '/'\
 '  {\n'\
-'    host = \"http:\/\/elasticsearch.default.svc.cluster.eskimo:9200\"\n'\
+'    host = \"http:\/\/elasticsearch.eskimo.svc.cluster.eskimo:9200\"\n'\
 '    name = \"Eskimo\"\n'\
 '    headers-whitelist = \[ \"x-proxy-user\", \"x-proxy-roles\", \"X-Forwarded-For\" \]\n'\
 ' }/g;p;}' /usr/local/lib/cerebro/conf/application.conf

@@ -2,7 +2,7 @@
 It works !!
 
 Reachable by :
-http://localhost:8001/api/v1/namespaces/default/services/cerebro:31900/proxy/#/connect
+http://localhost:8001/api/v1/namespaces/eskimo/services/cerebro:31900/proxy/#/connect
 (from : https://kubernetes.io/docs/tasks/access-application-cluster/access-cluster-services/)
 
 Another way to rewch it is using the service IP :

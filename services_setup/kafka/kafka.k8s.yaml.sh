@@ -42,7 +42,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: kafka
-  namespace: default
+  namespace: eskimo
   labels:
     service: kafka
 spec:
@@ -63,7 +63,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: kafka
-  namespace: default
+  namespace: eskimo
   labels:
     service: kafka
 spec:
@@ -74,6 +74,7 @@ spec:
       service: kafka
   template:
     metadata:
+      namespace: eskimo
       labels:
         service: kafka
     spec:

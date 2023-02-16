@@ -95,22 +95,22 @@ fi
 if [[ "$*" == "get pod --all-namespaces -o custom-columns=NAME:metadata.name,NAMESPACE:metadata.namespace" ]]; then
 
     echo "NAME                                         NAMESPACE
-cerebro-5bc7f5874b-w9x88                     default
-elasticsearch-0                              default
-elasticsearch-1                              default
-elasticsearch-2                              default
-flink-runtime-7b8cccbb79-4m4gn               default
-grafana-5c4dd9848d-cmbkz                     default
-kafka-0                                      default
-kafka-1                                      default
-kafka-2                                      default
-kafka-manager-6b4c89dc9b-dtfpq               default
-kibana-6d7656c9c5-tlmwp                      default
-logstash-0                                   default
-logstash-1                                   default
-logstash-2                                   default
-spark-console-69bf57d949-sb2bh        default
-zeppelin-9f6d88d6f-5pwcf                     default
+cerebro-5bc7f5874b-w9x88                      eskimo
+elasticsearch-0                               eskimo
+elasticsearch-1                               eskimo
+elasticsearch-2                               eskimo
+flink-runtime-7b8cccbb79-4m4gn                eskimo
+grafana-5c4dd9848d-cmbkz                      eskimo
+kafka-0                                       eskimo
+kafka-1                                       eskimo
+kafka-2                                       eskimo
+kafka-manager-6b4c89dc9b-dtfpq                eskimo
+kibana-6d7656c9c5-tlmwp                       eskimo
+logstash-0                                    eskimo
+logstash-1                                    eskimo
+logstash-2                                    eskimo
+spark-console-69bf57d949-sb2bh         eskimo
+zeppelin-9f6d88d6f-5pwcf                      eskimo
 coredns-5d8697db8f-vr459                     kube-system
 dashboard-metrics-scraper-78f56fbd8b-78bz2   kubernetes-dashboard
 kubernetes-dashboard-789fd6b89-t9xnb         kubernetes-dashboard

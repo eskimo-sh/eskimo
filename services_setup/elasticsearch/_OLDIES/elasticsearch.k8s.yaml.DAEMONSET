@@ -55,7 +55,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: elasticsearch
-  namespace: default
+  namespace: eskimo
   labels:
     k8s-app: elasticsearch
 spec:
@@ -64,6 +64,7 @@ spec:
       name: elasticsearch
   template:
     metadata:
+      namespace: eskimo
       labels:
         name: elasticsearch
     spec:

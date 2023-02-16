@@ -128,7 +128,7 @@ public class SparkRuntimeSetupTest extends AbstractSetupShellTest {
         // test a few essential ones
         assertTrue (configEchoed.contains("spark.master=k8s://https://192.168.10.11:6443\""));
         assertTrue (configEchoed.contains("spark.kubernetes.driver.master=https://192.168.10.11:6443\""));
-        assertTrue (configEchoed.contains("spark.es.nodes=elasticsearch.default.svc.cluster.eskimo\""));
+        assertTrue (configEchoed.contains("spark.es.nodes=elasticsearch.eskimo.svc.cluster.eskimo\""));
         assertTrue (configEchoed.contains("spark.driver.host=192.168.10.13\""));
         assertTrue (configEchoed.contains("spark.driver.bindAddress=192.168.10.13\""));
 

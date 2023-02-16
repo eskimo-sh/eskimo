@@ -49,7 +49,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: flink-runtime
-  namespace: default
+  namespace: eskimo
   labels:
     app: flink-runtime
     type: flink-native-kubernetes
@@ -74,11 +74,13 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: pod-template-flink
-  namespace: default
+  namespace: eskimo
 data:
   taskmanager-pod-template.yaml: |
     apiVersion: v1
     kind: Pod
+    metadata:
+      namespace: eskimo
     spec:
       containers:
       - name: flink-main-container # this has to be this name !!!
@@ -144,7 +146,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: flink-runtime-rest
-  namespace: default
+  namespace: eskimo
   labels:
     app: flink-runtime
     type: flink-native-kubernetes
@@ -167,7 +169,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: flink-runtime
-  namespace: default
+  namespace: eskimo
   labels:
     app: flink-runtime
     component: jobmanager
@@ -181,6 +183,7 @@ spec:
       type: flink-native-kubernetes
   template:
     metadata:
+      namespace: eskimo
       labels:
         app: flink-runtime
         component: jobmanager

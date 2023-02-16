@@ -42,7 +42,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: logstash
-  namespace: default
+  namespace: eskimo
   labels:
     service: logstash
 spec:
@@ -59,7 +59,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: logstash
-  namespace: default
+  namespace: eskimo
   labels:
     service: logstash
 spec:
@@ -70,6 +70,7 @@ spec:
       service: logstash
   template:
     metadata:
+      namespace: eskimo
       labels:
         service: logstash
     spec:

@@ -252,6 +252,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: $USER
+  namespace: eskimo
 EOF
 
     sudo mv serviceaccount-$USER.yaml /etc/k8s/serviceaccount-$USER.yaml
@@ -264,6 +265,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: $USER-secret
+  namespace: eskimo
   annotations:
     kubernetes.io/service-account.name: "$USER"
 type: kubernetes.io/service-account-token
@@ -288,7 +290,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: $USER
-  namespace: default
+  namespace: eskimo
 EOF
 
     sudo mv clusterrolebinding-kubernetes-dashboard-$USER.yaml /etc/k8s/clusterrolebinding-kubernetes-dashboard-$USER.yaml
@@ -297,6 +299,7 @@ fi
 if [[ ! -f /etc/k8s/clusterrolebinding-default-$USER.yaml ]]; then
     echo "   + Creating /etc/k8s/clusterrolebinding-default-$USER.yaml"
     cat > clusterrolebinding-default-$USER.yaml <<EOF
+
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -309,7 +312,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: $USER
-  namespace: default
+  namespace: eskimo
 EOF
 
     sudo mv clusterrolebinding-default-$USER.yaml /etc/k8s/clusterrolebinding-default-$USER.yaml
@@ -339,7 +342,11 @@ if [[ ! -f /etc/k8s/shared/ssl/etc/k8s/shared/ssl/kubernetes-csr.json ]]; then
     "eskimo.eskimo",
     "eskimo.eskimo.svc",
     "eskimo.eskimo.svc.cluster",
-    "eskimo.eskimo.svc.cluster.local"
+    "eskimo.eskimo.svc.cluster.local",
+    "kubernetes.eskimo",
+    "kubernetes.eskimo.svc",
+    "kubernetes.eskimo.svc.cluster",
+    "kubernetes.eskimo.svc.cluster.local"
   ],
   "key": {
     "algo": "rsa",

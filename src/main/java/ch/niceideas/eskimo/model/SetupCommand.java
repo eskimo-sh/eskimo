@@ -231,11 +231,14 @@ public class SetupCommand implements JSONOpCommand {
 
     @RequiredArgsConstructor
     public enum SetupOperation implements Operation {
-        DOWNLOAD("Download"),
-        BUILD ("Build");
+        DOWNLOAD("Download", 7),
+        BUILD ("Build", 6);
 
         @Getter
         private final String type;
+
+        @Getter
+        private final int ordinal;
 
         @Override
         public String toString () {

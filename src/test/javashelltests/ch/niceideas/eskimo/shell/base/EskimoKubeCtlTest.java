@@ -115,7 +115,7 @@ public class EskimoKubeCtlTest {
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
 
         //System.err.println (result);
-        assertTrue (result.contains("-n default logs elasticsearch-0"));
+        assertTrue (result.contains("-n eskimo logs elasticsearch-0"));
     }
 
     @Test
@@ -125,7 +125,7 @@ public class EskimoKubeCtlTest {
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
 
         //System.err.println (result);
-        assertTrue (result.contains("-n default logs cerebro-5bc7f5874b-w9x88"));
+        assertTrue (result.contains("-n eskimo logs cerebro-5bc7f5874b-w9x88"));
     }
 
     @Test
@@ -136,7 +136,7 @@ public class EskimoKubeCtlTest {
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
 
         //System.err.println (result);
-        assertTrue (result.contains("-n default delete deployment cerebro"));
+        assertTrue (result.contains("-n eskimo delete deployment cerebro"));
     }
 
     @Test
@@ -146,7 +146,7 @@ public class EskimoKubeCtlTest {
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/calling_script.sh"}, true);
 
         System.err.println (result);
-        assertTrue (result.contains("-n default delete statefulset kafka"));
+        assertTrue (result.contains("-n eskimo delete statefulset kafka"));
     }
 
     @Test

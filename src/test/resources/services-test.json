@@ -526,7 +526,7 @@
     "ui": {
       "kubeProxy": true,
       "__comment_urlTemplate": "Going through Kubectl proxy.",
-      "urlTemplate": "broker-manager/api/v1/namespaces/default/services/broker-manager:31220/proxy/",
+      "urlTemplate": "broker-manager/api/v1/namespaces/eskimo/services/broker-manager:31220/proxy/",
       "__comment_proxyTargetPort": "Kubectl proxy target port",
       "proxyTargetPort" : 8001,
       "waitTime": 6000,
@@ -732,7 +732,7 @@
     "ui": {
       "kubeProxy": true,
       "__comment_urlTemplate": "Going through Kubectl proxy.",
-      "urlTemplate": "database-manager/api/v1/namespaces/default/services/cerebro:31900/proxy/#/overview?host=http:%2F%2Fdatabase.default.svc.cluster.eskimo:9200",
+      "urlTemplate": "database-manager/api/v1/namespaces/eskimo/services/cerebro:31900/proxy/#/overview?host=http:%2F%2Fdatabase.default.svc.cluster.eskimo:9200",
       "__comment_proxyTargetPort": "Kubectl proxy target port",
       "proxyTargetPort" : 8001,
       "waitTime": 5000,
@@ -910,7 +910,7 @@
     "ui": {
       "kubeProxy": true,
       "__comment_urlTemplate": "Going through Kubectl proxy.",
-      "urlTemplate": "zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/",
+      "urlTemplate": "zeppelin/api/v1/namespaces/eskimo/services/zeppelin:31008/proxy/",
       "__comment_proxyTargetPort": "Kubectl proxy target port",
       "proxyTargetPort" : 8001,
       "waitTime": 8000,

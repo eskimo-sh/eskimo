@@ -255,33 +255,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                                     String propertyName = property.getString("name");
                                     if (propertyName.equals(propertyKey)) {
 
-                                        String defaultValue = property.getString("defaultValue");
-                                        String previousValue = property.has("value") ? property.getString("value") : null;
-
-                                        // Handle service dirtiness
-                                        if (   (StringUtils.isBlank(previousValue) && StringUtils.isNotBlank(value))
-                                            || (StringUtils.isNotBlank(previousValue) && StringUtils.isBlank(value))
-                                            || (StringUtils.isNotBlank(previousValue) && StringUtils.isNotBlank(value) && !previousValue.equals(value)
-                                                )) {
-
-                                            dirtyServices.add(service);
-
-                                            Map<String, List<SettingsOperationsCommand.ChangedSettings>> changedSettingsforService =
-                                                    changedSettings.computeIfAbsent(service, ser -> new HashMap<>());
-
-                                            List<SettingsOperationsCommand.ChangedSettings> changeSettingsForFile =
-                                                    changedSettingsforService.computeIfAbsent(filename, fn -> new ArrayList<>());
-
-                                            changeSettingsForFile.add(new SettingsOperationsCommand.ChangedSettings (
-                                                    service, filename, propertyName, value, previousValue));
-                                        }
-
-                                        // Handle value saving
-                                        if (StringUtils.isBlank(value) || value.equals(defaultValue)) {
-                                            property.remove("value");
-                                        } else {
-                                            property.put("value", value);
-                                        }
+                                        handleProperty(changedSettings, dirtyServices, service, value, filename, property, propertyName);
                                         break main;
                                     }
                                 }
@@ -293,6 +267,43 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
         }
 
         return dirtyServices.toArray(new Service[0]);
+    }
+
+    private void handleProperty(
+            Map<Service, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
+            Set<Service> dirtyServices,
+            Service service,
+            String value,
+            String filename,
+            JSONObject property,
+            String propertyName) {
+        String defaultValue = property.getString("defaultValue");
+        String previousValue = property.has("value") ? property.getString("value") : null;
+
+        // Handle service dirtiness
+        if (   (StringUtils.isBlank(previousValue) && StringUtils.isNotBlank(value))
+            || (StringUtils.isNotBlank(previousValue) && StringUtils.isBlank(value))
+            || (StringUtils.isNotBlank(previousValue) && StringUtils.isNotBlank(value) && !previousValue.equals(value)
+                )) {
+
+            dirtyServices.add(service);
+
+            Map<String, List<SettingsOperationsCommand.ChangedSettings>> changedSettingsforService =
+                    changedSettings.computeIfAbsent(service, ser -> new HashMap<>());
+
+            List<SettingsOperationsCommand.ChangedSettings> changeSettingsForFile =
+                    changedSettingsforService.computeIfAbsent(filename, fn -> new ArrayList<>());
+
+            changeSettingsForFile.add(new SettingsOperationsCommand.ChangedSettings (
+                    service, filename, propertyName, value, previousValue));
+        }
+
+        // Handle value saving
+        if (StringUtils.isBlank(value) || value.equals(defaultValue)) {
+            property.remove("value");
+        } else {
+            property.put("value", value);
+        }
     }
 
     private static class ServiceRestartOperationsCommand extends JSONInstallOpCommand<ServiceOperationsCommand.ServiceOperationId> {

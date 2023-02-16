@@ -157,7 +157,7 @@ sudo bash -c "echo -e \"# Eskimo Kubernetes Configuration part \"  >> /usr/local
 sudo bash -c "echo -e \"#==============================================================================\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
 # FIXME
-sudo bash -c "echo -e \"kubernetes.context: default\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
+sudo bash -c "echo -e \"kubernetes.context: eskimo\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
 if [[ $FLINK_CONTAINER_TAG == "" ]]; then
     echo " - Finding last flink-runtime container tag"
@@ -180,21 +180,16 @@ if [[ $FLINK_CONTAINER_TAG == "" ]]; then
 fi
 
 sudo bash -c "echo -e \"kubernetes.container.image: kubernetes.registry:5000/flink-runtime:$FLINK_CONTAINER_TAG\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-
+sudo bash -c "echo -e \"kubernetes.namespace: eskimo\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 sudo bash -c "echo -e \"kubernetes.jobmanager.replicas: 1\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-
 sudo bash -c "echo -e \"kubernetes.config.file: /home/flink/.kube/config\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-
 sudo bash -c "echo -e \"kubernetes.cluster-id: flink-runtime\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
-sed -E -i s/"#?jobmanager.rpc.address: .*"/"jobmanager.rpc.address: flink-runtime.default.svc.cluster.eskimo"/g /usr/local/lib/flink/conf/flink-conf.yaml
-
+sed -E -i s/"#?jobmanager.rpc.address: .*"/"jobmanager.rpc.address: flink-runtime.eskimo.svc.cluster.eskimo"/g /usr/local/lib/flink/conf/flink-conf.yaml
 sed -E -i s/"#?rest.bind-address: .*"/"rest.bind-address: 0.0.0.0"/g /usr/local/lib/flink/conf/flink-conf.yaml
-
-sed -E -i s/"#?rest.address: .*"/"rest.address: flink-runtime-rest.default.svc.cluster.eskimo"/g /usr/local/lib/flink/conf/flink-conf.yaml
+sed -E -i s/"#?rest.address: .*"/"rest.address: flink-runtime-rest.eskimo.svc.cluster.eskimo"/g /usr/local/lib/flink/conf/flink-conf.yaml
 
 sudo bash -c "echo -e \"blob.server.port: 6124\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
-
 sudo bash -c "echo -e \"taskmanager.rpc.port: 50100\"  >> /usr/local/lib/flink/conf/flink-conf.yaml"
 
 echo " - Symlinking entrypoint to /docker-entrypoint.sh"

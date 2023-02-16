@@ -95,17 +95,20 @@ public class SimpleOperationCommand implements JSONOpCommand {
 
     @RequiredArgsConstructor
     public enum SimpleOperation implements LabelledOperation {
-        SHOW_JOURNAL("show_journal", "Showing journal"),
-        START("start", "Starting"),
-        STOP ("stop", "Stopping"),
-        RESTART ("restart", "Restarting"),
-        COMMAND ("command", "Calling custom command");
+        SHOW_JOURNAL("show_journal", "Showing journal", 34),
+        START("start", "Starting", 31),
+        STOP ("stop", "Stopping", 32),
+        RESTART ("restart", "Restarting", 33),
+        COMMAND ("command", "Calling custom command", 35);
 
         @Getter
         private final String type;
 
         @Getter
         private final String label;
+
+        @Getter
+        private final int ordinal;
 
         @Override
         public String toString () {

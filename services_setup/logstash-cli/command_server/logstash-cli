@@ -63,7 +63,7 @@ echo "CAUTION : stdin piping is implemented using the -std_in argument where a f
 echo "needs to be passed"
 echo ""
 echo "Arguments will be passed to a call to logstash in the logstash container."
-echo " - Target host : logstash.default.svc.cluster.eskimo"
+echo " - Target host : logstash.eskimo.svc.cluster.eskimo"
 echo " - STDIN : $STDIN"
 echo " - Arguments   : $REBUILD_ARGS"
 echo "--------------------------------------------------------------------------------"
@@ -77,12 +77,12 @@ rm -f /tmp/call_out.log
 rm -f /tmp/call_error.log
 
 if [[ $STDIN == "" ]]; then
-    curl -w "HTTP_CODE=%{http_code}" -XPOST "http://logstash.default.svc.cluster.eskimo:28999/" -d "$REBUILD_ARGS" \
+    curl -w "HTTP_CODE=%{http_code}" -XPOST "http://logstash.eskimo.svc.cluster.eskimo:28999/" -d "$REBUILD_ARGS" \
         -o /tmp/call_result.log \
         >/tmp/call_out.log \
         2>/tmp/call_error.log
 else
-    curl -w "HTTP_CODE=%{http_code}" -H "stdin_file: $STDIN"  -XPOST "http://logstash.default.svc.cluster.eskimo:28999/" -d "$REBUILD_ARGS" \
+    curl -w "HTTP_CODE=%{http_code}" -H "stdin_file: $STDIN"  -XPOST "http://logstash.eskimo.svc.cluster.eskimo:28999/" -d "$REBUILD_ARGS" \
         -o /tmp/call_result.log \
         >/tmp/call_out.log \
         2>/tmp/call_error.log

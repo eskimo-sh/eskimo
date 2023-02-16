@@ -272,13 +272,13 @@ public class KubernetesServiceTest {
             if (script.startsWith("/usr/local/bin/kubectl get pod")) {
                 return "" +
                         "NAMESPACE              NAME                                         READY   STATUS    RESTARTS      AGE   IP              NODE            NOMINATED NODE   READINESS GATES\n" +
-                        "default                cerebro-65d5556459-fjwh9                     1/1     Running     1 (47m ago)   54m   192.168.10.11   192.168.10.11   <none>           <none>\n" +
-                        "default                kibana-65d55564519-fjwh8                     1/1     Error       1 (47m ago)   54m   192.168.10.11   192.168.10.11   <none>           <none>\n";
+                        "eskimo                 cerebro-65d5556459-fjwh9                     1/1     Running     1 (47m ago)   54m   192.168.10.11   192.168.10.11   <none>           <none>\n" +
+                        "eskimo                 kibana-65d55564519-fjwh8                     1/1     Error       1 (47m ago)   54m   192.168.10.11   192.168.10.11   <none>           <none>\n";
             } else if (script.startsWith("/usr/local/bin/kubectl get service")) {
                 return "" +
                         "NAMESPACE              NAME                        TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                  AGE   SELECTOR\n" +
-                        "default                cerebro                     ClusterIP   10.254.38.33     <none>        31900/TCP                13h   k8s-app=cerebro\n" +
-                        "default                kibana                      ClusterIP   10.254.41.25     <none>        32000/TCP                13h   k8s-app=kibana\n";
+                        "eskimo                 cerebro                     ClusterIP   10.254.38.33     <none>        31900/TCP                13h   k8s-app=cerebro\n" +
+                        "eskimo                 kibana                      ClusterIP   10.254.41.25     <none>        32000/TCP                13h   k8s-app=kibana\n";
             } else if (script.startsWith("/bin/ls -1")) {
                 return "" +
                         "cerebro\n" +

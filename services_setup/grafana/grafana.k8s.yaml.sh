@@ -44,7 +44,7 @@ metadata:
   labels:
     k8s-app: grafana
   name: grafana
-  namespace: default
+  namespace: eskimo
 spec:
   type: NodePort
   ports:
@@ -62,7 +62,7 @@ metadata:
   labels:
     k8s-app: grafana
   name: grafana
-  namespace: default
+  namespace: eskimo
 spec:
   replicas: 1
   revisionHistoryLimit: 10
@@ -71,6 +71,7 @@ spec:
       k8s-app: grafana
   template:
     metadata:
+      namespace: eskimo
       labels:
         k8s-app: grafana
     spec:

@@ -58,7 +58,7 @@ sed -i -n '1h;1!H;${;g;s/'\
 '          \"value\": \"localhost\",'\
 '/'\
 '          \"name\": \"elasticsearch.host\",\n'\
-'          \"value\": \"elasticsearch.default.svc.cluster.eskimo\",'\
+'          \"value\": \"elasticsearch.eskimo.svc.cluster.eskimo\",'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
 sed -i -n '1h;1!H;${;g;s/'\
@@ -74,7 +74,7 @@ sed -i -n '1h;1!H;${;g;s/'\
 '          \"value\": \"\",'\
 '/'\
 '          \"name\": \"flink.execution.remote.host\",\n'\
-'          \"value\": \"flink-runtime-rest.default.svc.cluster.eskimo\",'\
+'          \"value\": \"flink-runtime-rest.eskimo.svc.cluster.eskimo\",'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
 

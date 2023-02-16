@@ -44,7 +44,7 @@ metadata:
   labels:
     k8s-app: cerebro
   name: cerebro
-  namespace: default
+  namespace: eskimo
 spec:
   ports:
     - port: 31900
@@ -60,7 +60,7 @@ metadata:
   labels:
     k8s-app: cerebro
   name: cerebro
-  namespace: default
+  namespace: eskimo
 spec:
   replicas: 1
   revisionHistoryLimit: 10
@@ -71,6 +71,7 @@ spec:
     metadata:
       labels:
         k8s-app: cerebro
+      namespace: eskimo
     spec:
       #securityContext:
       #  seccompProfile:

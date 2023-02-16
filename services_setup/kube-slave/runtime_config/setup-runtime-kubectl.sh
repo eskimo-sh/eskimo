@@ -43,8 +43,15 @@ kubectl config set-context eskimo \
   --user=$ADMIN_USER \
   --kubeconfig=temp.kubeconfig
 
-echo " - Set the context eskimo as default context"
-kubectl config use-context eskimo --kubeconfig=temp.kubeconfig
+echo "   + Set the context eskimo as default context"
+kubectl config use-context eskimo \
+  --kubeconfig=temp.kubeconfig
+
+echo "   + Set default namespace eskimo"
+kubectl config set-context \
+  --current \
+  --namespace=eskimo \
+  --kubeconfig=temp.kubeconfig
 
 echo "   + removing previous configuration"
 rm -f /home/$ADMIN_USER/.kube/config

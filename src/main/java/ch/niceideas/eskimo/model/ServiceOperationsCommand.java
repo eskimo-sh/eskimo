@@ -309,13 +309,16 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
 
     @RequiredArgsConstructor
     public enum ServiceOperation implements Operation {
-        CHECK_INSTALL("Check / Install"),
-        INSTALLATION("installation"),
-        UNINSTALLATION ("uninstallation"),
-        RESTART ("restart");
+        CHECK_INSTALL("Check / Install", 10),
+        INSTALLATION("installation", 11),
+        UNINSTALLATION ("uninstallation", 12),
+        RESTART ("restart", 13);
 
         @Getter
         private final String type;
+
+        @Getter
+        private final int ordinal;
 
         @Override
         public String toString () {

@@ -334,7 +334,7 @@ https://www.elastic.co/products/elasticsearch
 ElasticSearch is deployed as a Kubernetes StatefulSet in such a way that Kubernetes schedules an ElasticSearch instance
 on every Eskimo cluster node.
 
-Elasticsearch instances are available using the DNS hostname `elasticsearch.default.svc.cluster.eskimo` both within
+Elasticsearch instances are available using the DNS hostname `elasticsearch.eskimo.svc.cluster.eskimo` both within
 containers (PODs) running through Kubernetes and within containers running natively on nodes. +
 Individual ES instances have specific names but the hostname above enables to reach anyone of them in a random fashion
 (high availability),
@@ -397,7 +397,7 @@ https://kafka.apache.org/
 Kafka is deployed as a Kubernetes StatefulSet in such a way that Kubernetes schedules an Kafka instance
 on every Eskimo cluster node.
 
-Kafka instances are available using the DNS hostname `kafka.default.svc.cluster.eskimo` both within
+Kafka instances are available using the DNS hostname `kafka.eskimo.svc.cluster.eskimo` both within
 containers (PODs) running through Kubernetes and within containers running natively on nodes. +
 Individual Kafka instances have specific names but the hostname above enables to reach anyone of them in a random
 fashion (high availability),
@@ -485,7 +485,7 @@ Flink distributions. It is intended to be installed on nodes where operators, ad
 interact with flink.
 
 The _remote host_ to use in flink command line tools to reach flink deployed on Kubernetes with Eskimo is
-`flink-runtime-rest.default.svc.cluster.eskimo` and the port is `8081`.
+`flink-runtime-rest.eskimo.svc.cluster.eskimo` and the port is `8081`.
 
 ==== Gluster shares for Flink
 

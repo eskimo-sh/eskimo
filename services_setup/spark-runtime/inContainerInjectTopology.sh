@@ -60,7 +60,7 @@ bash -c "echo -e \"spark.master=k8s://https://${KUBERNETES_API_MASTER}:6443\"  >
 #if [[ `cat /etc/eskimo_topology.sh | grep ELASTICSEARCH` != "" ]]; then
     bash -c "echo -e \"\n#ElasticSearch setting (first node to be reached => can use localhost everywhere)\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
     #sudo bash -c "echo -e \"spark.es.nodes=localhost\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
-    bash -c "echo -e \"spark.es.nodes=elasticsearch.default.svc.cluster.eskimo\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+    bash -c "echo -e \"spark.es.nodes=elasticsearch.eskimo.svc.cluster.eskimo\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
     bash -c "echo -e \"spark.es.port=9200\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
     #sudo bash -c "echo -e \"spark.es.nodes.data.only=false\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 #fi

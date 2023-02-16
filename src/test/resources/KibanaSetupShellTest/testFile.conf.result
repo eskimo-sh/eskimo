@@ -8,6 +8,6 @@ logging.dest: /var/log/elasticsearch/kibana/kibana.log
 
 server.basePath: "/kibana"
 
-elasticsearch.url: "http://elasticsearch.default.svc.cluster.eskimo:9200"
+elasticsearch.url: "http://elasticsearch.eskimo.svc.cluster.eskimo:9200"
 
-elasticsearch.hosts: ["http://elasticsearch.default.svc.cluster.eskimo:9200"]
+elasticsearch.hosts: ["http://elasticsearch.eskimo.svc.cluster.eskimo:9200"]

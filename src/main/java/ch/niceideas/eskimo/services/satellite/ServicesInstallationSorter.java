@@ -89,32 +89,7 @@ public class ServicesInstallationSorter {
         for (ServiceDefinition serviceDef : services) {
             List<T> operationForService = groupedOperations.get(serviceDef.toService());
             if (operationForService != null) {
-                operationForService.sort((o1, o2) -> {
-                    // Unfortunately I can't compare Operations among themselves directly
-                    if (o1.getOperation().getType().equals(ServiceOperationsCommand.ServiceOperation.INSTALLATION.getType())) {
-                        if (o2.getOperation().getType().equals(ServiceOperationsCommand.ServiceOperation.INSTALLATION.getType())) {
-                            return 0;
-                        } else {
-                            return -1;
-                        }
-                    }
-
-                    if (o1.getOperation().getType().equals(ServiceOperationsCommand.ServiceOperation.UNINSTALLATION.getType())) {
-                        if (o2.getOperation().getType().equals(ServiceOperationsCommand.ServiceOperation.INSTALLATION.getType())) {
-                            return 1;
-                        } else if (o2.getOperation().getType().equals(ServiceOperationsCommand.ServiceOperation.UNINSTALLATION.getType())) {
-                            return 0;
-                        } else {
-                            return -1;
-                        }
-                    }
-
-                    if (o2.getOperation().getType().equals(ServiceOperationsCommand.ServiceOperation.RESTART.getType())) {
-                        return 0;
-                    } else {
-                        return 1;
-                    }
-                });
+                operationForService.sort(Comparator.comparingInt(o -> o.getOperation().getOrdinal()));
             }
         }
 

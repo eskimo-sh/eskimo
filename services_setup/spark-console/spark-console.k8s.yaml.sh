@@ -44,7 +44,7 @@ metadata:
   labels:
     k8s-app: spark-console
   name: spark-console
-  namespace: default
+  namespace: eskimo
 spec:
   ports:
     - port: 31810
@@ -60,7 +60,7 @@ metadata:
   labels:
     k8s-app: spark-console
   name: spark-console-node
-  namespace: default
+  namespace: eskimo
 spec:
   type: NodePort
   ports:
@@ -78,7 +78,7 @@ metadata:
   labels:
     k8s-app: spark-console
   name: spark-console
-  namespace: default
+  namespace: eskimo
 spec:
   replicas: 1
   revisionHistoryLimit: 10
@@ -87,6 +87,7 @@ spec:
       k8s-app: spark-console
   template:
     metadata:
+      namespace: eskimo
       labels:
         k8s-app: spark-console
     spec:

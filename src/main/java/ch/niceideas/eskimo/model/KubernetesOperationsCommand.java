@@ -204,12 +204,15 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
 
     @RequiredArgsConstructor
     public enum KuberneteOperation implements Operation {
-        INSTALLATION(ServiceOperationsCommand.ServiceOperation.INSTALLATION.getType()),
-        UNINSTALLATION (ServiceOperationsCommand.ServiceOperation.UNINSTALLATION.getType()),
-        RESTART (ServiceOperationsCommand.ServiceOperation.RESTART.getType());
+        INSTALLATION(ServiceOperationsCommand.ServiceOperation.INSTALLATION.getType(), 21),
+        UNINSTALLATION (ServiceOperationsCommand.ServiceOperation.UNINSTALLATION.getType(), 22),
+        RESTART (ServiceOperationsCommand.ServiceOperation.RESTART.getType(), 23);
 
         @Getter
         private final String type;
+
+        @Getter
+        private final int ordinal;
 
         @Override
         public String toString () {

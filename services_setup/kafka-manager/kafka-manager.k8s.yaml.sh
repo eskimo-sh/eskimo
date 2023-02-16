@@ -44,7 +44,7 @@ metadata:
   labels:
     k8s-app: kafka-manager
   name: kafka-manager
-  namespace: default
+  namespace: eskimo
 spec:
   ports:
     - port: 31220
@@ -60,7 +60,7 @@ metadata:
   labels:
     k8s-app: kafka-manager
   name: kafka-manager
-  namespace: default
+  namespace: eskimo
 spec:
   replicas: 1
   revisionHistoryLimit: 10
@@ -69,6 +69,7 @@ spec:
       k8s-app: kafka-manager
   template:
     metadata:
+      namespace: eskimo
       labels:
         k8s-app: kafka-manager
     spec:

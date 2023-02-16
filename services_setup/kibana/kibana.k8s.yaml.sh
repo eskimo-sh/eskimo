@@ -44,7 +44,7 @@ metadata:
   labels:
     k8s-app: kibana
   name: kibana
-  namespace: default
+  namespace: eskimo
 spec:
   ports:
     - port: 31561
@@ -58,9 +58,9 @@ kind: Service
 apiVersion: v1
 metadata:
   labels:
-    k8s-app: kibana
+    k8s-app: eskimo
   name: kibana-node
-  namespace: default
+  namespace: eskimo
 spec:
   type: NodePort
   ports:
@@ -78,7 +78,7 @@ metadata:
   labels:
     k8s-app: kibana
   name: kibana
-  namespace: default
+  namespace: eskimo
 spec:
   replicas: 1
   revisionHistoryLimit: 10
@@ -87,6 +87,7 @@ spec:
       k8s-app: kibana
   template:
     metadata:
+      namespace: eskimo
       labels:
         k8s-app: kibana
     spec:

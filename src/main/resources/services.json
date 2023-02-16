@@ -468,7 +468,7 @@
       {
         "id" : "kubeDashboardLoginToken",
         "service": "kube-master",
-        "command": "/usr/local/bin/kubectl get secret eskimo-secret -o go-template=\"{{.data.token | base64decode}}\""
+        "command": "/usr/local/bin/kubectl -n eskimo create token eskimo"
       }
     ],
     "ui": {
@@ -779,7 +779,7 @@
     "ui": {
       "kubeProxy": true,
       "__comment_urlTemplate": "Going through Kubectl proxy.",
-      "urlTemplate": "kafka-manager/api/v1/namespaces/default/services/kafka-manager:31220/proxy/",
+      "urlTemplate": "kafka-manager/api/v1/namespaces/eskimo/services/kafka-manager:31220/proxy/",
       "__comment_proxyTargetPort": "Kubectl proxy target port",
       "proxyTargetPort" : 8001,
       "waitTime": 6000,
@@ -1069,7 +1069,7 @@
     "ui": {
       "kubeProxy": true,
       "__comment_urlTemplate": "Going through Kubectl proxy.",
-      "urlTemplate": "flink-runtime/api/v1/namespaces/default/services/flink-runtime-rest:8081/proxy/#/overview",
+      "urlTemplate": "flink-runtime/api/v1/namespaces/eskimo/services/flink-runtime-rest:8081/proxy/#/overview",
       "__comment_proxyTargetPort": "Kubectl proxy target port",
       "proxyTargetPort" : 8001,
       "waitTime": 5000,
@@ -1319,7 +1319,7 @@
     "ui": {
       "kubeProxy": true,
       "__comment_urlTemplate": "Going through Kubectl proxy.",
-      "urlTemplate": "cerebro/api/v1/namespaces/default/services/cerebro:31900/proxy/#!/overview?host=Eskimo",
+      "urlTemplate": "cerebro/api/v1/namespaces/eskimo/services/cerebro:31900/proxy/#!/overview?host=Eskimo",
       "__comment_proxyTargetPort": "Kubectl proxy target port",
       "proxyTargetPort" : 8001,
       "waitTime": 5000,
@@ -1577,7 +1577,7 @@
     "ui": {
       "kubeProxy": true,
       "__comment_urlTemplate": "Going through Kubectl proxy.",
-      "urlTemplate": "zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/",
+      "urlTemplate": "zeppelin/api/v1/namespaces/eskimo/services/zeppelin:31008/proxy/",
       "__comment_proxyTargetPort": "Kubectl proxy target port",
       "proxyTargetPort" : 8001,
       "waitTime": 8000,

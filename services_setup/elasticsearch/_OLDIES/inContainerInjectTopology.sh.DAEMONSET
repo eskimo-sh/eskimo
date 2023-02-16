@@ -83,9 +83,9 @@ echo " - Adapting configuration in file elasticsearch.yml - enabling discovery o
 #export ES_MASTERS=""
 #for i in `seq 0 $(($ESKIMO_NODE_COUNT-1))`; do
 #    if [[ "$ES_MASTERS" == "" ]]; then
-#        export ES_MASTERS="\"elasticsearch-$i.es.default.svc.cluster.local\""
+#        export ES_MASTERS="\"elasticsearch-$i.es.eskimo.svc.cluster.local\""
 #    else
-#        export ES_MASTERS="$ES_MASTERS, \"elasticsearch-$i.es.default.svc.cluster.local\""
+#        export ES_MASTERS="$ES_MASTERS, \"elasticsearch-$i.es.eskimo.svc.cluster.local\""
 #    fi
 #done
 

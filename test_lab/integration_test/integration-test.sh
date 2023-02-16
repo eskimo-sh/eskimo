@@ -127,7 +127,7 @@ restart_zeppelin_spark_interpreter() {
         -H 'Content-Type: application/json' \
         -m 3600 \
         -XPUT \
-        http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/interpreter/setting/restart/spark \
+        http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/eskimo/services/zeppelin:31008/proxy/api/interpreter/setting/restart/spark \
         -d "$data" \
         > eskimo-zeppelin-admin_call \
         2> eskimo-zeppelin-call-error
@@ -926,7 +926,7 @@ query_zeppelin_notebook () {
     curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook \
+            -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/eskimo/services/zeppelin:31008/proxy/api/notebook \
             2> /dev/null |
             jq -r " .body | .[] | select (.path == \"$nb_path\") | .id"
 }
@@ -938,12 +938,12 @@ run_all_zeppelin_pararaphs () {
     for i in $(curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
+            -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/eskimo/services/zeppelin:31008/proxy/api/notebook/$nb_id \
             2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '); do
 
         echo_date "  + running $i"
         call_eskimo \
-            "zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/run/$nb_id/$i"
+            "zeppelin/api/v1/namespaces/eskimo/services/zeppelin:31008/proxy/api/notebook/run/$nb_id/$i"
 
     done
 }
@@ -953,7 +953,7 @@ clear_zeppelin_results () {
     nb_id=$(query_zeppelin_notebook "$nb_path")
 
     call_eskimo \
-        "zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id/clear" \
+        "zeppelin/api/v1/namespaces/eskimo/services/zeppelin:31008/proxy/api/notebook/$nb_id/clear" \
         "" \
         "PUT"
 }
@@ -968,7 +968,7 @@ run_zeppelin_pararaph () {
     for i in $(curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
+            -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/eskimo/services/zeppelin:31008/proxy/api/notebook/$nb_id \
             2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '); do
 
         cnt=$((cnt + 1))
@@ -976,7 +976,7 @@ run_zeppelin_pararaph () {
         if [[ $cnt == $par_nbr ]]; then
             echo_date "  + running $i"
             call_eskimo \
-                "zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/run/$nb_id/$i" "$params"
+                "zeppelin/api/v1/namespaces/eskimo/services/zeppelin:31008/proxy/api/notebook/run/$nb_id/$i" "$params"
             break
         fi
     done
@@ -991,7 +991,7 @@ get_zeppelin_paragraph_status () {
     for i in $(curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
+            -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/eskimo/services/zeppelin:31008/proxy/api/notebook/$nb_id \
             2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '); do
 
         cnt=$((cnt + 1))
@@ -1001,7 +1001,7 @@ get_zeppelin_paragraph_status () {
             curl \
                 -b $SCRIPT_DIR/cookies \
                 -H 'Content-Type: application/json' \
-                -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
+                -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/eskimo/services/zeppelin:31008/proxy/api/notebook/$nb_id \
                 2> /dev/null | jq -r " .body | .paragraphs | .[] | select(.id==\"$i\") | .status "
 
             break
@@ -1018,7 +1018,7 @@ start_zeppelin_pararaph () {
     for i in $(curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
+            -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/eskimo/services/zeppelin:31008/proxy/api/notebook/$nb_id \
             2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '); do
 
         cnt=$((cnt + 1))
@@ -1026,7 +1026,7 @@ start_zeppelin_pararaph () {
         if [[ $cnt == $par_nbr ]]; then
             echo_date "  + running $i"
             call_eskimo \
-                "zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/job/$nb_id/$i"
+                "zeppelin/api/v1/namespaces/eskimo/services/zeppelin:31008/proxy/api/notebook/job/$nb_id/$i"
             break
         fi
     done
@@ -1041,7 +1041,7 @@ stop_zeppelin_pararaph () {
     for i in $(curl \
             -b $SCRIPT_DIR/cookies \
             -H 'Content-Type: application/json' \
-            -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/$nb_id \
+            -XGET http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/eskimo/services/zeppelin:31008/proxy/api/notebook/$nb_id \
             2> /dev/null | jq -r ' .body | .paragraphs | .[] | .id '); do
 
         cnt=$((cnt + 1))
@@ -1052,7 +1052,7 @@ stop_zeppelin_pararaph () {
             curl \
                     -b $SCRIPT_DIR/cookies \
                     -H 'Content-Type: application/json' \
-                    -XDELETE http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/default/services/zeppelin:31008/proxy/api/notebook/job/$nb_id/$i \
+                    -XDELETE http://$ESKIMO_ROOT/zeppelin/api/v1/namespaces/eskimo/services/zeppelin:31008/proxy/api/notebook/job/$nb_id/$i \
                     >> /tmp/integration-test.log 2>&1
 
 
@@ -1155,7 +1155,7 @@ run_zeppelin_spark_kafka() {
     echo_date " - ZEPPELIN spark Kafka demo - Now expecting some result on kafka topic berka-payments-aggregate"
     sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
             vagrant@$BOX_IP \
-            "sudo su -c '/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.default.svc.cluster.eskimo:9092 --topic berka-payments-aggregate --timeout-ms 150000 --max-messages 100' eskimo" \
+            "sudo su -c '/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.eskimo.svc.cluster.eskimo:9092 --topic berka-payments-aggregate --timeout-ms 150000 --max-messages 100' eskimo" \
             > kafka-berka-payments-aggregate-results 2> /dev/null
 
     if [[ $(wc -l kafka-berka-payments-aggregate-results | cut -d ' ' -f 1) -lt 100 ]]; then
@@ -1273,7 +1273,7 @@ run_zeppelin_kafka_streams() {
     echo_date " - ZEPPELIN Kafka Streams demo - Checking results"
     sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
             vagrant@$BOX_IP \
-            "sudo su -c '/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.default.svc.cluster.eskimo:9092 --topic streams-wordcount-output --timeout-ms 20000 --from-beginning --max-messages 100' eskimo" \
+            "sudo su -c '/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.eskimo.svc.cluster.eskimo:9092 --topic streams-wordcount-output --timeout-ms 20000 --from-beginning --max-messages 100' eskimo" \
             > streams-wordcount-output-results 2> /dev/null
 
     if [[ $(wc -l streams-wordcount-output-results | cut -d ' ' -f 1) -lt 4 ]]; then
@@ -1317,7 +1317,7 @@ run_zeppelin_flink_kafka() {
     echo_date " - ZEPPELIN flink Kafka demo - Now expecting some result on kafka topic berka-payments-aggregate"
     sshpass -p vagrant ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" \
             vagrant@$BOX_IP \
-            "sudo su -c '/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.default.svc.cluster.eskimo:9092 --topic berka-payments-aggregate --timeout-ms 150000 --max-messages 100' eskimo" \
+            "sudo su -c '/usr/local/bin/kafka-console-consumer.sh --bootstrap-server kafka.eskimo.svc.cluster.eskimo:9092 --topic berka-payments-aggregate --timeout-ms 150000 --max-messages 100' eskimo" \
             > kafka-berka-payments-aggregate-results 2> /dev/null
 
     if [[ $(wc -l kafka-berka-payments-aggregate-results | cut -d ' ' -f 1) -lt 100 ]]; then
@@ -1442,7 +1442,7 @@ do_cleanup() {
 
     #echo_date "   + Delete berka-trans"
     echo_date " - Delete berka index berka-trans"
-    vagrant ssh -c "sudo su -c '/usr/local/bin/eskimo-kube-exec curl -XDELETE http://elasticsearch.default.svc.cluster.eskimo:9200/berka-trans' eskimo" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
+    vagrant ssh -c "sudo su -c '/usr/local/bin/eskimo-kube-exec curl -XDELETE http://elasticsearch.eskimo.svc.cluster.eskimo:9200/berka-trans' eskimo" $TARGET_MASTER_VM >> /tmp/integration-test.log 2>&1
 
 }
 
@@ -1674,7 +1674,7 @@ filter {
 }
 output {
    elasticsearch {
-     hosts => "http://elasticsearch.default.svc.cluster.eskimo:9200"
+     hosts => "http://elasticsearch.eskimo.svc.cluster.eskimo:9200"
      index => "demo-csv"
   }
 stdout {}
@@ -1711,7 +1711,7 @@ test_web_apps() {
     fi
 
     echo_date "   + testing cerebro"
-    if [[ $(query_eskimo "cerebro/api/v1/namespaces/default/services/cerebro:31900/proxy/" | grep 'ng-app="cerebro"') == "" ]]; then
+    if [[ $(query_eskimo "cerebro/api/v1/namespaces/eskimo/services/cerebro:31900/proxy/" | grep 'ng-app="cerebro"') == "" ]]; then
         echo_date "Couldn't reach Cerebro"
         exit 102
     fi
@@ -1745,7 +1745,7 @@ test_web_apps() {
     #fi
 
     echo_date "   + testing kafka-manager"
-    if [[ $(query_eskimo "kafka-manager/api/v1/namespaces/default/services/kafka-manager:31220/proxy/" | grep "clusters/Eskimo") == "" ]]; then
+    if [[ $(query_eskimo "kafka-manager/api/v1/namespaces/eskimo/services/kafka-manager:31220/proxy/" | grep "clusters/Eskimo") == "" ]]; then
         echo_date "Couldn't reach Kafka-Manager"
         exit 106
     fi

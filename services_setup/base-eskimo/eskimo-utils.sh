@@ -495,10 +495,5 @@ function get_last_tag() {
         fi
     fi
 
-    if [[ $last == 0 ]]; then
-        echo "Couldn't find any tag for $IMAGE"
-        exit 1
-    fi
-
     echo $last
 }

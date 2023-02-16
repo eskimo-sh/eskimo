@@ -45,9 +45,9 @@ echo " - Adapting configuration in file elasticsearch.yml"
 # in node.name and the same that is declared in cluster.initial_master_nodes ...
 # And the problem is that I only know the master as it is IP address
 #sed -i s/"#node.name: node-1"/"node.name: $SELF_IP_ADDRESS"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
-sed -i s/"#node.name: node-1"/"node.name: $ESKIMO_NODE_NAME.elasticsearch.default.svc.cluster.eskimo"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
+sed -i s/"#node.name: node-1"/"node.name: $ESKIMO_NODE_NAME.elasticsearch.eskimo.svc.cluster.eskimo"/g /usr/local/lib/elasticsearch/config/elasticsearch.yml
 
-echo "   + Using node.name=$ESKIMO_NODE_NAME.elasticsearch.default.svc.cluster.eskimo"
+echo "   + Using node.name=$ESKIMO_NODE_NAME.elasticsearch.eskimo.svc.cluster.eskimo"
 
 
 #echo " - Building reference list of masters"
@@ -83,9 +83,9 @@ export number_of_es_nodes=$ESKIMO_NODE_COUNT
 export ES_MASTERS=""
 for i in $(seq 0 $(($ESKIMO_NODE_COUNT-1))); do
     if [[ "$ES_MASTERS" == "" ]]; then
-        export ES_MASTERS="\"elasticsearch-$i.elasticsearch.default.svc.cluster.eskimo\""
+        export ES_MASTERS="\"elasticsearch-$i.elasticsearch.eskimo.svc.cluster.eskimo\""
     else
-        export ES_MASTERS="$ES_MASTERS, \"elasticsearch-$i.elasticsearch.default.svc.cluster.eskimo\""
+        export ES_MASTERS="$ES_MASTERS, \"elasticsearch-$i.elasticsearch.eskimo.svc.cluster.eskimo\""
     fi
 done
 

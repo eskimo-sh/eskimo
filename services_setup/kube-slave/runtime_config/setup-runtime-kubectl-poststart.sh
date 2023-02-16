@@ -78,6 +78,11 @@ fi
 # Making /root/.kube/config available
 export HOME=/root
 
+if [[ $(kubectl get namespace | grep eskimo) == "" ]]; then
+    echo "   + Creating namespace eskimo"
+    kubectl create namespace eskimo
+    sleep 2
+fi
 
 # Not recreating systematically  on slave
 if [[ $(kubectl get serviceaccount | grep $ADMIN_USER) == "" ]]; then

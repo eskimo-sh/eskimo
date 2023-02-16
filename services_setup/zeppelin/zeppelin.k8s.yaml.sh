@@ -44,7 +44,7 @@ metadata:
   labels:
     k8s-app: zeppelin
   name: zeppelin
-  namespace: default
+  namespace: eskimo
 spec:
   ports:
     - name: httpzeppelin1
@@ -64,7 +64,7 @@ metadata:
   labels:
     k8s-app: zeppelin
   name: zeppelin
-  namespace: default
+  namespace: eskimo
 spec:
   replicas: 1
   revisionHistoryLimit: 10
@@ -73,6 +73,7 @@ spec:
       k8s-app: zeppelin
   template:
     metadata:
+      namespace: eskimo
       labels:
         k8s-app: zeppelin
     spec:

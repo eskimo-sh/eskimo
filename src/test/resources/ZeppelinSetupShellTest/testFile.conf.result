@@ -40,10 +40,10 @@ export SPARK_HOME=/usr/local/lib/spark/
           "value": "1200000",
 
           "name": "elasticsearch.host",
-          "value": "elasticsearch.default.svc.cluster.eskimo",
+          "value": "elasticsearch.eskimo.svc.cluster.eskimo",
 
           "name": "spark.master",
           "value": "k8s://https://192.168.10.11:6443",
 
           "name": "flink.execution.remote.host",
-          "value": "flink-runtime-rest.default.svc.cluster.eskimo",
+          "value": "flink-runtime-rest.eskimo.svc.cluster.eskimo",

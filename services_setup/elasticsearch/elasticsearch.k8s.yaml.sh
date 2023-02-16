@@ -42,7 +42,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: elasticsearch
-  namespace: default
+  namespace: eskimo
   labels:
     service: elasticsearch
 spec:
@@ -61,6 +61,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: es-var-lib-volume
+  namespace: eskimo
   labels:
     type: local
 spec:
@@ -87,6 +88,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: es-var-lib-claim
+  namespace: eskimo
 spec:
   storageClassName: es-local-storage
   accessModes:
@@ -101,7 +103,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: elasticsearch
-  namespace: default
+  namespace: eskimo
   labels:
     service: elasticsearch
 spec:

@@ -1,6 +1,6 @@
 
 {
-    host = "http://elasticsearch.default.svc.cluster.eskimo:9200"
+    host = "http://elasticsearch.eskimo.svc.cluster.eskimo:9200"
     name = "Eskimo"
     headers-whitelist = [ "x-proxy-user", "x-proxy-roles", "X-Forwarded-For" ]
  }

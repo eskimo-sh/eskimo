@@ -213,6 +213,7 @@ sudo bash -c "echo -e \"spark.kubernetes.file.upload.path=/var/lib/spark/data\" 
 sudo bash -c "echo -e \"spark.kubernetes.driver.podTemplateFile=/usr/local/lib/spark/conf/spark-pod-template.yaml\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.kubernetes.executor.podTemplateFile=/usr/local/lib/spark/conf/spark-pod-template.yaml\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.kubernetes.authenticate.driver.serviceAccountName=eskimo\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
+sudo bash -c "echo -e \"spark.kubernetes.namespace=eskimo\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 
 sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.eskimotopology.mount.path=/etc/eskimo_topology.sh\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"
 sudo bash -c "echo -e \"spark.kubernetes.executor.volumes.hostPath.eskimotopology.options.path=/etc/eskimo_topology.sh\"  >> /usr/local/lib/spark/conf/spark-defaults.conf"

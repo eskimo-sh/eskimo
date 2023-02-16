@@ -8,11 +8,11 @@ bootstrap.memory_lock: false
 
 network.host: 0.0.0.0
 
-discovery.zen.ping.unicast.hosts: ["elasticsearch-0.elasticsearch.default.svc.cluster.eskimo", "elasticsearch-1.elasticsearch.default.svc.cluster.eskimo"]
+discovery.zen.ping.unicast.hosts: ["elasticsearch-0.elasticsearch.eskimo.svc.cluster.eskimo", "elasticsearch-1.elasticsearch.eskimo.svc.cluster.eskimo"]
 
-discovery.seed_hosts: ["elasticsearch-0.elasticsearch.default.svc.cluster.eskimo", "elasticsearch-1.elasticsearch.default.svc.cluster.eskimo"]
+discovery.seed_hosts: ["elasticsearch-0.elasticsearch.eskimo.svc.cluster.eskimo", "elasticsearch-1.elasticsearch.eskimo.svc.cluster.eskimo"]
 
-cluster.initial_master_nodes: ["elasticsearch-0.elasticsearch.default.svc.cluster.eskimo", "elasticsearch-1.elasticsearch.default.svc.cluster.eskimo"]
+cluster.initial_master_nodes: ["elasticsearch-0.elasticsearch.eskimo.svc.cluster.eskimo", "elasticsearch-1.elasticsearch.eskimo.svc.cluster.eskimo"]
 
 discovery.zen.minimum_master_nodes: 1
 
