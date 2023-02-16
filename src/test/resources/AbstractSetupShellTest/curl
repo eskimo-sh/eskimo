@@ -1,0 +1,13 @@
+
+#/bin/bash
+
+echo "$@" >> .log_curl
+
+
+if [[ $1 == "-XGET" && $2 == "http://kubernetes.registry:5000/v2/cerebro/tags/list" ]]; then
+    echo '{"name":"cerebro","tags":["2"]}'
+fi
+
+if [[ $1 == "-XGET" && $2 == "http://kubernetes.registry:5000/v2/zeppelin/tags/list" ]]; then
+    echo '{"name":"zeppelin","tags":["3"]}'
+fi

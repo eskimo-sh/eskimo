@@ -37,8 +37,6 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.eskimo.types.Node;
 import com.trilead.ssh2.*;
-import com.trilead.ssh2.auth.AgentProxy;
-import com.trilead.ssh2.transport.ClientServerHello;
 import lombok.EqualsAndHashCode;
 
 import java.io.Closeable;
@@ -46,7 +44,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.security.SecureRandom;
 
 @EqualsAndHashCode
 public class SSHConnection implements Closeable {

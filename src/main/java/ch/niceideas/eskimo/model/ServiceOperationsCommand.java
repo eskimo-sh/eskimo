@@ -131,7 +131,6 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         changedServices.addAll (retCommand.getInstallations().stream().map(ServiceOperationId::getService).collect(Collectors.toList()));
         changedServices.addAll (retCommand.getUninstallations().stream().map(ServiceOperationId::getService).collect(Collectors.toList()));
 
-        //Set<String> restartedServices = new HashSet<>();
         changedServices.forEach(service -> servicesDefinition.getDependentServices(service).stream()
                 .filter(dependent -> {
                     ServiceDefinition masterServiceDef = servicesDefinition.getServiceDefinition(service);
@@ -173,8 +172,6 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
                 feedInRestartService(servicesDefinition, servicesInstallStatus, retCommand, node, installedService);
             }
         });
-
-        //feedInRestartService(servicesDefinition, servicesInstallStatus, retCommand, nodesConfig, (Set<String>) restartedServices);
 
         // XXX need to sort again since I am not relying on feedInRestartService which was taking care of sorting
         retCommand.getRestarts().sort((o1, o2) -> servicesDefinition.compareServices(o1.getService(), o2.getService()));

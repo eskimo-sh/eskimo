@@ -370,10 +370,8 @@ public class Topology {
     }
 
     private void handleMissingMasterInternal(ConfigurationOwner nodesConfig, Dependency dep, Node masterNode, String message) throws NodesConfigurationException {
-        if (masterNode == null) {
-            if (dep.isMandatory(nodesConfig)) {
-                throw new NodesConfigurationException(message);
-            }
+        if (masterNode == null && dep.isMandatory(nodesConfig)) {
+            throw new NodesConfigurationException(message);
         }
     }
 

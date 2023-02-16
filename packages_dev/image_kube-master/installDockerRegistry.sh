@@ -76,6 +76,8 @@ storage:
     blobdescriptor: inmemory
   filesystem:
     rootdirectory: /var/lib/docker_registry
+  delete:
+    enabled: true
 http:
   addr: :5000
   headers:
@@ -86,6 +88,22 @@ health:
     interval: 10s
     threshold: 3
 EOF
+
+
+echo " - Downloading regclient regctl-$REGCLIENT_VERSION "
+wget https://github.com/regclient/regclient/releases/download/v$REGCLIENT_VERSION/regctl-linux-amd64 > /tmp/docker_registry_install_log 2>&1
+if [[ $? != 0 ]]; then
+    echo " -> Failed to downolad regclient regctl-$REGCLIENT_VERSION from github. Trying to download from niceideas.ch"
+    wget http://niceideas.ch/mes/regclient-v$REGCLIENT_VERSION/regctl-linux-amd64  >> /tmp/docker_registry_install_log 2>&1
+    fail_if_error $? "/tmp/docker_registry_install_log" -1
+fi
+
+echo " - Installing regclient regctl"
+set -e
+mv regctl-linux-amd64 /usr/local/bin/
+ln -s /usr/local/bin/regctl-linux-amd64 /usr/local/bin/regctl
+chmod 755 /usr/local/bin/regctl-linux-amd64
+set +e
 
 
 echo " - Checking startup"

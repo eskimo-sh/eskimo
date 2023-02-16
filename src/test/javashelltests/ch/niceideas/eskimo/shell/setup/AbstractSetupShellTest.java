@@ -254,6 +254,7 @@ public abstract class AbstractSetupShellTest {
         createLoggingExecutable("gluster_call_remote.sh", tempFile.getAbsolutePath());
         createLoggingExecutable("kubectl", tempFile.getAbsolutePath());
         createLoggingExecutable("envsubst", tempFile.getAbsolutePath());
+        createLoggingExecutable("regctl", tempFile.getAbsolutePath());
 
         createDummyExecutable("id", tempFile.getAbsolutePath());
         createDummyExecutable("docker", tempFile.getAbsolutePath());
@@ -261,6 +262,7 @@ public abstract class AbstractSetupShellTest {
         createDummyExecutable("sudo", tempFile.getAbsolutePath());
         createDummyExecutable("pidof", tempFile.getAbsolutePath());
         createDummyExecutable("kubectl", tempFile.getAbsolutePath());
+        createDummyExecutable("curl", tempFile.getAbsolutePath());
 
         File var = new File (tempFile, "var");
         assertTrue (var.mkdirs());

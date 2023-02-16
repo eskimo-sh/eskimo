@@ -480,17 +480,24 @@ function get_last_tag() {
         fi
     done
 
-    if [[ $last == 0 ]]; then # try to get it drom registry
+    if [[ $last == 0 ]]; then # try to get it from registry
         TAGS=$(curl -XGET http://kubernetes.registry:5000/v2/$IMAGE/tags/list 2>/dev/null | jq -r -c  ".tags | .[]" 2>/dev/null)
         if [[ $? == 0 ]]; then
             for tag in $TAGS; do
                 if [[ $tag != "latest" ]]; then
-                    if [[ $(__vercomp $last $tag) == 2 ]]; then
+                    __vercomp $last $tag
+                    ret=$?
+                    if [[ $ret == 2 ]]; then
                         last=$tag
                     fi
                 fi
             done
         fi
+    fi
+
+    if [[ $last == 0 ]]; then
+        echo "Couldn't find any tag for $IMAGE"
+        exit 1
     fi
 
     echo $last

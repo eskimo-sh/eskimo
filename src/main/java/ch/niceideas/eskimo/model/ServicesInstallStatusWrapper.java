@@ -55,6 +55,8 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
     public static final String INSTALLED_ON_IP_FLAG = "_installed_on_IP_";
 
     private static final Logger logger = Logger.getLogger(ServicesInstallStatusWrapper.class);
+    public static final String RESTART_FLAG = "restart";
+    public static final String OK_FLAG = "OK";
 
     public ServicesInstallStatusWrapper(File statusFile) throws FileException {
         super(FileUtils.readFile(statusFile));
@@ -74,7 +76,7 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
 
     public boolean isServiceOK(Service service, Node node) {
         try {
-            return ("OK".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName())));
+            return (OK_FLAG.equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName())));
         } catch (JSONException e) {
             logger.error(e, e);
             return false;
@@ -84,8 +86,8 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
     public boolean isServiceInstalledAnywhere(Service service) {
         try {
             for (Node node : getNodesAndKubeFlags()) {
-                if ("OK".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName()))
-                        || "restart".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName()))) {
+                if (OK_FLAG.equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName()))
+                        || RESTART_FLAG.equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName()))) {
                     return true;
                 }
             }
@@ -98,8 +100,8 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
 
     public boolean isServiceInstalled(Service service, Node node) {
         try {
-            return ("OK".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName()))
-                 || "restart".equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName())));
+            return (OK_FLAG.equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName()))
+                 || RESTART_FLAG.equals(getValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName())));
         } catch (JSONException e) {
             logger.error(e, e);
             return false;
@@ -159,11 +161,11 @@ public class ServicesInstallStatusWrapper extends JsonWrapper implements Seriali
     }
 
     public void setInstallationFlagOK (Service service, Node node) {
-        setValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName(), "OK");
+        setInstallationFlag(service, node, OK_FLAG);
     }
 
     public void setInstallationFlagRestart (Service service, Node node) {
-        setValueForPath(service + INSTALLED_ON_IP_FLAG + node.getName(), "restart");
+        setInstallationFlag(service, node, RESTART_FLAG);
     }
 
     private void setInstallationFlag (Service service, Node node, String flag) {

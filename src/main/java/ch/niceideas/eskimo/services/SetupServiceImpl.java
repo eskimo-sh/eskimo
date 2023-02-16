@@ -83,6 +83,7 @@ public class SetupServiceImpl implements SetupService {
 
 
     private static final Pattern imageFileNamePattern = Pattern.compile("("+DOCKER_TEMPLATE_PREFIX+"|eskimo_)[a-zA-Z0-9\\-]+_([a-zA-Z0-9_\\.]+)_([0-9]+)\\.tar\\.gz");
+    public static final String NO_REMOTE_VERSION_ERROR = "Can't find remote version for ";
 
     @Autowired
     private NotificationService notificationService;
@@ -434,14 +435,14 @@ public class SetupServiceImpl implements SetupService {
                     String newDistributionVersion = (String) packagesVersion.getValueForPath(imageName + DOT_DISTRIBUTION);
 
                     if (StringUtils.isBlank(newSoftwareVersion)) {
-                        String msg = "Can't find remote version for " + imageName + " (Software Version is not found)";
+                        String msg = NO_REMOTE_VERSION_ERROR + imageName + " (Software Version is not found)";
                         notificationService.addError(msg);
                         logger.warn(msg);
                         continue;
                     }
 
                     if (StringUtils.isBlank(newDistributionVersion)) {
-                        String msg = "Can't find remote version for " + imageName + " (New distribution Version is not found)";
+                        String msg = NO_REMOTE_VERSION_ERROR + imageName + " (New distribution Version is not found)";
                         notificationService.addError(msg);
                         logger.warn(msg);
                         continue;
@@ -491,14 +492,14 @@ public class SetupServiceImpl implements SetupService {
         String softwareVersion = (String) packagesVersion.getValueForPath(packageName + DOT_SOFTWARE);
         String distributionVersion = (String) packagesVersion.getValueForPath(packageName + DOT_DISTRIBUTION);
         if (StringUtils.isBlank(softwareVersion)) {
-            String msg = "Can't find remote version for " + packageName + " (Software Version is not found)";
+            String msg = NO_REMOTE_VERSION_ERROR + packageName + " (Software Version is not found)";
             notificationService.addError(msg);
             logger.warn(msg);
             return null;
         }
 
         if (StringUtils.isBlank(distributionVersion)) {
-            String msg = "Can't find remote version for " + packageName + " (New distribution Version is not found)";
+            String msg = NO_REMOTE_VERSION_ERROR + packageName + " (New distribution Version is not found)";
             notificationService.addError(msg);
             logger.warn(msg);
             return null;

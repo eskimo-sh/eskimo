@@ -580,35 +580,21 @@ function __delete_registry_repository() {
     fi
     LAST_TAG=$2
 
+    if [[ $3 == "" ]]; then
+        echo "Log file path needs to be passed in argument"
+        exit 4
+    fi
+    export LOG_FILE=$3
+
     if [[ -d "/var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/$CONTAINER/" ]]; then
 
-        echo " - Deleting previous container image tag $LAST_TAG from registry"
+        echo "   + Deleting previous container image tag $LAST_TAG from registry"
+        docker exec k8s-registry /usr/local/bin/regctl tag delete kubernetes.registry:5000/$CONTAINER:$LAST_TAG >> $LOG_FILE 2>&1
+        fail_if_error $? "$LOG_FILE" 5
 
-        if [[ -d "/var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/$CONTAINER/_manifests/tags/$LAST_TAG/index/sha256/" ]]; then
-
-            local TAG_REF=$(ls -1 "/var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/$CONTAINER/_manifests/tags/$LAST_TAG/index/sha256/")
-            echo "   + Tag reference is $TAG_REF"
-
-            local layers=$(curl -XGET -H "Accept: application/vnd.docker.distribution.manifest.v2+json~" http://kubernetes.registry:5000/v2/$CONTAINER/manifests/$LAST_TAG  2>/dev/null \
-                    | /usr/local/bin/jq -r -c  ".fsLayers | .[] | .blobSum" \
-                    | cut -d ":" -f 2)
-
-            if [[ $layers != "" ]]; then
-                echo "   + Deleting layers and blobs"
-                for layer in $layers; do
-
-                    layer_index=${layer:0:2}
-
-                    sudo rm -Rf /var/lib/kubernetes/docker_registry/docker/registry/v2/blobs/sha256/$layer_index/$layer/
-
-                    sudo rm -Rf /var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/$CONTAINER/_layers/sha256/$layer
-                done
-            fi
-
-            echo "   + Deleting manifest"
-            sudo rm -Rf /var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/$CONTAINER/_manifests/revisions/sha256/$TAG_REF
-            sudo rm -Rf /var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/$CONTAINER/_manifests/tags/$LAST_TAG/
-        fi
+        echo "   + Garbage collecting layers"
+        docker exec k8s-registry docker-registry garbage-collect /etc/docker_registry/config.yml  >> $LOG_FILE 2>&1
+        fail_if_error $? "$LOG_FILE" 6
     fi
 }
 
@@ -682,7 +668,7 @@ function build_container() {
         docker image rm kubernetes.registry:5000/$CONTAINER:$LAST_TAG --force >> $LOG_FILE 2>&1
 
         echo " - Searching for previous image tag $LAST_TAG in registry to delete it (if appliable)"
-        __delete_registry_repository $CONTAINER $LAST_TAG
+        __delete_registry_repository $CONTAINER $LAST_TAG $LOG_FILE
     fi
 
     # build

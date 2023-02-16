@@ -136,7 +136,7 @@ public class LogstashCliWrappersTest extends AbstractSetupShellTest {
                         "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                         "-e NODE_NAME=testhost " +
                         "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                        "kubernetes.registry:5000/logstash:0 " +
+                        "kubernetes.registry:5000/logstash:2 " +
                             "/usr/local/bin/kube_do /usr/local/bin/logstash --path.config /tmp/import.json --path.data /var/lib/eskimo/data --path.logs /var/log/eskimo\n")
                 ||
                 dockerLogs.equals("image ls -a\n" +
@@ -155,7 +155,7 @@ public class LogstashCliWrappersTest extends AbstractSetupShellTest {
                         "--mount type=bind,source=/tmp/" + kubeNSFile + ",target=/tmp/" + kubeNSFile + " " +
                         "-e NODE_NAME=testhost " +
                         "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                        "kubernetes.registry:5000/logstash:0 " +
+                        "kubernetes.registry:5000/logstash:2 " +
                         "/usr/local/bin/kube_do /usr/local/bin/logstash --path.config /tmp/import.json --path.data /var/lib/eskimo/data --path.logs /var/log/eskimo\n"));
 
     }

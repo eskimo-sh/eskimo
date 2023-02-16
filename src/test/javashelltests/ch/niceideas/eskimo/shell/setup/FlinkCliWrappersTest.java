@@ -138,7 +138,7 @@ public class FlinkCliWrappersTest extends AbstractSetupShellTest {
                 "-v /etc/k8s:/etc/k8s:ro " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/flink:0 " +
+                "kubernetes.registry:5000/flink:2 " +
                     "/usr/local/bin/kube_do /usr/local/bin/sql-client.sh --jar /var/lib/eskimo/flink-demo.jar -l /var/cache/eskimo -pyFiles /usr/local/lib/python3.7/\n", dockerLogs);
     }
 
@@ -169,7 +169,7 @@ public class FlinkCliWrappersTest extends AbstractSetupShellTest {
                 "-v /etc/k8s:/etc/k8s:ro " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/flink:0 " +
+                "kubernetes.registry:5000/flink:2 " +
                     "/usr/local/bin/kube_do /usr/local/bin/pyflink-shell.sh remote flink.svc.cluster.eskimo 8080\n", dockerLogs);
     }
 
@@ -202,7 +202,7 @@ public class FlinkCliWrappersTest extends AbstractSetupShellTest {
                 "-v /etc/k8s:/etc/k8s:ro " +
                 "-e NODE_NAME=testhost " +
                 "-e ADDITONAL_HOSTS_FILE=/tmp/" + kubeNSFile + " " +
-                "kubernetes.registry:5000/flink:0 " +
+                "kubernetes.registry:5000/flink:2 " +
                     "/usr/local/bin/kube_do /usr/local/bin/flink --jarfile /var/lib/eskimo/flink-demo.jar -p /var/cache/eskimo --savepointPath /tmp ch.niceideas.eskmo-TestFlink\n", dockerLogs);
     }
 

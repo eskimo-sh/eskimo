@@ -57,6 +57,7 @@ public class SystemStatusParser {
      */
 
     static final Pattern pattern = Pattern.compile(" *Active: ([^\\( ]+) \\(([^\\(\\)]+)\\).*");
+    public static final String SERVICE_SUFFIX = ".service";
 
     private final Map<Service, String> serviceStatus = new HashMap<>();
 
@@ -72,15 +73,15 @@ public class SystemStatusParser {
             if (    (contentLines[i].startsWith("●")
                  || contentLines[i].startsWith("×")
                     || contentLines[i].startsWith("○"))
-                    && contentLines[i].contains(".service")) {
+                    && contentLines[i].contains(SERVICE_SUFFIX)) {
 
                 String foundService;
                 if (contentLines[i].contains("●")) {
-                    foundService = contentLines[i].substring(contentLines[i].indexOf('●') + 2, contentLines[i].indexOf(".service"));
+                    foundService = contentLines[i].substring(contentLines[i].indexOf('●') + 2, contentLines[i].indexOf(SERVICE_SUFFIX));
                 } else if (contentLines[i].contains("○")) {
-                    foundService = contentLines[i].substring(contentLines[i].indexOf('○') + 2, contentLines[i].indexOf(".service"));
+                    foundService = contentLines[i].substring(contentLines[i].indexOf('○') + 2, contentLines[i].indexOf(SERVICE_SUFFIX));
                 } else { // then it's obligatory '×'
-                    foundService = contentLines[i].substring(contentLines[i].indexOf('×') + 2, contentLines[i].indexOf(".service"));
+                    foundService = contentLines[i].substring(contentLines[i].indexOf('×') + 2, contentLines[i].indexOf(SERVICE_SUFFIX));
                 }
 
                 handleServiceFound (Service.from(foundService), i, contentLines);
@@ -123,6 +124,6 @@ public class SystemStatusParser {
     }
 
     public String getServiceStatus(Service service) {
-        return serviceStatus.computeIfAbsent(service, (key) -> "NA");
+        return serviceStatus.computeIfAbsent(service, key -> "NA");
     }
 }

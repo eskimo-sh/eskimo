@@ -74,21 +74,17 @@ fi
 
 echo " - Creating user kubernetes home directory"
 mkdir -p /home/kubernetes
-chown kubernetes /home/kubernetes
+chown -R kubernetes /home/kubernetes
 
 echo " - Updating kubernetes registry config"
-sudo sed -i s/"rootdirectory: \/var\/lib\/docker_registry"/"rootdirectory: \/var\/lib\/kubernetes\/docker_registry"/g /etc/docker_registry/config.yml
+sed -i s/"rootdirectory: \/var\/lib\/docker_registry"/"rootdirectory: \/var\/lib\/kubernetes\/docker_registry"/g /etc/docker_registry/config.yml
 #rootdirectory: /var/lib/docker_registry
 
-echo " - Enabling to delete reoositories"
-sudo sed -i -n '1h;1!H;${;g;s/'\
-'    rootdirectory: \/var\/lib\/kubernetes\/docker_registry'\
-'/'\
-'    rootdirectory: \/var\/lib\/kubernetes\/docker_registry\n'\
-'  delete:\n'\
-'    enabled: true'\
-'/g;p;}' /etc/docker_registry/config.yml
-
+echo " - disabling TLS for kubernetes.registry in regctl"
+# for user kubernetes
+regctl registry set --tls disabled kubernetes.registry:5000
+cp -R /root/.regctl /home/kubernetes/
+chown -R kubernetes /home/kubernetes/.regctl
 
 # Caution : the in container setup script must mandatorily finish with this log"
 echo "$IN_CONTAINER_CONFIG_SUCESS_MESSAGE"

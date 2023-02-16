@@ -3,6 +3,54 @@
 
 echo "$@" >> .log_docker
 
+if [[ $1 == "image" && $2 == "ls" && $3 == "-a" ]]; then
+    TEMP_FILE=$(mktemp)
+
+    cat > $TEMP_FILE <<EOF
+REPOSITORY                                              TAG       IMAGE ID       CREATED              SIZE
+kubernetes.registry:5000/logstash                       2         278c43d14a8f   28 seconds ago       945MB
+kubernetes.registry:5000/cerebro                        1         aad443706e85   About a minute ago   911MB
+kubernetes.registry:5000/kube-shell                     2         8e6c483aa88b   2 minutes ago        1.04GB
+kubernetes.registry:5000/grafana                        2         a26c7b9ab9d1   4 minutes ago        570MB
+kubernetes.registry:5000/kibana                         1         107dd375cde2   5 minutes ago        780MB
+kubernetes.registry:5000/elasticsearch                  3         6907889ffcaa   8 minutes ago        1.38GB
+kubernetes.registry:5000/kafka-manager                  1         e6b9571f4251   13 minutes ago       1.01GB
+kubernetes.registry:5000/kafka                          1         6ca1302a1a99   16 minutes ago       995MB
+kubernetes.registry:5000/flink-runtime                  2         8484a7432341   47 seconds ago      3.27GB
+kubernetes.registry:5000/flink                          2         bb4a0c27277f   47 seconds ago      3.27GB
+kubernetes.registry:5000/spark                          2         061865df6847   8 minutes ago       1.37GB
+kubernetes.registry:5000/spark-runtime                  2         095d5df0d302   8 minutes ago       1.37GB
+<none>                                                  <none>    4d07e6e5baf3   19 minutes ago       945MB
+<none>                                                  <none>    bdf50c6a35d1   21 minutes ago       911MB
+<none>                                                  <none>    698e59960e83   28 minutes ago       780MB
+<none>                                                  <none>    2793ce29ef54   30 minutes ago       1.38GB
+eskimo/k8s-registry                                     1         c35df19f0e06   About an hour ago    876MB
+eskimo/gluster                                          1         2cd3483c5a9a   About an hour ago    987MB
+eskimo/prometheus                                       1         2ccb468e37be   About an hour ago    886MB
+eskimo/zookeeper                                        1         4a4370de14bc   About an hour ago    441MB
+eskimo/ntp                                              1         d58390e94ca1   About an hour ago    267MB
+<none>                                                  <none>    a8b12fd88872   3 hours ago          875MB
+<none>                                                  <none>    5a6b4c62941b   2 days ago           1.01GB
+<none>                                                  <none>    42a604e39e20   2 days ago           994MB
+<none>                                                  <none>    a8571cde69b0   2 days ago           779MB
+<none>                                                  <none>    d8db87a108d2   2 days ago           910MB
+<none>                                                  <none>    814a1b22790d   2 days ago           944MB
+<none>                                                  <none>    5c66997dff37   2 days ago           1.38GB
+<none>                                                  <none>    d261a8473eb5   2 days ago           568MB
+<none>                                                  <none>    1a96d5d175aa   2 days ago           886MB
+<none>                                                  <none>    119412c32581   2 days ago           1.04GB
+<none>                                                  <none>    9876714b79f7   2 days ago           987MB
+<none>                                                  <none>    cd6028e1048d   2 days ago           441MB
+<none>                                                  <none>    f3679162dd1b   2 days ago           267MB
+kubernetes.registry:5000/coredns/coredns                latest    0ad7f9e4a77d   5 months ago         50.2MB
+kubernetes.registry:5000/kubernetesui/dashboard         latest    07655ddf2eeb   5 months ago         246MB
+kubernetes.registry:5000/kubernetesui/metrics-scraper   latest    115053965e86   8 months ago         43.8MB
+kubernetes.registry:5000/k8s.gcr.io/pause               latest    6270bb605e12   17 months ago        683kB
+EOF
+    cat $TEMP_FILE
+    rm -Rf $TEMP_FILE
+fi
+
 
 if [[ $1 == "exec" && $3 == "bash" ]]; then
     if [[ `echo $4 | grep inContainerSetup` != "" ]]; then
