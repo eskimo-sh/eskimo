@@ -201,7 +201,7 @@ public class ServicesDefinitionTest {
                         "#Kubernetes Topology\n",
                 topology.getTopologyScriptForNode(nodesConfig,
                         new KubernetesServicesConfigWrapper(jsonKubernetesConfig),
-                        StandardSetupHelpers.getStandard2NodesTestInstallStatus(), servicesDefinition, emptyModel, 1));
+                        StandardSetupHelpers.getStandard2NodesInstallStatus(), servicesDefinition, emptyModel, 1));
     }
 
     @Test
@@ -269,7 +269,7 @@ public class ServicesDefinitionTest {
                         "#Kubernetes Topology\n",
                 topology.getTopologyScriptForNode(nodesConfig,
                         new KubernetesServicesConfigWrapper (jsonKubernetesConfig),
-                        StandardSetupHelpers.getStandard2NodesTestInstallStatus(), servicesDefinition, emptyModel, 1));
+                        StandardSetupHelpers.getStandard2NodesInstallStatus(), servicesDefinition, emptyModel, 1));
     }
 
     @Test

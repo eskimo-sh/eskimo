@@ -3,13 +3,13 @@
   "zookeeper": "1",
   "gluster1": "on",
   "ntp1": "on",
-  "prometheus1": "on",
+  "prom-node-exporter1": "on",
   "node_id2": "192.168.56.22",
   "gluster2": "on",
   "ntp2": "on",
-  "prometheus2": "on",
+  "prom-node-exporter2": "on",
   "node_id3": "192.168.56.23",
   "gluster3": "on",
   "ntp3": "on",
-  "prometheus3": "on"
+  "prom-node-exporter3": "on"
 }

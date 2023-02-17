@@ -81,20 +81,20 @@ public class PrometheusSetupTest extends AbstractSetupShellTest {
         copyFile(jailPath, "inContainerSetupPrometheus.sh");
         copyFile(jailPath, "inContainerStartService.sh");
         copyFile(jailPath, "inContainerInjectTopology.sh");
+        copyFile(jailPath, "prometheus.k8s.yaml.sh");
     }
 
     @Override
     protected String[] getScriptsToExecute() {
         return new String[] {
                 "setup.sh",
-                "inContainerSetupPrometheus.sh",
                 "inContainerInjectTopology.sh"
         };
     }
 
     @Test
-    public void testSystemDInstallation() throws Exception {
-        assertSystemDInstallation();
+    public void testKubernetesInstallation() throws Exception {
+        assertKubernetesCommands();
     }
 
     @Test

@@ -63,7 +63,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-system", "test-setup", "test-conf", "test-connection-manager", "test-ssh"})
+@ActiveProfiles({"no-web-stack", "test-system", "test-setup", "test-conf", "test-connection-manager", "test-ssh", "test-services"})
 public class KubernetesServicesConfigControllerTest {
 
     @Autowired
@@ -126,35 +126,29 @@ public class KubernetesServicesConfigControllerTest {
 
         configurationServiceTest.setStandardKubernetesConfig();
 
-        //System.err.println (kscc.loadKubernetesServicesConfig());
+        System.err.println (kscc.loadKubernetesServicesConfig());
         assertTrue (new JSONObject("{\n" +
-                "    \"spark-runtime_ram\": \"800M\",\n" +
-                "    \"zeppelin_ram\": \"800M\",\n" +
-                "    \"kibana_ram\": \"800M\",\n" +
-                "    \"kafka-manager_ram\": \"800M\",\n" +
-                "    \"kafka-manager_install\": \"on\",\n" +
-                "    \"kafka_ram\": \"800M\",\n" +
-                "    \"kafka_cpu\": \"1\",\n" +
-                "    \"elasticsearch_cpu\": \"1\",\n" +
-                "    \"kafka-manager_cpu\": \"1\",\n" +
-                "    \"elasticsearch_install\": \"on\",\n" +
-                "    \"kafka_install\": \"on\",\n" +
-                "    \"kibana_cpu\": \"1\",\n" +
-                "    \"zeppelin_install\": \"on\",\n" +
-                "    \"spark-runtime_cpu\": \"1\",\n" +
-                "    \"logstash_cpu\": \"1\",\n" +
-                "    \"logstash_ram\": \"800M\",\n" +
-                "    \"spark-runtime_install\": \"on\",\n" +
-                "    \"cerebro_ram\": \"800M\",\n" +
-                "    \"spark-console_cpu\": \"1\",\n" +
-                "    \"spark-console_install\": \"on\",\n" +
-                "    \"elasticsearch_ram\": \"800M\",\n" +
-                "    \"spark-console_ram\": \"800M\",\n" +
-                "    \"cerebro_install\": \"on\",\n" +
-                "    \"zeppelin_cpu\": \"1\",\n" +
-                "    \"kibana_install\": \"on\",\n" +
-                "    \"logstash_install\": \"on\",\n" +
-                "    \"cerebro_cpu\": \"1\"\n" +
+                "    \"broker_cpu\": \"1\",\n" +
+                "    \"broker-manager_cpu\": \"1\",\n" +
+                "    \"cluster-dashboard_ram\": \"800M\",\n" +
+                "    \"database-manager_cpu\": \"1\",\n" +
+                "    \"user-console_install\": \"on\",\n" +
+                "    \"cluster-dashboard_cpu\": \"1\",\n" +
+                "    \"calculator-runtime_cpu\": \"1\",\n" +
+                "    \"database_cpu\": \"1\",\n" +
+                "    \"database_install\": \"on\",\n" +
+                "    \"database_ram\": \"800M\",\n" +
+                "    \"calculator-runtime_ram\": \"800M\",\n" +
+                "    \"cluster-dashboard_install\": \"on\",\n" +
+                "    \"user-console_ram\": \"800M\",\n" +
+                "    \"database-manager_install\": \"on\",\n" +
+                "    \"database-manager_ram\": \"800M\",\n" +
+                "    \"broker_ram\": \"800M\",\n" +
+                "    \"broker-manager_ram\": \"800M\",\n" +
+                "    \"calculator-runtime_install\": \"on\",\n" +
+                "    \"broker-manager_install\": \"on\",\n" +
+                "    \"broker_install\": \"on\",\n" +
+                "    \"user-console_cpu\": \"1\"\n" +
                 "}").similar(new JSONObject (kscc.loadKubernetesServicesConfig())));
 
         setupServiceTest.setSetupError();
@@ -191,16 +185,18 @@ public class KubernetesServicesConfigControllerTest {
                 "    \"uninstallations\": [],\n" +
                 "    \"restarts\": [],\n" +
                 "    \"installations\": [\n" +
-                "      \"elasticsearch\",\n" +
-                "      \"spark-runtime\",\n" +
-                "      \"cerebro\",\n" +
-                "      \"kafka\",\n" +
-                "      \"zeppelin\"\n" +
+                "      \"database\",\n" +
+                "      \"broker\",\n" +
+                "      \"user-console\"\n" +
                 "    ],\n" +
                 "    \"warnings\": \"Kubernetes is not available. The changes in kubernetes services configuration and deployments will be saved but they will <strong>need to be applied again<\\/strong> another time when Kubernetes Master is available\"\n" +
                 "  },\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", kscc.reinstallKubernetesServiceConfig("{\"spark-runtime_install\":\"on\",\"kafka_install\":\"on\",\"elasticsearch_install\":\"on\",\"cerebro_install\":\"on\",\"grafana_install\":\"on\",\"zeppelin_install\":\"on\"}", session));
+                "}", kscc.reinstallKubernetesServiceConfig("{" +
+                "\"calculator_install\":\"on\"," +
+                "\"broker_install\":\"on\"," +
+                "\"database_install\":\"on\"," +
+                "\"user-console_install\":\"on\"}", session));
 
         assertEquals ("{\"status\": \"OK\"}", kscc.applyKubernetesServicesConfig(session));
 
@@ -250,15 +246,13 @@ public class KubernetesServicesConfigControllerTest {
                         "  \"command\": {\n" +
                         "    \"uninstallations\": [],\n" +
                         "    \"restarts\": [\n" +
-                        "      \"elasticsearch\",\n" +
-                        "      \"kibana\",\n" +
-                        "      \"spark-runtime\",\n" +
-                        "      \"cerebro\",\n" +
-                        "      \"logstash\",\n" +
-                        "      \"kafka\",\n" +
-                        "      \"kafka-manager\",\n" +
-                        "      \"spark-console\",\n" +
-                        "      \"zeppelin\"\n" +
+                        "      \"cluster-dashboard\",\n" +
+                        "      \"database\",\n" +
+                        "      \"database-manager\",\n" +
+                        "      \"calculator-runtime\",\n" +
+                        "      \"broker\",\n" +
+                        "      \"broker-manager\",\n" +
+                        "      \"user-console\"\n" +
                         "    ],\n" +
                         "    \"installations\": [],\n" +
                         "    \"warnings\": \"Kubernetes is not available. The changes in kubernetes services configuration and deployments will be saved but they will <strong>need to be applied again<\\/strong> another time when Kubernetes Master is available\"\n" +

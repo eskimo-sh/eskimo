@@ -46,46 +46,20 @@ public class StandardSetupHelpers {
     public static NodesConfigWrapper getStandard2NodesSetup() {
         return new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
-            put("kube-master", "1");
-            put("gluster1", "on");
-            put("etcd1", "on");
-            put("kube-slave1", "on");
-            put("ntp1", "on");
+            put("cluster-master", "1");
+            put("distributed-filesystem1", "on");
+            put("cluster-slave1", "on");
+            put("distributed-time1", "on");
 
             put("node_id2", "192.168.10.13");
-            put("zookeeper", "2");
-            put("gluster2", "on");
-            put("etcd2", "on");
-            put("kube-slave2", "on");
-            put("ntp2", "on");
+            put("cluster-manager", "2");
+            put("distributed-filesystem2", "on");
+            put("cluster-slave2", "on");
+            put("distributed-time2", "on");
         }});
     }
 
     public static ServicesInstallStatusWrapper getStandard2NodesInstallStatus() {
-        return new ServicesInstallStatusWrapper(new HashMap<>() {{
-            put("cerebro_installed_on_IP_KUBERNETES_NODE", "OK");
-            put("elasticsearch_installed_on_IP_KUBERNETES_NODE", "OK");
-            put("gluster_installed_on_IP_192-168-10-11", "OK");
-            put("gluster_installed_on_IP_192-168-10-13", "OK");
-            put("kafka-manager_installed_on_IP_KUBERNETES_NODE", "OK");
-            put("logstash_installed_on_IP_KUBERNETES_NODE", "OK");
-            put("kafka_installed_on_IP_KUBERNETES_NODE", "OK");
-            put("kibana_installed_on_IP_KUBERNETES_NODE", "OK");
-            put("kube-slave_installed_on_IP_192-168-10-11", "OK");
-            put("kube-slave_installed_on_IP_192-168-10-13", "OK");
-            put("kube-master_installed_on_IP_192-168-10-11", "OK");
-            put("ntp_installed_on_IP_192-168-10-11", "OK");
-            put("ntp_installed_on_IP_192-168-10-13", "OK");
-            put("etcd_installed_on_IP_192-168-10-11", "OK");
-            put("etcd_installed_on_IP_192-168-10-13", "OK");
-            put("spark-runtime_installed_on_IP_KUBERNETES_NODE", "OK");
-            put("spark-console_installed_on_IP_KUBERNETES_NODE", "OK");
-            put("zeppelin_installed_on_IP_KUBERNETES_NODE", "OK");
-            put("zookeeper_installed_on_IP_192-168-10-13", "OK");
-        }});
-    }
-
-    public static ServicesInstallStatusWrapper getStandard2NodesTestInstallStatus() {
         return new ServicesInstallStatusWrapper(new HashMap<>() {{
             put("database-manager_installed_on_IP_KUBERNETES_NODE", "OK");
             put("database_installed_on_IP_KUBERNETES_NODE", "OK");
@@ -93,6 +67,7 @@ public class StandardSetupHelpers {
             put("distributed-filesystem_installed_on_IP_192-168-10-13", "OK");
             put("broker-manager_installed_on_IP_KUBERNETES_NODE", "OK");
             put("broker_installed_on_IP_KUBERNETES_NODE", "OK");
+            put("cluster-dashboard_installed_on_IP_KUBERNETES_NODE", "OK");
             put("cluster-slave_installed_on_IP_192-168-10-11", "OK");
             put("cluster-slave_installed_on_IP_192-168-10-13", "OK");
             put("cluster-master_installed_on_IP_192-168-10-11", "OK");
@@ -112,61 +87,51 @@ public class StandardSetupHelpers {
             put("node_alive_192-168-10-13", "OK");
             put("node_nbr_192-168-10-11", "1");
             put("node_nbr_192-168-10-13", "2");
-            put("service_cerebro_192-168-10-11", "OK");
-            put("service_elasticsearch_192-168-10-11", "OK");
-            put("service_elasticsearch_192-168-10-13", "OK");
-            put("service_gluster_192-168-10-11", "OK");
-            put("service_gluster_192-168-10-13", "OK");
-            put("service_kafka_192-168-10-11", "OK");
-            put("service_kafka_192-168-10-13", "OK");
-            put("service_kafka-manager_192-168-10-11", "OK");
-            put("service_kibana_192-168-10-11", "OK");
-            put("service_logstash_192-168-10-11", "OK");
-            put("service_logstash_192-168-10-13", "OK");
-            put("service_kube-slave_192-168-10-11", "OK");
-            put("service_kube-slave_192-168-10-13", "OK");
-            put("service_kube-master_192-168-10-11", "OK");
-            put("service_ntp_192-168-10-11", "OK");
-            put("service_ntp_192-168-10-13", "OK");
-            put("service_etcd_192-168-10-11", "OK");
-            put("service_etcd_192-168-10-13", "OK");
-            put("service_spark-runtime_192-168-10-11", "OK");
-            put("service_spark-runtime_192-168-10-13", "OK");
-            put("service_spark-console_192-168-10-13", "OK");
-            put("service_zeppelin_192-168-10-13", "OK");
-            put("service_zookeeper_192-168-10-13", "OK");
+            put("service_database-manager_192-168-10-11", "OK");
+            put("service_database_192-168-10-11", "OK");
+            put("service_database_192-168-10-13", "OK");
+            put("service_distributed-filesystem_192-168-10-11", "OK");
+            put("service_distributed-filesystem_192-168-10-13", "OK");
+            put("service_broker_192-168-10-11", "OK");
+            put("service_broker_192-168-10-13", "OK");
+            put("service_broker-manager_192-168-10-11", "OK");
+            put("service_cluster-slave_192-168-10-11", "OK");
+            put("service_cluster-slave_192-168-10-13", "OK");
+            put("service_cluster-master_192-168-10-11", "OK");
+            put("service_distributed-time_192-168-10-11", "OK");
+            put("service_distributed-time_192-168-10-13", "OK");
+            put("service_calculator-runtime_192-168-10-11", "OK");
+            put("service_calculator-runtime_192-168-10-13", "OK");
+            put("service_user-console_192-168-10-13", "OK");
+            put("service_cluster-dashboard_192-168-10-13", "OK");
+            put("service_cluster-manager_192-168-10-13", "OK");
         }});
     }
 
     public static KubernetesServicesConfigWrapper getStandardKubernetesConfig() {
         return new KubernetesServicesConfigWrapper(new HashMap<>() {{
-            put("cerebro_install", "on");
-            put("cerebro_cpu", "1");
-            put("cerebro_ram", "800M");
-            put("kibana_install", "on");
-            put("kibana_cpu", "1");
-            put("kibana_ram", "800M");
-            put("spark-runtime_install", "on");
-            put("spark-runtime_cpu", "1");
-            put("spark-runtime_ram", "800M");
-            put("logstash_install", "on");
-            put("logstash_cpu", "1");
-            put("logstash_ram", "800M");
-            put("spark-console_install", "on");
-            put("spark-console_cpu", "1");
-            put("spark-console_ram", "800M");
-            put("kafka-manager_install", "on");
-            put("kafka-manager_cpu", "1");
-            put("kafka-manager_ram", "800M");
-            put("kafka_install", "on");
-            put("kafka_cpu", "1");
-            put("kafka_ram", "800M");
-            put("zeppelin_install", "on");
-            put("zeppelin_cpu", "1");
-            put("zeppelin_ram", "800M");
-            put("elasticsearch_install", "on");
-            put("elasticsearch_cpu", "1");
-            put("elasticsearch_ram", "800M");
+            put("database-manager_install", "on");
+            put("database-manager_cpu", "1");
+            put("database-manager_ram", "800M");
+            put("calculator-runtime_install", "on");
+            put("calculator-runtime_cpu", "1");
+            put("calculator-runtime_ram", "800M");
+            put("broker-manager_install", "on");
+            put("broker-manager_cpu", "1");
+            put("broker-manager_ram", "800M");
+            put("broker_install", "on");
+            put("broker_cpu", "1");
+            put("broker_ram", "800M");
+            put("user-console_install", "on");
+            put("user-console_cpu", "1");
+            put("user-console_ram", "800M");
+            put("database_install", "on");
+            put("database_cpu", "1");
+            put("database_ram", "800M");
+            put("cluster-dashboard_install", "on");
+            put("cluster-dashboard_cpu", "1");
+            put("cluster-dashboard_ram", "800M");
+
         }});
     }
 }

@@ -15,7 +15,7 @@
   "logstash1": "on",
   "kube-slave1": "on",
   "ntp1": "on",
-  "prometheus1": "on",
+  "prom-node-exporter1": "on",
   "spark-runtime1": "on",
   "node_id2": "192.168.10.13",
   "elasticsearch2": "on",
@@ -25,6 +25,6 @@
   "logstash2": "on",
   "kube-slave2": "on",
   "ntp2": "on",
-  "prometheus2": "on",
+  "prom-node-exporter2": "on",
   "spark-runtime2": "on"
 }

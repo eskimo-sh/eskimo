@@ -73,8 +73,8 @@ public class NodeRangeResolverTest {
                 put("kafka2", "on");
                 put("ntp1", "on");
                 put("ntp2", "on");
-                put("prometheus1", "on");
-                put("prometheus2", "on");
+                put("prom-node-exporter1", "on");
+                put("prom-node-exporter2", "on");
                 put("gluster1", "on");
                 put("gluster2", "on");
                 put("kibana", "1");
@@ -109,8 +109,8 @@ public class NodeRangeResolverTest {
                 put("kafka2", "on");
                 put("ntp1", "on");
                 put("ntp2", "on");
-                put("prometheus1", "on");
-                put("prometheus2", "on");
+                put("prom-node-exporter1", "on");
+                put("prom-node-exporter2", "on");
                 put("gluster1", "on");
                 put("gluster2", "on");
                 put("kibana", "1");
@@ -145,8 +145,8 @@ public class NodeRangeResolverTest {
                 put("kafka2", "on");
                 put("ntp1", "on");
                 put("ntp2", "on");
-                put("prometheus1", "on");
-                put("prometheus2", "on");
+                put("prom-node-exporter1", "on");
+                put("prom-node-exporter2", "on");
                 put("gluster1", "on");
                 put("gluster2", "on");
                 put("kibana", "1");
@@ -206,8 +206,8 @@ public class NodeRangeResolverTest {
             put("kafka2", "on");
             put("ntp1", "on");
             put("ntp2", "on");
-            put("prometheus1", "on");
-            put("prometheus2", "on");
+            put("prom-node-exporter1", "on");
+            put("prom-node-exporter2", "on");
             put("gluster1", "on");
             put("gluster2", "on");
             put("kibana", "1");
@@ -259,10 +259,10 @@ public class NodeRangeResolverTest {
             put("ntp2", "on");
             put("ntp3", "on");
             put("ntp4", "on");
-            put("prometheus1", "on");
-            put("prometheus2", "on");
-            put("prometheus3", "on");
-            put("prometheus4", "on");
+            put("prom-node-exporter1", "on");
+            put("prom-node-exporter2", "on");
+            put("prom-node-exporter3", "on");
+            put("prom-node-exporter4", "on");
             put("spark-runtime1", "on");
             put("spark-runtime2", "on");
             put("spark-runtime3", "on");

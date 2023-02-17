@@ -68,7 +68,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-system", "test-setup", "test-conf", "test-connection-manager", "test-ssh"})
+@ActiveProfiles({"no-web-stack", "test-system", "test-setup", "test-conf", "test-connection-manager", "test-ssh", "test-services"})
 public class NodesConfigControllerTest {
 
     @Autowired
@@ -126,21 +126,19 @@ public class NodesConfigControllerTest {
 
         setupServiceTest.setSetupCompleted();
 
-        //System.err.println (ncc.loadNodesConfig());
+        System.err.println (ncc.loadNodesConfig());
 
         assertTrue (new JSONObject("{\n" +
-                "    \"kube-master\": \"1\",\n" +
-                "    \"etcd1\": \"on\",\n" +
-                "    \"ntp1\": \"on\",\n" +
-                "    \"zookeeper\": \"2\",\n" +
-                "    \"etcd2\": \"on\",\n" +
-                "    \"gluster1\": \"on\",\n" +
-                "    \"ntp2\": \"on\",\n" +
+                "    \"cluster-slave2\": \"on\",\n" +
+                "    \"cluster-slave1\": \"on\",\n" +
+                "    \"cluster-manager\": \"2\",\n" +
+                "    \"distributed-filesystem1\": \"on\",\n" +
+                "    \"distributed-filesystem2\": \"on\",\n" +
                 "    \"node_id1\": \"192.168.10.11\",\n" +
-                "    \"kube-slave1\": \"on\",\n" +
-                "    \"kube-slave2\": \"on\",\n" +
-                "    \"node_id2\": \"192.168.10.13\",\n" +
-                "    \"gluster2\": \"on\"\n" +
+                "    \"distributed-time2\": \"on\",\n" +
+                "    \"distributed-time1\": \"on\",\n" +
+                "    \"cluster-master\": \"1\",\n" +
+                "    \"node_id2\": \"192.168.10.13\"\n" +
                 "}").similar(new JSONObject (ncc.loadNodesConfig())));
 
         setupServiceTest.setSetupError();
@@ -173,13 +171,13 @@ public class NodesConfigControllerTest {
         HttpSession session = HttpObjectsHelper.createHttpSession(sessionContent);
 
         ServicesInstallStatusWrapper serviceInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        serviceInstallStatus.setInstallationFlagOK(Service.from("kafka-cli"), Node.fromName("192-168-10-11"));
-        serviceInstallStatus.setInstallationFlagOK(Service.from("kafka-cli"), Node.fromName("192-168-10-13"));
+        serviceInstallStatus.setInstallationFlagOK(Service.from("broker-cli"), Node.fromName("192-168-10-11"));
+        serviceInstallStatus.setInstallationFlagOK(Service.from("broker-cli"), Node.fromName("192-168-10-13"));
         configurationServiceTest.saveServicesInstallationStatus(serviceInstallStatus);
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
-        nodesConfig.setValueForPath("kafka-cli1", "on");
-        nodesConfig.setValueForPath("kafka-cli2", "on");
+        nodesConfig.setValueForPath("broker-cli1", "on");
+        nodesConfig.setValueForPath("broker-cli2", "on");
         configurationServiceTest.saveNodesConfig(nodesConfig);
 
         assertEquals ("{\n" +
@@ -187,17 +185,17 @@ public class NodesConfigControllerTest {
                 "    \"restarts\": [],\n" +
                 "    \"uninstallations\": [],\n" +
                 "    \"installations\": [\n" +
-                "      {\"kafka-cli\": \"192.168.10.11\"},\n" +
-                "      {\"kafka-cli\": \"192.168.10.13\"}\n" +
+                "      {\"broker-cli\": \"192.168.10.11\"},\n" +
+                "      {\"broker-cli\": \"192.168.10.13\"}\n" +
                 "    ]\n" +
                 "  },\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", ncc.reinstallNodesConfig("{\"kafka-cli\":\"on\"}", session));
+                "}", ncc.reinstallNodesConfig("{\"broker-cli\":\"on\"}", session));
 
         // now we're expecting that only kafka-cli was removed from the one stored in session
 
-        serviceInstallStatus.removeInstallationFlag(Service.from("kafka-cli"), Node.fromName("192-168-10-11"));
-        serviceInstallStatus.removeInstallationFlag(Service.from("kafka-cli"), Node.fromName("192-168-10-13"));
+        serviceInstallStatus.removeInstallationFlag(Service.from("broker-cli"), Node.fromName("192-168-10-11"));
+        serviceInstallStatus.removeInstallationFlag(Service.from("broker-cli"), Node.fromName("192-168-10-13"));
 
         //assertEquals(serviceInstallStatus.getFormattedValue(), ((ServicesInstallStatusWrapper)session.getAttribute(NodesConfigController.PENDING_OPERATIONS_STATUS_OVERRIDE)).getFormattedValue());
 
@@ -215,25 +213,21 @@ public class NodesConfigControllerTest {
         assertEquals ("{\n" +
                 "  \"command\": {\n" +
                 "    \"restarts\": [\n" +
-                "      {\"kube-master\": \"192.168.10.11\"},\n" +
-                "      {\"kube-slave\": \"192.168.10.11\"},\n" +
-                "      {\"kube-slave\": \"192.168.10.13\"},\n" +
-                "      {\"spark-runtime\": \"(kubernetes)\"},\n" +
-                "      {\"logstash\": \"(kubernetes)\"},\n" +
-                "      {\"spark-console\": \"(kubernetes)\"},\n" +
-                "      {\"kafka\": \"(kubernetes)\"},\n" +
-                "      {\"zeppelin\": \"(kubernetes)\"}\n" +
+                "      {\"cluster-slave\": \"192.168.10.11\"},\n" +
+                "      {\"cluster-slave\": \"192.168.10.13\"},\n" +
+                "      {\"cluster-master\": \"192.168.10.11\"},\n" +
+                "      {\"user-console\": \"(kubernetes)\"}\n" +
                 "    ],\n" +
                 "    \"uninstallations\": [],\n" +
                 "    \"installations\": [\n" +
-                "      {\"etcd\": \"192.168.10.11\"},\n" +
-                "      {\"etcd\": \"192.168.10.13\"},\n" +
-                "      {\"gluster\": \"192.168.10.11\"},\n" +
-                "      {\"gluster\": \"192.168.10.13\"}\n" +
+                "      {\"distributed-time\": \"192.168.10.11\"},\n" +
+                "      {\"distributed-time\": \"192.168.10.13\"},\n" +
+                "      {\"distributed-filesystem\": \"192.168.10.11\"},\n" +
+                "      {\"distributed-filesystem\": \"192.168.10.13\"}\n" +
                 "    ]\n" +
                 "  },\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", ncc.reinstallNodesConfig("{\"gluster\":\"on\",\"etcd\":\"on\"}", session));
+                "}", ncc.reinstallNodesConfig("{\"distributed-filesystem\":\"on\",\"distributed-time\":\"on\"}", session));
 
         assertEquals ("{\"status\": \"OK\"}", ncc.applyNodesConfig(session));
 
@@ -281,36 +275,28 @@ public class NodesConfigControllerTest {
         assertEquals ("{\n" +
                         "  \"command\": {\n" +
                         "    \"restarts\": [\n" +
-                        "      {\"gluster\": \"192.168.10.11\"},\n" +
-                        "      {\"gluster\": \"192.168.10.13\"},\n" +
-                        "      {\"kafka\": \"(kubernetes)\"},\n" +
-                        "      {\"kafka-manager\": \"(kubernetes)\"},\n" +
-                        "      {\"zeppelin\": \"(kubernetes)\"}\n" +
+                        "      {\"distributed-filesystem\": \"192.168.10.11\"},\n" +
+                        "      {\"distributed-filesystem\": \"192.168.10.13\"},\n" +
+                        "      {\"broker\": \"(kubernetes)\"},\n" +
+                        "      {\"broker-manager\": \"(kubernetes)\"},\n" +
+                        "      {\"user-console\": \"(kubernetes)\"}\n" +
                         "    ],\n" +
-                        "    \"uninstallations\": [{\"zookeeper\": \"192.168.10.13\"}],\n" +
-                        "    \"installations\": [\n" +
-                        "      {\"zookeeper\": \"192.168.10.11\"},\n" +
-                        "      {\"prometheus\": \"192.168.10.11\"},\n" +
-                        "      {\"prometheus\": \"192.168.10.13\"}\n" +
-                        "    ]\n" +
+                        "    \"uninstallations\": [{\"cluster-manager\": \"192.168.10.13\"}],\n" +
+                        "    \"installations\": [{\"cluster-manager\": \"192.168.10.11\"}]\n" +
                         "  },\n" +
                         "  \"status\": \"OK\"\n" +
                         "}",
                 ncc.saveNodesConfig("" +
                 "{\"node_id1\":\"192.168.10.11\"," +
-                "\"kube-master\":\"1\"," +
-                "\"zookeeper\":\"1\"," +
-                "\"gluster1\":\"on\"," +
-                "\"kube-slave1\":\"on\"," +
-                "\"ntp1\":\"on\"," +
-                "\"etcd1\":\"on\"," +
-                "\"prometheus1\":\"on\"," +
+                "\"cluster-master\":\"1\"," +
+                "\"cluster-manager\":\"1\"," +
+                "\"distributed-filesystem1\":\"on\"," +
+                "\"cluster-slave1\":\"on\"," +
+                "\"distributed-time1\":\"on\"," +
                 "\"node_id2\":\"192.168.10.13\"," +
-                "\"gluster2\":\"on\"," +
-                "\"kube-slave2\":\"on\"," +
-                "\"ntp2\":\"on\"," +
-                "\"etcd2\":\"on\"," +
-                "\"prometheus2\":\"on\"}", session));
+                "\"distributed-filesystem2\":\"on\"," +
+                "\"cluster-slave2\":\"on\"," +
+                "\"distributed-time2\":\"on\"}", session));
 
         assertEquals ("{\"status\": \"OK\"}", ncc.applyNodesConfig(session));
 

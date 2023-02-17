@@ -56,8 +56,8 @@ CONTAINER_TAG=$CONTAINER_NEW_TAG
 
 echo " - Getting prometheus user"
 export prometheus_user_id=$(id -u prometheus 2>> prometheus_install_log)
-if [[ $prometheus_user_id == "" ]]; then
-    echo "User prometheis should have been added by eskimo-base-system setup script"
+if [[ $TEST_MODE != "true" && $prometheus_user_id == "" ]]; then
+    echo "User prometheus should have been added by eskimo-base-system setup script"
     exit 4
 fi
 

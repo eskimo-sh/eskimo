@@ -67,7 +67,7 @@ public class KubernetesServicesConfigCheckerTest {
         put("node_id1", "192.168.10.11");
         put("kube-master", "1");
         put("kube-slave", "1");
-        put("prometheus1", "on");
+        put("prom-node-exporter1", "on");
     }});
 
     KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<>() {{
@@ -101,7 +101,7 @@ public class KubernetesServicesConfigCheckerTest {
             put("node_id1", "192.168.10.11");
             put("cerebro", "1");
             put("ntp1", "on");
-            put("prometheus1", "on");
+            put("prom-node-exporter1", "on");
         }});
         configurationServiceTest.saveNodesConfig(nodesConfig);
 
@@ -124,7 +124,7 @@ public class KubernetesServicesConfigCheckerTest {
             put("node_id1", "192.168.10.11");
             put("ntp1", "on");
             put("gluster1", "on");
-            put("prometheus1", "on");
+            put("prom-node-exporter1", "on");
 
         }});
         configurationServiceTest.saveNodesConfig(nodesConfig);
@@ -147,7 +147,7 @@ public class KubernetesServicesConfigCheckerTest {
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("ntp1", "on");
-            put("prometheus1", "on");
+            put("prom-node-exporter1", "on");
             put("kube-master1", "on");
             put("kube-slave1", "on");
 
@@ -173,7 +173,7 @@ public class KubernetesServicesConfigCheckerTest {
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("ntp1", "on");
-            put("prometheus1", "on");
+            put("prom-node-exporter1", "on");
             put("elasticsearch1", "on");
             put("zookeeper", "1");
         }});

@@ -56,20 +56,20 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
         put("kube-slave", "1");
         put("ntp1", "on");
         put("etcd1", "on");
-        put("prometheus1", "on");
+        put("prom-node-exporter1", "on");
         put("gluster1", "on");
 
         put("node_id2", "192.168.10.12");
         put("ntp2", "on");
         put("zookeeper", "2");
         put("etcd2", "on");
-        put("prometheus2", "on");
+        put("prom-node-exporter2", "on");
         put("gluster2", "on");
 
         put("node_id3", "192.168.10.13");
         put("ntp3", "on");
         put("etcd3", "on");
-        put("prometheus3", "on");
+        put("prom-node-exporter3", "on");
         put("gluster3", "on");
     }});
 
@@ -198,7 +198,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
             put("kube-master", "1");
             put("kube-slave", "1");
             put("ntp1", "on");
-            put("prometheus1", "on");
+            put("prom-node-exporter1", "on");
         }});
 
         JSONObject kubernetesConfig = new JSONObject(new HashMap<>() {{
@@ -227,7 +227,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
                 put("node_id1", "192.168.10.11");
                 put("kubernetes", "1");
                 put("ntp1", "on");
-                put("prometheus1", "on");
+                put("prom-node-exporter1", "on");
             }});
 
             JSONObject kubernetesConfig = new JSONObject(new HashMap<>() {{
@@ -271,7 +271,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "192.168.10.11");
                 put("ntp1", "on");
-                put("prometheus1", "on");
+                put("prom-node-exporter1", "on");
                 put("kube-master1", "on");
                 put("kube-slave1", "on");
             }});

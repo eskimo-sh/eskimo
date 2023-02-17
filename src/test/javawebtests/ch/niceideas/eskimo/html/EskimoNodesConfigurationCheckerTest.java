@@ -97,8 +97,8 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             put("zookeeper", "2");
             put("gluster1", "on");
             put("gluster2", "on");
-            put("prometheus1", "on");
-            put("prometheus2", "on");
+            put("prom-node-exporter1", "on");
+            put("prom-node-exporter2", "on");
         }});
 
         js ("callCheckNodeSetup(" + nodesConfig + ")");
@@ -111,7 +111,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
                 put("node_id1", "blabla");
                 put("ntp1", "on");
-                put("prometheus1", "on");
+                put("prom-node-exporter1", "on");
             }});
 
             js("callCheckNodeSetup(" + nodesConfig + ")");
@@ -129,8 +129,8 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             put("node_id2", "192.168.10.12");
             put("ntp1", "on");
             put("ntp2", "on");
-            put("prometheus1", "on");
-            put("prometheus2", "on");
+            put("prom-node-exporter1", "on");
+            put("prom-node-exporter2", "on");
             put("gluster1", "on");
             put("gluster2", "on");
             put("etcd1", "on");
@@ -152,8 +152,8 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("node_id2", "192.168.10.12-192.160.10.15");
                 put("ntp1", "on");
                 put("ntp2", "on");
-                put("prometheus1", "on");
-                put("prometheus2", "on");
+                put("prom-node-exporter1", "on");
+                put("prom-node-exporter2", "on");
                 put("gluster1", "on");
                 put("gluster2", "on");
                 put("etcd1", "on");
@@ -175,7 +175,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
             put("etcd1", "on");
             put("ntp1", "on");
             put("gluster1", "on");
-            put("prometheus1", "on");
+            put("prom-node-exporter1", "on");
             put("kube-slave1", "on");
             put("kube-master", "1");
             put("zookeeper", "1");
@@ -193,8 +193,8 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("node_id2", "192.168.10.12-192.160.10.15");
                 put("ntp1", "on");
                 put("ntp2", "on");
-                put("prometheus1", "on");
-                put("prometheus2", "on");
+                put("prom-node-exporter1", "on");
+                put("prom-node-exporter2", "on");
                 put("gluster1", "on");
                 put("gluster2", "on");
                 put("etcd1", "on");
@@ -277,7 +277,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
         JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
             put("ntp1", "on");
-            put("prometheus1", "on");
+            put("prom-node-exporter1", "on");
             put("gluster1", "on");
             put("etcd1", "on");
             put("kube-slave1", "on");
@@ -296,7 +296,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("node_id1", "192.168.10.11");
                 put("ntp1", "on");
                 put("etcd1", "on");
-                put("prometheus1", "on");
+                put("prom-node-exporter1", "on");
                 put("kube-slave1", "on");
                 put("kube-master", "1");
                 put("zookeeper", "1");
@@ -322,7 +322,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("ntp1", "on");
                 put("etcd1", "on");
                 put("gluster1", "on");
-                put("prometheus1", "on");
+                put("prom-node-exporter1", "on");
             }});
 
             js("callCheckNodeSetup(" + nodesConfig + ")");
@@ -344,7 +344,7 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("ntp1", "on");
                 put("etcd1", "on");
                 put("gluster1", "on");
-                put("prometheus1", "on");
+                put("prom-node-exporter1", "on");
                 //put("zookeeper", "1");
             }});
 
@@ -369,8 +369,8 @@ public class EskimoNodesConfigurationCheckerTest extends AbstractWebTest {
                 put("etcd2", "on");
                 put("kube-slave1", "on");
                 put("kube-slave2", "on");
-                put("prometheus1", "on");
-                put("prometheus2", "on");
+                put("prom-node-exporter1", "on");
+                put("prom-node-exporter2", "on");
                 put("gluster1", "on");
                 put("gluster2", "on");
                 put("kube-master", "1");

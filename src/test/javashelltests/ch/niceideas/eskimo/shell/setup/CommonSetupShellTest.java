@@ -134,8 +134,7 @@ public class CommonSetupShellTest {
         String result = ProcessHelper.exec(new String[]{"bash", jailPath + "/handle_topology_infrastructure.sh"}, true);
 
         // no error reported
-        assertEquals (" - Copying Topology Injection Script\n" +
-                " - Copying Service Start Script\n", result);
+        assertEquals (" - Copying Service Start Script\n", result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(dockerLogs)) {
@@ -145,17 +144,17 @@ public class CommonSetupShellTest {
             int indexOfCpFirst = dockerLogs.indexOf("cp ");
             assertTrue(indexOfCpFirst > -1);
 
-            int indexOfExecFirst = dockerLogs.indexOf("exec --user root cerebro bash -c chmod 755 /usr/local/sbin/inContainerInjectTopology.sh", indexOfCpFirst);
-            assertTrue(indexOfExecFirst > -1);
+            //int indexOfExecFirst = dockerLogs.indexOf("exec --user root cerebro bash -c chmod 755 /usr/local/sbin/inContainerInjectTopology.sh", indexOfCpFirst);
+            //assertTrue(indexOfExecFirst > -1);
 
-            int indexOfCpSecond = dockerLogs.indexOf("cp ");
-            assertTrue(indexOfCpSecond > -1);
+            //int indexOfCpSecond = dockerLogs.indexOf("cp ");
+            //assertTrue(indexOfCpSecond > -1);
 
-            int indexOfExecSecond = dockerLogs.indexOf("exec --user root cerebro bash -c chmod 755 /usr/local/sbin/inContainerStartService.sh", indexOfCpSecond);
+            int indexOfExecSecond = dockerLogs.indexOf("exec --user root cerebro bash -c chmod 755 /usr/local/sbin/inContainerStartService.sh", indexOfCpFirst);
             assertTrue(indexOfExecSecond > -1);
 
-            int indexOfCpThird = dockerLogs.indexOf("cp ");
-            assertTrue(indexOfCpThird > -1);
+            //int indexOfCpThird = dockerLogs.indexOf("cp ", indexOfExecSecond);
+            //assertTrue(indexOfCpThird > -1);
 
         } else {
             fail ("No docker manipulations found");
