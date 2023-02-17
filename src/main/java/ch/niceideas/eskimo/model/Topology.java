@@ -54,6 +54,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Topology {
 
@@ -480,7 +481,7 @@ public class Topology {
         sb.append("\n");
     }
 
-    public String getTopologyScript(ServicesInstallStatusWrapper serviceInstallStatus) {
+    public String getTopologyScript(ServicesInstallStatusWrapper serviceInstallStatus, ServicesDefinition servicesDefinition) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("#Topology\n");
@@ -506,6 +507,19 @@ public class Topology {
                     });
         }
 
+        String userDef = Arrays.stream(servicesDefinition.listAllServices())
+                .map(servicesDefinition::getServiceDefinition)
+                .map(ServiceDefinition::getUser)
+                .filter(Objects::nonNull)
+                .map(Object::toString)
+                .distinct()
+                .collect(Collectors.joining(","));
+
+        if (StringUtils.isNotBlank(userDef)) {
+            sb.append("\n#Eskimo System Users\n");
+            appendExport(sb, "ESKIMO_USERS", userDef);
+        }
+
         return sb.toString();
     }
 
@@ -517,7 +531,7 @@ public class Topology {
             MemoryModel memoryModel, int nodeNbr) throws NodesConfigurationException {
 
         StringBuilder sb = new StringBuilder();
-        sb.append(getTopologyScript(serviceInstallStatus));
+        sb.append(getTopologyScript(serviceInstallStatus, servicesDefinition));
 
         // find all services on node
         Set<Service> services = new HashSet<>();

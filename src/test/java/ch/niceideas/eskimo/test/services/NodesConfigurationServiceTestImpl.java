@@ -66,7 +66,9 @@ public class NodesConfigurationServiceTestImpl implements NodesConfigurationServ
     }
 
     @Override
-    public void installTopologyAndSettings(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig, ServicesInstallStatusWrapper servicesInstallStatus, MemoryModel memoryModel, Node node) {
+    public void installTopologyAndSettings(
+            MessageLogger ml, NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeServicesConfig,
+            ServicesInstallStatusWrapper servicesInstallStatus, MemoryModel memoryModel, Node node) {
         // No-Op
     }
 

@@ -47,7 +47,7 @@ function fail_if_error(){
 }
 
 # Make sure we have sudo access
-echo "  - checking if user $USER has sudo access"
+echo " - checking if user $USER has sudo access"
 sudo -n ls /dev/null >/dev/null 1>&2
 if [[ $? != 0 ]]; then
     echoerr "$USER requires sudo access on machine $HOSTNAME"
@@ -55,7 +55,7 @@ if [[ $? != 0 ]]; then
 fi
 
 # make sure systemd is installed
-echo "  - checking if systemd is running"
+echo " - checking if systemd is running"
 pidof_command=$(which pidof)
 if [[ -f "/etc/debian_version" ]]; then
     systemd_command=$(which systemd)
@@ -74,7 +74,7 @@ fi
 
 function enable_docker() {
 
-    echo "  - Enabling docker service"
+    echo " - Enabling docker service"
     sudo systemctl enable docker >>/tmp/install_docker 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to enable docker"
@@ -82,7 +82,7 @@ function enable_docker() {
         exit 71
     fi
 
-    echo "  - Starting docker service"
+    echo " - Starting docker service"
     sudo systemctl start docker >>/tmp/install_docker 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to start docker"
@@ -90,7 +90,7 @@ function enable_docker() {
         exit 72
     fi
 
-    echo "  - Adding current user to docker group"
+    echo " - Adding current user to docker group"
     sudo usermod -a -G docker $USER >>/tmp/install_docker 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to add user $USER to docker"
@@ -98,7 +98,7 @@ function enable_docker() {
         exit 73
     fi
 
-    echo "  - Registering kubernetes.registry as insecure registry"
+    echo " - Registering kubernetes.registry as insecure registry"
     cat > /tmp/daemon.json <<- "EOF"
 {
   "insecure-registries" : ["kubernetes.registry:5000"]
@@ -110,7 +110,7 @@ EOF
     sudo mv /tmp/daemon.json /etc/docker/daemon.json
     sudo chown root. /etc/docker/daemon.json
 
-    echo "  - Restart docker"
+    echo " - Restart docker"
     sudo systemctl restart docker >>/tmp/install_docker 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to reload docker"
@@ -136,7 +136,7 @@ function install_docker_redhat_based() {
 
     rm -Rf /tmp/install_docker
 
-    echo "  - Install required packages. "
+    echo " - Install required packages. "
     sudo yum install -y yum-utils \
             device-mapper-persistent-data \
             lvm2 >>/tmp/install_docker 2>&1
@@ -146,7 +146,7 @@ function install_docker_redhat_based() {
         exit 66
     fi
 
-    echo "  - set up the stable repository."
+    echo " - set up the stable repository."
     if [[ -f /usr/bin/dnf ]]; then
         sudo dnf config-manager \
                 --add-repo \
@@ -162,7 +162,7 @@ function install_docker_redhat_based() {
         exit 67
     fi
 
-    echo "  - Install the latest version of Docker CE and containerd"
+    echo " - Install the latest version of Docker CE and containerd"
     sudo yum install -y docker-ce docker-ce-cli containerd.io >>/tmp/install_docker 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to install docker"
@@ -175,7 +175,7 @@ function install_docker_debian_based() {
 
     rm -Rf /tmp/install_docker
 
-    echo "  - install packages to allow apt to use a repository over HTTPS"
+    echo " - install packages to allow apt to use a repository over HTTPS"
     sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install \
             apt-transport-https \
             ca-certificates \
@@ -187,11 +187,11 @@ function install_docker_debian_based() {
         exit 61
     fi
 
-    echo "  - attempting packages installation that are different between ubuntu and debian"
+    echo " - attempting packages installation that are different between ubuntu and debian"
     sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install gnupg-agent >/dev/null 2>&1
     sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install gnupg2 >/dev/null 2>&1
 
-    echo "  - Add Docker's official GPG key"
+    echo " - Add Docker's official GPG key"
     local DOCKER_DEB_VERSION=$(lsb_release -cs)
     if [[ $DOCKER_DEB_VERSION == "bullseye" ]]; then
         echo "   + HACK reverting debian version to buster for docker (bullseye is not supported)"
@@ -205,7 +205,7 @@ function install_docker_debian_based() {
         exit 62
     fi
 
-    echo "  - Add Docker repository"
+    echo " - Add Docker repository"
     sudo add-apt-repository \
            "deb [arch=amd64] https://download.docker.com/linux/$LINUX_DISTRIBUTION \
            $DOCKER_DEB_VERSION \
@@ -217,7 +217,7 @@ function install_docker_debian_based() {
         exit 63
     fi
 
-    echo "  - Update the apt package index."
+    echo " - Update the apt package index."
     sudo DEBIAN_FRONTEND=noninteractive apt-get -yq update >>/tmp/install_docker 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to apt package index"
@@ -226,7 +226,7 @@ function install_docker_debian_based() {
         #exit 64
     fi
 
-    echo "  - Install the latest version of Docker CE and containerd"
+    echo " - Install the latest version of Docker CE and containerd"
     sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install docker-ce docker-ce-cli containerd.io >>/tmp/install_docker 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to install docker"
@@ -237,7 +237,7 @@ function install_docker_debian_based() {
 
 function install_suse_eskimo_dependencies() {
 
-    echo "  - Installing other eskimo dependencies"
+    echo " - Installing other eskimo dependencies"
     sudo zypper install -y ipset binutils >> /tmp/setup_log 2>&1
      if [[ $? != 0 ]]; then
         echoerr "Unable to install eskimo dependencies"
@@ -249,7 +249,7 @@ function install_suse_eskimo_dependencies() {
 
 function install_redhat_eskimo_dependencies() {
 
-    echo "  - Installing other eskimo dependencies"
+    echo " - Installing other eskimo dependencies"
     sudo yum install -y ipset binutils >> /tmp/setup_log 2>&1
      if [[ $? != 0 ]]; then
         echoerr "Unable to install eskimo dependencies"
@@ -280,7 +280,7 @@ function install_debian_eskimo_dependencies() {
         fi
 
         if [[ "$LIBSTDCPP" != "" ]]; then
-            echo "  - Checking libstdc++"
+            echo " - Checking libstdc++"
 
             if [[ $(! strings $LIBSTDCPP | grep GLIBCXX | grep 3.4.22) == "" ]]; then
                 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test  >> /tmp/setup_log 2>&1
@@ -306,10 +306,10 @@ rm -Rf /tmp/setup_log
 
 # Extract Linux distribution
 export LINUX_DISTRIBUTION=$(grep -e "^ID=" /etc/os-release | cut -d '=' -f 2 | sed s/'"'//g)
-echo "  - Linux distribution is $LINUX_DISTRIBUTION"
+echo " - Linux distribution is $LINUX_DISTRIBUTION"
 
 if [[ "$LINUX_DISTRIBUTION" == "rhel" ]]; then
-    echo "  - Overriding 'rel' repo with 'centos'. Docker only provides packages for centos"
+    echo " - Overriding 'rel' repo with 'centos'. Docker only provides packages for centos"
     export LINUX_DISTRIBUTION="centos"
 fi
 
@@ -319,7 +319,7 @@ sudo chown $USER.$USER /var/lib/eskimo
 
 if [[ -f "/etc/debian_version" ]]; then
 
-    echo "  - updating apt package index"
+    echo " - updating apt package index"
     sudo DEBIAN_FRONTEND=noninteractive apt-get -yq update >>/tmp/setup_log 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to update apt package index"
@@ -328,7 +328,7 @@ if [[ -f "/etc/debian_version" ]]; then
         #exit -1
     fi
 
-    echo "  - installing some required dependencies"
+    echo " - installing some required dependencies"
     sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install net-tools socat dnsmasq gettext-base iputils-ping >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
@@ -337,15 +337,15 @@ if [[ -f "/etc/debian_version" ]]; then
 
 elif [[ -f "/etc/redhat-release" ]]; then
 
-    echo "  - updating yum package index"
+    echo " - updating yum package index"
     sudo yum -y update >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
-    echo "  - installing some required dependencies"
+    echo " - installing some required dependencies"
     sudo yum install -y net-tools anacron socat dnsmasq gettext iputils >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
-    echo "  - enabling crond"
+    echo " - enabling crond"
     sudo systemctl enable crond >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
@@ -354,15 +354,15 @@ elif [[ -f "/etc/redhat-release" ]]; then
 
 elif [[ -f "/etc/SUSE-brand" ]]; then
 
-    echo "  - updating zypper package index"
+    echo " - updating zypper package index"
     sudo bash -c "zypper --non-interactive refresh | echo 'a'" >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
-    echo "  - installing some required dependencies"
+    echo " - installing some required dependencies"
     sudo zypper install -y net-tools cron socat dnsmasq iputils >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
-    echo "  - enabling cron"
+    echo " - enabling cron"
     sudo systemctl enable cron >> /tmp/setup_log 2>&1
     fail_if_error $? "/tmp/setup_log" -1
 
@@ -377,7 +377,7 @@ else
 fi
 
 
-echo "  - installing mesos dependencies"
+echo " - installing mesos dependencies"
 if [[ -f "/etc/debian_version" ]]; then
     install_debian_eskimo_dependencies
 elif [[ -f "/etc/redhat-release" ]]; then
@@ -412,11 +412,11 @@ fi
 
 
 # Check if docker is installed
-echo "  - checking if docker is installed"
+echo " - checking if docker is installed"
 docker -v 2>/dev/null
 if [[ $? != 0 ]]; then
 
-    echo "  - docker is not installed. attempting installation"
+    echo " - docker is not installed. attempting installation"
     if [[ -f "/etc/debian_version" ]]; then
         install_docker_debian_based
 
@@ -437,7 +437,7 @@ if [[ $? != 0 ]]; then
 fi
 
 
-echo "  - Enabling docker"
+echo " - Enabling docker"
 enable_docker
 
 # Docker is likely running on systemd cgroup driver or cgroup2, need to bring it back to using systemd as cgroup driver
@@ -503,10 +503,10 @@ if [[ $(mount | grep /sys/fs/cgroup/systemd) == "" ]]; then
     sudo mount -t cgroup -o none,name=systemd cgroup /sys/fs/cgroup/systemd
 fi
 
-echo "  - Create group eskimoservices"
+echo " - Create group eskimoservices"
 sudo /usr/bin/getent group eskimoservices > /dev/null 2>&1 || sudo /usr/sbin/groupadd eskimoservices
 
-echo "  - Creating common system users"
+echo " - Creating common system users"
 
 cat > /tmp/eskimo-system-checks.sh <<- "EOF"
 #!/usr/bin/env bash
@@ -525,9 +525,9 @@ function create_user_infrastructure() {
     fi
     USER_ID=$2
 
-    echo " - Creating user $USER_NAME (if not exist)"
     new_user_id=`id -u $USER_NAME 2> /dev/null`
     if [[ $new_user_id == "" ]]; then
+        echo " - Creating user $USER_NAME"
         sudo useradd -m -u $USER_ID $USER_NAME
         new_user_id=`id -u $USER_NAME 2> /dev/null`
         if [[ $new_user_id == "" ]]; then
@@ -536,12 +536,12 @@ function create_user_infrastructure() {
         fi
     fi
 
-    echo " - Adding user to group eskimoservices"
     if [[ `groups $USER_NAME | grep eskimoservices` == "" ]]; then
+        echo " - Adding user to group eskimoservices"
         sudo usermod -a -G eskimoservices $USER_NAME
     fi
 
-    echo " - Creating user system folders"
+    echo " - Creating user $USER_NAME system folders (if not exist) and fixing rights"
     sudo mkdir -p /var/lib/$USER_NAME
     sudo chown -R $USER_NAME /var/lib/$USER_NAME
 
@@ -552,18 +552,17 @@ function create_user_infrastructure() {
     sudo chown -R $USER_NAME /var/run/$USER_NAME
 }
 
+if [[ -f /etc/eskimo_topology.sh ]]; then
 
-create_user_infrastructure elasticsearch 3301
-
-create_user_infrastructure spark 3302
-
-create_user_infrastructure kafka 3303
-
-create_user_infrastructure grafana 3304
-
-create_user_infrastructure flink 3305
-
-create_user_infrastructure kubernetes 3306
+    . /etc/eskimo_topology.sh
+    if [[ "$ESKIMO_USERS" != "" ]]; then
+       for esk_user in $(echo $ESKIMO_USERS | tr ',' ' '); do
+           esk_user_name=$(echo $esk_user | cut -d ':' -f 1)
+           esk_user_id=$(echo $esk_user | cut -d ':' -f 2)
+           create_user_infrastructure $esk_user_name $esk_user_id
+       done
+    fi
+fi
 
 # removing all remaining / staled lock files upon startup
 rm -Rf /etc/k8s/*.lock

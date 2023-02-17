@@ -189,7 +189,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
                                         // topology
                                         if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
                                             operationsMonitoringService.addInfo(operation, "Installing Topology and settings");
-                                            installTopologyAndSettings(nodesConfig, kubeServicesConfig, servicesInstallStatus, memoryModel, node);
+                                            installTopologyAndSettings(ml, nodesConfig, kubeServicesConfig, servicesInstallStatus, memoryModel, node);
                                         }
 
                                         if (StringUtils.isNotBlank(enableKubernetes) && enableKubernetes.equals("true")
@@ -341,6 +341,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
     @Override
     public void installTopologyAndSettings(
+            MessageLogger ml,
             NodesConfigWrapper nodesConfig,
             KubernetesServicesConfigWrapper kubeServicesConfig,
             ServicesInstallStatusWrapper servicesInstallStatus,
@@ -349,6 +350,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
         try (SSHConnection connection = connectionManagerService.getPrivateConnection(node)) {
 
+            ml.addInfo(" - (Re-)Creating topology File");
             File tempTopologyFile = systemService.createTempFile(Service.TOPOLOGY_FLAG, ".sh");
             deleteTempFile(tempTopologyFile);
             try {
@@ -365,6 +367,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
             deleteTempFile(tempTopologyFile);
 
+            ml.addInfo(" - (Re-)Creating settings File");
             ServicesSettingsWrapper servicesConfig = configurationService.loadServicesConfigNoLock();
 
             File tempServicesSettingsFile = systemService.createTempFile(Service.SERVICES_SETTINGS_FLAG, ".json");
@@ -377,6 +380,9 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             sshChmod755(connection, "/etc/eskimo_services-settings.json");
 
             deleteTempFile(tempServicesSettingsFile);
+
+            ml.addInfo(" - Checking / fixing system users");
+            sshCommandService.runSSHCommand(connection, new String[]{"sudo", "/usr/local/sbin/eskimo-system-checks.sh"});
 
         } catch (FileException | SetupException e) {
             logger.error (e, e);

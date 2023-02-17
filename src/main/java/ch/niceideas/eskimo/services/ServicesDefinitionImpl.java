@@ -178,6 +178,18 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
             serviceDef.setStatusGroup (group);
             serviceDef.setStatusName (name);
 
+            String userName = (String) servicesConfig.getValueForPath(serviceString+".config.user.name");
+            if (StringUtils.isNotBlank(userName)) {
+
+                Integer userId = (Integer) servicesConfig.getValueForPath(serviceString+".config.user.id");
+                if (userId == null) {
+                    throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " defined a user '" + userName +"' but no user ID !");
+                }
+
+                ServiceUser user = new ServiceUser (userName, userId);
+                serviceDef.setUser (user);
+            }
+
             Integer selectionLayoutRow = (Integer) servicesConfig.getValueForPath(serviceString+".config.selectionLayout.row");
             if (selectionLayoutRow != null) {
                 serviceDef.setSelectionLayoutRow(selectionLayoutRow);

@@ -1953,6 +1953,7 @@ do_screenshots() {
      saved_dir=$(pwd)
      cd ../..
      export ESKIMO_NODE=$ESKIMO_ROOT
+     export NODE_OVERRIDE=$(echo $BOX_IP | tr '.' '-')
      mvn exec:java -P screenshots  >> /tmp/integration-test.log 2>&1
      cd $saved_dir
 }

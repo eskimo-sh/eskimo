@@ -39,6 +39,7 @@ import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.types.Node;
+import org.springframework.messaging.handler.MessagingAdviceBean;
 
 import java.io.IOException;
 
@@ -48,6 +49,7 @@ public interface NodesConfigurationService {
     void applyNodesConfig(ServiceOperationsCommand command) throws NodesConfigurationException;
 
     void installTopologyAndSettings(
+            MessageLogger ml,
             NodesConfigWrapper nodesConfig,
             KubernetesServicesConfigWrapper kubeServicesConfig,
             ServicesInstallStatusWrapper servicesInstallStatus,

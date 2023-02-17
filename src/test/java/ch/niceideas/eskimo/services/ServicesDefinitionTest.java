@@ -121,8 +121,12 @@ public class ServicesDefinitionTest {
                 Node.fromAddress("192.168.56.23"));
 
         assertEquals ("#Topology\n" +
-                "export MASTER_CLUSTER_MANAGER_1=192.168.56.21\n" +
-                "export MASTER_DISTRIBUTED_TIME_1=192.168.56.21\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
+                        "export MASTER_CLUSTER_MANAGER_1=192.168.56.21\n" +
+                        "export MASTER_DISTRIBUTED_TIME_1=192.168.56.21\n" +
+                        "\n" +
+                        "#Eskimo System Users\n" +
+                        "export ESKIMO_USERS=broker:1002,calculator:1003,cluster:1001,database:1004\n",
+                topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), servicesDefinition));
     }
 
     @Test
@@ -138,7 +142,11 @@ public class ServicesDefinitionTest {
                         "export MASTER_CLUSTER_MANAGER_1=192.168.10.11\n" +
                         "export MASTER_CLUSTER_MASTER_1=192.168.10.11\n" +
                         "export MASTER_DISTRIBUTED_FILESYSTEM_1=192.168.10.11\n" +
-                        "export MASTER_DISTRIBUTED_TIME_1=192.168.10.11\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty()));
+                        "export MASTER_DISTRIBUTED_TIME_1=192.168.10.11\n" +
+                        "\n" +
+                        "#Eskimo System Users\n" +
+                        "export ESKIMO_USERS=broker:1002,calculator:1003,cluster:1001,database:1004\n",
+                topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), servicesDefinition));
     }
 
     @Test
@@ -172,6 +180,9 @@ public class ServicesDefinitionTest {
                         "export ESKIMO_INSTALLED_database_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_calculator_runtime_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_broker_manager_KUBERNETES_NODE=OK\n" +
+                        "\n" +
+                        "#Eskimo System Users\n" +
+                        "export ESKIMO_USERS=broker:1002,calculator:1003,cluster:1001,database:1004\n" +
                         "\n" +
                         "#Additional Environment\n" +
                         "export NODE_NBR_CLUSTER_MANAGER_1921681011=1\n" +
@@ -240,6 +251,9 @@ public class ServicesDefinitionTest {
                         "export ESKIMO_INSTALLED_database_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_calculator_runtime_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_broker_manager_KUBERNETES_NODE=OK\n" +
+                        "\n" +
+                        "#Eskimo System Users\n" +
+                        "export ESKIMO_USERS=broker:1002,calculator:1003,cluster:1001,database:1004\n" +
                         "\n" +
                         "#Additional Environment\n" +
                         "export NODE_NBR_CLUSTER_MANAGER_1921681011=1\n" +
@@ -406,6 +420,9 @@ public class ServicesDefinitionTest {
         assertEquals ("#Topology\n" +
                         "export MASTER_CLUSTER_MANAGER_1=192.168.10.11\n" +
                         "export MASTER_DISTRIBUTED_TIME_1=192.168.10.11\n" +
+                        "\n" +
+                        "#Eskimo System Users\n" +
+                        "export ESKIMO_USERS=broker:1002,calculator:1003,cluster:1001,database:1004\n" +
                         "\n" +
                         "#Additional Environment\n" +
                         "export NODE_NBR_CLUSTER_MANAGER_1921681011=1\n" +

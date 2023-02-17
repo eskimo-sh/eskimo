@@ -81,7 +81,7 @@ docker run \
         -i $USE_TTY \
         --rm \
         --network host \
-        --user eskimo \
+        --user $USER \
         --privileged \
         $DOCKER_VOLUMES_ARGS \
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \

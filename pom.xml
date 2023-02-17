@@ -493,6 +493,9 @@ Software.
                                 <argument>
                                     ${project.build.directory}/screenshots
                                 </argument>
+                                <argument>
+                                    ${env.NODE_OVERRIDE}
+                                </argument>
                             </arguments>
                         </configuration>
                     </plugin>

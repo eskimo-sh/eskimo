@@ -167,7 +167,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                                                 if (!operationsMonitoringService.isInterrupted() && (error.get() == null)) {
                                                     operationsMonitoringService.addInfo(operation, "Installing Topology and settings");
                                                     nodesConfigurationService.installTopologyAndSettings(
-                                                            nodesConfig, kubeServicesConfig, servicesInstallStatus, memoryModel, node);
+                                                            ml, nodesConfig, kubeServicesConfig, servicesInstallStatus, memoryModel, node);
                                                 }
                                             }, null);
                                 }

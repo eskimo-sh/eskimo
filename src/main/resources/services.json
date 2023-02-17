@@ -142,7 +142,11 @@
       "name" : "Grafana",
       "memory": "small",
       "logo" : "images/grafana-logo.png",
-      "icon" : "images/grafana-icon.png"
+      "icon" : "images/grafana-icon.png",
+      "user": {
+        "name": "grafana",
+        "id": 3304
+      }
     },
     "ui": {
       "proxyTargetPort" : 31300,
@@ -338,7 +342,11 @@
       "selectionLayout" : { "row" : 4, "col" : 1},
       "memory": "negligible",
       "logo" : "images/kube-master-logo.png",
-      "icon" : "images/kube-master-icon.png"
+      "icon" : "images/kube-master-icon.png",
+      "user": {
+        "name": "kubernetes",
+        "id": 3306
+      }
     },
     "dependencies": [
       {
@@ -368,7 +376,11 @@
       "selectionLayout" : { "row" : 2, "col" : 2},
       "memory": "negligible",
       "logo" : "images/kube-master-logo.png",
-      "icon" : "images/kube-master-icon.png"
+      "icon" : "images/kube-master-icon.png",
+      "user": {
+        "name": "kubernetes",
+        "id": 3306
+      }
     },
     "dependencies": [
       {
@@ -413,7 +425,11 @@
       "selectionLayout" : { "row" : 5, "col" : 1},
       "memory": "negligible",
       "logo" : "images/kube-slave-logo.png",
-      "icon" : "images/kube-slave-icon.png"
+      "icon" : "images/kube-slave-icon.png",
+      "user": {
+        "name": "kubernetes",
+        "id": 3306
+      }
     },
     "dependencies": [
       {
@@ -455,14 +471,18 @@
         "request": {
           "cpu": "0.3",
           "ram": "500M"
-        }
+        },
       },
       "unique": true,
       "group" : "Kubernetes",
       "name" : "Dashboard",
       "memory": "small",
       "logo" : "images/kube-master-logo.png",
-      "icon" : "images/kube-master-icon.png"
+      "icon" : "images/kube-master-icon.png",
+      "user": {
+        "name": "kubernetes",
+        "id": 3306
+      }
     },
     "webCommands": [
       {
@@ -603,7 +623,11 @@
       "name" : "Broker",
       "memory": "medium",
       "logo" : "images/kafka-logo.png",
-      "icon" : "images/kafka-icon.png"
+      "icon" : "images/kafka-icon.png",
+      "user": {
+        "name": "kafka",
+        "id": 3303
+      }
     },
     "dependencies": [
       {
@@ -735,7 +759,11 @@
       },
       "memory": "negligible",
       "logo" : "images/kafka-logo.png",
-      "icon" : "images/kafka-icon.png"
+      "icon" : "images/kafka-icon.png",
+      "user": {
+        "name": "kafka",
+        "id": 3303
+      }
     },
     "dependencies" : [
       {
@@ -774,7 +802,11 @@
       "name" : "Manager",
       "memory": "small",
       "logo" : "images/kafka-manager-logo.png",
-      "icon" : "images/kafka-manager-icon.png"
+      "icon" : "images/kafka-manager-icon.png",
+      "user": {
+        "name": "kafka",
+        "id": 3303
+      }
     },
     "ui": {
       "kubeProxy": true,
@@ -843,7 +875,11 @@
       "name" : "Console",
       "memory": "small",
       "logo" : "images/spark-console-logo.png",
-      "icon" : "images/spark-console-icon.png"
+      "icon" : "images/spark-console-icon.png",
+      "user": {
+        "name": "spark",
+        "id": 3302
+      }
     },
     "ui": {
       "proxyTargetPort" : 31811,
@@ -918,7 +954,11 @@
       "registryOnly": true,
       "memory": "large",
       "logo" : "images/spark-runtime-logo.png",
-      "icon" : "images/spark-runtime-icon.png"
+      "icon" : "images/spark-runtime-icon.png",
+      "user": {
+        "name": "spark",
+        "id": 3302
+      }
     },
     "dependencies": [
       {
@@ -1019,7 +1059,11 @@
       },
       "memory": "negligible",
       "logo" : "images/spark-runtime-logo.png",
-      "icon" : "images/spark-runtime-icon.png"
+      "icon" : "images/spark-runtime-icon.png",
+      "user": {
+        "name": "spark",
+        "id": 3302
+      }
     },
     "dependencies" : [
       {
@@ -1064,7 +1108,11 @@
       },
       "memory": "large",
       "logo" : "images/flink-runtime-logo.png",
-      "icon" : "images/flink-runtime-icon.png"
+      "icon" : "images/flink-runtime-icon.png",
+      "user": {
+        "name": "flink",
+        "id": 3305
+      }
     },
     "ui": {
       "kubeProxy": true,
@@ -1169,7 +1217,11 @@
       },
       "memory": "negligible",
       "logo" : "images/flink-logo.png",
-      "icon" : "images/flink-icon.png"
+      "icon" : "images/flink-icon.png",
+      "user": {
+        "name": "flink",
+        "id": 3305
+      }
     },
     "dependencies" : [
       {
@@ -1207,7 +1259,11 @@
       "name" : "Logstash",
       "memory": "small",
       "logo" : "images/logstash-logo.png",
-      "icon" : "images/logstash-icon.png"
+      "icon" : "images/logstash-icon.png",
+      "user": {
+        "name" : "elasticsearch",
+        "id": 3301
+      }
     },
     "dependencies": [
       {
@@ -1275,7 +1331,11 @@
       },
       "memory": "negligible",
       "logo": "images/logstash-logo.png",
-      "icon": "images/logstash-icon.png"
+      "icon": "images/logstash-icon.png",
+      "user": {
+        "name" : "elasticsearch",
+        "id": 3301
+      }
     },
     "dependencies" : [
       {
@@ -1314,7 +1374,11 @@
       "name" : "Cerebro",
       "memory": "small",
       "logo" : "images/cerebro-logo.png",
-      "icon" : "images/cerebro-icon.png"
+      "icon" : "images/cerebro-icon.png",
+      "user": {
+        "name" : "elasticsearch",
+        "id": 3301
+      }
     },
     "ui": {
       "kubeProxy": true,
@@ -1370,7 +1434,11 @@
       "name" : "Elastic-Search",
       "memory": "large",
       "logo" : "images/elasticsearch-logo.png",
-      "icon" : "images/elasticsearch-icon.png"
+      "icon" : "images/elasticsearch-icon.png",
+      "user": {
+        "name" : "elasticsearch",
+        "id": 3301
+      }
     },
     "dependencies": [
       {
@@ -1486,7 +1554,11 @@
       "name" : "Kibana",
       "memory": "medium",
       "logo" : "images/kibana-logo.png",
-      "icon" : "images/kibana-icon.png"
+      "icon" : "images/kibana-icon.png",
+      "user": {
+        "name" : "elasticsearch",
+        "id": 3301
+      }
     },
     "ui": {
       "urlTemplate": "./kibana/app/home",
@@ -1572,7 +1644,11 @@
       "____comment": "We need to know about the spark executor memory to set",
       "memoryAdditional__commentedOut": ["spark-runtime"],
       "logo" : "images/zeppelin-logo.png",
-      "icon" : "images/zeppelin-icon.png"
+      "icon" : "images/zeppelin-icon.png",
+      "user": {
+        "name": "spark",
+        "id": 3302
+      }
     },
     "ui": {
       "kubeProxy": true,

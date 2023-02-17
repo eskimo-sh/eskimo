@@ -95,6 +95,8 @@ public class ServiceDefinition {
     private String logo;
     private String icon;
 
+    private ServiceUser user;
+
     private final List<Command> commands = new ArrayList<>();
 
     private final List<WebCommand> webCommands = new ArrayList<>();

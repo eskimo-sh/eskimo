@@ -188,7 +188,11 @@
       "selectionLayout" : { "row" : 2, "col" : 2},
       "memory": "negligible",
       "logo" : "images/cluster-master-logo.png",
-      "icon" : "images/cluster-master-icon.png"
+      "icon" : "images/cluster-master-icon.png",
+      "user": {
+        "name": "cluster",
+        "id": 1001
+      }
     },
     "dependencies": [
       {
@@ -227,7 +231,11 @@
       "selectionLayout" : { "row" : 5, "col" : 1},
       "memory": "negligible",
       "logo" : "images/cluster-slave-logo.png",
-      "icon" : "images/cluster-slave-icon.png"
+      "icon" : "images/cluster-slave-icon.png",
+      "user": {
+        "name": "cluster",
+        "id": 1001
+      }
     },
     "dependencies": [
       {
@@ -269,7 +277,11 @@
       "name" : "Dashboard",
       "memory": "small",
       "logo" : "images/cluster-master-logo.png",
-      "icon" : "images/cluster-master-icon.png"
+      "icon" : "images/cluster-master-icon.png",
+      "user": {
+        "name": "cluster",
+        "id": 1001
+      }
     },
     "webCommands": [
       {
@@ -367,7 +379,11 @@
       "name" : "runtime",
       "memory": "medium",
       "logo" : "images/broker-logo.png",
-      "icon" : "images/broker-icon.png"
+      "icon" : "images/broker-icon.png",
+      "user": {
+        "name": "broker",
+        "id": 1002
+      }
     },
     "dependencies": [
       {
@@ -491,7 +507,11 @@
       },
       "memory": "negligible",
       "logo" : "images/broker-logo.png",
-      "icon" : "images/broker-icon.png"
+      "icon" : "images/broker-icon.png",
+      "user": {
+        "name": "broker",
+        "id": 1002
+      }
     },
     "commands" : [
       {
@@ -521,7 +541,11 @@
       "name" : "Manager",
       "memory": "small",
       "logo" : "images/broker-manager-logo.png",
-      "icon" : "images/broker-manager-icon.png"
+      "icon" : "images/broker-manager-icon.png",
+      "user": {
+        "name": "broker",
+        "id": 1002
+      }
     },
     "ui": {
       "kubeProxy": true,
@@ -590,7 +614,11 @@
       "registryOnly": true,
       "memory": "large",
       "logo" : "images/calculator-runtime-logo.png",
-      "icon" : "images/calculator-runtime-icon.png"
+      "icon" : "images/calculator-runtime-icon.png",
+      "user": {
+        "name": "calculator",
+        "id": 1003
+      }
     },
     "dependencies": [
       {
@@ -691,7 +719,11 @@
       },
       "memory": "negligible",
       "logo" : "images/calculator-runtime-logo.png",
-      "icon" : "images/calculator-runtime-icon.png"
+      "icon" : "images/calculator-runtime-icon.png",
+      "user": {
+        "name": "calculator",
+        "id": 1003
+      }
     },
     "commands" : [
       {
@@ -727,7 +759,11 @@
       "name" : "manager",
       "memory": "small",
       "logo" : "images/database-manager-logo.png",
-      "icon" : "images/database-manager-icon.png"
+      "icon" : "images/database-manager-icon.png",
+      "user": {
+        "name": "database",
+        "id": 1004
+      }
     },
     "ui": {
       "kubeProxy": true,
@@ -788,7 +824,11 @@
       "name" : "Runtime",
       "memory": "large",
       "logo" : "images/database-logo.png",
-      "icon" : "images/database-icon.png"
+      "icon" : "images/database-icon.png",
+      "user": {
+        "name": "database",
+        "id": 1004
+      }
     },
     "dependencies": [
       {
@@ -905,7 +945,11 @@
       "____comment": "We need to know about the calculator memory to set",
       "memoryAdditional__commentedOut": ["calculator-runtime"],
       "logo" : "images/zeppelin-logo.png",
-      "icon" : "images/zeppelin-icon.png"
+      "icon" : "images/zeppelin-icon.png",
+      "user": {
+        "name": "calculator",
+        "id": 1003
+      }
     },
     "ui": {
       "kubeProxy": true,
