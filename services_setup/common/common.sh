@@ -153,12 +153,14 @@ function handle_topology_infrastructure() {
     fi
     export LOG_FILE=$2
 
-    echo " - Copying Topology Injection Script"
-    docker cp $SCRIPT_DIR/inContainerInjectTopology.sh $CONTAINER:/usr/local/sbin/inContainerInjectTopology.sh >> $LOG_FILE 2>&1
-    fail_if_error $? $LOG_FILE 83
+    if [[ -f $SCRIPT_DIR/inContainerInjectTopology.sh ]]; then
+        echo " - Copying Topology Injection Script"
+        docker cp $SCRIPT_DIR/inContainerInjectTopology.sh $CONTAINER:/usr/local/sbin/inContainerInjectTopology.sh >> $LOG_FILE 2>&1
+        fail_if_error $? $LOG_FILE 83
 
-    docker exec --user root $CONTAINER bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopology.sh" >> $LOG_FILE 2>&1
-    fail_if_error $? $LOG_FILE 84
+        docker exec --user root $CONTAINER bash -c "chmod 755 /usr/local/sbin/inContainerInjectTopology.sh" >> $LOG_FILE 2>&1
+        fail_if_error $? $LOG_FILE 84
+    fi
 
     echo " - Copying Service Start Script"
     docker cp $SCRIPT_DIR/inContainerStartService.sh $CONTAINER:/usr/local/sbin/inContainerStartService.sh >> $LOG_FILE 2>&1
@@ -590,11 +592,14 @@ function __delete_registry_repository() {
 
         echo "   + Deleting previous container image tag $LAST_TAG from registry"
         docker exec k8s-registry /usr/local/bin/regctl tag delete kubernetes.registry:5000/$CONTAINER:$LAST_TAG >> $LOG_FILE 2>&1
-        fail_if_error $? "$LOG_FILE" 5
+        local result=$?
+        # ignoring errors
 
-        echo "   + Garbage collecting layers"
-        docker exec k8s-registry docker-registry garbage-collect /etc/docker_registry/config.yml  >> $LOG_FILE 2>&1
-        fail_if_error $? "$LOG_FILE" 6
+        if [[ $result == 0 ]]; then
+            echo "   + Garbage collecting layers"
+            docker exec k8s-registry docker-registry garbage-collect /etc/docker_registry/config.yml  >> $LOG_FILE 2>&1
+            fail_if_error $? "$LOG_FILE" 6
+        fi
     fi
 }
 

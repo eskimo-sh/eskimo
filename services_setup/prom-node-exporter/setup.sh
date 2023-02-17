@@ -47,19 +47,12 @@ loadTopology
 
 
 # reinitializing log
-sudo rm -f prometheus_install_log
+sudo rm -f prom-node-exporter_install_log
 
-echo " - Building container prometheus"
-build_container prometheus prometheus prometheus_install_log
+echo " - Building container Prometheus Node Exporter"
+build_container prom-node-exporter prom-node-exporter prom-node-exporter_install_log
 #save tag
 CONTAINER_TAG=$CONTAINER_NEW_TAG
-
-echo " - Getting prometheus user"
-export prometheus_user_id=$(id -u prometheus 2>> prometheus_install_log)
-if [[ $prometheus_user_id == "" ]]; then
-    echo "User prometheis should have been added by eskimo-base-system setup script"
-    exit 4
-fi
 
 echo " - Creating shared directory"
 # TODO
@@ -70,25 +63,19 @@ docker run \
         -v $PWD:/scripts \
         -v $PWD/../common:/common \
         -v /var/log/prometheus:/var/log/prometheus \
-        -v /var/lib/prometheus:/var/lib/prometheus \
-        -d --name prometheus \
+        -d --name prom-node-exporter \
         -i \
-        -t eskimo/prometheus:$CONTAINER_TAG bash >> prometheus_install_log 2>&1
-fail_if_error $? "prometheus_install_log" -2
-
-echo " - Configuring prometheus container"
-docker exec prometheus bash /scripts/inContainerSetupPrometheus.sh $prometheus_user_id | tee -a prometheus_install_log 2>&1
-check_in_container_config_success prometheus_install_log
+        -t eskimo/prom-node-exporter:$CONTAINER_TAG bash >> prom-node-exporter_install_log 2>&1
+fail_if_error $? "prom-node-exporter_install_log" -2
 
 echo " - Handling Eskimo Base Infrastructure"
-handle_eskimo_base_infrastructure prometheus prometheus_install_log
+handle_eskimo_base_infrastructure prom-node-exporter prom-node-exporter_install_log
 
 echo " - Handling topology infrastructure"
-handle_topology_infrastructure prometheus prometheus_install_log
+handle_topology_infrastructure prom-node-exporter prom-node-exporter_install_log
 
-echo " - Committing changes to local template and exiting container prometheus"
-commit_container prometheus $CONTAINER_TAG prometheus_install_log
+echo " - Committing changes to local template and exiting container prom-node-exporter"
+commit_container prom-node-exporter $CONTAINER_TAG prom-node-exporter_install_log
 
-echo " - Starting Kubernetes deployment"
-deploy_kubernetes prometheus $CONTAINER_TAG prometheus_install_log
-
+echo " - Installing and checking systemd service file"
+install_and_check_service_file prom-node-exporter prom-node-exporter_install_log

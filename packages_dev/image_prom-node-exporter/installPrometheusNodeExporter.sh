@@ -63,6 +63,9 @@ rm -Rf /tmp/prometheus_ne_setup
 mkdir -p /tmp/prometheus_ne_setup
 cd /tmp/prometheus_ne_setup || (echo "Couldn't change to /tmp/prometheus_ne_setup" && exit 200)
 
+sudo mkdir -p /usr/local/lib/prometheus-$PROMETHEUS_VERSION.linux-amd64/
+sudo ln -s /usr/local/lib/prometheus-$PROMETHEUS_VERSION.linux-amd64 /usr/local/lib/prometheus
+
 echo " - Downloading node_exporter-$PROMETHEUS_NODE_EXPORTER_VERSION"
 wget https://github.com/prometheus/node_exporter/releases/download/v$PROMETHEUS_NODE_EXPORTER_VERSION/node_exporter-$PROMETHEUS_NODE_EXPORTER_VERSION.linux-amd64.tar.gz > /tmp/prometheus_install_log 2>&1
 if [[ $? != 0 ]]; then

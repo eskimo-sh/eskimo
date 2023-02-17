@@ -39,56 +39,33 @@ echoerr() { echo "$@" 1>&2; }
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
-# CHange current folder to script dir (important !)
-cd $SCRIPT_DIR || exit 199
-
-# Loading topology
-loadTopology
-
+echo "Building Prometheus Node Exporter Image"
+echo "--------------------------------------------------------------------------------"
 
 # reinitializing log
-sudo rm -f prometheus_install_log
+rm -f /tmp/prom-node-exporter_build_log
 
-echo " - Building container prometheus"
-build_container prometheus prometheus prometheus_install_log
-#save tag
-CONTAINER_TAG=$CONTAINER_NEW_TAG
+echo " - Building image prometheus node exporter"
+build_image prom-node-exporter_template /tmp/prom-node-exporter_build_log
 
-echo " - Getting prometheus user"
-export prometheus_user_id=$(id -u prometheus 2>> prometheus_install_log)
-if [[ $prometheus_user_id == "" ]]; then
-    echo "User prometheis should have been added by eskimo-base-system setup script"
-    exit 4
-fi
+echo " - Installing go language environment (for exporters)"
+docker exec -i prom-node-exporter_template apt-get install -y golang > /tmp/ntp_build_log 2>&1
 
-echo " - Creating shared directory"
-# TODO
+echo " - Installing prometheus Node Exporter"
+docker exec -i prom-node-exporter_template bash /scripts/installPrometheusNodeExporter.sh | tee /tmp/prom-node-exporter_build_log 2>&1
+check_in_container_install_success /tmp/prom-node-exporter_build_log
 
-# create and start container
-echo " - Running docker container"
-docker run \
-        -v $PWD:/scripts \
-        -v $PWD/../common:/common \
-        -v /var/log/prometheus:/var/log/prometheus \
-        -v /var/lib/prometheus:/var/lib/prometheus \
-        -d --name prometheus \
-        -i \
-        -t eskimo/prometheus:$CONTAINER_TAG bash >> prometheus_install_log 2>&1
-fail_if_error $? "prometheus_install_log" -2
+echo " - Installing prometheus Push Gateway"
+docker exec -i prom-node-exporter_template bash /scripts/installPrometheusPushgateway.sh | tee /tmp/prom-node-exporter_build_log 2>&1
+check_in_container_install_success /tmp/prom-node-exporter_build_log
 
-echo " - Configuring prometheus container"
-docker exec prometheus bash /scripts/inContainerSetupPrometheus.sh $prometheus_user_id | tee -a prometheus_install_log 2>&1
-check_in_container_config_success prometheus_install_log
+#echo " - TODO"
+#docker exec -i prometheus bash TODO
 
-echo " - Handling Eskimo Base Infrastructure"
-handle_eskimo_base_infrastructure prometheus prometheus_install_log
+echo " - Cleaning up image"
+docker exec -i prom-node-exporter_template apt-get remove -y git gcc >> /tmp/prom-node-exporter_build_log 2>&1
+docker exec -i prom-node-exporter_template apt-get -y auto-remove >> /tmp/prom-node-exporter_build_log 2>&1
 
-echo " - Handling topology infrastructure"
-handle_topology_infrastructure prometheus prometheus_install_log
 
-echo " - Committing changes to local template and exiting container prometheus"
-commit_container prometheus $CONTAINER_TAG prometheus_install_log
-
-echo " - Starting Kubernetes deployment"
-deploy_kubernetes prometheus $CONTAINER_TAG prometheus_install_log
-
+echo " - Closing and saving image prometheus"
+close_and_save_image prom-node-exporter_template /tmp/prom-node-exporter_build_log $PROMETHEUS_VERSION

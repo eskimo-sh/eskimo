@@ -40,12 +40,7 @@ echo " - Loading Topology"
 . /etc/eskimo_topology.sh
 
 
-echo " - Replacing markers in provisionning documents"
-for i in $(find /usr/local/lib/grafana/conf/provisioning); do
-    if [[ -f $i ]]; then
-        sed -i s/"MASTER_PROMETHEUS"/"$MASTER_PROMETHEUS_1"/g $i
-    fi
-done
-
+echo " - TODO "
+# nothing speciic for the time being
 
 

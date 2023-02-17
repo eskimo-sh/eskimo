@@ -37,7 +37,7 @@
       "imageName" : "zookeeper",
       "order": 1,
       "unique": true,
-      "name" : "Zookeeper",
+      "name" : "Zoo-keeper",
       "selectionLayout" : { "row" : 1, "col" : 2},
       "memory": "small",
       "logo" : "images/zookeeper-logo.png",
@@ -77,26 +77,19 @@
 
 
 
-  "prometheus" : {
+  "prom-node-exporter" : {
     "config": {
-      "imageName" : "prometheus",
+      "imageName" : "prom-node-exporter",
       "order": 2,
       "mandatory": true,
       "group" : "Monitoring",
-      "name" : "Prometheus",
+      "name" : "Node Exporter",
       "selectionLayout" : { "row" : 3, "col" : 1},
       "memory": "negligible",
       "logo" : "images/prometheus-logo.png",
       "icon" : "images/prometheus-icon.png"
     },
     "dependencies": [
-      {
-        "masterElectionStrategy": "RANDOM",
-        "masterService": "prometheus",
-        "numberOfMasters": 1,
-        "mandatory": true,
-        "restart": true
-      },
       {
         "masterElectionStrategy": "SAME_NODE",
         "masterService": "ntp",
@@ -105,16 +98,7 @@
         "restart": false
       }
     ],
-    "additionalEnvironment": [
-      "ALL_NODES_LIST_prometheus"
-    ],
     "commands" : [
-      {
-        "id" : "show_prometheus_log",
-        "name" : "Show Prometheus Logs",
-        "command": "cat /var/log/prometheus/prometheus.log",
-        "icon": "fa-file"
-      },
       {
         "id" : "show_nodeexporter_log",
         "name" : "Show Node Exporter Logs",
@@ -126,10 +110,53 @@
 
 
 
+  "prometheus" : {
+    "config": {
+      "imageName" : "prometheus",
+      "order": 3,
+      "unique": true,
+      "kubernetes": true,
+      "kubeConfig": {
+        "request": {
+          "cpu": "0.1",
+          "ram": "400M"
+        }
+      },
+      "group" : "Monitoring",
+      "name" : "Prome-theus",
+      "memory": "negligible",
+      "logo" : "images/prometheus-logo.png",
+      "icon" : "images/prometheus-icon.png",
+        "user": {
+          "name": "prometheus",
+          "id": 3307
+        }
+    },
+    "dependencies": [
+      {
+        "masterElectionStrategy": "RANDOM",
+        "masterService": "prometheus",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": true
+      }
+    ],
+    "commands" : [
+      {
+        "id" : "show_prometheus_log",
+        "name" : "Show Prometheus Logs",
+        "command": "cat /var/log/prometheus/prometheus.log",
+        "icon": "fa-file"
+      }
+    ]
+  },
+
+
+
   "grafana" : {
     "config": {
       "imageName" : "grafana",
-      "order": 3,
+      "order": 4,
       "unique": true,
       "kubernetes": true,
       "kubeConfig": {
@@ -241,7 +268,7 @@
   "gluster" : {
     "config": {
       "imageName" : "gluster",
-      "order": 4,
+      "order": 5,
       "name" : "Gluster / EGMI",
       "selectionLayout" : { "row" : 2, "col" : 1},
       "memory": "negligible",
@@ -336,7 +363,7 @@
 
   "etcd": {
     "config": {
-      "order": 5,
+      "order": 6,
       "group" : "Kubernetes",
       "name" : "Etcd",
       "selectionLayout" : { "row" : 4, "col" : 1},
@@ -368,7 +395,7 @@
   "kube-master": {
     "config": {
       "imageName" : "kube-master",
-      "order": 6,
+      "order": 7,
       "kubeMaster" : true,
       "unique": true,
       "group" : "Kubernetes",
@@ -418,7 +445,7 @@
 
   "kube-slave": {
     "config": {
-      "order": 7,
+      "order": 8,
       "kubeSlave" : true,
       "group" : "Kubernetes",
       "name" : "Slave",
@@ -452,6 +479,13 @@
         "numberOfMasters": 1,
         "mandatory": true,
         "restart": false
+      },
+      {
+        "masterElectionStrategy": "SAME_NODE",
+        "masterService": "prom-node-exporter",
+        "numberOfMasters": 1,
+        "mandatory": true,
+        "restart": false
       }
     ],
     "additionalEnvironment": [
@@ -465,17 +499,17 @@
   "kubernetes-dashboard" : {
     "config": {
       "imageName" : "kubernetes-dashboard",
-      "order": 8,
+      "order": 9,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
           "cpu": "0.3",
           "ram": "500M"
-        },
+        }
       },
       "unique": true,
       "group" : "Kubernetes",
-      "name" : "Dashboard",
+      "name" : "Dash-board",
       "memory": "small",
       "logo" : "images/kube-master-logo.png",
       "icon" : "images/kube-master-icon.png",
@@ -580,7 +614,7 @@
   "kube-shell" : {
     "config": {
       "imageName" : "kube-shell",
-      "order": 9,
+      "order": 10,
       "group" : "Kubernetes",
       "name" : "Shell",
       "kubernetes": true,
@@ -611,7 +645,7 @@
   "kafka" : {
     "config": {
       "imageName" : "kafka",
-      "order": 10,
+      "order": 11,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -750,7 +784,7 @@
 
   "kafka-cli" : {
     "config": {
-      "order": 11,
+      "order": 12,
       "group": "Kafka",
       "name": "Client",
       "selectionLayout": {
@@ -789,7 +823,7 @@
   "kafka-manager": {
     "config": {
       "imageName" : "kafka-manager",
-      "order": 12,
+      "order": 13,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -862,7 +896,7 @@
   "spark-console" : {
     "config": {
       "imageName" : "spark",
-      "order": 13,
+      "order": 14,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -941,7 +975,7 @@
   "spark-runtime" : {
     "config": {
       "imageName" : "spark",
-      "order": 14,
+      "order": 15,
       "group" : "Spark",
       "name" : "Runtime",
       "kubernetes": true,
@@ -1050,7 +1084,7 @@
 
   "spark-cli" : {
     "config": {
-      "order": 15,
+      "order": 16,
       "group" : "Spark",
       "name": "Client",
       "selectionLayout": {
@@ -1095,7 +1129,7 @@
   "flink-runtime" : {
     "config": {
       "imageName" : "flink",
-      "order": 16,
+      "order": 17,
       "group" : "Flink",
       "name" : "Runtime",
       "unique": true,
@@ -1208,7 +1242,7 @@
 
   "flink-cli" : {
     "config": {
-      "order": 17,
+      "order": 18,
       "group" : "Flink",
       "name": "Client",
       "selectionLayout": {
@@ -1253,10 +1287,10 @@
   "logstash" : {
     "config": {
       "imageName" : "logstash",
-      "order": 18,
+      "order": 19,
       "kubernetes": true,
       "group" : "Elastic Stack",
-      "name" : "Logstash",
+      "name" : "Log-stash",
       "memory": "small",
       "logo" : "images/logstash-logo.png",
       "icon" : "images/logstash-icon.png",
@@ -1322,7 +1356,7 @@
 
   "logstash-cli" : {
     "config": {
-      "order": 19,
+      "order": 20,
       "group": "Elastic Stack",
       "name": "LS Client",
       "selectionLayout": {
@@ -1361,7 +1395,7 @@
   "cerebro" : {
     "config": {
       "imageName" : "cerebro",
-      "order": 20,
+      "order": 21,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -1422,7 +1456,7 @@
   "elasticsearch": {
     "config": {
       "imageName" : "elasticsearch",
-      "order": 21,
+      "order": 22,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -1541,7 +1575,7 @@
   "kibana" : {
     "config": {
       "imageName" : "kibana",
-      "order": 22,
+      "order": 23,
       "kubernetes": true,
       "kubeConfig": {
         "request": {
@@ -1630,7 +1664,7 @@
   "zeppelin" : {
     "config": {
       "imageName" : "zeppelin",
-      "order": 23,
+      "order": 24,
       "unique": true,
       "kubernetes": true,
       "kubeConfig": {

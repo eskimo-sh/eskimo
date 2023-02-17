@@ -33,7 +33,7 @@
 #
 
 [Unit]
-Description=Prometheus
+Description=Prometheus Node Exporter
 Wants=network-online.target
 After=docker.service
 After=eskimo-startup-checks.service
@@ -50,11 +50,11 @@ RemainAfterExit=false
 # Run ExecStartPre with root-permissions
 PermissionsStartOnly=true
 
-ExecStartPre=-/usr/bin/docker kill prometheus
-ExecStartPre=-/usr/bin/docker rm -f prometheus
+ExecStartPre=-/usr/bin/docker kill prom-node-exporter
+ExecStartPre=-/usr/bin/docker rm -f prom-node-exporter
 ExecStart=/bin/bash -c ". /usr/local/sbin/eskimo-utils.sh && /usr/bin/docker run \
         -i \
-        --name prometheus \
+        --name prom-node-exporter \
         --network host \
         --privileged \
         -v /var/log/prometheus:/var/log/prometheus \
@@ -64,9 +64,9 @@ ExecStart=/bin/bash -c ". /usr/local/sbin/eskimo-utils.sh && /usr/bin/docker run
         --mount type=bind,source=/etc/eskimo_topology.sh,target=/etc/eskimo_topology.sh \
         --mount type=bind,source=/etc/eskimo_services-settings.json,target=/etc/eskimo_services-settings.json \
         -e NODE_NAME=$HOSTNAME \
-        eskimo/prometheus:$(get_last_tag prometheus) \
+        eskimo/prom-node-exporter:$(get_last_tag prom-node-exporter) \
         /usr/local/sbin/inContainerStartService.sh"
-ExecStop=/usr/bin/docker stop prometheus
+ExecStop=/usr/bin/docker stop prom-node-exporter
 Type=simple
 
 Restart=always

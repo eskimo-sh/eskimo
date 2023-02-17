@@ -34,61 +34,34 @@
 # Software.
 #
 
-echoerr() { echo "$@" 1>&2; }
+set -e
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-. $SCRIPT_DIR/common.sh "$@"
+#echo " - Injecting topology"
+#. /usr/local/sbin/inContainerInjectTopology.sh
 
-# CHange current folder to script dir (important !)
-cd $SCRIPT_DIR || exit 199
-
-# Loading topology
-loadTopology
+echo " - Inject settings"
+/usr/local/sbin/settingsInjector.sh prometheus
 
 
-# reinitializing log
-sudo rm -f prometheus_install_log
+# Starting node exporter process
+echo " - Starting node exporter"
+/usr/local/lib/prometheus/exporters/node_exporter/node_exporter \
+        --path.procfs /host/proc \
+        --path.sysfs /host/sys \
+        --collector.filesystem.ignored-mount-points "^/(sys|proc|dev|host|etc)($|/)"\
+    > /var/log/prometheus/node-exporter.log 2>&1 &
+export NODE_EXPORTER_PROC_ID=$!
 
-echo " - Building container prometheus"
-build_container prometheus prometheus prometheus_install_log
-#save tag
-CONTAINER_TAG=$CONTAINER_NEW_TAG
-
-echo " - Getting prometheus user"
-export prometheus_user_id=$(id -u prometheus 2>> prometheus_install_log)
-if [[ $prometheus_user_id == "" ]]; then
-    echo "User prometheis should have been added by eskimo-base-system setup script"
-    exit 4
+echo " - Checking Node exporter startup"
+sleep 5
+if ! kill -0 $NODE_EXPORTER_PROC_ID > /dev/null 2>&1; then
+    echo " !! Failed to start Node exporter !!"
+    cat /var/log/prometheus/node-exporter.log
+    exit 9
 fi
 
-echo " - Creating shared directory"
-# TODO
 
-# create and start container
-echo " - Running docker container"
-docker run \
-        -v $PWD:/scripts \
-        -v $PWD/../common:/common \
-        -v /var/log/prometheus:/var/log/prometheus \
-        -v /var/lib/prometheus:/var/lib/prometheus \
-        -d --name prometheus \
-        -i \
-        -t eskimo/prometheus:$CONTAINER_TAG bash >> prometheus_install_log 2>&1
-fail_if_error $? "prometheus_install_log" -2
+echo " - Now waiting on main process to exit"
+wait $NODE_EXPORTER_PROC_ID
 
-echo " - Configuring prometheus container"
-docker exec prometheus bash /scripts/inContainerSetupPrometheus.sh $prometheus_user_id | tee -a prometheus_install_log 2>&1
-check_in_container_config_success prometheus_install_log
-
-echo " - Handling Eskimo Base Infrastructure"
-handle_eskimo_base_infrastructure prometheus prometheus_install_log
-
-echo " - Handling topology infrastructure"
-handle_topology_infrastructure prometheus prometheus_install_log
-
-echo " - Committing changes to local template and exiting container prometheus"
-commit_container prometheus $CONTAINER_TAG prometheus_install_log
-
-echo " - Starting Kubernetes deployment"
-deploy_kubernetes prometheus $CONTAINER_TAG prometheus_install_log
 

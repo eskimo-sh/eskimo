@@ -55,14 +55,6 @@ echo " - Installing prometheus"
 docker exec -i prometheus_template bash /scripts/installPrometheus.sh | tee /tmp/prometheus_build_log 2>&1
 check_in_container_install_success /tmp/prometheus_build_log
 
-echo " - Installing prometheus Node Exporter"
-docker exec -i prometheus_template bash /scripts/installPrometheusNodeExporter.sh | tee /tmp/prometheus_build_log 2>&1
-check_in_container_install_success /tmp/prometheus_build_log
-
-echo " - Installing prometheus Push Gateway"
-docker exec -i prometheus_template bash /scripts/installPrometheusPushgateway.sh | tee /tmp/prometheus_build_log 2>&1
-check_in_container_install_success /tmp/prometheus_build_log
-
 #echo " - TODO"
 #docker exec -i prometheus bash TODO
 

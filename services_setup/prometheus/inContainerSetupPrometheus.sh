@@ -39,10 +39,39 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
+PROMETHEUS_USER_ID=$1
+if [[ $PROMETHEUS_USER_ID == "" ]]; then
+    echo " - Didn't get PROMETHEUS_USER_ID User ID as argument"
+    exit 2
+fi
+
 
 echo "-- SETTING UP PROMETHEUS -----------------------------------------------------------"
 
-# TODO
+echo " - Creating prometheus user (if not exist) in container"
+set +e
+prometheus_user_id=$(id -u kubernetes 2>/dev/null)
+set -e
+if [[ $prometheus_user_id == "" ]]; then
+    useradd -u $PROMETHEUS_USER_ID prometheus
+elif [[ $prometheus_user_id != $PROMETHEUS_USER_ID ]]; then
+    echo "Docker PROMETHEUS USER ID is $PROMETHEUS_USER_ID while requested USER ID is $PROMETHEUS_USER_ID"
+    exit 5
+fi
+
+echo " - Creating user prometheus home directory"
+mkdir -p /home/prometheus
+chown -R prometheus /home/prometheus
+
+echo " - Enabling user to change config at runtime"
+chown -R prometheus /usr/local/lib/prometheus/prometheus.yml
+chmod 755 /usr/local/lib/prometheus/prometheus.yml
+
+echo " - Changing data storage to 777 (required by prometheus)"
+sudo mkdir -p /var/lib/prometheus/data
+chown -R prometheus /var/lib/prometheus/data
+sudo chmod 777 /var/lib/prometheus/data
+ln -s /var/lib/prometheus/data /usr/local/lib/prometheus/data
 
 
 # Caution : the in container setup script must mandatorily finish with this log"

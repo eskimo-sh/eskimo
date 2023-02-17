@@ -42,56 +42,23 @@ echo " - Injecting topology"
 echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh prometheus
 
-# starting prometheus process
-if [[ $MASTER_PROMETHEUS_1 == $SELF_IP_ADDRESS ]]; then
+echo " - Starting service prometheus"
+/usr/local/lib/prometheus/prometheus \
+    --config.file=/usr/local/lib/prometheus/prometheus.yml \
+    --storage.tsdb.path=/var/lib/prometheus/data \
+    > /var/log/prometheus/prometheus.log 2>&1 &
+export PROMETHEUS_PROC_ID=$!
 
-    echo " - Starting service prometheus"
-    /usr/local/lib/prometheus/prometheus \
-        --config.file=/usr/local/lib/prometheus/prometheus.yml \
-        > /var/log/prometheus/prometheus.log 2>&1 &
-    export PROMETHEUS_PROC_ID=$!
-
-    echo " - Checking Prometheus startup"
-    sleep 5
-    if ! kill -0 $PROMETHEUS_PROC_ID > /dev/null 2>&1; then
-        echo " !! Failed to start Prometheus !!"
-        cat /var/log/prometheus/prometheus.log
-        exit 8
-    fi
-else
-    echo " - (Not Starting service prometheus since master is $MASTER_PROMETHEUS_1 and I am $SELF_IP_ADDRESS)" \
-        | tee /var/log/prometheus/prometheus.log
-fi
-
-
-# Starting node exporter process
-echo " - Starting node exporter"
-/usr/local/lib/prometheus/exporters/node_exporter/node_exporter \
-        --path.procfs /host/proc \
-        --path.sysfs /host/sys \
-        --collector.filesystem.ignored-mount-points "^/(sys|proc|dev|host|etc)($|/)"\
-    > /var/log/prometheus/node-exporter.log 2>&1 &
-export NODE_EXPORTER_PROC_ID=$!
-
-echo " - Checking Node exporter startup"
+echo " - Checking Prometheus startup"
 sleep 5
-if ! kill -0 $NODE_EXPORTER_PROC_ID > /dev/null 2>&1; then
-    echo " !! Failed to start Node exporter !!"
-    cat /var/log/prometheus/node-exporter.log
-    exit 9
+if ! kill -0 $PROMETHEUS_PROC_ID > /dev/null 2>&1; then
+    echo " !! Failed to start Prometheus !!"
+    cat /var/log/prometheus/prometheus.log
+    exit 8
 fi
 
-# running watch dogs
-
-if [[ $MASTER_PROMETHEUS_1 == $SELF_IP_ADDRESS ]]; then
-
-    echo " - Launching Watch Dog on Node exporter"
-    /usr/local/sbin/containerWatchDog.sh $PROMETHEUS_PROC_ID $NODE_EXPORTER_PROC_ID /var/log/prometheus/node-exporter-watchdog.log &
-fi
-
-# TODO launch other watchdogs as appropriate
 
 echo " - Now waiting on main process to exit"
-wait $NODE_EXPORTER_PROC_ID
+wait $PROMETHEUS_PROC_ID
 
 
