@@ -1,32 +1,26 @@
-● etcd.service - Etcd server
-   Loaded: loaded (/lib/systemd/system/etcd.service; enabled; vendor preset: enabled)
-   Active: active (running) since Sun 2019-06-09 10:08:34 UTC; 9h ago
-     Docs: http://kubernetes.org
- Main PID: 7511 (docker)
-    Tasks: 10 (limit: 4915)
-● ntp.service - NTP Server
-   Loaded: loaded (/lib/systemd/system/ntp.service; enabled; vendor preset: enabled)
+
+● distributed-time.service - distributed-time Server
+   Loaded: loaded (/lib/systemd/system/distributed-time.service; enabled; vendor preset: enabled)
    Active: active (running) since Sun 2019-06-09 06:48:26 UTC; 13h ago
  Main PID: 24563 (docker)
     Tasks: 11 (limit: 4915)
-● spark-executor.service - Mesos Shuffle Service for Spark executors
-   Loaded: loaded (/lib/systemd/system/spark-executor.service; enabled; vendor preset: enabled)
+● calculator-runtime.service - Mesos Shuffle Service for Spark executors
+   Loaded: loaded (/lib/systemd/system/calculator-runtime.service; enabled; vendor preset: enabled)
    Active: active (running) since Sun 2019-06-09 10:16:33 UTC; 9h ago
   Process: 16152 ExecStartPre=/bin/chown spark /var/lib/spark/eventlog (code=exited, status=0/SUCCESS)
-● kibana.service - Kibana UI
-   Loaded: loaded (/lib/systemd/system/kibana.service; enabled; vendor preset: enabled)
-   Active: active (running) since Sun 2019-06-09 10:09:43 UTC; 9h ago
-     Docs: http://www.elastic.co
- Main PID: 9071 (docker)
-    Tasks: 9 (limit: 4915)
-● cerebro.service - Cerebro Admin Backend
-   Loaded: loaded (/lib/systemd/system/cerebro.service; enabled; vendor preset: enabled)
+● database-manager.service - database-manager Admin Backend
+   Loaded: loaded (/lib/systemd/system/database-manager.service; enabled; vendor preset: enabled)
    Active: active (running) since Sun 2019-06-09 10:05:28 UTC; 10h ago
      Docs: http://www.elastic.co
  Main PID: 5262 (docker)
     Tasks: 9 (limit: 4915)
-● gluster.service - Gluster FS Server
-   Loaded: loaded (/lib/systemd/system/gluster.service; enabled; vendor preset: enabled)
+● distributed-filesystem.service - Gluster FS Server
+   Loaded: loaded (/lib/systemd/system/distributed-filesystem.service; enabled; vendor preset: enabled)
+   Active: active (running) since Sun 2019-06-09 06:48:50 UTC; 13h ago
+ Main PID: 25597 (docker)
+    Tasks: 11 (limit: 4915)"
+● cluster-master.service - Cluster Master
+   Loaded: loaded (/lib/systemd/system/ckuster-master.service; enabled; vendor preset: enabled)
    Active: active (running) since Sun 2019-06-09 06:48:50 UTC; 13h ago
  Main PID: 25597 (docker)
     Tasks: 11 (limit: 4915)"

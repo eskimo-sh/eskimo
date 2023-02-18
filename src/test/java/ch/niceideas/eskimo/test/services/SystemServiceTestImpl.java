@@ -245,7 +245,7 @@ public class SystemServiceTestImpl implements SystemService {
     @Override
     public void feedInServiceStatus(Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus, Node node, Node referenceNode, Service service, boolean shall, boolean installed, boolean running) {
         if (node == null) {
-            throw new IllegalArgumentException("nodeName can't be null");
+            throw new IllegalArgumentException("node can't be null");
         }
         if (service == null) {
             throw new IllegalArgumentException("service can't be null");

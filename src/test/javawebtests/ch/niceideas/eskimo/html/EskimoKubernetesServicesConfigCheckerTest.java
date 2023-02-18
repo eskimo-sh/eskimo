@@ -86,6 +86,9 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
             "    \"grafana_install\": \"on\",\n" +
             "    \"grafana_cpu\": \"0.3\",\n" +
             "    \"grafana_ram\": \"400M\",\n" +
+            "    \"prometheus_install\": \"on\",\n" +
+            "    \"prometheus_cpu\": \"0.2\",\n" +
+            "    \"prometheus_ram\": \"300M\",\n" +
             "    \"kafka_install\": \"on\",\n" +
             "    \"kafka_cpu\": \"1\",\n" +
             "    \"kafka_ram\": \"1G\",\n" +
@@ -205,6 +208,7 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
             put("elasticsearch_install", "on");
             put("cerebro_install", "on");
             put("kibana_install", "on");
+            put("prometheus_install", "on");
             put("grafana_install", "on");
         }});
 

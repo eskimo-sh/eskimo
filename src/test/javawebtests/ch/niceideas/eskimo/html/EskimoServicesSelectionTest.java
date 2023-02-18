@@ -78,7 +78,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
         //js("eskimoNodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
 
         js("window.UNIQUE_SERVICES = [\"zookeeper\", \"kube-master\"];");
-        js("window.MULTIPLE_SERVICES = [\"ntp\", \"etcd\", \"kube-slave\", \"gluster\", \"prometheus\"];");
+        js("window.MULTIPLE_SERVICES = [\"ntp\", \"etcd\", \"kube-slave\", \"gluster\", \"prom-node-exporter\"];");
         js("window.MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         js("window.CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
@@ -126,7 +126,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
                 "  \"kube-master\": \"1\",\n" +
                 "  \"ntp1\": \"on\",\n" +
                 "  \"gluster1\": \"on\",\n" +
-                "  \"prometheus1\": \"on\",\n" +
+                "  \"prom-node-exporter1\": \"on\",\n" +
                 "  \"zookeeper\": \"1\"\n" +
                 "};" +
                 "}");
@@ -137,7 +137,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         js("eskimoServicesSelection.validateServicesSelection();");
 
-        assertJavascriptEquals("{\"ntp1\":\"on\",\"zookeeper\":\"1\",\"gluster1\":\"on\",\"kube-master\":\"1\",\"prometheus1\":\"on\",\"etcd1\":\"on\",\"kube-slave1\":\"on\"}", "JSON.stringify (result)");
+        assertJavascriptEquals("{\"ntp1\":\"on\",\"zookeeper\":\"1\",\"gluster1\":\"on\",\"kube-master\":\"1\",\"prom-node-exporter1\":\"on\",\"etcd1\":\"on\",\"kube-slave1\":\"on\"}", "JSON.stringify (result)");
     }
 
     @Test
@@ -153,6 +153,6 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         js("eskimoServicesSelection.validateServicesSelection();");
 
-        assertJavascriptEquals("{\"ntp\":\"on\",\"zookeeper\":\"on\",\"gluster\":\"on\",\"kube-master\":\"on\",\"prometheus\":\"on\",\"etcd\":\"on\",\"kube-slave\":\"on\"}", "JSON.stringify (result)");
+        assertJavascriptEquals("{\"ntp\":\"on\",\"zookeeper\":\"on\",\"gluster\":\"on\",\"kube-master\":\"on\",\"prom-node-exporter\":\"on\",\"etcd\":\"on\",\"kube-slave\":\"on\"}", "JSON.stringify (result)");
     }
 }

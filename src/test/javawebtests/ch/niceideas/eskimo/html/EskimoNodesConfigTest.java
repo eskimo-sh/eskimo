@@ -62,7 +62,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         waitForDefinition("window.eskimo.NodesConfig");
 
         js("window.UNIQUE_SERVICES = [\"zookeeper\", \"kube-master\", ];");
-        js("window.MULTIPLE_SERVICES = [\"ntp\", \"prometheus\", \"etcd\", \"kube-slave\", \"gluster\" ];");
+        js("window.MULTIPLE_SERVICES = [\"ntp\", \"prom-node-exporter\", \"etcd\", \"kube-slave\", \"gluster\" ];");
         js("window.MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         js("window.CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
@@ -106,7 +106,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     @Test
     public void testRenderNodesConfig() {
 
-        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetupRealWorld();
 
         js("eskimoNodesConfig.renderNodesConfig("+nodesConfig.getFormattedValue()+");");
 
@@ -138,23 +138,25 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
 
         //System.err.println(js("JSON.stringify (window.nodeSetup)"));
 
-        JSONObject expectedResult = new JSONObject("{" +
-                "\"kube-master\":\"1\"," +
-                "\"ntp1\":\"on\"," +
-                "\"etcd1\":\"on\"," +
+        JSONObject expectedResult = new JSONObject("" +
+                "{\"etcd1\":\"on\"," +
                 "\"zookeeper\":\"2\"," +
                 "\"etcd2\":\"on\"," +
+                "\"node_id1\":\"192.168.10.11\"," +
+                "\"node_id2\":\"192.168.10.13\"," +
+                "\"kube-master\":\"1\"," +
+                "\"ntp1\":\"on\"," +
+                "\"prom-node-exporter2\":\"on\"," +
+                "\"prom-node-exporter1\":\"on\"," +
                 "\"gluster1\":\"on\"," +
                 "\"ntp2\":\"on\"," +
-                "\"node_id1\":\"192.168.10.11\"," +
                 "\"kube-slave1\":\"on\"," +
                 "\"kube-slave2\":\"on\"," +
-                "\"node_id2\":\"192.168.10.13\"," +
                 "\"gluster2\":\"on\"}");
 
         JSONObject actualResult = new JSONObject((String)js("return JSON.stringify (window.nodeSetup)"));
 
-        //System.err.println (actualResult);
+        System.err.println (actualResult);
 
         assertTrue(expectedResult.similar(actualResult));
     }
@@ -199,7 +201,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     @Test
     public void testOnServiceSelectedForNode() {
 
-        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetupRealWorld();
 
         js("eskimoNodesConfig.renderNodesConfig(" + nodesConfig.getFormattedValue() + ");");
 
@@ -209,10 +211,10 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
                 "\"etcd2\": \"on\",\n" +
                 "\"kube-slave2\": \"on\",\n" +
                 "\"ntp2\": \"on\",\n" +
-                "\"prometheus2\": \"on\",\n" +
+                "\"prom-node-exporter2\": \"on\",\n" +
                 "}, 2)");
 
-        assertJavascriptEquals("1", "$('#prometheus2:checked').length");
+        assertJavascriptEquals("1", "$('#prom-node-exporter2:checked').length");
 
         assertJavascriptEquals("1", "$('#ntp2:checked').length");
     }

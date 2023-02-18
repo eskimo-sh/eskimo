@@ -1,19 +1,13 @@
 {
   "prometheus_installed_on_IP_192-168-10-15": "OK",
   "prometheus_installed_on_IP_192-168-10-13": "OK",
-  "grafana_installed_on_IP_192-168-10-15": "OK",
-  "flink-runtime_installed_on_IP_192-168-10-13": "OK",
-  "ntp_installed_on_IP_192-168-10-15": "OK",
-  "flink-runtime_installed_on_IP_192-168-10-15": "OK",
-  "cerebro_installed_on_IP_192-168-10-15": "OK",
-  "ntp_installed_on_IP_192-168-10-13": "OK",
-  "kafka_installed_on_IP_192-168-10-13": "OK",
-  "kafka_installed_on_IP_192-168-10-15": "OK",
-  "zookeeper_installed_on_IP_192-168-10-15": "OK",
-  "kibana_installed_on_IP_192-168-10-15": "OK",
-  "kafka-manager_installed_on_IP_192-168-10-15": "OK",
-  "logstash_installed_on_IP_192-168-10-13": "OK",
-  "logstash_installed_on_IP_192-168-10-15": "OK",
-  "gluster_installed_on_IP_192-168-10-13": "OK",
-  "gluster_installed_on_IP_192-168-10-15": "OK"
+  "distributed-time_installed_on_IP_192-168-10-15": "OK",
+  "database-manager_installed_on_IP_192-168-10-15": "OK",
+  "distributed-time_installed_on_IP_192-168-10-13": "OK",
+  "broker_installed_on_IP_192-168-10-13": "OK",
+  "broker_installed_on_IP_192-168-10-15": "OK",
+  "cluster-manager_installed_on_IP_192-168-10-15": "OK",
+  "broker-manager_installed_on_IP_192-168-10-15": "OK",
+  "distributed-filesystem_installed_on_IP_192-168-10-13": "OK",
+  "distributed-filesystem_installed_on_IP_192-168-10-15": "OK"
 }

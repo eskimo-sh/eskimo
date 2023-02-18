@@ -73,7 +73,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-proxy", "test-ssh", "test-connection-manager", "system-under-test"})
+@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-proxy", "test-ssh", "test-connection-manager", "system-under-test", "test-services"})
 public class SystemServiceTest {
 
     private static final Logger logger = Logger.getLogger(SystemServiceTest.class);
@@ -131,13 +131,13 @@ public class SystemServiceTest {
     public void testInstallationCleanup() throws Exception {
         systemService.installationCleanup(new TestMessageLogger(new StringBuilder()),
                 connectionManagerServiceTest.getPrivateConnection(Node.fromAddress("192.168.56.11")),
-                Service.from("cerebro"),
-                "cerebro",
+                Service.from("database-manager"),
+                "database-manager",
                 File.createTempFile("test_cleanup", "test"));
 
-        assertEquals ("rm -Rf /tmp/cerebro\n" +
-                "rm -f /tmp/cerebro.tgz\n" +
-                "docker image rm eskimo/cerebro_template:latest || true\n", sshCommandServiceTest.getExecutedCommands());
+        assertEquals ("rm -Rf /tmp/database-manager\n" +
+                "rm -f /tmp/database-manager.tgz\n" +
+                "docker image rm eskimo/database-manager_template:latest || true\n", sshCommandServiceTest.getExecutedCommands());
     }
 
     @Test
@@ -145,7 +145,7 @@ public class SystemServiceTest {
 
         String tempStorage = createTempStoragePath();
 
-        File serviceFolder = new File (tempStorage, "cerebro");
+        File serviceFolder = new File (tempStorage, "database-manager");
         assertTrue (serviceFolder.mkdirs());
 
         FileUtils.writeFile(new File (serviceFolder, "setup.sh"), "#!/bin/bash\necho OK");
@@ -158,18 +158,18 @@ public class SystemServiceTest {
                 () -> systemService.installationSetup(new TestMessageLogger(new StringBuilder()),
                         connectionManagerServiceTest.getPrivateConnection(Node.fromAddress("192.168.56.11")),
                         Node.fromAddress("192.168.56.11"),
-                        Service.from("cerebro")));
+                        Service.from("database-manager")));
 
         sshCommandServiceTest.setConnectionResultBuilder((node, script) -> "");
 
         systemService.installationSetup(new TestMessageLogger(new StringBuilder()),
                 connectionManagerServiceTest.getPrivateConnection(Node.fromAddress("192.168.56.11")),
                 Node.fromAddress("192.168.56.11"),
-                Service.from("cerebro"));
+                Service.from("database-manager"));
 
         assertEquals(
-                "bash /tmp/cerebro/setup.sh 192.168.56.11\n" +
-                "bash /tmp/cerebro/setup.sh 192.168.56.11\n",
+                "bash /tmp/database-manager/setup.sh 192.168.56.11\n" +
+                "bash /tmp/database-manager/setup.sh 192.168.56.11\n",
                 sshCommandServiceTest.getExecutedCommands());
     }
 
@@ -178,7 +178,7 @@ public class SystemServiceTest {
 
         String tempStorage = createTempStoragePath();
 
-        File serviceFolder = new File (tempStorage, "cerebro");
+        File serviceFolder = new File (tempStorage, "database-manager");
         assertTrue (serviceFolder.mkdirs());
 
         FileUtils.writeFile(new File (serviceFolder, "uninstall.sh"), "#!/bin/bash\necho OK");
@@ -189,62 +189,62 @@ public class SystemServiceTest {
                 () -> systemService.callUninstallScript(
                     new TestMessageLogger(new StringBuilder()),
                     connectionManagerServiceTest.getPrivateConnection(Node.fromAddress("192.168.56.11")),
-                    Service.from("grafana")));
+                    Service.from("database")));
 
         systemService.callUninstallScript(
                 new TestMessageLogger(new StringBuilder()),
                 connectionManagerServiceTest.getPrivateConnection(Node.fromAddress("192.168.56.11")),
-                Service.from("cerebro"));
+                Service.from("database-manager"));
 
-        assertTrue(sshCommandServiceTest.getExecutedCommands().contains("/cerebro/uninstall.sh"));
+        assertTrue(sshCommandServiceTest.getExecutedCommands().contains("/database-manager/uninstall.sh"));
     }
 
     @Test
     public void testShowJournal() throws Exception {
-        systemService.showJournal(servicesDefinition.getServiceDefinition(Service.from("ntp")), Node.fromAddress("192.168.10.11"));
-        assertEquals ("sudo journalctl -u ntp --no-pager", sshCommandServiceTest.getExecutedCommands().trim());
+        systemService.showJournal(servicesDefinition.getServiceDefinition(Service.from("distributed-time")), Node.fromAddress("192.168.10.11"));
+        assertEquals ("sudo journalctl -u distributed-time --no-pager", sshCommandServiceTest.getExecutedCommands().trim());
 
         assertThrows(UnsupportedOperationException.class,
-                () -> systemService.showJournal(servicesDefinition.getServiceDefinition(Service.from("grafana")), Node.fromAddress("192.168.10.11")));
+                () -> systemService.showJournal(servicesDefinition.getServiceDefinition(Service.from("user-console")), Node.fromAddress("192.168.10.11")));
     }
 
     @Test
     public void testStartService() throws Exception {
-        systemService.startService(servicesDefinition.getServiceDefinition(Service.from("ntp")), Node.fromAddress("192.168.10.11"));
-        assertEquals ("sudo bash -c 'systemctl reset-failed ntp && systemctl start ntp'", sshCommandServiceTest.getExecutedCommands().trim());
+        systemService.startService(servicesDefinition.getServiceDefinition(Service.from("distributed-time")), Node.fromAddress("192.168.10.11"));
+        assertEquals ("sudo bash -c 'systemctl reset-failed distributed-time && systemctl start distributed-time'", sshCommandServiceTest.getExecutedCommands().trim());
 
         assertThrows(UnsupportedOperationException.class,
-                () -> systemService.startService(servicesDefinition.getServiceDefinition(Service.from("grafana")), Node.fromAddress("192.168.10.11")));
+                () -> systemService.startService(servicesDefinition.getServiceDefinition(Service.from("user-console")), Node.fromAddress("192.168.10.11")));
     }
 
     @Test
     public void testStopService() throws Exception {
-        systemService.stopService(servicesDefinition.getServiceDefinition(Service.from("ntp")), Node.fromAddress("192.168.10.11"));
-        assertEquals ("sudo systemctl stop ntp", sshCommandServiceTest.getExecutedCommands().trim());
+        systemService.stopService(servicesDefinition.getServiceDefinition(Service.from("distributed-time")), Node.fromAddress("192.168.10.11"));
+        assertEquals ("sudo systemctl stop distributed-time", sshCommandServiceTest.getExecutedCommands().trim());
 
         assertThrows(UnsupportedOperationException.class,
-                () -> systemService.stopService(servicesDefinition.getServiceDefinition(Service.from("grafana")), Node.fromAddress("192.168.10.11")));
+                () -> systemService.stopService(servicesDefinition.getServiceDefinition(Service.from("user-console")), Node.fromAddress("192.168.10.11")));
     }
 
     @Test
     public void testRestartService() throws Exception {
-        systemService.restartService(servicesDefinition.getServiceDefinition(Service.from("ntp")), Node.fromAddress("192.168.10.11"));
-        assertEquals ("sudo bash -c 'systemctl reset-failed ntp && systemctl restart ntp'", sshCommandServiceTest.getExecutedCommands().trim());
+        systemService.restartService(servicesDefinition.getServiceDefinition(Service.from("distributed-time")), Node.fromAddress("192.168.10.11"));
+        assertEquals ("sudo bash -c 'systemctl reset-failed distributed-time && systemctl restart distributed-time'", sshCommandServiceTest.getExecutedCommands().trim());
 
         assertThrows(UnsupportedOperationException.class,
-                () -> systemService.restartService(servicesDefinition.getServiceDefinition(Service.from("grafana")), Node.fromAddress("192.168.10.11")));
+                () -> systemService.restartService(servicesDefinition.getServiceDefinition(Service.from("user-console")), Node.fromAddress("192.168.10.11")));
     }
 
     @Test
     public void testCallCommand() throws Exception {
 
         SystemException exception = assertThrows(SystemException.class,
-                () -> systemService.callCommand("dummy", Service.from("ntp"), Node.fromAddress("192.168.10.11")));
+                () -> systemService.callCommand("dummy", Service.from("distributed-time"), Node.fromAddress("192.168.10.11")));
         assertNotNull(exception);
-        assertEquals("Command dummy is unknown for service ntp", exception.getMessage());
+        assertEquals("Command dummy is unknown for service distributed-time", exception.getMessage());
 
-        systemService.callCommand("show_log", Service.from("ntp"), Node.fromAddress("192.168.10.11"));
-        assertEquals ("cat /var/log/ntp/ntp.log", sshCommandServiceTest.getExecutedCommands().trim());
+        systemService.callCommand("show_log", Service.from("distributed-time"), Node.fromAddress("192.168.10.11"));
+        assertEquals ("cat /var/log/distributed-time/distributed-time.log", sshCommandServiceTest.getExecutedCommands().trim());
     }
 
     @Test
@@ -288,7 +288,7 @@ public class SystemServiceTest {
 
         String tempStorage = createTempStoragePath();
 
-        File serviceFolder = new File (tempStorage, "cerebro");
+        File serviceFolder = new File (tempStorage, "database-manager");
         assertTrue (serviceFolder.mkdirs());
 
         FileUtils.writeFile(new File (serviceFolder, "build.sh"), "#!/bin/bash\necho OK");
@@ -300,30 +300,29 @@ public class SystemServiceTest {
         assertTrue(tempPackageDist.mkdirs());
         tempPackageDist.deleteOnExit();
 
-        FileUtils.writeFile(new File (tempPackageDist, "cerebro_1.0_1.tar.gz"), "#!/bin/bash\necho OK");
+        FileUtils.writeFile(new File (tempPackageDist, "database-manager_1.0_1.tar.gz"), "#!/bin/bash\necho OK");
 
         systemService.setPackageDistributionPath(tempPackageDist.getAbsolutePath());
 
         MessageLogger ml = new TestMessageLogger(new StringBuilder());
         systemService.createRemotePackageFolder(ml,
                 connectionManagerServiceTest.getPrivateConnection(Node.fromAddress("192.168.56.11")),
-                Service.from("cerebro"),
-                "cerebro");
+                Service.from("database-manager"),
+                "database-manager");
 
-        assertTrue(sshCommandServiceTest.getExecutedScpCommands().contains("192.168.56.11:/tmp/cerebro"));
-        assertTrue(sshCommandServiceTest.getExecutedScpCommands().contains("192.168.56.11:/tmp/setup_service_test"));
+        //System.err.println (sshCommandServiceTest.getExecutedScpCommands());
 
-        //System.err.println (sshCommandServiceTest.getExecutedCommands());
+        assertTrue(sshCommandServiceTest.getExecutedScpCommands().contains("192.168.56.11:/tmp/database-manager"));
 
-        assertTrue (sshCommandServiceTest.getExecutedCommands().contains(
-                "rm -Rf /tmp/cerebro\n" +
-                "rm -f /tmp/cerebro.tgz"));
+        System.err.println (sshCommandServiceTest.getExecutedCommands());
 
         assertTrue (sshCommandServiceTest.getExecutedCommands().contains(
-                "tar xfz /tmp/cerebro.tgz --directory=/tmp/\n" +
-                "chmod 755 /tmp/cerebro/setup.sh\n" +
-                "mv cerebro_1.0_1.tar.gz /tmp/cerebro/\n" +
-                "mv /tmp/cerebro/cerebro_1.0_1.tar.gz /tmp/cerebro/docker_template_cerebro.tar.gz"));
+                "rm -Rf /tmp/database-manager\n" +
+                "rm -f /tmp/database-manager.tgz"));
+
+        assertTrue (sshCommandServiceTest.getExecutedCommands().contains(
+                "tar xfz /tmp/database-manager.tgz --directory=/tmp/\n" +
+                "chmod 755 /tmp/database-manager/setup.sh"));
     }
 
     @Test
@@ -420,7 +419,7 @@ public class SystemServiceTest {
 
         JSONObject actual = systemStatus.getJSONObject();
 
-        //System.err.println (actual.toString(2));
+        System.err.println (actual.toString(2));
 
         assertTrue(new JSONObject(expectedFullStatus).similar(actual), actual.toString(2));
     }
@@ -455,7 +454,7 @@ public class SystemServiceTest {
 
         JSONObject actual = systemStatus.getJSONObject();
 
-        //System.err.println (actual.toString(2));
+        System.err.println (actual.toString(2));
 
         assertTrue(new JSONObject(expectedFullStatusNoKubernetes).similar(actual), actual.toString(2));
     }
@@ -485,13 +484,12 @@ public class SystemServiceTest {
 
         systemService.fetchNodeStatus (nodesConfig, statusMap, nodeNumnberAndIpAddress, servicesInstallStatus);
 
-        assertEquals(6, statusMap.size());
+        assertEquals(5, statusMap.size());
 
-        assertNull(statusMap.get("service_kafka-manager_192-168-10-11")); // this is moved to Kubernetes
+        assertNull(statusMap.get("service_broker-manager_192-168-10-11")); // this is moved to Kubernetes
         assertEquals("OK", statusMap.get("node_alive_192-168-10-11"));
-        assertEquals("OK", statusMap.get("service_etcd_192-168-10-11"));
-        assertEquals("OK", statusMap.get("service_gluster_192-168-10-11"));
-        assertEquals("OK", statusMap.get("service_ntp_192-168-10-11"));
+        assertEquals("OK", statusMap.get("service_distributed-filesystem_192-168-10-11"));
+        assertEquals("OK", statusMap.get("service_distributed-time_192-168-10-11"));
     }
 
     @Test
@@ -517,33 +515,33 @@ public class SystemServiceTest {
 
         sshCommandServiceTest.setConnectionResultBuilder((connection, script) -> script);
 
-        servicesInstallStatus.setValueForPath("etcd_installed_on_IP_192-168-10-11", "restart");
-        servicesInstallStatus.setValueForPath("gluster_installed_on_IP_192-168-10-11", "restart");
+        servicesInstallStatus.setValueForPath("cluster-master_installed_on_IP_192-168-10-11", "restart");
+        servicesInstallStatus.setValueForPath("distributed-filesystem_installed_on_IP_192-168-10-11", "restart");
 
         systemService.fetchNodeStatus (nodesConfig, statusMap, nbrAndPair, servicesInstallStatus);
 
-        assertEquals(6, statusMap.size());
+        assertEquals(5, statusMap.size());
 
-        assertNull(statusMap.get("service_kafka-manager_192-168-10-11")); // kafka manager is moved to kubernetes
+        assertNull(statusMap.get("service_broker-manager_192-168-10-11")); // broker manager is moved to kubernetes
         assertEquals("OK", statusMap.get("node_alive_192-168-10-11"));
-        assertEquals("restart", statusMap.get("service_etcd_192-168-10-11"));
-        assertEquals("restart", statusMap.get("service_gluster_192-168-10-11"));
-        assertEquals("OK", statusMap.get("service_ntp_192-168-10-11"));
+        assertEquals("restart", statusMap.get("service_cluster-master_192-168-10-11"));
+        assertEquals("restart", statusMap.get("service_distributed-filesystem_192-168-10-11"));
+        assertEquals("OK", statusMap.get("service_distributed-time_192-168-10-11"));
     }
 
     @Test
     public void testCheckServiceDisappearance() {
 
         SystemStatusWrapper prevSystemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
-        prevSystemStatus.getJSONObject().remove("service_kafka-manager_192-168-10-11");
+        prevSystemStatus.getJSONObject().remove("service_broker-manager_192-168-10-11");
 
         systemService.setLastStatusForTest(prevSystemStatus);
 
-        // we'll make it so that kibana and cerebro seem to have disappeared
+        // we'll make it so that kibana and database-manager seem to have disappeared
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
-        systemStatus.getJSONObject().remove("service_kafka-manager_192-168-10-11");
-        systemStatus.setValueForPath("service_cerebro_192-168-10-11", "NA");
-        systemStatus.setValueForPath("service_kibana_192-168-10-11", "KO");
+        systemStatus.getJSONObject().remove("service_broker-manager_192-168-10-11");
+        systemStatus.setValueForPath("service_database-manager_192-168-10-11", "NA");
+        systemStatus.setValueForPath("service_user-console_192-168-10-13", "KO");
 
         systemService.checkServiceDisappearance (systemStatus);
 
@@ -554,30 +552,30 @@ public class SystemServiceTest {
         assertEquals(2, notifications.getKey().intValue());
 
         assertEquals("Error", notifications.getValue().get(0).getString("type"));
-        assertEquals("Service cerebro on 192.168.10.11 got into problem", notifications.getValue().get(0).getString("message"));
+        assertEquals("Service database-manager on 192.168.10.11 got into problem", notifications.getValue().get(0).getString("message"));
 
         assertEquals("Error", notifications.getValue().get(1).getString("type"));
-        assertEquals("Service kibana on 192.168.10.11 got into problem", notifications.getValue().get(1).getString("message"));
+        assertEquals("Service user-console on 192.168.10.13 got into problem", notifications.getValue().get(1).getString("message"));
     }
 
     @Test
     public void testCheckServiceDisappearanceWithRestarts() {
 
         SystemStatusWrapper prevSystemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
-        prevSystemStatus.getJSONObject().remove("service_kafka-manager_192-168-10-11");
+        prevSystemStatus.getJSONObject().remove("service_broker-manager_192-168-10-11");
 
         systemService.setLastStatusForTest(prevSystemStatus);
 
-        // we'll make it so that kibana and cerebro seem to have disappeared
+        // we'll make it so that kibana and database-manager seem to have disappeared
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
-        systemStatus.getJSONObject().remove("service_kafka-manager_192-168-10-11");
-        systemStatus.setValueForPath("service_cerebro_192-168-10-11", "NA");
-        systemStatus.setValueForPath("service_kibana_192-168-10-11", "KO");
+        systemStatus.getJSONObject().remove("service_broker-manager_192-168-10-11");
+        systemStatus.setValueForPath("service_database-manager_192-168-10-11", "NA");
+        systemStatus.setValueForPath("service_user-console_192-168-10-13", "KO");
 
         // flag a few services as restart => should not be reported as in issue
-        systemStatus.setValueForPath("service_kafka_192-168-10-11", "restart");
-        systemStatus.setValueForPath("service_kafka_192-168-10-13", "restart");
-        systemStatus.setValueForPath("service_kafka-manager_192-168-10-11", "restart");
+        systemStatus.setValueForPath("service_broker_192-168-10-11", "restart");
+        systemStatus.setValueForPath("service_broker_192-168-10-13", "restart");
+        systemStatus.setValueForPath("service_broker-manager_192-168-10-11", "restart");
 
         systemService.checkServiceDisappearance (systemStatus);
 
@@ -588,10 +586,10 @@ public class SystemServiceTest {
         assertEquals(2, notifications.getKey().intValue());
 
         assertEquals("Error", notifications.getValue().get(0).getString("type"));
-        assertEquals("Service cerebro on 192.168.10.11 got into problem", notifications.getValue().get(0).getString("message"));
+        assertEquals("Service database-manager on 192.168.10.11 got into problem", notifications.getValue().get(0).getString("message"));
 
         assertEquals("Error", notifications.getValue().get(1).getString("type"));
-        assertEquals("Service kibana on 192.168.10.11 got into problem", notifications.getValue().get(1).getString("message"));
+        assertEquals("Service user-console on 192.168.10.13 got into problem", notifications.getValue().get(1).getString("message"));
     }
 
     @Test
@@ -601,7 +599,7 @@ public class SystemServiceTest {
 
         systemService.setLastStatusForTest(prevSystemStatus);
 
-        // we'll make it so that kibana and cerebro seem to have disappeared
+        // we'll make it so that kibana and database-manager seem to have disappeared
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
         List<String> toBeremoved = new ArrayList<>();
         systemStatus.getRootKeys().stream()
@@ -632,7 +630,7 @@ public class SystemServiceTest {
         }};
 
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
-        systemStatus.getJSONObject().remove("service_etcd_192-168-10-11");
+        systemStatus.getJSONObject().remove("service_distributed-time_192-168-10-11");
 
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
@@ -650,7 +648,7 @@ public class SystemServiceTest {
         // now I have changes
         resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
 
-        // etcd is missing
+        // distributed-time is missing
         System.err.println (resultPrevStatus.getFormattedValue());
         assertTrue (new JSONObject(expectedPrevStatusServicesRemoved).similar(resultPrevStatus.getJSONObject()));
     }
@@ -704,7 +702,7 @@ public class SystemServiceTest {
         }};
 
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
-        systemStatus.getJSONObject().remove("service_cerebro_192-168-10-11");
+        systemStatus.getJSONObject().remove("service_database-manager_192-168-10-11");
 
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
@@ -723,12 +721,12 @@ public class SystemServiceTest {
         resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
 
         JSONObject expectedPrevStatusJson = new JSONObject(expectedPrevStatusServicesRemoved);
-        expectedPrevStatusJson.put("etcd_installed_on_IP_192-168-10-11", "OK"); // need to re-add this since the expectedPrevStatusServicesRemoved is for another test
-        expectedPrevStatusJson.remove("cerebro_installed_on_IP_KUBERNETES_NODE");
+        expectedPrevStatusJson.put("distributed-time_installed_on_IP_192-168-10-11", "OK"); // need to re-add this since the expectedPrevStatusServicesRemoved is for another test
+        expectedPrevStatusJson.remove("database-manager_installed_on_IP_KUBERNETES_NODE");
 
-        // cerebro is missing
+        // database-manager is missing
         //System.err.println (expectedPrevStatusJson.toString(2));
-        //System.err.println (resultPrevStatus.getJSONObject().toString(2));
+        System.err.println (resultPrevStatus.getJSONObject().toString(2));
         assertTrue (expectedPrevStatusJson.similar(resultPrevStatus.getJSONObject()));
     }
 
@@ -741,8 +739,8 @@ public class SystemServiceTest {
         }};
 
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
-        systemStatus.getJSONObject().remove("service_cerebro_192-168-10-11");
-        systemStatus.getJSONObject().put("service_kube-master_192-168-10-11", "KO");
+        systemStatus.getJSONObject().remove("service_database-manager_192-168-10-11");
+        systemStatus.getJSONObject().put("service_cluster-master_192-168-10-11", "KO");
 
         ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
@@ -757,7 +755,7 @@ public class SystemServiceTest {
             systemService.handleStatusChanges(servicesInstallStatus, systemStatus, configuredAndLiveIps);
         }
 
-        // Since the Kubernetes service status change has not been saved (since marazthon is down), it's still empty !!
+        // Since the Kubernetes service status change has not been saved (since kubernetes is down), it's still empty !!
         resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
 
         assertEquals("{}", resultPrevStatus.getJSONObject().toString(2));
@@ -779,10 +777,10 @@ public class SystemServiceTest {
         SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
         //logger.debug (systemStatus.getIpAddresses());
 
-        // remove all status for node 2 : 192-168-10-13 EXCEPT KAFKA AND ELASTICSEARCH
+        // remove all status for node 2 : 192-168-10-13 EXCEPT cluster-dashboard
         List<String> toBeremoved = new ArrayList<>();
         systemStatus.getRootKeys().stream()
-                .filter(key -> key.contains("192-168-10-13") && !key.contains("kafka") && !key.contains("elasticsearch") && !key.contains("nbr")  && !key.contains("alive"))
+                .filter(key -> key.contains ("192-168-10-13") && !key.contains("cluster-manager") && !key.contains("nbr")  && !key.contains("alive"))
                 .forEach(toBeremoved::add);
         toBeremoved
                 .forEach(systemStatus::removeRootKey);
@@ -805,21 +803,19 @@ public class SystemServiceTest {
         // now I have changes
         resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
 
-        // kafka and elasticsearch have been kept
+        // cluster-manager has been kept
         System.err.println (resultPrevStatus.getFormattedValue());
         assertTrue(new JSONObject("{\n" +
-                "    \"kafka-manager_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
-                "    \"logstash_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
-                "    \"kube-slave_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"kibana_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
-                "    \"kafka_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
-                "    \"etcd_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"elasticsearch_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
-                "    \"ntp_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"cerebro_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
-                "    \"gluster_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"kube-master_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"spark-runtime_installed_on_IP_KUBERNETES_NODE\": \"OK\"\n" +
+                "    \"cluster-master_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"distributed-time_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"distributed-filesystem_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"cluster-manager_installed_on_IP_192-168-10-13\": \"OK\",\n" +
+                "    \"database-manager_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
+                "    \"broker_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
+                "    \"cluster-slave_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"database_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
+                "    \"calculator-runtime_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
+                "    \"broker-manager_installed_on_IP_KUBERNETES_NODE\": \"OK\"\n" +
                 "}").similar(resultPrevStatus.getJSONObject()));
     }
 
@@ -865,7 +861,7 @@ public class SystemServiceTest {
         // now I have changes
         resultPrevStatus = configurationServiceTest.loadServicesInstallationStatus();
 
-        // kafka and elasticsearch have been kept
+        // broker and database have been kept
         System.err.println (resultPrevStatus.getFormattedValue());
         JSONObject expectedPrevStatusJson = new JSONObject(expectedPrevStatusAllServicesStay);
         assertTrue(expectedPrevStatusJson.similar(resultPrevStatus.getJSONObject()));
@@ -914,18 +910,15 @@ public class SystemServiceTest {
         // everything has been removed
         System.err.println(resultPrevStatus.getFormattedValue());
         assertTrue(new JSONObject("{\n" +
-                "    \"kafka-manager_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
-                "    \"logstash_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
-                "    \"kube-slave_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"kibana_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
-                "    \"kafka_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
-                "    \"etcd_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"elasticsearch_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
-                "    \"ntp_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"cerebro_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
-                "    \"gluster_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"kube-master_installed_on_IP_192-168-10-11\": \"OK\",\n" +
-                "    \"spark-runtime_installed_on_IP_KUBERNETES_NODE\": \"OK\"\n" +
+                "    \"cluster-master_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"distributed-time_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"distributed-filesystem_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"database-manager_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
+                "    \"broker_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
+                "    \"cluster-slave_installed_on_IP_192-168-10-11\": \"OK\",\n" +
+                "    \"database_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
+                "    \"calculator-runtime_installed_on_IP_KUBERNETES_NODE\": \"OK\",\n" +
+                "    \"broker-manager_installed_on_IP_KUBERNETES_NODE\": \"OK\"\n" +
                 "}").similar(resultPrevStatus.getJSONObject()));
     }
 
@@ -934,7 +927,7 @@ public class SystemServiceTest {
 
         AtomicBoolean called = new AtomicBoolean(false);
 
-        systemService.applyServiceOperation(Service.from("ntp"), Node.fromAddress("192.168.10.11"), SimpleOperationCommand.SimpleOperation.COMMAND, () -> {
+        systemService.applyServiceOperation(Service.from("distributed-time"), Node.fromAddress("192.168.10.11"), SimpleOperationCommand.SimpleOperation.COMMAND, () -> {
             called.set(true);
             return "OK";
         });
@@ -944,21 +937,21 @@ public class SystemServiceTest {
         List<JSONObject> result = notificationService.getSubList(0);
 
         assertEquals("Doing", result.get(0).getString("type"));
-        assertEquals("Calling custom command ntp on 192.168.10.11", result.get(0).getString("message"));
+        assertEquals("Calling custom command distributed-time on 192.168.10.11", result.get(0).getString("message"));
 
         assertEquals("Info", result.get(1).getString("type"));
-        assertEquals("Calling custom command ntp succeeded on 192.168.10.11", result.get(1).getString("message"));
+        assertEquals("Calling custom command distributed-time succeeded on 192.168.10.11", result.get(1).getString("message"));
 
         SimpleOperationCommand.SimpleOperationId operationId = new SimpleOperationCommand.SimpleOperationId(
                 SimpleOperationCommand.SimpleOperation.COMMAND,
-                Service.from("ntp"),
+                Service.from("distributed-time"),
                 Node.fromAddress("192.168.10.11"));
 
         List<String> messages = operationsMonitoringService.getNewMessages(operationId, 0);
 
         assertEquals ("[\n" +
-                "Calling custom command ntp on 192.168.10.11, " +
-                "Done Calling custom command ntp on 192.168.10.11, " +
+                "Calling custom command distributed-time on 192.168.10.11, " +
+                "Done Calling custom command distributed-time on 192.168.10.11, " +
                 "-------------------------------------------------------------------------------, " +
                 "OK" +
                 "]", ""+messages);
