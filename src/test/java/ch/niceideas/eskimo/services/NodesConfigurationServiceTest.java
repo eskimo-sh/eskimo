@@ -67,7 +67,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-system", "test-operation", "test-operations", "test-proxy", "test-kube", "test-ssh", "test-connection-manager", "test-services"})
+@ActiveProfiles({
+        "no-web-stack",
+        "test-setup",
+        "test-conf",
+        "test-system",
+        "test-operation",
+        "test-operations",
+        "test-proxy",
+        "test-kube",
+        "test-ssh",
+        "test-connection-manager",
+        "test-services"})
 public class NodesConfigurationServiceTest {
 
     private final String testRunUUID = UUID.randomUUID().toString();

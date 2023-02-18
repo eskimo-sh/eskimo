@@ -177,6 +177,7 @@ public class ServicesDefinitionTest {
                         "export ESKIMO_INSTALLED_cluster_slave_1921681013=OK\n" +
                         "export ESKIMO_INSTALLED_broker_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_cluster_slave_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_dashboard_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_database_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_calculator_runtime_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_broker_manager_KUBERNETES_NODE=OK\n" +
@@ -248,6 +249,7 @@ public class ServicesDefinitionTest {
                         "export ESKIMO_INSTALLED_cluster_slave_1921681013=OK\n" +
                         "export ESKIMO_INSTALLED_broker_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_cluster_slave_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_dashboard_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_database_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_calculator_runtime_KUBERNETES_NODE=OK\n" +
                         "export ESKIMO_INSTALLED_broker_manager_KUBERNETES_NODE=OK\n" +

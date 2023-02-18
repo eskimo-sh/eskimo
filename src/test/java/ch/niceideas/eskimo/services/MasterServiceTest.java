@@ -55,7 +55,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-conf", "test-system", "test-operation", "test-proxy", "test-nodes-conf", "test-ssh", "test-connection-manager"})
+@ActiveProfiles({
+        "no-web-stack",
+        "test-conf",
+        "test-system",
+        "test-operation",
+        "test-proxy",
+        "test-nodes-conf",
+        "test-ssh",
+        "test-connection-manager",
+        "test-services"})
 public class MasterServiceTest {
 
     @Autowired
@@ -92,15 +101,15 @@ public class MasterServiceTest {
                         return "MemTotal:        3999444 kB";
                 }
             }
-            if (script.equals("grep 'I am the new leader' /var/log/gluster/egmi/egmi.log")) {
+            if (script.equals("grep 'I am the new leader' /var/log/distributed-filesystem/management/management.log")) {
                 if (node.getAddress().equals("192.168.10.11")) {
                     return "2021-01-17 22:44:05,633 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-4] About to execute command: volume - subcommand: status - options: all detail\n" +
                             "2021-01-17 22:44:36,564 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-6] About to execute command: pool - subcommand: list - options: \n" +
                             "2021-01-17 22:44:36,682 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-7] About to execute command: volume - subcommand: info - options: \n" +
                             "2021-01-17 22:44:36,746 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-8] About to execute command: volume - subcommand: status - options: all detail\n" +
-                            "2021-01-17 22:44:52,559 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: test-node1] Event received: WatchedEvent state:SyncConnected type:NodeDeleted path:/egmi/egmi_election/p_0000000000\n" +
+                            "2021-01-17 22:44:52,559 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: test-node1] Event received: WatchedEvent state:SyncConnected type:NodeDeleted path:/management/management_election/p_0000000000\n" +
                             "2021-01-17 22:44:52,561 INFO c.n.e.e.z.ElectionProcess [Thread-1-EventThread] [Process: test-node1] I am the new leader!\n" +
-                            "2021-01-17 22:44:52,566 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: test-node1] Event received: WatchedEvent state:SyncConnected type:NodeDataChanged path:/egmi/master_id\n" +
+                            "2021-01-17 22:44:52,566 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: test-node1] Event received: WatchedEvent state:SyncConnected type:NodeDataChanged path:/management/master_id\n" +
                             "2021-01-17 22:44:52,567 INFO c.n.e.e.z.ElectionProcess$ProcessNodeWatcher [Thread-1-EventThread] [Process: test-node1] Master changed: test-node1\n" +
                             "2021-01-17 22:44:59,136 INFO c.n.e.e.m.ManagementService [pool-2-thread-1] - Updating System Status\n" +
                             "2021-01-17 22:44:59,360 INFO c.n.e.e.c.CommandServer [http-nio-28901-exec-10] About to execute command: pool - subcommand: list - options: \n" +
@@ -123,8 +132,8 @@ public class MasterServiceTest {
         assertEquals(1, masterService.getServiceMasterNodes().size());
         assertEquals(1, masterService.getServiceMasterTimestamps().size());
 
-        assertEquals(Node.fromAddress("192.168.10.11"), masterService.getServiceMasterNodes().get(Service.from("gluster")));
-        assertNotNull(masterService.getServiceMasterTimestamps().get(Service.from("gluster")));
+        assertEquals(Node.fromAddress("192.168.10.11"), masterService.getServiceMasterNodes().get(Service.from("distributed-filesystem")));
+        assertNotNull(masterService.getServiceMasterTimestamps().get(Service.from("distributed-filesystem")));
     }
 
     @Test
@@ -140,8 +149,8 @@ public class MasterServiceTest {
         assertEquals(1, masterService.getServiceMasterNodes().size());
         assertEquals(1, masterService.getServiceMasterTimestamps().size());
 
-        assertEquals(Node.fromAddress("192.168.10.11"), masterService.getServiceMasterNodes().get(Service.from("gluster")));
-        assertNotNull(masterService.getServiceMasterTimestamps().get(Service.from("gluster")));
+        assertEquals(Node.fromAddress("192.168.10.11"), masterService.getServiceMasterNodes().get(Service.from("distributed-filesystem")));
+        assertNotNull(masterService.getServiceMasterTimestamps().get(Service.from("distributed-filesystem")));
     }
 
 }

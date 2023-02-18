@@ -57,7 +57,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-conf", "test-setup", "test-system"})
+@ActiveProfiles({"no-web-stack", "test-conf", "test-setup", "test-system", "test-services"})
 public class SettingsOperationsCommandTest {
 
     @Autowired
@@ -91,7 +91,7 @@ public class SettingsOperationsCommandTest {
 
         SettingsOperationsCommand command = SettingsOperationsCommand.create(testForm, scs);
 
-        System.err.println (command.toJSON());
+        //System.err.println (command.toJSON());
         assertTrue (new JSONObject(expectedJson).similar(command.toJSON()));
     }
 

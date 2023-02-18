@@ -73,7 +73,15 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-proxy", "test-ssh", "test-connection-manager", "system-under-test", "test-services"})
+@ActiveProfiles({
+        "no-web-stack",
+        "test-setup",
+        "test-conf",
+        "test-proxy",
+        "test-ssh",
+        "test-connection-manager",
+        "system-under-test",
+        "test-services"})
 public class SystemServiceTest {
 
     private static final Logger logger = Logger.getLogger(SystemServiceTest.class);

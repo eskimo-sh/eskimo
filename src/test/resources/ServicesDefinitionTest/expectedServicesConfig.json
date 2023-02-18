@@ -27,7 +27,7 @@
       "comment": "The scheduling mode between jobs submitted to the same CalculatorContext. \nCan be FIFO or FAIR. FAIR Seem not to work well with Kubernetes"
     },
     {
-      "name": "spark.locality.wait",
+      "name": "calculator.locality.wait",
       "defaultValue": "20s",
       "comment": "How long to wait to launch a data-local task before giving up and launching it on a less-local node."
     },

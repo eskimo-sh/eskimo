@@ -58,7 +58,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-system", "test-operations", "test-proxy", "test-kube", "test-ssh", "test-connection-manager"})
+@ActiveProfiles({
+        "no-web-stack",
+        "test-setup",
+        "test-conf",
+        "test-system",
+        "test-operations",
+        "test-proxy",
+        "test-kube",
+        "test-ssh",
+        "test-connection-manager"})
 public class SystemOperationServiceTest {
 
     @Autowired
