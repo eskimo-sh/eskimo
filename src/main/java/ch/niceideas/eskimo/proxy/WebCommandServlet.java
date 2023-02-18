@@ -92,7 +92,7 @@ public class WebCommandServlet extends HttpServlet {
                     .map (ServiceDefinition::getWebCommands)
                     .flatMap(List::stream)
                     .filter(wc -> wc.getId().equals(command))
-                    .findFirst().orElseThrow(() -> new IllegalStateException("More than one webCommand found with ID " + command));
+                    .findFirst().orElseThrow(() -> new IllegalStateException("No webCommand found with ID " + command));
 
             // 3. Find node running target service
             ServicesInstallStatusWrapper installStatus = configurationService.loadServicesInstallationStatus();

@@ -109,7 +109,7 @@ public class HttpObjectsHelper {
                             } else if ("spark-console".equals(service)) {
                                 return context + "/spark-console/history/spark-application-1653861510346/jobs/";
                             } else if ("eskimo-command".equals(service)) {
-                                return context + "/eskimo-command/kubeDashboardLoginToken";
+                                return context + "/eskimo-command/clusterDashboardLoginToken";
                             }else {
                                 throw new UnsupportedOperationException(
                                         "Unsupported method: " + method.getName());

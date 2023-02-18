@@ -59,7 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-web-socket", "test-conf", "test-ssh"})
+@ActiveProfiles({"no-web-stack", "test-web-socket", "test-conf", "test-ssh", "test-services"})
 public class WebCommandServletTest {
 
     @Autowired
