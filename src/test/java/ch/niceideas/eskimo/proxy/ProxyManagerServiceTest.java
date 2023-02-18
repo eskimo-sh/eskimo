@@ -63,7 +63,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-web-socket", "test-conf", "test-connection-manager"})
+@ActiveProfiles({"no-web-stack", "test-web-socket", "test-conf", "test-connection-manager", "test-services"})
 public class ProxyManagerServiceTest {
 
     private static final Logger logger = LogManager.getLogger(ProxyManagerServiceTest.class.getName());
@@ -88,20 +88,20 @@ public class ProxyManagerServiceTest {
 
         configurationServiceTest.setStandard2NodesInstallStatus();
 
-        proxyManagerService.removeServerForService (Service.from("gluster"), Node.fromAddress("192.168.10.11"));
-        proxyManagerService.removeServerForService (Service.from("gluster"), Node.fromAddress("192.168.10.13"));
+        proxyManagerService.removeServerForService (Service.from("distributed-filesystem"), Node.fromAddress("192.168.10.11"));
+        proxyManagerService.removeServerForService (Service.from("distributed-filesystem"), Node.fromAddress("192.168.10.13"));
 
-        proxyManagerService.removeServerForService (Service.from("zeppelin"), Node.fromAddress("192.168.10.11"));
+        proxyManagerService.removeServerForService (Service.from("user-console"), Node.fromAddress("192.168.10.11"));
 
-        proxyManagerService.removeServerForService (Service.from("flink-runtime"), Node.fromAddress("192.168.10.11"));
-        proxyManagerService.removeServerForService (Service.from("flink-runtime"), Node.fromAddress("192.168.10.12"));
-        proxyManagerService.removeServerForService (Service.from("flink-runtime"), Node.fromAddress("192.168.10.13"));
+        proxyManagerService.removeServerForService (Service.from("calculator-runtime"), Node.fromAddress("192.168.10.11"));
+        proxyManagerService.removeServerForService (Service.from("calculator-runtime"), Node.fromAddress("192.168.10.12"));
+        proxyManagerService.removeServerForService (Service.from("calculator-runtime"), Node.fromAddress("192.168.10.13"));
 
-        proxyManagerService.removeServerForService (Service.from("kubernetes-dashboard"), Node.fromAddress("192.168.10.11"));
-        proxyManagerService.removeServerForService (Service.from("kubernetes-dashboard"), Node.fromAddress("192.168.10.13"));
+        proxyManagerService.removeServerForService (Service.from("cluster-dashboard"), Node.fromAddress("192.168.10.11"));
+        proxyManagerService.removeServerForService (Service.from("cluster-dashboard"), Node.fromAddress("192.168.10.13"));
 
-        proxyManagerService.removeServerForService (Service.from("kibana"), Node.fromAddress("192.168.10.11"));
-        proxyManagerService.removeServerForService (Service.from("kibana"), Node.fromAddress("192.168.10.13"));
+        proxyManagerService.removeServerForService (Service.from("database-manager"), Node.fromAddress("192.168.10.11"));
+        proxyManagerService.removeServerForService (Service.from("database-manager"), Node.fromAddress("192.168.10.13"));
 
         connectionManagerServiceTest.reset();
         webSocketProxyServerTest.reset();
@@ -137,16 +137,16 @@ public class ProxyManagerServiceTest {
 
             ((org.apache.logging.log4j.core.Logger) testLogger).addAppender(testAppender);
 
-            proxyManagerService.updateServerForService(Service.from("gluster"), Node.fromAddress("192.168.10.11"));
+            proxyManagerService.updateServerForService(Service.from("distributed-filesystem"), Node.fromAddress("192.168.10.11"));
 
             String result = builder.toString();
 
             logger.info(result);
 
-            assertTrue(result.contains("------ BEFORE ---- updateServerForService (gluster,192.168.10.11) ----------- "));
-            assertTrue(result.contains("Updating server config for service gluster. Will recreate tunnels to 192.168.10.11"));
-            assertTrue(result.contains("------ AFTER ---- updateServerForService (gluster,192.168.10.11) -----------"));
-            assertTrue(result.contains(" - gluster/192-168-10-11 -> gluster - "));
+            assertTrue(result.contains("------ BEFORE ---- updateServerForService (distributed-filesystem,192.168.10.11) ----------- "));
+            assertTrue(result.contains("Updating server config for service distributed-filesystem. Will recreate tunnels to 192.168.10.11"));
+            assertTrue(result.contains("------ AFTER ---- updateServerForService (distributed-filesystem,192.168.10.11) -----------"));
+            assertTrue(result.contains(" - distributed-filesystem/192-168-10-11 -> distributed-filesystem - "));
         } finally {
             setLevel(ProxyManagerService.class.getName(), Level.INFO);
         }
@@ -155,21 +155,21 @@ public class ProxyManagerServiceTest {
     @Test
     @DirtiesContext
     public void testGetServerURI() throws Exception {
-        proxyManagerService.updateServerForService(Service.from("zeppelin"), Node.fromAddress("192.168.10.11"));
+        proxyManagerService.updateServerForService(Service.from("user-console"), Node.fromAddress("192.168.10.11"));
 
-        assertEquals("http://localhost:"+proxyManagerService.getTunnelConfig(ServiceWebId.fromService(Service.from("zeppelin"))).getLocalPort()+"/",
-                proxyManagerService.getServerURI(Service.from ("zeppelin"), "/zeppelin"));
-        assertEquals("http://localhost:"+proxyManagerService.getTunnelConfig(ServiceWebId.fromService(Service.from("zeppelin"))).getLocalPort()+"/",
-                proxyManagerService.getServerURI(Service.from ("zeppelin"), "/zeppelin/tugudu"));
+        assertEquals("http://localhost:"+proxyManagerService.getTunnelConfig(ServiceWebId.fromService(Service.from("user-console"))).getLocalPort()+"/",
+                proxyManagerService.getServerURI(Service.from ("user-console"), "/user-console"));
+        assertEquals("http://localhost:"+proxyManagerService.getTunnelConfig(ServiceWebId.fromService(Service.from("user-console"))).getLocalPort()+"/",
+                proxyManagerService.getServerURI(Service.from ("user-console"), "/user-console/tugudu"));
 
         assertTrue (
-                   proxyManagerService.getTunnelConfig(ServiceWebId.fromService(Service.from("zeppelin"))).getLocalPort() >= ProxyManagerService.LOCAL_PORT_RANGE_START
-                        && proxyManagerService.getTunnelConfig(ServiceWebId.fromService(Service.from("zeppelin"))).getLocalPort() <= 65535);
+                   proxyManagerService.getTunnelConfig(ServiceWebId.fromService(Service.from("user-console"))).getLocalPort() >= ProxyManagerService.LOCAL_PORT_RANGE_START
+                        && proxyManagerService.getTunnelConfig(ServiceWebId.fromService(Service.from("user-console"))).getLocalPort() <= 65535);
 
-        proxyManagerService.updateServerForService(Service.from("gluster"), Node.fromAddress("192.168.10.11"));
+        proxyManagerService.updateServerForService(Service.from("distributed-filesystem"), Node.fromAddress("192.168.10.11"));
 
-        ServiceWebId glusterServiceId  = servicesDefinition.getServiceDefinition(Service.from("gluster")).getServiceId(Node.fromAddress("192.168.10.11"));
-        assertEquals("http://localhost:"+proxyManagerService.getTunnelConfig(glusterServiceId).getLocalPort()+"/", proxyManagerService.getServerURI(Service.from ("gluster"), "/192-168-10-11/test"));
+        ServiceWebId distributedFilesystemServiceId  = servicesDefinition.getServiceDefinition(Service.from("distributed-filesystem")).getServiceId(Node.fromAddress("192.168.10.11"));
+        assertEquals("http://localhost:"+proxyManagerService.getTunnelConfig(distributedFilesystemServiceId).getLocalPort()+"/", proxyManagerService.getServerURI(Service.from ("distributed-filesystem"), "/192-168-10-11/test"));
     }
 
     @Test
@@ -183,14 +183,14 @@ public class ProxyManagerServiceTest {
     @DirtiesContext
     public void testServerForServiceManagemement_reproduceFlinkRuntimeProblem() throws Exception {
 
-        logger.info (" ---- flink-runtime detected on 192.168.10.12");
-        proxyManagerService.updateServerForService (Service.from ("flink-runtime"), Node.fromAddress("192.168.10.12"));
+        logger.info (" ---- distributed-filesystem detected on 192.168.10.12");
+        proxyManagerService.updateServerForService (Service.from ("distributed-filesystem"), Node.fromAddress("192.168.10.12"));
 
-        logger.info (" ---- flink-runtime removed from 192.168.10.12");
-        proxyManagerService.removeServerForService(Service.from ("flink-runtime"), Node.fromAddress("192.168.10.12"));
+        logger.info (" ---- distributed-filesystem removed from 192.168.10.12");
+        proxyManagerService.removeServerForService(Service.from ("distributed-filesystem"), Node.fromAddress("192.168.10.12"));
 
-        logger.info (" ---- now flink-runtime detected on 192.168.10.13");
-        proxyManagerService.updateServerForService (Service.from ("flink-runtime"), Node.fromAddress("192.168.10.13"));
+        logger.info (" ---- now distributed-filesystem detected on 192.168.10.13");
+        proxyManagerService.updateServerForService (Service.from ("distributed-filesystem"), Node.fromAddress("192.168.10.13"));
 
         assertEquals(2, connectionManagerServiceTest.getOpenedForwarders().size());
         assertEquals(1, connectionManagerServiceTest.getClosedForwarders().size());
@@ -200,20 +200,20 @@ public class ProxyManagerServiceTest {
 
         String closedForwarder = connectionManagerServiceTest.getClosedForwarders().get(0);
 
-        assertTrue(firstForwarder.endsWith("192.168.10.11/8001"));
-        assertTrue(secondForwarder.endsWith("192.168.10.11/8001"));
+        assertTrue(firstForwarder.endsWith("192.168.10.12/28901"));
+        assertTrue(secondForwarder.endsWith("192.168.10.13/28901"));
 
         assertEquals(closedForwarder, firstForwarder);
     }
 
     @Test
     @DirtiesContext
-    public void testServerForServiceManagemement_Kubernetes_kbeProxy() throws Exception {
+    public void testServerForServiceManagemement_Kubernetes_kubeProxy() throws Exception {
 
         assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
 
-        proxyManagerService.updateServerForService(Service.from ("kubernetes-dashboard"), Node.fromAddress("192.168.10.11"));
+        proxyManagerService.updateServerForService(Service.from ("cluster-dashboard"), Node.fromAddress("192.168.10.11"));
 
         assertTrue(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertTrue(webSocketProxyServerTest.isRemoveForwardersCalled());
@@ -221,13 +221,13 @@ public class ProxyManagerServiceTest {
         connectionManagerServiceTest.reset();
         webSocketProxyServerTest.reset();
 
-        proxyManagerService.updateServerForService(Service.from ("kubernetes-dashboard"), Node.fromAddress("192.168.10.11"));
+        proxyManagerService.updateServerForService(Service.from ("cluster-dashboard"), Node.fromAddress("192.168.10.11"));
 
         // should not have been recreated
         assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
 
-        proxyManagerService.updateServerForService(Service.from ("kubernetes-dashboard"), Node.fromAddress("192.168.10.13"));
+        proxyManagerService.updateServerForService(Service.from ("cluster-dashboard"), Node.fromAddress("192.168.10.13"));
 
         // since kub service are redirected to poxy on kube master, no tunnel recreation should occur when service moves
         assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
@@ -241,7 +241,7 @@ public class ProxyManagerServiceTest {
         assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
 
-        proxyManagerService.updateServerForService(Service.from ("kibana"), Node.fromAddress("192.168.10.11"));
+        proxyManagerService.updateServerForService(Service.from ("distributed-filesystem"), Node.fromAddress("192.168.10.11"));
 
         assertTrue(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertTrue(webSocketProxyServerTest.isRemoveForwardersCalled());
@@ -250,13 +250,13 @@ public class ProxyManagerServiceTest {
         connectionManagerServiceTest.dontConnect();
         webSocketProxyServerTest.reset();
 
-        proxyManagerService.updateServerForService(Service.from ("kibana"), Node.fromAddress("192.168.10.11"));
+        proxyManagerService.updateServerForService(Service.from ("distributed-filesystem"), Node.fromAddress("192.168.10.11"));
 
         // should not have been recreated
         assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
 
-        proxyManagerService.updateServerForService(Service.from ("kibana"), Node.fromAddress("192.168.10.13"));
+        proxyManagerService.updateServerForService(Service.from ("distributed-filesystem"), Node.fromAddress("192.168.10.13"));
 
         assertTrue(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertTrue(webSocketProxyServerTest.isRemoveForwardersCalled());
@@ -269,7 +269,7 @@ public class ProxyManagerServiceTest {
         assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
 
-        proxyManagerService.updateServerForService(Service.from ("gluster"), Node.fromAddress("192.168.10.11"));
+        proxyManagerService.updateServerForService(Service.from ("distributed-filesystem"), Node.fromAddress("192.168.10.11"));
 
         assertTrue(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertTrue(webSocketProxyServerTest.isRemoveForwardersCalled());
@@ -278,13 +278,13 @@ public class ProxyManagerServiceTest {
         connectionManagerServiceTest.dontConnect();
         webSocketProxyServerTest.reset();
 
-        proxyManagerService.updateServerForService(Service.from ("gluster"), Node.fromAddress("192.168.10.11"));
+        proxyManagerService.updateServerForService(Service.from ("distributed-filesystem"), Node.fromAddress("192.168.10.11"));
 
         // should not have been recreated
         assertFalse(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertFalse(webSocketProxyServerTest.isRemoveForwardersCalled());
 
-        proxyManagerService.updateServerForService(Service.from ("gluster"), Node.fromAddress("192.168.10.13"));
+        proxyManagerService.updateServerForService(Service.from ("distributed-filesystem"), Node.fromAddress("192.168.10.13"));
 
         assertTrue(connectionManagerServiceTest.isRecreateTunnelsCalled());
         assertTrue(webSocketProxyServerTest.isRemoveForwardersCalled());

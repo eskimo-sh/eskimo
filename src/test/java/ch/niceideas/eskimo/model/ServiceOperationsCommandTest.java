@@ -63,7 +63,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-conf", "test-setup"})
+@ActiveProfiles({"no-web-stack", "test-conf", "test-setup", "test-services"})
 public class ServiceOperationsCommandTest {
 
     @Autowired
@@ -94,7 +94,7 @@ public class ServiceOperationsCommandTest {
     public void testInstallationKubeMaster() throws Exception {
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        savedServicesInstallStatus.getJSONObject().remove("kube-master_installed_on_IP_192-168-10-11");
+        savedServicesInstallStatus.getJSONObject().remove("cluster-master_installed_on_IP_192-168-10-11");
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
 
@@ -102,13 +102,13 @@ public class ServiceOperationsCommandTest {
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         assertEquals(1, oc.getInstallations().size());
-        assertEquals(Service.from("kube-master"), oc.getInstallations().get(0).getService());
+        assertEquals(Service.from("cluster-master"), oc.getInstallations().get(0).getService());
         assertEquals(Node.fromAddress("192.168.10.11"), oc.getInstallations().get(0).getNode());
 
         assertEquals(0, oc.getUninstallations().size());
 
         assertEquals(2, oc.getRestarts().size());
-        assertEquals(Service.from("kube-slave"), oc.getRestarts().get(0).getService());
+        assertEquals(Service.from("cluster-slave"), oc.getRestarts().get(0).getService());
         assertEquals(Node.fromAddress("192.168.10.11"), oc.getRestarts().get(0).getNode());
     }
 
@@ -118,7 +118,7 @@ public class ServiceOperationsCommandTest {
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
-        nodesConfig.getJSONObject().remove("kube-master");
+        nodesConfig.getJSONObject().remove("cluster-master");
 
         ServiceOperationsCommand oc = ServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
@@ -126,25 +126,25 @@ public class ServiceOperationsCommandTest {
         assertEquals(0, oc.getInstallations().size());
 
         assertEquals(1, oc.getUninstallations().size());
-        assertEquals(Service.from("kube-master"), oc.getUninstallations().get(0).getService());
+        assertEquals(Service.from("cluster-master"), oc.getUninstallations().get(0).getService());
         assertEquals(Node.fromAddress("192.168.10.11"), oc.getUninstallations().get(0).getNode());
 
         assertEquals(2, oc.getRestarts().size());
-        assertEquals(Service.from("kube-slave"), oc.getRestarts().get(0).getService());
+        assertEquals(Service.from("cluster-slave"), oc.getRestarts().get(0).getService());
         assertEquals(Node.fromAddress("192.168.10.11"), oc.getRestarts().get(0).getNode());
     }
 
     @Test
     public void testRestartMany() throws Exception {
 
-        ServiceOperationsCommand oc = prepareFiveOps();
+        ServiceOperationsCommand oc = prepareThreeOps();
 
         System.err.println (oc.toJSON());
 
         assertTrue (new JSONObject(
-                "{\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
-                "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
-                "\"installations\":[{\"zookeeper\":\"192.168.10.11\"},{\"etcd\":\"192.168.10.13\"}]}")
+                "{\"restarts\":[{\"distributed-filesystem\":\"192.168.10.11\"},{\"distributed-filesystem\":\"192.168.10.13\"},{\"database\":\"(kubernetes)\"},{\"broker\":\"(kubernetes)\"},{\"broker-manager\":\"(kubernetes)\"},{\"user-console\":\"(kubernetes)\"}]," +
+                        "\"uninstallations\":[{\"cluster-manager\":\"192.168.10.13\"},{\"cluster-slave\":\"192.168.10.11\"},{\"distributed-time\":\"192.168.10.11\"}]," +
+                        "\"installations\":[{\"distributed-time\":\"192.168.10.13\"},{\"cluster-manager\":\"192.168.10.11\"}]}")
                 .similar(oc.toJSON()));
     }
 
@@ -152,7 +152,7 @@ public class ServiceOperationsCommandTest {
     public void testRestartOnlySameNode() throws Exception {
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        savedServicesInstallStatus.getJSONObject().remove("gluster_installed_on_IP_192-168-10-11");
+        savedServicesInstallStatus.getJSONObject().remove("distributed-filesystem_installed_on_IP_192-168-10-11");
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
 
@@ -161,21 +161,17 @@ public class ServiceOperationsCommandTest {
 
         assertEquals(1, oc.getInstallations().size());
 
-        assertEquals(Service.from("gluster"), oc.getInstallations().get(0).getService());
+        assertEquals(Service.from("distributed-filesystem"), oc.getInstallations().get(0).getService());
         assertEquals(Node.fromAddress("192.168.10.11"), oc.getInstallations().get(0).getNode());
 
         assertEquals(0, oc.getUninstallations().size());
 
-        assertEquals(7, oc.getRestarts().size());
+        assertEquals(3, oc.getRestarts().size());
 
         assertEquals (
-                "kube-master=192.168.10.11\n" +
-                        "kube-slave=192.168.10.11\n" +
-                        "spark-runtime=(kubernetes)\n" +
-                        "logstash=(kubernetes)\n" +
-                        "spark-console=(kubernetes)\n" +
-                        "kafka=(kubernetes)\n" +
-                        "zeppelin=(kubernetes)"
+                "cluster-slave=192.168.10.11\n" +
+                        "cluster-master=192.168.10.11\n" +
+                        "user-console=(kubernetes)"
                 , oc.getRestarts().stream()
                         .map(operationId -> operationId.getService()+"="+operationId.getNode())
                         .collect(Collectors.joining("\n")));
@@ -185,16 +181,16 @@ public class ServiceOperationsCommandTest {
     public void testMoveServices() throws Exception {
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = new ServicesInstallStatusWrapper (new HashMap<>() {{
-            put ("cerebro_installed_on_IP_KUBERNETES_NODE", "OK");
-            put ("ntp_installed_on_IP_192-168-10-11", "OK");
-            put ("etcd_installed_on_IP_192-168-10-11", "OK");
+            put ("database-manager_installed_on_IP_KUBERNETES_NODE", "OK");
+            put ("distributed-time_installed_on_IP_192-168-10-11", "OK");
+            put ("cluster-manager_installed_on_IP_192-168-10-11", "OK");
         }});
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put ("node_id1", "192.168.10.11");
             put ("node_id2", "192.168.10.13");
-            put ("etcd2", "on");
-            put ("ntp2", "on");
+            put ("cluster-manager2", "on");
+            put ("distributed-time2", "on");
         }} );
 
         ServiceOperationsCommand oc = ServiceOperationsCommand.create(
@@ -203,48 +199,11 @@ public class ServiceOperationsCommandTest {
         System.err.println (oc.toJSON());
 
         assertTrue (new JSONObject(
-                "{" +
-                "\"restarts\":[]," +
-                "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"ntp\":\"192.168.10.11\"}]," +
-                "\"installations\":[{\"ntp\":\"192.168.10.13\"},{\"etcd\":\"192.168.10.13\"}]}")
+                "{\"restarts\":[]," +
+                        "\"uninstallations\":[{\"cluster-manager\":\"192.168.10.11\"},{\"distributed-time\":\"192.168.10.11\"}]," +
+                        "\"installations\":[{\"distributed-time\":\"192.168.10.13\"},{\"cluster-manager\":\"192.168.10.13\"}]}")
                 .similar(oc.toJSON()));
 
-    }
-
-    @Test
-    public void testToJSON() {
-
-        ServiceOperationsCommand oc = new ServiceOperationsCommand(NodesConfigWrapper.empty());
-
-        oc.addInstallation(new ServiceOperationsCommand.ServiceOperationId(
-                ServiceOperationsCommand.ServiceOperation.INSTALLATION, Service.from("elasticsearch"), Node.fromAddress("192.168.10.11")));
-        oc.addInstallation(new ServiceOperationsCommand.ServiceOperationId(
-                ServiceOperationsCommand.ServiceOperation.INSTALLATION, Service.from("kibana"), Node.fromAddress("192.168.10.11")));
-        oc.addInstallation(new ServiceOperationsCommand.ServiceOperationId(
-                ServiceOperationsCommand.ServiceOperation.INSTALLATION, Service.from("cerebro"), Node.fromAddress("192.168.10.11")));
-
-        oc.addUninstallation(new ServiceOperationsCommand.ServiceOperationId(
-                ServiceOperationsCommand.ServiceOperation.UNINSTALLATION, Service.from("cerebro"), Node.fromAddress("192.168.10.13")));
-        oc.addUninstallation(new ServiceOperationsCommand.ServiceOperationId(
-                ServiceOperationsCommand.ServiceOperation.UNINSTALLATION, Service.from("kibana"), Node.fromAddress("192.168.10.13")));
-        oc.addUninstallation(new ServiceOperationsCommand.ServiceOperationId(
-                ServiceOperationsCommand.ServiceOperation.UNINSTALLATION, Service.from("logstash"), Node.fromAddress("192.168.10.13")));
-
-        oc.addRestartIfNotInstalled(Service.from("zeppelin"), Node.fromAddress("192.168.10.13"));
-
-        assertTrue(new JSONObject("{\n" +
-                "  \"installations\": [\n" +
-                "    {\"elasticsearch\": \"192.168.10.11\"},\n" +
-                "    {\"kibana\": \"192.168.10.11\"},\n" +
-                "    {\"cerebro\": \"192.168.10.11\"}\n" +
-                "  ],\n" +
-                "  \"restarts\": [{\"zeppelin\": \"192.168.10.13\"}],\n" +
-                "  \"uninstallations\": [\n" +
-                "    {\"cerebro\": \"192.168.10.13\"},\n" +
-                "    {\"kibana\": \"192.168.10.13\"},\n" +
-                "    {\"logstash\": \"192.168.10.13\"}\n" +
-                "  ]\n" +
-                "}").similar(oc.toJSON()));
     }
 
     @Test
@@ -264,7 +223,7 @@ public class ServiceOperationsCommandTest {
         assertTrue(oc.getUninstallations().isEmpty());
 
         // new installations on .15, .16, .17, .18
-        assertEquals(32, oc.getInstallations().size());
+        assertEquals(24, oc.getInstallations().size());
     }
 
 
@@ -272,14 +231,14 @@ public class ServiceOperationsCommandTest {
     public void testRecoverUninstallationWhenNodeDownMiddleUninstall() throws Exception {
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        savedServicesInstallStatus.getJSONObject().remove("etcd_installed_on_IP_192-168-10-13");
+        savedServicesInstallStatus.getJSONObject().remove("distributed-time_installed_on_IP_192-168-10-13");
 
         // 1. some services are uninstalled from a node, one service is moved
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
-        nodesConfig.getJSONObject().remove("kube-slave1");
-        nodesConfig.getJSONObject().remove("etcd1");
+        nodesConfig.getJSONObject().remove("cluster-slave1");
+        nodesConfig.getJSONObject().remove("distribted-time1");
 
-        nodesConfig.setValueForPath("zookeeper", "1");
+        nodesConfig.setValueForPath("cluster-manager", "1");
 
         ServiceOperationsCommand oc = ServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
@@ -287,23 +246,21 @@ public class ServiceOperationsCommandTest {
         System.err.println (oc.toJSON());
 
         assertTrue (new JSONObject(
-                "{\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
-                "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
-                "\"installations\":[{\"zookeeper\":\"192.168.10.11\"},{\"etcd\":\"192.168.10.13\"}]}")
+                "{\"restarts\":[{\"distributed-time\":\"192.168.10.11\"},{\"distributed-filesystem\":\"192.168.10.11\"},{\"distributed-filesystem\":\"192.168.10.13\"},{\"database\":\"(kubernetes)\"},{\"broker\":\"(kubernetes)\"},{\"broker-manager\":\"(kubernetes)\"},{\"user-console\":\"(kubernetes)\"}]," +
+                        "\"uninstallations\":[{\"cluster-manager\":\"192.168.10.13\"},{\"cluster-slave\":\"192.168.10.11\"}]," +
+                        "\"installations\":[{\"distributed-time\":\"192.168.10.13\"},{\"cluster-manager\":\"192.168.10.11\"}]}")
                 .similar(oc.toJSON()));
 
         // node vanished
-        // uninstallation fails in the middle (after zookeeper)
-        savedServicesInstallStatus.setValueForPath("zookeeper_installed_on_IP_192-168-10-11", "OK");
-        savedServicesInstallStatus.setValueForPath("etcd_installed_on_IP_192-168-10-13", "OK");
-        savedServicesInstallStatus.getJSONObject().remove("etcd_installed_on_IP_192-168-10-11");
+        // uninstallation fails in the middle (after cluster-manager)
+        savedServicesInstallStatus.setValueForPath("cluster-manager_installed_on_IP_192-168-10-11", "OK");
+        savedServicesInstallStatus.setValueForPath("distributed-time_installed_on_IP_192-168-10-13", "OK");
+        savedServicesInstallStatus.getJSONObject().remove("distributed-time_installed_on_IP_192-168-10-11");
 
         // flag all restarts
-        savedServicesInstallStatus.setValueForPath("etcd_installed_on_IP_192-168-10-11", "restart");
-        savedServicesInstallStatus.setValueForPath("kube-master_installed_on_IP_192-168-10-13", "restart");
-        savedServicesInstallStatus.setValueForPath("kube-slave_installed_on_IP_192-168-10-13", "restart");
-        savedServicesInstallStatus.setValueForPath("logstash_installed_on_IP_192-168-10-11", "restart");
-        savedServicesInstallStatus.setValueForPath("logstash_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("distributed-time_installed_on_IP_192-168-10-11", "restart");
+        savedServicesInstallStatus.setValueForPath("cluster-master_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("cluster-slave_installed_on_IP_192-168-10-13", "restart");
 
         ServiceOperationsCommand oc2 = ServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
@@ -311,9 +268,9 @@ public class ServiceOperationsCommandTest {
         System.err.println (oc2.toJSON());
 
         assertTrue (new JSONObject(
-                "{\"restarts\":[{\"etcd\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"kube-master\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.13\"},{\"kube-slave\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
-                "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-master\":\"192.168.10.13\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
-                "\"installations\":[]}")
+                "{\"restarts\":[{\"cluster-manager\":\"192.168.10.11\"},{\"distributed-time\":\"192.168.10.11\"},{\"distributed-filesystem\":\"192.168.10.11\"},{\"distributed-filesystem\":\"192.168.10.13\"},{\"cluster-master\":\"192.168.10.11\"},{\"cluster-slave\":\"192.168.10.13\"},{\"cluster-master\":\"192.168.10.13\"},{\"database\":\"(kubernetes)\"},{\"broker\":\"(kubernetes)\"},{\"broker-manager\":\"(kubernetes)\"},{\"user-console\":\"(kubernetes)\"}]," +
+                        "\"uninstallations\":[{\"cluster-manager\":\"192.168.10.13\"},{\"cluster-master\":\"192.168.10.13\"},{\"cluster-slave\":\"192.168.10.11\"}]," +
+                        "\"installations\":[]}")
                 .similar(oc2.toJSON()));
     }
 
@@ -321,14 +278,14 @@ public class ServiceOperationsCommandTest {
     public void testRecoverUninstallationWhenNodeDownAfterUninstall() throws Exception {
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        savedServicesInstallStatus.getJSONObject().remove("etcd_installed_on_IP_192-168-10-13");
+        savedServicesInstallStatus.getJSONObject().remove("distributed-time_installed_on_IP_192-168-10-13");
 
         // 1. some services are uninstalled from a node, one service is moved
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
-        nodesConfig.getJSONObject().remove("kube-slave1");
-        nodesConfig.getJSONObject().remove("etcd1");
+        nodesConfig.getJSONObject().remove("cluster-slave1");
+        nodesConfig.getJSONObject().remove("distributed-time1");
 
-        nodesConfig.setValueForPath("zookeeper", "1");
+        nodesConfig.setValueForPath("cluster-manager", "1");
 
         ServiceOperationsCommand oc = ServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
@@ -336,25 +293,23 @@ public class ServiceOperationsCommandTest {
         System.err.println (oc.toJSON());
 
         assertTrue(new JSONObject(
-                "{\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
-                "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
-                "\"installations\":[{\"zookeeper\":\"192.168.10.11\"},{\"etcd\":\"192.168.10.13\"}]}")
+                "{\"restarts\":[{\"distributed-filesystem\":\"192.168.10.11\"},{\"distributed-filesystem\":\"192.168.10.13\"},{\"database\":\"(kubernetes)\"},{\"broker\":\"(kubernetes)\"},{\"broker-manager\":\"(kubernetes)\"},{\"user-console\":\"(kubernetes)\"}]," +
+                        "\"uninstallations\":[{\"cluster-manager\":\"192.168.10.13\"},{\"cluster-slave\":\"192.168.10.11\"},{\"distributed-time\":\"192.168.10.11\"}]," +
+                        "\"installations\":[{\"distributed-time\":\"192.168.10.13\"},{\"cluster-manager\":\"192.168.10.11\"}]}")
                 .similar(oc.toJSON()));
 
         // node vanished
-        // uninstallation fails in the middle (after zookeeper)
-        savedServicesInstallStatus.setValueForPath("zookeeper_installed_on_IP_192-168-10-11", "OK");
-        savedServicesInstallStatus.setValueForPath("etcd_installed_on_IP_192-168-10-13", "OK");
-        savedServicesInstallStatus.getJSONObject().remove("zookeeper_installed_on_IP_192-168-10-13");
-        savedServicesInstallStatus.getJSONObject().remove("kube-slave_installed_on_IP_192-168-10-11");
-        savedServicesInstallStatus.getJSONObject().remove("etcd_installed_on_IP_192-168-10-11");
+        // uninstallation fails in the middle (after cluster-manager)
+        savedServicesInstallStatus.setValueForPath("cluster-manager_installed_on_IP_192-168-10-11", "OK");
+        savedServicesInstallStatus.setValueForPath("distributed-time_installed_on_IP_192-168-10-13", "OK");
+        savedServicesInstallStatus.getJSONObject().remove("cluster-manager_installed_on_IP_192-168-10-13");
+        savedServicesInstallStatus.getJSONObject().remove("cluster-slave_installed_on_IP_192-168-10-11");
+        savedServicesInstallStatus.getJSONObject().remove("distributed-time_installed_on_IP_192-168-10-11");
 
         // flag all restarts
-        savedServicesInstallStatus.setValueForPath("etcd_installed_on_IP_192-168-10-13", "restart");
-        savedServicesInstallStatus.setValueForPath("kube-master_installed_on_IP_192-168-10-13", "restart");
-        savedServicesInstallStatus.setValueForPath("kube-slave_installed_on_IP_192-168-10-13", "restart");
-        savedServicesInstallStatus.setValueForPath("logstash_installed_on_IP_192-168-10-11", "restart");
-        savedServicesInstallStatus.setValueForPath("logstash_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("distributed-time_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("cluster-master_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("cluster-slave_installed_on_IP_192-168-10-13", "restart");
 
         ServiceOperationsCommand oc2 = ServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
@@ -362,15 +317,9 @@ public class ServiceOperationsCommandTest {
         System.err.println (oc2.toJSON());
 
         assertTrue (new JSONObject(
-                "{\"restarts\":[" +
-                        "{\"etcd\":\"192.168.10.13\"}," +
-                        "{\"kube-master\":\"192.168.10.11\"}," +
-                        "{\"kube-master\":\"192.168.10.13\"}," +
-                        "{\"kube-slave\":\"192.168.10.13\"}," +
-                        "{\"logstash\":\"(kubernetes)\"}]" +
-                ",\"uninstallations\":[" +
-                        "{\"kube-master\":\"192.168.10.13\"}]," +
-                 "\"installations\":[]}")
+                "{\"restarts\":[{\"distributed-time\":\"192.168.10.13\"},{\"cluster-master\":\"192.168.10.11\"},{\"cluster-slave\":\"192.168.10.13\"},{\"cluster-master\":\"192.168.10.13\"}]," +
+                        "\"uninstallations\":[{\"cluster-master\":\"192.168.10.13\"}]," +
+                        "\"installations\":[]}")
                 .similar(oc2.toJSON()));
     }
 
@@ -378,14 +327,14 @@ public class ServiceOperationsCommandTest {
     public void testRecoverUninstallationWhenNodeDownMiddleRestart() throws Exception {
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        savedServicesInstallStatus.getJSONObject().remove("etcd_installed_on_IP_192-168-10-13");
+        savedServicesInstallStatus.getJSONObject().remove("distributed-time_installed_on_IP_192-168-10-13");
 
         // 1. some services are uninstalled from a node, one service is moved
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
-        nodesConfig.getJSONObject().remove("kube-slave1");
-        nodesConfig.getJSONObject().remove("etcd1");
+        nodesConfig.getJSONObject().remove("cluster-slave1");
+        nodesConfig.getJSONObject().remove("distributed-time1");
 
-        nodesConfig.setValueForPath("zookeeper", "1");
+        nodesConfig.setValueForPath("cluster-manager", "1");
 
         ServiceOperationsCommand oc = ServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
@@ -393,30 +342,28 @@ public class ServiceOperationsCommandTest {
         System.err.println (oc.toJSON());
 
         assertTrue(new JSONObject(
-                "{\"restarts\":[{\"gluster\":\"192.168.10.11\"},{\"gluster\":\"192.168.10.13\"},{\"elasticsearch\":\"(kubernetes)\"},{\"logstash\":\"(kubernetes)\"},{\"kafka\":\"(kubernetes)\"},{\"kafka-manager\":\"(kubernetes)\"},{\"zeppelin\":\"(kubernetes)\"}]," +
-                "\"uninstallations\":[{\"etcd\":\"192.168.10.11\"},{\"kube-slave\":\"192.168.10.11\"},{\"zookeeper\":\"192.168.10.13\"}]," +
-                "\"installations\":[{\"zookeeper\":\"192.168.10.11\"},{\"etcd\":\"192.168.10.13\"}]}")
+                "{\"restarts\":[{\"distributed-filesystem\":\"192.168.10.11\"},{\"distributed-filesystem\":\"192.168.10.13\"},{\"database\":\"(kubernetes)\"},{\"broker\":\"(kubernetes)\"},{\"broker-manager\":\"(kubernetes)\"},{\"user-console\":\"(kubernetes)\"}]," +
+                        "\"uninstallations\":[{\"cluster-manager\":\"192.168.10.13\"},{\"cluster-slave\":\"192.168.10.11\"},{\"distributed-time\":\"192.168.10.11\"}]," +
+                        "\"installations\":[{\"distributed-time\":\"192.168.10.13\"},{\"cluster-manager\":\"192.168.10.11\"}]}")
                 .similar(oc.toJSON()));
 
 
         // node vanished
-        // uninstallation fails in the middle (after zookeeper)
-        savedServicesInstallStatus.setValueForPath("zookeeper_installed_on_IP_192-168-10-11", "OK");
-        savedServicesInstallStatus.setValueForPath("etcd_installed_on_IP_192-168-10-13", "OK");
-        savedServicesInstallStatus.getJSONObject().remove("zookeeper_installed_on_IP_192-168-10-13");
-        savedServicesInstallStatus.getJSONObject().remove("kube-slave_installed_on_IP_192-168-10-11");
-        savedServicesInstallStatus.getJSONObject().remove("etcd_installed_on_IP_192-168-10-11");
+        // uninstallation fails in the middle (after cluster-manager)
+        savedServicesInstallStatus.setValueForPath("cluster-manager_installed_on_IP_192-168-10-11", "OK");
+        savedServicesInstallStatus.setValueForPath("distributed-time_installed_on_IP_192-168-10-13", "OK");
+        savedServicesInstallStatus.getJSONObject().remove("cluster-manager_installed_on_IP_192-168-10-13");
+        savedServicesInstallStatus.getJSONObject().remove("cluster-slave_installed_on_IP_192-168-10-11");
+        savedServicesInstallStatus.getJSONObject().remove("distributed-time_installed_on_IP_192-168-10-11");
 
         // flag all restarts
-        savedServicesInstallStatus.setValueForPath("kube-master_installed_on_IP_192-168-10-13", "restart");
-        savedServicesInstallStatus.setValueForPath("kube-slave_installed_on_IP_192-168-10-13", "restart");
-        savedServicesInstallStatus.setValueForPath("logstash_installed_on_IP_192-168-10-11", "restart");
-        savedServicesInstallStatus.setValueForPath("logstash_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("cluster-master_installed_on_IP_192-168-10-13", "restart");
+        savedServicesInstallStatus.setValueForPath("cluster-slave_installed_on_IP_192-168-10-13", "restart");
 
         // some restarts done
-        savedServicesInstallStatus.setValueForPath("gluster_installed_on_IP_192-168-10-11", "OK");
-        savedServicesInstallStatus.setValueForPath("gluster_installed_on_IP_192-168-10-13", "OK");
-        savedServicesInstallStatus.setValueForPath("kube-master_installed_on_IP_192-168-10-13", "OK");
+        savedServicesInstallStatus.setValueForPath("distributed-filesystem_installed_on_IP_192-168-10-11", "OK");
+        savedServicesInstallStatus.setValueForPath("distributed-filesystem_installed_on_IP_192-168-10-13", "OK");
+        savedServicesInstallStatus.setValueForPath("cluster-master_installed_on_IP_192-168-10-13", "OK");
 
         ServiceOperationsCommand oc2 = ServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
@@ -424,53 +371,48 @@ public class ServiceOperationsCommandTest {
         System.err.println (oc2.toJSON());
 
         assertTrue (new JSONObject(
-                "{\"restarts\":[" +
-                        "{\"kube-master\":\"192.168.10.11\"}," +
-                        "{\"kube-slave\":\"192.168.10.13\"}," +
-                        "{\"logstash\":\"(kubernetes)\"}]" +
-                ",\"uninstallations\":[" +
-                        "{\"kube-master\":\"192.168.10.13\"}]," +
-                "\"installations\":[]}")
+                "{\"restarts\":[{\"cluster-master\":\"192.168.10.11\"},{\"cluster-slave\":\"192.168.10.13\"}]," +
+                        "\"uninstallations\":[{\"cluster-master\":\"192.168.10.13\"}]," +
+                        "\"installations\":[]}")
                 .similar(oc2.toJSON()));
     }
 
     @Test
-    public void toJSON () throws Exception {
+    public void testToJSON () throws Exception {
 
-        ServiceOperationsCommand oc = prepareFiveOps();
+        ServiceOperationsCommand oc = prepareThreeOps();
 
         assertEquals ("{\n" +
                 "  \"restarts\": [\n" +
-                "    {\"gluster\": \"192.168.10.11\"},\n" +
-                "    {\"gluster\": \"192.168.10.13\"},\n" +
-                "    {\"elasticsearch\": \"(kubernetes)\"},\n" +
-                "    {\"logstash\": \"(kubernetes)\"},\n" +
-                "    {\"kafka\": \"(kubernetes)\"},\n" +
-                "    {\"kafka-manager\": \"(kubernetes)\"},\n" +
-                "    {\"zeppelin\": \"(kubernetes)\"}\n" +
+                "    {\"distributed-filesystem\": \"192.168.10.11\"},\n" +
+                "    {\"distributed-filesystem\": \"192.168.10.13\"},\n" +
+                "    {\"database\": \"(kubernetes)\"},\n" +
+                "    {\"broker\": \"(kubernetes)\"},\n" +
+                "    {\"broker-manager\": \"(kubernetes)\"},\n" +
+                "    {\"user-console\": \"(kubernetes)\"}\n" +
                 "  ],\n" +
                 "  \"uninstallations\": [\n" +
-                "    {\"etcd\": \"192.168.10.11\"},\n" +
-                "    {\"kube-slave\": \"192.168.10.11\"},\n" +
-                "    {\"zookeeper\": \"192.168.10.13\"}\n" +
+                "    {\"cluster-manager\": \"192.168.10.13\"},\n" +
+                "    {\"cluster-slave\": \"192.168.10.11\"},\n" +
+                "    {\"distributed-time\": \"192.168.10.11\"}\n" +
                 "  ],\n" +
                 "  \"installations\": [\n" +
-                "    {\"zookeeper\": \"192.168.10.11\"},\n" +
-                "    {\"etcd\": \"192.168.10.13\"}\n" +
+                "    {\"distributed-time\": \"192.168.10.13\"},\n" +
+                "    {\"cluster-manager\": \"192.168.10.11\"}\n" +
                 "  ]\n" +
                 "}", oc.toJSON().toString(2));
     }
 
-    private ServiceOperationsCommand prepareFiveOps() throws NodesConfigurationException {
+    private ServiceOperationsCommand prepareThreeOps() throws NodesConfigurationException {
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        savedServicesInstallStatus.getJSONObject().remove("etcd_installed_on_IP_192-168-10-13");
+        savedServicesInstallStatus.getJSONObject().remove("distributed-time_installed_on_IP_192-168-10-13");
 
         // 1. some services are uninstalled from a node, one service is moved
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
-        nodesConfig.getJSONObject().remove("kube-slave1");
-        nodesConfig.getJSONObject().remove("etcd1");
+        nodesConfig.getJSONObject().remove("cluster-slave1");
+        nodesConfig.getJSONObject().remove("distributed-time1");
 
-        nodesConfig.setValueForPath("zookeeper", "1");
+        nodesConfig.setValueForPath("cluster-manager", "1");
 
         return ServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
@@ -479,7 +421,7 @@ public class ServiceOperationsCommandTest {
     @Test
     public void testGetAllOperationsInOrder() throws Exception {
 
-        ServiceOperationsCommand oc = prepareFiveOps();
+        ServiceOperationsCommand oc = prepareThreeOps();
 
         List<ServiceOperationsCommand.ServiceOperationId> opsInOrder =  oc.getAllOperationsInOrder(new OperationsContext() {
             @Override
@@ -490,8 +432,8 @@ public class ServiceOperationsCommandTest {
             @Override
             public NodesConfigWrapper getNodesConfig() {
                 NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
-                nodesConfig.getJSONObject().remove("kube-slave1");
-                nodesConfig.getJSONObject().remove("etcd1");
+                nodesConfig.getJSONObject().remove("cluster-slave1");
+                nodesConfig.getJSONObject().remove("distributed-time1");
                 return nodesConfig;
             }
         });
@@ -499,18 +441,17 @@ public class ServiceOperationsCommandTest {
         assertEquals(
                 "Check--Install_Base-System_192-168-10-11,\n" +
                         "Check--Install_Base-System_192-168-10-13,\n" +
-                        "installation_zookeeper_192-168-10-11,\n" +
-                        "uninstallation_zookeeper_192-168-10-13,\n" +
-                        "installation_etcd_192-168-10-13,\n" +
-                        "uninstallation_etcd_192-168-10-11,\n" +
-                        "restart_gluster_192-168-10-11,\n" +
-                        "restart_gluster_192-168-10-13,\n" +
-                        "uninstallation_kube-slave_192-168-10-11,\n" +
-                        "restart_elasticsearch_kubernetes,\n" +
-                        "restart_kafka_kubernetes,\n" +
-                        "restart_kafka-manager_kubernetes,\n" +
-                        "restart_logstash_kubernetes,\n" +
-                        "restart_zeppelin_kubernetes",
+                        "installation_cluster-manager_192-168-10-11,\n" +
+                        "uninstallation_cluster-manager_192-168-10-13,\n" +
+                        "installation_distributed-time_192-168-10-13,\n" +
+                        "uninstallation_distributed-time_192-168-10-11,\n" +
+                        "restart_distributed-filesystem_192-168-10-11,\n" +
+                        "restart_distributed-filesystem_192-168-10-13,\n" +
+                        "uninstallation_cluster-slave_192-168-10-11,\n" +
+                        "restart_database_kubernetes,\n" +
+                        "restart_broker_kubernetes,\n" +
+                        "restart_broker-manager_kubernetes,\n" +
+                        "restart_user-console_kubernetes",
                 opsInOrder.stream()
                         .map(ServiceOperationsCommand.ServiceOperationId::toString)
                         .collect(Collectors.joining(","))

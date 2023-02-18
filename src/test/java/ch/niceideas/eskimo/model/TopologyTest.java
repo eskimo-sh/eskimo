@@ -43,6 +43,7 @@ import ch.niceideas.eskimo.services.SystemServiceTest;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
+import ch.niceideas.eskimo.test.services.ServicesDefinitionTestImpl;
 import ch.niceideas.eskimo.test.testwrappers.SetupServiceUnderTest;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
@@ -69,10 +70,10 @@ public class TopologyTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        def = new ServicesDefinitionImpl();
+        def = new ServicesDefinitionTestImpl();
         def.setSetupService (setupService);
         setupService.setServicesDefinition(def);
-        def.afterPropertiesSet();
+        //def.afterPropertiesSet();
         tempStoragePath = SystemServiceTest.createTempStoragePath();
         setupService.setConfigStoragePathInternal(tempStoragePath);
     }
@@ -384,10 +385,7 @@ public class TopologyTest {
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_B_1=192.168.10.12\n" +
                 "export MASTER_SERVICE_C_1=192.168.10.11\n" +
-                "export MASTER_SERVICE_C_2=192.168.10.13\n" +
-                "\n" +
-                "#Eskimo System Users\n" +
-                "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
+                "export MASTER_SERVICE_C_2=192.168.10.13\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
     }
 
     private KubernetesServicesConfigWrapper createTestKubernetesConfig() {
@@ -422,10 +420,7 @@ public class TopologyTest {
 
         assertEquals ("#Topology\n" +
                 "export SELF_MASTER_SERVICE_B_1921681011=192.168.10.11\n" +
-                "export SELF_MASTER_SERVICE_C_1921681011=192.168.10.11\n" +
-                "\n" +
-                "#Eskimo System Users\n" +
-                "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
+                "export SELF_MASTER_SERVICE_C_1921681011=192.168.10.11\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
     }
 
     @Test
@@ -442,10 +437,7 @@ public class TopologyTest {
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_B_1=192.168.10.12\n" +
                 "export MASTER_SERVICE_C_1=192.168.10.11\n" +
-                "export MASTER_SERVICE_C_2=192.168.10.13\n" +
-                "\n" +
-                "#Eskimo System Users\n" +
-                "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
+                "export MASTER_SERVICE_C_2=192.168.10.13\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
     }
 
     @Test
@@ -469,10 +461,7 @@ public class TopologyTest {
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_B_1921681011=192.168.10.13\n" +
                 "export MASTER_SERVICE_C_1921681011=192.168.10.13\n" +
-                "export MASTER_SERVICE_C_1921681013=192.168.10.11\n" +
-                "\n" +
-                "#Eskimo System Users\n" +
-                "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
+                "export MASTER_SERVICE_C_1921681013=192.168.10.11\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
     }
 
     @Test
@@ -496,10 +485,7 @@ public class TopologyTest {
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_B_1921681011=192.168.10.13\n" +
                 "export MASTER_SERVICE_C_1921681011=192.168.10.13\n" +
-                "export MASTER_SERVICE_C_1921681013=192.168.10.11\n" +
-                "\n" +
-                "#Eskimo System Users\n" +
-                "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
+                "export MASTER_SERVICE_C_1921681013=192.168.10.11\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
     }
 
     @Test
@@ -518,10 +504,7 @@ public class TopologyTest {
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_B_1921681011=192.168.10.11\n" +
-                "export MASTER_SERVICE_C_1921681011=192.168.10.11\n" +
-                "\n" +
-                "#Eskimo System Users\n" +
-                "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
+                "export MASTER_SERVICE_C_1921681011=192.168.10.11\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
     }
 
     @Test
@@ -551,10 +534,7 @@ public class TopologyTest {
                 "export MASTER_SERVICE_C_1921681011=192.168.10.13\n" +
                 "export MASTER_SERVICE_C_1921681012=192.168.10.13\n" +
                 "export MASTER_SERVICE_C_1921681013=192.168.10.14\n" +
-                "export MASTER_SERVICE_C_1921681014=192.168.10.11\n" +
-                "\n" +
-                "#Eskimo System Users\n" +
-                "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
+                "export MASTER_SERVICE_C_1921681014=192.168.10.11\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
     }
 
     @Test
@@ -565,10 +545,10 @@ public class TopologyTest {
         def = new ServicesDefinitionImpl();
         def.setSetupService (setupService);
 
-        ServiceDefinition serviceA = new ServiceDefinition("gluster");
+        ServiceDefinition serviceA = new ServiceDefinition("distributed-filesystem");
         Dependency depA = new Dependency();
         depA.setMes(MasterElectionStrategy.RANDOM_NODE_AFTER);
-        depA.setMasterService(Service.from ("gluster"));
+        depA.setMasterService(Service.from ("distributed-filesystem"));
         depA.setNumberOfMasters(1);
         serviceA.addDependency (depA);
         def.addService(serviceA);
@@ -577,40 +557,64 @@ public class TopologyTest {
                 put("node_id1", "192.168.10.11");
                 put("node_id2", "192.168.10.13-192.168.10.14");
                 put("node_id3", "192.168.10.12");
-                put("gluster1", "on");
-                put("gluster2", "on");
-                put("gluster3", "on");
+                put("distributed-filesystem1", "on");
+                put("distributed-filesystem2", "on");
+                put("distributed-filesystem3", "on");
         }});
 
         Topology topology = Topology.create(nrr.resolveRanges(nodesConfig), KubernetesServicesConfigWrapper.empty(),  def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
-                "export MASTER_GLUSTER_1921681011=192.168.10.13\n" +
-                "export MASTER_GLUSTER_1921681012=192.168.10.14\n" +
-                "export MASTER_GLUSTER_1921681013=192.168.10.12\n" +
-                "export MASTER_GLUSTER_1921681014=192.168.10.11\n" +
-                "\n" +
-                "#Eskimo installation status\n" +
-                "export ESKIMO_INSTALLED_kafka_manager_KUBERNETES_NODE=OK\n" +
-                "export ESKIMO_INSTALLED_kube_slave_1921681013=OK\n" +
-                "export ESKIMO_INSTALLED_logstash_KUBERNETES_NODE=OK\n" +
-                "export ESKIMO_INSTALLED_kube_slave_1921681011=OK\n" +
-                "export ESKIMO_INSTALLED_kibana_KUBERNETES_NODE=OK\n" +
-                "export ESKIMO_INSTALLED_spark_console_KUBERNETES_NODE=OK\n" +
-                "export ESKIMO_INSTALLED_elasticsearch_KUBERNETES_NODE=OK\n" +
-                "export ESKIMO_INSTALLED_ntp_1921681011=OK\n" +
-                "export ESKIMO_INSTALLED_cerebro_KUBERNETES_NODE=OK\n" +
-                "export ESKIMO_INSTALLED_zookeeper_1921681013=OK\n" +
-                "export ESKIMO_INSTALLED_spark_runtime_KUBERNETES_NODE=OK\n" +
-                "export ESKIMO_INSTALLED_kafka_KUBERNETES_NODE=OK\n" +
-                "export ESKIMO_INSTALLED_etcd_1921681011=OK\n" +
-                "export ESKIMO_INSTALLED_ntp_1921681013=OK\n" +
-                "export ESKIMO_INSTALLED_etcd_1921681013=OK\n" +
-                "export ESKIMO_INSTALLED_gluster_1921681011=OK\n" +
-                "export ESKIMO_INSTALLED_gluster_1921681013=OK\n" +
-                "export ESKIMO_INSTALLED_kube_master_1921681011=OK\n" +
-                "export ESKIMO_INSTALLED_zeppelin_KUBERNETES_NODE=OK\n",
+                        "export MASTER_DISTRIBUTED_FILESYSTEM_1921681011=192.168.10.13\n" +
+                        "export MASTER_DISTRIBUTED_FILESYSTEM_1921681012=192.168.10.14\n" +
+                        "export MASTER_DISTRIBUTED_FILESYSTEM_1921681013=192.168.10.12\n" +
+                        "export MASTER_DISTRIBUTED_FILESYSTEM_1921681014=192.168.10.11\n" +
+                        "\n" +
+                        "#Eskimo installation status\n" +
+                        "export ESKIMO_INSTALLED_distributed_time_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_master_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_distributed_time_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_user_console_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_distributed_filesystem_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_distributed_filesystem_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_manager_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_database_manager_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_slave_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_broker_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_slave_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_dashboard_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_database_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_calculator_runtime_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_broker_manager_KUBERNETES_NODE=OK\n",
                 topology.getTopologyScript(StandardSetupHelpers.getStandard2NodesInstallStatus(), def));
+    }
+
+    @Test
+    public void testUserDefinition() throws Exception {
+
+        initAdditionalEnvironment();
+
+        def.getServiceDefinition(Service.from("service_a")).setUser(new ServiceUser("test", 1000));;
+        def.getServiceDefinition(Service.from("service_b")).setUser(new ServiceUser("test", 1000));;
+
+        def.getServiceDefinition(Service.from("service_c")).setUser(new ServiceUser("test2", 1001));;
+        def.getServiceDefinition(Service.from("service_d")).setUser(new ServiceUser("test2", 1001));;
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
+            put("node_id1", "192.168.10.11");
+            put("service_a1", "on");
+            put("node_id2", "192.168.10.12");
+            put("service_b", "1");
+            put("node_id3", "192.168.10.13");
+            put("service_b3", "on");
+        }});
+
+        Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, Node.fromAddress("192.168.10.11"));
+
+        assertEquals ("#Topology\n" +
+                "\n" +
+                "#Eskimo System Users\n" +
+                "export ESKIMO_USERS=test:1000,test2:1001\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
     }
 
     @Test
@@ -629,10 +633,7 @@ public class TopologyTest {
 
         Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, Node.fromAddress("192.168.10.11"));
 
-        assertEquals ("#Topology\n" +
-                "\n" +
-                "#Eskimo System Users\n" +
-                "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
+        assertEquals ("#Topology\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
     }
 
     @Test
@@ -650,10 +651,7 @@ public class TopologyTest {
         Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
-                "export MASTER_SERVICE_B_1=192.168.10.11\n" +
-                "\n" +
-                "#Eskimo System Users\n" +
-                "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
+                "export MASTER_SERVICE_B_1=192.168.10.11\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
 
         final NodesConfigWrapper nodesConfig2 = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
@@ -682,10 +680,7 @@ public class TopologyTest {
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_B_1=192.168.10.11\n" +
-                "export MASTER_SERVICE_C_1=192.168.10.12\n" +
-                "\n" +
-                "#Eskimo System Users\n" +
-                "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
+                "export MASTER_SERVICE_C_1=192.168.10.12\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
     }
 
     @Test
@@ -707,9 +702,6 @@ public class TopologyTest {
 
         assertEquals ("#Topology\n" +
                         "\n" +
-                        "#Eskimo System Users\n" +
-                        "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n" +
-                        "\n" +
                         "#Additional Environment\n" +
                         "export NODE_NBR_SERVICE_A_1921681012=1\n" +
                         "export NODE_NBR_SERVICE_A_1921681011=0\n" +
@@ -727,9 +719,6 @@ public class TopologyTest {
                         emptyModel, 1));
 
         assertEquals ("#Topology\n" +
-                        "\n" +
-                        "#Eskimo System Users\n" +
-                        "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n" +
                         "\n" +
                         "#Additional Environment\n" +
                         "export NODE_NBR_SERVICE_A_1921681012=1\n" +
@@ -751,9 +740,6 @@ public class TopologyTest {
 
         assertEquals ("#Topology\n" +
                         "\n" +
-                        "#Eskimo System Users\n" +
-                        "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n" +
-                        "\n" +
                         "#Additional Environment\n" +
                         "export NODE_NBR_SERVICE_C_1921681013=2\n" +
                         "export NODE_NBR_SERVICE_C_1921681012=1\n" +
@@ -774,6 +760,8 @@ public class TopologyTest {
     @Test
     public void testAdditionalEnvironmentWithKubeTopology() throws Exception {
 
+        def.afterPropertiesSet();
+
         KubernetesServicesConfigWrapper kubeConfig = StandardSetupHelpers.getStandardKubernetesConfig();
         kubeConfig.setValueForPath("cerebro_cpu", "1");
         kubeConfig.setValueForPath("cerebro_ram", "1024");
@@ -785,22 +773,19 @@ public class TopologyTest {
                 kubeConfig, def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
-                        "export MASTER_GLUSTER_1=192.168.10.11\n" +
-                        "export MASTER_KUBE_MASTER_1=192.168.10.11\n" +
-                        "export MASTER_NTP_1=192.168.10.11\n" +
-                        "export MASTER_ZOOKEEPER_1=192.168.10.13\n" +
+                        "export MASTER_CLUSTER_MANAGER_1=192.168.10.13\n" +
+                        "export MASTER_CLUSTER_MASTER_1=192.168.10.11\n" +
+                        "export MASTER_DISTRIBUTED_FILESYSTEM_1=192.168.10.11\n" +
+                        "export MASTER_DISTRIBUTED_TIME_1=192.168.10.11\n" +
                         "\n" +
                         "#Eskimo System Users\n" +
-                        "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n" +
+                        "export ESKIMO_USERS=broker:1002,calculator:1003,cluster:1001,database:1004\n" +
                         "\n" +
                         "#Additional Environment\n" +
-                        "export ALL_NODES_LIST_etcd=192.168.10.11,192.168.10.13\n" +
-                        "export NODE_NBR_ETCD_1921681013=2\n" +
-                        "export NODE_NBR_ETCD_1921681011=1\n" +
-                        "export ALL_NODES_LIST_gluster=192.168.10.11,192.168.10.13\n" +
-                        "export ALL_NODES_LIST_kube_slave=192.168.10.11,192.168.10.13\n" +
-                        "export NODE_NBR_KUBE_SLAVE_1921681013=2\n" +
-                        "export NODE_NBR_KUBE_SLAVE_1921681011=1\n" +
+                        "export ALL_NODES_LIST_cluster_slave=192.168.10.11,192.168.10.13\n" +
+                        "export NODE_NBR_CLUSTER_SLAVE_1921681011=1\n" +
+                        "export NODE_NBR_CLUSTER_SLAVE_1921681013=2\n" +
+                        "export ALL_NODES_LIST_distributed_filesystem=192.168.10.11,192.168.10.13\n" +
                         "\n" +
                         "#Self identification\n" +
                         "export SELF_IP_ADDRESS=192.168.10.11\n" +
@@ -809,24 +794,20 @@ public class TopologyTest {
                         "export ALL_NODES_LIST=192.168.10.11,192.168.10.13\n" +
                         "\n" +
                         "#Kubernetes Topology\n" +
-                        "export ESKIMO_KUBE_REQUEST_CEREBRO_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_CEREBRO_RAM=1024\n" +
-                        "export ESKIMO_KUBE_REQUEST_ELASTICSEARCH_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_ELASTICSEARCH_RAM=800M\n" +
-                        "export ESKIMO_KUBE_REQUEST_KAFKA_MANAGER_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_KAFKA_MANAGER_RAM=800M\n" +
-                        "export ESKIMO_KUBE_REQUEST_KAFKA_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_KAFKA_RAM=800M\n" +
-                        "export ESKIMO_KUBE_REQUEST_KIBANA_CPU=2\n" +
-                        "export ESKIMO_KUBE_REQUEST_KIBANA_RAM=2048m\n" +
-                        "export ESKIMO_KUBE_REQUEST_LOGSTASH_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_LOGSTASH_RAM=800M\n" +
-                        "export ESKIMO_KUBE_REQUEST_SPARK_CONSOLE_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_SPARK_CONSOLE_RAM=800M\n" +
-                        "export ESKIMO_KUBE_REQUEST_SPARK_RUNTIME_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_SPARK_RUNTIME_RAM=800M\n" +
-                        "export ESKIMO_KUBE_REQUEST_ZEPPELIN_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_ZEPPELIN_RAM=800M\n",
+                        "export ESKIMO_KUBE_REQUEST_BROKER_MANAGER_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_BROKER_MANAGER_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_BROKER_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_BROKER_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_CALCULATOR_RUNTIME_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_CALCULATOR_RUNTIME_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_CLUSTER_DASHBOARD_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_CLUSTER_DASHBOARD_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_DATABASE_MANAGER_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_DATABASE_MANAGER_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_DATABASE_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_DATABASE_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_USER_CONSOLE_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_USER_CONSOLE_RAM=800M\n",
                 topology.getTopologyScriptForNode (
                         StandardSetupHelpers.getStandard2NodesSetup(),
                         kubeConfig,
@@ -838,48 +819,43 @@ public class TopologyTest {
     @Test
     public void testServiceInstallationInTopology() throws Exception {
 
+        def.afterPropertiesSet();
+
         Topology topology = Topology.create(
                 StandardSetupHelpers.getStandard2NodesSetup(),
                 StandardSetupHelpers.getStandardKubernetesConfig(), def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
-                        "export MASTER_GLUSTER_1=192.168.10.11\n" +
-                        "export MASTER_KUBE_MASTER_1=192.168.10.11\n" +
-                        "export MASTER_NTP_1=192.168.10.11\n" +
-                        "export MASTER_ZOOKEEPER_1=192.168.10.13\n" +
+                        "export MASTER_CLUSTER_MANAGER_1=192.168.10.13\n" +
+                        "export MASTER_CLUSTER_MASTER_1=192.168.10.11\n" +
+                        "export MASTER_DISTRIBUTED_FILESYSTEM_1=192.168.10.11\n" +
+                        "export MASTER_DISTRIBUTED_TIME_1=192.168.10.11\n" +
                         "\n" +
                         "#Eskimo installation status\n" +
-                        "export ESKIMO_INSTALLED_kafka_manager_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_kube_slave_1921681013=OK\n" +
-                        "export ESKIMO_INSTALLED_logstash_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_kube_slave_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_kibana_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_spark_console_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_elasticsearch_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_ntp_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_cerebro_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_zookeeper_1921681013=OK\n" +
-                        "export ESKIMO_INSTALLED_spark_runtime_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_kafka_KUBERNETES_NODE=OK\n" +
-                        "export ESKIMO_INSTALLED_etcd_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_ntp_1921681013=OK\n" +
-                        "export ESKIMO_INSTALLED_etcd_1921681013=OK\n" +
-                        "export ESKIMO_INSTALLED_gluster_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_gluster_1921681013=OK\n" +
-                        "export ESKIMO_INSTALLED_kube_master_1921681011=OK\n" +
-                        "export ESKIMO_INSTALLED_zeppelin_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_distributed_time_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_master_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_distributed_time_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_user_console_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_distributed_filesystem_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_distributed_filesystem_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_manager_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_database_manager_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_slave_1921681013=OK\n" +
+                        "export ESKIMO_INSTALLED_broker_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_slave_1921681011=OK\n" +
+                        "export ESKIMO_INSTALLED_cluster_dashboard_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_database_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_calculator_runtime_KUBERNETES_NODE=OK\n" +
+                        "export ESKIMO_INSTALLED_broker_manager_KUBERNETES_NODE=OK\n" +
                         "\n" +
                         "#Eskimo System Users\n" +
-                        "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n" +
+                        "export ESKIMO_USERS=broker:1002,calculator:1003,cluster:1001,database:1004\n" +
                         "\n" +
                         "#Additional Environment\n" +
-                        "export ALL_NODES_LIST_etcd=192.168.10.11,192.168.10.13\n" +
-                        "export NODE_NBR_ETCD_1921681013=2\n" +
-                        "export NODE_NBR_ETCD_1921681011=1\n" +
-                        "export ALL_NODES_LIST_gluster=192.168.10.11,192.168.10.13\n" +
-                        "export ALL_NODES_LIST_kube_slave=192.168.10.11,192.168.10.13\n" +
-                        "export NODE_NBR_KUBE_SLAVE_1921681013=2\n" +
-                        "export NODE_NBR_KUBE_SLAVE_1921681011=1\n" +
+                        "export ALL_NODES_LIST_cluster_slave=192.168.10.11,192.168.10.13\n" +
+                        "export NODE_NBR_CLUSTER_SLAVE_1921681011=1\n" +
+                        "export NODE_NBR_CLUSTER_SLAVE_1921681013=2\n" +
+                        "export ALL_NODES_LIST_distributed_filesystem=192.168.10.11,192.168.10.13\n" +
                         "\n" +
                         "#Self identification\n" +
                         "export SELF_IP_ADDRESS=192.168.10.11\n" +
@@ -888,24 +864,20 @@ public class TopologyTest {
                         "export ALL_NODES_LIST=192.168.10.11,192.168.10.13\n" +
                         "\n" +
                         "#Kubernetes Topology\n" +
-                        "export ESKIMO_KUBE_REQUEST_CEREBRO_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_CEREBRO_RAM=800M\n" +
-                        "export ESKIMO_KUBE_REQUEST_ELASTICSEARCH_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_ELASTICSEARCH_RAM=800M\n" +
-                        "export ESKIMO_KUBE_REQUEST_KAFKA_MANAGER_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_KAFKA_MANAGER_RAM=800M\n" +
-                        "export ESKIMO_KUBE_REQUEST_KAFKA_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_KAFKA_RAM=800M\n" +
-                        "export ESKIMO_KUBE_REQUEST_KIBANA_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_KIBANA_RAM=800M\n" +
-                        "export ESKIMO_KUBE_REQUEST_LOGSTASH_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_LOGSTASH_RAM=800M\n" +
-                        "export ESKIMO_KUBE_REQUEST_SPARK_CONSOLE_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_SPARK_CONSOLE_RAM=800M\n" +
-                        "export ESKIMO_KUBE_REQUEST_SPARK_RUNTIME_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_SPARK_RUNTIME_RAM=800M\n" +
-                        "export ESKIMO_KUBE_REQUEST_ZEPPELIN_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_ZEPPELIN_RAM=800M\n",
+                        "export ESKIMO_KUBE_REQUEST_BROKER_MANAGER_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_BROKER_MANAGER_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_BROKER_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_BROKER_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_CALCULATOR_RUNTIME_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_CALCULATOR_RUNTIME_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_CLUSTER_DASHBOARD_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_CLUSTER_DASHBOARD_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_DATABASE_MANAGER_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_DATABASE_MANAGER_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_DATABASE_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_DATABASE_RAM=800M\n" +
+                        "export ESKIMO_KUBE_REQUEST_USER_CONSOLE_CPU=1\n" +
+                        "export ESKIMO_KUBE_REQUEST_USER_CONSOLE_RAM=800M\n",
                 topology.getTopologyScriptForNode (
                         StandardSetupHelpers.getStandard2NodesSetup(),
                         StandardSetupHelpers.getStandardKubernetesConfig(),
@@ -937,9 +909,6 @@ public class TopologyTest {
         Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
-                        "\n" +
-                        "#Eskimo System Users\n" +
-                        "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n" +
                         "\n" +
                         "#Additional Environment\n" +
                         "export ALL_NODES_LIST_service_a=192.168.10.11\n" +
@@ -985,9 +954,6 @@ public class TopologyTest {
         Topology topology = Topology.create(nodesConfig, KubernetesServicesConfigWrapper.empty(), def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
-                        "\n" +
-                        "#Eskimo System Users\n" +
-                        "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n" +
                         "\n" +
                         "#Additional Environment\n" +
                         "export ALL_NODES_LIST_service_a=192.168.10.11\n" +
@@ -1038,9 +1004,6 @@ public class TopologyTest {
         assertEquals ("#Topology\n" +
                         "export MASTER_SERVICE_C_1=192.168.10.12\n" +
                         "\n" +
-                        "#Eskimo System Users\n" +
-                        "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n" +
-                        "\n" +
                         "#Additional Environment\n" +
                         "export ALL_NODES_LIST_service_a=192.168.10.11,192.168.10.12,192.168.10.15\n" +
                         "\n" +
@@ -1056,9 +1019,6 @@ public class TopologyTest {
 
         assertEquals ("#Topology\n" +
                         "export MASTER_SERVICE_C_1=192.168.10.12\n" +
-                        "\n" +
-                        "#Eskimo System Users\n" +
-                        "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n" +
                         "\n" +
                         "#Additional Environment\n" +
                         "export ALL_NODES_LIST_service_b=192.168.10.11,192.168.10.12,192.168.10.14\n" +
@@ -1110,9 +1070,6 @@ public class TopologyTest {
 
         assertEquals ("#Topology\n" +
                         "\n" +
-                        "#Eskimo System Users\n" +
-                        "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n" +
-                        "\n" +
                         "#Additional Environment\n" +
                         "export NODE_NBR_SERVICE_A_1921681012=1\n" +
                         "export NODE_NBR_SERVICE_A_1921681011=0\n" +
@@ -1148,9 +1105,6 @@ public class TopologyTest {
         topology = Topology.create(nodesConfig, kubeServicesConfig, def, null, Node.fromAddress("192.168.10.11"));
 
         assertEquals ("#Topology\n" +
-                        "\n" +
-                        "#Eskimo System Users\n" +
-                        "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n" +
                         "\n" +
                         "#Additional Environment\n" +
                         "export NODE_NBR_SERVICE_A_1921681012=1\n" +
@@ -1268,9 +1222,6 @@ public class TopologyTest {
 
         assertEquals ("#Topology\n" +
                         "\n" +
-                        "#Eskimo System Users\n" +
-                        "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n" +
-                        "\n" +
                         "#Additional Environment\n" +
                         "\n" +
                         "#Self identification\n" +
@@ -1306,10 +1257,7 @@ public class TopologyTest {
 
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_C_1=192.168.10.11\n" +
-                "export MASTER_SERVICE_C_2=192.168.10.13\n" +
-                "\n" +
-                "#Eskimo System Users\n" +
-                "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
+                "export MASTER_SERVICE_C_2=192.168.10.13\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
     }
 
 
@@ -1340,9 +1288,6 @@ public class TopologyTest {
         assertEquals ("#Topology\n" +
                 "export MASTER_SERVICE_B_1=192.168.10.11\n" +
                 "export MASTER_SERVICE_C_1=192.168.10.11\n" +
-                "export MASTER_SERVICE_C_2=192.168.10.13\n" +
-                "\n" +
-                "#Eskimo System Users\n" +
-                "export ESKIMO_USERS=elasticsearch:3301,kubernetes:3306,flink:3305,grafana:3304,kafka:3303,spark:3302\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
+                "export MASTER_SERVICE_C_2=192.168.10.13\n", topology.getTopologyScript(ServicesInstallStatusWrapper.empty(), def));
     }
 }

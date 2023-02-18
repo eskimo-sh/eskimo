@@ -55,7 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-system", "test-setup"})
+@ActiveProfiles({"no-web-stack", "test-system", "test-setup", "test-services"})
 public class KubernetesOperationsCommandTest {
 
     @Autowired
@@ -89,7 +89,7 @@ public class KubernetesOperationsCommandTest {
     public void testInstallation() {
 
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        savedServicesInstallStatus.getJSONObject().remove("kafka-manager_installed_on_IP_KUBERNETES_NODE");
+        savedServicesInstallStatus.getJSONObject().remove("broker-manager_installed_on_IP_KUBERNETES_NODE");
 
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
 
@@ -101,7 +101,7 @@ public class KubernetesOperationsCommandTest {
         assertEquals(1, koc.getInstallations().size());
         assertEquals(0, koc.getUninstallations().size());
 
-        assertEquals ("kafka-manager", koc.getInstallations().stream()
+        assertEquals ("broker-manager", koc.getInstallations().stream()
                 .map(KubernetesOperationsCommand.KubernetesOperationId::getService)
                 .map(Service::getName)
                 .collect(Collectors.joining(",")));
@@ -113,7 +113,7 @@ public class KubernetesOperationsCommandTest {
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
-        kubeServicesConfig.getJSONObject().remove("kafka-manager_install");
+        kubeServicesConfig.getJSONObject().remove("broker-manager_install");
 
         systemServiceTest.setStandard2NodesStatus();
 
@@ -123,7 +123,7 @@ public class KubernetesOperationsCommandTest {
         assertEquals(0, koc.getInstallations().size());
         assertEquals(1, koc.getUninstallations().size());
 
-        assertEquals ("kafka-manager", koc.getUninstallations().stream()
+        assertEquals ("broker-manager", koc.getUninstallations().stream()
                 .map(KubernetesOperationsCommand.KubernetesOperationId::getService)
                 .map(Service::getName)
                 .collect(Collectors.joining(",")));
@@ -132,42 +132,37 @@ public class KubernetesOperationsCommandTest {
     @Test
     public void toJSON () {
 
-        KubernetesOperationsCommand moc = prepareFourOps();
+        KubernetesOperationsCommand moc = prepareThreeOps();
 
         assertEquals("{\n" +
                 "  \"restarts\": [\n" +
-                "    \"elasticsearch\",\n" +
-                "    \"spark-runtime\",\n" +
-                "    \"logstash\",\n" +
-                "    \"kafka\",\n" +
-                "    \"spark-console\"\n" +
+                "    \"cluster-dashboard\",\n" +
+                "    \"database\",\n" +
+                "    \"calculator-runtime\",\n" +
+                "    \"broker\"\n" +
                 "  ],\n" +
                 "  \"uninstallations\": [\n" +
-                "    \"kafka-manager\",\n" +
-                "    \"zeppelin\"\n" +
+                "    \"broker-manager\",\n" +
+                "    \"user-console\"\n" +
                 "  ],\n" +
-                "  \"installations\": [\n" +
-                "    \"kibana\",\n" +
-                "    \"cerebro\"\n" +
-                "  ]\n" +
+                "  \"installations\": [\"database-manager\"]\n" +
                 "}", moc.toJSON().toString(2));
     }
 
-    private KubernetesOperationsCommand prepareFourOps() {
+    private KubernetesOperationsCommand prepareThreeOps() {
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
-        savedServicesInstallStatus.getJSONObject().remove("cerebro_installed_on_IP_KUBERNETES_NODE");
-        savedServicesInstallStatus.getJSONObject().remove("kibana_installed_on_IP_KUBERNETES_NODE");
+        savedServicesInstallStatus.getJSONObject().remove("database-manager_installed_on_IP_KUBERNETES_NODE");
 
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
-        kubeServicesConfig.getJSONObject().remove("kafka-manager_install");
-        kubeServicesConfig.getJSONObject().remove("zeppelin_install");
+        kubeServicesConfig.getJSONObject().remove("broker-manager_install");
+        kubeServicesConfig.getJSONObject().remove("user-console_install");
 
         systemServiceTest.setStandard2NodesStatus();
 
         KubernetesOperationsCommand koc = KubernetesOperationsCommand.create(servicesDefinition, systemServiceTest,
                 KubernetesServicesConfigWrapper.empty(), savedServicesInstallStatus, kubeServicesConfig);
 
-        assertEquals(2, koc.getInstallations().size());
+        assertEquals(1, koc.getInstallations().size());
         assertEquals(2, koc.getUninstallations().size());
         return koc;
     }
@@ -175,20 +170,18 @@ public class KubernetesOperationsCommandTest {
     @Test
     public void testGetAllOperationsInOrder() {
 
-        KubernetesOperationsCommand moc = prepareFourOps();
+        KubernetesOperationsCommand moc = prepareThreeOps();
 
         List<KubernetesOperationsCommand.KubernetesOperationId> opInOrder = moc.getAllOperationsInOrder(null);
 
         assertEquals ("installation_Topology-All-Nodes\n" +
-                        "installation_kibana\n" +
-                        "installation_cerebro\n" +
-                        "uninstallation_kafka-manager\n" +
-                        "uninstallation_zeppelin\n" +
-                        "restart_elasticsearch\n" +
-                        "restart_spark-runtime\n" +
-                        "restart_logstash\n" +
-                        "restart_kafka\n" +
-                        "restart_spark-console",
+                        "installation_database-manager\n" +
+                        "uninstallation_broker-manager\n" +
+                        "uninstallation_user-console\n" +
+                        "restart_cluster-dashboard\n" +
+                        "restart_database\n" +
+                        "restart_calculator-runtime\n" +
+                        "restart_broker",
                 opInOrder.stream().map(KubernetesOperationsCommand.KubernetesOperationId::toString).collect(Collectors.joining("\n")));
     }
 
@@ -198,8 +191,8 @@ public class KubernetesOperationsCommandTest {
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
 
         KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
-        kubeServicesConfig.setValueForPath("kafka_cpu", "2");
-        kubeServicesConfig.setValueForPath("zeppelin_ram", "3000m");
+        kubeServicesConfig.setValueForPath("broker_cpu", "2");
+        kubeServicesConfig.setValueForPath("user-console_ram", "3000m");
 
         systemServiceTest.setStandard2NodesStatus();
 
@@ -210,10 +203,10 @@ public class KubernetesOperationsCommandTest {
         assertEquals(0, koc.getUninstallations().size());
         assertEquals(2, koc.getRestarts().size());
 
-        assertEquals (Service.from("kafka"), koc.getRestarts().get(0).getService());
+        assertEquals (Service.from("broker"), koc.getRestarts().get(0).getService());
         assertEquals (KubernetesOperationsCommand.KuberneteOperation.RESTART, koc.getRestarts().get(0).getOperation());
 
-        assertEquals (Service.from("zeppelin"), koc.getRestarts().get(1).getService());
+        assertEquals (Service.from("user-console"), koc.getRestarts().get(1).getService());
         assertEquals (KubernetesOperationsCommand.KuberneteOperation.RESTART, koc.getRestarts().get(1).getOperation());
 
     }

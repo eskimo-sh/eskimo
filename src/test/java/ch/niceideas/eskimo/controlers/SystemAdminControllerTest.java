@@ -56,7 +56,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-conf", "test-operations", "test-system"})
+@ActiveProfiles({"no-web-stack", "test-conf", "test-operations", "test-system", "test-services"})
 public class SystemAdminControllerTest {
 
     @Autowired
@@ -103,52 +103,52 @@ public class SystemAdminControllerTest {
     public void testShowJournal() {
 
         assertEquals ("{\n" +
-                "  \"messages\": \"zookeeper journal display from 192.168.10.11.\",\n" +
+                "  \"messages\": \"cluster-manager journal display from 192.168.10.11.\",\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", sac.showJournal("zookeeper", "192.168.10.11"));
+                "}", sac.showJournal("cluster-manager", "192.168.10.11"));
     }
 
     @Test
     public void testStartService() {
 
         assertEquals ("{\n" +
-                "  \"messages\": \"zookeeper has been started successfuly on 192.168.10.11.\",\n" +
+                "  \"messages\": \"cluster-manager has been started successfuly on 192.168.10.11.\",\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", sac.startService("zookeeper", "192.168.10.11"));
+                "}", sac.startService("cluster-manager", "192.168.10.11"));
 
         systemServiceTest.setStartServiceError();
 
         assertEquals ("{\n" +
                 "  \"error\": \"Test Error\",\n" +
                 "  \"status\": \"KO\"\n" +
-                "}", sac.startService("zookeeper", "192.168.10.11"));
+                "}", sac.startService("cluster-manager", "192.168.10.11"));
     }
 
     @Test
     public void testStopService() {
 
         assertEquals ("{\n" +
-                "  \"messages\": \"zookeeper has been stopped successfuly on 192.168.10.11.\",\n" +
+                "  \"messages\": \"cluster-manager has been stopped successfuly on 192.168.10.11.\",\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", sac.stopService("zookeeper", "192.168.10.11"));
+                "}", sac.stopService("cluster-manager", "192.168.10.11"));
     }
 
     @Test
     public void testRestartService() {
 
         assertEquals ("{\n" +
-                "  \"messages\": \"zookeeper has been restarted successfuly on 192.168.10.11.\",\n" +
+                "  \"messages\": \"cluster-manager has been restarted successfuly on 192.168.10.11.\",\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", sac.restartService("zookeeper", "192.168.10.11"));
+                "}", sac.restartService("cluster-manager", "192.168.10.11"));
     }
 
     @Test
     public void testServiceActionCustom() {
 
         assertEquals ("{\n" +
-                "  \"messages\": \"command show_log for zookeeper has been executed successfuly on 192.168.10.11.\",\n" +
+                "  \"messages\": \"command show_log for cluster-manager has been executed successfuly on 192.168.10.11.\",\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", sac.serviceActionCustom("show_log", "zookeeper", "192.168.10.11"));
+                "}", sac.serviceActionCustom("show_log", "cluster-manager", "192.168.10.11"));
     }
 
     @Test
@@ -159,7 +159,7 @@ public class SystemAdminControllerTest {
         assertEquals ("{\n" +
                 "  \"messages\": \"Unfortunately, re-installing a service is not possible in DEMO mode.\",\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", sac.reinstallService("zookeeper", "192.168.10.13"));
+                "}", sac.reinstallService("cluster-manager", "192.168.10.13"));
     }
 
     @Test
@@ -171,7 +171,7 @@ public class SystemAdminControllerTest {
         assertEquals ("{\n" +
                 "  \"messages\": \"Some backend operations are currently running. Please retry after they are completed.\",\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", sac.reinstallService("zookeeper", "192.168.10.13"));
+                "}", sac.reinstallService("cluster-manager", "192.168.10.13"));
     }
 
     @Test
@@ -180,15 +180,15 @@ public class SystemAdminControllerTest {
         configurationServiceTest.setStandard2NodesSetup();
         configurationServiceTest.setStandard2NodesInstallStatus();
 
-        assertEquals ("OK", configurationServiceTest.loadServicesInstallationStatus().getValueForPathAsString("zookeeper_installed_on_IP_192-168-10-13"));
+        assertEquals ("OK", configurationServiceTest.loadServicesInstallationStatus().getValueForPathAsString("cluster-manager_installed_on_IP_192-168-10-13"));
 
         assertEquals ("{\n" +
-                "  \"messages\": \"zookeeper has been reinstalled successfuly on 192.168.10.13.\",\n" +
+                "  \"messages\": \"cluster-manager has been reinstalled successfuly on 192.168.10.13.\",\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", sac.reinstallService("zookeeper", "192.168.10.13"));
+                "}", sac.reinstallService("cluster-manager", "192.168.10.13"));
 
         // should have been remove prior to reinstall and not set back since reinstall is mocked (No-Op)
-        assertNull (configurationServiceTest.loadServicesInstallationStatus().getValueForPathAsString("zookeeper_installed_on_IP_192-168-10-13"));
+        assertNull (configurationServiceTest.loadServicesInstallationStatus().getValueForPathAsString("cluster-manager_installed_on_IP_192-168-10-13"));
 
         assertTrue(configurationServiceTest.isSaveServicesInstallationStatusCalled());
     }
