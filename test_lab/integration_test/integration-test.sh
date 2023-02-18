@@ -638,7 +638,7 @@ setup_eskimo() {
         "gluster1":"on",
         "ntp1":"on",
         "etcd1":"on",
-        "prometheus1":"on",
+        "prom-node-exporter1":"on",
         "logstash-cli1":"on",
         "spark-cli1":"on",
         "kafka-cli1":"on",
@@ -670,10 +670,10 @@ setup_eskimo() {
         "ntp2":"on",
         "ntp3":"on",
         "ntp4":"on",
-        "prometheus1":"on",
-        "prometheus2":"on",
-        "prometheus3":"on",
-        "prometheus4":"on",
+        "prom-node-exporter1":"on",
+        "prom-node-exporter2":"on",
+        "prom-node-exporter3":"on",
+        "prom-node-exporter4":"on",
         "logstash-cli1":"on",
         "logstash-cli2":"on",
         "logstash-cli3":"on",
@@ -719,6 +719,9 @@ setup_eskimo() {
               "grafana_install": "on",
               "grafana_cpu": "0.1",
               "grafana_ram": "800M",
+              "prometheus_install": "on",
+              "prometheus_cpu": "0.1",
+              "prometheus_ram": "300M",
               "kafka_install": "on",
               "kafka_cpu": "0.1",
               "kafka_ram": "1G",
@@ -765,6 +768,9 @@ setup_eskimo() {
               "grafana_install": "on",
               "grafana_cpu": "0.2",
               "grafana_ram": "800M",
+              "prometheus_install": "on",
+              "prometheus_cpu": "0.1",
+              "prometheus_ram": "300M",
               "kafka_install": "on",
               "kafka_cpu": "0.2",
               "kafka_ram": "1G",
@@ -822,6 +828,7 @@ check_all_services_up() {
                  "service_zeppelin_" \
                  "node_alive_192-168-56-41" \
                  "service_grafana_" \
+                 "service_prom-node-exporter_192-168-56-41" \
                  "service_prometheus_192-168-56-41" \
                  "service_gluster_192-168-56-41" \
                  "service_kube-master_192-168-56-41" \
@@ -864,13 +871,14 @@ check_all_services_up() {
                  "node_alive_192-168-56-53" \
                  "node_alive_192-168-56-54" \
                  "service_gluster_192-168-56-54" \
-                 "service_prometheus_192-168-56-52" \
+                 "service_prom-node-exporter_192-168-56-52" \
                  "service_grafana_" \
+                 "service_promeheus_" \
                  "service_gluster_192-168-56-53" \
-                 "service_prometheus_192-168-56-51" \
-                 "service_prometheus_192-168-56-54" \
+                 "service_prom-node-exporter_192-168-56-51" \
+                 "service_prom-node-exporter_192-168-56-54" \
                  "service_gluster_192-168-56-52" \
-                 "service_prometheus_192-168-56-53" \
+                 "service_prom-node-exporter_192-168-56-53" \
                  "service_gluster_192-168-56-51" \
                  "service_kube-master_192-168-56-51" \
                  "service_kafka-cli_192-168-56-53" \

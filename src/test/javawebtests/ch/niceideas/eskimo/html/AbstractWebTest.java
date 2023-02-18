@@ -64,10 +64,6 @@ public abstract class AbstractWebTest {
 
     private static final File jsCoverageFlagFile = new File("target/jsCoverageFlag");
 
-    private static final int INCREMENTAL_WAIT_MS = 200;
-    private static final int MAX_WAIT_RETRIES = 100;
-    private static final int MAX_WAIT_TIME_SECS = 20;
-
     private static String className = null;
 
     private static TestResourcesServer server;
@@ -186,7 +182,7 @@ public abstract class AbstractWebTest {
         server.postTestMethodHook(this::js);
     }
 
-    private void initDriver() throws InterruptedException {
+    private void initDriver() {
         // create mock functions
         js("window.eskimoServices = {};");
         js("eskimoServices.serviceMenuServiceFoundHook = function (){};");
@@ -400,15 +396,6 @@ public abstract class AbstractWebTest {
         }
         assertEquals (value, jsResult.toString());
     }
-
-    /*
-    protected void assertJavascriptEquals(String value, String javascript) {
-        Object result = js("return " + javascript);
-        if (result == null) {
-            throw new IllegalStateException("Result of script '" + javascript + "' is null");
-        }
-        assertEquals (value, result.toString());
-    }*/
 
     protected void assertJavascriptNull(String javascript) {
         assertNull (js("return " + javascript));
