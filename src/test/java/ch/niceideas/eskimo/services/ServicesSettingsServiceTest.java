@@ -59,7 +59,18 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-system", "test-operation", "test-operations", "test-proxy", "test-kube", "test-ssh", "test-connection-manager"})
+@ActiveProfiles({
+        "no-web-stack",
+        "test-setup",
+        "test-conf",
+        "test-system",
+        "test-operation",
+        "test-operations",
+        "test-proxy",
+        "test-kube",
+        "test-ssh",
+        "test-connection-manager",
+        "test-services"})
 public class ServicesSettingsServiceTest {
 
     private String jsonConfig = null;
@@ -131,29 +142,26 @@ public class ServicesSettingsServiceTest {
 
         SettingsOperationsCommand command = SettingsOperationsCommand.create(testForm, servicesSettingsService);
 
-        //System.err.println (command.toJSON().toString(2));
-
+        //assertEquals(expectedJsonString, command.toJSON().toString(2));
         assertTrue (new JSONObject(expectedJsonString).similar(command.toJSON()));
 
         servicesSettingsService.applyServicesSettings(command);
 
         ServicesSettingsWrapper newConfig = configurationServiceTest.loadServicesSettings();
 
-        //System.err.println (newConfig.getFormattedValue());
-
+        //assertEquals(expectedNewConfig, newConfig.getFormattedValue());
         assertTrue (new JSONObject(expectedNewConfig).similar(newConfig.getJSONObject()));
 
         String notifications = operationsMonitoringServiceTest.getAllMessages();
 
-        //System.err.println (notifications);
+        System.err.println (notifications);
 
         assertTrue(notifications.contains("Check--Install_settings_192-168-10-13 : --> Done : Executing Check / Install of settings on 192.168.10.13"));
         assertTrue(notifications.contains("Check--Install_settings_192-168-10-11 : --> Done : Executing Check / Install of settings on 192.168.10.11"));
 
-        assertTrue(notifications.contains("Done : Executing restart of elasticsearch on (kubernetes)"));
-        assertTrue(notifications.contains("Done : Executing restart of grafana on (kubernetes)"));
-        assertTrue(notifications.contains("Done : Executing restart of spark-runtime on (kubernetes)"));
-        assertTrue(notifications.contains("Done : Executing restart of kafka on (kubernetes)"));
+        assertTrue(notifications.contains("Done : Executing restart of database on (kubernetes)"));
+        assertTrue(notifications.contains("Done : Executing restart of calculator-runtime on (kubernetes)"));
+        assertTrue(notifications.contains("Done : Executing restart of broker on (kubernetes)"));
     }
 
 }

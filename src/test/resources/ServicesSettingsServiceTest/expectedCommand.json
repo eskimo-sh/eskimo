@@ -1,55 +1,6 @@
 {
   "settings": {
-    "spark-runtime": {"spark-defaults.conf": [
-      {
-        "value": "200s",
-        "key": "spark.dynamicAllocation.executorIdleTimeout",
-        "oldValue": "300s"
-      },
-      {
-        "value": "FIFO",
-        "key": "spark.scheduler.mode",
-        "oldValue": ""
-      },
-      {
-        "value": "10",
-        "key": "spark.rpc.numRetries",
-        "oldValue": ""
-      },
-      {
-        "value": "500m",
-        "key": "spark.driver.memory",
-        "oldValue": ""
-      },
-      {
-        "value": "400s",
-        "key": "spark.dynamicAllocation.cachedExecutorIdleTimeout",
-        "oldValue": ""
-      },
-      {
-        "value": "",
-        "key": "spark.locality.wait",
-        "oldValue": "40s"
-      }
-    ]},
-    "elasticsearch": {"elasticsearch.yml": [{
-      "value": "",
-      "key": "bootstrap.memory_lock",
-      "oldValue": "true"
-    }]},
-    "grafana": {"defaults.ini": [
-      {
-        "value": "test",
-        "key": "admin_user",
-        "oldValue": ""
-      },
-      {
-        "value": "testpassword",
-        "key": "admin_password",
-        "oldValue": ""
-      }
-    ]},
-    "kafka": {"server.properties": [
+    "broker": {"server.properties": [
       {
         "value": "5",
         "key": "num.network.threads",
@@ -57,18 +8,8 @@
       },
       {
         "value": "",
-        "key": "socket.receive.buffer.bytes",
-        "oldValue": "204800"
-      },
-      {
-        "value": "",
         "key": "num.partitions",
         "oldValue": "3"
-      },
-      {
-        "value": "10",
-        "key": "num.io.threads",
-        "oldValue": ""
       },
       {
         "value": "",
@@ -79,13 +20,59 @@
         "value": "",
         "key": "socket.request.max.bytes",
         "oldValue": "128857600"
+      },
+      {
+        "value": "10",
+        "key": "num.io.threads",
+        "oldValue": ""
+      },
+      {
+        "value": "",
+        "key": "socket.receive.buffer.bytes",
+        "oldValue": "204800"
+      }
+    ]},
+    "database": {"database.yml": [{
+      "value": "",
+      "key": "bootstrap.memory_lock",
+      "oldValue": "true"
+    }]},
+    "calculator-runtime": {"calculator-defaults.conf": [
+      {
+        "value": "200s",
+        "key": "calculator.dynamicAllocation.executorIdleTimeout",
+        "oldValue": "300s"
+      },
+      {
+        "value": "",
+        "key": "calculator.locality.wait",
+        "oldValue": "40s"
+      },
+      {
+        "value": "10",
+        "key": "calculator.rpc.numRetries",
+        "oldValue": ""
+      },
+      {
+        "value": "FIFO",
+        "key": "calculator.scheduler.mode",
+        "oldValue": ""
+      },
+      {
+        "value": "500m",
+        "key": "calculator.driver.memory",
+        "oldValue": ""
+      },
+      {
+        "value": "400s",
+        "key": "calculator.dynamicAllocation.cachedExecutorIdleTimeout",
+        "oldValue": ""
       }
     ]}
   },
   "restarts": [
-    "kafka",
-    "elasticsearch",
-    "spark-runtime",
-    "grafana"
+    "broker",
+    "calculator-runtime",
+    "database"
   ]
 }

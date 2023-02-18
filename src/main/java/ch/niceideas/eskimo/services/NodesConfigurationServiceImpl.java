@@ -486,7 +486,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             ml.addInfo(" - Removing systemd Service File");
             // Find systemd unit config files directory
             String foundStandardFlag = sshCommandService.runSSHScript(connection, "if [[ -d /lib/systemd/system/ ]]; then echo found_standard; fi");
-            if (foundStandardFlag.contains("found_standard")) {
+            if (StringUtils.isNotBlank(foundStandardFlag) && foundStandardFlag.contains("found_standard")) {
                 sshCommandService.runSSHCommand(connection, "sudo rm -f  /lib/systemd/system/" + service + ".service");
             } else {
                 sshCommandService.runSSHCommand(connection, "sudo rm -f  /usr/lib/systemd/system/" + service + ".service");

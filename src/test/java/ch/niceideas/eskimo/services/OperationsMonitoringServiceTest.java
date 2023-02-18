@@ -66,7 +66,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-system", "test-operation", "test-proxy", "test-kube", "test-ssh", "test-conf", "test-connection-manager"})
+@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-system", "test-operation", "test-proxy", "test-kube", "test-ssh", "test-conf", "test-connection-manager", "test-services"})
 public class OperationsMonitoringServiceTest {
 
     private static final Logger logger = Logger.getLogger(OperationsMonitoringServiceTest.class);
@@ -277,19 +277,17 @@ public class OperationsMonitoringServiceTest {
         OperationsMonitoringStatusWrapper operationsMonitoringStatus = operationsMonitoringService.getOperationsMonitoringStatus(new HashMap<>());
         assertNotNull (operationsMonitoringStatus);
 
-        //System.err.println (operationsMonitoringStatus.getFormattedValue());
-
-        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_spark-console_192-168-10-15"));
-        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.restart_kafka_kubernetes"));
-        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_zeppelin_192-168-10-15"));
-        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_kube-slave_192-168-10-13"));
-        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_kube-slave_192-168-10-15"));
-        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_spark-runtime_192-168-10-13"));
-        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_kube-master_192-168-10-15"));
-        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_elasticsearch_192-168-10-13"));
-        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_elasticsearch_192-168-10-15"));
-        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.restart_logstash_kubernetes"));
-        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_spark-runtime_192-168-10-15"));
+        System.err.println (operationsMonitoringStatus.getFormattedValue());
+        
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.restart_cluster-slave_192-168-10-13"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_calculator-runtime_192-168-10-13"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.restart_cluster-slave_192-168-10-15"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_user-console_192-168-10-15"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_cluster-master_192-168-10-15"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.uninstallation_cluster-master_192-168-10-13"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_database_192-168-10-13"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_database_192-168-10-15"));
+        assertEquals("CANCELLED", operationsMonitoringStatus.getValueForPathAsString("status.installation_calculator-runtime_192-168-10-15"));
 
         // same test as above but keep all operations pending (object.wait selectively / then object.notifyAll())
         // test that the operations selectively blocked are kept running and all the ones not started are cancelled

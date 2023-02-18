@@ -99,15 +99,15 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
 
         // test a few input values
 
-        assertJavascriptEquals ("false", "$('#elasticsearch-action---destructive_requires_name').val()");
+        assertJavascriptEquals ("false", "$('#database-action---destructive_requires_name').val()");
 
-        assertJavascriptEquals ("", "$('#kafka-socket---send---buffer---bytes').val()");
+        assertJavascriptEquals ("", "$('#broker-socket---send---buffer---bytes').val()");
 
-        assertJavascriptEquals ("3", "$('#kafka-num---partitions').val()");
+        assertJavascriptEquals ("3", "$('#broker-num---partitions').val()");
 
-        assertJavascriptEquals ("", "$('#spark-runtime-spark---rpc---numRetries').val()");
+        assertJavascriptEquals ("", "$('#calculator-runtime-calculator---rpc---numRetries').val()");
 
-        assertJavascriptEquals ("", "$('#spark-runtime-spark---dynamicAllocation---cachedExecutorIdleTimeout').val()");
+        assertJavascriptEquals ("", "$('#calculator-runtime-calculator---dynamicAllocation---cachedExecutorIdleTimeout').val()");
     }
 
 }

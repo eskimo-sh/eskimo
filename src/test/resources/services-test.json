@@ -658,7 +658,7 @@
             "defaultValue" : "FAIR"
           },
           {
-            "name" :  "spark.locality.wait",
+            "name" :  "calculator.locality.wait",
             "comment": "How long to wait to launch a data-local task before giving up and launching it on a less-local node.",
             "defaultValue" : "20s"
           },

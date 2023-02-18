@@ -1,7 +1,5 @@
 {
-  "kibana_install": "on",
-  "zeppelin_install": "on",
-  "spark-console_install": "on",
-  "cerebro_install": "on",
-  "kafka-manager_install": "on"
+  "user-console_install": "on",
+  "database-manager_install": "on",
+  "broker-manager_install": "on"
 }

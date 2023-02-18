@@ -2,43 +2,39 @@
   "settings": [
     {
       "settings": [],
-      "name": "mesos-master"
+      "name": "cluster-master"
     },
     {
       "settings": [],
-      "name": "zookeeper"
+      "name": "cluster-manager"
     },
     {
       "settings": [],
-      "name": "zeppelin"
+      "name": "user-console"
     },
     {
       "settings": [],
-      "name": "ntp"
+      "name": "distributed-time"
     },
     {
       "settings": [],
-      "name": "gluster"
+      "name": "distributed-filesystem"
     },
     {
       "settings": [],
-      "name": "mesos-agent"
+      "name": "cluster-slave"
     },
     {
       "settings": [],
-      "name": "logstash"
-    },
-    {
-      "settings": [],
-      "name": "cerebro"
+      "name": "database-manager"
     },
     {
       "settings": [{
-        "filename": "elasticsearch.yml",
+        "filename": "database.yml",
         "propertyFormat": "{name}: {value}",
-        "commentPrefix": "#",
-        "service": "elasticsearch",
-        "filesystemService": "elasticsearch",
+        "commedistributed-timerefix": "#",
+        "service": "database",
+        "filesystemService": "database",
         "propertyType": "VARIABLE",
         "properties": [
           {
@@ -55,42 +51,19 @@
           }
         ]
       }],
-      "name": "elasticsearch"
-    },
-    {
-      "settings": [{
-        "filename": "defaults.ini",
-        "propertyFormat": "{name} = {value}",
-        "commentPrefix": "#",
-        "service": "grafana",
-        "filesystemService": "grafana",
-        "propertyType": "VARIABLE",
-        "properties": [
-          {
-            "defaultValue": "eskimo",
-            "name": "admin_user",
-            "comment": "Grafana admin user within eskimo",
-          },
-          {
-            "defaultValue": "eskimo",
-            "name": "admin_password",
-            "comment": "Grafana admin user password within eskimo",
-          }
-        ]
-      }],
-      "name": "grafana"
+      "name": "database"
     },
     {
       "settings": [],
-      "name": "kafka-manager"
+      "name": "broker-manager"
     },
     {
       "settings": [{
         "filename": "server.properties",
         "propertyFormat": "{name}={value}",
-        "commentPrefix": "#",
-        "service": "kafka",
-        "filesystemService": "kafka",
+        "commedistributed-timerefix": "#",
+        "service": "broker",
+        "filesystemService": "broker",
         "propertyType": "VARIABLE",
         "properties": [
           {
@@ -136,9 +109,9 @@
       },
         {
           "filename": "test.properties",
-          "service": "kafka",
-          "filesystemService": "kafka",
-          "commentPrefix": "#",
+          "service": "broker",
+          "filesystemService": "broker",
+          "commedistributed-timerefix": "#",
           "propertyType": "VARIABLE",
           "propertyFormat": "{name}={value}",
           "properties": [
@@ -149,74 +122,62 @@
             }
           ]
         }],
-      "name": "kafka"
+      "name": "broker"
     },
     {
       "settings": [{
-        "filename": "spark-defaults.conf",
+        "filename": "calculator-defaults.conf",
         "propertyFormat": "{name}={value}",
-        "commentPrefix": "#",
-        "service": "spark-runtime",
-        "filesystemService": "spark",
+        "commedistributed-timerefix": "#",
+        "service": "calculator-runtime",
+        "filesystemService": "calculator",
         "propertyType": "VARIABLE",
         "properties": [
           {
             "defaultValue": "800m",
-            "name": "spark.driver.memory",
+            "name": "calculator.driver.memory",
             "comment": "Limiting the driver (client) memory"
           },
           {
             "defaultValue": "5",
-            "name": "spark.rpc.numRetries",
+            "name": "calculator.rpc.numRetries",
             "comment": "Number of times to retry before an RPC task gives up. An RPC task will run at most times of this number."
           },
           {
             "defaultValue": "5s",
-            "name": "spark.rpc.retry.wait",
+            "name": "calculator.rpc.retry.wait",
             "comment": "Duration for an RPC ask operation to wait before retrying."
           },
           {
             "defaultValue": "FAIR",
-            "name": "spark.scheduler.mode",
-            "comment": "The scheduling mode between jobs submitted to the same SparkContext. \nCan be FIFO or FAIR. FAIR Seem not to work well with mesos"
+            "name": "calculator.scheduler.mode",
+            "comment": "The scheduling mode between jobs submitted to the same calculatorContext. \nCan be FIFO or FAIR. FAIR Seem not to work well with mesos"
           },
           {
             "defaultValue": "20s",
-            "name": "spark.locality.wait",
+            "name": "calculator.locality.wait",
             "comment": "How long to wait to launch a data-local task before giving up and launching it on a less-local node.",
             "value": "40s"
           },
           {
             "defaultValue": "200s",
-            "name": "spark.dynamicAllocation.executorIdleTimeout",
+            "name": "calculator.dynamicAllocation.executorIdleTimeout",
             "comment": "If dynamic allocation is enabled and an executor has been idle for more than this duration, the executor will be removed. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)",
             "value": "300s"
           },
           {
             "defaultValue": "300s",
-            "name": "spark.dynamicAllocation.cachedExecutorIdleTimeout",
+            "name": "calculator.dynamicAllocation.cachedExecutorIdleTimeout",
             "comment": "If dynamic allocation is enabled and an executor which has cached data blocks has been idle for more than this duration, the executor will be removed. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)"
           },
           {
             "defaultValue": "[ESKIMO_DEFAULT]",
-            "name": "spark.executor.memory",
-            "comment": "Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology). \nUSE [ESKIMO_DEFAULT] to leave untouched or e.g. 800m, 1.2g, etc."
+            "name": "calculator.executor.memory",
+            "comment": "Defining default calculator executor memory allowed by Eskimo Memory Management (found in topology). \nUSE [ESKIMO_DEFAULT] to leave untouched or e.g. 800m, 1.2g, etc."
           }
         ]
       }],
-      "name": "spark-runtime"
-    },
-    {
-      "settings": [],
-      "name": "prometheus"
-    },
-    {
-      "settings": [],
-      "name": "kibana"
-    },
-    {
-      "settings": [],
-      "name": "spark-console"
+      "name": "calculator-runtime"
     }
   ],
   "status": "OK"

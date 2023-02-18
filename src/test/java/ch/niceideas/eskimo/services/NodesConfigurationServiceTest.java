@@ -67,7 +67,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-system", "test-operation", "test-operations", "test-proxy", "test-kube", "test-ssh", "test-connection-manager"})
+@ActiveProfiles({"no-web-stack", "test-setup", "test-conf", "test-system", "test-operation", "test-operations", "test-proxy", "test-kube", "test-ssh", "test-connection-manager", "test-services"})
 public class NodesConfigurationServiceTest {
 
     private final String testRunUUID = UUID.randomUUID().toString();
@@ -214,8 +214,8 @@ public class NodesConfigurationServiceTest {
     public void testInstallService() throws Exception {
 
         ServicesInstallStatusWrapper savedStatus = new ServicesInstallStatusWrapper(new HashMap<>() {{
-                put("ntp_installed_on_IP_192-168-10-11", "OK");
-                put("ntp_installed_on_IP_192-168-10-13", "OK");
+                put("distributed-time_installed_on_IP_192-168-10-11", "OK");
+                put("distributed-time_installed_on_IP_192-168-10-13", "OK");
         }});
 
         configurationServiceTest.saveServicesInstallationStatus(savedStatus);
@@ -226,17 +226,17 @@ public class NodesConfigurationServiceTest {
 
         operationsMonitoringServiceTest.startCommand(command);
 
-        // testing zookeeper installation
+        // testing cluster-manager installation
         nodesConfigurationService.installService(new ServiceOperationsCommand.ServiceOperationId(
                 ServiceOperationsCommand.ServiceOperation.INSTALLATION,
-                Service.from("zookeeper"),
+                Service.from("cluster-manager"),
                 Node.fromAddress("192.168.10.13")));
 
         String executedActions = String.join("\n", systemServiceTest.getExecutedActions());
 
         assertEquals ("" +
-                "Installation setup  - zookeeper - 192.168.10.13 - 192.168.10.13\n" +
-                "Installation cleanup  - zookeeper - zookeeper - 192.168.10.13", executedActions);
+                "Installation setup  - cluster-manager - 192.168.10.13 - 192.168.10.13\n" +
+                "Installation cleanup  - cluster-manager - cluster-manager - 192.168.10.13", executedActions);
 
         operationsMonitoringServiceTest.endCommand(true);
     }
@@ -291,24 +291,19 @@ public class NodesConfigurationServiceTest {
 
         System.err.println (systemServiceTest.getExecutedActions());
 
-        assertEquals ("Installation setup  - kube-master - 192.168.10.15 - 192.168.10.15\n" +
-                "Installation cleanup  - kube-master - kube-master - 192.168.10.15\n" +
-                "Installation setup  - kube-slave - 192.168.10.15 - 192.168.10.15\n" +
-                "Installation cleanup  - kube-slave - null - 192.168.10.15\n" +
-                "Installation setup  - kube-slave - 192.168.10.13 - 192.168.10.13\n" +
-                "Installation cleanup  - kube-slave - null - 192.168.10.13\n" +
-                "Installation setup  - elasticsearch - 192.168.10.15 - 192.168.10.15\n" +
-                "Installation cleanup  - elasticsearch - elasticsearch - 192.168.10.15\n" +
-                "Installation setup  - elasticsearch - 192.168.10.13 - 192.168.10.13\n" +
-                "Installation cleanup  - elasticsearch - elasticsearch - 192.168.10.13\n" +
-                "Installation setup  - spark-runtime - 192.168.10.15 - 192.168.10.15\n" +
-                "Installation cleanup  - spark-runtime - spark - 192.168.10.15\n" +
-                "Installation setup  - spark-runtime - 192.168.10.13 - 192.168.10.13\n" +
-                "Installation cleanup  - spark-runtime - spark - 192.168.10.13\n" +
-                "Installation setup  - spark-console - 192.168.10.15 - 192.168.10.15\n" +
-                "Installation cleanup  - spark-console - spark - 192.168.10.15\n" +
-                "Installation setup  - zeppelin - 192.168.10.15 - 192.168.10.15\n" +
-                "Installation cleanup  - zeppelin - zeppelin - 192.168.10.15", String.join("\n", systemServiceTest.getExecutedActions()));
+        assertEquals ("Installation setup  - cluster-master - 192.168.10.15 - 192.168.10.15\n" +
+                "Installation cleanup  - cluster-master - cluster-master - 192.168.10.15\n" +
+                "call Uninstall script  - cluster-master - 192.168.10.13\n" +
+                "Installation setup  - calculator-runtime - 192.168.10.15 - 192.168.10.15\n" +
+                "Installation cleanup  - calculator-runtime - calculator - 192.168.10.15\n" +
+                "Installation setup  - calculator-runtime - 192.168.10.13 - 192.168.10.13\n" +
+                "Installation cleanup  - calculator-runtime - calculator - 192.168.10.13\n" +
+                "Installation setup  - database - 192.168.10.15 - 192.168.10.15\n" +
+                "Installation cleanup  - database - database - 192.168.10.15\n" +
+                "Installation setup  - database - 192.168.10.13 - 192.168.10.13\n" +
+                "Installation cleanup  - database - database - 192.168.10.13\n" +
+                "Installation setup  - user-console - 192.168.10.15 - 192.168.10.15\n" +
+                "Installation cleanup  - user-console - user-console - 192.168.10.15", String.join("\n", systemServiceTest.getExecutedActions()));
 
         for (String commandStart : expectedCommandStart.split("\n")) {
             assertTrue (commandString.contains(commandStart.replace("\r", "")), commandStart + "\nis contained in \n" + commandString);
@@ -325,16 +320,16 @@ public class NodesConfigurationServiceTest {
     public void testUninstallation() throws Exception {
 
         ServicesInstallStatusWrapper savedStatus = new ServicesInstallStatusWrapper(new HashMap<>() {{
-            put("ntp_installed_on_IP_192-168-10-11", "OK");
-            put("ntp_installed_on_IP_192-168-10-13", "OK");
-            put("zookeeper_installed_on_IP_192-168-10-11", "OK");
+            put("distributed-time_installed_on_IP_192-168-10-11", "OK");
+            put("distributed-time_installed_on_IP_192-168-10-13", "OK");
+            put("cluster-manager_installed_on_IP_192-168-10-11", "OK");
         }});
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
-            put("ntp1", "on");
+            put("distributed-time1", "on");
             put("node_id2", "192.168.10.13");
-            put("ntp2", "on");
+            put("distributed-time2", "on");
         }});
 
         configurationServiceTest.saveServicesInstallationStatus(savedStatus);
@@ -345,20 +340,20 @@ public class NodesConfigurationServiceTest {
 
         operationsMonitoringServiceTest.startCommand(command);
 
-        // testing zookeeper installation
+        // testing cluster-manager installation
         nodesConfigurationService.uninstallService(new ServiceOperationsCommand.ServiceOperationId(
                 ServiceOperationsCommand.ServiceOperation.INSTALLATION,
-                Service.from("zookeeper"),
+                Service.from("cluster-manager"),
                 Node.fromAddress("192.168.10.11")));
 
         //System.err.println (sshCommandServiceTest.getExecutedCommands());
 
         assertTrue(sshCommandServiceTest.getExecutedCommands().contains(
-                "sudo systemctl stop zookeeper\n" +
+                "sudo systemctl stop cluster-manager\n" +
                 "if [[ -d /lib/systemd/system/ ]]; then echo found_standard; fi\n" +
-                "sudo rm -f  /usr/lib/systemd/system/zookeeper.service\n" +
-                "sudo docker rm -f zookeeper || true \n" +
-                "sudo bash -c '. /usr/local/sbin/eskimo-utils.sh && docker image rm -f eskimo/zookeeper:$(get_last_tag zookeeper)'\n" +
+                "sudo rm -f  /usr/lib/systemd/system/cluster-manager.service\n" +
+                "sudo docker rm -f cluster-manager || true \n" +
+                "sudo bash -c '. /usr/local/sbin/eskimo-utils.sh && docker image rm -f eskimo/cluster-manager:$(get_last_tag cluster-manager)'\n" +
                 "sudo systemctl daemon-reload\n" +
                 "sudo systemctl reset-failed\n"));
 
