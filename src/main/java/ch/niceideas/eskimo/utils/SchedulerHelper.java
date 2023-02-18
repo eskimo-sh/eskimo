@@ -33,38 +33,32 @@
  */
 
 
-package ch.niceideas.eskimo.services;
+package ch.niceideas.eskimo.utils;
 
-import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.model.service.MemoryModel;
-import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
-import ch.niceideas.eskimo.types.Node;
+import org.apache.log4j.Logger;
 
-import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+public class SchedulerHelper {
 
-public interface NodesConfigurationService {
+    private static final Logger logger = Logger.getLogger(SchedulerHelper.class);
 
-    void applyNodesConfig(ServiceOperationsCommand command) throws NodesConfigurationException;
+    public static ScheduledExecutorService scheduleRunnableOneShot(boolean shouldSchedule, long schedulePeriodSeconds, Runnable runnable) {
+        if (shouldSchedule) {
 
-    void installTopologyAndSettings(
-            MessageLogger ml,
-            NodesConfigWrapper nodesConfig,
-            KubernetesServicesConfigWrapper kubeServicesConfig,
-            ServicesInstallStatusWrapper servicesInstallStatus,
-            MemoryModel memoryModel,
-            Node node)
-            throws SystemException, SSHCommandException, IOException;
+            // I shouldn't use a timer here since scheduling at fixed inteval may lead to flooding the system and ending
+            // up in doing only this on large clusters
 
-    void restartServiceForSystem(AbstractStandardOperationId<?> operationId) throws SystemException;
+            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-    void installEskimoBaseSystem(MessageLogger ml, Node node) throws SSHCommandException;
+            logger.info("Initializing Status updater scheduler ...");
+            scheduler.schedule(runnable, schedulePeriodSeconds, TimeUnit.SECONDS);
 
-    String getNodeFlavour(SSHConnection connection) throws SSHCommandException, SystemException;
-
-    void copyCommand (String source, String target, SSHConnection connection) throws SSHCommandException;
-
-    void uninstallService(AbstractStandardOperationId<?> operationId) throws SystemException;
-
-    void installService(AbstractStandardOperationId<?> operationId) throws SystemException;
+            return scheduler;
+        } else {
+            return null;
+        }
+    }
 }

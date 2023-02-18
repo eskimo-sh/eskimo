@@ -41,6 +41,7 @@ import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import ch.niceideas.eskimo.utils.SchedulerHelper;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,6 +62,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -110,26 +114,23 @@ public class ApplicationStatusServiceImpl implements ApplicationStatusService {
             = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
     private final ReentrantLock statusUpdateLock = new ReentrantLock();
-    private final Timer timer;
+    private final ScheduledExecutorService scheduler;
     private final AtomicReference<JsonWrapper> lastStatus = new AtomicReference<>();
 
     // constructor for spring
     public ApplicationStatusServiceImpl() {
-        this.timer = new Timer(true);
+        this.scheduler = Executors.newSingleThreadScheduledExecutor();
 
         logger.info ("Initializing Application Status update scheduler ...");
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                updateStatus();
-            }
-        }, 15L * 1000L, 15L * 1000L);
+        scheduler.scheduleAtFixedRate(this::updateStatus, 15L * 1000L, 15L * 1000L, TimeUnit.SECONDS);
     }
 
     @PreDestroy
     public void destroy() {
         logger.info ("Cancelling status updater scheduler");
-        timer.cancel();
+        if (scheduler != null) {
+            scheduler.shutdown();
+        }
     }
 
     public static boolean isSnapshot(String buildVersion) {

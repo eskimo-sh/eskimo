@@ -45,6 +45,7 @@ import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
+import ch.niceideas.eskimo.utils.SchedulerHelper;
 import ch.niceideas.eskimo.utils.SystemStatusParser;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -135,18 +136,7 @@ public class SystemServiceImpl implements SystemService {
         this (true);
     }
     public SystemServiceImpl(boolean createUpdateScheduler) {
-        if (createUpdateScheduler) {
-
-            // I shouldn't use a timer here since scheduling at fixed inteval may lead to flooding the system and ending
-            // up in doing only this on large clusters
-
-            statusRefreshScheduler = Executors.newSingleThreadScheduledExecutor();
-
-            logger.info("Initializing Status updater scheduler ...");
-            statusRefreshScheduler.schedule(this::updateStatus, statusUpdatePeriodSeconds, TimeUnit.SECONDS);
-        } else {
-            statusRefreshScheduler = null;
-        }
+        statusRefreshScheduler = SchedulerHelper.scheduleRunnableOneShot(createUpdateScheduler, statusUpdatePeriodSeconds, this::updateStatus);
     }
 
     @PreDestroy
