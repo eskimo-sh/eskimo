@@ -100,8 +100,8 @@ public abstract class AbstractSetupShellTest {
 
 
         // generate custom topology file
-        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
-        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
+        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetupRealWorld();
+        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfigRealWorld();
 
         ServicesDefinitionImpl def = new ServicesDefinitionImpl();
         SetupServiceUnderTest setupService = new SetupServiceUnderTest();
@@ -115,7 +115,7 @@ public abstract class AbstractSetupShellTest {
 
         FileUtils.writeFile(new File (jailPath + "/eskimo-topology.sh"),
                 topology.getTopologyScriptForNode(
-                        nodesConfig, kubeServicesConfig, StandardSetupHelpers.getStandard2NodesInstallStatus(), def, new MemoryModel(new HashMap<>()), 2));
+                        nodesConfig, kubeServicesConfig, StandardSetupHelpers.getStandard2NodesInstallStatusRealWorld(), def, new MemoryModel(new HashMap<>()), 2));
         ProcessHelper.exec(new String[]{"chmod", "755", jailPath + "/eskimo-topology.sh"}, true);
 
         String testFileConf = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(getCamelCaseServiceName()+"SetupShellTest/testFile.conf"), StandardCharsets.UTF_8);

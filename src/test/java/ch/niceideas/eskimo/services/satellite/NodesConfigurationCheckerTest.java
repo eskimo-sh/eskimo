@@ -184,7 +184,7 @@ public class NodesConfigurationCheckerTest {
     }
 
     @Test
-    public void testMissingPrometheus() {
+    public void testMissingPromNodeExporter() {
 
         NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
             NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
@@ -203,7 +203,7 @@ public class NodesConfigurationCheckerTest {
             nodeConfigChecker.checkNodesSetup(nodesConfig);
         });
 
-        assertEquals("Inconsistency found : service prometheus is mandatory on all nodes but some nodes are lacking it.", exception.getMessage());
+        assertEquals("Inconsistency found : service prom-node-exporter is mandatory on all nodes but some nodes are lacking it.", exception.getMessage());
     }
 
     @Test
@@ -232,22 +232,6 @@ public class NodesConfigurationCheckerTest {
         });
 
         assertEquals("Inconsistency found : got key node_id2 which is greater than node number 1", exception.getMessage());
-    }
-
-    @Test
-    public void testNoPrometheus() {
-
-        NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
-                    put("node_id1", "192.168.10.11");
-                    put("ntp1", "on");
-                    put("gluster1", "on");
-            }});
-
-            nodeConfigChecker.checkNodesSetup(nodesConfig);
-        });
-
-        assertEquals("Inconsistency found : service prometheus is mandatory on all nodes but some nodes are lacking it.", exception.getMessage());
     }
 
     @Test

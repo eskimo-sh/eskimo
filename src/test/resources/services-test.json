@@ -960,6 +960,17 @@
       "waitTime": 8000,
       "role" : "*",
       "title" : "USer Console",
+      "____comment": "the following is recovered from spark console to have a case to test here",
+      "urlRewriting" : [
+        {
+          "startUrl" : "{FULL_SERVER_ROOT}/history/",
+          "replacement" : "{FULL_SERVER_ROOT}/user-console/history/"
+        },
+        {
+          "startUrl" : "{FULL_SERVER_ROOT_NO_CONTEXT}/history/",
+          "replacement" : "{FULL_SERVER_ROOT}/user-console/history/"
+        }
+      ],
       "proxyReplacements" : [
         {
           "type" : "PLAIN",

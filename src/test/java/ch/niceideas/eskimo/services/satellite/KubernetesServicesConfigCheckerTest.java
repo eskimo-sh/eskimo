@@ -79,6 +79,10 @@ public class KubernetesServicesConfigCheckerTest {
         put("cerebro_cpu", "1");
         put("cerebro_ram", "1G");
 
+        put("prometheus_install", "on");
+        put("prometheus_cpu", "0.2");
+        put("prometheus_ram", "400M");
+
         put("kibana_install", "on");
         put("kibana_cpu", "500m");
         put("kibana_ram", "500M");

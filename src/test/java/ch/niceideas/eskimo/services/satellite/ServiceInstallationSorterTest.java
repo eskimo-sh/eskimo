@@ -58,7 +58,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-setup"})
+@ActiveProfiles({"no-web-stack", "test-setup", "test-services"})
 public class ServiceInstallationSorterTest {
 
     @Autowired
@@ -84,11 +84,11 @@ public class ServiceInstallationSorterTest {
                 servicesDefinition,
                 nodeRangeResolver,
                 new Service[] {
-                        Service.from("kube-master"),
-                        Service.from("kube-slave"),
-                        Service.from("gluster"),
-                        Service.from("cerebro"),
-                        Service.from("kibana")},
+                        Service.from("cluster-master"),
+                        Service.from("cluster-slave"),
+                        Service.from("distributed-filesystem"),
+                        Service.from("database-manager"),
+                        Service.from("user-console")},
                 StandardSetupHelpers.getStandard2NodesInstallStatus(),
                 StandardSetupHelpers.getStandard2NodesSetup()
         );
@@ -104,13 +104,13 @@ public class ServiceInstallationSorterTest {
         );
 
 
-        assertEquals("restart_gluster_192-168-10-11\n" +
-                "restart_gluster_192-168-10-13\n" +
-                "restart_kube-master_192-168-10-11\n" +
-                "restart_kube-slave_192-168-10-11\n" +
-                "restart_kube-slave_192-168-10-13\n" +
-                "restart_kibana_kubernetes\n" +
-                "restart_cerebro_kubernetes\n", resultBuilder.toString());
+        assertEquals("restart_distributed-filesystem_192-168-10-11\n" +
+                "restart_distributed-filesystem_192-168-10-13\n" +
+                "restart_cluster-master_192-168-10-11\n" +
+                "restart_cluster-slave_192-168-10-11\n" +
+                "restart_cluster-slave_192-168-10-13\n" +
+                "restart_database-manager_kubernetes\n" +
+                "restart_user-console_kubernetes\n", resultBuilder.toString());
     }
 
     @Test
@@ -133,18 +133,16 @@ public class ServiceInstallationSorterTest {
 
         System.err.println (resultBuilder);
 
-        assertEquals(7, orderedInstall.size());
+        assertEquals(5, orderedInstall.size());
 
-        assertEquals("installation_ntp_192-168-10-11\n" +
-                "installation_ntp_192-168-10-13\n" +
-                "installation_zookeeper_192-168-10-13\n" +
-                "installation_etcd_192-168-10-11\n" +
-                "installation_etcd_192-168-10-13\n" +
-                "installation_gluster_192-168-10-11\n" +
-                "installation_gluster_192-168-10-13\n" +
-                "installation_kube-master_192-168-10-11\n" +
-                "installation_kube-slave_192-168-10-11\n" +
-                "installation_kube-slave_192-168-10-13\n", resultBuilder.toString());
+        assertEquals("installation_cluster-manager_192-168-10-13\n" +
+                "installation_distributed-time_192-168-10-11\n" +
+                "installation_distributed-time_192-168-10-13\n" +
+                "installation_distributed-filesystem_192-168-10-11\n" +
+                "installation_distributed-filesystem_192-168-10-13\n" +
+                "installation_cluster-master_192-168-10-11\n" +
+                "installation_cluster-slave_192-168-10-11\n" +
+                "installation_cluster-slave_192-168-10-13\n", resultBuilder.toString());
     }
 
 }

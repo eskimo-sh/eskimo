@@ -61,7 +61,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-ssh"})
+@ActiveProfiles({"no-web-stack", "test-ssh", "test-services"})
 public class MemoryComputerTest {
 
     @Autowired
@@ -108,19 +108,16 @@ public class MemoryComputerTest {
 
         Map<Service, Long> memmModel1 = res.get(Node.fromAddress("192.168.10.11"));
         assertNotNull(memmModel1);
-        assertEquals(10, memmModel1.size());
+        assertEquals(7, memmModel1.size());
 
-        assertEquals(Long.valueOf(219), memmModel1.get(Service.from("logstash")));
-        assertEquals(Long.valueOf(657), memmModel1.get(Service.from("elasticsearch")));
-        assertEquals(Long.valueOf(657), memmModel1.get(Service.from("spark-runtime")));
-        assertNull(memmModel1.get(Service.from("flink-runtime"))); // flink is not configured
-        assertNull(memmModel1.get(Service.from("grafana"))); // grafana is not configured
-        assertEquals(Long.valueOf(438), memmModel1.get(Service.from("kibana")));
-        assertEquals(Long.valueOf(1095), memmModel1.get(Service.from("zeppelin")));
-        assertEquals(Long.valueOf(438), memmModel1.get(Service.from("kafka")));
-        assertEquals(Long.valueOf(219), memmModel1.get(Service.from("kafka-manager")));
-        assertEquals(Long.valueOf(219), memmModel1.get(Service.from("cerebro")));
-        assertEquals(Long.valueOf(219), memmModel1.get(Service.from("zookeeper")));
+        assertEquals(Long.valueOf(801), memmModel1.get(Service.from("database")));
+        assertEquals(Long.valueOf(801), memmModel1.get(Service.from("calculator-runtime")));
+        assertNull(memmModel1.get(Service.from("calculator-cli"))); // calculator-cli is not configured
+        assertEquals(Long.valueOf(267), memmModel1.get(Service.from("database-manager")));
+        assertEquals(Long.valueOf(1335), memmModel1.get(Service.from("user-console")));
+        assertEquals(Long.valueOf(534), memmModel1.get(Service.from("broker")));
+        assertEquals(Long.valueOf(267), memmModel1.get(Service.from("broker-manager")));
+        assertEquals(Long.valueOf(267), memmModel1.get(Service.from("broker-manager")));
     }
 
     @Test
@@ -135,41 +132,35 @@ public class MemoryComputerTest {
 
         Map<Service, Long> memmModel1 = res.get(Node.fromAddress("192.168.10.11"));
         assertNotNull(memmModel1);
-        assertEquals(10, memmModel1.size());
+        assertEquals(7, memmModel1.size());
 
-        assertEquals(Long.valueOf(321), memmModel1.get(Service.from("logstash")));
-        assertEquals(Long.valueOf(963), memmModel1.get(Service.from("elasticsearch")));
-        assertEquals(Long.valueOf(963), memmModel1.get(Service.from("spark-runtime")));
-        assertNull(memmModel1.get(Service.from("flink-runtime"))); // flink is not configured
-        assertNull(memmModel1.get(Service.from("grafana"))); // grafana is not configured
-        assertEquals(Long.valueOf(642), memmModel1.get(Service.from("kibana")));
-        assertEquals(Long.valueOf(1605), memmModel1.get(Service.from("zeppelin")));
-        assertEquals(Long.valueOf(642), memmModel1.get(Service.from("kafka")));
-        assertEquals(Long.valueOf(321), memmModel1.get(Service.from("kafka-manager")));
-        assertEquals(Long.valueOf(321), memmModel1.get(Service.from("cerebro")));
-        assertEquals(Long.valueOf(321), memmModel1.get(Service.from("zookeeper")));
+        assertEquals(Long.valueOf(1110), memmModel1.get(Service.from("database")));
+        assertEquals(Long.valueOf(1110), memmModel1.get(Service.from("calculator-runtime")));
+        assertNull(memmModel1.get(Service.from("calculator-cli"))); // calculator-cli is not configured
+        assertEquals(Long.valueOf(370), memmModel1.get(Service.from("database-manager")));
+        assertEquals(Long.valueOf(1850), memmModel1.get(Service.from("user-console")));
+        assertEquals(Long.valueOf(740), memmModel1.get(Service.from("broker")));
+        assertEquals(Long.valueOf(370), memmModel1.get(Service.from("broker-manager")));
+        assertEquals(Long.valueOf(370), memmModel1.get(Service.from("broker-manager")));
 
         Map<Service, Long> memmModel2 = res.get(Node.fromAddress("192.168.10.12"));
         assertNotNull(memmModel2);
-        assertEquals(9, memmModel2.size());
-
-        assertEquals(Long.valueOf(321), memmModel1.get(Service.from("logstash")));
-        assertEquals(Long.valueOf(963), memmModel1.get(Service.from("elasticsearch")));
-        assertEquals(Long.valueOf(963), memmModel1.get(Service.from("spark-runtime")));
-        assertNull(memmModel1.get(Service.from("flink-runtime"))); // flink is not configured
-        assertNull(memmModel1.get(Service.from("grafana"))); // grafana is not configured
-        assertEquals(Long.valueOf(642), memmModel1.get(Service.from("kibana")));
-        assertEquals(Long.valueOf(1605), memmModel1.get(Service.from("zeppelin")));
-        assertEquals(Long.valueOf(642), memmModel1.get(Service.from("kafka")));
-        assertEquals(Long.valueOf(321), memmModel1.get(Service.from("kafka-manager")));
-        assertEquals(Long.valueOf(321), memmModel1.get(Service.from("cerebro")));
+        assertEquals(6, memmModel2.size());
+        
+        assertEquals(Long.valueOf(1110), memmModel1.get(Service.from("database")));
+        assertEquals(Long.valueOf(1110), memmModel1.get(Service.from("calculator-runtime")));
+        assertNull(memmModel1.get(Service.from("calculator-cli"))); // calculator-cli is not configured
+        assertEquals(Long.valueOf(370), memmModel1.get(Service.from("database-manager")));
+        assertEquals(Long.valueOf(1850), memmModel1.get(Service.from("user-console")));
+        assertEquals(Long.valueOf(740), memmModel1.get(Service.from("broker")));
+        assertEquals(Long.valueOf(370), memmModel1.get(Service.from("broker-manager")));
 
         Map<Service, Long> memmModel3 = res.get(Node.fromAddress("192.168.10.13"));
         assertNotNull(memmModel3);
-        assertEquals(9, memmModel3.size());
+        assertEquals(6, memmModel3.size());
 
-        assertEquals(Long.valueOf(621), memmModel3.get(Service.from("elasticsearch")));
-        assertEquals(Long.valueOf(414), memmModel3.get(Service.from("kafka")));
+        assertEquals(Long.valueOf(723), memmModel3.get(Service.from("database")));
+        assertEquals(Long.valueOf(482), memmModel3.get(Service.from("broker")));
 
     }
 
@@ -215,25 +206,21 @@ public class MemoryComputerTest {
 
         Map<Service, Long> memmModel1 = res.get(Node.fromAddress("192.168.10.11"));
         assertNotNull(memmModel1);
-        assertEquals(9, memmModel1.size());
-
-        assertEquals(Long.valueOf(1087), memmModel1.get(Service.from("logstash")));
-        assertEquals(Long.valueOf(3261), memmModel1.get(Service.from("elasticsearch")));
-        assertEquals(Long.valueOf(3261), memmModel1.get(Service.from("spark-runtime")));
-        assertNull(memmModel1.get(Service.from("flink-runtime"))); // flink is not configured
-        assertNull(memmModel1.get(Service.from("grafana"))); // grafana is not configured
-        assertEquals(Long.valueOf(2174), memmModel1.get(Service.from("kibana")));
-        assertEquals(Long.valueOf(5435), memmModel1.get(Service.from("zeppelin")));
-        assertEquals(Long.valueOf(2174), memmModel1.get(Service.from("kafka")));
-        assertEquals(Long.valueOf(1087), memmModel1.get(Service.from("kafka-manager")));
-        assertEquals(Long.valueOf(1087), memmModel1.get(Service.from("cerebro")));
-        assertNull(memmModel1.get(Service.from("zookeeper")));
+        assertEquals(7, memmModel1.size());
+        
+        assertEquals(Long.valueOf(3696), memmModel1.get(Service.from("database")));
+        assertEquals(Long.valueOf(3696), memmModel1.get(Service.from("calculator-runtime")));
+        assertNull(memmModel1.get(Service.from("calculator-cli"))); // calculator-cli is not configured
+        assertEquals(Long.valueOf(1232), memmModel1.get(Service.from("database-manager")));
+        assertEquals(Long.valueOf(6160), memmModel1.get(Service.from("user-console")));
+        assertEquals(Long.valueOf(2464), memmModel1.get(Service.from("broker")));
+        assertEquals(Long.valueOf(1232), memmModel1.get(Service.from("broker-manager")));
 
         Map<Service, Long> memmModel3 = res.get(Node.fromAddress("192.168.10.13"));
         assertNotNull(memmModel3);
-        assertEquals(10, memmModel3.size());
+        assertEquals(8, memmModel3.size());
 
-        assertEquals(Long.valueOf(3081), memmModel3.get(Service.from("elasticsearch")));
-        assertEquals(Long.valueOf(2054), memmModel3.get(Service.from("kafka")));
+        assertEquals(Long.valueOf(3465), memmModel3.get(Service.from("database")));
+        assertEquals(Long.valueOf(2310), memmModel3.get(Service.from("broker")));
     }
 }

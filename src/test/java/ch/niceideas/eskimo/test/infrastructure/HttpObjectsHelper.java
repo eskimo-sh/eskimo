@@ -106,8 +106,12 @@ public class HttpObjectsHelper {
                         case "getRequestURI":
                             if ("cerebro".equals(service)) {
                                 return context + "/cerebro/statistics?server=192.168.10.13";
+                            } else if ("database-manager".equals(service)) {
+                                return context + "/database-manager/statistics?server=192.168.10.13";
                             } else if ("spark-console".equals(service)) {
                                 return context + "/spark-console/history/spark-application-1653861510346/jobs/";
+                            } else if ("user-console".equals(service)) {
+                                return context + "/user-console/history/spark-application-1653861510346/jobs/";
                             } else if ("eskimo-command".equals(service)) {
                                 return context + "/eskimo-command/clusterDashboardLoginToken";
                             }else {
@@ -117,7 +121,11 @@ public class HttpObjectsHelper {
                         case "getPathInfo":
                             if ("cerebro".equals(service)) {
                                 return "/cerebro/statistics";
+                            } else if ("database-manager".equals(service)) {
+                                return "/database-manager/statistics";
                             } else if ("spark-console".equals(service)) {
+                                return "/history/spark-application-1653861510346/jobs/";
+                            } else if ("user-console".equals(service)) {
                                 return "/history/spark-application-1653861510346/jobs/";
                             } else {
                                 throw new UnsupportedOperationException(
@@ -126,14 +134,18 @@ public class HttpObjectsHelper {
                         case "getRequestURL":
                             if ("cerebro".equals(service)) {
                                 return new StringBuffer("http://localhost:9090" + context + "/cerebro/statistics");
+                            } else if ("database-manager".equals(service)) {
+                                return new StringBuffer("http://localhost:9090" + context + "/database-manager/statistics");
                             } else if ("spark-console".equals(service)) {
                                 return new StringBuffer("http://localhost:9191" + context + "/history/spark-application-1652639268719/jobs/");
+                            } else if ("user-console".equals(service)) {
+                                return new StringBuffer("http://localhost:9191" + context + "/history/user-console-application-1652639268719/jobs/");
                             } else {
                                 throw new UnsupportedOperationException(
                                         "Unsupported method: " + method.getName());
                             }
                         case "getQueryString":
-                            if ("cerebro".equals(service)) {
+                            if ("cerebro".equals(service) || "database-manager".equals(service)) {
                                 return "server=192.168.10.13";
                             } else {
                                 throw new UnsupportedOperationException(
@@ -156,7 +168,7 @@ public class HttpObjectsHelper {
                             return 9191;
                         case "getAttribute":
                             if (methodArgs[0].equals(ProxyServlet.class.getSimpleName() + ".targetUri")) {
-                                if ("cerebro".equals(service)) {
+                                if ("cerebro".equals(service) || "database-manager".equals(service)) {
                                     return "http://localhost:9090/";
                                 } else if ("spark-console".equals(service)) {
                                     return "http://localhost:9191/";

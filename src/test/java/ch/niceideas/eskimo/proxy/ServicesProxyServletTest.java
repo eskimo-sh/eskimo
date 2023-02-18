@@ -69,7 +69,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-web-socket", "test-conf", "test-connection-manager"})
+@ActiveProfiles({"no-web-stack", "test-web-socket", "test-conf", "test-connection-manager", "test-services"})
 public class ServicesProxyServletTest {
 
     @Autowired
@@ -93,20 +93,20 @@ public class ServicesProxyServletTest {
     public void setUp() throws Exception {
         configurationServiceTest.setStandard2NodesInstallStatus();
 
-        pms.removeServerForService (Service.from("gluster"), Node.fromAddress("192.168.10.11"));
-        pms.removeServerForService (Service.from("gluster"), Node.fromAddress("192.168.10.13"));
+        pms.removeServerForService (Service.from("distributed-storage"), Node.fromAddress("192.168.10.11"));
+        pms.removeServerForService (Service.from("distributed-storage"), Node.fromAddress("192.168.10.13"));
 
-        pms.removeServerForService (Service.from("zeppelin"), Node.fromAddress("192.168.10.11"));
+        pms.removeServerForService (Service.from("user-console"), Node.fromAddress("192.168.10.11"));
 
-        pms.removeServerForService (Service.from("flink-runtime"), Node.fromAddress("192.168.10.11"));
-        pms.removeServerForService (Service.from("flink-runtime"), Node.fromAddress("192.168.10.12"));
-        pms.removeServerForService (Service.from("flink-runtime"), Node.fromAddress("192.168.10.13"));
+        pms.removeServerForService (Service.from("calculator-runtime"), Node.fromAddress("192.168.10.11"));
+        pms.removeServerForService (Service.from("calculator-runtime"), Node.fromAddress("192.168.10.12"));
+        pms.removeServerForService (Service.from("calculator-runtime"), Node.fromAddress("192.168.10.13"));
 
-        pms.removeServerForService (Service.from("kubernetes-dashboard"), Node.fromAddress("192.168.10.11"));
-        pms.removeServerForService (Service.from("kubernetes-dashboard"), Node.fromAddress("192.168.10.13"));
+        pms.removeServerForService (Service.from("cluster-dashboard"), Node.fromAddress("192.168.10.11"));
+        pms.removeServerForService (Service.from("cluster-dashboard"), Node.fromAddress("192.168.10.13"));
 
-        pms.removeServerForService (Service.from("kibana"), Node.fromAddress("192.168.10.11"));
-        pms.removeServerForService (Service.from("kibana"), Node.fromAddress("192.168.10.13"));
+        pms.removeServerForService (Service.from("database-manager"), Node.fromAddress("192.168.10.11"));
+        pms.removeServerForService (Service.from("database-manager"), Node.fromAddress("192.168.10.13"));
 
         connectionManagerServiceTest.reset();
         connectionManagerServiceTest.dontConnect();
@@ -118,12 +118,12 @@ public class ServicesProxyServletTest {
     @Test
     public void testGetTargetUri() throws Exception {
 
-        HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("cerebro");
+        HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("database-manager");
 
-        pms.updateServerForService(Service.from("cerebro"), Node.fromAddress("192.168.10.11"));
+        pms.updateServerForService(Service.from("database-manager"), Node.fromAddress("192.168.10.11"));
 
         assertEquals ("http://localhost:"
-                + pms.getTunnelConfig(ServiceWebId.fromService(Service.from("cerebro"))).getLocalPort()
+                + pms.getTunnelConfig(ServiceWebId.fromService(Service.from("database-manager"))).getLocalPort()
                 + "/",
                 servlet.getTargetUri(request));
     }
@@ -131,45 +131,45 @@ public class ServicesProxyServletTest {
     @Test
     public void testRewriteUrlFromRequest() throws Exception {
 
-        HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("cerebro");
+        HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("database-manager");
 
-        pms.updateServerForService(Service.from("cerebro"), Node.fromAddress("192.168.10.11"));
+        pms.updateServerForService(Service.from("database-manager"), Node.fromAddress("192.168.10.11"));
 
         assertEquals("http://localhost:"
-                + pms.getTunnelConfig(ServiceWebId.fromService(Service.from("cerebro"))).getLocalPort()
-                + "/cerebro/statistics?server=192.168.10.13",
+                + pms.getTunnelConfig(ServiceWebId.fromService(Service.from("database-manager"))).getLocalPort()
+                + "/database-manager/statistics?server=192.168.10.13",
                 servlet.rewriteUrlFromRequest(request));
     }
 
     @Test
     public void testRewriteUrlFromResponse() throws Exception {
 
-        HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("cerebro");
+        HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("database-manager");
 
-        pms.updateServerForService(Service.from("cerebro"), Node.fromAddress("192.168.10.11"));
+        pms.updateServerForService(Service.from("database-manager"), Node.fromAddress("192.168.10.11"));
 
-        assertEquals("http://localhost:9090/cerebro/nodeStats/statistics=192.168.10.13",
+        assertEquals("http://localhost:9090/database-manager/nodeStats/statistics=192.168.10.13",
                 servlet.rewriteUrlFromResponse(request, "http://localhost:" +
-                     pms.getTunnelConfig(ServiceWebId.fromService(Service.from("cerebro"))).getLocalPort() +
+                     pms.getTunnelConfig(ServiceWebId.fromService(Service.from("database-manager"))).getLocalPort() +
                     "/nodeStats/statistics=192.168.10.13"));
     }
 
     @Test
     public void testRewriteUrlFromResponse_sparkHistoryCase() throws Exception {
-        HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("spark-console");
+        HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("user-console");
 
-        pms.updateServerForService(Service.from("spark-console"), Node.fromAddress("192.168.10.11"));
+        pms.updateServerForService(Service.from("user-console"), Node.fromAddress("192.168.10.11"));
 
         // http://localhost:9191/history/spark-application-1653861510346/jobs/
 
-        assertEquals("http://localhost:9191/spark-console/history/spark-application-1652639268719/jobs/",
+        assertEquals("http://localhost:9191/user-console/history/spark-application-1652639268719/jobs/",
                 servlet.rewriteUrlFromResponse(request, "http://localhost:9191/history/spark-application-1652639268719/jobs/"));
     }
 
     @Test
     public void testNominalReplacements() {
 
-        ServiceDefinition kafkaManagerService = servicesDefinition.getServiceDefinition(Service.from("kafka-manager"));
+        ServiceDefinition kafkaManagerService = servicesDefinition.getServiceDefinition(Service.from("broker-manager"));
         assertNotNull(kafkaManagerService);
 
         String toReplace  = "\n <a href='/toto.txt'>\na/a>";
@@ -182,7 +182,7 @@ public class ServicesProxyServletTest {
 
     @Test
     public void testPageScripterInjection() {
-        ServiceDefinition kubeDashboardService = servicesDefinition.getServiceDefinition(Service.from("kubernetes-dashboard"));
+        ServiceDefinition kubeDashboardService = servicesDefinition.getServiceDefinition(Service.from("cluster-dashboard"));
         assertNotNull(kubeDashboardService);
 
         String toReplace  = ""+"" +
@@ -196,16 +196,18 @@ public class ServicesProxyServletTest {
                 "</html>";
 
         ReplacementContext ctx = new ReplacementContext("", "test/test", "", "", "", "");
-        String result = servlet.performReplacements(kubeDashboardService, "api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/", ctx, toReplace );
+        String result = servlet.performReplacements(kubeDashboardService, "api/v1/namespaces/cluster-dashboard/services/https:cluster-dashboard:/proxy/", ctx, toReplace );
 
-        assertTrue(result.contains ("<html><head><title>one title</title></head><body><div id=\"a\"></div><script>function triggerLogin () {"));
+        //System.err.println (result);
+
+        assertTrue(result.contains ("<html><head><title>one title</title></head><body><div id=\"a\"></div><script>function eskimoLoginChecker() {"));
         assertTrue(result.contains ("eskimoLoginChecker();</script></body></html>"));
     }
 
     @Test
-    public void testZeppelinReplacements() {
+    public void testuserConsoleReplacements() {
 
-        ServiceDefinition zeppelinService = servicesDefinition.getServiceDefinition(Service.from("zeppelin"));
+        ServiceDefinition userConsoleService = servicesDefinition.getServiceDefinition(Service.from("user-console"));
 
         String toReplace = "function(e, t, n) {\n" +
                 "    \"use strict\";\n" +
@@ -235,11 +237,11 @@ public class ServicesProxyServletTest {
                 "            return e.replace(/\\/$/, \"\")\n" +
                 "        }\n" +
                 "    }\n" +
-                "    angular.module(\"zeppelinWebApp\").service(\"baseUrlSrv\", r)\n" +
+                "    angular.module(\"user-consoleWebApp\").service(\"baseUrlSrv\", r)\n" +
                 "}";
 
         ReplacementContext ctx = new ReplacementContext("", "test/test", "", "", "", "");
-        String result = servlet.performReplacements(zeppelinService, "controllers.js", ctx, toReplace );
+        String result = servlet.performReplacements(userConsoleService, "controllers.js", ctx, toReplace );
 
         assertEquals("function(e, t, n) {\n" +
                 "    \"use strict\";\n" +
@@ -269,7 +271,7 @@ public class ServicesProxyServletTest {
                 "            return e.replace(/\\/$/, \"\")\n" +
                 "        }\n" +
                 "    }\n" +
-                "    angular.module(\"zeppelinWebApp\").service(\"baseUrlSrv\", r)\n" +
+                "    angular.module(\"user-consoleWebApp\").service(\"baseUrlSrv\", r)\n" +
                 "}", result);
     }
 
@@ -286,7 +288,7 @@ public class ServicesProxyServletTest {
 
         HttpResponse proxyResponse = HttpObjectsHelper.createHttpResponse(proxyServedEntity);
 
-        HttpServletRequest servletRequest = HttpObjectsHelper.createHttpServletRequest("cerebro");
+        HttpServletRequest servletRequest = HttpObjectsHelper.createHttpServletRequest("database-manager");
 
         HttpServletResponse servletResponse = HttpObjectsHelper.createHttpServletResponse(new HashMap<>(), responseOutputStream);
 
@@ -310,15 +312,15 @@ public class ServicesProxyServletTest {
 
         HttpResponse proxyResponse = HttpObjectsHelper.createHttpResponse(proxyServedEntity);
 
-        HttpServletRequest servletRequest = HttpObjectsHelper.createHttpServletRequest("cerebro");
+        HttpServletRequest servletRequest = HttpObjectsHelper.createHttpServletRequest("database-manager");
 
         HttpServletResponse servletResponse = HttpObjectsHelper.createHttpServletResponse(headers, responseOutputStream);
 
         servlet.copyResponseEntity(proxyResponse, servletResponse, proxyRequest, servletRequest);
 
-        assertEquals ("src=\"/cerebro/TEST ABC STRING", new String (responseOutputStream.toByteArray()));
+        assertEquals ("src=\"/database-manager/TEST ABC STRING", new String (responseOutputStream.toByteArray()));
 
-        assertEquals(29, headers.get(HttpHeaders.CONTENT_LENGTH));
+        assertEquals(38, headers.get(HttpHeaders.CONTENT_LENGTH));
     }
 
 }
