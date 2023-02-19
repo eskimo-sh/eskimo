@@ -57,7 +57,7 @@ fi
 
 #echo $DOCKER_VOLUMES_ARGS
 
-docker inspect kubernetes.registry:5000/kube-shell:$(get_last_tag kube-shell > /dev/null
+docker inspect kubernetes.registry:5000/kube-shell:$(get_last_tag kube-shell) > /dev/null 2>&1
 if [[ $? != 0 ]]; then
     echo "This commands invokes a shell in docker having access to Kubernetes services by their names"
     echo "It uses a docker image named 'kube-shell' which is made available by the kube-shell kubernetes service"
