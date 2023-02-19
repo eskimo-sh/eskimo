@@ -227,6 +227,16 @@
           "type" : "PLAIN",
           "source" : "prometheus/api",
           "target" : "prometheus/grafana/api"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "n=g.u.getUrlForPartial(e,{forceLogin:\"true\"})",
+          "target" : "n=g.u.getUrlForPartial(e,{forceLogin:\"true\"}); if (!n.startsWith(\"/{CONTEXT_PATH}grafana\")) { n = \"{CONTEXT_PATH}grafana\" + (n.startsWith(\"/\") ? n : (\"/\" + n)) }"
+        },
+        {
+          "type" : "PLAIN",
+          "source" : "const n=g.u.getUrlForPartial(t,{forceLogin:\"true\"});",
+          "target" : "let n=g.u.getUrlForPartial(t,{forceLogin:\"true\"}); if (!n.startsWith(\"/{CONTEXT_PATH}grafana\")) { n = \"{CONTEXT_PATH}grafana\" + (n.startsWith(\"/\") ? n : (\"/\" + n)) }"
         }
       ]
     },
