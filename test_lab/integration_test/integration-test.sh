@@ -873,7 +873,7 @@ check_all_services_up() {
                  "service_gluster_192-168-56-54" \
                  "service_prom-node-exporter_192-168-56-52" \
                  "service_grafana_" \
-                 "service_promeheus_" \
+                 "service_prometheus_" \
                  "service_gluster_192-168-56-53" \
                  "service_prom-node-exporter_192-168-56-51" \
                  "service_prom-node-exporter_192-168-56-54" \
