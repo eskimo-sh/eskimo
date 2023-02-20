@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.proxy;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.model.service.proxy.WebCommand;
@@ -44,6 +45,8 @@ import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -89,7 +92,7 @@ public class WebCommandServlet extends HttpServlet {
             // 2. Find matching command
             WebCommand webCommand = Arrays.stream(servicesDefinition.listUIServices())
                     .map(servicesDefinition::getServiceDefinition)
-                    .map (ServiceDefinition::getWebCommands)
+                    .map(ServiceDefinition::getWebCommands)
                     .flatMap(List::stream)
                     .filter(wc -> wc.getId().equals(command))
                     .findFirst().orElseThrow(() -> new IllegalStateException("No webCommand found with ID " + command));
@@ -101,10 +104,19 @@ public class WebCommandServlet extends HttpServlet {
                 throw new IllegalStateException("Couldn't find any node running servuce " + webCommand.getTarget().getName());
             }
 
-            // 3. Execute command
+            // 6. Ensure user has required Role (if any is required)
+            String requiredRole = webCommand.getRole();
+            if (StringUtils.isNotBlank(requiredRole)) {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                if (auth == null || auth.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(requiredRole))) {
+                    throw new IllegalStateException("User is lacking role " + requiredRole);
+                }
+            }
+
+            // 5. Execute command
             String result = sshCommandService.runSSHCommand(serviceNode, webCommand.getCommand());
 
-            // 4. Return result or error in expected json format
+            // 6. Return result or error in expected json format
             JsonWrapper returnObject = new JsonWrapper("{}");
             returnObject.setValueForPath("value", result);
             servletResponse.getOutputStream().write(returnObject.getFormattedValue().getBytes(StandardCharsets.UTF_8));

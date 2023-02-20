@@ -49,6 +49,7 @@ public class WebCommand {
     private final ServiceDefinition owner;
     private final String id;
     private final String command;
+    private final String role;
 
     @Setter
     @EqualsAndHashCode.Exclude

@@ -380,7 +380,10 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                     if (StringUtils.isBlank(serviceName)) {
                         throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a Web command without a service name");
                     }
-                    WebCommand command = new WebCommand(serviceDef, commandId, commandCall);
+
+                    String roleName = webCommandObj.getString("role");
+
+                    WebCommand command = new WebCommand(serviceDef, commandId, commandCall, roleName);
                     webCommandServices.put (command, Service.from(serviceName));
 
                     serviceDef.addWebCommand (command);

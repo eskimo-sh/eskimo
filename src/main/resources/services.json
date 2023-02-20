@@ -532,7 +532,8 @@
       {
         "id" : "kubeDashboardLoginToken",
         "service": "kube-master",
-        "command": "/usr/local/bin/kubectl -n eskimo create token eskimo"
+        "command": "/usr/local/bin/kubectl -n eskimo create token eskimo",
+        "role" : "ADMIN"
       }
     ],
     "ui": {
