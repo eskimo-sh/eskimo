@@ -279,10 +279,18 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
             (OperationsContext context)
             throws ServiceDefinitionException, NodesConfigurationException, SystemException {
 
-        List<ServiceOperationId> allOpList = new ArrayList<>();
-        context.getNodesConfig().getAllNodes().forEach(node -> allOpList.add(new ServiceOperationId(ServiceOperation.CHECK_INSTALL, Service.BASE_SYSTEM, node)));
+        List<ServiceOperationId> allOpList = new ArrayList<>(getNodesCheckOperation(context.getNodesConfig()));
         getOperationsGroupInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
         return allOpList;
+    }
+
+    public List<ServiceOperationId> getNodesCheckOperation(NodesConfigWrapper nodesConfig) {
+        Set<Node> allNodes = new HashSet<>(getAllNodes());
+        allNodes.addAll(nodesConfig.getAllNodes());
+        return allNodes.stream()
+                .map(node -> new ServiceOperationId(ServiceOperation.CHECK_INSTALL, Service.BASE_SYSTEM, node))
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     public List<List<ServiceOperationId>> getOperationsGroupInOrder

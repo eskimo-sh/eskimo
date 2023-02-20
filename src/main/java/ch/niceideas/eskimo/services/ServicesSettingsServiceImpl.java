@@ -145,18 +145,10 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                         return;
                     }
 
-                    List<ServiceOperationsCommand.ServiceOperationId> nodesSetup =
-                            nodeSetupPairs.stream()
-                                    .map(nodeSetupPair -> new ServiceOperationsCommand.ServiceOperationId(
-                                            ServiceOperationsCommand.ServiceOperation.CHECK_INSTALL,
-                                            Service.SETTINGS,
-                                            nodeSetupPair.getValue()))
-                                    .collect(Collectors.toList());
-
                     MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, kubeServicesConfig, deadNodes);
 
                     // Nodes setup
-                    systemService.performPooledOperation (nodesSetup, parallelismInstallThreadCount, baseInstallWaitTimout,
+                    systemService.performPooledOperation (restartCommand.getNodesCheckOperation(nodesConfig), parallelismInstallThreadCount, baseInstallWaitTimout,
                             (operation, error) -> {
                                 Node node = operation.getNode();
                                 if (nodesConfig.getAllNodes().contains(node) && liveNodes.contains(node)) {
@@ -174,8 +166,8 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                             });
 
                     // restarts
-                    for (List<ServiceOperationsCommand.ServiceOperationId> restarts : servicesInstallationSorter.orderOperations (
-                            restartCommand.getRestarts(), nodesConfig)) {
+                    for (List<ServiceOperationsCommand.ServiceOperationId> restarts :
+                            restartCommand.getRestartsInOrder(servicesInstallationSorter, nodesConfig)) {
                         systemService.performPooledOperation(restarts, 1, operationWaitTimoutSeconds,
                                 (operation, error) -> {
                                     if (operation.getNode().equals(Node.KUBERNETES_FLAG) || liveNodes.contains(operation.getNode())) {
@@ -352,18 +344,22 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
             return retSet;
         }
 
+        public List<ServiceOperationsCommand.ServiceOperationId> getNodesCheckOperation(NodesConfigWrapper nodesConfig) {
+            Set<Node> allNodes = new HashSet<>(getAllNodes());
+            allNodes.addAll(nodesConfig.getAllNodes());
+            return allNodes.stream()
+                    .map(node -> new ServiceOperationsCommand.ServiceOperationId(ServiceOperationsCommand.ServiceOperation.CHECK_INSTALL, Service.SETTINGS, node))
+                    .sorted()
+                    .collect(Collectors.toList());
+        }
+
         @Override
         public List<ServiceOperationsCommand.ServiceOperationId> getAllOperationsInOrder
                 (OperationsContext context)
                 throws ServiceDefinitionException, NodesConfigurationException, SystemException {
 
-            List<ServiceOperationsCommand.ServiceOperationId> allOpList = new ArrayList<>();
-
-            context.getNodesConfig().getAllNodes()
-                    .forEach(node -> allOpList.add(new ServiceOperationsCommand.ServiceOperationId(
-                            ServiceOperationsCommand.ServiceOperation.RESTART,
-                            Service.SETTINGS,
-                            node)));
+            List<ServiceOperationsCommand.ServiceOperationId> allOpList = new ArrayList<>(
+                    getNodesCheckOperation (context.getNodesConfig()));
 
             getRestartsInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
 

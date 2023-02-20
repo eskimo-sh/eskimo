@@ -151,14 +151,6 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
                 return;
             }
 
-            List<ServiceOperationsCommand.ServiceOperationId> nodesSetup =
-                    nodeSetupPairs.stream()
-                            .map(nodeSetupPair -> new ServiceOperationsCommand.ServiceOperationId(
-                                    ServiceOperationsCommand.ServiceOperation.CHECK_INSTALL,
-                                    Service.BASE_SYSTEM,
-                                    nodeSetupPair.getValue()))
-                            .collect(Collectors.toList());
-
             KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
             ServicesInstallStatusWrapper servicesInstallStatus = configurationService.loadServicesInstallationStatus();
 
@@ -169,7 +161,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             }
 
             // Nodes setup
-            systemService.performPooledOperation(nodesSetup, parallelismInstallThreadCount, baseInstallWaitTimout,
+            systemService.performPooledOperation(command.getNodesCheckOperation(nodesConfig), parallelismInstallThreadCount, baseInstallWaitTimout,
                     (operation, error) -> {
                         Node node = operation.getNode();
                         if (nodesConfig.getAllNodes().contains(node) && liveNodes.contains(node)) {

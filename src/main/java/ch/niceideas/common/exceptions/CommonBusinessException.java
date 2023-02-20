@@ -23,6 +23,6 @@ public class CommonBusinessException extends Exception {
     }
 
     public CommonBusinessException(Throwable cause) {
-        super(cause);
+        super(cause.getMessage(), cause);
     }
 }

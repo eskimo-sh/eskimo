@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.controlers;
 
+import ch.niceideas.common.exceptions.CommonBusinessException;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.ServicesSettingsWrapper;
 import ch.niceideas.eskimo.model.SettingsOperationsCommand;

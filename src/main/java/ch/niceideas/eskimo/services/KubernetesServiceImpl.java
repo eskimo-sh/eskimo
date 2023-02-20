@@ -187,7 +187,7 @@ public class KubernetesServiceImpl implements KubernetesService {
                     if (kubeMasterNode == null) {
                         throw new KubernetesException(KUBE_MASTER_NOT_INSTALLED);
                     }
-                    return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl restart " + serviceDef.getName() + " " + kubeMasterNode);
+                    return sshCommandService.runSSHCommand(kubeMasterNode, "tugudu && eskimo-kubectl restart " + serviceDef.getName() + " " + kubeMasterNode);
                 } catch (FileException | SetupException e) {
                     logger.error(e, e);
                     throw new KubernetesException(e);

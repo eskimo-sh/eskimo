@@ -366,22 +366,22 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
                     JSONObject webCommandObj = webCommandsConf.getJSONObject(i);
 
-                    String commandId = webCommandObj.getString("id");
+                    String commandId = webCommandObj.has("id") ? webCommandObj.getString("id") : null;
                     if (StringUtils.isBlank(commandId)) {
                         throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a command without an id");
                     }
 
-                    String commandCall = webCommandObj.getString("command");
+                    String commandCall = webCommandObj.has("command") ? webCommandObj.getString("command") : null;
                     if (StringUtils.isBlank(commandCall)) {
                         throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a command without a command");
                     }
 
-                    String serviceName = webCommandObj.getString("service");
+                    String serviceName = webCommandObj.has("service") ? webCommandObj.getString("service") : null;
                     if (StringUtils.isBlank(serviceName)) {
                         throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a Web command without a service name");
                     }
 
-                    String roleName = webCommandObj.getString("role");
+                    String roleName = webCommandObj.has("role") ? webCommandObj.getString("role") : null;
 
                     WebCommand command = new WebCommand(serviceDef, commandId, commandCall, roleName);
                     webCommandServices.put (command, Service.from(serviceName));
@@ -397,22 +397,22 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
                     JSONObject commandObj = commandsConf.getJSONObject(i);
 
-                    String commandId = commandObj.getString("id");
+                    String commandId = commandObj.has("id") ? commandObj.getString("id") : null;
                     if (StringUtils.isBlank(commandId)) {
                         throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a command without an id");
                     }
 
-                    String commandName = commandObj.getString("name");
+                    String commandName = commandObj.has("name") ? commandObj.getString("name") : null;
                     if (StringUtils.isBlank(commandName)) {
                         throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a command without a name");
                     }
 
-                    String commandIcon = commandObj.getString("icon");
+                    String commandIcon = commandObj.has("icon") ? commandObj.getString("icon") : null;
                     if (StringUtils.isBlank(commandIcon)) {
                         throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a command without an icon");
                     }
 
-                    String commandCall = commandObj.getString("command");
+                    String commandCall = commandObj.has("command") ? commandObj.getString("command") : null;
                     if (StringUtils.isBlank(commandCall)) {
                         throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " is declaring a command without a command");
                     }

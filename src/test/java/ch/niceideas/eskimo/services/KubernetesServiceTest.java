@@ -169,7 +169,7 @@ public class KubernetesServiceTest {
 
         KubernetesException exception = assertThrows(KubernetesException.class, () -> kubernetesService.applyServicesConfig(command));
         assertNotNull(exception);
-        assertEquals("ch.niceideas.eskimo.services.SystemException: Kubernetes doesn't seem to be installed. Kubernetes services configuration is saved but will need to be re-applied when k8s-master is available.", exception.getMessage());
+        assertEquals("Kubernetes doesn't seem to be installed. Kubernetes services configuration is saved but will need to be re-applied when k8s-master is available.", exception.getMessage());
 
         configurationServiceTest.saveServicesInstallationStatus(serviceInstallStatus);
 
