@@ -58,6 +58,8 @@ cd $tmp_dir || (echo "Couldn't cd to $tmp_dir" && exit 1)
 # Making /root/.kube/config available
 export HOME=/root
 
+echo " - Deploying CoreDNS"
+
 echo "   + Creating runtime resolv.conf"
 
 # copy resolve.conf somewhere else and remove 127.0.0.x (and add 8.8.8.8 if it now has no nameserve ranymore)
@@ -78,8 +80,18 @@ echo "   + Injecting runtime properties"
 sed -i "s/CLUSTER_DNS_SVC_IP/$CLUSTER_DNS_SVC_IP/g" /var/lib/kubernetes/core-dns.yaml
 sed -i "s/CLUSTER_DNS_DOMAIN/$CLUSTER_DNS_DOMAIN/g" /var/lib/kubernetes/core-dns.yaml
 
-echo " - Deploying core-dns"
+echo "   + Deploying core-dns"
 kubectl apply -f /var/lib/kubernetes/core-dns.yaml
+
+echo " - Deploying kube-state-metrics"
+
+echo "   + Creating runtime kube-state-metrics file"
+/bin/cp -f /etc/k8s/services/kube-state-metrics.yaml /var/lib/kubernetes/kube-state-metrics.yaml
+
+echo "   + Deploying kube-state-metrics"
+kubectl apply -f /var/lib/kubernetes/kube-state-metrics
+
+
 
 echo "   + removing temp folder"
 rm -Rf $tmp_dir

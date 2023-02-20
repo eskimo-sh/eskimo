@@ -53,4 +53,4 @@ providers:
   updateIntervalSeconds: 10
   options:
     # <string, required> path to dashboard files on disk. Required
-    path: /usr/local/lib/grafana/conf/provisioning/dashboards/system-wide-monitoring.json
+    path: /usr/local/lib/grafana/conf/provisioning/dashboards/kube-state-metrics.json

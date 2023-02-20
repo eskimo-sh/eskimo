@@ -72,5 +72,7 @@ deploy_image_in_registry "$(ls -1 /usr/local/lib/k8s/images/k8s.gcr.io_pause*)" 
 echo " - Deploying coredns/coredns in registry"
 deploy_image_in_registry "$(ls -1 /usr/local/lib/k8s/images/coredns_coredns*)" coredns/coredns
 
+echo " - Deploying coredns/coredns in registry"
+deploy_image_in_registry "$(ls -1 /usr/local/lib/k8s/images/kube-state-metrics_kube-state-metrics*)" registry.k8s.io/kube-state-metrics/kube-state-metrics
 
 rm -Rf /tmp/kube_services_setup

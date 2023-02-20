@@ -80,24 +80,28 @@ public abstract class AbstractSetupShellTest {
         String jailPath = createJail();
 
         // Enhance setup script
-        String setupScript = FileUtils.readFile(new File("./services_setup/" + serviceName + "/setup.sh"));
+        File setupFile = new File("./services_setup/" + serviceName + "/setup.sh");
+        if (setupFile.exists()) {
+            String setupScript = FileUtils.readFile(setupFile);
 
-        // inject custom topology loading
-        setupScript = setupScript.replace("loadTopology", ". ./eskimo-topology.sh");
-        FileUtils.writeFile(new File(jailPath + "/setup.sh"), setupScript);
-
+            // inject custom topology loading
+            setupScript = setupScript.replace("loadTopology", ". ./eskimo-topology.sh");
+            FileUtils.writeFile(new File(jailPath + "/setup.sh"), setupScript);
+        }
 
         // Enhance common script
-        String commonScript = FileUtils.readFile(new File("./services_setup/" + serviceName + "/common.sh"));
+        File commonFile = new File("./services_setup/" + serviceName + "/common.sh");
+        if (commonFile.exists()) {
+            String commonScript = FileUtils.readFile(commonFile);
 
-        // use mock wrappers
-        commonScript = commonScript.replace(
-                "function create_binary_wrapper(){",
-                "function create_binary_wrapper(){\n" +
-                        "return\n");
+            // use mock wrappers
+            commonScript = commonScript.replace(
+                    "function create_binary_wrapper(){",
+                    "function create_binary_wrapper(){\n" +
+                            "return\n");
 
-        FileUtils.writeFile(new File(jailPath + "/common.sh"), commonScript);
-
+            FileUtils.writeFile(new File(jailPath + "/common.sh"), commonScript);
+        }
 
         // generate custom topology file
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetupRealWorld();

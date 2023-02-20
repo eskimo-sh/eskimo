@@ -67,6 +67,20 @@ echo " - Enabling user to change config at runtime"
 chown -R prometheus /usr/local/lib/prometheus/prometheus.yml
 chmod 755 /usr/local/lib/prometheus/prometheus.yml
 
+echo " - Adding kube-state-metrics scrape target"
+cat >> /usr/local/lib/prometheus/prometheus.yml <<EOF
+
+  - job_name: 'kube-state-metrics'
+    honor_timestamps: true
+    scrape_interval: 1m
+    scrape_timeout: 1m
+    metrics_path: /metrics
+    scheme: http
+    static_configs:
+    - targets:
+      - kube-state-metrics.kube-system.svc.cluster.eskimo:8080
+EOF
+
 echo " - Changing data storage to 777 (required by prometheus)"
 sudo mkdir -p /var/lib/prometheus/data
 chown -R prometheus /var/lib/prometheus/data

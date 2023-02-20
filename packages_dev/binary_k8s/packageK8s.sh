@@ -217,6 +217,7 @@ set -e
 mkdir -p /usr/local/lib/k8s/images/
 mv /tmp/k8s.gcr.io_pause:$K8S_INFRA_IMAGE_PAUSE.tar.gz /usr/local/lib/k8s/images/
 mv /tmp/coredns_coredns:$K8S_INFRA_IMAGE_COREDNS.tar.gz /usr/local/lib/k8s/images/
+mv /tmp/kube-state-metrics_kube-state-metrics:v$K8S_INFRA_IMAGE_STATE_METRICS.tar.gz /usr/local/lib/k8s/images/
 set +e
 
 

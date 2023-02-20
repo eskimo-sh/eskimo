@@ -117,6 +117,17 @@ if [[ $? != 0 ]]; then
     exit 23
 fi
 
+echo "   + kube-state-metrics/kube-state-metrics:v$K8S_INFRA_IMAGE_STATE_METRICS"
+docker pull registry.k8s.io/kube-state-metrics/kube-state-metrics:v$K8S_INFRA_IMAGE_STATE_METRICS > /tmp/package-k8s-log 2>&1
+fail_if_error $? "package-k8s-log" -22
+
+docker save registry.k8s.io/kube-state-metrics/kube-state-metrics:v$K8S_INFRA_IMAGE_STATE_METRICS | gzip > /tmp/kube-state-metrics_kube-state-metrics:v$K8S_INFRA_IMAGE_STATE_METRICS.tar.gz
+if [[ $? != 0 ]]; then
+    echo "failed to save image !"
+    exit 23
+fi
+
+
 
 echo " - Package Kubernetes"
 docker exec -i package_k8s bash -c "/scripts/packageK8s.sh"
