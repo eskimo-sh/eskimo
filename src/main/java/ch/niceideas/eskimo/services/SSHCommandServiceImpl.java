@@ -239,7 +239,6 @@ public class SSHCommandServiceImpl implements SSHCommandService {
         try {
             JsonWrapper systemConfig = configurationService.loadSetupConfig();
 
-            //SCPClient scp = new SCPClient(connection);
             SCPClient scp = connection.createSCPClient();
 
             scp.put(filePath, "/home/" + systemConfig.getValueForPath(SetupService.SSH_USERNAME_FIELD), "0755");

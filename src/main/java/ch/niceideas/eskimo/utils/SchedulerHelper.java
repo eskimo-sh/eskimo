@@ -45,6 +45,8 @@ public class SchedulerHelper {
 
     private static final Logger logger = Logger.getLogger(SchedulerHelper.class);
 
+    private SchedulerHelper() {}
+
     public static ScheduledExecutorService scheduleRunnableOneShot(boolean shouldSchedule, long schedulePeriodSeconds, Runnable runnable) {
         if (shouldSchedule) {
 
