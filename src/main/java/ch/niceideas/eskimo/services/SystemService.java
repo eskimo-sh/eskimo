@@ -130,7 +130,7 @@ public interface SystemService {
 
         static final long serialVersionUID = -3317632123352221248L;
 
-        StatusExceptionWrapperException(Exception cause) {
+        public StatusExceptionWrapperException(Exception cause) {
             super(cause);
         }
 

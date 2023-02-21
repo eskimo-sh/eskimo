@@ -36,7 +36,9 @@
 package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.eskimo.EskimoApplication;
+import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.OperationsMonitoringServiceTestImpl;
+import ch.niceideas.eskimo.test.services.SetupServiceTestImpl;
 import ch.niceideas.eskimo.test.services.SystemServiceTestImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,7 +58,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class SystemStatusControllerTest {
 
     @Autowired
-    private SystemStatusController ssc;
+    private SystemStatusController systemStatusController;
 
     @Autowired
     private OperationsMonitoringServiceTestImpl operationsMonitoringServiceTest;
@@ -64,9 +66,23 @@ public class SystemStatusControllerTest {
     @Autowired
     private SystemServiceTestImpl systemServiceTest;
 
+    @Autowired
+    private SetupServiceTestImpl setupServiceTest;
+
     @BeforeEach
     public void setUp() {
         operationsMonitoringServiceTest.endCommand(true);
+    }
+
+    @Test
+    public void testGetContext() {
+        SecurityContextHelper.loginAdmin();
+        assertEquals("{\n" +
+                "    \"version\": \"@project.version@\",\n" +
+                "    \"user\": \"test\",\n" +
+                "    \"roles\": [\"ADMIN\"],\n" +
+                "    \"status\": \"OK\"\n" +
+                "}", systemStatusController.getContext());
     }
 
     @Test
@@ -75,12 +91,12 @@ public class SystemStatusControllerTest {
         assertEquals ("{\n" +
                 "  \"success\": true,\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", ssc.getLastOperationResult());
+                "}", systemStatusController.getLastOperationResult());
 
         operationsMonitoringServiceTest.setLastOperationSuccessError();
 
         IllegalStateException exception = assertThrows(IllegalStateException.class,
-                () -> ssc.getLastOperationResult());
+                () -> systemStatusController.getLastOperationResult());
 
         assertEquals ("Test Error", exception.getMessage());
     }
@@ -95,7 +111,7 @@ public class SystemStatusControllerTest {
                 "  \"processingPending\": false,\n" +
                 "  \"systemStatus\": {\"status\": \"OK\"},\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", ssc.getStatus());
+                "}", systemStatusController.getStatus());
 
         systemServiceTest.setReturnEmptySystemStatus();
 
@@ -104,6 +120,25 @@ public class SystemStatusControllerTest {
                 "  \"processingPending\": false,\n" +
                 "  \"systemStatus\": {\"status\": \"OK\"},\n" +
                 "  \"status\": \"OK\"\n" +
-                "}", ssc.getStatus());
+                "}", systemStatusController.getStatus());
+
+        setupServiceTest.setSetupError();
+
+        assertEquals ("{\n" +
+                "  \"clear\": \"setup\",\n" +
+                "  \"processingPending\": false,\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", systemStatusController.getStatus());
+
+        setupServiceTest.setSetupCompleted();;
+
+        systemServiceTest.setThrowStatusWrapperException();
+
+        assertEquals ("{\n" +
+                "  \"clear\": \"nodes\",\n" +
+                "  \"processingPending\": false,\n" +
+                "  \"systemStatus\": {\"status\": \"OK\"},\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", systemStatusController.getStatus());
     }
 }

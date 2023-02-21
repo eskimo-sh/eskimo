@@ -513,10 +513,11 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
                         String propName = prop.getString("name");
                         String comment = prop.getString("comment");
+                        String validationRegex = prop.has("validationRegex") ? prop.getString("validationRegex") : null;
                         String defaultValue = prop.getString("defaultValue");
                         String value = prop.has("value") ? prop.getString("value") : null;
 
-                        EditableProperty property = new EditableProperty(propName, comment, defaultValue, value);
+                        EditableProperty property = new EditableProperty(propName, comment, validationRegex, defaultValue, value);
 
                         editableSettings.addProperty(property);
                     }

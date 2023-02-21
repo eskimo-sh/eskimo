@@ -154,4 +154,28 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
             assertEquals ("bash: line 1: /bin/tada: No such file or directory\n", e.getMessage());
         }
     }
+
+    @Test
+    public void testRunSSHScriptPath() throws Exception {
+        File script = File.createTempFile("test_ssh", ".txt");
+        FileUtils.writeFile(script, "#!/bin/bash\n echo 1");
+        assertEquals ("1\n", sshCommandService.runSSHScriptPath(Node.fromName("localhost"), script.getAbsolutePath()));
+    }
+
+    @Test
+    public void testScpFile() throws Exception {
+        File source = File.createTempFile("test_ssh", ".txt");
+        FileUtils.writeFile(source, "test content");
+        try {
+            sshCommandService.copySCPFile(Node.fromName("localhost"), source.getAbsolutePath());
+            File dest = new File ("/home/" + source.getName());
+            assertTrue (dest.exists());
+            assertEquals ("test content", FileUtils.readFile(dest));
+        } catch (SSHCommandException e) {
+            // this can happen if we don0t have the right to write in /home
+            if (!e.getMessage().equals("Error during SCP transfer.")) {
+                fail (e.getMessage() + " is not expected");
+            }
+        }
+    }
 }

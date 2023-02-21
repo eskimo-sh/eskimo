@@ -145,6 +145,7 @@ public class ConnectionManagerServiceTestImpl extends ConnectionManagerServiceIm
             @Override
             public void close() {
                 closedForwarders.add (config.getLocalPort() + "/" + config.getNode() + "/" + config.getRemotePort());
+                super.close();
             }
         };
     }

@@ -47,6 +47,7 @@ public class EditableProperty {
 
     private final String name;
     private final String comment;
+    private final String validationRegex;
     private final String defaultValue;
     private final String value;
 
@@ -54,6 +55,9 @@ public class EditableProperty {
         return new JSONObject(new HashMap<String, Object>() {{
             put("name", getName());
             put("comment", getComment());
+            if (StringUtils.isNotBlank(validationRegex)) {
+                put("validationRegex", getValidationRegex());
+            }
             put("defaultValue", getDefaultValue());
             if (StringUtils.isNotBlank(getValue())) {
                 put("value", getValue());

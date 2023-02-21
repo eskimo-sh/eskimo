@@ -39,6 +39,7 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.SSHCommandException;
+import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.SystemException;
 import ch.niceideas.eskimo.services.SystemService;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
@@ -63,6 +64,7 @@ public class SystemServiceTestImpl implements SystemService {
 
     private boolean returnEmptySystemStatus = false;
     private boolean returnOKSystemStatus = false;
+    private boolean throwStatusWrapperException = false;
 
     private boolean startServiceError = false;
 
@@ -83,6 +85,7 @@ public class SystemServiceTestImpl implements SystemService {
     public void reset() {
         this.returnEmptySystemStatus = false;
         this.returnOKSystemStatus = false;
+        this.throwStatusWrapperException = false;
         this.startServiceError = false;
         this.standard2NodesStatus = false;
         this.pingError = false;
@@ -100,6 +103,10 @@ public class SystemServiceTestImpl implements SystemService {
 
     public void setReturnEmptySystemStatus() {
         this.returnEmptySystemStatus = true;
+    }
+
+    public void setThrowStatusWrapperException() {
+        this.throwStatusWrapperException = true;
     }
 
     public void setReturnOKSystemStatus() {
@@ -148,11 +155,13 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public SystemStatusWrapper getStatus() {
+    public SystemStatusWrapper getStatus() throws StatusExceptionWrapperException {
         if (returnEmptySystemStatus) {
             return SystemStatusWrapper.empty();
-        } else  if (returnOKSystemStatus) {
+        } else if (returnOKSystemStatus) {
             return new SystemStatusWrapper("{\"status\":\"OK\"}");
+        } else if (this.throwStatusWrapperException) {
+            throw new StatusExceptionWrapperException (new SetupException("test"));
         } else if (standard2NodesStatus) {
             return StandardSetupHelpers.getStandard2NodesSystemStatus();
         }
@@ -279,4 +288,5 @@ public class SystemServiceTestImpl implements SystemService {
             }
         }
     }
+
 }

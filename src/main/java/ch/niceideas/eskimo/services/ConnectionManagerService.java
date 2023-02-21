@@ -39,11 +39,11 @@ import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
 import com.trilead.ssh2.LocalPortForwarder;
+import lombok.EqualsAndHashCode;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.net.BindException;
-import java.util.Objects;
 
 
 public interface ConnectionManagerService {
@@ -56,14 +56,19 @@ public interface ConnectionManagerService {
 
     void dropTunnelsToBeClosed(Node host);
 
+    @EqualsAndHashCode
     class LocalPortForwarderWrapper {
 
         private static final Logger logger = Logger.getLogger(LocalPortForwarderWrapper.class);
 
         private final LocalPortForwarder forwarder;
 
+        @EqualsAndHashCode.Exclude
         private final Service service;
+
+        @EqualsAndHashCode.Exclude
         private final int localPort;
+
         private final Node targetHost;
         private final int targetPort;
 
@@ -110,20 +115,6 @@ public interface ConnectionManagerService {
 
         public boolean matches(ProxyTunnelConfig config) {
             return matches(config.getService(), config.getLocalPort(), config.getNode(), config.getRemotePort());
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            LocalPortForwarderWrapper that = (LocalPortForwarderWrapper) o;
-            return targetPort == that.targetPort &&
-                    Objects.equals(targetHost, that.targetHost);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(targetHost, targetPort);
         }
     }
 

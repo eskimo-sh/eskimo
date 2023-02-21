@@ -53,6 +53,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -128,6 +129,21 @@ public class ServicesSettingsServiceTest {
             }
             return null;
         });
+    }
+
+    @Test
+    public void testSomeRegex() {
+        Pattern validationRegex = Pattern.compile("^([0-9\\.]+[kmgt]?)|(\\[ESKIMO_DEFAULT\\])$");
+        assertTrue(validationRegex.matcher("1024m").matches());
+        assertTrue(validationRegex.matcher("1024").matches());
+        assertTrue(validationRegex.matcher("10241024").matches());
+        assertTrue(validationRegex.matcher("1g").matches());
+        assertTrue(validationRegex.matcher("[ESKIMO_DEFAULT]").matches());
+
+        assertFalse(validationRegex.matcher("tada").matches());
+        assertFalse(validationRegex.matcher("").matches());
+        assertFalse(validationRegex.matcher("none").matches());
+        assertFalse(validationRegex.matcher("false").matches());
     }
 
     @Test
