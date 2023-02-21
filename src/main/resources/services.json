@@ -55,11 +55,13 @@
           {
             "name": "Xms",
             "comment": "Startup Heap Size for zookeeper\n [ESKIMO_DEFAULT] means memory allocator will decide of zookeeper memory share.",
+            "validation_regex": "^([0-9\\.]+[kmgt]?)|(\\[ESKIMO_DEFAULT\\])$",
             "defaultValue": "[ESKIMO_DEFAULT]"
           },
           {
             "name": "Xmx",
             "comment": "Maximum Heap Size for zookeeper\n [ESKIMO_DEFAULT] means memory allocator will decide of zookeeper memory share.",
+            "validation_regex": "^([0-9\\.]+[kmgt]?)|(\\[ESKIMO_DEFAULT\\])$",
             "defaultValue": "[ESKIMO_DEFAULT]"
           }
         ]

@@ -255,7 +255,7 @@ public class ServicesProxyServlet extends ProxyServlet {
     private String getFullServerRootNoContext (HttpServletRequest servletRequest) {
         return servletRequest.getScheme() + "://"
                 + servletRequest.getServerName()
-                + (servletRequest.getServerPort() == 80 ?
+                + (servletRequest.getServerPort() == 80 || servletRequest.getServerPort() == 443 ?
                     "" :
                     ":" + servletRequest.getServerPort());
     }
@@ -268,7 +268,7 @@ public class ServicesProxyServlet extends ProxyServlet {
     private String getAppRootNoContext (HttpServletRequest servletRequest) {
         return "//"
                 + servletRequest.getServerName()
-                + (servletRequest.getServerPort() == 80 ?
+                + (servletRequest.getServerPort() == 80 || servletRequest.getServerPort() == 443 ?
                     "" :
                     ":" + servletRequest.getServerPort());
     }

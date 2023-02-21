@@ -149,7 +149,7 @@ public class WebSocketProxyForwarder {
 
         // Hack : message HELLO_ESKIMO is used to force create the connection to target service
         if (("" + webSocketMessage.getPayload()).equals("HELLO_ESKIMO")) {
-            logger.debug ("God sessin opening message for " + serviceId);
+            logger.debug ("Got session opening message for " + serviceId);
 
         } else {
 
