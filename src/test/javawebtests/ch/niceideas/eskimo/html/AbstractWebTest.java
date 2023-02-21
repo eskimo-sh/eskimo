@@ -49,12 +49,17 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.v106.emulation.Emulation;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.time.Duration;
+import java.util.Date;
+import java.util.logging.Level;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -132,6 +137,29 @@ public abstract class AbstractWebTest {
         return driver;
     }
 
+    protected static void logConsoleLogs() {
+        LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
+        for (LogEntry entry : logEntries) {
+            switch (entry.getLevel().intValue()) {
+                case 1000: //Level.SEVERE:
+                    logger.error(entry.getMessage());
+                    break;
+                case 900: //Level.WARNING:
+                    logger.warn(entry.getMessage());
+                    break;
+                case 800: // Level.INFO:
+                    logger.info(entry.getMessage());
+                    break;
+                case 500: //Level.FINE:
+                case 400: //Level.FINER:
+                    logger.debug(entry.getMessage());
+                    break;
+                default:
+                    logger.info(entry.getLevel() + " " + entry.getMessage());
+            }
+        }
+    }
+
     private static boolean hasQuit(WebDriver driver) {
         try {
             if (driver == null) {
@@ -179,6 +207,7 @@ public abstract class AbstractWebTest {
 
     @AfterEach
     public void tearDown() throws Exception {
+        logConsoleLogs();
         server.postTestMethodHook(this::js);
     }
 
@@ -215,6 +244,7 @@ public abstract class AbstractWebTest {
         js("window.eskimoSetup = {}");
         js("eskimoSetup.setSnapshot = function () {};");
         js("eskimoSetup.showSetupMessage = function (message, success) {window.setupMessage = message; window.setupStatus = success;};");
+        js("eskimoSetup.loadSetup = function () {};");
 
 
         js("window.eskimoSetupCommand = {}");
@@ -315,6 +345,7 @@ public abstract class AbstractWebTest {
     }
 
     Object js (String jsCode) {
+        logConsoleLogs();
         JavascriptExecutor js = (JavascriptExecutor)driver;
         Object result = js.executeScript (jsCode);
 
@@ -344,6 +375,7 @@ public abstract class AbstractWebTest {
     }
 
     WebElement getElementBy (By by) {
+        logConsoleLogs();
         try {
             return driver.findElement(by);
         } catch (org.openqa.selenium.NoSuchElementException e) {
@@ -353,12 +385,7 @@ public abstract class AbstractWebTest {
     }
 
     WebElement getElementById (String elementId) {
-        try {
-            return driver.findElement(By.id(elementId));
-        } catch (org.openqa.selenium.NoSuchElementException e) {
-            logger.debug (e.getMessage());
-            return null;
-        }
+        return getElementBy (By.id(elementId));
     }
 
     protected static boolean isCoverageRun() {
@@ -377,19 +404,23 @@ public abstract class AbstractWebTest {
     }
 
     protected void assertAttrContains(String selector, String attribute, String value) {
+        logConsoleLogs();
         String cssValue = js("return $('"+selector+"').attr('"+attribute+"')").toString();
         assertTrue (cssValue.contains(value));
     }
 
     protected void assertAttrValue(String selector, String attribute, String value) {
+        logConsoleLogs();
         assertEquals (value, js("return $('"+selector+"').attr('"+attribute+"')"));
     }
 
     protected void assertCssValue(String selector, String attribute, String value) {
+        logConsoleLogs();
         assertEquals (value, js("return $('"+selector+"').css('"+attribute+"')"));
     }
 
     protected void assertJavascriptEquals(String value, String javascript) {
+        logConsoleLogs();
         Object jsResult = js("return " + javascript);
         if (jsResult == null) {
             throw new NullPointerException("javascript execution returned null value.");
@@ -398,22 +429,27 @@ public abstract class AbstractWebTest {
     }
 
     protected void assertJavascriptNull(String javascript) {
+        logConsoleLogs();
         assertNull (js("return " + javascript));
     }
 
     protected void assertTagName(String elementId, String tagName) {
+        logConsoleLogs();
         assertEquals (tagName, getElementById(elementId).getTagName());
     }
 
     protected void waitForElementInDOM(By by) {
         ActiveWaiter.wait(() -> getElementBy(by) != null);
+        logConsoleLogs();
     }
 
     protected void waitForElementIdInDOM(String elementId) {
         ActiveWaiter.wait(() -> getElementById(elementId) != null);
+        logConsoleLogs();
     }
 
     protected void waitForDefinition(String varName) {
         ActiveWaiter.wait(() -> !js("return typeof " + varName).toString().equals ("undefined"));
+        logConsoleLogs();
     }
 }

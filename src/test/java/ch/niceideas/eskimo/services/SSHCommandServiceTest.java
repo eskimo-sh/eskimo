@@ -172,7 +172,7 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
             assertTrue (dest.exists());
             assertEquals ("test content", FileUtils.readFile(dest));
         } catch (SSHCommandException e) {
-            // this can happen if we don0t have the right to write in /home
+            // this can happen if we don't have the right to write in /home
             if (!e.getMessage().equals("Error during SCP transfer.")) {
                 fail (e.getMessage() + " is not expected");
             }

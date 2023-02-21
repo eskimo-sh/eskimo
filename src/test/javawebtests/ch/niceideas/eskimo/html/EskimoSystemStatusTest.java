@@ -42,8 +42,12 @@ import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -82,15 +86,19 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         js("eskimoSystemStatus.eskimoServices = eskimoServices");
         js("eskimoSystemStatus.eskimoMain = eskimoMain");
 
-        js("$.ajaxGet = function(callback) { console.log(callback); }");
+        js("$.ajaxGet = function(callback) { " +
+                "if (callback.url == \"get-ui-services-status-config\") {\n" +
+                "    callback.success({'status': 'OK', 'uiServicesStatusConfig': SERVICES_STATUS_CONFIG});\n" +
+                "} else if (callback.url == \"list-services\") {\n" +
+                "    callback.success({'status': 'OK', 'services': STATUS_SERVICES});\n" +
+                "} else if (callback.url == \"get-status\") {\n" +
+                "    callback.success(" + jsonFullStatus + ");\n" +
+                "}\n"+
+                "console.log(callback); }");
 
         js("eskimoSystemStatus.initialize()");
 
         waitForElementIdInDOM("service-status-warning");
-
-        // set services for tests
-        js("eskimoSystemStatus.setStatusServices (STATUS_SERVICES);");
-        js("eskimoSystemStatus.setServicesStatusConfig (SERVICES_STATUS_CONFIG);");
 
         js("$('#inner-content-status').css('display', 'inherit')");
         js("$('#inner-content-status').css('visibility', 'visible')");
@@ -219,10 +227,6 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
     @Test
     public void testShowStatus() {
-
-        js("$.ajaxGet = function (options) {" +
-                "    options.success(" + jsonFullStatus + ")" +
-                "}");
 
         js("eskimoSystemStatus.showStatus()");
 

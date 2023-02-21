@@ -295,17 +295,10 @@ eskimo.SystemStatus = function() {
     }
 
     function setNodeFilter (doNodeFilter) {
+        console.log(doNodeFilter);
         nodeFilter = doNodeFilter;
     }
     this.setNodeFilter = setNodeFilter;
-
-    /** For tests */
-    this.setStatusServices = function (statusServices) {
-        STATUS_SERVICES = statusServices;
-    };
-    this.setServicesStatusConfig = function (servicesStatusConfig) {
-        SERVICES_STATUS_CONFIG = servicesStatusConfig;
-    };
 
     function showStatus (blocking) {
 
