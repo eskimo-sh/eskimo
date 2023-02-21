@@ -34,33 +34,32 @@
 # Software.
 #
 
-echoerr() { echo "$@" 1>&2; }
-
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $SCRIPT_DIR/common.sh "$@"
 
-
-echo "Building kube-master Image"
-echo "--------------------------------------------------------------------------------"
-
-# reinitializing log
-rm -f /tmp/kube-master_build_log
-
-echo " - Building image kube-master"
-build_image kube-master_template /tmp/kube-master_build_log
-
-echo " - Installing Docker Registry"
-docker exec -i kube-master_template bash /scripts/installDockerRegistry.sh | tee /tmp/kube-master_build_log 2>&1
-check_in_container_install_success /tmp/kube-master_build_log
+echo "-- REMOVING USELESS COMPONENTS ---------------------------------------------------------"
 
 
-#echo " - TODO"
-#docker exec -it kube-master_template bash
+echo " - removing spark YARN infrastructure"
+rm -Rf /usr/local/lib/spark/yarn/*
+rm -Rf /usr/local/lib/spark/jars/hadoop-yarn*.jar
+rm -Rf /usr/local/lib/spark/jars/spark-yarn*.jar
+
+echo " - removing spark MESOS infrastucture"
+rm -Rf /usr/local/lib/spark/jars/mesos*.jar
+rm -Rf /usr/local/lib/spark/jars/spark-mesos*.jar
+
+echo " - emoving flink Azure and S3 infrastructure"
+rm -Rf /usr/local/lib/flink/opt/flink-azure-fs-hadoop*.jar
+rm -Rf /usr/local/lib/flink/opt/flink-s3-fs-hadoop*.jar
+rm -Rf /usr/local/lib/flink/opt/flink-s3-fs-presto*.jar
 
 
-echo " - Cleaning up image"
-docker exec -i kube-master_template apt-get remove -y git gcc adwaita-icon-theme >> /tmp/kube-master_build_log 2>&1
-docker exec -i kube-master_template apt-get -y auto-remove >> /tmp/kube-master_build_log 2>&1
+# Caution : the in container setup script must mandatorily finish with this log"
+echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"
 
-echo " - Closing and saving image kube-master"
-close_and_save_image kube-master_template /tmp/kube-master_build_log $DOCKER_REGISTRY_VERSION_SHORT
+
+
+
+
+

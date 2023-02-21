@@ -50,7 +50,7 @@ echo " - Building image flink"
 build_image flink_template /tmp/flink_build_log
 
 echo " - Installing OpenJDK 11"
-docker exec -i flink_template apt-get install -y openjdk-11-jdk > /tmp/flink_build_log 2>&1
+docker exec -i flink_template apt-get install -y openjdk-11-jdk-headless > /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -3
 
 echo " - Installing scala"
@@ -98,6 +98,9 @@ docker exec -i flink_template bash /scripts/installPyFlinkVenv.sh | tee -a /tmp/
 check_in_container_install_success /tmp/flink_build_log
 
 
+echo " - Removing useless stuff"
+docker exec -i flink_template bash /scripts/removeUselessStuff.sh | tee /tmp/flink_build_log 2>&1
+check_in_container_install_success /tmp/flink_build_log
 
 #echo " - TODO"
 #docker exec -it flink_template bash

@@ -49,7 +49,7 @@ echo " - Building image kube-shell"
 build_image kube-shell_template /tmp/kube-shell_build_log
 
 echo " - Installing OpenJDK 11"
-docker exec -i kube-shell_template apt-get install -y openjdk-11-jdk > /tmp/kube-shell_build_log 2>&1
+docker exec -i kube-shell_template apt-get install -y openjdk-11-jdk-headless > /tmp/kube-shell_build_log 2>&1
 fail_if_error $? "/tmp/kube-shell_build_log" -3
 
 echo " - Installing scala"

@@ -86,9 +86,15 @@ echo " - deactivate the conda python virtual environment"
 conda deactivate  > /tmp/pyflink_install_log 2>&1
 fail_if_error $? "/tmp/pyflink_install_log" -26
 
-# remove the cached packages
+echo " - removing package files virtual environment"
 rm -rf venv/pkgs  > /tmp/pyflink_install_log 2>&1
 fail_if_error $? "/tmp/pyflink_install_log" -27
+
+echo " - Fixing cygrpc.cpython x86_64-linux-gnu.so"
+for i in $(find venv -name 'cygrpc.cpython*x86_64-linux-gnu.so'); do
+    echo "   + Fixing $i"
+    strip --strip-debug $i
+done
 
 # package the prepared conda python virtual environment
 echo " - Packaging Virtual environment"

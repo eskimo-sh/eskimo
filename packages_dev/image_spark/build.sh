@@ -49,7 +49,7 @@ echo " - Building image spark"
 build_image spark_template /tmp/spark_build_log
 
 echo " - Installing OpenJDK 11"
-docker exec -i spark_template apt-get install -y openjdk-11-jdk > /tmp/spark_build_log 2>&1
+docker exec -i spark_template apt-get install -y openjdk-11-jdk-headless > /tmp/spark_build_log 2>&1
 fail_if_error $? "/tmp/spark_build_log" -3
 
 echo " - Installing scala"

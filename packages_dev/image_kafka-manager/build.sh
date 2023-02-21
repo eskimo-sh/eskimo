@@ -50,7 +50,7 @@ echo " - Building image kafka"
 build_image kafka-manager_template /tmp/kafkamanager_build_log
 
 echo " - Installing OpenJDK 11"
-docker exec -i kafka-manager_template apt-get install -y openjdk-11-jdk > /tmp/kafkamanager_build_log 2>&1
+docker exec -i kafka-manager_template apt-get install -y openjdk-11-jdk-headless > /tmp/kafkamanager_build_log 2>&1
 fail_if_error $? "/tmp/kafkamanager_build_log" -3
 
 echo " - Installing scala"

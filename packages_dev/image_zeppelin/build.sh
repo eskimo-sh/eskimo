@@ -140,6 +140,10 @@ if [[ $(tail -n 1 /tmp/zeppelin_build_log | grep " - In container install SUCCES
     exit 105
 fi
 
+echo " - Removing useless stuff"
+docker exec -i zeppelin_template bash /scripts/removeUselessStuff.sh | tee /tmp/zeppelin_build_log 2>&1
+check_in_container_install_success /tmp/zeppelin_build_log
+
 #docker exec -it zeppelin_template bash
 
 echo " - Cleaning up image"

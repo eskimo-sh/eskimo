@@ -72,6 +72,10 @@ echo " - Building and installing python (This takes time)"
 sudo make install > /tmp/python37_install_log 2>&1
 fail_if_error $? "/tmp/python37_install_log" -25
 
+echo " - Removing test folder"
+sudo rm -Rf /usr/lib/python3.7/test > /tmp/python37_install_log 2>&1
+fail_if_error $? "/tmp/python37_install_log" -25
+
 echo " - Installing pip"
 python3.7 -m pip install pip > /tmp/python37_install_log 2>&1
 fail_if_error $? "/tmp/python37_install_log" -26
