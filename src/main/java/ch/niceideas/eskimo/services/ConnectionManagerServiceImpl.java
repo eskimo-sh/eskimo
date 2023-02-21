@@ -39,6 +39,7 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
+import ch.niceideas.eskimo.terminal.Session;
 import ch.niceideas.eskimo.types.Node;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -53,6 +54,9 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
@@ -101,23 +105,20 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
 
     protected final List<SSHConnection> connectionsToCloseLazily = new ArrayList<>();
 
-    private final Timer timer;
+    private final ScheduledExecutorService scheduler;
 
     // constructor for spring
     public ConnectionManagerServiceImpl() {
-        this.timer = new Timer(true);
+        scheduler = Executors.newSingleThreadScheduledExecutor();
 
         logger.info ("Initializing connection closer scheduler ...");
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                for (SSHConnection connection : connectionsToCloseLazily) {
-                    logger.info ("Lazily closing connection to " + connection.getHostname());
-                    closeConnection(connection);
-                }
-                connectionsToCloseLazily.clear();
+        scheduler.scheduleAtFixedRate(() -> {
+            for (SSHConnection connection : connectionsToCloseLazily) {
+                logger.info ("Lazily closing connection to " + connection.getHostname());
+                closeConnection(connection);
             }
-        }, maximumConnectionAge, maximumConnectionAge);
+            connectionsToCloseLazily.clear();
+        }, maximumConnectionAge, maximumConnectionAge, TimeUnit.MILLISECONDS);
     }
 
     private void __dumpPortForwardersMap () {
@@ -131,7 +132,9 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
     @PreDestroy
     public void destroy() {
         logger.info ("Cancelling connection closer scheduler");
-        timer.cancel();
+        if (scheduler != null) {
+            scheduler.shutdownNow();
+        }
     }
 
     @Override
@@ -252,11 +255,9 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
         } finally  {
             connectionMapLock.unlock();
         }
-
     }
 
     protected SSHConnection createConnectionInternal(Node node, int operationTimeout) throws IOException, FileException, SetupException {
-
         logger.info ("Creating connection to " + node);
         SSHConnection connection = new SSHConnection(node, sshPort, operationTimeout);
         return connect(connection);
@@ -358,21 +359,17 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
 
     private class ConnectionOperationWatchDog implements AutoCloseable{
 
-        private final Timer timer;
+        private final ScheduledExecutorService scheduler;
 
         public ConnectionOperationWatchDog(SSHConnection connection) {
-            this.timer = new Timer(true);
-
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    closeConnection(connection);
-                }
-            }, sshOperationTimeout);
+            scheduler = Executors.newSingleThreadScheduledExecutor();
+            scheduler.schedule(() -> closeConnection(connection), sshOperationTimeout, TimeUnit.MILLISECONDS);
         }
 
         public void close() {
-            timer.cancel();
+            if (scheduler != null) {
+                scheduler.shutdownNow();
+            }
         }
     }
 

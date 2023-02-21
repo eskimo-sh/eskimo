@@ -126,7 +126,7 @@ public class ApplicationStatusServiceImpl implements ApplicationStatusService {
     public void destroy() {
         logger.info ("Cancelling status updater scheduler");
         if (scheduler != null) {
-            scheduler.shutdown();
+            scheduler.shutdownNow();
         }
     }
 

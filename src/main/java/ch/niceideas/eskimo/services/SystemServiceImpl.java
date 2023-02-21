@@ -143,7 +143,7 @@ public class SystemServiceImpl implements SystemService {
     public void destroy() {
         logger.info ("Cancelling status updater scheduler");
         if (statusRefreshScheduler != null) {
-            statusRefreshScheduler.shutdown();
+            statusRefreshScheduler.shutdownNow();
         }
     }
 

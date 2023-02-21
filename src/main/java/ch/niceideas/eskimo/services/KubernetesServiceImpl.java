@@ -37,7 +37,6 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.Pair;
-import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.model.service.ServiceDefinition;
@@ -277,7 +276,8 @@ public class KubernetesServiceImpl implements KubernetesService {
             }
 
             // get kubectl status all at once and then below get it from Kubectl result
-            KubeStatusParser parser = getKubeStatusParser();
+            KubeStatusParser parser = KubeStatusParser.getKubeStatusParser(
+                    kubeMasterNode, servicesDefinition, systemService, sshCommandService);
 
             for (Service service : servicesDefinition.listKubernetesServices()) {
 
@@ -456,11 +456,13 @@ public class KubernetesServiceImpl implements KubernetesService {
                     (operation, error) -> restartServiceForSystem(operation));
 
             success = true;
+
         } catch (FileException | SetupException | SystemException | ServiceDefinitionException | NodesConfigurationException e) {
             logger.error (e, e);
             operationsMonitoringService.addGlobalInfo("Kubernetes Services installation failed ! " + e.getMessage());
             notificationService.addError("Kubernetes Services installation failed !");
             throw new KubernetesException(e);
+
         } finally {
             operationsMonitoringService.endCommand(success);
             logger.info ("Kubernetes Deployment Operations Completed.");
@@ -490,52 +492,13 @@ public class KubernetesServiceImpl implements KubernetesService {
         }
     }
 
-    protected KubeStatusParser getKubeStatusParser() throws KubernetesException {
+    private Pair<Node,KubeStatusParser.KubernetesServiceStatus> getServiceRuntimeNode(ServiceDefinition serviceDef, Node kubeMasterNode) throws KubernetesException {
 
-        try {
-            ServicesInstallStatusWrapper servicesInstallationStatus = configurationService.loadServicesInstallationStatus();
-
-            Node kubeMasterNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterServiceDef());
-
-            String ping = null;
-            if (kubeMasterNode != null) {
-
-                // find out if SSH connection to host can succeeed
-                try {
-                    ping = systemService.sendPing(kubeMasterNode);
-                } catch (SSHCommandException e) {
-                    logger.warn(e.getMessage());
-                    logger.debug(e, e);
-                }
-            }
-
-            if (StringUtils.isBlank(ping) || !ping.startsWith("OK")) {
-                return null;
-            }
-
-            String allPodStatus = sshCommandService.runSSHScript(kubeMasterNode,
-                    "/usr/local/bin/kubectl get pod --all-namespaces -o wide 2>/dev/null ", false);
-
-            String allServicesStatus = sshCommandService.runSSHScript(kubeMasterNode,
-                    "/usr/local/bin/kubectl get service --all-namespaces -o wide 2>/dev/null ", false);
-
-            String registryServices = sshCommandService.runSSHScript(kubeMasterNode,
-                    "/bin/ls -1 /var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/", false);
-
-            return new KubeStatusParser(allPodStatus, allServicesStatus, registryServices, servicesDefinition);
-
-        } catch (SSHCommandException | SetupException | FileException e) {
-            logger.error (e, e);
-            throw new KubernetesException(e);
-        }
-    }
-
-    private Pair<Node,KubeStatusParser.KubernetesServiceStatus> getServiceRuntimeNode(ServiceDefinition serviceDef, Node kubeIp) throws KubernetesException {
-
-        KubeStatusParser parser = getKubeStatusParser();
+        KubeStatusParser parser = KubeStatusParser.getKubeStatusParser(
+                kubeMasterNode, servicesDefinition, systemService, sshCommandService);
         if (parser == null) {
             return new Pair<>(Node.KUBE_NA_FLAG, KubeStatusParser.KubernetesServiceStatus.NA);
         }
-        return parser.getServiceRuntimeNode (serviceDef, kubeIp);
+        return parser.getServiceRuntimeNode (serviceDef, kubeMasterNode);
     }
 }

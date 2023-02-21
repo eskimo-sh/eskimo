@@ -59,6 +59,9 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 @Component
@@ -83,35 +86,34 @@ public class TerminalServiceImpl implements TerminalService {
     /* Controlers are singleton */
     private final Map<String, Session> sessions = new ConcurrentHashMap<>();
 
-    private final Timer timer;
+    private final ScheduledExecutorService scheduler;
 
     public TerminalServiceImpl() {
 
-        this.timer = new Timer(true);
+        scheduler = Executors.newSingleThreadScheduledExecutor();
 
         logger.info ("Initializing terminal closer scheduler ...");
-        timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    for (String sessionId : new ArrayList<>(sessions.keySet())) {
-                        Session session = sessions.get (sessionId);
-                        if (System.currentTimeMillis() - session.getLastAccess() > idleTimeoutSeconds * 1000) {
-                            try {
-                                logger.info("Closing session with ID " + sessionId + " (idle tineout)");
-                                removeTerminal(sessionId);
-                            } catch (IOException e) {
-                                logger.debug (e, e);
-                            }
-                        }
+        scheduler.scheduleAtFixedRate(() -> {
+            for (String sessionId : new ArrayList<>(sessions.keySet())) {
+                Session session = sessions.get (sessionId);
+                if (System.currentTimeMillis() - session.getLastAccess() > idleTimeoutSeconds * 1000) {
+                    try {
+                        logger.info("Closing session with ID " + sessionId + " (idle tineout)");
+                        removeTerminal(sessionId);
+                    } catch (IOException e) {
+                        logger.debug (e, e);
                     }
                 }
-            }, idleTimeoutSeconds / 10 * 1000, idleTimeoutSeconds / 10 * 1000);
+            }
+        }, idleTimeoutSeconds / 10, idleTimeoutSeconds / 10, TimeUnit.SECONDS);
     }
 
     @PreDestroy
     public void destroy() {
         logger.info ("Cancelling terminal closer scheduler");
-        timer.cancel();
+        if (scheduler != null) {
+            scheduler.shutdownNow();
+        }
     }
 
     @Override

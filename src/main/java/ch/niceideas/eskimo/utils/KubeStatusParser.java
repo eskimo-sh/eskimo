@@ -35,19 +35,23 @@
 
 package ch.niceideas.eskimo.utils;
 
+import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.service.ServiceDefinition;
-import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.log4j.Logger;
 
 import java.util.*;
 import java.util.regex.Pattern;
 
 public class KubeStatusParser {
+
+    private static final Logger logger = Logger.getLogger(KubeStatusParser.class);
 
     static final Pattern POD_NAME_REXP = Pattern.compile("[a-zA-Z]+(-[a-zA-Z]+)?(\\-[a-zA-Z0-9]+){1,2}");
 
@@ -85,6 +89,47 @@ public class KubeStatusParser {
     private final Map<String, Map<String, String>> podStatuses = new HashMap<>();
     private final Map<String, Map<String, String>> serviceStatuses = new HashMap<>();
     private final List<String> registryServices = new ArrayList<>();
+
+    public static KubeStatusParser getKubeStatusParser(
+            Node kubeMasterNode,
+            ServicesDefinition servicesDefinition,
+            SystemService systemService,
+            SSHCommandService sshCommandService) throws KubernetesException {
+
+        try {
+
+            String ping = null;
+            if (kubeMasterNode != null) {
+
+                // find out if SSH connection to host can succeeed
+                try {
+                    ping = systemService.sendPing(kubeMasterNode);
+                } catch (SSHCommandException e) {
+                    logger.warn(e.getMessage());
+                    logger.debug(e, e);
+                }
+            }
+
+            if (StringUtils.isBlank(ping) || !ping.startsWith("OK")) {
+                return null;
+            }
+
+            String allPodStatus = sshCommandService.runSSHScript(kubeMasterNode,
+                    "/usr/local/bin/kubectl get pod --all-namespaces -o wide 2>/dev/null ", false);
+
+            String allServicesStatus = sshCommandService.runSSHScript(kubeMasterNode,
+                    "/usr/local/bin/kubectl get service --all-namespaces -o wide 2>/dev/null ", false);
+
+            String registryServices = sshCommandService.runSSHScript(kubeMasterNode,
+                    "/bin/ls -1 /var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/", false);
+
+            return new KubeStatusParser(allPodStatus, allServicesStatus, registryServices, servicesDefinition);
+
+        } catch (SSHCommandException e) {
+            logger.error (e, e);
+            throw new KubernetesException(e);
+        }
+    }
 
 
     public KubeStatusParser(String allPodStatus, String allServicesStatus, String allRegistryServices, ServicesDefinition servicesDefinition) {

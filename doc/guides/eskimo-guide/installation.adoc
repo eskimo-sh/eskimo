@@ -344,7 +344,7 @@ Once extracted on the filesystem, the Eskimo folder contains the following eleme
 * `conf` : contains Eskimo configuration files
 * `lib` : contains eskimo runtime binaries
 * `packages-dev` : contains the Eskimo _docker images (packages) development framework_ which is used to build eskimo
-services docker packages locally (this is not required if the administrators decides to download packages
+components / services docker images locally (this is not required if the administrators decides to download packages
 from www.eskimo.sh)
 * `packages_distrib`: contains eventually the eskimo services docker image packages (either build locally or downloaded
 from internet)

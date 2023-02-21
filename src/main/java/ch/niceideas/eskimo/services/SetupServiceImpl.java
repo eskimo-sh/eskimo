@@ -431,25 +431,12 @@ public class SetupServiceImpl implements SetupService {
 
                 if (lastVersionValues != null) {
 
-                    String newSoftwareVersion = (String) packagesVersion.getValueForPath(imageName + DOT_SOFTWARE);
-                    String newDistributionVersion = (String) packagesVersion.getValueForPath(imageName + DOT_DISTRIBUTION);
-
-                    if (StringUtils.isBlank(newSoftwareVersion)) {
-                        String msg = NO_REMOTE_VERSION_ERROR + imageName + " (Software Version is not found)";
-                        notificationService.addError(msg);
-                        logger.warn(msg);
+                    Pair<String, String> remoteVersion = getVersionFromRemote(packagesVersion, imageName);
+                    if (remoteVersion == null) {
                         continue;
                     }
 
-                    if (StringUtils.isBlank(newDistributionVersion)) {
-                        String msg = NO_REMOTE_VERSION_ERROR + imageName + " (New distribution Version is not found)";
-                        notificationService.addError(msg);
-                        logger.warn(msg);
-                        continue;
-                    }
-
-                    if (compareVersion (new Pair<> (newSoftwareVersion, newDistributionVersion),
-                            lastVersionValues) > 0) {
+                    if (compareVersion (remoteVersion, lastVersionValues) > 0) {
                         updates.add(imageName);
                     }
                 }
@@ -489,6 +476,11 @@ public class SetupServiceImpl implements SetupService {
     }
 
     private Pair<String, String> getVersionFromRemote(JsonWrapper packagesVersion, String packageName) {
+        if (packagesVersion == null) {
+            logger.warn("Could not download latest package definition file from " + packagesDownloadUrlRoot);
+            return null;
+        }
+
         String softwareVersion = (String) packagesVersion.getValueForPath(packageName + DOT_SOFTWARE);
         String distributionVersion = (String) packagesVersion.getValueForPath(packageName + DOT_DISTRIBUTION);
         if (StringUtils.isBlank(softwareVersion)) {

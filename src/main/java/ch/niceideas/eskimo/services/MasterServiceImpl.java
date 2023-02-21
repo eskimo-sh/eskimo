@@ -119,7 +119,7 @@ public class MasterServiceImpl implements MasterService {
     public void destroy() {
         logger.info ("Cancelling status updater scheduler");
         if (statusRefreshScheduler != null) {
-            statusRefreshScheduler.shutdown();
+            statusRefreshScheduler.shutdownNow();
         }
         serviceMasterNodes.clear();
         serviceMasterTimestamps.clear();
