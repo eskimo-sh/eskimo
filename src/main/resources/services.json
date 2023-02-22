@@ -336,7 +336,7 @@
           },
           {
             "name": "target.volumes.performance.off",
-            "comment": "Volumes for which the performance settings needs to be turned off\n.",
+            "comment": "Volumes for which the performance settings needs to be turned off.",
             "defaultValue": "",
             "value": "kafka_data"
           },

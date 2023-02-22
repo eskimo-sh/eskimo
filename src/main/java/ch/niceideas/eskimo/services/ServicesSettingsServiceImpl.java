@@ -230,7 +230,8 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
 
                     String propertyKey = settingsKey.substring(serviceName.length() + 1).replace("---", ".");
 
-                    String validationRegex = settingsForm.getString(settingsKey + "_validation");
+                    String validationRegex = settingsForm.has(settingsKey + "_validation") ?
+                            settingsForm.getString(settingsKey + "_validation") : null;
 
                     if (StringUtils.isNotBlank(value) && StringUtils.isNotBlank(validationRegex)) {
                         Pattern regex = Pattern.compile(validationRegex);

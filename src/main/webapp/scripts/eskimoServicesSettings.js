@@ -240,8 +240,8 @@ eskimo.ServicesSettings = function () {
                             '     </label>\n' +
                             '     <div class="col-md-12">\n' +
                             property.comment.replaceAll("\n", "<br>") +
-                            ' (default value : ' + property.defaultValue +
-                            ( property.validationRegex ? ' / format ' +  property.validationRegex : '') +
+                            ' <br>(default value : ' + (property.defaultValue ? property.defaultValue : "<i>none</i>" )  +
+                            ( property.validationRegex ? ' / format : ' +  property.validationRegex : '') +
                             ')'+
                             '     </div>'+
                             '     <div class="col-lg-8 col-md-10 col-sm-12" style="margin-bottom: 5px;">\n' +
