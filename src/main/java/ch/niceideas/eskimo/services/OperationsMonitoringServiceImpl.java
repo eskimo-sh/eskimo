@@ -176,8 +176,7 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
             interruption.set(true);
 
             operationList.forEach(operationId -> {
-                if (operationStatus.get(operationId) == null ||
-                        operationStatus.get(operationId) == OperationStatus.INIT) {
+                if (operationStatus.get(operationId) == null || operationStatus.get(operationId) == OperationStatus.INIT) {
                     operationStatus.put (operationId, OperationStatus.CANCELLED);
                 }
             });
@@ -239,20 +238,16 @@ public class OperationsMonitoringServiceImpl implements OperationsContext, Opera
 
     @Override
     public List<String> getNewMessages (OperationId<?> operation, int lastLine) {
-        MessagingManager msgMgr = operationLogs.get(operation);
-        if (msgMgr == null) {
-            return Collections.emptyList();
-        }
-        return msgMgr.getSubList(lastLine);
+        return Optional.ofNullable(operationLogs.get(operation))
+                .map (mgr -> mgr.getSubList(lastLine))
+                .orElse(Collections.emptyList());
     }
 
     @Override
     public Pair<Integer, String> fetchNewMessages (OperationId<?> operation, int lastLine) {
-        MessagingManager msgMgr = operationLogs.get(operation);
-        if (msgMgr == null) {
-            return new Pair<>(0, "");
-        }
-        return msgMgr.fetchElements(lastLine);
+        return Optional.ofNullable(operationLogs.get(operation))
+                .map (mgr -> mgr.fetchElements(lastLine))
+                .orElse(new Pair<>(0, ""));
     }
 
     @Override

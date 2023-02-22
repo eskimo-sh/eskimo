@@ -120,10 +120,9 @@ public class KubernetesServiceImpl implements KubernetesService {
         systemService.applyServiceOperation(serviceDef.toService(), Node.KUBERNETES_NODE, SimpleOperationCommand.SimpleOperation.SHOW_JOURNAL, () -> {
             if (serviceDef.isKubernetes()) {
                 try {
-                    Node kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(servicesDefinition.getKubeMasterServiceDef());
-                    if (kubeMasterNode == null) {
-                        throw new KubernetesException(KUBE_MASTER_NOT_INSTALLED);
-                    }
+                    Node kubeMasterNode = Optional.ofNullable(
+                                configurationService.loadServicesInstallationStatus().getFirstNode(servicesDefinition.getKubeMasterServiceDef()))
+                            .orElseThrow(() -> new KubernetesException(KUBE_MASTER_NOT_INSTALLED));
                     return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl logs " + serviceDef.getName() + " " + node);
                 } catch (FileException | SetupException e) {
                     logger.error (e, e);
@@ -151,10 +150,9 @@ public class KubernetesServiceImpl implements KubernetesService {
         systemService.applyServiceOperation(serviceDef.toService(), Node.KUBERNETES_NODE, simpleOp, () -> {
             if (serviceDef.isKubernetes()) {
                 try {
-                    Node kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(servicesDefinition.getKubeMasterServiceDef());
-                    if (kubeMasterNode == null) {
-                        throw new KubernetesException(KUBE_MASTER_NOT_INSTALLED);
-                    }
+                    Node kubeMasterNode = Optional.ofNullable(
+                                configurationService.loadServicesInstallationStatus().getFirstNode(servicesDefinition.getKubeMasterServiceDef()))
+                            .orElseThrow(() -> new KubernetesException(KUBE_MASTER_NOT_INSTALLED));
                     return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl " + op + " " + serviceDef.getName() + " " + kubeMasterNode);
                 } catch (FileException | SetupException e) {
                     logger.error (e, e);
@@ -182,10 +180,9 @@ public class KubernetesServiceImpl implements KubernetesService {
         if (serviceDef.isKubernetes()) {
             if (!serviceDef.isRegistryOnly()) {
                 try {
-                    Node kubeMasterNode = configurationService.loadServicesInstallationStatus().getFirstNode(servicesDefinition.getKubeMasterServiceDef());
-                    if (kubeMasterNode == null) {
-                        throw new KubernetesException(KUBE_MASTER_NOT_INSTALLED);
-                    }
+                    Node kubeMasterNode = Optional.ofNullable(
+                                configurationService.loadServicesInstallationStatus().getFirstNode(servicesDefinition.getKubeMasterServiceDef()))
+                            .orElseThrow(() -> new KubernetesException(KUBE_MASTER_NOT_INSTALLED));
                     return sshCommandService.runSSHCommand(kubeMasterNode, "eskimo-kubectl restart " + serviceDef.getName() + " " + kubeMasterNode);
                 } catch (FileException | SetupException e) {
                     logger.error(e, e);
@@ -493,12 +490,8 @@ public class KubernetesServiceImpl implements KubernetesService {
     }
 
     private Pair<Node,KubeStatusParser.KubernetesServiceStatus> getServiceRuntimeNode(ServiceDefinition serviceDef, Node kubeMasterNode) throws KubernetesException {
-
-        KubeStatusParser parser = KubeStatusParser.getKubeStatusParser(
-                kubeMasterNode, servicesDefinition, systemService, sshCommandService);
-        if (parser == null) {
-            return new Pair<>(Node.KUBE_NA_FLAG, KubeStatusParser.KubernetesServiceStatus.NA);
-        }
-        return parser.getServiceRuntimeNode (serviceDef, kubeMasterNode);
+        return Optional.ofNullable(KubeStatusParser.getKubeStatusParser(kubeMasterNode, servicesDefinition, systemService, sshCommandService))
+                .map (parser -> parser.getServiceRuntimeNode (serviceDef, kubeMasterNode))
+                .orElse(new Pair<>(Node.KUBE_NA_FLAG, KubeStatusParser.KubernetesServiceStatus.NA));
     }
 }

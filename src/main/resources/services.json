@@ -1230,25 +1230,25 @@
           },
           {
             "name": "parallelism.default",
-            "comment": "Default parallelism for jobs. Default value : 1.",
+            "comment": "Default parallelism for jobs.",
             "validationRegex": "^[0-9\\.]+$",
             "defaultValue": "1"
           },
           {
             "name": "taskmanager.numberOfTaskSlots",
-            "comment": "The number of parallel operator or user function instances that a single TaskManager can run. Default value : 1.",
+            "comment": "The number of parallel operator or user function instances that a single TaskManager can run. ",
             "validationRegex": "^[0-9\\.]+$",
             "defaultValue": "1"
           },
           {
             "name": "taskmanager.slot.timeout",
-            "comment": "Timeout used for identifying inactive slots. The TaskManager will free the slot if it does not become active within the given amount of time. Default value : 20 s.",
+            "comment": "Timeout used for identifying inactive slots. The TaskManager will free the slot if it does not become active within the given amount of time.",
             "validationRegex": "^[0-9\\.]+s$",
             "defaultValue": "20s"
           },
           {
             "name": "resourcemanager.taskmanager-timeout",
-            "comment": "The timeout for an idle task manager to be released, expressed in ms. Default value : 60000.",
+            "comment": "The timeout for an idle task manager to be released, expressed in ms.",
             "validationRegex": "^[0-9\\.]+$",
             "defaultValue": "60000"
           }

@@ -204,10 +204,8 @@ public class SystemServiceImpl implements SystemService {
         applyServiceOperation(service, node, SimpleOperationCommand.SimpleOperation.COMMAND , () -> {
             ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
 
-            Command command = serviceDef.getCommand (commandId);
-            if (command == null) {
-                throw new SSHCommandException("Command " + commandId + " is unknown for service " + service);
-            }
+            Command command = Optional.ofNullable(serviceDef.getCommand (commandId))
+                    .orElseThrow(() -> new SSHCommandException("Command " + commandId + " is unknown for service " + service));
 
             SimpleOperationCommand.SimpleOperationId op = new SimpleOperationCommand.SimpleOperationId(SimpleOperationCommand.SimpleOperation.COMMAND, service, node);
             logOperationMessage(op, "Command ID is " + commandId);

@@ -56,6 +56,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class WebCommandServlet extends HttpServlet {
 
@@ -99,10 +100,8 @@ public class WebCommandServlet extends HttpServlet {
 
             // 3. Find node running target service
             ServicesInstallStatusWrapper installStatus = configurationService.loadServicesInstallationStatus();
-            Node serviceNode = installStatus.getFirstNode(webCommand.getTarget());
-            if (serviceNode == null) {
-                throw new IllegalStateException("Couldn't find any node running servuce " + webCommand.getTarget().getName());
-            }
+            Node serviceNode = Optional.ofNullable(installStatus.getFirstNode(webCommand.getTarget()))
+                    .orElseThrow(() -> new IllegalStateException("Couldn't find any node running servuce " + webCommand.getTarget().getName()));
 
             // 6. Ensure user has required Role (if any is required)
             String requiredRole = webCommand.getRole();

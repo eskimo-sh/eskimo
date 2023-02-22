@@ -50,6 +50,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.util.Optional;
 
 @Component
 @Profile("!test-ssh")
@@ -93,10 +94,8 @@ public class SSHCommandServiceImpl implements SSHCommandService {
     }
 
     String getScriptContent(String scriptName) throws SSHCommandException {
-        InputStream scriptIs = ResourceUtils.getResourceAsStream(scriptName);
-        if (scriptIs == null) {
-            throw new SSHCommandException("Impossible to load script " + scriptName);
-        }
+        InputStream scriptIs = Optional.ofNullable(ResourceUtils.getResourceAsStream(scriptName))
+                .orElseThrow(() -> new SSHCommandException("Impossible to load script " + scriptName));
 
         String scriptContent;
         try (BufferedReader reader = new BufferedReader (new InputStreamReader(scriptIs))) {
@@ -154,13 +153,8 @@ public class SSHCommandServiceImpl implements SSHCommandService {
 
             // wait for some time since the delivery of the exit status often gets delayed
             session.waitForCondition(ChannelCondition.EXIT_STATUS, connection.getReadTimeout());
-            Integer r = session.getExitStatus();
-
-            if (r == null) {
-                throw new IOException("Could not get a return status within " + connection.getReadTimeout() + " milliseconds");
-            }
-
-            int retValue = r;
+            int retValue = Optional.ofNullable(session.getExitStatus())
+                    .orElseThrow(() -> new IOException("Could not get a return status within " + connection.getReadTimeout() + " milliseconds"));
 
             String outResult = baosOut.toString();
             String errResult = baosErr.toString();

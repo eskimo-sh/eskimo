@@ -54,6 +54,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -85,10 +86,9 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
 
     @Override
     public HttpHost getServerHost(ServiceWebId serviceId) {
-        ProxyTunnelConfig config =  proxyTunnelConfigs.get(serviceId);
-        if (config == null) {
-            throw new IllegalStateException("No config found for " + serviceId);
-        }
+        ProxyTunnelConfig config =  Optional.ofNullable (proxyTunnelConfigs.get(serviceId))
+                .orElseThrow(() -> new IllegalStateException("No config found for " + serviceId));
+
         return new HttpHost("http", "localhost", config.getLocalPort());
     }
 
@@ -104,10 +104,9 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
         }
         serviceId = serviceDef.getServiceId(targetHost);
 
-        HttpHost serverHost = getServerHost(serviceId);
-        if (serverHost == null) {
-            throw new IllegalStateException("No host stored for " + serviceId);
-        }
+        HttpHost serverHost = Optional.ofNullable (getServerHost(serviceId))
+                .orElseThrow(() -> new IllegalStateException("No host stored for " + serviceId));
+
         return serverHost.getSchemeName() + "://" + serverHost.getHostName() + ":" + serverHost.getPort() + "/";
     }
 
@@ -198,10 +197,8 @@ public class ProxyManagerServiceImpl implements ProxyManagerService {
                 logger.error(e, e);
                 throw new ConnectionManagerException(e.getMessage(), e);
             }
-            effNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterServiceDef());
-            if (effNode == null) {
-                throw new ConnectionManagerException("Asked for kube master runtime node, but it couldn't be found in installation status");
-            }
+            effNode = Optional.ofNullable(servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterServiceDef()))
+                    .orElseThrow(() -> new ConnectionManagerException("Asked for kube master runtime node, but it couldn't be found in installation status"));
         }
         return effNode;
     }

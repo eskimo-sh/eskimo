@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.services.ServicesSettingsException;
 import ch.niceideas.eskimo.services.ServicesSettingsService;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.types.Service;
@@ -63,7 +64,7 @@ public class SettingsOperationsCommand implements Serializable {
 
     public static SettingsOperationsCommand create (
             String settingsFormAsString, ServicesSettingsService servicesSettingsService)
-            throws FileException, SetupException {
+            throws FileException, SetupException, ServicesSettingsException {
 
         Map<Service, Map<String, List<ChangedSettings>>> changedSettings = new HashMap<>();
         List<Service> restartedServices = new ArrayList<>();

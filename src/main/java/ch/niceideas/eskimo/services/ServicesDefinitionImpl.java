@@ -107,10 +107,9 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
         logger.info ("Using services definition from file : " + getServicesDefinitionFile());
 
-        InputStream is = ResourceUtils.getResourceAsStream(getServicesDefinitionFile());
-        if (is == null) {
-            throw new ServiceDefinitionException("File " + getServicesDefinitionFile() + " couldn't be loaded");
-        }
+        InputStream is = Optional.ofNullable(ResourceUtils.getResourceAsStream(getServicesDefinitionFile()))
+                .orElseThrow(() -> new ServiceDefinitionException("File " + getServicesDefinitionFile() + " couldn't be loaded"));
+
         String servicesAsString =  StreamUtils.getAsString(is, StandardCharsets.UTF_8);
         if (StringUtils.isBlank(servicesAsString)) {
             throw new ServiceDefinitionException("File " + getServicesDefinitionFile() + " is empty.");
@@ -181,10 +180,8 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
             String userName = (String) servicesConfig.getValueForPath(serviceString+".config.user.name");
             if (StringUtils.isNotBlank(userName)) {
 
-                Integer userId = (Integer) servicesConfig.getValueForPath(serviceString+".config.user.id");
-                if (userId == null) {
-                    throw new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " defined a user '" + userName +"' but no user ID !");
-                }
+                Integer userId = Optional.ofNullable((Integer) servicesConfig.getValueForPath(serviceString+".config.user.id"))
+                        .orElseThrow(() -> new ServiceDefinitionException(SERVICE_PREFIX + serviceString + " defined a user '" + userName +"' but no user ID !"));
 
                 ServiceUser user = new ServiceUser (userName, userId);
                 serviceDef.setUser (user);
@@ -538,13 +535,12 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
             services.values().stream()
                     .filter(ServiceDefinition::isKubernetes)
                     .forEach(service -> {
-                        // Kubernetes services have an implicit dependency on kubernetes
+                          ServiceDefinition kubeMasterService = Optional.ofNullable(getKubeMasterServiceDef())
+                                  .orElseThrow(() -> new IllegalArgumentException("No Kube Master service found !"));
+                            // Kubernetes services have an implicit dependency on kubernetes
                             Dependency kubeDependency = new Dependency();
                             kubeDependency.setMes(MasterElectionStrategy.RANDOM);
-                            if (getKubeMasterServiceDef() == null) {
-                                throw new IllegalArgumentException("No Kube Master service found !");
-                            }
-                            kubeDependency.setMasterService(getKubeMasterServiceDef().toService());
+                            kubeDependency.setMasterService(kubeMasterService.toService());
                             kubeDependency.setNumberOfMasters(1);
                             kubeDependency.setMandatory(true);
                             kubeDependency.setRestart(false);

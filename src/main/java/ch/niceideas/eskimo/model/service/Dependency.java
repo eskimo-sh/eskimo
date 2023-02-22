@@ -41,6 +41,7 @@ import lombok.Setter;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 public class Dependency {
 
@@ -78,8 +79,8 @@ public class Dependency {
 
     public JSONObject toJSON () {
         return new JSONObject(new HashMap<String, Object>() {{
-            put("mes", mes == null ? "" : mes.name());
-            put("masterService", masterService == null ? "" : masterService.getName());
+            put("mes", Optional.ofNullable(mes).map(Enum::toString).orElse(""));
+            put("masterService", Optional.ofNullable(masterService).map(Service::getName).orElse(""));
             put("numberOfMasters", numberOfMasters);
             put("mandatory", mandatory);
             put("restart", restart);

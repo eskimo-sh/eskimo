@@ -38,7 +38,9 @@ package ch.niceideas.eskimo.security;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class SecurityHelper {
@@ -48,23 +50,16 @@ public class SecurityHelper {
     }
 
     public static String getUserId()  throws AuthorizationException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) {
-            throw new AuthorizationException("No logged in user");
-        }
-
-        return auth.getName();
-
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .orElseThrow(() -> new AuthorizationException("No logged in user"))
+                .getName();
     }
 
     public static List<Role> getuserRoles() throws AuthorizationException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) {
-            throw new AuthorizationException("No logged in user");
-        }
-
-        return auth.getAuthorities().stream()
-                .map(a -> Role.valueOf(a.getAuthority()))
-                .collect(Collectors.toList());
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .orElseThrow(() -> new AuthorizationException("No logged in user"))
+                .getAuthorities().stream()
+                    .map(a -> Role.valueOf(a.getAuthority()))
+                    .collect(Collectors.toList());
     }
 }

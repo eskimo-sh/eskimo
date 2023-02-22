@@ -982,3 +982,8 @@ html[data-sidenav-size=condensed]:not(.authentication-bg) .side-nav .side-nav-it
     color:var(--ct-table-color);
     border-color:var(--ct-table-border-color)
 }
+
+.form-control.invalid {
+    border-color: red;
+    border-width: 2px;
+}

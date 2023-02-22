@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -135,10 +136,8 @@ public class SystemStatusParserTest {
     }
 
     private String loadTestConfig (String fileName) throws IOException, ProcessHelper.ProcessHelperException{
-        InputStream scriptIs = ResourceUtils.getResourceAsStream("SystemStatusParserTest/" + fileName);
-        if (scriptIs == null) {
-            throw new ProcessHelper.ProcessHelperException("Impossible to load file " + fileName);
-        }
+        InputStream scriptIs = Optional.ofNullable(ResourceUtils.getResourceAsStream("SystemStatusParserTest/" + fileName))
+                .orElseThrow(() -> new ProcessHelper.ProcessHelperException("Impossible to load file " + fileName));
 
         BufferedReader reader = new BufferedReader( new InputStreamReader(scriptIs, StandardCharsets.UTF_8));
         String line;

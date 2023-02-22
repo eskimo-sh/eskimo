@@ -47,6 +47,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -222,11 +223,10 @@ public class NodesConfigurationChecker {
                     && (property.getService() != null)
                     && !property.getService().equals(Service.NODE_ID_FIELD)) {
 
-                ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(property.getService());
-                if (serviceDef == null) {
-                    throw new NodesConfigurationException("Inconsistency found : service " + property.getService()
-                            + " doesn't exist in ServiceDefinition");
-                }
+                ServiceDefinition serviceDef = Optional.ofNullable(servicesDefinition.getServiceDefinition(property.getService()))
+                        .orElseThrow(() -> new NodesConfigurationException("Inconsistency found : service " + property.getService()
+                                + " doesn't exist in ServiceDefinition"));
+
                 if (serviceDef.isKubernetes()) {
                     throw new NodesConfigurationException("Inconsistency found : service " + property.getService()
                             + " is a kubernetes service which should not be selectable here.");

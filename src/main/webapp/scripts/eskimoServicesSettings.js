@@ -54,7 +54,15 @@ eskimo.ServicesSettings = function () {
             if (statusTxt === "success") {
 
                 $("#save-services-settings-btn").click(e => {
-                    saveServicesSettings();
+
+                    let servicesConfigForm = $("form#services-settings").serializeObject();
+
+                    try {
+                        checkServicesSettings(servicesConfigForm);
+                        saveServicesSettings(servicesConfigForm);
+                    } catch (error) {
+                        eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, error);
+                    }
 
                     e.preventDefault();
                     return false;
@@ -96,9 +104,39 @@ eskimo.ServicesSettings = function () {
         SERVICES_SETTINGS = servicesConfig;
     };
 
-    function saveServicesSettings() {
+    function checkServicesSettings(servicesConfigForm) {
 
-        let servicesConfigForm = $("form#services-settings").serializeObject();
+        let errors = "";
+
+        // build list of services
+        for (let i = 0; i < SERVICES_SETTINGS.length; i++) {
+            let serviceName = SERVICES_SETTINGS[i].name;
+
+            for (let settingsKey in servicesConfigForm) {
+
+                if (settingsKey.startsWith(serviceName) && !settingsKey.endsWith("_validation")) {
+
+                    let value = servicesConfigForm[settingsKey];
+                    let validationRegex =  servicesConfigForm[settingsKey +"_validation"];
+
+                    let propertyKey = settingsKey.substring(serviceName.length + 1).replaceAll("---", ".");
+
+                    if (value && validationRegex && value !== "" && validationRegex !== "") {
+                        if (!new RegExp(validationRegex).test(value)) {
+                            errors += ("Value " + value + " for " + serviceName + " / " + propertyKey + " doesn't comply to format " + validationRegex + "<br>");
+                        }
+                    }
+                }
+            }
+        }
+
+        if (errors !== "") {
+            throw errors;
+        }
+    }
+    this.checkServicesSettings = checkServicesSettings;
+
+    function saveServicesSettings(servicesConfigForm) {
 
         that.eskimoMain.showProgressbar();
 
@@ -201,13 +239,19 @@ eskimo.ServicesSettings = function () {
                             '         </strong> : '+
                             '     </label>\n' +
                             '     <div class="col-md-12">\n' +
-                            property.comment.replace("\n", "<br>") +
-                            ' (default value : ' + property.defaultValue + ')'+
+                            property.comment.replaceAll("\n", "<br>") +
+                            ' (default value : ' + property.defaultValue +
+                            ( property.validationRegex ? ' / format ' +  property.validationRegex : '') +
+                            ')'+
                             '     </div>'+
                             '     <div class="col-lg-8 col-md-10 col-sm-12" style="margin-bottom: 5px;">\n' +
                             '         <input id="' + inputName + '" name="' + inputName + '" type="text"\n' +
-                            '                placeholder="' + property.defaultValue + '" class="form-control"' +
+                            '                placeholder="' + property.defaultValue + '" class="form-control eskimo-settings-input"' +
                             '                value="' + (property.value != null ? property.value : '') + '"'+
+                            '         >\n' +
+                            '         <input id="' + inputName + '_validation" name="' + inputName + '_validation" \n' +
+                            '                type="hidden"' +
+                            '                value="' + (property.validationRegex ? property.validationRegex : '') + '"'+
                             '         >\n' +
                             '     </div>\n' +
                             '     <br>\n' +
@@ -222,7 +266,20 @@ eskimo.ServicesSettings = function () {
 
         servicesSettingsContent += '</div>';
 
-        $("#services-settings-placeholder").html(servicesSettingsContent)
+        $("#services-settings-placeholder").html(servicesSettingsContent);
+
+        // register onchange handler
+        $(".eskimo-settings-input").change(function() {
+            const value = $("#"+this.id).val();
+            const regex = $("#"+this.id+"_validation").val();
+            if (value && regex && value != "" && regex !== "") {
+                if (!new RegExp(regex).test(value)) {
+                    $("#"+this.id).addClass("invalid")
+                } else {
+                    $("#"+this.id).removeClass("invalid")
+                }
+            }
+        })
     }
     this.layoutServicesSettings = layoutServicesSettings;
 

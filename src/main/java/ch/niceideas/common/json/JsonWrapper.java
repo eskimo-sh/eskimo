@@ -84,12 +84,10 @@ public class JsonWrapper implements Serializable {
         json = new JSONObject(jsonString);
     }
 
-    private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException
-    {
-        if (aInputStream == null) {
-            throw new IllegalArgumentException("passed inputstream cannot be null");
-        }
-        String serializedString = aInputStream.readUTF();
+    private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException {
+        String serializedString = Optional.ofNullable(aInputStream)
+                .orElseThrow(() -> new IllegalArgumentException("passed inputstream cannot be null"))
+                .readUTF();
         try {
             json = new JSONObject(serializedString);
         } catch (JSONException e) {
@@ -98,12 +96,10 @@ public class JsonWrapper implements Serializable {
         }
     }
 
-    private void writeObject(ObjectOutputStream aOutputStream) throws IOException
-    {
-        if (aOutputStream == null) {
-            throw new IllegalArgumentException("passed outputstream cannot be null");
-        }
-        aOutputStream.writeUTF(getFormattedValue());
+    private void writeObject(ObjectOutputStream aOutputStream) throws IOException {
+        Optional.ofNullable(aOutputStream)
+            .orElseThrow(() -> new IllegalArgumentException("passed outputstream cannot be null"))
+            .writeUTF(getFormattedValue());
     }
 
     public List<String> getRootKeys() {
@@ -172,7 +168,6 @@ public class JsonWrapper implements Serializable {
             }
 
             try {
-
                 current = handleArray(path, current, nextPath);
 
             } catch (JSONException e) {
@@ -216,11 +211,9 @@ public class JsonWrapper implements Serializable {
             parent = current;
 
             if (current instanceof JSONArray) {
-
                 current = setValueJSONArray(path, current, nextPath);
 
             } else if (current instanceof JSONObject) {
-
                 current = setValueJSONObject(path, current, nextPath);
             }
 

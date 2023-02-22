@@ -58,6 +58,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Component
@@ -198,15 +199,52 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
     public ServicesSettingsWrapper prepareSaveSettings (
             String settingsFormAsString,
             Map<Service, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
-            List<Service> restartedServices) throws FileException, SetupException  {
+            List<Service> restartedServices) throws FileException, SetupException, ServicesSettingsException  {
 
         ServicesSettingsWrapper servicesSettings = configurationService.loadServicesSettings();
 
-        Service[] dirtyServices = fillInEditedConfigs(changedSettings, new JSONObject(settingsFormAsString), servicesSettings.getSubJSONArray("settings"));
+        JSONObject settingsForm = new JSONObject(settingsFormAsString);
+
+        checkServiceSettings (servicesDefinition, settingsForm);
+
+        Service[] dirtyServices = fillInEditedConfigs(changedSettings, settingsForm, servicesSettings.getSubJSONArray("settings"));
 
         restartedServices.addAll(Arrays.asList(dirtyServices));
 
         return servicesSettings;
+    }
+
+    protected void checkServiceSettings(ServicesDefinition servicesDefinition, JSONObject settingsForm) throws ServicesSettingsException {
+        StringBuilder errors = new StringBuilder();
+
+        // build list of services
+        Service[] services = servicesDefinition.listAllServices();
+        for (Service service : services) {
+            String serviceName = service.getName();
+
+            for (String settingsKey : settingsForm.keySet()) {
+
+                if (settingsKey.startsWith(serviceName) && !settingsKey.endsWith("_validation")) {
+
+                    String value = settingsForm.getString(settingsKey);
+
+                    String propertyKey = settingsKey.substring(serviceName.length() + 1).replace("---", ".");
+
+                    String validationRegex = settingsForm.getString(settingsKey + "_validation");
+
+                    if (StringUtils.isNotBlank(value) && StringUtils.isNotBlank(validationRegex)) {
+                        Pattern regex = Pattern.compile(validationRegex);
+                        if (!regex.matcher(value).matches()) {
+                            errors.append("Value ").append(value).append(" for ").append(serviceName).append(" / ").append(propertyKey).append(" doesn't comply to format ").append(validationRegex).append("<br>");
+                        }
+                    }
+                }
+            }
+        }
+
+        if (StringUtils.isNotBlank(errors.toString())) {
+            throw new ServicesSettingsException (errors.toString());
+        }
     }
 
     protected Service[] fillInEditedConfigs(Map<Service, Map<String, List<SettingsOperationsCommand.ChangedSettings>>> changedSettings,
@@ -220,7 +258,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
             // get all properties for service
             for (String settingsKey : settingsForm.keySet()) {
 
-                if (settingsKey.startsWith(service.getName())) {
+                if (settingsKey.startsWith(service.getName()) && !settingsKey.endsWith("_validation")) {
 
                     String value = settingsForm.getString(settingsKey);
 

@@ -44,9 +44,11 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
+import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -109,12 +111,9 @@ public class WebSocketProxyForwarder {
         String targetWsUri = "(undefined yet)";
         try {
 
-            ProxyTunnelConfig config = proxyManagerService.getTunnelConfig(serviceId);
-
-            if (config == null) {
-                throw new IllegalStateException("Tunnel configuration not created yet for service " + serviceId
-                        + " - likely status is not initialized yet");
-            }
+            ProxyTunnelConfig config = Optional.ofNullable(proxyManagerService.getTunnelConfig(serviceId))
+                    .orElseThrow(() -> new IllegalStateException("Tunnel configuration not created yet for service " + serviceId
+                            + " - likely status is not initialized yet"));
 
             targetWsUri = WS_LOCALHOST_PREFIX + config.getLocalPort() + targetPath;
 

@@ -48,6 +48,8 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class KubernetesServicesConfigChecker {
@@ -63,10 +65,8 @@ public class KubernetesServicesConfigChecker {
     public void checkKubernetesServicesSetup(KubernetesServicesConfigWrapper kubeServicesConfig) throws KubernetesServicesConfigException {
 
         try {
-            NodesConfigWrapper nodesConfig = configurationService.loadNodesConfig();
-            if (nodesConfig == null) {
-                throw new KubernetesServicesConfigException("Inconsistency found : No node configuration is found");
-            }
+            NodesConfigWrapper nodesConfig = Optional.ofNullable(configurationService.loadNodesConfig())
+                    .orElseThrow(() -> new KubernetesServicesConfigException("Inconsistency found : No node configuration is found"));
 
             // ensure only kubernetes services
             for (Service service : kubeServicesConfig.getEnabledServices()) {

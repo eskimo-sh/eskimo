@@ -153,7 +153,6 @@ public abstract class ResourceUtils {
      * @throws FileNotFoundException if the URL cannot be resolved to a file in the file system
      */
     public static File getFile(URL resourceUrl) throws FileNotFoundException {
-
         if (resourceUrl == null) {
             throw new IllegalArgumentException(RESOURCE_LOCATION_MUST_NOT_BE_NULL);
         }

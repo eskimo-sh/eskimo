@@ -95,12 +95,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         servicesConfigFileLock.lock();
         try {
             String configStoragePath = setupService.getConfigStoragePath();
-            File statusFile = new File(configStoragePath + SERVICES_SETTINGS_JSON_PATH);
-            if (!statusFile.exists()) {
+            File settingsConfigFile = new File(configStoragePath + SERVICES_SETTINGS_JSON_PATH);
+            if (!settingsConfigFile.exists()) {
                 return ServicesSettingsWrapper.initEmpty(servicesDefinition);
             }
 
-            return new ServicesSettingsWrapper(statusFile);
+            return new ServicesSettingsWrapper(settingsConfigFile);
         } finally {
             servicesConfigFileLock.unlock();
         }

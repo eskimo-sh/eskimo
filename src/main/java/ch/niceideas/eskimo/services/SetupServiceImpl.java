@@ -313,11 +313,9 @@ public class SetupServiceImpl implements SetupService {
 
         Pair<File, Pair<String, String>> lastVersion = findLastVersion(prefix, packageName, packagesDistribFolder);
 
-        if (lastVersion.getKey() == null) {
-            throw new IllegalStateException("No package image found for " + packageName);
-        }
-
-        return lastVersion.getKey().getName();
+        return Optional.ofNullable(lastVersion.getKey())
+                .map (File::getName)
+                .orElseThrow(() -> new IllegalStateException("No package image found for " + packageName));
     }
 
     protected Pair<File, Pair<String, String>> findLastVersion(String prefix, String packageName, File packagesDistribFolder) {

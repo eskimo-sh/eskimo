@@ -32,38 +32,15 @@
  * Software.
  */
 
+package ch.niceideas.eskimo.services;
 
-package ch.niceideas.eskimo.types;
+import ch.niceideas.common.exceptions.CommonBusinessException;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+public class ServicesSettingsException extends CommonBusinessException {
 
-import java.io.Serializable;
-import java.util.Optional;
+    static final long serialVersionUID = -3387516912124221248L;
 
-@EqualsAndHashCode
-@RequiredArgsConstructor
-public final class ServiceWebId implements Serializable {
-
-    @Getter
-    private final Service service;
-
-    @Getter
-    private final Node node;
-
-    public static ServiceWebId fromService(Service service) {
-        return new ServiceWebId(service, null);
-    }
-
-    public static ServiceWebId fromServiceAndNode(Service service, Node node) {
-        return new ServiceWebId(service, node);
-    }
-
-    @Override
-    public String toString() {
-        return Optional.ofNullable(getNode())
-                .map(node -> service.getName() + "/" + node.getName())
-                .orElse(service.getName());
+    public ServicesSettingsException(String message) {
+        super(message);
     }
 }

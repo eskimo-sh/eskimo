@@ -94,11 +94,8 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
             Service installedService = installationPairs.getKey();
             Node node = installationPairs.getValue();
 
-            ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(installedService);
-            if (serviceDef == null) {
-                throw new IllegalStateException("Cann find service " + installedService + " in services definition");
-            }
-
+            ServiceDefinition serviceDef = Optional.ofNullable(servicesDefinition.getServiceDefinition(installedService))
+                    .orElseThrow(() -> new IllegalStateException("Cann find service " + installedService + " in services definition"));
             if (!serviceDef.isKubernetes()) {
 
                 try {

@@ -41,6 +41,8 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class EskimoServicesSettingsTest extends AbstractWebTest {
 
     @BeforeEach
@@ -70,6 +72,11 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
 
         js("$('#inner-content-services-settings').css('display', 'inherit')");
         js("$('#inner-content-services-settings').css('visibility', 'visible')");
+    }
+
+    @Test
+    public void testCheckServicesSettings() {
+        fail ("To Be Implemented");
     }
 
     @Test

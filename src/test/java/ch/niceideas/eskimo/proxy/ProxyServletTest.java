@@ -566,9 +566,9 @@ public class ProxyServletTest {
     }
 
     protected String getExpectedTargetUri(WebRequest request, String expectedUri) throws MalformedURLException, URISyntaxException {
-        if (expectedUri == null)
-            expectedUri = request.getURL().toString().substring(sourceBaseUri.length());
-        return new URI(this.targetBaseUri).getPath() + expectedUri;
+        return new URI(this.targetBaseUri).getPath() +
+                Optional.ofNullable(expectedUri)
+                        .orElse(request.getURL().toString().substring(sourceBaseUri.length()));
     }
 
     protected GetMethodWebRequest makeGetMethodRequest(final String url) {

@@ -113,10 +113,8 @@ public class FileManagerServiceImpl implements FileManagerService {
     public void removeFileManager(Node node) {
         logger.debug(node);
 
-        SFTPv3Client client = sftpClients.get(node);
-        if (client == null) {
-            throw new IllegalStateException("Session not found : " + node);
-        }
+        SFTPv3Client client = Optional.ofNullable(sftpClients.get(node))
+                .orElseThrow(() -> new IllegalStateException("Session not found : " + node));
 
         client.close();
         sftpClients.remove(node);

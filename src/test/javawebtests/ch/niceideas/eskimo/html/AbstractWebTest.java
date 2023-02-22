@@ -59,6 +59,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.io.File;
 import java.time.Duration;
 import java.util.Date;
+import java.util.Optional;
 import java.util.logging.Level;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -421,10 +422,9 @@ public abstract class AbstractWebTest {
 
     protected void assertJavascriptEquals(String value, String javascript) {
         logConsoleLogs();
-        Object jsResult = js("return " + javascript);
-        if (jsResult == null) {
-            throw new NullPointerException("javascript execution returned null value.");
-        }
+        Object jsResult = Optional.ofNullable(js("return " + javascript))
+                .orElseThrow(() -> new NullPointerException("javascript execution returned null value."));
+
         assertEquals (value, jsResult.toString());
     }
 

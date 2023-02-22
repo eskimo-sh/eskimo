@@ -43,6 +43,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -72,7 +73,7 @@ public class UIConfig {
 
     public JSONObject toJSON () {
         return new JSONObject(new HashMap<String, Object>() {{
-            put("urlTemplate", urlTemplate == null ? "" : urlTemplate);
+            put("urlTemplate", Optional.ofNullable(urlTemplate).orElse(""));
             put("proxyContext", "./"+ serviceDef.getName()+"/");
             put("waitTime", waitTime);
             put("title", title);

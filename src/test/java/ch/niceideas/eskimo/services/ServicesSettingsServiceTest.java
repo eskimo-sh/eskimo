@@ -147,6 +147,11 @@ public class ServicesSettingsServiceTest {
     }
 
     @Test
+    public void testCheckServicesSettings() {
+        fail ("To Be Implemented");
+    }
+
+    @Test
     public void testSaveAndApplyServicesConfig() throws Exception {
         //fail ("To Be Implemented");
 

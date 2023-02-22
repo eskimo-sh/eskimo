@@ -84,11 +84,8 @@ public class Topology {
 
     public static ParsedNodesConfigProperty parseKeyToServiceConfig (String key, NodesConfigWrapper nodesConfig)
             throws NodesConfigurationException {
-
-        ParsedNodesConfigProperty property = NodesConfigWrapper.parseProperty(key);
-        if (property == null) {
-            throw new NodesConfigurationException(("Could not parse service config key " + key));
-        }
+        ParsedNodesConfigProperty property = Optional.ofNullable(NodesConfigWrapper.parseProperty(key))
+                .orElseThrow(() -> new NodesConfigurationException("Could not parse service config key " + key));
 
         int nodeNbr = getNodeNbr(key, nodesConfig, property);
 
@@ -135,11 +132,8 @@ public class Topology {
             // Define master for kubernetes services
             if (currentNode != null && kubeServicesConfig != null) {
                 for (Service key : kubeServicesConfig.getEnabledServices()) {
-
-                    ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(key);
-                    if (serviceDef == null) {
-                        throw new NodesConfigurationException("Could not find any service definition matching " + key);
-                    }
+                    ServiceDefinition serviceDef = Optional.ofNullable(servicesDefinition.getServiceDefinition(key))
+                            .orElseThrow(() -> new NodesConfigurationException("Could not find any service definition matching " + key));
 
                     int currentNodeNumber = nodesConfig.getNodeNumber(currentNode);
 
@@ -448,12 +442,8 @@ public class Topology {
     private Node findNodeNumberNode(NodesConfigWrapper nodesConfig, int nodeNumber) throws NodesConfigurationException {
         if (nodeNumber > -1) {
             // return IP address corresponding to master number
-            Node node = nodesConfig.getNode(nodeNumber);
-            if (node == null) {
-                throw new NodesConfigurationException("Inconsistency : could not find IP of " + nodeNumber);
-            }
-
-            return node;
+            return Optional.ofNullable(nodesConfig.getNode(nodeNumber))
+                    .orElseThrow(() -> new NodesConfigurationException("Inconsistency : could not find IP of " + nodeNumber));
         }
         return null;
     }
@@ -562,10 +552,9 @@ public class Topology {
 
         // Add self variable
         sb.append("\n#Self identification\n");
-        Node node = nodesConfig.getNode(nodeNbr);
-        if (node == null) {
-            throw new NodesConfigurationException("No Node Address found for node number " + nodeNbr);
-        }
+        Node node = Optional.ofNullable(nodesConfig.getNode(nodeNbr))
+                .orElseThrow(() -> new NodesConfigurationException("No Node Address found for node number " + nodeNbr));
+
         appendExport(sb, "SELF_IP_ADDRESS", node.getAddress());
 
         appendExport(sb, "SELF_NODE_NUMBER", ""+nodeNbr);

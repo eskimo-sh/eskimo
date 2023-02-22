@@ -145,6 +145,24 @@ public class ProxyServlet extends HttpServlet {
             put ("accept-encoding", "gzip, deflate");
         }};
 
+    protected static final BitSet asciiQueryChars;
+
+    static {
+        char[] cUnreserved = "_-!.~'()*".toCharArray();//plus alphanum
+        char[] cPunct = ",;:$&+=".toCharArray();
+        char[] cReserved = "?/[]@".toCharArray();//plus punct
+
+        asciiQueryChars = new BitSet(128);
+        for (char c = 'a'; c <= 'z'; c++) asciiQueryChars.set(c);
+        for (char c = 'A'; c <= 'Z'; c++) asciiQueryChars.set(c);
+        for (char c = '0'; c <= '9'; c++) asciiQueryChars.set(c);
+        for (char c : cUnreserved) asciiQueryChars.set(c);
+        for (char c : cPunct) asciiQueryChars.set(c);
+        for (char c : cReserved) asciiQueryChars.set(c);
+
+        asciiQueryChars.set('%');//leave existing percent escapes in place
+    }
+
     /* MISC */
 
     protected boolean doLog = false;
@@ -304,10 +322,9 @@ public class ProxyServlet extends HttpServlet {
     }
 
     protected void initTarget() throws ServletException {
-        targetUri = getConfigParam(P_TARGET_URI);
-        if (targetUri == null) {
-            throw new ServletException(P_TARGET_URI + " is required.");
-        }
+        targetUri = Optional.ofNullable (getConfigParam(P_TARGET_URI))
+                .orElseThrow(() -> new ServletException(P_TARGET_URI + " is required."));
+
         //test it's valid
         try {
             targetUriObj = new URI(targetUri);
@@ -795,23 +812,4 @@ public class ProxyServlet extends HttpServlet {
         }
         return outBuf != null ? outBuf : in;
     }
-
-    protected static final BitSet asciiQueryChars;
-
-    static {
-        char[] cUnreserved = "_-!.~'()*".toCharArray();//plus alphanum
-        char[] cPunct = ",;:$&+=".toCharArray();
-        char[] cReserved = "?/[]@".toCharArray();//plus punct
-
-        asciiQueryChars = new BitSet(128);
-        for (char c = 'a'; c <= 'z'; c++) asciiQueryChars.set(c);
-        for (char c = 'A'; c <= 'Z'; c++) asciiQueryChars.set(c);
-        for (char c = '0'; c <= '9'; c++) asciiQueryChars.set(c);
-        for (char c : cUnreserved) asciiQueryChars.set(c);
-        for (char c : cPunct) asciiQueryChars.set(c);
-        for (char c : cReserved) asciiQueryChars.set(c);
-
-        asciiQueryChars.set('%');//leave existing percent escapes in place
-    }
-
 }

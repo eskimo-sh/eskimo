@@ -63,10 +63,7 @@ import java.net.SocketException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 
 public class ServicesProxyServlet extends ProxyServlet {
 
@@ -140,11 +137,8 @@ public class ServicesProxyServlet extends ProxyServlet {
 
     private String getPrefixPath(HttpServletRequest servletRequest, String contextPathPrefix) {
         Service service = Service.from(getServiceName(servletRequest));
-        ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
-
-        if (serviceDef == null) {
-            throw new IllegalStateException("Couldn't find service " + service + " in service definition.");
-        }
+        ServiceDefinition serviceDef = Optional.ofNullable(servicesDefinition.getServiceDefinition(service))
+                .orElseThrow(() -> new IllegalStateException("Couldn't find service " + service + " in service definition."));
 
         if (serviceDef.isUnique()) {
             return contextPathPrefix + service;
@@ -158,8 +152,8 @@ public class ServicesProxyServlet extends ProxyServlet {
     @Override
     protected HttpHost getTargetHost(HttpServletRequest servletRequest) {
         Service service = Service.from(getServiceName(servletRequest));
-
-        ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
+        ServiceDefinition serviceDef = Optional.ofNullable(servicesDefinition.getServiceDefinition(service))
+                .orElseThrow(() -> new IllegalStateException("Couldn't find service " + service + " in service definition."));
 
         ServiceWebId serviceId = ServiceWebId.fromService(service);
         if (!serviceDef.isUnique()) {
@@ -180,7 +174,8 @@ public class ServicesProxyServlet extends ProxyServlet {
         StringBuilder uri = new StringBuilder(500);
 
         Service service = Service.from(getServiceName(servletRequest));
-        ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
+        ServiceDefinition serviceDef = Optional.ofNullable (servicesDefinition.getServiceDefinition(service))
+                .orElseThrow(() -> new IllegalStateException("Couldn't find service " + service + " in service definition."));
 
         uri.append(getTargetUri(servletRequest));
 
@@ -211,8 +206,7 @@ public class ServicesProxyServlet extends ProxyServlet {
     protected ClassicHttpRequest newProxyRequestWithEntity(String method, String proxyRequestUri,
                                                     HttpServletRequest servletRequest) throws IOException {
 
-        BasicClassicHttpRequest eProxyRequest =
-                new BasicClassicHttpRequest(method, proxyRequestUri);
+        BasicClassicHttpRequest eProxyRequest = new BasicClassicHttpRequest(method, proxyRequestUri);
 
         if (APPLICATION_X_WWW_FORM_URLENCODED.equals(servletRequest.getContentType()) || getContentLengthOverride(servletRequest) == 0){
             List<NameValuePair> formparams = new ArrayList<>();
@@ -363,10 +357,9 @@ public class ServicesProxyServlet extends ProxyServlet {
         }
 
         for (ServiceWebId key : proxyManagerService.getAllTunnelConfigKeys()) {
-            ProxyTunnelConfig config = proxyManagerService.getTunnelConfig (key);
-            if (config == null) {
-                throw new IllegalStateException("Asked for proxy for service " + key + " - but none has been configured !");
-            }
+            ProxyTunnelConfig config = Optional.ofNullable(proxyManagerService.getTunnelConfig (key))
+                    .orElseThrow(() -> new IllegalStateException("Asked for proxy for service " + key + " - but none has been configured !"));
+
             input = input.replace(config.getNode()+":"+config.getLocalPort(), "/" + key);
         }
 
