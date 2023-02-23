@@ -65,11 +65,13 @@
           {
             "name": "Xms",
             "comment": "Startup Heap Size for Cluster manager\n [ESKIMO_DEFAULT] means memory allocator will decide of Cluster Manager memory share.",
+            "validationRegex": "^([0-9\\.]+[kmgt]?)$|^(\\[ESKIMO_DEFAULT\\])$",
             "defaultValue": "[ESKIMO_DEFAULT]"
           },
           {
             "name": "Xmx",
             "comment": "Maximum Heap Size for Cluster Manager\n [ESKIMO_DEFAULT] means memory allocator will decide of Cluster Manager memory share.",
+            "validationRegex": "^([0-9\\.]+[kmgt]?)$|^(\\[ESKIMO_DEFAULT\\])$",
             "defaultValue": "[ESKIMO_DEFAULT]"
           }
         ]
@@ -154,6 +156,7 @@
           {
             "name": "system.statusUpdatePeriodSeconds",
             "comment": "The orchestration loop delay in seconds. distributed-filesystem Management runs its checks and updates its status every X seconds.",
+            "validationRegex": "^[0-9\\.]+$",
             "defaultValue": "30",
             "value": "20"
           }
@@ -412,11 +415,13 @@
           {
             "name": "Xms",
             "comment": "Startup Heap Size for Broker java process\n [ESKIMO_DEFAULT] means memory allocator will decide of Broker memory share.",
+            "validationRegex": "^([0-9\\.]+[kmgt]?)$|^(\\[ESKIMO_DEFAULT\\])$",
             "defaultValue": "[ESKIMO_DEFAULT]"
           },
           {
             "name": "Xmx",
             "comment": "Maximum Heap Size for Broker java process\n [ESKIMO_DEFAULT] means memory allocator will decide of Broker memory share.",
+            "validationRegex": "^([0-9\\.]+[kmgt]?)$|^(\\[ESKIMO_DEFAULT\\])$",
             "defaultValue": "[ESKIMO_DEFAULT]"
           }
         ]
@@ -431,36 +436,43 @@
           {
             "name": "num.network.threads",
             "comment": "The number of threads that the server uses for receiving requests from the network and sending responses to the network",
+            "validationRegex": "^[0-9\\.]+$",
             "defaultValue": "3"
           },
           {
             "name": "num.io.threads",
             "comment": "The number of threads that the server uses for processing requests, which may include disk I/O",
+            "validationRegex": "^[0-9\\.]+$",
             "defaultValue": "8"
           },
           {
             "name": "socket.send.buffer.bytes",
             "comment": "The send buffer (SO_SNDBUF) used by the socket server",
+            "validationRegex": "^[0-9\\.]+$",
             "defaultValue": "102400"
           },
           {
             "name": "socket.receive.buffer.bytes",
             "comment": "The receive buffer (SO_RCVBUF) used by the socket server",
+            "validationRegex": "^[0-9\\.]+$",
             "defaultValue": "102400"
           },
           {
             "name": "socket.request.max.bytes",
             "comment": "The maximum size of a request that the socket server will accept (protection against OOM)",
+            "validationRegex": "^[0-9\\.]+$",
             "defaultValue": "104857600"
           },
           {
             "name": "num.partitions",
             "comment": "The default number of log partitions per topic. More partitions allow greater parallelism for consumption, but this will also result in more files across the brokers.",
+            "validationRegex": "^[0-9\\.]+$",
             "defaultValue": "1"
           },
           {
             "name": "log.retention.hours",
             "comment": "The minimum age of a log file to be eligible for deletion due to age",
+            "validationRegex": "^[0-9\\.]+$",
             "defaultValue": "168"
           }
         ]
@@ -640,51 +652,61 @@
           {
             "name" :  "calculator.driver.memory",
             "comment": "Limiting the driver (client) memory",
+            "validationRegex": "^([0-9\\.]+[kmgt]?)$|^(\\[ESKIMO_DEFAULT\\])$",
             "defaultValue" : "800m"
           },
           {
             "name" :  "calculator.rpc.numRetries",
             "comment": "Number of times to retry before an RPC task gives up. An RPC task will run at most times of this number.",
+            "validationRegex": "^[0-9\\.]+$",
             "defaultValue" : "5"
           },
           {
             "name" :  "calculator.rpc.retry.wait",
             "comment": "Duration for an RPC ask operation to wait before retrying.",
+            "validationRegex": "^[0-9\\.]+s$",
             "defaultValue" : "5s"
           },
           {
             "name" :  "calculator.scheduler.mode",
             "comment": "The scheduling mode between jobs submitted to the same CalculatorContext. \nCan be FIFO or FAIR. FAIR Seem not to work well with Kubernetes",
+            "validationRegex": "^(FAIR)$|^(FIFO))$",
             "defaultValue" : "FAIR"
           },
           {
             "name" :  "calculator.locality.wait",
             "comment": "How long to wait to launch a data-local task before giving up and launching it on a less-local node.",
+            "validationRegex": "^[0-9\\.]+s$",
             "defaultValue" : "20s"
           },
           {
             "name" :  "calculator.dynamicAllocation.executorIdleTimeout",
             "comment": "If dynamic allocation is enabled and an executor has been idle for more than this duration, the executor will be removed. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)",
+            "validationRegex": "^[0-9\\.]+s$",
             "defaultValue" : "200s"
           },
           {
             "name" :  "calculator.dynamicAllocation.cachedExecutorIdleTimeout",
             "comment": "If dynamic allocation is enabled and an executor which has cached data blocks has been idle for more than this duration, the executor will be removed - should be consistent with spark.dynamicAllocation.shuffleTracking.timeout. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)",
+            "validationRegex": "^[0-9\\.]+s$",
             "defaultValue" : "300s"
           },
           {
             "name" :  "calculator.dynamicAllocation.shuffleTracking.timeout",
             "comment": "When shuffle tracking is enabled, controls the timeout for executors that are holding shuffle data - should be consistent with spark.dynamicAllocation.cachedExecutorIdleTimeout.",
+            "validationRegex": "^[0-9\\.]+s$",
             "defaultValue" : "300s"
           },
           {
             "name" :  "calculator.dynamicAllocation.schedulerBacklogTimeout",
             "comment": "\tIf dynamic allocation is enabled and there have been pending tasks backlogged for more than this duration, new executors will be requested.",
+            "validationRegex": "^[0-9\\.]+s$",
             "defaultValue" : "5s"
           },
           {
             "name" :  "calculator.executor.memory",
             "comment": "Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology). \nUSE [ESKIMO_DEFAULT] to leave untouched or e.g. 800m, 1.2g, etc.",
+            "validationRegex": "^([0-9\\.]+[kmgt]?)$|^(\\[ESKIMO_DEFAULT\\])$",
             "defaultValue" : "[ESKIMO_DEFAULT]"
           }
         ]
@@ -795,11 +817,13 @@
           {
             "name": "Xms",
             "comment": "Startup Heap Size for database-manager java process\n[ESKIMO_DEFAULT] means memory allocator will decide of Cerebro memory share.",
+            "validationRegex": "^([0-9\\.]+[kmgt]?)$|^(\\[ESKIMO_DEFAULT\\])$",
             "defaultValue": "[ESKIMO_DEFAULT]"
           },
           {
             "name": "Xmx",
             "comment": "Maximum Heap Size for database-manager java process\n[ESKIMO_DEFAULT] means memory allocator will decide of Cerebro memory share.",
+            "validationRegex": "^([0-9\\.]+[kmgt]?)$|^(\\[ESKIMO_DEFAULT\\])$",
             "defaultValue": "[ESKIMO_DEFAULT]"
           }
         ]
@@ -850,11 +874,13 @@
           {
             "name": "Xms",
             "comment": "Startup Heap Size for ES java process\n[ESKIMO_DEFAULT] means memory allocator will decide of ES memory share.\n<strong>THIS NEEDS TO BE THE SAME VALUE AS Xmx OTHERWISE ES WILL LIKELY REFUSE TO START</strong>.",
+            "validationRegex": "^([0-9\\.]+[kmgt]?)$|^(\\[ESKIMO_DEFAULT\\])$",
             "defaultValue": "[ESKIMO_DEFAULT]"
           },
           {
             "name": "Xmx",
             "comment": "Maximum Heap Size for ES java process\n[ESKIMO_DEFAULT] means memory allocator will decide of ES memory share.\n<strong>THIS NEEDS TO BE THE SAME VALUE AS Xms OTHERWISE ES WILL LIKELY REFUSE TO START</strong>.",
+            "validationRegex": "^([0-9\\.]+[kmgt]?)$|^(\\[ESKIMO_DEFAULT\\])$",
             "defaultValue": "[ESKIMO_DEFAULT]"
           }
         ]
@@ -869,6 +895,7 @@
           {
             "name": "action.destructive_requires_name",
             "comment": "Require explicit names when deleting indices",
+            "validationRegex": "^(true)$|^(false)$",
             "defaultValue": "false"
           }
         ]
@@ -883,16 +910,19 @@
           {
             "name" :  "index.refresh_interval",
             "comment": "Default refresh interval on new indices. Use format such as 10s, 1m, etc. \nUSE [ESKIMO_DEFAULT] to leave ElasticSearch default value.",
+            "validationRegex": "^([0-9\\.]+[smh]?)$|^(\\[ESKIMO_DEFAULT\\])$",
             "defaultValue" : "[ESKIMO_DEFAULT]"
           },
           {
             "name" :  "index.number_of_replicas",
             "comment": "Default number of additional replicas on new indices.  \nUSE [ESKIMO_DEFAULT] to let Eskimo compute best value.",
+            "validationRegex": "^([0-9\\.]+)$|^(\\[ESKIMO_DEFAULT\\])$",
             "defaultValue" : "[ESKIMO_DEFAULT]"
           },
           {
             "name" :  "index.number_of_shards",
             "comment": "Default number of additional replicas on new indices.  \nUSE [ESKIMO_DEFAULT] to leave ElasticSearch default value (5).",
+            "validationRegex": "^([0-9\\.]+)$|^(\\[ESKIMO_DEFAULT\\])$",
             "defaultValue" : "[ESKIMO_DEFAULT]"
           }
         ]
@@ -1040,6 +1070,7 @@
           {
             "name": "Xmx",
             "comment": "Maximum heap size memory allocated to user-console process.\n[ESKIMO_DEFAULT] leaves the default memory allocation strategy decide of it.",
+            "validationRegex": "^([0-9\\.]+[kmgt]?)$|^(\\[ESKIMO_DEFAULT\\])$",
             "defaultValue": "[ESKIMO_DEFAULT]"
           }
         ]
@@ -1054,6 +1085,7 @@
           {
             "name": "zeppelin_note_isolation",
             "comment": "The setting 'zeppelin_note_isolation' is used to control whether interpreter processes are created and managed globally for the whole zeppelin process or per note.\nPossible values are:\n 'shared' : one single instance of every interpreter is created and shared among users and notes (better for laboratory).\n 'per_note' : one instance of interpreter is created for every note (better for production - but requires a lot of RAM).\n",
+            "validationRegex": "^(per_note)$|^(shared)$",
             "defaultValue": "shared"
           }
         ]

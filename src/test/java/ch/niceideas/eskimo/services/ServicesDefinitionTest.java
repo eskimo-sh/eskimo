@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.EskimoApplication;
@@ -480,9 +481,11 @@ public class ServicesDefinitionTest {
 
         String expectedServicesConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesDefinitionTest/expectedServicesConfig.json"), StandardCharsets.UTF_8);
 
+
         assertEquals(
                 expectedServicesConfig.replace("\r", "").trim(),
                 conf.toJSON().toString(2).replace("\r", "").trim());
+
         //assertTrue (new JsonWrapper(expectedServicesConfig).getJSONObject().similar(conf.toJSON()));
     }
 

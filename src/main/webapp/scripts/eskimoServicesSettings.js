@@ -120,10 +120,11 @@ eskimo.ServicesSettings = function () {
                     let validationRegex =  servicesConfigForm[settingsKey +"_validation"];
 
                     let propertyKey = settingsKey.substring(serviceName.length + 1).replaceAll("---", ".");
-
                     if (value && validationRegex && value !== "" && validationRegex !== "") {
                         if (!new RegExp(validationRegex).test(value)) {
-                            errors += ("Value " + value + " for " + serviceName + " / " + propertyKey + " doesn't comply to format " + validationRegex + "<br>");
+                            let error = "Value " + value + " for " + serviceName + " / " + propertyKey + " doesn't comply to format " + validationRegex;
+                            console.warn (error);
+                            errors += (error + "<br>");
                         }
                     }
                 }

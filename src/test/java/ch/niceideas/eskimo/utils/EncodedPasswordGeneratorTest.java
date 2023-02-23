@@ -37,10 +37,21 @@ package ch.niceideas.eskimo.utils;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static com.github.stefanbirkner.systemlambda.SystemLambda.catchSystemExit;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EncodedPasswordGeneratorTest {
+
+    @Test
+    public void testEdgeCases() throws Exception {
+        assertEquals (-1, catchSystemExit(() -> {
+            EncodedPasswordGenerator.main(new String[] {});
+        }));
+
+        assertEquals (-2, catchSystemExit(() -> {
+            EncodedPasswordGenerator.main(new String[] {""});
+        }));
+    }
 
     @Test
     public void testEncodePassword() {

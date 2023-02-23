@@ -76,6 +76,7 @@ public class ServicesSettingsServiceTest {
 
     private String jsonConfig = null;
     private String testForm = null;
+    private String testFormWithValidation = null;
     private String expectedJsonString = null;
     private String expectedNewConfig = null;
 
@@ -105,6 +106,7 @@ public class ServicesSettingsServiceTest {
 
         jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
         testForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testForm.json"), StandardCharsets.UTF_8);
+        testFormWithValidation = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testFormWithValidation.json"), StandardCharsets.UTF_8);
         expectedJsonString = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesSettingsServiceTest/expectedCommand.json"), StandardCharsets.UTF_8);
         expectedNewConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesSettingsServiceTest/expectedNewConfig.json"), StandardCharsets.UTF_8);
 
@@ -133,13 +135,14 @@ public class ServicesSettingsServiceTest {
 
     @Test
     public void testSomeRegex() {
-        Pattern validationRegex = Pattern.compile("^([0-9\\.]+[kmgt]?)|(\\[ESKIMO_DEFAULT\\])$");
+        Pattern validationRegex = Pattern.compile("^([0-9\\.]+[kmgt]?)$|^(\\[ESKIMO_DEFAULT\\])$");
         assertTrue(validationRegex.matcher("1024m").matches());
         assertTrue(validationRegex.matcher("1024").matches());
         assertTrue(validationRegex.matcher("10241024").matches());
         assertTrue(validationRegex.matcher("1g").matches());
         assertTrue(validationRegex.matcher("[ESKIMO_DEFAULT]").matches());
 
+        assertFalse(validationRegex.matcher("1024x").matches());
         assertFalse(validationRegex.matcher("tada").matches());
         assertFalse(validationRegex.matcher("").matches());
         assertFalse(validationRegex.matcher("none").matches());
@@ -147,14 +150,33 @@ public class ServicesSettingsServiceTest {
     }
 
     @Test
-    public void testCheckServicesSettings() {
-        fail ("To Be Implemented");
+    public void testCheckServicesSettings() throws Exception {
+
+        configurationServiceTest.saveNodesConfig(StandardSetupHelpers.getStandard2NodesSetup());
+        configurationServiceTest.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
+        configurationServiceTest.saveServicesInstallationStatus(StandardSetupHelpers.getStandard2NodesInstallStatus());
+
+        configurationServiceTest.saveServicesSettings(new ServicesSettingsWrapper(jsonConfig));
+
+        SettingsOperationsCommand.create(testFormWithValidation, servicesSettingsService);
+
+        JSONObject tamperedForm = new JSONObject(testFormWithValidation);
+
+        tamperedForm.put("broker-socket---send---buffer---bytes", "abc");
+        tamperedForm.put("calculator-runtime-calculator---driver---memory", "1024x");
+
+        ServicesSettingsException exp = assertThrows(
+                ServicesSettingsException.class,
+                () -> SettingsOperationsCommand.create(tamperedForm.toString(2), servicesSettingsService));
+
+        assertNotNull (exp);
+
+        assertEquals("Value abc for broker / socket.send.buffer.bytes doesn't comply to format ^[0-9\\.]+$<br>" +
+                "Value 1024x for calculator-runtime / calculator.driver.memory doesn't comply to format ^([0-9\\.]+[kmgt]?)$|^(\\[ESKIMO_DEFAULT\\])$<br>", exp.getMessage());
     }
 
     @Test
     public void testSaveAndApplyServicesConfig() throws Exception {
-        //fail ("To Be Implemented");
-
         configurationServiceTest.saveNodesConfig(StandardSetupHelpers.getStandard2NodesSetup());
         configurationServiceTest.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
         configurationServiceTest.saveServicesInstallationStatus(StandardSetupHelpers.getStandard2NodesInstallStatus());

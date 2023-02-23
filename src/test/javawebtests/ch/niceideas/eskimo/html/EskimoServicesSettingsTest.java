@@ -36,12 +36,14 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.JavascriptException;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EskimoServicesSettingsTest extends AbstractWebTest {
 
@@ -75,8 +77,25 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
     }
 
     @Test
-    public void testCheckServicesSettings() {
-        fail ("To Be Implemented");
+    public void testCheckServicesSettings() throws Exception {
+
+        String testFormWithValidation = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testFormWithValidation.json"), StandardCharsets.UTF_8);
+
+        js("eskimoServicesSettings.checkServicesSettings(" + testFormWithValidation + ");");
+
+        JSONObject tamperedForm = new JSONObject(testFormWithValidation);
+
+        tamperedForm.put("broker-socket---send---buffer---bytes", "abc");
+        tamperedForm.put("calculator-runtime-calculator---driver---memory", "1024x");
+
+        JavascriptException exp = assertThrows(JavascriptException.class,
+                () -> js("eskimoServicesSettings.checkServicesSettings(" + tamperedForm.toString(2) + ");"));
+
+        assertNotNull(exp);
+
+        assertTrue(exp.getMessage().startsWith("javascript error: " +
+                "Value abc for broker / socket.send.buffer.bytes doesn't comply to format ^[0-9\\.]+$<br>" +
+                "Value 1024x for calculator-runtime / calculator.driver.memory doesn't comply to format ^([0-9\\.]+[kmgt]?)$|^(\\[ESKIMO_DEFAULT\\])$<br>"));
     }
 
     @Test

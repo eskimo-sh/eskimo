@@ -8,53 +8,63 @@
   "properties": [
     {
       "name": "calculator.driver.memory",
-      "defaultValue": "800m",
-      "comment": "Limiting the driver (client) memory"
+      "comment": "Limiting the driver (client) memory",
+      "validationRegex": "^([0-9\\.]+[kmgt]?)$|^(\\[ESKIMO_DEFAULT\\])$",
+      "defaultValue": "800m"
     },
     {
       "name": "calculator.rpc.numRetries",
-      "defaultValue": "5",
-      "comment": "Number of times to retry before an RPC task gives up. An RPC task will run at most times of this number."
+      "comment": "Number of times to retry before an RPC task gives up. An RPC task will run at most times of this number.",
+      "validationRegex": "^[0-9\\.]+$",
+      "defaultValue": "5"
     },
     {
       "name": "calculator.rpc.retry.wait",
-      "defaultValue": "5s",
-      "comment": "Duration for an RPC ask operation to wait before retrying."
+      "comment": "Duration for an RPC ask operation to wait before retrying.",
+      "validationRegex": "^[0-9\\.]+s$",
+      "defaultValue": "5s"
     },
     {
       "name": "calculator.scheduler.mode",
-      "defaultValue": "FAIR",
-      "comment": "The scheduling mode between jobs submitted to the same CalculatorContext. \nCan be FIFO or FAIR. FAIR Seem not to work well with Kubernetes"
+      "comment": "The scheduling mode between jobs submitted to the same CalculatorContext. \nCan be FIFO or FAIR. FAIR Seem not to work well with Kubernetes",
+      "validationRegex": "^(FAIR)$|^(FIFO))$",
+      "defaultValue": "FAIR"
     },
     {
       "name": "calculator.locality.wait",
-      "defaultValue": "20s",
-      "comment": "How long to wait to launch a data-local task before giving up and launching it on a less-local node."
+      "comment": "How long to wait to launch a data-local task before giving up and launching it on a less-local node.",
+      "validationRegex": "^[0-9\\.]+s$",
+      "defaultValue": "20s"
     },
     {
       "name": "calculator.dynamicAllocation.executorIdleTimeout",
-      "defaultValue": "200s",
-      "comment": "If dynamic allocation is enabled and an executor has been idle for more than this duration, the executor will be removed. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)"
+      "comment": "If dynamic allocation is enabled and an executor has been idle for more than this duration, the executor will be removed. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)",
+      "validationRegex": "^[0-9\\.]+s$",
+      "defaultValue": "200s"
     },
     {
       "name": "calculator.dynamicAllocation.cachedExecutorIdleTimeout",
-      "defaultValue": "300s",
-      "comment": "If dynamic allocation is enabled and an executor which has cached data blocks has been idle for more than this duration, the executor will be removed - should be consistent with spark.dynamicAllocation.shuffleTracking.timeout. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)"
+      "comment": "If dynamic allocation is enabled and an executor which has cached data blocks has been idle for more than this duration, the executor will be removed - should be consistent with spark.dynamicAllocation.shuffleTracking.timeout. \n (Caution here : small values cause issues. I have executors killed with 10s for instance)",
+      "validationRegex": "^[0-9\\.]+s$",
+      "defaultValue": "300s"
     },
     {
       "name": "calculator.dynamicAllocation.shuffleTracking.timeout",
-      "defaultValue": "300s",
-      "comment": "When shuffle tracking is enabled, controls the timeout for executors that are holding shuffle data - should be consistent with spark.dynamicAllocation.cachedExecutorIdleTimeout."
+      "comment": "When shuffle tracking is enabled, controls the timeout for executors that are holding shuffle data - should be consistent with spark.dynamicAllocation.cachedExecutorIdleTimeout.",
+      "validationRegex": "^[0-9\\.]+s$",
+      "defaultValue": "300s"
     },
     {
       "name": "calculator.dynamicAllocation.schedulerBacklogTimeout",
-      "defaultValue": "5s",
-      "comment": "\tIf dynamic allocation is enabled and there have been pending tasks backlogged for more than this duration, new executors will be requested."
+      "comment": "\tIf dynamic allocation is enabled and there have been pending tasks backlogged for more than this duration, new executors will be requested.",
+      "validationRegex": "^[0-9\\.]+s$",
+      "defaultValue": "5s"
     },
     {
       "name": "calculator.executor.memory",
-      "defaultValue": "[ESKIMO_DEFAULT]",
-      "comment": "Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology). \nUSE [ESKIMO_DEFAULT] to leave untouched or e.g. 800m, 1.2g, etc."
+      "comment": "Defining default Spark executor memory allowed by Eskimo Memory Management (found in topology). \nUSE [ESKIMO_DEFAULT] to leave untouched or e.g. 800m, 1.2g, etc.",
+      "validationRegex": "^([0-9\\.]+[kmgt]?)$|^(\\[ESKIMO_DEFAULT\\])$",
+      "defaultValue": "[ESKIMO_DEFAULT]"
     }
   ]
 }
