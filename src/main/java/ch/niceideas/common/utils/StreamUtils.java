@@ -100,9 +100,13 @@ public abstract class StreamUtils {
      * Copies information between specified streams and then closes both of the streams.
      */
     public static void copyThenClose(InputStream input, OutputStream output) throws IOException {
-        copy(
-            Optional.ofNullable(input).orElseThrow(() -> new IOException ("Passed input stream is null")),
-            Optional.ofNullable(output).orElseThrow(() -> new IOException ("Passed output stream is null")));
+        if (input == null) {
+            throw new IOException ("Passed input stream is null");
+        }
+        if (output == null) {
+            throw new IOException ("Passed output stream is null");
+        }
+        copy(input, output);
         input.close();
         output.close();
     }

@@ -84,8 +84,11 @@ public class Topology {
 
     public static ParsedNodesConfigProperty parseKeyToServiceConfig (String key, NodesConfigWrapper nodesConfig)
             throws NodesConfigurationException {
-        ParsedNodesConfigProperty property = Optional.ofNullable(NodesConfigWrapper.parseProperty(key))
-                .orElseThrow(() -> new NodesConfigurationException("Could not parse service config key " + key));
+
+        ParsedNodesConfigProperty property = NodesConfigWrapper.parseProperty(key);
+        if (property == null) {
+            throw new NodesConfigurationException(("Could not parse service config key " + key));
+        }
 
         int nodeNbr = getNodeNbr(key, nodesConfig, property);
 
