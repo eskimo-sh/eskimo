@@ -171,6 +171,7 @@ public class ServiceDefinition {
             put("unique", isUnique());
             put("kubernetes", isKubernetes());
             put("mandatory", isMandatory());
+            put("registryOnly", isRegistryOnly());
             put("conditional", getConditional().name());
             if (kubeConfig != null) {
                 put ("kubeConfig", kubeConfig.toJSON());

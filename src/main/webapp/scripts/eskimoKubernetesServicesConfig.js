@@ -159,16 +159,59 @@ eskimo.KubernetesServicesConfig = function() {
     }
     this.selectAll = selectAll;
 
+    function reqValueChangeHandler (regex, inputId) {
+        const thisInput = $("#" + inputId);
+        const value = thisInput.val();
+        if (value && value !== "") {
+            if (!regex.test(value)) {
+                thisInput.addClass("invalid")
+            } else {
+                thisInput.removeClass("invalid")
+            }
+        }
+    }
+
+    function deploymentStrategyChanged() {
+        const thisInput = $("#" + this.id);
+        const serviceName = this.id.substring(0, this.id.indexOf("_deployment_strategy"))
+        if (thisInput.get(0).checked) {
+            $('#' + serviceName + '_replicas_setting').html("");
+        } else {
+            $('#' + serviceName + '_replicas_setting').html(
+                '<input style="width: 80px;" type="text" class="form-control" name="' + serviceName + '_replicas" id="' + serviceName + '_replicas">');
+            $("#" + serviceName + "_replicas").change(function() {
+                reqValueChangeHandler (eskimoKubeReplicasCheckRE, this.id);
+            });
+        }
+    }
+
     this.onKubernetesServiceSelected = function (serviceName, kubernetesConfig) {
 
         $('#' + serviceName + '_cpu_setting').html(
-            '    <input style="width: 80px;" type="text" class="form-control" pattern="[0-9\\.]+[m]{0,1}" name="' + serviceName +'_cpu" id="' + serviceName +'_cpu">');
+            '    <input style="width: 80px;" type="text" class="form-control" name="' + serviceName +'_cpu" id="' + serviceName +'_cpu">');
 
         $('#' + serviceName + '_ram_setting').html(
-            '    <input style="width: 80px;" type="text" class="form-control" pattern="[0-9\\.]+[EPTGMk]{0,1}" name="' + serviceName +'_ram" id="' + serviceName +'_ram">');
+            '    <input style="width: 80px;" type="text" class="form-control" name="' + serviceName +'_ram" id="' + serviceName +'_ram">');
+
+        $("#" + serviceName + "_cpu").change(function() {
+            reqValueChangeHandler (eskimoKubeCpuCheckRE, this.id);
+        });
+
+        $("#" + serviceName + "_ram").change(function() {
+            reqValueChangeHandler (eskimoKubeRamCheckRE, this.id);
+        });
+
+        if (!KUBERNETES_SERVICES_CONFIG[serviceName].unique && !KUBERNETES_SERVICES_CONFIG[serviceName].registryOnly) {
+            $('#' + serviceName + '_depl_strat').html(
+                '<input type="checkbox" class="form-check-input" name="' + serviceName + '_deployment_strategy" id="' + serviceName + '_deployment_strategy">');
+        }
+
+        $("#" + serviceName + "_deployment_strategy").change(deploymentStrategyChanged);
 
         let cpuSet = false;
         let ramSet = false;
+        let deplStrategySet = false;
+        let replicasSet = false;
 
         // Trying to get previouly configured value
         if (kubernetesConfig) {
@@ -181,6 +224,23 @@ eskimo.KubernetesServicesConfig = function() {
             if (ramConf) {
                 $('#' + serviceName + '_ram').val (ramConf);
                 ramSet = true;
+            }
+            let deplStrategy = kubernetesConfig[serviceName + "_deployment_strategy"];
+            if (deplStrategy) {
+                $eploymentStrategy = $('#' + serviceName + '_deployment_strategy');
+                if (deplStrategy === "on") {
+                    $eploymentStrategy.attr("checked", true);
+                } else {
+                    $eploymentStrategy.attr("checked", false);
+
+                    let replicas = kubernetesConfig[serviceName + "_replicas"];
+                    if (replicas) {
+                        $('#' + serviceName + '_replicas').val (replicas);
+                        replicasSet = true;
+                    }
+                }
+                $eploymentStrategy.change();
+                deplStrategySet = true;
             }
         }
 
@@ -202,6 +262,13 @@ eskimo.KubernetesServicesConfig = function() {
             }
         }
 
+        // if no previous deploymemnt strategy was set, neithre replicas, default is cluster wide
+        if (!deplStrategySet) {
+            $eploymentStrategy = $('#' + serviceName + '_deployment_strategy');
+            $eploymentStrategy.attr("checked", true);
+            $eploymentStrategy.change();
+        }
+
         // if node could be found there either, take hardcoded default values
         if (!cpuSet) {
             $('#' + serviceName + '_cpu').val ("1");
@@ -214,8 +281,9 @@ eskimo.KubernetesServicesConfig = function() {
     this.onKubernetesServiceUnselected = function (serviceName) {
 
         $('#' + serviceName + '_cpu_setting').html("");
-
         $('#' + serviceName + '_ram_setting').html("");
+        $('#' + serviceName + '_depl_strat').html("");
+        $('#' + serviceName + '_replicas_setting').html("");
     };
 
     this.renderKubernetesConfig = function (kubernetesConfig) {
@@ -239,6 +307,10 @@ eskimo.KubernetesServicesConfig = function() {
                 '<td id="' + KUBERNETES_SERVICES[i] + '_cpu_setting" style="text-align: center;">' +
                 '</td>' +
                 '<td id="' + KUBERNETES_SERVICES[i] + '_ram_setting" style="text-align: center;">' +
+                '</td>' +
+                '<td id="' + KUBERNETES_SERVICES[i] + '_depl_strat" style="text-align: center;">' +
+                '</td>' +
+                '<td id="' + KUBERNETES_SERVICES[i] + '_replicas_setting" style="text-align: center;">' +
                 '</td>';
 
 

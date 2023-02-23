@@ -271,13 +271,14 @@ eskimo.ServicesSettings = function () {
 
         // register onchange handler
         $(".eskimo-settings-input").change(function() {
-            const value = $("#"+this.id).val();
+            const thisInput = $("#"+this.id);
+            const value = thisInput.val();
             const regex = $("#"+this.id+"_validation").val();
-            if (value && regex && value != "" && regex !== "") {
+            if (value && regex && value !== "" && regex !== "") {
                 if (!new RegExp(regex).test(value)) {
-                    $("#"+this.id).addClass("invalid")
+                    thisInput.addClass("invalid")
                 } else {
-                    $("#"+this.id).removeClass("invalid")
+                    thisInput.removeClass("invalid")
                 }
             }
         })

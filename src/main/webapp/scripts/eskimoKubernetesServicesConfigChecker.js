@@ -33,10 +33,13 @@ Software.
 */
 
 
-let cpuCheckRE = /^[0-9\\.]+[m]{0,1}$/g;
-let ramCheckRE = /^[0-9\\.]+[EPTGMk]{0,1}$/g;
+window.eskimoKubeCpuCheckRE = /^[0-9\\.]+[m]?$/;
+window.eskimoKubeRamCheckRE = /^[0-9\\.]+[EPTGMk]?$/;
+window.eskimoKubeReplicasCheckRE = /^[0-9\\.]+$/;
 
 function checkKubernetesSetup (kubernetesSetupConfig, servicesDependencies, kubernetesServices, successCallback) {
+
+    alert ("Aapt to dpeloyment strategy and replicas");
 
     $.ajaxGet({
         url: "load-nodes-config",
@@ -137,7 +140,7 @@ function doCheckKubernetesSetup (nodesConfig, kubernetesSetupConfig, servicesDep
                 }
 
                 let cpuDef = kubernetesSetupConfig [serviceName + "_cpu"];
-                if (cpuDef.match(cpuCheckRE) == null) {
+                if (cpuDef.match(eskimoKubeCpuCheckRE) == null) {
                     throw "CPU definition for " + key + " doesn't match expected REGEX - [0-9\\\\.]+[m]{0,1}";
                 }
             }
@@ -157,7 +160,7 @@ function doCheckKubernetesSetup (nodesConfig, kubernetesSetupConfig, servicesDep
                 }
 
                 let ramDef = kubernetesSetupConfig [serviceName + "_ram"];
-                if (ramDef.match(ramCheckRE) == null) {
+                if (ramDef.match(eskimoKubeRamCheckRE) == null) {
                     throw "RAM definition for " + key + " doesn't match expected REGEX - [0-9\\.]+[EPTGMk]{0,1}";
                 }
             }
