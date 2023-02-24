@@ -64,7 +64,7 @@ metadata:
     service: logstash
 spec:
   serviceName: logstash
-  replicas: $(get_replicas elasticsearch)
+  replicas: $(get_replicas logstash)
   selector:
     matchLabels:
       service: logstash

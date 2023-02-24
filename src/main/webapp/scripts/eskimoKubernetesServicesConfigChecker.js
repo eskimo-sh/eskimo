@@ -135,11 +135,11 @@ function doCheckKubernetesSetup (nodesConfig, kubernetesSetupConfig, servicesDep
 
                 let serviceName = matcher[1];
 
-                if (!kubernetesSetupConfig[serviceName + "_cpu"] || !kubernetesSetupConfig[serviceName + "_cpu"] == "") {
+                if (!kubernetesSetupConfig[serviceName + "_cpu"] || kubernetesSetupConfig[serviceName + "_cpu"] === "") {
                     throw "Inconsistency found : Kubernetes Service " + serviceName + " is enabled but misses CPU request setting";
                 }
 
-                if (!kubernetesSetupConfig[serviceName + "_ram"] || !kubernetesSetupConfig[serviceName + "_ram"] == "") {
+                if (!kubernetesSetupConfig[serviceName + "_ram"] || kubernetesSetupConfig[serviceName + "_ram"] === "") {
                     throw "Inconsistency found : Kubernetes Service " + serviceName + " is enabled but misses RAM request setting";
                 }
             }
