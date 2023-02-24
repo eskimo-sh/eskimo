@@ -67,6 +67,7 @@ public class Topology {
     public static final String SERVICE_NUMBER_1_BASED = "SERVICE_NUMBER_1_BASED";
     public static final String CONTEXT_PATH = "CONTEXT_PATH";
     public static final String SERVICE = "Service";
+    public static final String KUBE_REQUEST_PREFIX = "ESKIMO_KUBE_REQUEST_";
 
     private final Map<String, Node> definedMasters = new HashMap<>();
     private final Map<Service, Map<String, String>> additionalEnvironment = new HashMap<>();
@@ -541,37 +542,31 @@ public class Topology {
             }
         }
 
-        sb.append("\n#Additional Environment\n");
-        services.stream()
-                .sorted(Comparator.naturalOrder())
-                .filter(service -> additionalEnvironment.get(service) != null)
-                .forEach(service -> {
-                    for (String additionalProp : additionalEnvironment.get(service).keySet()) {
-                        appendExport (sb, additionalProp, additionalEnvironment.get(service).get(additionalProp));
-                    }
-                });
+        appendAdditionalEnv(sb, services);
 
-        // Add self variable
-        sb.append("\n#Self identification\n");
-        Node node = Optional.ofNullable(nodesConfig.getNode(nodeNbr))
-                .orElseThrow(() -> new NodesConfigurationException("No Node Address found for node number " + nodeNbr));
+        appendIdentification(nodesConfig, nodeNbr, sb);
 
-        appendExport(sb, "SELF_IP_ADDRESS", node.getAddress());
+        appendKubernetesTopology(nodesConfig, kubeConfig, servicesDefinition, nodeNbr, sb);
 
-        appendExport(sb, "SELF_NODE_NUMBER", ""+nodeNbr);
+        appendMemoryConfiguration(nodesConfig, memoryModel, nodeNbr, sb);
 
-        appendExport(sb, "ESKIMO_NODE_COUNT", ""+nodesConfig.getAllNodes().size());
+        return sb.toString();
+    }
 
-        if (StringUtils.isNotBlank(contextPath)) {
-            appendExport(sb, CONTEXT_PATH, ""+contextPath);
+    private void appendMemoryConfiguration(NodesConfigWrapper nodesConfig, MemoryModel memoryModel, int nodeNbr, StringBuilder sb) {
+        // memory management
+        Map<Service, Long> memorySettings = memoryModel.getModelForNode(nodesConfig, nodeNbr);
+        if (memorySettings != null && !memorySettings.isEmpty()) {
+            sb.append("\n#Memory Management\n");
+
+            memorySettings.keySet().stream()
+                    .sorted()
+                    .forEach(service -> appendExport(sb,
+                            "MEMORY_" + service.getEnv(), "" + memorySettings.get(service)));
         }
+    }
 
-        List<Node> allNodeList = new ArrayList<>(nodesConfig.getAllNodes());
-        Collections.sort(allNodeList); // THis is absolutely key, the order needs to be predictable
-        String allNodes = String.join(",", allNodeList.stream().map(Node::getAddress).toArray(String[]::new));
-
-        appendExport(sb, ALL_NODES_LIST, allNodes);
-
+    private void appendKubernetesTopology(NodesConfigWrapper nodesConfig, KubernetesServicesConfigWrapper kubeConfig, ServicesDefinition servicesDefinition, int nodeNbr, StringBuilder sb) throws KubernetesServicesConfigException {
         // Kubernetes Topology
         if (servicesDefinition.getKubeMasterServiceDef() != null
                 && nodesConfig.hasServiceConfigured(servicesDefinition.getKubeMasterServiceDef()) &&
@@ -585,12 +580,12 @@ public class Topology {
 
                     String cpuSetting = kubeConfig.getCpuSetting(service);
                     if (StringUtils.isNotBlank(cpuSetting)) {
-                        appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.getEnv() + "_CPU", cpuSetting);
+                        appendExport(sb, KUBE_REQUEST_PREFIX + service.getEnv() + "_CPU", cpuSetting);
                     }
 
                     String ramSetting = kubeConfig.getRamSetting(service);
                     if (StringUtils.isNotBlank(ramSetting)) {
-                        appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.getEnv() + "_RAM", ramSetting);
+                        appendExport(sb, KUBE_REQUEST_PREFIX + service.getEnv() + "_RAM", ramSetting);
                     }
 
                     KubeDeploymentStrategy deplStrat = kubeConfig.getDeploymentStrategy(service);
@@ -605,24 +600,46 @@ public class Topology {
                         if (StringUtils.isBlank(replicaSetting)) {
                             throw new KubernetesServicesConfigException ("Service " + service + " isdefined as customer deployment but number of replicas is missing");
                         }
-                        appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.getEnv() + "_REPLICAS", replicaSetting);
+                        appendExport(sb, KUBE_REQUEST_PREFIX + service.getEnv() + "_REPLICAS", replicaSetting);
                     }
                 }
             }
         }
+    }
 
-        // memory management
-        Map<Service, Long> memorySettings = memoryModel.getModelForNode(nodesConfig, nodeNbr);
-        if (memorySettings != null && !memorySettings.isEmpty()) {
-            sb.append("\n#Memory Management\n");
+    private void appendIdentification(NodesConfigWrapper nodesConfig, int nodeNbr, StringBuilder sb) throws NodesConfigurationException {
+        // Add self variable
+        sb.append("\n#Self identification\n");
+        Node node = Optional.ofNullable(nodesConfig.getNode(nodeNbr))
+                .orElseThrow(() -> new NodesConfigurationException("No Node Address found for node number " + nodeNbr));
 
-            memorySettings.keySet().stream()
-                    .sorted()
-                    .forEach(service -> appendExport(sb,
-                            "MEMORY_" + service.getEnv(), "" + memorySettings.get(service)));
+        appendExport(sb, "SELF_IP_ADDRESS", node.getAddress());
+
+        appendExport(sb, "SELF_NODE_NUMBER", ""+ nodeNbr);
+
+        appendExport(sb, "ESKIMO_NODE_COUNT", ""+ nodesConfig.getAllNodes().size());
+
+        if (StringUtils.isNotBlank(contextPath)) {
+            appendExport(sb, CONTEXT_PATH, ""+contextPath);
         }
 
-        return sb.toString();
+        List<Node> allNodeList = new ArrayList<>(nodesConfig.getAllNodes());
+        Collections.sort(allNodeList); // THis is absolutely key, the order needs to be predictable
+        String allNodes = String.join(",", allNodeList.stream().map(Node::getAddress).toArray(String[]::new));
+
+        appendExport(sb, ALL_NODES_LIST, allNodes);
+    }
+
+    private void appendAdditionalEnv(StringBuilder sb, Set<Service> services) {
+        sb.append("\n#Additional Environment\n");
+        services.stream()
+                .sorted(Comparator.naturalOrder())
+                .filter(service -> additionalEnvironment.get(service) != null)
+                .forEach(service -> {
+                    for (String additionalProp : additionalEnvironment.get(service).keySet()) {
+                        appendExport (sb, additionalProp, additionalEnvironment.get(service).get(additionalProp));
+                    }
+                });
     }
 
 }

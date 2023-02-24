@@ -44,7 +44,6 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
-import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;

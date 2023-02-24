@@ -229,7 +229,7 @@ eskimo.KubernetesServicesConfig = function() {
             }
 
             let deplStrategy = kubernetesConfig[serviceName + "_deployment_strategy"];
-            $eploymentStrategy = $('#' + serviceName + '_deployment_strategy');
+            const $eploymentStrategy = $('#' + serviceName + '_deployment_strategy');
             if (deplStrategy && deplStrategy === "on") {
                 $eploymentStrategy.attr("checked", true);
                 $eploymentStrategy.change();

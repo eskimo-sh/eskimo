@@ -39,7 +39,6 @@ import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
-import ch.niceideas.eskimo.terminal.Session;
 import ch.niceideas.eskimo.types.Node;
 import org.apache.log4j.Logger;
 import org.json.JSONException;

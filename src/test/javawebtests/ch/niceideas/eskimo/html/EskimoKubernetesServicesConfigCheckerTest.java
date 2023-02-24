@@ -39,7 +39,6 @@ import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.services.ServicesDefinitionTestImpl;
-import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,8 +48,6 @@ import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
-
-    private static final Logger logger = Logger.getLogger(EskimoKubernetesServicesConfigCheckerTest.class);
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -98,16 +95,18 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
 
     @Test
     public void testCheckKubernetesSetupCustomDeploymentOK() {
-        js("callCheckKubernetesSetup("
-                + StandardSetupHelpers.getStandard2NodesSetup().getFormattedValue() + ","
-                + StandardSetupHelpers.getKubernetesConfigCustomDeployment().getFormattedValue() + ")");
+        assertDoesNotThrow(() ->
+            js("callCheckKubernetesSetup("
+                    + StandardSetupHelpers.getStandard2NodesSetup().getFormattedValue() + ","
+                    + StandardSetupHelpers.getKubernetesConfigCustomDeployment().getFormattedValue() + ")"));
     }
 
     @Test
     public void testWithKubeConfigRequest() {
-        js("callCheckKubernetesSetup("
-                + StandardSetupHelpers.getStandard2NodesSetup().getFormattedValue() + ","
-                + StandardSetupHelpers.getStandardKubernetesConfig().getFormattedValue() + ")");
+        assertDoesNotThrow(() ->
+            js("callCheckKubernetesSetup("
+                    + StandardSetupHelpers.getStandard2NodesSetup().getFormattedValue() + ","
+                    + StandardSetupHelpers.getStandardKubernetesConfig().getFormattedValue() + ")"));
     }
 
     @Test
@@ -233,7 +232,8 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
             put("user-console_deployment_strategy", "on");
         }});
 
-        js("callCheckKubernetesSetup(" + nodesConfig.toString(2) + "," + kubernetesConfig.toString(2) + ")");
+        assertDoesNotThrow(() ->
+            js("callCheckKubernetesSetup(" + nodesConfig.toString(2) + "," + kubernetesConfig.toString(2) + ")"));
     }
 
     @Test

@@ -63,7 +63,7 @@ public final class ServiceWebId implements Serializable {
     @Override
     public String toString() {
         return Optional.ofNullable(getNode())
-                .map(node -> service.getName() + "/" + node.getName())
+                .map(nd -> service.getName() + "/" + nd.getName())
                 .orElse(service.getName());
     }
 }

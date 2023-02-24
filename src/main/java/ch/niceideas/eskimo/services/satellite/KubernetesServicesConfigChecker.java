@@ -162,39 +162,36 @@ public class KubernetesServicesConfigChecker {
             // test deployment strategy and rreplicas setting
             for (Service service : servicesDefinition.listKubernetesServices()) {
                 ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
-                if (!serviceDef.isUnique() && !serviceDef.isRegistryOnly()) {
+                if (!serviceDef.isUnique() && !serviceDef.isRegistryOnly() && kubeServicesConfig.isServiceInstallRequired(service)) {
 
-                    if (kubeServicesConfig.isServiceInstallRequired(service)) {
+                    // either wide cluster selection is selected, or I want eplicas configured (in the proper format)
+                    KubeDeploymentStrategy deplStratDef = kubeServicesConfig.getDeploymentStrategy(service);
 
-                        // either wide cluster selection is selected, or I want eplicas configured (in the proper format)
-                        KubeDeploymentStrategy deplStratDef = kubeServicesConfig.getDeploymentStrategy(service);
+                    String replicasDef = kubeServicesConfig.getReplicasSetting(service);
 
-                        String replicasDef = kubeServicesConfig.getReplicasSetting(service);
+                    if (deplStratDef == null && StringUtils.isBlank(replicasDef)) {
+                        deplStratDef = KubeDeploymentStrategy.CLUSTER_WIDE;
+                    }
 
-                        if (deplStratDef == null && StringUtils.isBlank(replicasDef)) {
-                            deplStratDef = KubeDeploymentStrategy.CLUSTER_WIDE;
+                    if (deplStratDef == KubeDeploymentStrategy.CLUSTER_WIDE) {
+
+                        // in this case I want no replica !
+                        if (StringUtils.isNotBlank(replicasDef)) {
+                            throw new KubernetesServicesConfigException(
+                                    "Service " + service + " defines a deployment strategy as 'cluster wide' and yet it has replicas configured");
                         }
 
-                        if (deplStratDef == KubeDeploymentStrategy.CLUSTER_WIDE) {
+                    } else {
 
-                            // in this case I want no replica !
-                            if (StringUtils.isNotBlank(replicasDef)) {
-                                throw new KubernetesServicesConfigException(
-                                        "Service " + service + " defines a deployment strategy as 'cluster wide' and yet it has replicas configured");
-                            }
+                        // in this case I want replica and in the proper format
+                        if (StringUtils.isBlank(replicasDef)) {
+                            throw new KubernetesServicesConfigException(
+                                    "Service " + service + " defines a deployment strategy as 'custom' and yet it is missing replicas configuration");
 
                         } else {
-
-                            // in this case I want replica and in the proper format
-                            if (StringUtils.isBlank(replicasDef)) {
+                            if (!KubeRequest.KUBE_REQUEST_REPLICAS_RE.matcher(replicasDef).matches()) {
                                 throw new KubernetesServicesConfigException(
-                                        "Service " + service + " defines a deployment strategy as 'custom' and yet it is missing replicas configuration");
-
-                            } else {
-                                if (!KubeRequest.KUBE_REQUEST_REPLICAS_RE.matcher(replicasDef).matches()) {
-                                    throw new KubernetesServicesConfigException(
-                                            "Replica definition for " + service + " doesn't match expected REGEX - " + KubeRequest.KUBE_REQUEST_REPLICAS_RE);
-                                }
+                                        "Replica definition for " + service + " doesn't match expected REGEX - " + KubeRequest.KUBE_REQUEST_REPLICAS_RE);
                             }
                         }
                     }
