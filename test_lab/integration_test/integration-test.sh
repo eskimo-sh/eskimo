@@ -725,6 +725,7 @@ setup_eskimo() {
               "kafka_install": "on",
               "kafka_cpu": "0.1",
               "kafka_ram": "1G",
+              "kafka_replicas": "3",
               "kafka-manager_install": "on",
               "kafka-manager_cpu": "0.1",
               "kafka-manager_ram": "1G",
@@ -740,6 +741,7 @@ setup_eskimo() {
               "logstash_install": "on",
               "logstash_cpu": "0.2",
               "logstash_ram": "1G",
+              "logstash_replicas": "2",
               "spark-console_install": "on",
               "spark-console_cpu": "0.1",
               "spark-console_ram": "1G",
@@ -1221,7 +1223,7 @@ run_zeppelin_kafka_streams() {
     start_zeppelin_pararaph "/Kafka Streams Demo" 5
 
     # Give it a little time to start
-    sleep 8
+    sleep 10
 
     # Check status
     if [[ $(get_zeppelin_paragraph_status "/Kafka Streams Demo" 5) != "RUNNING" ]]; then
@@ -1243,7 +1245,7 @@ run_zeppelin_kafka_streams() {
     start_zeppelin_pararaph "/Kafka Streams Demo" 9
 
     # Give it a little time to start
-    sleep 5
+    sleep 10
 
     # Check status
     if [[ $(get_zeppelin_paragraph_status "/Kafka Streams Demo" 9) != "RUNNING" ]]; then
@@ -1267,7 +1269,7 @@ run_zeppelin_kafka_streams() {
     run_zeppelin_pararaph "/Kafka Streams Demo" 11 '{"params" : { "input": "some additional text with some more words" }}'
 
     # Give it a little time to run
-    sleep 5
+    sleep 10
 
     # Now stop them all
 
