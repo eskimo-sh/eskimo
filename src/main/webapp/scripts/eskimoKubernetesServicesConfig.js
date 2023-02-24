@@ -364,9 +364,10 @@ eskimo.KubernetesServicesConfig = function() {
             kubernetesServicesSelectionHTML +
             '</form>');
 
-        // removing both last columns
-        $("#kubernetes-services-selection-table").find('thead tr td:nth-child(5), tbody tr td:nth-child(5)').remove();
-        $("#kubernetes-services-selection-table").find('thead tr td:nth-child(4), tbody tr td:nth-child(4)').remove();
+        // removing last columns
+        for (let i = 7 ; i >= 4; i--) {
+            $("#kubernetes-services-selection-table").find("thead tr td:nth-child(" + i + "), tbody tr td:nth-child(" + i + ")").remove();
+        }
     }
     this.showReinstallSelection = showReinstallSelection;
 

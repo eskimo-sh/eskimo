@@ -521,11 +521,11 @@ function get_replicas() {
     local DEPLOY_STRAT=$(eval "echo \$ESKIMO_KUBE_DEPLOYMENT_${SERVICE_UP}_DEPLOY_STRAT")
 
     # default is CLUSTER_WIDE
-    if [[ $DEPLOY_STRAT == "" || $DEPLOY_STRAT == "CLUSTER_WIDE" ]]; then
+    if [[ ($DEPLOY_STRAT == "" || $DEPLOY_STRAT == "CLUSTER_WIDE") && $REPLICAS == "" ]]; then
         echo $ESKIMO_NODE_COUNT
     else
 
-        local REPLICAS=$(eval "echo \$ESKIMO_KUBE_DEPLOYMENT_${SERVICE_UP}_REPLICAS")
+        local REPLICAS=$(eval "echo \$ESKIMO_KUBE_REQUEST_${SERVICE_UP}_REPLICAS")
         if [[ $REPLICAS == "" ]]; then
             echo $ESKIMO_NODE_COUNT
         else
