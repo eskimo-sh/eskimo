@@ -1,0 +1,32 @@
+{
+  "command": {
+    "buildPackage": [
+      "base-eskimo",
+      "ntp",
+      "zookeeper",
+      "prom-node-exporter",
+      "gluster",
+      "kube-master",
+      "kubernetes-dashboard",
+      "prometheus",
+      "elasticsearch",
+      "cerebro",
+      "grafana",
+      "kibana",
+      "kube-shell",
+      "spark",
+      "flink",
+      "kafka",
+      "kafka-manager",
+      "logstash",
+      "zeppelin"
+    ],
+    "buildKube": ["kube"],
+    "downloadKube": [],
+    "none": false,
+    "downloadPackages": [],
+    "packageUpdates": [],
+    "packageDownloadUrl": "https://www.eskimo.sh/eskimo/V0.4/"
+  },
+  "status": "OK"
+}

@@ -1,8 +1,8 @@
 {
   "command": {
     "buildPackage": [],
-    "buildMesos": [],
-    "downloadMesos": [
+    "buildKube": [],
+    "downloadKube": [
       "mesos-suse_1.8.1_1",
       "mesos-redhat_1.8.1_1",
       "mesos-debian_1.8.1_1"

@@ -76,6 +76,18 @@ public class EskimoSetupCommandTest extends AbstractWebTest {
     }
 
     @Test
+    public void testShowCommandBuild() throws Exception {
+
+        String command = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSetupCommandTest/commandBuild.json"), StandardCharsets.UTF_8);
+
+        js("eskimoSetupCommand.showCommand("+command+".command)");
+
+        String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSetupCommandTest/expectedResultBuild.html"), StandardCharsets.UTF_8);
+
+        assertJavascriptEquals(expectedResult.replace("\n", "").replace("  ", ""), "$('#setup-command-body').html()");
+    }
+
+    @Test
     public void testSubmit() throws Exception {
 
         js("$.ajaxPost = function(callback) { callback.success ({ \"status\" : \"OK\"}); }");
