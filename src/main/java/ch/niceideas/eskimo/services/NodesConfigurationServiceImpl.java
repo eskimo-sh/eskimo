@@ -42,10 +42,7 @@ import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
-import ch.niceideas.eskimo.services.satellite.MemoryComputer;
-import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
-import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
-import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
+import ch.niceideas.eskimo.services.satellite.*;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
@@ -349,7 +346,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
                 FileUtils.writeFile(tempTopologyFile, servicesDefinition
                         .getTopology(nodesConfig, kubeServicesConfig, node)
                         .getTopologyScriptForNode(nodesConfig, kubeServicesConfig, servicesInstallStatus, servicesDefinition, memoryModel, nodesConfig.getNodeNumber (node)));
-            } catch (ServiceDefinitionException | NodesConfigurationException | FileException e) {
+            } catch (ServiceDefinitionException | NodesConfigurationException | KubernetesServicesConfigException | FileException e) {
                 logger.error (e, e);
                 throw new SystemException(e);
             }

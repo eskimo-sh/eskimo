@@ -200,7 +200,13 @@ public class ServicesDefinitionTest {
                         "export ESKIMO_NODE_COUNT=3\n" +
                         "export ALL_NODES_LIST=192.168.10.11,192.168.10.12,192.168.10.13\n" +
                         "\n" +
-                        "#Kubernetes Topology\n",
+                        "#Kubernetes Topology\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_BROKER_MANAGER_DEPLOY_STRAT=CLUSTER_WIDE\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_BROKER_DEPLOY_STRAT=CLUSTER_WIDE\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_CALCULATOR_RUNTIME_DEPLOY_STRAT=CLUSTER_WIDE\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_DATABASE_MANAGER_DEPLOY_STRAT=CLUSTER_WIDE\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_DATABASE_DEPLOY_STRAT=CLUSTER_WIDE\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_USER_CONSOLE_DEPLOY_STRAT=CLUSTER_WIDE\n",
                 topology.getTopologyScriptForNode(nodesConfig,
                         new KubernetesServicesConfigWrapper(jsonKubernetesConfig),
                         StandardSetupHelpers.getStandard2NodesInstallStatus(), servicesDefinition, emptyModel, 1));
@@ -269,7 +275,13 @@ public class ServicesDefinitionTest {
                         "export ESKIMO_NODE_COUNT=1\n" +
                         "export ALL_NODES_LIST=192.168.10.11\n" +
                         "\n" +
-                        "#Kubernetes Topology\n",
+                        "#Kubernetes Topology\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_BROKER_MANAGER_DEPLOY_STRAT=CLUSTER_WIDE\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_BROKER_DEPLOY_STRAT=CLUSTER_WIDE\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_CALCULATOR_RUNTIME_DEPLOY_STRAT=CLUSTER_WIDE\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_DATABASE_MANAGER_DEPLOY_STRAT=CLUSTER_WIDE\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_DATABASE_DEPLOY_STRAT=CLUSTER_WIDE\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_USER_CONSOLE_DEPLOY_STRAT=CLUSTER_WIDE\n",
                 topology.getTopologyScriptForNode(nodesConfig,
                         new KubernetesServicesConfigWrapper (jsonKubernetesConfig),
                         StandardSetupHelpers.getStandard2NodesInstallStatus(), servicesDefinition, emptyModel, 1));

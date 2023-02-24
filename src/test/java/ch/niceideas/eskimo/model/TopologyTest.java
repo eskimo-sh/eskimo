@@ -796,18 +796,25 @@ public class TopologyTest {
                         "#Kubernetes Topology\n" +
                         "export ESKIMO_KUBE_REQUEST_BROKER_MANAGER_CPU=1\n" +
                         "export ESKIMO_KUBE_REQUEST_BROKER_MANAGER_RAM=800M\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_BROKER_MANAGER_DEPLOY_STRAT=CLUSTER_WIDE\n" +
                         "export ESKIMO_KUBE_REQUEST_BROKER_CPU=1\n" +
                         "export ESKIMO_KUBE_REQUEST_BROKER_RAM=800M\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_BROKER_DEPLOY_STRAT=CLUSTER_WIDE\n" +
                         "export ESKIMO_KUBE_REQUEST_CALCULATOR_RUNTIME_CPU=1\n" +
                         "export ESKIMO_KUBE_REQUEST_CALCULATOR_RUNTIME_RAM=800M\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_CALCULATOR_RUNTIME_DEPLOY_STRAT=CLUSTER_WIDE\n" +
                         "export ESKIMO_KUBE_REQUEST_CLUSTER_DASHBOARD_CPU=1\n" +
                         "export ESKIMO_KUBE_REQUEST_CLUSTER_DASHBOARD_RAM=800M\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_CLUSTER_DASHBOARD_DEPLOY_STRAT=CLUSTER_WIDE\n" +
                         "export ESKIMO_KUBE_REQUEST_DATABASE_MANAGER_CPU=1\n" +
                         "export ESKIMO_KUBE_REQUEST_DATABASE_MANAGER_RAM=800M\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_DATABASE_MANAGER_DEPLOY_STRAT=CLUSTER_WIDE\n" +
                         "export ESKIMO_KUBE_REQUEST_DATABASE_CPU=1\n" +
                         "export ESKIMO_KUBE_REQUEST_DATABASE_RAM=800M\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_DATABASE_DEPLOY_STRAT=CLUSTER_WIDE\n" +
                         "export ESKIMO_KUBE_REQUEST_USER_CONSOLE_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_USER_CONSOLE_RAM=800M\n",
+                        "export ESKIMO_KUBE_REQUEST_USER_CONSOLE_RAM=800M\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_USER_CONSOLE_DEPLOY_STRAT=CLUSTER_WIDE\n",
                 topology.getTopologyScriptForNode (
                         StandardSetupHelpers.getStandard2NodesSetup(),
                         kubeConfig,
@@ -866,18 +873,25 @@ public class TopologyTest {
                         "#Kubernetes Topology\n" +
                         "export ESKIMO_KUBE_REQUEST_BROKER_MANAGER_CPU=1\n" +
                         "export ESKIMO_KUBE_REQUEST_BROKER_MANAGER_RAM=800M\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_BROKER_MANAGER_DEPLOY_STRAT=CLUSTER_WIDE\n" +
                         "export ESKIMO_KUBE_REQUEST_BROKER_CPU=1\n" +
                         "export ESKIMO_KUBE_REQUEST_BROKER_RAM=800M\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_BROKER_DEPLOY_STRAT=CLUSTER_WIDE\n" +
                         "export ESKIMO_KUBE_REQUEST_CALCULATOR_RUNTIME_CPU=1\n" +
                         "export ESKIMO_KUBE_REQUEST_CALCULATOR_RUNTIME_RAM=800M\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_CALCULATOR_RUNTIME_DEPLOY_STRAT=CLUSTER_WIDE\n" +
                         "export ESKIMO_KUBE_REQUEST_CLUSTER_DASHBOARD_CPU=1\n" +
                         "export ESKIMO_KUBE_REQUEST_CLUSTER_DASHBOARD_RAM=800M\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_CLUSTER_DASHBOARD_DEPLOY_STRAT=CLUSTER_WIDE\n" +
                         "export ESKIMO_KUBE_REQUEST_DATABASE_MANAGER_CPU=1\n" +
                         "export ESKIMO_KUBE_REQUEST_DATABASE_MANAGER_RAM=800M\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_DATABASE_MANAGER_DEPLOY_STRAT=CLUSTER_WIDE\n" +
                         "export ESKIMO_KUBE_REQUEST_DATABASE_CPU=1\n" +
                         "export ESKIMO_KUBE_REQUEST_DATABASE_RAM=800M\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_DATABASE_DEPLOY_STRAT=CLUSTER_WIDE\n" +
                         "export ESKIMO_KUBE_REQUEST_USER_CONSOLE_CPU=1\n" +
-                        "export ESKIMO_KUBE_REQUEST_USER_CONSOLE_RAM=800M\n",
+                        "export ESKIMO_KUBE_REQUEST_USER_CONSOLE_RAM=800M\n" +
+                        "export ESKIMO_KUBE_DEPLOYMENT_USER_CONSOLE_DEPLOY_STRAT=CLUSTER_WIDE\n",
                 topology.getTopologyScriptForNode (
                         StandardSetupHelpers.getStandard2NodesSetup(),
                         StandardSetupHelpers.getStandardKubernetesConfig(),

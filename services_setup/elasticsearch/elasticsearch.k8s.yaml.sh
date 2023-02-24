@@ -35,6 +35,9 @@
 
 . /usr/local/sbin/eskimo-utils.sh
 
+# Loading topology
+loadTopology
+
 TEMP_FILE=$(mktemp)
 
 cat > $TEMP_FILE <<EOF
@@ -108,7 +111,7 @@ metadata:
     service: elasticsearch
 spec:
   serviceName: elasticsearch
-  replicas: $ESKIMO_NODE_COUNT
+  replicas: $(get_replicas elasticsearch)
   selector:
     matchLabels:
       service: elasticsearch

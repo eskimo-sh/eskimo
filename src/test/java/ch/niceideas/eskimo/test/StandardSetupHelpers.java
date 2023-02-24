@@ -220,6 +220,36 @@ public class StandardSetupHelpers {
         }});
     }
 
+    public static KubernetesServicesConfigWrapper getKubernetesConfigCustomDeployment() {
+        return new KubernetesServicesConfigWrapper(new HashMap<>() {{
+            put("database-manager_install", "on");
+            put("database-manager_cpu", "1");
+            put("database-manager_ram", "800M");
+            put("calculator-runtime_install", "on");
+            put("calculator-runtime_cpu", "1");
+            put("calculator-runtime_ram", "800M");
+            put("broker-manager_install", "on");
+            put("broker-manager_cpu", "1");
+            put("broker-manager_ram", "800M");
+            put("broker_install", "on");
+            put("broker_cpu", "1");
+            put("broker_ram", "800M");
+            put("broker_deployment_strategy", "off");
+            put("broker_replicas", "1");
+            put("user-console_install", "on");
+            put("user-console_cpu", "1");
+            put("user-console_ram", "800M");
+            put("database_install", "on");
+            put("database_cpu", "1");
+            put("database_ram", "800M");
+            put("database_deployment_strategy", "off");
+            put("database_replicas", "2");
+            put("cluster-dashboard_install", "on");
+            put("cluster-dashboard_cpu", "1");
+            put("cluster-dashboard_ram", "800M");
+        }});
+    }
+
     public static KubernetesServicesConfigWrapper getStandardKubernetesConfig() {
         return new KubernetesServicesConfigWrapper(new HashMap<>() {{
             put("database-manager_install", "on");
@@ -234,12 +264,14 @@ public class StandardSetupHelpers {
             put("broker_install", "on");
             put("broker_cpu", "1");
             put("broker_ram", "800M");
+            put("broker_deployment_strategy", "on");
             put("user-console_install", "on");
             put("user-console_cpu", "1");
             put("user-console_ram", "800M");
             put("database_install", "on");
             put("database_cpu", "1");
             put("database_ram", "800M");
+            put("database_deployment_strategy", "on");
             put("cluster-dashboard_install", "on");
             put("cluster-dashboard_cpu", "1");
             put("cluster-dashboard_ram", "800M");

@@ -497,3 +497,39 @@ function get_last_tag() {
 
     echo $last
 }
+
+# This is used to load the topology definition file
+function loadTopology() {
+
+    if [[ ! -f /etc/eskimo_topology.sh ]]; then
+        echo "  - ERROR : no topology file defined !"
+        exit 2
+    fi
+
+    . /etc/eskimo_topology.sh
+}
+
+function get_replicas() {
+    if [[ $1 == "" ]]; then
+        echo "Service needs to be passed in argument"
+        exit 81
+    fi
+    local SERVICE=$1
+
+    local SERVICE_UP=$(echo $SERVICE | tr '[:lower:]' '[:upper:]' | tr '-' '_')
+
+    local DEPLOY_STRAT=$(eval "echo \$ESKIMO_KUBE_DEPLOYMENT_${SERVICE_UP}_DEPLOY_STRAT")
+
+    # default is CLUSTER_WIDE
+    if [[ $DEPLOY_STRAT == "" || $DEPLOY_STRAT == "CLUSTER_WIDE" ]]; then
+        echo $ESKIMO_NODE_COUNT
+    else
+
+        local REPLICAS=$(eval "echo \$ESKIMO_KUBE_DEPLOYMENT_${SERVICE_UP}_REPLICAS")
+        if [[ $REPLICAS == "" ]]; then
+            echo $ESKIMO_NODE_COUNT
+        else
+            echo $REPLICAS
+        fi
+    fi
+}

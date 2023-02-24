@@ -60,13 +60,13 @@ eskimo.KubernetesServicesConfig = function() {
 
                 $("#save-kubernetes-servicesbtn").click(e => {
 
-                    let setupConfig = $("form#kubernetes-servicesconfig").serializeObject();
+                    let kubernetesConfig = $("form#kubernetes-servicesconfig").serializeObject();
 
-                    console.log(setupConfig);
+                    console.log(kubernetesConfig);
 
                     try {
-                        checkKubernetesSetup(setupConfig, that.eskimoNodesConfig.getServicesDependencies(), KUBERNETES_SERVICES_CONFIG,
-                            () => { proceedWithKubernetesInstallation(setupConfig); });
+                        checkKubernetesSetup(kubernetesConfig, that.eskimoNodesConfig.getServicesDependencies(), KUBERNETES_SERVICES_CONFIG,
+                            () => { proceedWithKubernetesInstallation(kubernetesConfig); });
                     } catch (error) {
                         eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, error);
                     }
@@ -215,33 +215,35 @@ eskimo.KubernetesServicesConfig = function() {
 
         // Trying to get previouly configured value
         if (kubernetesConfig) {
+
             let cpuConf = kubernetesConfig[serviceName + "_cpu"];
             if (cpuConf) {
                 $('#' + serviceName + '_cpu').val (cpuConf);
                 cpuSet = true;
             }
+
             let ramConf = kubernetesConfig[serviceName + "_ram"];
             if (ramConf) {
                 $('#' + serviceName + '_ram').val (ramConf);
                 ramSet = true;
             }
-            let deplStrategy = kubernetesConfig[serviceName + "_deployment_strategy"];
-            if (deplStrategy) {
-                $eploymentStrategy = $('#' + serviceName + '_deployment_strategy');
-                if (deplStrategy === "on") {
-                    $eploymentStrategy.attr("checked", true);
-                } else {
-                    $eploymentStrategy.attr("checked", false);
 
-                    let replicas = kubernetesConfig[serviceName + "_replicas"];
-                    if (replicas) {
-                        $('#' + serviceName + '_replicas').val (replicas);
-                        replicasSet = true;
-                    }
-                }
+            let deplStrategy = kubernetesConfig[serviceName + "_deployment_strategy"];
+            $eploymentStrategy = $('#' + serviceName + '_deployment_strategy');
+            if (deplStrategy && deplStrategy === "on") {
+                $eploymentStrategy.attr("checked", true);
                 $eploymentStrategy.change();
                 deplStrategySet = true;
+            } else {
+                $eploymentStrategy.attr("checked", false);
+                $eploymentStrategy.change();
+                let replicas = kubernetesConfig[serviceName + "_replicas"];
+                if (replicas) {
+                    $('#' + serviceName + '_replicas').val (replicas);
+                    replicasSet = true;
+                }
             }
+
         }
 
         // If no previously configured values have been found, take value from service definition
@@ -262,8 +264,8 @@ eskimo.KubernetesServicesConfig = function() {
             }
         }
 
-        // if no previous deploymemnt strategy was set, neithre replicas, default is cluster wide
-        if (!deplStrategySet) {
+        // if no previous deploymemnt strategy was set, neither replicas, default is cluster wide
+        if (!deplStrategySet && !replicasSet) {
             $eploymentStrategy = $('#' + serviceName + '_deployment_strategy');
             $eploymentStrategy.attr("checked", true);
             $eploymentStrategy.change();

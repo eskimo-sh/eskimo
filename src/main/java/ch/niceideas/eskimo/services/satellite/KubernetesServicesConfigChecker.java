@@ -36,10 +36,7 @@ package ch.niceideas.eskimo.services.satellite;
 
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
-import ch.niceideas.eskimo.model.service.Dependency;
-import ch.niceideas.eskimo.model.service.KubeRequest;
-import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
-import ch.niceideas.eskimo.model.service.ServiceDefinition;
+import ch.niceideas.eskimo.model.service.*;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
@@ -160,6 +157,48 @@ public class KubernetesServicesConfigChecker {
                     throw new KubernetesServicesConfigException("RAM definition for " + service + " doesn't match expected REGEX - [0-9\\.]+[EPTGMk]{0,1}");
                 }
 
+            }
+
+            // test deployment strategy and rreplicas setting
+            for (Service service : servicesDefinition.listKubernetesServices()) {
+                ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(service);
+                if (!serviceDef.isUnique() && !serviceDef.isRegistryOnly()) {
+
+                    if (kubeServicesConfig.isServiceInstallRequired(service)) {
+
+                        // either wide cluster selection is selected, or I want eplicas configured (in the proper format)
+                        KubeDeploymentStrategy deplStratDef = kubeServicesConfig.getDeploymentStrategy(service);
+
+                        String replicasDef = kubeServicesConfig.getReplicasSetting(service);
+
+                        if (deplStratDef == null && StringUtils.isBlank(replicasDef)) {
+                            deplStratDef = KubeDeploymentStrategy.CLUSTER_WIDE;
+                        }
+
+                        if (deplStratDef == KubeDeploymentStrategy.CLUSTER_WIDE) {
+
+                            // in this case I want no replica !
+                            if (StringUtils.isNotBlank(replicasDef)) {
+                                throw new KubernetesServicesConfigException(
+                                        "Service " + service + " defines a deployment strategy as 'cluster wide' and yet it has replicas configured");
+                            }
+
+                        } else {
+
+                            // in this case I want replica and in the proper format
+                            if (StringUtils.isBlank(replicasDef)) {
+                                throw new KubernetesServicesConfigException(
+                                        "Service " + service + " defines a deployment strategy as 'custom' and yet it is missing replicas configuration");
+
+                            } else {
+                                if (!KubeRequest.KUBE_REQUEST_REPLICAS_RE.matcher(replicasDef).matches()) {
+                                    throw new KubernetesServicesConfigException(
+                                            "Replica definition for " + service + " doesn't match expected REGEX - " + KubeRequest.KUBE_REQUEST_REPLICAS_RE);
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
         } catch (SystemException | SetupException e) {

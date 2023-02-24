@@ -10,6 +10,7 @@
       "icon": "images/broker-icon.png",
       "logo": "images/broker-logo.png",
       "row": 2,
+      "registryOnly": false,
       "title": "Broker Client",
       "mandatory": false
     },
@@ -23,6 +24,7 @@
       "icon": "images/cluster-slave-icon.png",
       "logo": "images/cluster-slave-logo.png",
       "row": 5,
+      "registryOnly": false,
       "title": "Cluster Slave",
       "mandatory": false
     },
@@ -36,6 +38,7 @@
       "icon": "images/distributed-filesystem-icon.png",
       "logo": "images/distributed-filesystem-logo.png",
       "row": 2,
+      "registryOnly": false,
       "title": "Distributed Filesystem",
       "mandatory": true
     },
@@ -49,6 +52,7 @@
       "icon": "images/cluster-manager-icon.png",
       "logo": "images/cluster-manager-logo.png",
       "row": 1,
+      "registryOnly": false,
       "title": "Cluster Manager",
       "mandatory": false
     },
@@ -62,6 +66,7 @@
       "icon": "images/calculator-runtime-icon.png",
       "logo": "images/calculator-runtime-logo.png",
       "row": 3,
+      "registryOnly": false,
       "title": "Calculator Client",
       "mandatory": false
     },
@@ -75,6 +80,7 @@
       "icon": "images/cluster-master-icon.png",
       "logo": "images/cluster-master-logo.png",
       "row": 2,
+      "registryOnly": false,
       "title": "Cluster Master",
       "mandatory": false
     },
@@ -88,6 +94,7 @@
       "icon": "images/distributed-time-icon.png",
       "logo": "images/distributed-time-logo.png",
       "row": 1,
+      "registryOnly": false,
       "title": "Distributed Time",
       "mandatory": true
     }

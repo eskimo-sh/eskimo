@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.model.service.KubeDeploymentStrategy;
 import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.types.Service;
 import org.json.JSONObject;
@@ -50,6 +51,8 @@ public class KubernetesServicesConfigWrapper extends JsonWrapper implements Seri
     public static final String INSTALL_FLAG = "_install";
     public static final String CPU_FLAG = "_cpu";
     public static final String RAM_FLAG = "_ram";
+    public static final String DEPL_STRAT_FLAG = "_deployment_strategy";
+    public static final String REPLICA_FLAG = "_replicas";
 
     public static KubernetesServicesConfigWrapper empty() {
         return new KubernetesServicesConfigWrapper("{}");
@@ -86,6 +89,22 @@ public class KubernetesServicesConfigWrapper extends JsonWrapper implements Seri
 
     public String getRamSetting(Service service) {
         return getValueForPathAsString(service + RAM_FLAG);
+    }
+
+    public String getReplicasSetting (Service service) {
+        return getValueForPathAsString(service + REPLICA_FLAG);
+    }
+
+    public KubeDeploymentStrategy getDeploymentStrategy(Service service) {
+        String deplStrategyString = getValueForPathAsString(service + DEPL_STRAT_FLAG);
+        if (StringUtils.isBlank(deplStrategyString)) {
+            return null;
+        }
+        if (deplStrategyString.equals("on")) { // on by default
+            return KubeDeploymentStrategy.CLUSTER_WIDE;
+        } else {
+            return KubeDeploymentStrategy.CUSTOM;
+        }
     }
 
     public boolean isServiceInstallRequired(ServiceDefinition serviceDef) {

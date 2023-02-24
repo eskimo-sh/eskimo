@@ -14,119 +14,126 @@
       "col": -1,
       "conditional": "NONE",
       "configOrder": 12,
-      "unique": false,
-      "name": "database",
       "icon": "images/database-icon.png",
       "kubeConfig": {"request": {
         "cpu": "1",
         "ram": "1G"
       }},
-      "logo": "images/database-logo.png",
-      "row": -1,
+      "registryOnly": false,
       "title": "Database Runtime",
-      "mandatory": false
+      "mandatory": false,
+      "unique": false,
+      "name": "database",
+      "logo": "images/database-logo.png",
+      "row": -1
     },
     "cluster-dashboard": {
       "kubernetes": true,
       "col": -1,
       "conditional": "NONE",
       "configOrder": 5,
-      "unique": true,
-      "name": "cluster-dashboard",
       "icon": "images/cluster-master-icon.png",
       "kubeConfig": {"request": {
         "cpu": "0.3",
         "ram": "500M"
       }},
-      "logo": "images/cluster-master-logo.png",
-      "row": -1,
+      "registryOnly": false,
       "title": "Cluster Dashboard",
-      "mandatory": false
+      "mandatory": false,
+      "unique": true,
+      "name": "cluster-dashboard",
+      "logo": "images/cluster-master-logo.png",
+      "row": -1
     },
     "broker-manager": {
       "kubernetes": true,
       "col": -1,
       "conditional": "NONE",
       "configOrder": 8,
-      "unique": true,
-      "name": "broker-manager",
       "icon": "images/broker-manager-icon.png",
       "kubeConfig": {"request": {
         "cpu": "0.3",
         "ram": "400M"
       }},
-      "logo": "images/broker-manager-logo.png",
-      "row": -1,
+      "registryOnly": false,
       "title": "Broker Manager",
-      "mandatory": false
+      "mandatory": false,
+      "unique": true,
+      "name": "broker-manager",
+      "logo": "images/broker-manager-logo.png",
+      "row": -1
     },
     "calculator-runtime": {
       "kubernetes": true,
       "col": -1,
       "conditional": "NONE",
       "configOrder": 9,
-      "unique": false,
-      "name": "calculator-runtime",
       "icon": "images/calculator-runtime-icon.png",
       "kubeConfig": {"request": {
         "cpu": "1",
         "ram": "800M"
       }},
-      "logo": "images/calculator-runtime-logo.png",
-      "row": -1,
+      "registryOnly": true,
       "title": "Calculator Runtime",
-      "mandatory": false
+      "mandatory": false,
+      "unique": false,
+      "name": "calculator-runtime",
+      "logo": "images/calculator-runtime-logo.png",
+      "row": -1
     },
     "broker": {
       "kubernetes": true,
       "col": -1,
       "conditional": "NONE",
       "configOrder": 6,
-      "unique": false,
-      "name": "broker",
       "icon": "images/broker-icon.png",
       "kubeConfig": {"request": {
         "cpu": "1",
         "ram": "1G"
       }},
-      "logo": "images/broker-logo.png",
-      "row": -1,
+      "registryOnly": false,
       "title": "Broker runtime",
-      "mandatory": false
+      "mandatory": false,
+      "unique": false,
+      "name": "broker",
+      "logo": "images/broker-logo.png",
+      "row": -1
     },
     "database-manager": {
       "kubernetes": true,
       "col": -1,
       "conditional": "NONE",
       "configOrder": 11,
-      "unique": true,
-      "name": "database-manager",
       "icon": "images/database-manager-icon.png",
       "kubeConfig": {"request": {
         "cpu": "0.3",
         "ram": "400M"
       }},
-      "logo": "images/database-manager-logo.png",
-      "row": -1,
+      "registryOnly": false,
       "title": "Database manager",
-      "mandatory": false
+      "mandatory": false,
+      "unique": true,
+      "name": "database-manager",
+      "logo": "images/database-manager-logo.png",
+      "row": -1
     },
     "user-console": {
       "kubernetes": true,
       "col": -1,
       "conditional": "NONE",
       "configOrder": 13,
-      "unique": true,
-      "name": "user-console",
       "icon": "images/zeppelin-icon.png",
       "kubeConfig": {"request": {
         "cpu": "1",
         "ram": "1G"
       }},
-      "logo": "images/zeppelin-logo.png",
-      "row": -1,
+      "registryOnly": false,
       "title": "User Console",
-      "mandatory": false
+      "mandatory": false,
+      "unique": true,
+      "name": "user-console",
+      "logo": "images/zeppelin-logo.png",
+      "row": -1
     }
   },
   "status": "OK"

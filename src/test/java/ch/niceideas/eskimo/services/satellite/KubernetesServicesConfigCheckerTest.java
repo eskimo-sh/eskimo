@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.services.satellite;
 import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,7 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-conf", "test-setup"})
+@ActiveProfiles({"no-web-stack", "test-conf", "test-setup", "test-services"})
 public class KubernetesServicesConfigCheckerTest {
 
     @Autowired
@@ -63,39 +64,84 @@ public class KubernetesServicesConfigCheckerTest {
     @Autowired
     private ConfigurationServiceTestImpl configurationServiceTest;
 
-    NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
-        put("node_id1", "192.168.10.11");
-        put("kube-master", "1");
-        put("kube-slave", "1");
-        put("prom-node-exporter1", "on");
-    }});
-
-    KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<>() {{
-        put("elasticsearch_install", "on");
-        put("elasticsearch_cpu", "1");
-        put("elasticsearch_ram", "1G");
-
-        put("cerebro_install", "on");
-        put("cerebro_cpu", "1");
-        put("cerebro_ram", "1G");
-
-        put("prometheus_install", "on");
-        put("prometheus_cpu", "0.2");
-        put("prometheus_ram", "400M");
-
-        put("kibana_install", "on");
-        put("kibana_cpu", "500m");
-        put("kibana_ram", "500M");
-
-        put("grafana_install", "on");
-        put("grafana_cpu", "1.5");
-        put("grafana_ram", "1G");
-    }});
 
     @BeforeEach
     public void setUp() throws Exception {
         configurationServiceTest.reset();
-        configurationServiceTest.saveNodesConfig(nodesConfig);
+        configurationServiceTest.saveNodesConfig(StandardSetupHelpers.getStandard2NodesSetup());
+    }
+
+    @Test
+    public void testCheckKubernetesSetupCustomDeploymentWong() throws Exception {
+        KubernetesServicesConfigWrapper kubeConfigStd = StandardSetupHelpers.getStandardKubernetesConfig();
+        kubeConfigStd.setValueForPath("database_deployment_strategy", "off");
+        KubernetesServicesConfigException exp = assertThrows(KubernetesServicesConfigException.class,
+                () -> kubernetesConfigChecker.checkKubernetesServicesSetup(kubeConfigStd));
+        assertEquals("Service database defines a deployment strategy as 'custom' and yet it is missing replicas configuration", exp.getMessage());
+
+        KubernetesServicesConfigWrapper kubeConfigCust = StandardSetupHelpers.getKubernetesConfigCustomDeployment();
+        kubeConfigCust.setValueForPath("database_deployment_strategy", "on");
+        exp = assertThrows(KubernetesServicesConfigException.class,
+                () -> kubernetesConfigChecker.checkKubernetesServicesSetup(kubeConfigCust));
+        assertEquals("Service database defines a deployment strategy as 'cluster wide' and yet it has replicas configured", exp.getMessage());
+    }
+
+    @Test
+    public void testCheckKubernetesSetupCustomDeploymentOK() throws Exception {
+        kubernetesConfigChecker.checkKubernetesServicesSetup(StandardSetupHelpers.getKubernetesConfigCustomDeployment());
+    }
+
+    @Test
+    public void testCheckKubernetesSetupOK() throws Exception {
+        kubernetesConfigChecker.checkKubernetesServicesSetup(StandardSetupHelpers.getStandardKubernetesConfig());
+    }
+
+    @Test
+    public void testCheckKubernetesSetup_missingCpuSetting() {
+
+        KubernetesServicesConfigWrapper kubeConfig = StandardSetupHelpers.getStandardKubernetesConfig();
+        kubeConfig.removeRootKey("database-manager_cpu");
+
+        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class,
+                () -> kubernetesConfigChecker.checkKubernetesServicesSetup(kubeConfig));
+
+        assertEquals("Inconsistency found : Kubernetes Service database-manager is enabled but misses CPU request setting", exception.getMessage());
+    }
+
+    @Test
+    public void testCheckKubernetesSetup_missingRamSetting() {
+
+        KubernetesServicesConfigWrapper kubeConfig = StandardSetupHelpers.getStandardKubernetesConfig();
+        kubeConfig.removeRootKey("database-manager_ram");
+
+        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class,
+                () -> kubernetesConfigChecker.checkKubernetesServicesSetup(kubeConfig));
+
+        assertEquals("Inconsistency found : Kubernetes Service database-manager is enabled but misses RAM request setting", exception.getMessage());
+    }
+
+    @Test
+    public void testCheckKubernetesSetup_missingCpuWrong() {
+
+        KubernetesServicesConfigWrapper kubeConfig = StandardSetupHelpers.getStandardKubernetesConfig();
+        kubeConfig.setValueForPath("database-manager_cpu", "1l");
+
+        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class,
+                () -> kubernetesConfigChecker.checkKubernetesServicesSetup(kubeConfig));
+
+        assertEquals("CPU definition for database-manager doesn't match expected REGEX - [0-9\\\\.]+[m]{0,1}", exception.getMessage());
+    }
+
+    @Test
+    public void testCheckKubernetesSetup_missingRamWrong() {
+
+        KubernetesServicesConfigWrapper kubeConfig = StandardSetupHelpers.getStandardKubernetesConfig();
+        kubeConfig.setValueForPath("database-manager_ram", "100ui");
+
+        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class,
+                () -> kubernetesConfigChecker.checkKubernetesServicesSetup(kubeConfig));
+
+        assertEquals("RAM definition for database-manager doesn't match expected REGEX - [0-9\\.]+[EPTGMk]{0,1}", exception.getMessage());
     }
 
     @Test
@@ -103,22 +149,23 @@ public class KubernetesServicesConfigCheckerTest {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
-            put("cerebro", "1");
-            put("ntp1", "on");
-            put("prom-node-exporter1", "on");
+            put("distributed-filesystem", "1");
+            put("distributed-time1", "on");
         }});
         configurationServiceTest.saveNodesConfig(nodesConfig);
 
         KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
 
             KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<>() {{
-                put("cerebro_installed", "on");
+                put("database-manager_installed", "on");
             }});
 
             kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
         });
 
-        assertEquals("Inconsistency found : Service cerebro expects a installaton of  elasticsearch. But it's not going to be installed", exception.getMessage());
+        assertEquals(
+                "Inconsistency found : Service database-manager expects a installaton of  database. But it's not going to be installed",
+                exception.getMessage());
     }
 
     @Test
@@ -126,23 +173,21 @@ public class KubernetesServicesConfigCheckerTest {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
-            put("ntp1", "on");
-            put("gluster1", "on");
-            put("prom-node-exporter1", "on");
-
+            put("distributed-filesystem1", "on");
+            put("distributed-time1", "on");
         }});
         configurationServiceTest.saveNodesConfig(nodesConfig);
 
         KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
 
             KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<>() {{
-                put("spark-runtime_install", "on");
+                put("calculator-runtime_install", "on");
             }});
 
             kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
         });
 
-        assertEquals("Inconsistency found : Service spark-runtime expects 1 kube-master instance(s). But only 0 has been found !", exception.getMessage());
+        assertEquals("Inconsistency found : Service calculator-runtime expects 1 cluster-master instance(s). But only 0 has been found !", exception.getMessage());
     }
 
     @Test
@@ -150,25 +195,26 @@ public class KubernetesServicesConfigCheckerTest {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
-            put("ntp1", "on");
-            put("prom-node-exporter1", "on");
-            put("kube-master1", "on");
-            put("kube-slave1", "on");
-
+            put("distributed-filesystem", "1");
+            put("distributed-time1", "on");
+            //put("cluster-manager", "1");
+            put("cluster-master", "1");
+            put("cluster-slave1", "on");
         }});
+
         configurationServiceTest.saveNodesConfig(nodesConfig);
 
         KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
 
             KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<>() {{
-                put("elasticsearch_install", "on");
-                put("zeppelin_installed", "on");
+                put("database_install", "on");
+                put("user-console_installed", "on");
             }});
 
             kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
         });
 
-        assertEquals("Inconsistency found : Service zeppelin expects 1 zookeeper instance(s). But only 0 has been found !", exception.getMessage());
+        assertEquals("Inconsistency found : Service user-console expects 1 cluster-manager instance(s). But only 0 has been found !", exception.getMessage());
     }
 
     @Test
@@ -176,72 +222,24 @@ public class KubernetesServicesConfigCheckerTest {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
-            put("ntp1", "on");
-            put("prom-node-exporter1", "on");
-            put("elasticsearch1", "on");
-            put("zookeeper", "1");
+            put("distributed-filesystem", "1");
+            put("distributed-time1", "on");
+            //put("cluster-manager", "1");
+            put("cluster-master", "1");
+            put("cluster-slave1", "on");
         }});
+
         configurationServiceTest.saveNodesConfig(nodesConfig);
 
         KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class, () -> {
 
             KubernetesServicesConfigWrapper kubeServicesConfig = new KubernetesServicesConfigWrapper(new HashMap<>() {{
-                put("zookeeper_installed", "on");
+                put("cluster-manager_installed", "on");
             }});
 
             kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
         });
 
-        assertEquals("Inconsistency found : service zookeeper is not a kubernetes service", exception.getMessage());
-    }
-
-    @Test
-    public void testCheckKubernetesSetupOK() throws Exception {
-
-        kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig);
-    }
-
-    @Test
-    public void testCheckKubernetesSetup_missingCpuSetting() {
-
-        kubeServicesConfig.removeRootKey("cerebro_cpu");
-
-        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class,
-                () -> kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig));
-
-        assertEquals("Inconsistency found : Kubernetes Service cerebro is enabled but misses CPU request setting", exception.getMessage());
-    }
-
-    @Test
-    public void testCheckKubernetesSetup_missingRamSetting() {
-
-        kubeServicesConfig.removeRootKey("cerebro_ram");
-
-        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class,
-                () -> kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig));
-
-        assertEquals("Inconsistency found : Kubernetes Service cerebro is enabled but misses RAM request setting", exception.getMessage());
-    }
-
-    @Test
-    public void testCheckKubernetesSetup_missingCpuWrong() {
-
-        kubeServicesConfig.setValueForPath("cerebro_cpu", "1l");
-
-        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class,
-                () -> kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig));
-
-        assertEquals("CPU definition for cerebro doesn't match expected REGEX - [0-9\\\\.]+[m]{0,1}", exception.getMessage());
-    }
-
-    @Test
-    public void testCheckKubernetesSetup_missingRamWrong() {
-
-        kubeServicesConfig.setValueForPath("cerebro_ram", "100ui");
-
-        KubernetesServicesConfigException exception = assertThrows(KubernetesServicesConfigException.class,
-                () -> kubernetesConfigChecker.checkKubernetesServicesSetup(kubeServicesConfig));
-
-        assertEquals("RAM definition for cerebro doesn't match expected REGEX - [0-9\\.]+[EPTGMk]{0,1}", exception.getMessage());
+        assertEquals("Inconsistency found : service cluster-manager is not a kubernetes service", exception.getMessage());
     }
 }

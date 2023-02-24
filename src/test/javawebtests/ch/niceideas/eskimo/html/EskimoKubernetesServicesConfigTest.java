@@ -34,12 +34,11 @@
 
 package ch.niceideas.eskimo.html;
 
+import ch.niceideas.eskimo.controlers.ServicesController;
+import ch.niceideas.eskimo.test.services.ServicesDefinitionTestImpl;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -53,13 +52,10 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
         loadScript("eskimoKubernetesServicesConfigChecker.js");
         loadScript("eskimoKubernetesServicesConfig.js");
 
-        /*
-        js("UNIQUE_SERVICES = [\"zookeeper\", \"mesos-master\", \"cerebro\", \"kibana\", \"spark-console\", \"zeppelin\", \"kafka-manager\", \"flink-app-master\", \"grafana\"];");
-        js("MULTIPLE_SERVICES = [\"ntp\", \"elasticsearch\", \"kafka\", \"mesos-agent\", \"spark-runtime\", \"gluster\", \"logstash\", \"flink-worker\", \"prometheus\"];");
-        js("MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
-        js("CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
-
-        */
+        ServicesController sc = new ServicesController();
+        ServicesDefinitionTestImpl sd = new ServicesDefinitionTestImpl();
+        sd.afterPropertiesSet();
+        sc.setServicesDefinition(sd);
 
         waitForDefinition("window.eskimo");
         waitForDefinition("window.eskimo.KubernetesServicesConfig");
@@ -71,40 +67,28 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
         js("eskimoKubernetesServicesConfig.eskimoKubernetesOperationsCommand = eskimoKubernetesOperationsCommand");
         js("eskimoKubernetesServicesConfig.eskimoNodesConfig = eskimoNodesConfig");
 
-        js("window.KUBERNETES_SERVICES = [\n" +
-                "    \"cerebro\",\n" +
-                "    \"grafana\",\n" +
-                "    \"kafka-manager\",\n" +
-                "    \"kibana\",\n" +
-                "    \"spark-console\",\n" +
-                "    \"zeppelin\"\n" +
-                "  ];");
-
-        js("window.KUBERNETES_SERVICES_CONFIG = {\n" +
-                "    \"cerebro\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
-                "    \"grafana\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
-                "    \"kafka-manager\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
-                "    \"kibana\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
-                "    \"spark-console\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
-                "    \"zeppelin\": { \"kubeConfig\" : { \"request\": { \"cpu\": \"1\", \"ram\": \"1G\" }}},\n" +
-                "  };");
-
         js("$.ajaxGet = function(callback) { console.log(callback); }");
+
+        js("" +
+                "$.ajaxGet = function (object) {\n" +
+                "    if (object.url === 'get-kubernetes-services') {" +
+                "        object.success(" + sc.getKubernetesServices() + ");\n" +
+                "    } else {\n" +
+                "        console.log(object); " +
+                "    } \n" +
+                "}");
+
 
         js("eskimoKubernetesServicesConfig.initialize();");
 
         waitForElementIdInDOM("reset-kubernetes-servicesconfig");
-
-        js("eskimoKubernetesServicesConfig.setKubernetesServicesForTest(KUBERNETES_SERVICES);");
-
-        js("eskimoKubernetesServicesConfig.setKubernetesServicesConfigForTest(KUBERNETES_SERVICES_CONFIG);");
 
         js("$('#inner-content-kubernetes-services-config').css('display', 'inherit')");
         js("$('#inner-content-kubernetes-services-config').css('visibility', 'visible')");
     }
 
     @Test
-    public void testSaveKubernetesServicesButtonClick() {
+    public void testSaveKubernetesServicesButtonClick() throws Exception {
 
         testRenderKubernetesConfig();
 
@@ -115,27 +99,31 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
 
         getElementById("save-kubernetes-servicesbtn").click();
 
-        JSONObject expectedConfig = new JSONObject("" +
-                "{\"zeppelin_ram\":\"1G\"," +
-                "\"kibana_ram\":\"1G\"," +
-                "\"kafka-manager_ram\":\"1G\"," +
-                "\"cerebro_ram\":\"1G\"," +
-                "\"kafka-manager_install\":\"on\"," +
-                "\"spark-console_install\":\"on\"," +
-                "\"spark-console_ram\":\"1G\"," +
-                "\"kafka-manager_cpu\":\"1\"," +
-                "\"grafana_ram\":\"1G\"," +
-                "\"cerebro_install\":\"on\"," +
-                "\"spark-console_cpu\":\"1\"," +
-                "\"zeppelin_cpu\":\"1\"," +
-                "\"kibana_cpu\":\"1\"," +
-                "\"zeppelin_install\":\"on\"," +
-                "\"kibana_install\":\"on\"," +
-                "\"grafana_install\":\"on\"," +
-                "\"cerebro_cpu\":\"1\"," +
-                "\"grafana_cpu\":\"1\"}");
+        JSONObject expectedConfig = new JSONObject("{\n" +
+                "  \"broker_cpu\": \"1\",\n" +
+                "  \"broker-manager_cpu\": \"0.3\",\n" +
+                "  \"database-manager_cpu\": \"0.3\",\n" +
+                "  \"user-console_install\": \"on\",\n" +
+                "  \"calculator-runtime_cpu\": \"1\",\n" +
+                "  \"database_cpu\": \"1\",\n" +
+                "  \"database_install\": \"on\",\n" +
+                "  \"database_ram\": \"1G\",\n" +
+                "  \"calculator-runtime_ram\": \"800M\",\n" +
+                "  \"user-console_ram\": \"1G\",\n" +
+                "  \"broker_ram\": \"1G\",\n" +
+                "  \"database-manager_install\": \"on\",\n" +
+                "  \"database-manager_ram\": \"400M\",\n" +
+                "  \"broker-manager_ram\": \"400M\",\n" +
+                "  \"broker-manager_install\": \"on\",\n" +
+                "  \"calculator-runtime_install\": \"on\",\n" +
+                "  \"broker_install\": \"on\",\n" +
+                "  \"database_deployment_strategy\": \"on\",\n" +
+                "  \"broker_deployment_strategy\": \"on\",\n" +
+                "  \"user-console_cpu\": \"1\"\n" +
+                "}");
 
         JSONObject actualConfig = new JSONObject((String)js("return window.savedKubernetesConfig"));
+        System.err.println (actualConfig.toString(2));
         assertTrue(expectedConfig.similar(actualConfig));
     }
 
@@ -146,54 +134,62 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
 
         js("eskimoKubernetesServicesConfig.selectAll()");
 
-        assertEquals (false, js("return $('#kibana_install').get(0).checked"));
-        assertEquals (false, js("return $('#zeppelin_install').get(0).checked"));
-        assertEquals (false, js("return $('#grafana_install').get(0).checked"));
-        assertEquals (false, js("return $('#cerebro_install').get(0).checked"));
+        assertEquals (true, js("return $('#broker_install').get(0).checked"));
+        assertEquals (true, js("return $('#user-console_install').get(0).checked"));
+        assertEquals (true, js("return $('#calculator-runtime_install').get(0).checked"));
+        assertEquals (true, js("return $('#database-manager_install').get(0).checked"));
 
         js("eskimoKubernetesServicesConfig.selectAll()");
 
-        assertEquals (true, js("return $('#kibana_install').get(0).checked"));
-        assertEquals (true, js("return $('#zeppelin_install').get(0).checked"));
-        assertEquals (true, js("return $('#grafana_install').get(0).checked"));
-        assertEquals (true, js("return $('#cerebro_install').get(0).checked"));
+        assertEquals (false, js("return $('#broker_install').get(0).checked"));
+        assertEquals (false, js("return $('#user-console_install').get(0).checked"));
+        assertEquals (false, js("return $('#calculator-runtime_install').get(0).checked"));
+        assertEquals (false, js("return $('#database-manager_install').get(0).checked"));
 
         js("eskimoKubernetesServicesConfig.selectAll()");
 
-        assertEquals (false, js("return $('#kibana_install').get(0).checked"));
-        assertEquals (false, js("return $('#zeppelin_install').get(0).checked"));
-        assertEquals (false, js("return $('#grafana_install').get(0).checked"));
-        assertEquals (false, js("return $('#cerebro_install').get(0).checked"));
+        assertEquals (true, js("return $('#broker_install').get(0).checked"));
+        assertEquals (true, js("return $('#user-console_install').get(0).checked"));
+        assertEquals (true, js("return $('#calculator-runtime_install').get(0).checked"));
+        assertEquals (true, js("return $('#database-manager_install').get(0).checked"));
+
+        js("eskimoKubernetesServicesConfig.selectAll()");
+
+        assertEquals (false, js("return $('#broker_install').get(0).checked"));
+        assertEquals (false, js("return $('#user-console_install').get(0).checked"));
+        assertEquals (false, js("return $('#calculator-runtime_install').get(0).checked"));
+        assertEquals (false, js("return $('#database-manager_install').get(0).checked"));
 
     }
 
     @Test
     public void testRenderKubernetesConfig() {
+
         js("eskimoKubernetesServicesConfig.renderKubernetesConfig({\n" +
-                "    \"cerebro_install\": \"on\",\n" +
-                "    \"zeppelin_install\": \"on\",\n" +
-                "    \"kafka-manager_install\": \"on\",\n" +
-                "    \"kibana_install\": \"on\",\n" +
-                "    \"spark-console_install\": \"on\",\n" +
-                "    \"grafana_install\": \"on\"\n" +
+                "    \"database-manager_install\": \"on\",\n" +
+                "    \"user-console_install\": \"on\",\n" +
+                "    \"broker_install\": \"on\",\n" +
+                "    \"broker-manager_install\": \"on\",\n" +
+                "    \"database_install\": \"on\",\n" +
+                "    \"calculator-runtime_install\": \"on\",\n" +
                 "})");
 
-        assertTrue((boolean)js("return $('#cerebro_install').is(':checked')"));
-        assertTrue((boolean)js("return $('#zeppelin_install').is(':checked')"));
-        assertTrue((boolean)js("return $('#kafka-manager_install').is(':checked')"));
-        assertTrue((boolean)js("return $('#kibana_install').is(':checked')"));
-        assertTrue((boolean)js("return $('#spark-console_install').is(':checked')"));
-        assertTrue((boolean)js("return $('#grafana_install').is(':checked')"));
+        assertTrue((boolean)js("return $('#database-manager_install').is(':checked')"));
+        assertTrue((boolean)js("return $('#user-console_install').is(':checked')"));
+        assertTrue((boolean)js("return $('#broker_install').is(':checked')"));
+        assertTrue((boolean)js("return $('#broker-manager_install').is(':checked')"));
+        assertTrue((boolean)js("return $('#database_install').is(':checked')"));
+        assertTrue((boolean)js("return $('#calculator-runtime_install').is(':checked')"));
+
+        assertTrue((boolean)js("return $('#broker_deployment_strategy').is(':checked')"));
+        assertTrue((boolean)js("return $('#database_deployment_strategy').is(':checked')"));
 
         // just test a few
-        assertEquals("1", js("return $('#cerebro_cpu').val()"));
-        assertEquals("1G", js("return $('#cerebro_ram').val()"));
+        assertEquals("0.3", js("return $('#database-manager_cpu').val()"));
+        assertEquals("400M", js("return $('#database-manager_ram').val()"));
 
-        assertEquals("1", js("return $('#kafka-manager_cpu').val()"));
-        assertEquals("1G", js("return $('#kafka-manager_ram').val()"));
-
-        assertEquals("1", js("return $('#grafana_cpu').val()"));
-        assertEquals("1G", js("return $('#grafana_ram').val()"));
+        assertEquals("0.3", js("return $('#broker-manager_cpu').val()"));
+        assertEquals("400M", js("return $('#broker-manager_ram').val()"));
     }
 
     @Test
@@ -206,12 +202,11 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
         js("eskimoKubernetesServicesConfig.showReinstallSelection()");
 
         // on means nothing, it doesn't mean checkbox is checked, but it enables to validate the rendering is OK
-        assertEquals("on", js("return $('#cerebro_reinstall').val()"));
-        assertEquals("on", js("return $('#zeppelin_reinstall').val()"));
-        assertEquals("on", js("return $('#kafka-manager_reinstall').val()"));
-        assertEquals("on", js("return $('#kibana_reinstall').val()"));
-        assertEquals("on", js("return $('#spark-console_reinstall').val()"));
-        assertEquals("on", js("return $('#grafana_reinstall').val()"));
+        assertEquals("on", js("return $('#database-manager_reinstall').val()"));
+        assertEquals("on", js("return $('#user-console_reinstall').val()"));
+        assertEquals("on", js("return $('#broker-manager_reinstall').val()"));
+        assertEquals("on", js("return $('#broker_reinstall').val()"));
+        assertEquals("on", js("return $('#calculator-runtime_reinstall').val()"));
 
     }
 
@@ -251,27 +246,26 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
 
         js("eskimoKubernetesServicesConfig.showKubernetesServicesConfig()");
 
-        assertEquals (false, js("return $('#kibana_install').get(0).checked"));
-        assertEquals (false, js("return $('#zeppelin_install').get(0).checked"));
-        assertEquals (false, js("return $('#grafana_install').get(0).checked"));
-        assertEquals (false, js("return $('#cerebro_install').get(0).checked"));
+        assertEquals (false, js("return $('#broker_install').get(0).checked"));
+        assertEquals (false, js("return $('#calculator-runtime_install').get(0).checked"));
+        assertEquals (false, js("return $('#broker-manager_install').get(0).checked"));
+        assertEquals (false, js("return $('#database-manager_install').get(0).checked"));
 
         // 5. all good, all services selected
         js("$.ajaxGet = function(object) { object.success( {\n" +
-                "    \"cerebro_install\": \"on\",\n" +
-                        "    \"zeppelin_install\": \"on\",\n" +
-                        "    \"kafka-manager_install\": \"on\",\n" +
-                        "    \"kibana_install\": \"on\",\n" +
-                        "    \"spark-console_install\": \"on\",\n" +
-                        "    \"grafana_install\": \"on\"\n" +
-                        "} ); }");
+                "    \"database-manager_install\": \"on\",\n" +
+                "    \"user-console_install\": \"on\",\n" +
+                "    \"broker-manager_install\": \"on\",\n" +
+                "    \"broker_install\": \"on\",\n" +
+                "    \"calculator-runtime_install\": \"on\",\n" +
+                "} ); }");
 
         js("eskimoKubernetesServicesConfig.showKubernetesServicesConfig()");
 
-        assertEquals (true, js("return $('#kibana_install').get(0).checked"));
-        assertEquals (true, js("return $('#zeppelin_install').get(0).checked"));
-        assertEquals (true, js("return $('#grafana_install').get(0).checked"));
-        assertEquals (true, js("return $('#cerebro_install').get(0).checked"));
+        assertEquals (true, js("return $('#broker_install').get(0).checked"));
+        assertEquals (true, js("return $('#user-console_install').get(0).checked"));
+        assertEquals (true, js("return $('#broker-manager_install').get(0).checked"));
+        assertEquals (true, js("return $('#database-manager_install').get(0).checked"));
     }
 
     @Test

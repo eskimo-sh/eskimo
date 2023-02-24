@@ -36,47 +36,6 @@
 
 package ch.niceideas.eskimo.model.service;
 
-import ch.niceideas.eskimo.services.ServiceDefinitionException;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.regex.Pattern;
-
-@NoArgsConstructor
-@Getter
-@Setter
-public class KubeRequest {
-
-    public static final Pattern KUBE_REQUEST_CPU_RE = Pattern.compile("[0-9\\.]+[m]?");
-    public static final Pattern KUBE_REQUEST_RAM_RE = Pattern.compile("[0-9\\.]+[EPTGMk]?");
-    public static final Pattern KUBE_REQUEST_REPLICAS_RE = Pattern.compile("[0-9\\.]+");
-
-    private String cpu;
-    private String ram;
-
-    public void setCpu(String cpu) throws ServiceDefinitionException {
-        if (KUBE_REQUEST_CPU_RE.matcher(cpu).matches()) {
-            this.cpu = cpu;
-        } else {
-            throw new ServiceDefinitionException("Kubernetes request cpu '" + cpu + "' doesn't match expected pattern (number)[m]{0,1}");
-        }
-    }
-
-    public void setRam(String ram) throws ServiceDefinitionException {
-        if (KUBE_REQUEST_RAM_RE.matcher(ram).matches()) {
-            this.ram = ram;
-        } else {
-            throw new ServiceDefinitionException("Kubernetes request ram '" + ram + "' doesn't match expected pattern (number)[EPTGMk]{0,1}");
-        }
-    }
-
-    public JSONObject toJSON() {
-        return new JSONObject(new HashMap<String, Object>() {{
-            put("cpu", getCpu());
-            put("ram", getRam());
-        }});
-    }
+public enum KubeDeploymentStrategy {
+    CLUSTER_WIDE, CUSTOM;
 }

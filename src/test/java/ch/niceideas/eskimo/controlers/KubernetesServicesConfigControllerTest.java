@@ -155,6 +155,8 @@ public class KubernetesServicesConfigControllerTest {
                 "    \"calculator-runtime_install\": \"on\",\n" +
                 "    \"broker-manager_install\": \"on\",\n" +
                 "    \"broker_install\": \"on\",\n" +
+                "    \"database_deployment_strategy\": \"on\",\n" +
+                "    \"broker_deployment_strategy\": \"on\",\n" +
                 "    \"user-console_cpu\": \"1\"\n" +
                 "}").similar(new JSONObject (kscc.loadKubernetesServicesConfig())));
 

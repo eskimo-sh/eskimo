@@ -36,7 +36,9 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.eskimo.controlers.ServicesController;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
-import ch.niceideas.eskimo.services.ServicesDefinitionImpl;
+import ch.niceideas.eskimo.model.NodesConfigWrapper;
+import ch.niceideas.eskimo.test.StandardSetupHelpers;
+import ch.niceideas.eskimo.test.services.ServicesDefinitionTestImpl;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,56 +52,6 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
 
     private static final Logger logger = Logger.getLogger(EskimoKubernetesServicesConfigCheckerTest.class);
 
-    JSONObject nodesConfig = new JSONObject(new HashMap<String, Object>() {{
-        put("node_id1", "192.168.10.11");
-        put("kube-master", "1");
-        put("kube-slave", "1");
-        put("ntp1", "on");
-        put("etcd1", "on");
-        put("prom-node-exporter1", "on");
-        put("gluster1", "on");
-
-        put("node_id2", "192.168.10.12");
-        put("ntp2", "on");
-        put("zookeeper", "2");
-        put("etcd2", "on");
-        put("prom-node-exporter2", "on");
-        put("gluster2", "on");
-
-        put("node_id3", "192.168.10.13");
-        put("ntp3", "on");
-        put("etcd3", "on");
-        put("prom-node-exporter3", "on");
-        put("gluster3", "on");
-    }});
-
-    KubernetesServicesConfigWrapper kubernetesConfig = new KubernetesServicesConfigWrapper("{\n" +
-            "    \"cerebro_install\": \"on\",\n" +
-            "    \"cerebro_cpu\": \"0.3\",\n" +
-            "    \"cerebro_ram\": \"400M\",\n" +
-            "    \"elasticsearch_install\": \"on\",\n" +
-            "    \"elasticsearch_cpu\": \"1\",\n" +
-            "    \"elasticsearch_ram\": \"1G\",\n" +
-            "    \"flink-runtime_install\": \"on\",\n" +
-            "    \"flink-runtime_cpu\": \"1\",\n" +
-            "    \"flink-runtime_ram\": \"1G\",\n" +
-            "    \"grafana_install\": \"on\",\n" +
-            "    \"grafana_cpu\": \"0.3\",\n" +
-            "    \"grafana_ram\": \"400M\",\n" +
-            "    \"prometheus_install\": \"on\",\n" +
-            "    \"prometheus_cpu\": \"0.2\",\n" +
-            "    \"prometheus_ram\": \"300M\",\n" +
-            "    \"kafka_install\": \"on\",\n" +
-            "    \"kafka_cpu\": \"1\",\n" +
-            "    \"kafka_ram\": \"1G\",\n" +
-            "    \"kubernetes-dashboard_install\": \"on\",\n" +
-            "    \"kubernetes-dashboard_cpu\": \"0.3\",\n" +
-            "    \"kubernetes-dashboard_ram\": \"500M\",\n" +
-            "    \"spark-runtime_install\": \"on\",\n" +
-            "    \"spark-runtime_cpu\": \"1\",\n" +
-            "    \"spark-runtime_ram\": \"800M\"\n" +
-            "}");
-
     @BeforeEach
     public void setUp() throws Exception {
 
@@ -109,10 +61,8 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
         waitForDefinition("window.doCheckKubernetesSetup");
 
         ServicesController sc = new ServicesController();
-
-        ServicesDefinitionImpl sd = new ServicesDefinitionImpl();
+        ServicesDefinitionTestImpl sd = new ServicesDefinitionTestImpl();
         sd.afterPropertiesSet();
-
         sc.setServicesDefinition(sd);
 
         String servicesDependencies = sc.getServicesDependencies();
@@ -128,69 +78,132 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
     }
 
     @Test
-    public void testWithKubeConfigRequest() {
+    public void testCheckKubernetesSetupCustomDeploymentWong() {
+        KubernetesServicesConfigWrapper kubeConfigStd = StandardSetupHelpers.getStandardKubernetesConfig();
+        kubeConfigStd.setValueForPath("database_deployment_strategy", "off");
+        Exception exp = assertThrows(Exception.class,
+                () -> js("callCheckKubernetesSetup("
+                        + StandardSetupHelpers.getStandard2NodesSetup().getFormattedValue() + ","
+                        + kubeConfigStd.getFormattedValue() + ")"));
+        assertTrue(exp.getMessage().contains("Service database defines a deployment strategy as 'custom' and yet it is missing replicas configuration"));
 
-        Exception error = null;
-        try {
-            js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")");
-        } catch (Exception e) {
-            error = e;
-            logger.error (e, e);
-        }
-        assertNull(error);
+        KubernetesServicesConfigWrapper kubeConfigCust = StandardSetupHelpers.getKubernetesConfigCustomDeployment();
+        kubeConfigCust.setValueForPath("database_deployment_strategy", "on");
+        exp = assertThrows(Exception.class,
+                () -> js("callCheckKubernetesSetup("
+                        + StandardSetupHelpers.getStandard2NodesSetup().getFormattedValue() + ","
+                        + kubeConfigCust.getFormattedValue() + ")"));
+        assertTrue(exp.getMessage().contains("Service database defines a deployment strategy as 'cluster wide' and yet it has replicas configured"));
+    }
+
+    @Test
+    public void testCheckKubernetesSetupCustomDeploymentOK() {
+        js("callCheckKubernetesSetup("
+                + StandardSetupHelpers.getStandard2NodesSetup().getFormattedValue() + ","
+                + StandardSetupHelpers.getKubernetesConfigCustomDeployment().getFormattedValue() + ")");
+    }
+
+    @Test
+    public void testWithKubeConfigRequest() {
+        js("callCheckKubernetesSetup("
+                + StandardSetupHelpers.getStandard2NodesSetup().getFormattedValue() + ","
+                + StandardSetupHelpers.getStandardKubernetesConfig().getFormattedValue() + ")");
     }
 
     @Test
     public void testWithKubeConfigRequest_BuggyCPU() {
 
-        kubernetesConfig.removeRootKey("flink-runtime_install");
+        KubernetesServicesConfigWrapper kubernetesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
+        kubernetesConfig.removeRootKey("calculator-runtime_install");
 
         Exception exception = assertThrows(Exception.class,
-                () -> js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")"));
+                () -> js("callCheckKubernetesSetup("
+                        + StandardSetupHelpers.getStandard2NodesSetup().getFormattedValue() + ","
+                        + kubernetesConfig.getFormattedValue() + ")"));
 
-        //logger.debug (exception.getMessage());
+        //System.err.println (exception.getMessage());
 
-        assertTrue(exception.getMessage().contains("Inconsistency found : Found a CPU definition for flink-runtime_cpu. But corresponding service installation is not enabled"));
+        assertTrue(exception.getMessage().contains("Inconsistency found : Found a CPU definition for calculator-runtime_cpu. But corresponding service installation is not enabled"));
     }
 
     @Test
     public void testWithKubeConfigRequest_BuggyRAM() {
 
-        kubernetesConfig.removeRootKey("flink-runtime_install");
-        kubernetesConfig.removeRootKey("flink-runtime_cpu");
+        KubernetesServicesConfigWrapper kubernetesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
+        kubernetesConfig.removeRootKey("calculator-runtime_install");
+        kubernetesConfig.removeRootKey("calculator-runtime_cpu");
 
         Exception exception = assertThrows(Exception.class,
-                () -> js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")"));
+                () -> js("callCheckKubernetesSetup("
+                        + StandardSetupHelpers.getStandard2NodesSetup().getFormattedValue() + ","
+                        + kubernetesConfig.getFormattedValue() + ")"));
 
-        //logger.debug (exception.getMessage());
+        //System.err.println (exception.getMessage());
 
-        assertTrue(exception.getMessage().contains("Inconsistency found : Found a RAM definition for flink-runtime_ram. But corresponding service installation is not enabled"));
+        assertTrue(exception.getMessage().contains("Inconsistency found : Found a RAM definition for calculator-runtime_ram. But corresponding service installation is not enabled"));
+    }
+
+    @Test
+    public void testWithKubeConfigRequest_missingCPU() {
+
+        KubernetesServicesConfigWrapper kubernetesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
+        kubernetesConfig.removeRootKey("calculator-runtime_cpu");
+
+        Exception exception = assertThrows(Exception.class,
+                () -> js("callCheckKubernetesSetup("
+                        + StandardSetupHelpers.getStandard2NodesSetup().getFormattedValue() + ","
+                        + kubernetesConfig.getFormattedValue() + ")"));
+
+        //System.err.println (exception.getMessage());
+
+        assertTrue(exception.getMessage().contains("Inconsistency found : Kubernetes Service calculator-runtime is enabled but misses CPU request setting"));
+    }
+
+    @Test
+    public void testWithKubeConfigRequest_missingRAM() {
+        KubernetesServicesConfigWrapper kubernetesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
+        kubernetesConfig.removeRootKey("calculator-runtime_ram");
+
+        Exception exception = assertThrows(Exception.class,
+                () -> js("callCheckKubernetesSetup("
+                        + StandardSetupHelpers.getStandard2NodesSetup().getFormattedValue() + ","
+                        + kubernetesConfig.getFormattedValue() + ")"));
+
+        //System.err.println (exception.getMessage());
+
+        assertTrue(exception.getMessage().contains("Inconsistency found : Kubernetes Service calculator-runtime is enabled but misses RAM request setting"));
     }
 
     @Test
     public void testWithKubeConfigRequest_wrongCPU() {
 
-        kubernetesConfig.setValueForPath("flink-runtime_cpu", "0.5z");
+        KubernetesServicesConfigWrapper kubernetesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
+        kubernetesConfig.setValueForPath("calculator-runtime_cpu", "0.5z");
 
         Exception exception = assertThrows(Exception.class,
-                () -> js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")"));
+                () -> js("callCheckKubernetesSetup("
+                         + StandardSetupHelpers.getStandard2NodesSetup().getFormattedValue() + ","
+                         + kubernetesConfig.getFormattedValue() + ")"));
 
-        //logger.debug (exception.getMessage());
+        //System.err.println (exception.getMessage());
 
-        assertTrue(exception.getMessage().contains("CPU definition for flink-runtime_cpu doesn't match expected REGEX - [0-9\\\\.]+[m]{0,1}"));
+        assertTrue(exception.getMessage().contains("CPU definition for calculator-runtime_cpu doesn't match expected REGEX - /^[0-9\\\\.]+[m]?$/"));
     }
 
     @Test
     public void testWithKubeConfigRequest_wrongRAM() {
 
-        kubernetesConfig.setValueForPath("flink-runtime_ram", "500Gb");
+        KubernetesServicesConfigWrapper kubernetesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
+        kubernetesConfig.setValueForPath("calculator-runtime_ram", "500Gb");
 
         Exception exception = assertThrows(Exception.class,
-                () -> js("callCheckKubernetesSetup(" + nodesConfig.toString() + "," + kubernetesConfig.getFormattedValue() + ")"));
+                () -> js("callCheckKubernetesSetup("
+                        + StandardSetupHelpers.getStandard2NodesSetup().getFormattedValue() + ","
+                        + kubernetesConfig.getFormattedValue() + ")"));
 
-        //logger.debug (exception.getMessage());
+        //System.err.println (exception.getMessage());
 
-        assertTrue(exception.getMessage().contains("RAM definition for flink-runtime_ram doesn't match expected REGEX - [0-9\\.]+[EPTGMk]{0,1}"));
+        assertTrue(exception.getMessage().contains("RAM definition for calculator-runtime_ram doesn't match expected REGEX - /^[0-9\\\\.]+[EPTGMk]?$/"));
     }
 
     @Test
@@ -198,99 +211,73 @@ public class EskimoKubernetesServicesConfigCheckerTest extends AbstractWebTest {
 
         JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
-            put("kube-master", "1");
-            put("kube-slave", "1");
-            put("ntp1", "on");
-            put("prom-node-exporter1", "on");
+            put("cluster-manager", "1");
+            put("cluster-master", "1");
+            put("cluster-slave1", "on");
+            put("distributed-time1", "on");
+            put("distributed-filesystem1", "on");
         }});
 
         JSONObject kubernetesConfig = new JSONObject(new HashMap<>() {{
-            put("elasticsearch_install", "on");
-            put("cerebro_install", "on");
-            put("kibana_install", "on");
-            put("prometheus_install", "on");
-            put("grafana_install", "on");
+            put("database_install", "on");
+            put("database_cpu", "1");
+            put("database_ram", "500M");
+            put("database_deployment_strategy", "on");
+            put("database-manager_install", "on");
+            put("database-manager_cpu", "1");
+            put("database-manager_ram", "600M");
+            put("database-manager_deployment_strategy", "on");
+            put("user-console_install", "on");
+            put("user-console_cpu", "1");
+            put("user-console_ram", "800M");
+            put("user-console_deployment_strategy", "on");
         }});
 
-        Exception error = null;
-        try {
-            js("callCheckKubernetesSetup(" + nodesConfig + "," + kubernetesConfig + ")");
-        } catch (Exception e) {
-            error = e;
-            logger.error (e, e);
-        }
-        assertNull(error);
+        js("callCheckKubernetesSetup(" + nodesConfig.toString(2) + "," + kubernetesConfig.toString(2) + ")");
     }
-
 
     @Test
     public void testOneCerebroButNoES() {
 
-        Exception exception = assertThrows(Exception.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
-                put("node_id1", "192.168.10.11");
-                put("kubernetes", "1");
-                put("ntp1", "on");
-                put("prom-node-exporter1", "on");
-            }});
+        KubernetesServicesConfigWrapper kubernetesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
+        kubernetesConfig.removeRootKey("database_install");
 
-            JSONObject kubernetesConfig = new JSONObject(new HashMap<>() {{
-                put("cerebro_install", "on");
-            }});
+        Exception exception = assertThrows(Exception.class, () -> js("callCheckKubernetesSetup("
+                + StandardSetupHelpers.getStandard2NodesSetup().getFormattedValue() + ","
+                + kubernetesConfig.getFormattedValue() + ")"));
 
-            js("callCheckKubernetesSetup(" + nodesConfig + "," + kubernetesConfig + ")");
-        });
+        //System.err.println (exception.getMessage());
 
-        //logger.debug (exception.getMessage());
-
-        assertTrue(exception.getMessage().contains("Inconsistency found : Service cerebro expects a installaton of  elasticsearch. But it's not going to be installed"));
+        assertTrue(exception.getMessage().contains("Inconsistency found : Service database-manager expects a installaton of  database. But it's not going to be installed"));
     }
 
     @Test
     public void testSparkButNoKube() {
 
-        Exception exception = assertThrows(Exception.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
-                put("node_id1", "192.168.10.11");
-                put("gluster1", "on");
-                put("ntp1", "on");
-            }});
+        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+        nodesConfig.removeRootKey("cluster-master");
 
-            JSONObject kubernetesConfig = new JSONObject(new HashMap<>() {{
-                put("spark-runtime_install", "on");
-            }});
+        Exception exception = assertThrows(Exception.class, () -> js("callCheckKubernetesSetup("
+                + nodesConfig.getFormattedValue() + ","
+                + StandardSetupHelpers.getStandardKubernetesConfig().getFormattedValue() + ")"));
 
-            js("callCheckKubernetesSetup(" + nodesConfig + "," + kubernetesConfig + ")");
-        });
+        //System.err.println (exception.getMessage());
 
-        System.err.println (exception.getMessage());
-
-        assertTrue(exception.getMessage().contains("Inconsistency found : Service spark-runtime expects 1 kube-master instance(s). But only 0 has been found !"));
+        assertTrue(exception.getMessage().contains("Inconsistency found : Service user-console expects 1 cluster-master instance(s). But only 0 has been found !"));
     }
 
     @Test
     public void testZeppelinButNoZookeeper() {
+        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+        nodesConfig.removeRootKey("cluster-manager");
 
-        Exception exception = assertThrows(Exception.class, () -> {
-            JSONObject nodesConfig = new JSONObject(new HashMap<>() {{
-                put("node_id1", "192.168.10.11");
-                put("ntp1", "on");
-                put("prom-node-exporter1", "on");
-                put("kube-master1", "on");
-                put("kube-slave1", "on");
-            }});
+        Exception exception = assertThrows(Exception.class, () -> js("callCheckKubernetesSetup("
+                + nodesConfig.getFormattedValue() + ","
+                + StandardSetupHelpers.getStandardKubernetesConfig().getFormattedValue() + ")"));
 
-            JSONObject kubernetesConfig = new JSONObject(new HashMap<>() {{
-                put("elasticsearch_install", "on");
-                put("zeppelin_install", "on");
-            }});
+        //System.err.println (exception.getMessage());
 
-            js("callCheckKubernetesSetup(" + nodesConfig + "," + kubernetesConfig + ")");
-        });
-
-        //logger.debug (exception.getMessage());
-
-        assertTrue(exception.getMessage().contains("Inconsistency found : Service zeppelin expects 1 zookeeper instance(s). But only 0 has been found !"));
+        assertTrue(exception.getMessage().contains("Inconsistency found : Service user-console expects 1 cluster-manager instance(s). But only 0 has been found !"));
     }
 
 }

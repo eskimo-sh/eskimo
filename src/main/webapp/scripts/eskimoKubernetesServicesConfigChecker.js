@@ -39,7 +39,7 @@ window.eskimoKubeReplicasCheckRE = /^[0-9\\.]+$/;
 
 function checkKubernetesSetup (kubernetesSetupConfig, servicesDependencies, kubernetesServices, successCallback) {
 
-    alert ("Aapt to dpeloyment strategy and replicas");
+    console.log (kubernetesSetupConfig);
 
     $.ajaxGet({
         url: "load-nodes-config",
@@ -126,6 +126,25 @@ function doCheckKubernetesSetup (nodesConfig, kubernetesSetupConfig, servicesDep
             }
         }
 
+        for (let key in kubernetesSetupConfig) {
+            let re = /([a-zA-Z\-]+)_install/;
+
+            let matcher = key.match(re);
+
+            if (matcher != null) {
+
+                let serviceName = matcher[1];
+
+                if (!kubernetesSetupConfig[serviceName + "_cpu"] || !kubernetesSetupConfig[serviceName + "_cpu"] === "") {
+                    throw "Inconsistency found : Kubernetes Service " + serviceName + " is enabled but misses CPU request setting";
+                }
+
+                if (!kubernetesSetupConfig[serviceName + "_ram"] || !kubernetesSetupConfig[serviceName + "_ram"] === "") {
+                    throw "Inconsistency found : Kubernetes Service " + serviceName + " is enabled but misses RAM request setting";
+                }
+            }
+        }
+
         // Now checking CPU definition
         for (let key in kubernetesSetupConfig) {
             let re = /([a-zA-Z\-]+)_cpu/;
@@ -141,7 +160,7 @@ function doCheckKubernetesSetup (nodesConfig, kubernetesSetupConfig, servicesDep
 
                 let cpuDef = kubernetesSetupConfig [serviceName + "_cpu"];
                 if (cpuDef.match(eskimoKubeCpuCheckRE) == null) {
-                    throw "CPU definition for " + key + " doesn't match expected REGEX - [0-9\\\\.]+[m]{0,1}";
+                    throw "CPU definition for " + key + " doesn't match expected REGEX - " + eskimoKubeCpuCheckRE;
                 }
             }
         }
@@ -161,16 +180,50 @@ function doCheckKubernetesSetup (nodesConfig, kubernetesSetupConfig, servicesDep
 
                 let ramDef = kubernetesSetupConfig [serviceName + "_ram"];
                 if (ramDef.match(eskimoKubeRamCheckRE) == null) {
-                    throw "RAM definition for " + key + " doesn't match expected REGEX - [0-9\\.]+[EPTGMk]{0,1}";
+                    throw "RAM definition for " + key + " doesn't match expected REGEX - " + eskimoKubeRamCheckRE;
                 }
             }
         }
 
+        // Now check deployment_strategy and replicas
+        for (let service in kubernetesServices) {
+            if (!kubernetesServices[service].unique && !kubernetesServices[service].registryOnly) {
 
-    } else if (nodesConfig.clear == "missing") {
+                let serviceInstalled = kubernetesSetupConfig [service + "_install"];
+                if (serviceInstalled && serviceInstalled === "on") {
+
+                    // either wide cluster selection is selected, or I want eplicas configured (in the proper format)
+                    let deplStratDef = kubernetesSetupConfig [service + "_deployment_strategy"];
+
+                    let replicasDef = kubernetesSetupConfig [service + "_replicas"];
+
+                    if (deplStratDef && deplStratDef === "on") {
+
+                        // in this case I want no replica !
+                        if (replicasDef && replicasDef !== "") {
+                            throw "Service " + service + " defines a deployment strategy as 'cluster wide' and yet it has replicas configured";
+                        }
+
+                    } else {
+
+                        // in this case I want replica and in the proper format
+                        if (!replicasDef || replicasDef === "") {
+                            throw "Service " + service + " defines a deployment strategy as 'custom' and yet it is missing replicas configuration";
+
+                        } else {
+                            if (replicasDef.match(eskimoKubeReplicasCheckRE) == null) {
+                                throw "Replica definition for " + service + " doesn't match expected REGEX - " + eskimoKubeReplicasCheckRE;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    } else if (nodesConfig.clear === "missing") {
         throw "No Nodes Configuration is available";
 
-    } else if (nodesConfig.clear == "setup") {
+    } else if (nodesConfig.clear === "setup") {
         throw "Setup is not completed";
     }
 }

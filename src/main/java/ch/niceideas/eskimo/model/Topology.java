@@ -39,14 +39,12 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.NodesConfigWrapper.ParsedNodesConfigProperty;
-import ch.niceideas.eskimo.model.service.Dependency;
-import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
-import ch.niceideas.eskimo.model.service.MemoryModel;
-import ch.niceideas.eskimo.model.service.ServiceDefinition;
+import ch.niceideas.eskimo.model.service.*;
 import ch.niceideas.eskimo.services.ServiceDefinitionException;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SetupException;
 import ch.niceideas.eskimo.services.SystemException;
+import ch.niceideas.eskimo.services.satellite.KubernetesServicesConfigException;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
@@ -521,7 +519,7 @@ public class Topology {
             KubernetesServicesConfigWrapper kubeConfig,
             ServicesInstallStatusWrapper serviceInstallStatus,
             ServicesDefinition servicesDefinition,
-            MemoryModel memoryModel, int nodeNbr) throws NodesConfigurationException {
+            MemoryModel memoryModel, int nodeNbr) throws NodesConfigurationException, KubernetesServicesConfigException {
 
         StringBuilder sb = new StringBuilder();
         sb.append(getTopologyScript(serviceInstallStatus, servicesDefinition));
@@ -595,6 +593,20 @@ public class Topology {
                         appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.getEnv() + "_RAM", ramSetting);
                     }
 
+                    KubeDeploymentStrategy deplStrat = kubeConfig.getDeploymentStrategy(service);
+                    String replicaSetting = kubeConfig.getReplicasSetting(service);
+                    if (deplStrat == null && StringUtils.isBlank(replicaSetting)) {
+                        deplStrat = KubeDeploymentStrategy.CLUSTER_WIDE;
+                    }
+                    if (deplStrat == KubeDeploymentStrategy.CLUSTER_WIDE) {
+                        appendExport(sb, "ESKIMO_KUBE_DEPLOYMENT_" + service.getEnv() + "_DEPLOY_STRAT", "CLUSTER_WIDE");
+                    } else {
+
+                        if (StringUtils.isBlank(replicaSetting)) {
+                            throw new KubernetesServicesConfigException ("Service " + service + " isdefined as customer deployment but number of replicas is missing");
+                        }
+                        appendExport(sb, "ESKIMO_KUBE_REQUEST_" + service.getEnv() + "_REPLICAS", replicaSetting);
+                    }
                 }
             }
         }

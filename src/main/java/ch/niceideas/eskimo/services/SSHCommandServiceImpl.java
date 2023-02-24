@@ -235,7 +235,7 @@ public class SSHCommandServiceImpl implements SSHCommandService {
 
             SCPClient scp = connection.createSCPClient();
 
-            scp.put(filePath, "/usr/" + systemConfig.getValueForPath(SetupService.SSH_USERNAME_FIELD), "0755");
+            scp.put(filePath, "/home/" + systemConfig.getValueForPath(SetupService.SSH_USERNAME_FIELD), "0755");
 
             // scp is stateless and doesn't nee to be closed
 

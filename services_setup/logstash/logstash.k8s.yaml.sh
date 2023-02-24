@@ -64,7 +64,7 @@ metadata:
     service: logstash
 spec:
   serviceName: logstash
-  replicas: $ESKIMO_NODE_COUNT
+  replicas: $(get_replicas elasticsearch)
   selector:
     matchLabels:
       service: logstash
