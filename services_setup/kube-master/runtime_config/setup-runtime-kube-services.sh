@@ -89,7 +89,7 @@ echo "   + Creating runtime kube-state-metrics file"
 /bin/cp -f /etc/k8s/services/kube-state-metrics.yaml /var/lib/kubernetes/kube-state-metrics.yaml
 
 echo "   + Deploying kube-state-metrics"
-kubectl apply -f /var/lib/kubernetes/kube-state-metrics
+kubectl apply -f /var/lib/kubernetes/kube-state-metrics.yaml
 
 
 
