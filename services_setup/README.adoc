@@ -37,6 +37,8 @@ Software.
 :authors: www.eskimo.sh / 2019
 :copyright: www.eskimo.sh / 2019
 
+:toc:
+
 == Eskimo Introduction
 
 Eskimo is a Big Data Management Web Console to _build_, _manage_ and _operate_
@@ -55,10 +57,27 @@ The *Service Development framework* is actually composed by two distinct parts:
 
 This document presents "2. The *Services Installation Framework*"
 
+=== Principle schema
+
+The whole services development framework can be represented as follows:
+
+image::../doc/guides/service-dev-guide/pngs/services-development-framework.png[800, 800, align="center"]
+
+* The *docker_images_development_framework* is used to develop and build Container templates images that are later
+used to build the actual docker containers images that are fine-tuned to Eskimo deployed on Kubernetes or natively on
+individual Eskimo cluster nodes.
+* The <<services_installation_framework>> which creates the actual container image from the template image and adapts
+it to the specific situation of the eskimo node or kube cluster on which it is being deployed.
+
+The different scripts involved in the different stages are presented on the schema above along with their
+responsibilities and the environment in which they are executed (outside of the container - on the eskimo host machine
+or the eskimo cluster node - or from within the docker container).
 
 
 
-// marker for inclusion : line 60
+
+
+// marker for inclusion : line 80
 [[services_installation_framework]]
 == Services Installation Framework
 
@@ -91,13 +110,18 @@ to respect an important constraint.
 used to control the _serviceX_ service lifecycle through
 commands such as `systemctl start serviceX`,
 ** or properly deployed in Kubernetes and executing a POD name prefixed by the service name and a kube service matching
-it.
+it. All of them being declared in a file `serviceX.k8s.yml.sh` which is actualyl a script generating the service file
+after proper injection of Eskimo Topology and configuration.
+
+The principle can be illustrated as follows:
+
+image::../doc/guides/service-dev-guide/pngs/services-installation-framework.png[800, 800, align="center"]
 
 Aside from the above, nothing is enforced and service developers can implement services the way they want.
 
 ==== Gluster share mounts
 
-Many Eskimo services can leverage on gluster to share data accross cluster nodes. +
+Many Eskimo services can leverage on gluster to share data across cluster nodes. +
 SystemD services rely on the host to mount gluster shares and then mount the share to the gluster container from the
 host mount. +
 The way to do this is as follows:
@@ -862,12 +886,118 @@ Page scripters form a third mechanism aimed at customizing the behaviour of prox
 declaring a javascript snippet that is injected at the bottom of the `body` tag in the referenced HTML document.
 
 
+[[docker_images_versioning]]
+== Docker Images Versioning
+
+The different scripts presented above and available with each and every service as part of the _Services Installation
+Framwork_ can be customized at will as ad often as required. +
+Whenever one of these scripts is updated or customized, one simply needs to _reinstall_ the service using
+
+* either the "_Setup Eskimo Nodes_" platform administration menu entry (for node native services)
+* or the "_Setup Kube Services_" platformadministration menu entry (for node kubernetes services)
+
+This can be done as frequentely as required.
+
+The system works by incrementing the image tag number at each and every installation and restarting the service (either
+using SystemD for native services, or _kubectl_ for Kubernetes services.
+
+The first time a service is installed, it will get the number "1" as tag, the seond time will make the tag number
+updated to the number "2", and so on. +
+The system automaticically purges and clobbers the previous tags and the docker filesysten layers (overlay) that might
+not be required anymore.
+
+
+[[services_customizatio_tool]]
+== Services Customization Tool
+
+Services can be customized by updating or customizing the different scripts presented in
+<<services_installation_framework>> above and available with each and every service. As explained in
+<<docker_images_versioning>>, this can be done at will and one just needs to reinstall the corresponding service to make
+his changes deployed on the system.
+
+But eskimo also provides an utility tool to perform such customization on the live systen, without requiring to get
+back to the eskimo UI and reinstall a service. +
+The tool takes the form of a shell script and is named `eskimo-edit-image.sh`.
+
+.`eskimo-edit-image.sh usage
+----
+[root@test-node1 vagrant]# eskimo-edit-image.sh -h
+eskimo-edit-image [-h] SERVICE [SCRIPT]
+where SERVICE is the eskimo service / container name whose image is to be edited
+SCRIPT is an optional script path to perfom customization
+[root@test-node1 vagrant]#
+
+----
+
+It takes as argument the name of the service (wich corresponds to the docker image name once a service is installed) as
+argument as well as an optional shell script aimed at performing the cusomization. +
+If the customization script is ommited, then a shell is presented to the user for him to perform the customization
+interactively.
+
+This would be the way to make `vim` available in the `cerebro` container for instance :
+
+.Install `vim` in cerebro
+----
+[root@test-node1 vagrant]# eskimo-edit-image.sh cerebro
+ - Image to be edited is kubernetes.registry:5000/cerebro
+ - Parsing arguments
+ - Creating Kubernetes service DNS entries
+ - Temp container name is e6d78843-9469-4ed2-bb04-a381d0e588a5
+ - Finding new tag for container image
+ - Launching Container ...
+ - Invoking shell in container. You can now type commands!
+root@test-node1:/# apt-get install vim
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following additional packages will be installed:
+  vim-common vim-runtime xxd
+Suggested packages:
+  ctags vim-doc vim-scripts
+The following NEW packages will be installed:
+  vim vim-common vim-runtime xxd
+0 upgraded, 4 newly installed, 0 to remove and 0 not upgraded.
+Need to get 8138 kB of archives.
+After this operation, 36.9 MB of additional disk space will be used.
+Do you want to continue? [Y/n] y
+...
+root@test-node1:/# exit
+exit
+ - Customization command exited successfully, will now save change as new tag in kubernetes.registry:5000/cerebro:2
+ - Committing the changes to the container
+ - Stopping container
+ - Pushing image in docker registry
+ - Deleting previous tag
+ - Deleting previous container image tag 1
+ - Attempting to delete it with registry tag as well
+ - Searching for previous image tag 1 in registry to delete it (if appliable)
+   + Deleting previous container image tag 1 from registry
+   + Garbage collecting layers
+----
+
+As a result of the above sequence, a new tag version "2" will be available in the system and the user is
+left with restarting cerebro manually on Kubernetes, which can be done with the help of the `eskimo-kubectl`
+command:
+
+.restarting cerebro on Kubernetes
+----
+[root@test-node1 vagrant]# eskimo-kubectl restart cerebro kubernetes
+ - Restart Service cerebro
+   + Deleting cerebro
+service "cerebro" deleted
+deployment.apps "cerebro" deleted
+   + (Re-)applying cerebro
+service/cerebro created
+deployment.apps/cerebro created
+[root@test-node1 vagrant]#
+----
 
 
 
 
 
-// marker for exclusion : line 870
+
+// marker for exclusion : line 1000
 
 
 

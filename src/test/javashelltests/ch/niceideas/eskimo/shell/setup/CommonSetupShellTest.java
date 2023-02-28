@@ -62,9 +62,12 @@ public class CommonSetupShellTest {
         jailPath = AbstractSetupShellTest.createJail();
 
         FileUtils.copy(
+                new File("./services_setup/base-eskimo/eskimo-utils.sh"),
+                new File (jailPath + "/eskimo-utils.sh"));
+
+        FileUtils.copy(
                 new File("./services_setup/common/common.sh"),
                 new File (jailPath + "/common.sh"));
-
     }
 
     @AfterEach
@@ -77,22 +80,9 @@ public class CommonSetupShellTest {
     private void createTestScript(String scriptName, String command) throws FileException {
 
         String script = "#!/bin/bash\n" + "\n" +
-                "SCRIPT_DIR=\"$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" && pwd )\"\n" +
-                "\n" +
-                "# Change current folder to script dir (important !)\n" +
-                "cd $SCRIPT_DIR\n" +
-                "\n" +
-                "# Avoid sleeps everywhere\n" +
-                "export NO_SLEEP=true\n" +
-                "\n" +
-                "# Set test mode\n" +
-                "export TEST_MODE=true\n" +
-                "\n" +
-                "# Using local commands\n" +
-                "export PATH=$SCRIPT_DIR:$PATH\n" +
-                "\n" +
+                AbstractSetupShellTest.COMMON_SCRIPT_HACKS +
                 ". $SCRIPT_DIR/common.sh\n" +
-                "\n"+
+                "\n" +
                 "get_last_tag() { \n" +
                 "    echo 1 \n" +
                 "}\n" +

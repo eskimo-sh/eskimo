@@ -77,22 +77,9 @@ public class CommonDevShellTest {
     private void createTestScript(String scriptName, String command) throws FileException {
 
         String script = "#!/bin/bash\n" + "\n" +
-                "SCRIPT_DIR=\"$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" && pwd )\"\n" +
-                "\n" +
-                "# Change current folder to script dir (important !)\n" +
-                "cd $SCRIPT_DIR\n" +
-                "\n" +
-                "# Avoid sleeps everywhere\n" +
-                "export NO_SLEEP=true\n" +
-                "\n" +
-                "# Set test mode\n" +
-                "export TEST_MODE=true\n" +
-                "\n" +
+                AbstractSetupShellTest.COMMON_SCRIPT_HACKS +
                 "# Set no base image load\n" +
                 "export NO_BASE_IMAGE=true\n" +
-                "\n" +
-                "# Using local commands\n" +
-                "export PATH=$SCRIPT_DIR:$PATH\n" +
                 "\n" +
                 ". $SCRIPT_DIR/common.sh\n" +
                 "\n" +

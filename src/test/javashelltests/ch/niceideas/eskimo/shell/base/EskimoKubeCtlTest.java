@@ -89,20 +89,7 @@ public class EskimoKubeCtlTest {
     private void createTestScript(String scriptName, String command) throws FileException, ProcessHelper.ProcessHelperException {
 
         String script = "#!/bin/bash\n" + "\n" +
-                "SCRIPT_DIR=\"$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" && pwd )\"\n" +
-                "\n" +
-                "# Change current folder to script dir (important !)\n" +
-                "cd $SCRIPT_DIR\n" +
-                "\n" +
-                "# Avoid sleeps everywhere\n" +
-                "export NO_SLEEP=true\n" +
-                "\n" +
-                "# Set test mode\n" +
-                "export TEST_MODE=true\n" +
-                "\n" +
-                "# Using local commands\n" +
-                "export PATH=$SCRIPT_DIR:$PATH\n" +
-                "\n" +
+                AbstractSetupShellTest.COMMON_SCRIPT_HACKS +
                 "# Call command\n" +
                 "$SCRIPT_DIR/eskimo-kubectl " + command;
         FileUtils.writeFile(new File (jailPath + "/" + scriptName), script);

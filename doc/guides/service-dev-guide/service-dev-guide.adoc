@@ -180,13 +180,13 @@ image::pngs/services-download.png[800, 800, align="center"]
 
 // included package developer README
 
-include::../../../packages_dev/README.adoc[leveloffset=0,lines=60..315]
+include::../../../packages_dev/README.adoc[leveloffset=0,lines=80..340]
 
 
 
 // included service developer README
 
-include::../../../services_setup/README.adoc[leveloffset=0,lines=60..870]
+include::../../../services_setup/README.adoc[leveloffset=0,lines=80..1000]
 
 
 

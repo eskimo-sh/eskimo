@@ -64,6 +64,26 @@ public abstract class AbstractSetupShellTest {
 
     private static final Logger logger = Logger.getLogger(AbstractSetupShellTest.class);
 
+    public static final String COMMON_SCRIPT_HACKS = "\n" +
+            "SCRIPT_DIR=\"$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" && pwd )\"\n" +
+            "\n" +
+            "# Change current folder to script dir (important !)\n" +
+            "cd $SCRIPT_DIR\n" +
+            "\n" +
+            "if [[ -f ./eskimo-utils.sh ]]; then\n" +
+            "    . ./eskimo-utils.sh\n" +
+            "fi\n" +
+            "\n" +
+            "# Avoid sleeps everywhere\n" +
+            "export NO_SLEEP=true\n" +
+            "\n" +
+            "# Set test mode\n" +
+            "export TEST_MODE=true\n" +
+            "\n" +
+            "# Using local commands\n" +
+            "export PATH=$SCRIPT_DIR:$PATH\n" +
+            "\n";
+
     /** Run Test on Linux only */
     @BeforeEach
     public void beforeMethod() {
@@ -127,6 +147,10 @@ public abstract class AbstractSetupShellTest {
             copyResource("testFile.conf", jailPath, testFileConf);
         }
 
+        FileUtils.copy(
+                new File("./services_setup/base-eskimo/eskimo-utils.sh"),
+                new File (jailPath + "/eskimo-utils.sh"));
+
         copyScripts(jailPath);
 
         enhanceScripts (jailPath);
@@ -155,26 +179,15 @@ public abstract class AbstractSetupShellTest {
             scriptContent = scriptContent.replace("#!/usr/bin/env bash\n", "" +
                     "#!/usr/bin/env bash\n" +
                     "\n" +
-                    "SCRIPT_DIR=\"$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" && pwd )\"\n" +
-                    "\n" +
-                    "# Change current folder to script dir (important !)\n" +
-                    "cd $SCRIPT_DIR\n"+
-                    "\n" +
-                    "# Avoid sleeps everywhere\n" +
-                    "export NO_SLEEP=true\n" +
+                    COMMON_SCRIPT_HACKS +
                     "\n" +
                     "# Hacky hack for kafka test\n" +
                     "export ESKIMO_POD_NAME=\"test-1\"\n" +
                     "\n"+
-                    "# Set test mode\n" +
-                    "export TEST_MODE=true\n" +
-                    "\n"+
                     "get_last_tag() {\n"+
-                    "echo 1\n"+
+                    "  echo 1\n"+
                     "}\n"+
-                    "\n"+
-                    "# Using local commands\n" +
-                    "export PATH=$SCRIPT_DIR:$PATH\n");
+                    "\n");
 
             // inject custom topology loading
             scriptContent = scriptContent.replace(". /etc/eskimo_topology.sh", ". " + jailPath + "/eskimo-topology.sh");

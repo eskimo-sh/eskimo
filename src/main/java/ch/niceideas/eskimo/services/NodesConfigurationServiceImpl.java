@@ -274,7 +274,8 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
             for (String script : new String[]{
                     "kube_do",
-                    "eskimo-kube-exec"}) {
+                    "eskimo-kube-exec",
+                    "eskimo-edit-image.sh"}) {
                 ml.addInfo(" - Copying script " + script);
                 copyCommand(script, "/usr/local/bin/" + script, connection);
             }

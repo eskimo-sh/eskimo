@@ -37,6 +37,8 @@ Software.
 :authors: www.eskimo.sh / 2019
 :copyright: www.eskimo.sh / 2019
 
+:toc:
+
 == Eskimo Introduction
 
 Eskimo is a Big Data Management Web Console to _build_, _manage_ and _operate_
@@ -55,9 +57,27 @@ nodes
 This document presents "1. The *Docker Images Development Framework*"
 
 
+=== Principle schema
+
+The whole services development framework can be represented as follows:
+
+image::../doc/guides/service-dev-guide/pngs/services-development-framework.png[800, 800, align="center"]
+
+* The <<docker_images_development_framework>> is used to develop and build Container templates images that are later
+used to build the actual docker containers images that are fine-tuned to Eskimo deployed on Kubernetes or natively on
+individual Eskimo cluster nodes.
+* The *services_installation_framework* which creates the actual container image from the template image and adapts
+it to the specific situation of the eskimo node or kube cluster on which it is being deployed.
+
+The different scripts involved in the different stages are presented on the schema above along with their
+responsibilities and the environment in which they are executed (outside of the container - on the eskimo host machine
+or the eskimo cluster node - or from within the docker container).
 
 
-// marker for inclusion : line 60
+
+
+
+// marker for inclusion : line 80
 [[docker_images_development_framework]]
 
 == Docker Images Development Framework
@@ -97,6 +117,12 @@ The principle is pretty straightforward:
 sub-folder of this very folder `packages_dev`
 * That `build.sh` script is free to perform whatever it wants as long as the result is a docker image with the expected
 name put in the folder `packages_distrib` in the parent folder and packaging the target software component.
+* By convention, the actual software component download and installation from within the container is done by a script
+names `installServiceX` (for a component that would be called "_serviceX_". More on that below.
+
+This principle is illustrated as follows:
+
+image::../doc/guides/service-dev-guide/pngs/images-development-framework.png[800, 800, align="center"]
 
 Build files are provided for each and every service pre-packaged within eskimo.
 
@@ -114,12 +140,12 @@ Eskimo needs a way during initial setup time to know which packages need to be b
 images to be built is composed by the conjunction of two lists:
 
 * The images referenced by services in `services.json` (See <<services_json>> )
-* The additional packages from configuration property `system.additionalPackagesToBuild` in the configuration file `eskimo.properties`, such as, for
-instance: base-eskimo
+* The additional packages from configuration property `system.additionalPackagesToBuild` in the configuration file
+`eskimo.properties`, such as, for instance: base-eskimo
 
-.default `system.packagesToBuild` property
+.default `system.additionalPackagesToBuild` property
 ----
-system.packagesToBuild=base-eskimo
+system.additionalPackagesToBuild=base-eskimo
 ----
 
 The property `system.additionalPackagesToBuild` is required to identify 3rd party or additional images that are required
@@ -311,8 +337,7 @@ It's content should be aligned with the following properties from the configurat
 
 
 
-
-// marker for exclusion : line 315
+// marker for exclusion : line 340
 
 [appendix]
 == Copyright and License

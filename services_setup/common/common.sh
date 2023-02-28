@@ -293,6 +293,7 @@ function deploy_registry() {
     fi
 
     if [[ $(echo $FLAGS | grep "NO_CONTAINER") == "" ]]; then
+
         echo " - Deploying $CONTAINER Service in docker registry for kubernetes"
         docker tag eskimo/$CONTAINER:$NEW_TAG kubernetes.registry:5000/$CONTAINER:$NEW_TAG >> $LOG_FILE 2>&1
         if [[ $? != 0 ]]; then
@@ -526,87 +527,11 @@ function install_and_check_service_file() {
 }
 
 
-# Commit the container in the docker image and remove container
-# Arguments:
-# - $1 the name of the container
-# - $2 the log file to dump command output to
-# - $3 the tag to use
-function commit_container() {
-
-    if [[ $1 == "" ]]; then
-        echo "Container needs to be passed in argument"
-        exit 71
-    fi
-    export CONTAINER=$1
-
-    if [[ $2 == "" ]]; then
-        echo "New tag needs to be passed in argument"
-        exit 4
-    fi
-    export NEW_TAG=$2
-
-    if [[ $3 == "" ]]; then
-        echo "Log file path needs to be passed in argument"
-        exit 72
-    fi
-    export LOG_FILE=$3
-
-    # Find container latest version
-
-    # Exit the container and commit the changes
-    # Now that we've modified the container we have to commit the changes.
-    echo " - Commiting the changes to the container"
-    docker commit $CONTAINER eskimo/$CONTAINER:$NEW_TAG  >> $LOG_FILE 2>&1
-    fail_if_error $? "$LOG_FILE" 73
-
-    # Stop setup container and and delete it
-    docker stop $CONTAINER  >> $LOG_FILE 2>&1
-    fail_if_error $? "$LOG_FILE" 74
-
-    docker container rm $CONTAINER >> $LOG_FILE 2>&1
-    fail_if_error $? "$LOG_FILE" 75
-
-}
-
-function __delete_registry_repository() {
-
-    if [[ $1 == "" ]]; then
-        echo "Container needs to be passed in argument"
-        exit 2
-    fi
-    export CONTAINER=$1
-
-    if [[ $2 == "" ]]; then
-        echo "Tag needs to be passed as argument"
-        exit 3
-    fi
-    LAST_TAG=$2
-
-    if [[ $3 == "" ]]; then
-        echo "Log file path needs to be passed in argument"
-        exit 4
-    fi
-    export LOG_FILE=$3
-
-    if [[ -d "/var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/$CONTAINER/" ]]; then
-
-        echo "   + Deleting previous container image tag $LAST_TAG from registry"
-        docker exec k8s-registry /usr/local/bin/regctl tag delete kubernetes.registry:5000/$CONTAINER:$LAST_TAG >> $LOG_FILE 2>&1
-        local result=$?
-        # ignoring errors
-
-        if [[ $result == 0 ]]; then
-            echo "   + Garbage collecting layers"
-            docker exec k8s-registry docker-registry garbage-collect /etc/docker_registry/config.yml  >> $LOG_FILE 2>&1
-            fail_if_error $? "$LOG_FILE" 6
-        fi
-    fi
-}
-
 # Commit a container from its docker image and start it
 # Arguments:
 # - $1 the name of the container
-# - $2 the log file to dump command output to
+# - $2 the name of the related docker image
+# - $3 the log file to dump command output to
 # - return new tag to use as exported variable CONTAINER_NEW_TAG
 function build_container() {
 
@@ -665,15 +590,7 @@ function build_container() {
     local NEW_TAG=$(($LAST_TAG+1))
 
     if [[ $NEW_TAG != 1 ]]; then
-        echo " - Deleting previous container image tag $LAST_TAG"
-        docker image rm eskimo/$CONTAINER:$LAST_TAG --force >> $LOG_FILE 2>&1
-        fail_if_error $? "$LOG_FILE" 7
-
-        echo " - Attempting to delete it with registry tag as well"
-        docker image rm kubernetes.registry:5000/$CONTAINER:$LAST_TAG --force >> $LOG_FILE 2>&1
-
-        echo " - Searching for previous image tag $LAST_TAG in registry to delete it (if appliable)"
-        __delete_registry_repository $CONTAINER $LAST_TAG $LOG_FILE
+        delete_tag $CONTAINER $LAST_TAG $LOG_FILE
     fi
 
     # build
@@ -741,15 +658,6 @@ check_in_container_config_success() {
     fi
 }
 
-
-# self explained
-function fail_if_error(){
-    if [[ $1 != 0 ]]; then
-        echo " -> failed \!\!"
-        cat $2
-        exit $3
-    fi
-}
 
 function preinstall_unmount_gluster_share () {
     if [[ $(grep $1 /etc/mtab) != "" ]]; then
