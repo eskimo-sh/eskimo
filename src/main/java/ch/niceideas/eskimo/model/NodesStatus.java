@@ -32,22 +32,34 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.model.service;
+
+package ch.niceideas.eskimo.model;
 
 import ch.niceideas.eskimo.types.Node;
-import ch.niceideas.eskimo.types.Service;
+import lombok.Getter;
 
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
-public class MemoryModel {
+@Getter
+public class NodesStatus {
 
-    private final Map<Node, Map<Service, Long>> innerModel;
+    private final Set<Node> liveNodes = new HashSet<>();
+    private final Set<Node> deadNodes = new HashSet<>();
 
-    public MemoryModel(Map<Node, Map<Service, Long>> innerModel) {
-        this.innerModel = innerModel;
+    public void addLiveNode (Node node) {
+        liveNodes.add (node);
     }
 
-    public Map<Service, Long> getModelForNode(Node node) {
-        return innerModel.get(node);
+    public void addDeadNode (Node node) {
+        deadNodes.add (node);
+    }
+
+    public boolean isNodeAlive(Node node) {
+        return liveNodes.contains(node);
+    }
+
+    public boolean isNodeDead(Node node) {
+        return deadNodes.contains(node);
     }
 }

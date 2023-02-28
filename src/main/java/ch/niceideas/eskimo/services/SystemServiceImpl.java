@@ -215,10 +215,8 @@ public class SystemServiceImpl implements SystemService {
         });
     }
 
-    private void logOperationMessage(OperationId<?> operationId, String operation) {
-        operationsMonitoringService.addInfo(operationId, new String[]{
-                "\n" + operation
-        });
+    private void logOperationMessage(OperationId<?> operationId, String message) {
+        operationsMonitoringService.addInfo(operationId, new String[]{"\n" + message});
     }
 
     @Override
@@ -431,9 +429,6 @@ public class SystemServiceImpl implements SystemService {
                             logger.error(e, e);
                             logger.warn("Storing error - " + e.getClass() + ":" + e.getMessage());
                             error.set(e);
-
-                            // actually killing the thread is perhaps not a good idea
-                            //throw new PooledOperationException(e.getMessage());
                         }
                     }
                 });
@@ -614,7 +609,6 @@ public class SystemServiceImpl implements SystemService {
 
                     // A. In case target node both configured and up, check services actual statuses before doing anything
                     if (    // nodes is configured and responding (up and running
-
                             nodeAlive != null && nodeAlive
                            && handleRemoveServiceIfDown(servicesInstallationStatus, systemStatus, savedService, node, originalNode)) {
                         changes = true;
@@ -696,9 +690,7 @@ public class SystemServiceImpl implements SystemService {
     }
 
     protected void checkServiceDisappearance(SystemStatusWrapper systemStatus) {
-
         if (lastStatus.get() != null) {
-
             for (String serviceStatusFlag : systemStatus.getRootKeys()) {
 
                 // if service is currently not OK but was previously OK
@@ -724,7 +716,6 @@ public class SystemServiceImpl implements SystemService {
             File uninstallScriptFile = new File(containerFolder, "uninstall.sh");
             if (uninstallScriptFile.exists()) {
                 ml.addInfo(" - Calling uninstall script");
-
                 ml.addInfo(sshCommandService.runSSHScriptPath(connection, uninstallScriptFile.getAbsolutePath()));
             }
         } catch (SSHCommandException e) {
@@ -777,8 +768,8 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public List<Pair<String, Node>> discoverAliveAndDeadNodes(Set<Node> allNodes, NodesConfigWrapper nodesConfig, Set<Node> liveNodes, Set<Node> deadNodes) {
-        List<Pair<String, Node>> nodesSetup = new ArrayList<>();
+    public NodesStatus discoverAliveAndDeadNodes(Set<Node> allNodes, NodesConfigWrapper nodesConfig) {
+        NodesStatus nodeStatus = new NodesStatus();
 
         // Find out about dead IPs
         Set<Node> nodesToTest = new HashSet<>(allNodes);
@@ -790,8 +781,6 @@ public class SystemServiceImpl implements SystemService {
                 return null;
             }
 
-            nodesSetup.add(new Pair<>("node_setup", node));
-
             // Ping IP to make sure it is available, report problem with IP if it is not ad move to next one
 
             // find out if SSH connection to host can succeed
@@ -800,17 +789,17 @@ public class SystemServiceImpl implements SystemService {
 
                 if (!ping.startsWith("OK")) {
 
-                    handleNodeDead(deadNodes, node);
+                    handleNodeDead(nodeStatus, node);
                 } else {
-                    liveNodes.add(node);
+                    nodeStatus.addLiveNode(node);
                 }
 
                 // Ensure sudo is possible
-                checkSudoPossible (deadNodes, node);
+                ensureSudoPossible(nodeStatus, node);
 
             } catch (SSHCommandException e) {
                 logger.debug(e, e);
-                handleSSHFails(deadNodes, node);
+                handleSSHFails(nodeStatus, node);
             }
         }
 
@@ -821,36 +810,38 @@ public class SystemServiceImpl implements SystemService {
         }
         */
 
-        return nodesSetup;
+        return nodeStatus;
     }
 
-    private void checkSudoPossible(Set<Node> deadIps, Node node) throws SSHCommandException {
+    private void ensureSudoPossible(NodesStatus nodeStatus, Node node) throws SSHCommandException {
 
         String result = sshCommandService.runSSHScript(node, "sudo ls", false);
         if (   result.contains("a terminal is required to read the password")
             || result.contains("a password is required")) {
+            /* FIXME : wherever this  is used, this should be returned to the UI as a warning either at the end of
+            */
             //messagingService.addLines("\nNode " + node + " doesn't enable the configured user to use sudo without password. Installing cannot continue.");
             notificationService.addError("Node " + node + " sudo problem");
-            deadIps.add(node);
+            nodeStatus.addDeadNode(node);
         }
 
     }
 
-    void handleNodeDead(Set<Node> deadNodes, Node node) {
+    void handleNodeDead(NodesStatus nodeStatus, Node node) {
         /* FIXME : wherever this  is used, this should be returned to the UI as a warning either at the end of
         the operation or during.
         //messagingService.addLines("\nNode seems dead " + node);
         */
         notificationService.addError("Node " + node + " is dead.");
-        deadNodes.add(node);
+        nodeStatus.addDeadNode(node);
     }
 
-    void handleSSHFails(Set<Node> deadNodes, Node node) {
+    void handleSSHFails(NodesStatus nodeStatus, Node node) {
         /* FIXME : wherever this  is used, this should be returned to the UI as a warning either at the end of
         //messagingService.addLines("\nNode " + node + " couldn't be joined through SSH\nIs the user to be used by eskimo properly created and the public key properly added to SSH authorized keys ? (See User Guide)");
         */
         notificationService.addError("Node " + node + " not reachable.");
-        deadNodes.add(node);
+        nodeStatus.addDeadNode(node);
     }
 
     @Override

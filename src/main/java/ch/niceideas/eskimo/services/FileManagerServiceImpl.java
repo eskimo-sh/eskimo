@@ -87,6 +87,7 @@ public class FileManagerServiceImpl implements FileManagerService {
             "application/xml",
             "inode/x-empty"
     };
+    public static final int TSTAMP_PREFIX_SKIP_LENGTH = 12;
 
     @Autowired
     private ConnectionManagerService connectionManagerService;
@@ -329,15 +330,9 @@ public class FileManagerServiceImpl implements FileManagerService {
     }
 
     boolean isTextMimeType(String fileMimeType) {
-
-        if (fileMimeType.startsWith("text")) {
+        if (fileMimeType.startsWith("text") || fileMimeType.contains("+xml")) {
             return true;
-
-        } else if (fileMimeType.contains("+xml")) {
-            return true;
-
         } else {
-
             return Arrays.stream(OTHER_TEXT_MIME_TYPES)
                     .anyMatch(otherText -> fileMimeType.contains(otherText) && !otherText.contains("sharedlib"));
         }
@@ -393,7 +388,7 @@ public class FileManagerServiceImpl implements FileManagerService {
                 throw new IllegalStateException("Couldn't parse " + entry.longEntry);
             }
 
-            String tsString = formatTimestamp(matcher);
+            String tsString = formatTimestamp(matcher.group(6));
 
             directoryContent.put(entry.filename, new JSONObject(new HashMap<String, Object>() {{
                 put ("permissions", matcher.group(1));
@@ -408,10 +403,9 @@ public class FileManagerServiceImpl implements FileManagerService {
         return new JSONObject(directoryContent);
     }
 
-    private String formatTimestamp(Matcher matcher) {
-        String tsString = matcher.group(6);
-        if (tsString.length() > 12) {
-            tsString = tsString.substring(0, 12);
+    private String formatTimestamp(String tsString) {
+        if (tsString.length() > TSTAMP_PREFIX_SKIP_LENGTH) {
+            tsString = tsString.substring(0, TSTAMP_PREFIX_SKIP_LENGTH);
         }
         return tsString;
     }

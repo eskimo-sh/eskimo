@@ -183,20 +183,10 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public List<Pair<String, Node>> discoverAliveAndDeadNodes(Set<Node> allNodes, NodesConfigWrapper nodesConfig, Set<Node> liveNodes, Set<Node> deadNodes) {
-        liveNodes.addAll(nodesConfig.getAllNodes());
-
-        List<Pair<String, Node>> nodesSetup = new ArrayList<>();
-
-        // Find out about dead IPs
-        Set<Node> nodesToTest = new HashSet<>(allNodes);
-        nodesToTest.addAll(nodesConfig.getAllNodes());
-        for (Node node : nodesToTest) {
-
-            nodesSetup.add(new Pair<>("node_setup", node));
-        }
-
-        return nodesSetup;
+    public NodesStatus discoverAliveAndDeadNodes(Set<Node> allNodes, NodesConfigWrapper nodesConfig) {
+        NodesStatus nodesStatus = new NodesStatus();
+        nodesConfig.getAllNodes().forEach(nodesStatus::addLiveNode);
+        return nodesStatus;
     }
 
     @Override

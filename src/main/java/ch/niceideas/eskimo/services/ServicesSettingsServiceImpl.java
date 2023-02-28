@@ -35,7 +35,6 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.MemoryModel;
@@ -135,24 +134,18 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                 operationsMonitoringService.startCommand(restartCommand);
                 try {
 
-                    Set<Node> liveNodes = new HashSet<>();
-                    Set<Node> deadNodes = new HashSet<>();
-
-                    List<Pair<String, Node>> nodeSetupPairs = systemService.discoverAliveAndDeadNodes(
-                            restartCommand.getAllNodes(),
-                            nodesConfig,
-                            liveNodes, deadNodes);
-                    if (nodeSetupPairs == null) {
+                    NodesStatus nodesStatus = systemService.discoverAliveAndDeadNodes( restartCommand.getAllNodes(), nodesConfig);
+                    if (nodesStatus == null) {
                         return;
                     }
 
-                    MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, kubeServicesConfig, deadNodes);
+                    MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, kubeServicesConfig, nodesStatus.getDeadNodes());
 
                     // Nodes setup
                     systemService.performPooledOperation (restartCommand.getNodesCheckOperation(nodesConfig), parallelismInstallThreadCount, baseInstallWaitTimout,
                             (operation, error) -> {
                                 Node node = operation.getNode();
-                                if (nodesConfig.getAllNodes().contains(node) && liveNodes.contains(node)) {
+                                if (nodesConfig.getAllNodes().contains(node) && nodesStatus.isNodeAlive(node)) {
                                     systemOperationService.applySystemOperation(
                                             operation,
                                             ml -> {
@@ -171,7 +164,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                             restartCommand.getRestartsInOrder(servicesInstallationSorter, nodesConfig)) {
                         systemService.performPooledOperation(restarts, 1, operationWaitTimoutSeconds,
                                 (operation, error) -> {
-                                    if (operation.getNode().equals(Node.KUBERNETES_FLAG) || liveNodes.contains(operation.getNode())) {
+                                    if (operation.getNode().equals(Node.KUBERNETES_FLAG) || nodesStatus.isNodeAlive(operation.getNode())) {
                                         nodesConfigurationService.restartServiceForSystem(operation);
                                     }
                                 });

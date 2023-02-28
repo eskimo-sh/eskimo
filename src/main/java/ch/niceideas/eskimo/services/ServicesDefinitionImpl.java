@@ -792,7 +792,6 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
 
         // compare based on dependencies
         return Integer.compare(one.getRelevantDependenciesCount(), other.getRelevantDependenciesCount());
-
     }
 
     @Override

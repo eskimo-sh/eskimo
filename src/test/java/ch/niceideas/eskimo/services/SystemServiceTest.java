@@ -349,30 +349,17 @@ public class SystemServiceTest {
             return "";
         });
 
-        Set<Node> liveNodes = new HashSet<>();
-        Set<Node> deadNodes = new HashSet<>();
-
-        List<Pair<String, Node>> nodesSetup = systemService.discoverAliveAndDeadNodes(
+        NodesStatus nodesStatus = systemService.discoverAliveAndDeadNodes(
                 new HashSet<>(){{
                       add (Node.fromAddress("192.168.10.11"));
                       add (Node.fromAddress("192.168.10.12"));
                   }},
-                StandardSetupHelpers.getStandard2NodesSetup(),
-                liveNodes,
-                deadNodes);
+                StandardSetupHelpers.getStandard2NodesSetup());
 
-        assertTrue(liveNodes.contains(Node.fromAddress("192.168.10.13")));
+        assertTrue(nodesStatus.isNodeAlive(Node.fromAddress("192.168.10.13")));
 
-        assertTrue(deadNodes.contains(Node.fromAddress("192.168.10.11")));
-        assertTrue(deadNodes.contains(Node.fromAddress("192.168.10.12")));
-
-        StringBuilder resultBuilder = new StringBuilder();
-        nodesSetup.forEach(
-                nodeSetup -> resultBuilder.append(nodeSetup.getKey()).append("-").append(nodeSetup.getValue()).append("\n")
-        );
-        assertEquals("node_setup-192.168.10.13\n" +
-                "node_setup-192.168.10.12\n" +
-                "node_setup-192.168.10.11\n", resultBuilder.toString());
+        assertTrue(nodesStatus.isNodeDead(Node.fromAddress("192.168.10.11")));
+        assertTrue(nodesStatus.isNodeDead(Node.fromAddress("192.168.10.12")));
     }
 
     @Test

@@ -107,14 +107,9 @@ public class MasterServiceImpl implements MasterService {
         return Collections.unmodifiableMap(serviceMasterTimestamps);
     }
 
-    // constructor for spring
     public MasterServiceImpl() {
-        this (true);
+        statusRefreshScheduler = SchedulerHelper.scheduleRunnableOneShot(true, statusUpdatePeriodSeconds, this::updateStatus);
     }
-    public MasterServiceImpl(boolean createUpdateScheduler) {
-        statusRefreshScheduler = SchedulerHelper.scheduleRunnableOneShot(createUpdateScheduler, statusUpdatePeriodSeconds, this::updateStatus);
-    }
-
     @PreDestroy
     public void destroy() {
         logger.info ("Cancelling status updater scheduler");

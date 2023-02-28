@@ -74,7 +74,7 @@ public interface SystemService {
             Set<Node> configuredNodesAndOtherLiveNodes)
                 throws FileException, SetupException;
 
-    List<Pair<String, Node>> discoverAliveAndDeadNodes(Set<Node> allNodes, NodesConfigWrapper nodesConfig, Set<Node> liveNodes, Set<Node> deadNodes);
+    NodesStatus discoverAliveAndDeadNodes(Set<Node> allNodes, NodesConfigWrapper nodesConfig);
 
     <T extends Serializable> void performPooledOperation(
             List<T> operations, int parallelism, long operationWaitTimout, PooledOperation<T> operation)

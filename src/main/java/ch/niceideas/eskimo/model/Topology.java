@@ -555,7 +555,7 @@ public class Topology {
 
     private void appendMemoryConfiguration(NodesConfigWrapper nodesConfig, MemoryModel memoryModel, int nodeNbr, StringBuilder sb) {
         // memory management
-        Map<Service, Long> memorySettings = memoryModel.getModelForNode(nodesConfig, nodeNbr);
+        Map<Service, Long> memorySettings = memoryModel.getModelForNode(nodesConfig.getNode(nodeNbr));
         if (memorySettings != null && !memorySettings.isEmpty()) {
             sb.append("\n#Memory Management\n");
 

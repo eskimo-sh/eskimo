@@ -106,7 +106,6 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
 
     private final ScheduledExecutorService scheduler;
 
-    // constructor for spring
     public ConnectionManagerServiceImpl() {
         scheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -171,9 +170,8 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
         connectionAges.remove(node);
 
         // tunnels should be closed immediately !
-        final List<LocalPortForwarderWrapper> previousForwarders = getForwarders(connection);
         try {
-            for (LocalPortForwarderWrapper forwarder : previousForwarders) {
+            for (LocalPortForwarderWrapper forwarder : getForwarders(connection)) {
                 forwarder.close();
             }
         } catch (Exception e) {
@@ -192,10 +190,7 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
 
     @Override
     public void dropTunnelsToBeClosed(Node host) {
-        SSHConnection connection = connectionMap.get(host);
-        if (connection != null) {
-            dropTunnelsToBeClosed(connection, host);
-        }
+        Optional.ofNullable(connectionMap.get(host)).ifPresent(con -> dropTunnelsToBeClosed(con, host));
     }
 
     private SSHConnection getConnectionInternal (Node node) throws ConnectionManagerException {
@@ -269,11 +264,11 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
         JsonWrapper systemConfig = configurationService.loadSetupConfig();
 
         if (privateSShKeyContent == null) {
-            privateSShKeyContent = (String)systemConfig.getValueForPath("content-ssh-key");
+            privateSShKeyContent = (String) systemConfig.getValueForPath("content-ssh-key");
         }
 
         connection.authenticateWithPublicKey(
-                (String)systemConfig.getValueForPath(SetupService.SSH_USERNAME_FIELD),
+                (String) systemConfig.getValueForPath(SetupService.SSH_USERNAME_FIELD),
                 privateSShKeyContent.toCharArray(),
                 null);
 
@@ -294,14 +289,14 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
                 .filter(forwarder -> notIn (forwarder, keptTunnelConfigs))
                 .collect(Collectors.toList());
 
-        try {
-            for (LocalPortForwarderWrapper forwarder : toBeClosed) {
+        for (LocalPortForwarderWrapper forwarder : toBeClosed) {
+            try {
                 forwarder.close();
-                currentForwarders.remove(forwarder);
+            } catch (Exception e) {
+                logger.warn(e.getMessage());
+                logger.debug(e, e);
             }
-        } catch (Exception e) {
-            logger.warn(e.getMessage());
-            logger.debug(e, e);
+            currentForwarders.remove(forwarder);
         }
     }
 
@@ -356,7 +351,7 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
         return tunnelConfigs.stream().noneMatch(forwarder::matches);
     }
 
-    private class ConnectionOperationWatchDog implements AutoCloseable{
+    private class ConnectionOperationWatchDog implements AutoCloseable {
 
         private final ScheduledExecutorService scheduler;
 
@@ -365,6 +360,7 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
             scheduler.schedule(() -> closeConnection(connection), sshOperationTimeout, TimeUnit.MILLISECONDS);
         }
 
+        @Override
         public void close() {
             if (scheduler != null) {
                 scheduler.shutdownNow();

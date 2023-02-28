@@ -37,7 +37,6 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.FileUtils;
-import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.MemoryModel;
@@ -56,7 +55,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -140,18 +141,15 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             NodesConfigWrapper rawNodesConfig = command.getRawConfig();
             NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(rawNodesConfig);
 
-            Set<Node> liveNodes = new HashSet<>();
-            Set<Node> deadNodes = new HashSet<>();
-
-            List<Pair<String, Node>> nodeSetupPairs = systemService.discoverAliveAndDeadNodes(command.getAllNodes(), nodesConfig, liveNodes, deadNodes);
-            if (nodeSetupPairs == null) {
+            NodesStatus nodesStatus = systemService.discoverAliveAndDeadNodes(command.getAllNodes(), nodesConfig);
+            if (nodesStatus == null) {
                 return;
             }
 
             KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
             ServicesInstallStatusWrapper servicesInstallStatus = configurationService.loadServicesInstallationStatus();
 
-            MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, kubeServicesConfig, deadNodes);
+            MemoryModel memoryModel = memoryComputer.buildMemoryModel(nodesConfig, kubeServicesConfig, nodesStatus.getDeadNodes());
 
             if (operationsMonitoringService.isInterrupted()) {
                 return;
@@ -161,7 +159,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             systemService.performPooledOperation(command.getNodesCheckOperation(nodesConfig), parallelismInstallThreadCount, baseInstallWaitTimout,
                     (operation, error) -> {
                         Node node = operation.getNode();
-                        if (nodesConfig.getAllNodes().contains(node) && liveNodes.contains(node)) {
+                        if (nodesConfig.getAllNodes().contains(node) && nodesStatus.isNodeAlive(node)) {
 
                             systemOperationService.applySystemOperation(
                                     operation,
@@ -221,15 +219,15 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
                 systemService.performPooledOperation(operationGroup, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
                             if (operation.getOperation().equals(ServiceOperationsCommand.ServiceOperation.INSTALLATION)) {
-                                if (liveNodes.contains(operation.getNode())) {
+                                if (nodesStatus.isNodeAlive(operation.getNode())) {
                                     installService(operation);
                                 }
 
                             } else if (operation.getOperation().equals(ServiceOperationsCommand.ServiceOperation.UNINSTALLATION)) {
-                                if (!deadNodes.contains(operation.getNode())) {
+                                if (!nodesStatus.isNodeDead (operation.getNode())) {
                                     uninstallService(operation);
                                 } else {
-                                    if (!liveNodes.contains(operation.getNode())) {
+                                    if (!nodesStatus.isNodeAlive(operation.getNode())) {
                                         // this means that the node has been de-configured
                                         // (since if it is neither dead nor alive then it just hasn't been tested since it's not
                                         // in the config anymore)
@@ -238,14 +236,14 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
                                     }
                                 }
                             } else { // restart
-                                if (operation.getNode().equals(Node.KUBERNETES_FLAG) || liveNodes.contains(operation.getNode())) {
+                                if (operation.getNode().equals(Node.KUBERNETES_FLAG) || nodesStatus.isNodeAlive(operation.getNode())) {
                                     restartServiceForSystem(operation);
                                 }
                             }
                         });
             }
 
-            if (!operationsMonitoringService.isInterrupted() && (!Collections.disjoint(deadNodes, nodesConfig.getAllNodes()))) {
+            if (!operationsMonitoringService.isInterrupted() && (!Collections.disjoint(nodesStatus.getDeadNodes(), nodesConfig.getAllNodes()))) {
                 operationsMonitoringService.addGlobalInfo("At least one configured node was found dead");
                 throw new NodesConfigurationException("At least one configured node was found dead");
             }
@@ -525,40 +523,24 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
     }
 
     private void sshChmod755 (SSHConnection connection, String file) throws SSHCommandException {
-        sshChmod (connection, file, "755");
-    }
-
-    private void sshChmod (SSHConnection connection, String file, String mode) throws SSHCommandException {
-        sshCommandService.runSSHCommand(connection, new String[]{"sudo", "chmod", mode, file});
+        sshCommandService.runSSHCommand(connection, new String[]{"sudo", "chmod", "755", file});
     }
 
     @Override
     public String getNodeFlavour(SSHConnection connection) throws SSHCommandException, SystemException {
-        // Find out if debian or RHEL or SUSE
-        String flavour = null;
-        String rawIsDebian = sshCommandService.runSSHScript(connection, "if [[ -f /etc/debian_version ]]; then echo debian; fi");
-        if (rawIsDebian.contains("debian")) {
-            flavour = "debian";
-        }
-
-        if (flavour == null) {
-            String rawIsRedHat = sshCommandService.runSSHScript(connection, "if [[ -f /etc/redhat-release ]]; then echo redhat; fi");
-            if (rawIsRedHat.contains("redhat")) {
-                flavour = "redhat";
+        if (sshCommandService.runSSHScript(connection, "if [[ -f /etc/debian_version ]]; then echo debian; fi").contains("debian")) {
+            return "debian";
+        } else {
+            if (sshCommandService.runSSHScript(connection, "if [[ -f /etc/redhat-release ]]; then echo redhat; fi").contains("redhat")) {
+                return "redhat";
+            } else {
+                if (sshCommandService.runSSHScript(connection, "if [[ -f /etc/SUSE-brand ]]; then echo suse; fi").contains("suse")) {
+                    return "suse";
+                } else {
+                    throw new SystemException ("Unknown OS flavour. None of the known OS type marker files has been found.");
+                }
             }
         }
-
-        if (flavour == null) {
-            String rawIsSuse = sshCommandService.runSSHScript(connection, "if [[ -f /etc/SUSE-brand ]]; then echo suse; fi");
-            if (rawIsSuse.contains("suse")) {
-                flavour = "suse";
-            }
-        }
-
-        if (flavour == null) {
-            throw new SystemException ("Unknown OS flavour. None of the known OS type marker files has been found.");
-        }
-        return flavour;
     }
 
 }
