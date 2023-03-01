@@ -126,8 +126,7 @@ public class NodesConfigurationCheckerTest {
                 put("prom-node-exporter2", "on");
                 put("gluster1", "on");
                 put("gluster2", "on");
-                put("etcd1", "on");
-                put("etcd2", "on");
+                put("etcd", "1");
                 put("kube-slave1", "on");
                 put("kube-slave2", "on");
                 put("kube-master", "1");
@@ -167,8 +166,7 @@ public class NodesConfigurationCheckerTest {
                     put("prom-node-exporter2", "on");
                     put("gluster1", "on");
                     put("gluster2", "on");
-                    put("etcd1", "on");
-                    put("etcd2", "on");
+                    put("etcd", "1");
                     put("logstash1", "on");
                     put("logstash2", "on");
                     put("kube-slave1", "on");
