@@ -589,5 +589,3 @@ public class TerminalTest {
         assertEquals (2, term.getCy());
     }
 }
-
-

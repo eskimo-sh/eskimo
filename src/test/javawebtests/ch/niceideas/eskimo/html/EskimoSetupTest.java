@@ -108,6 +108,24 @@ public class EskimoSetupTest extends AbstractWebTest {
     }
 
     @Test
+    public void testSaveSetupAlerts() throws Exception {
+
+        String setup = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSetupTest/setup.json"), StandardCharsets.UTF_8);
+
+        js("$.ajax = function (callback) { callback.success ( { error: btoa(\"test-error\") } ); }");
+        js("eskimoSetup.doSaveSetup(" + setup + ")");
+        assertJavascriptEquals("3 : test-error", "window.lastAlert");
+
+        js("$.ajax = function (callback) { callback.success ( { dummy: \"dummy\" } ); }");
+        js("eskimoSetup.doSaveSetup(" + setup + ")");
+        assertJavascriptEquals("3 : Expected pending operations command but got none !", "window.lastAlert");
+
+        js("$.ajax = function (callback) { callback.success ( { command: { none: true }} ); }");
+        js("eskimoSetup.doSaveSetup(" + setup + ")");
+        assertJavascriptEquals("1 : Configuration applied successfully", "window.lastAlert");
+    }
+
+    @Test
     public void testDisableDownloadInSnapshot_EnableInRelease() throws Exception {
 
         // build
@@ -132,11 +150,28 @@ public class EskimoSetupTest extends AbstractWebTest {
 
         String setupConfig =  StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SetupServiceTest/setupConfig.json"), StandardCharsets.UTF_8);
 
-        js("eskimoSetup.handleSetup("+setupConfig+")");
+        js("$.ajaxGet = function(callback) {\n" +
+                "    callback.success(" + setupConfig + ");\n" +
+                "}");
+
+        js("eskimoSetup.loadSetup(true)");
 
         assertJavascriptEquals("/tmp/setupConfigTest", "$('#setup_storage').val()");
         assertJavascriptEquals("eskimo", "$('#" + SetupService.SSH_USERNAME_FIELD + "').val()");
         assertJavascriptEquals("ssh_key", "$('#filename-ssh-key').val()");
+    }
+
+    @Test
+    public void testHandleSetupClear() {
+
+        js("$.ajaxGet = function(callback) {\n" +
+                "    callback.success({ version: \"1.0\", clear: \"setup\", message: \"test-message\"});\n" +
+                "}");
+
+        js("eskimoSetup.loadSetup(true)");
+
+        assertJavascriptEquals("true", "window.handleSetupNotCompletedCalled");
+        assertJavascriptEquals("1 : test-message", "window.lastAlert");
     }
 
 }

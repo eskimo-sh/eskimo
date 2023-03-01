@@ -137,7 +137,8 @@ eskimo.Menu = function() {
         $(".side-nav-link").each(function (target) {
             if (this.id.indexOf("main-menu-show-") <= -1 || this.id.indexOf("link") <= -1) {
                 if (this.id.indexOf("services-menu_") <= -1) {
-                    eskimoAlert.showAlert(ESKIMO_ALERT_LEVEL.ERROR, "menu with id '" + this.id + "' is expected of having an id of form 'main-menu-show-XXX-link'. There will be inconsistencies down the line.");
+                    eskimoAlert.showAlert(ESKIMO_ALERT_LEVEL.ERROR,
+                        "menu with id '" + this.id + "' is expected of having an id of form 'main-menu-show-XXX-link'. There will be inconsistencies down the line.");
                 }
             } else {
                 menuIdsToCheck.push (this.id.substring("main-menu-show-".length, this.id.indexOf("link") - 1));
@@ -279,7 +280,7 @@ eskimo.Menu = function() {
                 let menuEntry = '' +
                     '<li class="side-nav-item folder-menu-items disabled" id="folderMenu' + getUcfirst(getCamelCase(service)) + '">\n' +
                     '    <a id="services-menu_' + service + '" href="#" class="side-nav-link">\n' +
-                    '        <em><img src="' + that.eskimoNodesConfig.getServiceIconPath(service) + '"></em>\n' +
+                    '        <em><img alt="' + service + ' icon" src="' + that.eskimoNodesConfig.getServiceIconPath(service) + '"></em>\n' +
                     '        <span class="menu-text">' + uiConfig.title + '</span>\n' +
                     '        <span class="badge rounded-pill bg-secondary text-light font-11 align-middle float-end">&nbsp;Off&nbsp;</span>' +
                     '    </a>\n' +

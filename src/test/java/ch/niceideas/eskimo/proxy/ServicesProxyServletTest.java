@@ -46,10 +46,7 @@ import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
 import ch.niceideas.eskimo.types.ServiceWebId;
 import org.apache.catalina.ssi.ByteArrayServletOutputStream;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.HttpHeaders;
-import org.apache.hc.core5.http.HttpRequest;
-import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -112,32 +109,65 @@ public class ServicesProxyServletTest {
         connectionManagerServiceTest.dontConnect();
         webSocketProxyServerTest.reset();
 
-        servlet = new ServicesProxyServlet(pms, servicesDefinition, "/", 5, 10000, 10000, 10000);
+        servlet = new ServicesProxyServlet(pms, servicesDefinition, null, 5, 10000, 10000, 10000);
     }
 
     @Test
     public void testGetTargetUri() throws Exception {
 
         HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("database-manager");
-
         pms.updateServerForService(Service.from("database-manager"), Node.fromAddress("192.168.10.11"));
 
         assertEquals ("http://localhost:"
                 + pms.getTunnelConfig(ServiceWebId.fromService(Service.from("database-manager"))).getLocalPort()
                 + "/",
                 servlet.getTargetUri(request));
+
+        request = HttpObjectsHelper.createHttpServletRequest("distributed-filesystem");
+        pms.updateServerForService(Service.from("distributed-filesystem"), Node.fromAddress("192.168.56.21"));
+
+        assertEquals ("http://localhost:"
+                        + pms.getTunnelConfig(ServiceWebId.fromServiceAndNode(Service.from("distributed-filesystem"), Node.fromAddress("192.168.56.21"))).getLocalPort()
+                        + "/",
+                servlet.getTargetUri(request));
+    }
+
+    @Test
+    public void testGetTargetHost() throws Exception {
+        HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("database-manager");
+        pms.updateServerForService(Service.from("database-manager"), Node.fromAddress("192.168.10.11"));
+
+        HttpHost dbmHost = servlet.getTargetHost(request);
+        assertNotNull(dbmHost);
+        assertEquals ("localhost", dbmHost.getHostName());
+        assertEquals (pms.getTunnelConfig(ServiceWebId.fromService(Service.from("database-manager"))).getLocalPort(), dbmHost.getPort());
+
+        request = HttpObjectsHelper.createHttpServletRequest("distributed-filesystem");
+        pms.updateServerForService(Service.from("distributed-filesystem"), Node.fromAddress("192.168.56.21"));
+
+        HttpHost dfHost = servlet.getTargetHost(request);
+        assertNotNull(dfHost);
+        assertEquals ("localhost", dfHost.getHostName());
+        assertEquals (pms.getTunnelConfig(ServiceWebId.fromServiceAndNode(Service.from("distributed-filesystem"), Node.fromAddress("192.168.56.21"))).getLocalPort(), dfHost.getPort());
     }
 
     @Test
     public void testRewriteUrlFromRequest() throws Exception {
 
         HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("database-manager");
-
         pms.updateServerForService(Service.from("database-manager"), Node.fromAddress("192.168.10.11"));
 
         assertEquals("http://localhost:"
                 + pms.getTunnelConfig(ServiceWebId.fromService(Service.from("database-manager"))).getLocalPort()
-                + "/database-manager/statistics?server=192.168.10.13",
+                + "/statistics?server=192.168.10.13",
+                servlet.rewriteUrlFromRequest(request));
+
+        request = HttpObjectsHelper.createHttpServletRequest("distributed-filesystem");
+        pms.updateServerForService(Service.from("distributed-filesystem"), Node.fromAddress("192.168.56.21"));
+
+        assertEquals("http://localhost:"
+                        + pms.getTunnelConfig(ServiceWebId.fromServiceAndNode(Service.from("distributed-filesystem"), Node.fromAddress("192.168.56.21"))).getLocalPort()
+                        + "/egmi/app.html",
                 servlet.rewriteUrlFromRequest(request));
     }
 
@@ -145,13 +175,20 @@ public class ServicesProxyServletTest {
     public void testRewriteUrlFromResponse() throws Exception {
 
         HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("database-manager");
-
         pms.updateServerForService(Service.from("database-manager"), Node.fromAddress("192.168.10.11"));
 
         assertEquals("http://localhost:9090/database-manager/nodeStats/statistics=192.168.10.13",
                 servlet.rewriteUrlFromResponse(request, "http://localhost:" +
                      pms.getTunnelConfig(ServiceWebId.fromService(Service.from("database-manager"))).getLocalPort() +
                     "/nodeStats/statistics=192.168.10.13"));
+
+        request = HttpObjectsHelper.createHttpServletRequest("distributed-filesystem");
+        pms.updateServerForService(Service.from("distributed-filesystem"), Node.fromAddress("192.168.56.21"));
+
+        assertEquals("http://localhost:9090/distributed-filesystem/192-168-56-21/egmi/app.html",
+                servlet.rewriteUrlFromResponse(request, "http://localhost:" +
+                        pms.getTunnelConfig(ServiceWebId.fromServiceAndNode(Service.from("distributed-filesystem"), Node.fromAddress("192.168.56.21"))).getLocalPort() +
+                        "/egmi/app.html"));
     }
 
     @Test
@@ -321,6 +358,28 @@ public class ServicesProxyServletTest {
         assertEquals ("src=\"/database-manager/TEST ABC STRING", new String (responseOutputStream.toByteArray()));
 
         assertEquals(38, headers.get(HttpHeaders.CONTENT_LENGTH));
+    }
+
+    @Test
+    public void testNewProxyRequestWithEntity() throws Exception {
+
+        HttpServletRequest servletRequest = HttpObjectsHelper.createHttpServletRequest("database-manager");
+
+        ClassicHttpRequest request = servlet.newProxyRequestWithEntity(
+                "POST", "localhost:9191/test", servletRequest);
+
+        assertNotNull (request);
+        assertNotNull (request.getEntity());
+        assertEquals ("InputStreamEntity", request.getEntity().getClass().getSimpleName());
+
+        servletRequest = HttpObjectsHelper.createHttpServletRequest("distributed-filesystem");
+
+        request = servlet.newProxyRequestWithEntity(
+                "POST", "localhost:9191/test", servletRequest);
+
+        assertNotNull (request);
+        assertNotNull (request.getEntity());
+        assertEquals ("UrlEncodedFormEntity", request.getEntity().getClass().getSimpleName());
     }
 
 }

@@ -943,6 +943,6 @@ public class ProxyServletTest {
     public void testRewriteUrlFromRequest() {
         // ensure no double slashes situation
         String test = new ProxyServlet().rewriteUrlFromRequest(HttpObjectsHelper.createHttpServletRequest("cerebro"));
-        assertEquals("http://localhost:9090/cerebro/statistics?server=192.168.10.13", test);
+        assertEquals("http://localhost:9090/statistics?server=192.168.10.13", test);
     }
 }

@@ -129,18 +129,33 @@ public class ServicesProxyServletWithContextTest {
                 + pms.getTunnelConfig(ServiceWebId.fromService(Service.from("database-manager"))).getLocalPort()
                 + "/",
                 servlet.getTargetUri(request));
+
+        request = HttpObjectsHelper.createHttpServletRequest("distributed-filesystem", "/test-context");
+        pms.updateServerForService(Service.from("distributed-filesystem"), Node.fromAddress("192.168.56.21"));
+
+        assertEquals ("http://localhost:"
+                        + pms.getTunnelConfig(ServiceWebId.fromServiceAndNode(Service.from("distributed-filesystem"), Node.fromAddress("192.168.56.21"))).getLocalPort()
+                        + "/",
+                servlet.getTargetUri(request));
     }
 
     @Test
     public void testRewriteUrlFromRequest() throws Exception {
 
         HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("database-manager", "/test-context");
-
         pms.updateServerForService(Service.from("database-manager"), Node.fromAddress("192.168.10.11"));
 
         assertEquals("http://localhost:"
-                + pms.getTunnelConfig(ServiceWebId.fromService(Service.from("database-manager"))).getLocalPort()
-                + "/database-manager/statistics?server=192.168.10.13",
+                    + pms.getTunnelConfig(ServiceWebId.fromService(Service.from("database-manager"))).getLocalPort()
+                    + "/statistics?server=192.168.10.13",
+                servlet.rewriteUrlFromRequest(request));
+
+        request = HttpObjectsHelper.createHttpServletRequest("distributed-filesystem", "/test-context");
+        pms.updateServerForService(Service.from("distributed-filesystem"), Node.fromAddress("192.168.56.21"));
+
+        assertEquals("http://localhost:"
+                    + pms.getTunnelConfig(ServiceWebId.fromServiceAndNode(Service.from("distributed-filesystem"), Node.fromAddress("192.168.56.21"))).getLocalPort()
+                    + "/egmi/app.html",
                 servlet.rewriteUrlFromRequest(request));
     }
 
@@ -148,13 +163,20 @@ public class ServicesProxyServletWithContextTest {
     public void testRewriteUrlFromResponse() throws Exception {
 
         HttpServletRequest request = HttpObjectsHelper.createHttpServletRequest("database-manager", "/test-context");
-
         pms.updateServerForService(Service.from("database-manager"), Node.fromAddress("192.168.10.11"));
 
         assertEquals("http://localhost:9090/test-context/database-manager/nodeStats/statistics=192.168.10.13",
                 servlet.rewriteUrlFromResponse(request, "http://localhost:" +
                      pms.getTunnelConfig(ServiceWebId.fromService(Service.from("database-manager"))).getLocalPort() +
                     "/nodeStats/statistics=192.168.10.13"));
+
+        request = HttpObjectsHelper.createHttpServletRequest("distributed-filesystem", "/test-context");
+        pms.updateServerForService(Service.from("distributed-filesystem"), Node.fromAddress("192.168.56.21"));
+
+        assertEquals("http://localhost:9090/test-context/distributed-filesystem/192-168-56-21/egmi/app.html",
+                servlet.rewriteUrlFromResponse(request, "http://localhost:" +
+                        pms.getTunnelConfig(ServiceWebId.fromServiceAndNode(Service.from("distributed-filesystem"), Node.fromAddress("192.168.56.21"))).getLocalPort() +
+                        "/egmi/app.html"));
     }
 
     @Test

@@ -55,6 +55,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -91,19 +92,28 @@ public class TerminalServiceImpl implements TerminalService {
         scheduler = Executors.newSingleThreadScheduledExecutor();
 
         logger.info ("Initializing terminal closer scheduler ...");
-        scheduler.scheduleAtFixedRate(() -> {
-            for (String sessionId : new ArrayList<>(sessions.keySet())) {
-                Session session = sessions.get (sessionId);
-                if (System.currentTimeMillis() - session.getLastAccess() > idleTimeoutSeconds * 1000) {
-                    try {
-                        logger.info("Closing session with ID " + sessionId + " (idle tineout)");
-                        removeTerminal(sessionId);
-                    } catch (IOException e) {
-                        logger.debug (e, e);
-                    }
+        scheduler.scheduleAtFixedRate(
+                () -> removeExpiredTerminals(idleTimeoutSeconds),
+                idleTimeoutSeconds / 10, idleTimeoutSeconds / 10, TimeUnit.SECONDS);
+    }
+
+    /* for tests */
+    Map<String, Session> getSessions() {
+        return Collections.unmodifiableMap(sessions);
+    }
+
+    void removeExpiredTerminals(long effIdleTimeoutSecs) {
+        for (String sessionId : new ArrayList<>(sessions.keySet())) {
+            Session session = sessions.get (sessionId);
+            if (System.currentTimeMillis() - session.getLastAccess() > effIdleTimeoutSecs * 1000) {
+                try {
+                    logger.info("Closing session with ID " + sessionId + " (idle tineout)");
+                    removeTerminal(sessionId);
+                } catch (IOException e) {
+                    logger.debug (e, e);
                 }
             }
-        }, idleTimeoutSeconds / 10, idleTimeoutSeconds / 10, TimeUnit.SECONDS);
+        }
     }
 
     @PreDestroy

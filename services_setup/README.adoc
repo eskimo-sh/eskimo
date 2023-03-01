@@ -915,9 +915,18 @@ Services can be customized by updating or customizing the different scripts pres
 <<docker_images_versioning>>, this can be done at will and one just needs to reinstall the corresponding service to make
 his changes deployed on the system.
 
-But eskimo also provides an utility tool to perform such customization on the live systen, without requiring to get
-back to the eskimo UI and reinstall a service. +
-The tool takes the form of a shell script and is named `eskimo-edit-image.sh`.
+But eskimo also provides a utility tool to perform such customization on the live systen, without requiring to get
+back to the eskimo UI and reinstall a service from the UI. +
+Whenever one is develpping a new service or feature, havigng to get back to Eskimo and the full reinstallation procedure
+is cumbersome. This script is intended for this purpose, being able to quickly evolve services in an efficient and easy
+fashion.
+
+The principle is illustrated as follows:
+
+image::../doc/guides/service-dev-guide/pngs/services-customization-tool.png[800, 800, align="center"]
+
+
+This tool takes the form of a shell script and is named `eskimo-edit-image.sh`.
 
 .`eskimo-edit-image.sh usage
 ----
@@ -929,12 +938,12 @@ SCRIPT is an optional script path to perfom customization
 
 ----
 
-It takes as argument the name of the service (wich corresponds to the docker image name once a service is installed) as
-argument as well as an optional shell script aimed at performing the cusomization. +
-If the customization script is ommited, then a shell is presented to the user for him to perform the customization
-interactively.
+It takes as argument the name of the service to be modified (which corresponds to the docker image name once a service
+is installed) as well as an optional _shell script path_ aimed at performing the customization. +
+If the customization script is omitted, then an interactive shell prompt is presented to the user for him to be able to
+perform the customization interactively.
 
-This would be the way to make `vim` available in the `cerebro` container for instance :
+As an example, this would be the way to make the `vim` command available in the `cerebro` container:
 
 .Install `vim` in cerebro
 ----
@@ -975,9 +984,10 @@ exit
    + Garbage collecting layers
 ----
 
-As a result of the above sequence, a new tag version "2" will be available in the system and the user is
-left with restarting cerebro manually on Kubernetes, which can be done with the help of the `eskimo-kubectl`
-command:
+As a result of the above sequence, a new tag version "2" will be available in the system for the docker image use by
+the service `cerebro`. +
+The user is then left with restarting _cerebro_ manually on Kubernetes, which can be done with the help of the
+`eskimo-kubectl` command:
 
 .restarting cerebro on Kubernetes
 ----
@@ -997,7 +1007,7 @@ deployment.apps/cerebro created
 
 
 
-// marker for exclusion : line 1000
+// marker for exclusion : line 1010
 
 
 

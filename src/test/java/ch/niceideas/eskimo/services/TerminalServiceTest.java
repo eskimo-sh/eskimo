@@ -51,7 +51,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
@@ -95,28 +95,37 @@ public class TerminalServiceTest extends AbstractBaseSSHTest {
 
         ScreenImage si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=0");
 
-        //System.err.println(si.screen);
+        assertTrue (si.screen.startsWith("<pre class='term '><span class='"), si.screen);
 
-        assertTrue (si.screen.startsWith("<pre class='term '><span class='"));
+        si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=2000");
+        assertTrue (si.screen.startsWith("<idem/>"), si.screen);
 
-        /* FIXME Test nexts
-        si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=2001");
-        assertTrue (si.screen.startsWith("<idem/>"));
+        si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=2000");
+        assertTrue (si.screen.startsWith("<idem/>"), si.screen);
 
-        si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=2001");
-        assertTrue (si.screen.startsWith("<idem/>"));
+        si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=l&t=2001");
+        assertTrue (si.screen.startsWith("<pre class='term '><span class='"), si.screen);
 
-        si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=l&t=2003");
-        assertTrue (si.screen.startsWith("<pre class='term '><span class='"));
+        si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=2002");
+        assertTrue (si.screen.startsWith("<pre class='term '><span class='"), si.screen);
 
-        si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=s&t=2004");
-        assertTrue (si.screen.startsWith("<pre class='term '><span class='"));
-
-        si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=%0D&t=200");
-        assertTrue (si.screen.startsWith("<pre class='term '><span class='"));
-        */
+        si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=%0D&t=2003");
+        assertTrue (si.screen.startsWith("<pre class='term '><span class='"), si.screen);
 
         ts.removeTerminal("699156997");
     }
 
+    @Test
+    public void testRemoveExpiredTerminals() throws Exception {
+
+        ScreenImage si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=0");
+
+        ts.removeExpiredTerminals (1000);
+
+        assertEquals(1, ts.getSessions().size());
+
+        ts.removeExpiredTerminals (0);
+
+        assertEquals(0, ts.getSessions().size());
+    }
 }

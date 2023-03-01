@@ -38,18 +38,22 @@ package ch.niceideas.eskimo.test.infrastructure;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.controlers.NodesConfigController;
 import ch.niceideas.eskimo.proxy.ProxyServlet;
+import ch.niceideas.eskimo.proxy.ServicesProxyServlet;
 import ch.niceideas.eskimo.proxy.ServicesProxyServletTest;
 import ch.niceideas.eskimo.proxy.WebSocketProxyForwarderTest;
 import org.apache.hc.core5.http.*;
+import org.springframework.mock.web.DelegatingServletInputStream;
 import org.springframework.web.socket.WebSocketSession;
 
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.ByteArrayInputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Proxy;
-import java.util.List;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class HttpObjectsHelper {
 
@@ -103,11 +107,40 @@ public class HttpObjectsHelper {
                 new Class[] { HttpServletRequest.class },
                 (proxy, method, methodArgs) -> {
                     switch (method.getName()) {
+                        case "getParameter":
+                            if (methodArgs[0] != null && methodArgs[0].equals("param1")) {
+                                return "value1";
+                            } else if (methodArgs[0] != null && methodArgs[0].equals("param2")) {
+                                return "value2";
+                            } else {
+                                throw new UnsupportedOperationException("Unsupported method: " + method.getName());
+                            }
+                        case "getParameterNames":
+                            return Collections.enumeration(new HashSet<String>(){{
+                                add ("param1");
+                                add ("param2");
+                            }});
+                        case "getInputStream":
+                            return new DelegatingServletInputStream(new ByteArrayInputStream("test-content".getBytes(StandardCharsets.UTF_8)));
+                        case "getHeader":
+                            if (methodArgs[0] != null && methodArgs[0].equals("Content-Length")) {
+                                return "" + (long) (Math.random() * 100000L);
+                            } else {
+                                throw new UnsupportedOperationException("Unsupported method: " + method.getName());
+                            }
+                        case "getContentType":
+                            if ("distributed-filesystem".equals(service)) {
+                                return ServicesProxyServlet.APPLICATION_X_WWW_FORM_URLENCODED;
+                            } else {
+                                return "text/json";
+                            }
                         case "getRequestURI":
                             if ("cerebro".equals(service)) {
                                 return context + "/cerebro/statistics?server=192.168.10.13";
                             } else if ("database-manager".equals(service)) {
                                 return context + "/database-manager/statistics?server=192.168.10.13";
+                            } else if ("distributed-filesystem".equals(service)) {
+                                return context + "/distributed-filesystem/192-168-56-21/egmi/app.html";
                             } else if ("spark-console".equals(service)) {
                                 return context + "/spark-console/history/spark-application-1653861510346/jobs/";
                             } else if ("user-console".equals(service)) {
@@ -120,9 +153,11 @@ public class HttpObjectsHelper {
                             }
                         case "getPathInfo":
                             if ("cerebro".equals(service)) {
-                                return "/cerebro/statistics";
+                                return "/statistics";
                             } else if ("database-manager".equals(service)) {
-                                return "/database-manager/statistics";
+                                return "/statistics";
+                            } else if ("distributed-filesystem".equals(service)) {
+                                return "/192-168-56-21/egmi/app.html";
                             } else if ("spark-console".equals(service)) {
                                 return "/history/spark-application-1653861510346/jobs/";
                             } else if ("user-console".equals(service)) {
@@ -136,6 +171,8 @@ public class HttpObjectsHelper {
                                 return new StringBuffer("http://localhost:9090" + context + "/cerebro/statistics");
                             } else if ("database-manager".equals(service)) {
                                 return new StringBuffer("http://localhost:9090" + context + "/database-manager/statistics");
+                            } else if ("distributed-filesystem".equals(service)) {
+                                return new StringBuffer("http://localhost:9090" + context + "/distributed-filesystem/192-168-56-21/egmi/app.html");
                             } else if ("spark-console".equals(service)) {
                                 return new StringBuffer("http://localhost:9191" + context + "/history/spark-application-1652639268719/jobs/");
                             } else if ("user-console".equals(service)) {
@@ -147,6 +184,8 @@ public class HttpObjectsHelper {
                         case "getQueryString":
                             if ("cerebro".equals(service) || "database-manager".equals(service)) {
                                 return "server=192.168.10.13";
+                            } else if ("distributed-filesystem".equals(service)) {
+                                return null;
                             } else {
                                 throw new UnsupportedOperationException(
                                         "Unsupported method: " + method.getName());

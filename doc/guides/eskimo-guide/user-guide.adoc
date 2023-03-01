@@ -176,3 +176,18 @@ sudo rm -RF /usr/local/lib/eskimo-V0.3/packages_distrib/*
 
 When this is done the Eskimo Web UI will automaticalyl bring the user back to the setup page and enable him to either
 build or download the _Eskimo Service Package Images_. Internet access from the VM is required.
+
+=== Docker images versioning
+
+Every service deployed on the Eskimo Nods cluster by Eskimo takes a practical form of a docker image instantiated in a
+docker container either through SystemD (for note native services) or Kubernetes.
+
+These Docker images are installed automatically either in the node local repo (for native services) or in a Docker
+Registry (for kubernetes services).
+
+Services can be customized and reinstalled at will and as frequently as required. +
+Eskimo manages version numbers as image tags automatically. +
+The first time a service is installed, the corresponding image will get version number "1" as tag, the second time, it
+will get version "2", and so on.
+
+This is explained in more detals in the Eskimo "_Services Development Guide_" (another document).
