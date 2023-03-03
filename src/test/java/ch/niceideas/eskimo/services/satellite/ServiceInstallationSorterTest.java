@@ -36,11 +36,10 @@ package ch.niceideas.eskimo.services.satellite;
 
 import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.ServiceOperationsCommand;
+import ch.niceideas.eskimo.model.NodeServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
-import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -80,7 +79,7 @@ public class ServiceInstallationSorterTest {
     @Test
     public void testNoMixUpOfKubeAndNonKube() throws Exception {
 
-        ServiceOperationsCommand restartCommand = ServiceOperationsCommand.createForRestartsOnly(
+        NodeServiceOperationsCommand restartCommand = NodeServiceOperationsCommand.createForRestartsOnly(
                 servicesDefinition,
                 nodeRangeResolver,
                 new Service[] {
@@ -93,7 +92,7 @@ public class ServiceInstallationSorterTest {
                 StandardSetupHelpers.getStandard2NodesSetup()
         );
 
-        List<List<ServiceOperationsCommand.ServiceOperationId>> orderedRestart = restartCommand.getOperationsGroupInOrder(
+        List<List<NodeServiceOperationsCommand.ServiceOperationId>> orderedRestart = restartCommand.getOperationsGroupInOrder(
                 sis, StandardSetupHelpers.getStandard2NodesSetup()
         );
 
@@ -118,10 +117,10 @@ public class ServiceInstallationSorterTest {
 
         ServicesInstallStatusWrapper savesServicesInstallStatus = new ServicesInstallStatusWrapper (new HashMap<>());
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+        NodeServiceOperationsCommand oc = NodeServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savesServicesInstallStatus, nodesConfig);
 
-        List<List<ServiceOperationsCommand.ServiceOperationId>> orderedInstall = sis.orderOperations (oc.getInstallations(), nodesConfig);
+        List<List<NodeServiceOperationsCommand.ServiceOperationId>> orderedInstall = sis.orderOperations (oc.getInstallations(), nodesConfig);
 
         assertNotNull(orderedInstall);
 

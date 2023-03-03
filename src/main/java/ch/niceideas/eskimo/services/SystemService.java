@@ -35,7 +35,6 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.FileException;
-import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
@@ -53,7 +52,7 @@ public interface SystemService {
     String SERVICE_PREFIX = "Service ";
     String SHOULD_NOT_HAPPEN_FROM_HERE = " should not happen from here.";
 
-    void delegateApplyNodesConfig(ServiceOperationsCommand command) throws NodesConfigurationException;
+    void delegateApplyNodesConfig(NodeServiceOperationsCommand command) throws NodesConfigurationException;
 
     void showJournal(ServiceDefinition serviceDef, Node node) throws SystemException;
 
@@ -74,13 +73,13 @@ public interface SystemService {
             Set<Node> configuredNodesAndOtherLiveNodes)
                 throws FileException, SetupException;
 
-    NodesStatus discoverAliveAndDeadNodes(Set<Node> allNodes, NodesConfigWrapper nodesConfig);
+    NodesStatus discoverAliveAndDeadNodes(Set<Node> allNodes, NodesConfigWrapper nodesConfig) throws SystemException;
 
     <T extends Serializable> void performPooledOperation(
             List<T> operations, int parallelism, long operationWaitTimout, PooledOperation<T> operation)
             throws SystemException;
 
-    String sendPing(Node node) throws SSHCommandException;
+    boolean isNodeUp(Node node);
 
     File createTempFile(Service service, String extension) throws IOException;
 
@@ -103,6 +102,8 @@ public interface SystemService {
             boolean shall,
             boolean installed,
             boolean running) throws ConnectionManagerException;
+
+    void runPreUninstallHooks(MessageLogger ml, OperationId<?> operation) throws SystemException;
 
     interface PooledOperation<T> {
         void call(T operation, AtomicReference<Exception> error)

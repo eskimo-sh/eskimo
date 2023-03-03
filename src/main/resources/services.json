@@ -478,7 +478,10 @@
         "masterService": "kube-master",
         "numberOfMasters": 1,
         "mandatory": true,
-        "restart": true
+        "restart": true,
+        "hooks": {
+          "preUninstallHook": "/usr/local/bin/kubectl drain {service.node.address} --delete-local-data --force --timeout=300s && /usr/local/bin/kubectl delete node {service.node.address}"
+        }
       },
       {
         "masterElectionStrategy": "SAME_NODE",
@@ -536,7 +539,7 @@
       {
         "id" : "kubeDashboardLoginToken",
         "service": "kube-master",
-        "command": "/usr/local/bin/kubectl -n eskimo create token eskimo",
+        "command": "/usr/local/bin/kubectl -n eskimo create token eskimo --duration=3600s",
         "role" : "ADMIN"
       }
     ],

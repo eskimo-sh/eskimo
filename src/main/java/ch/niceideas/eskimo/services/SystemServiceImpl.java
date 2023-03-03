@@ -39,6 +39,7 @@ import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.*;
+import ch.niceideas.eskimo.model.service.Dependency;
 import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
@@ -148,7 +149,7 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public void delegateApplyNodesConfig(ServiceOperationsCommand command)
+    public void delegateApplyNodesConfig(NodeServiceOperationsCommand command)
             throws NodesConfigurationException {
         nodesConfigurationService.applyNodesConfig(command);
     }
@@ -303,33 +304,17 @@ public class SystemServiceImpl implements SystemService {
 
                 // 2. Build merged status
                 final ConcurrentHashMap<String, String> statusMap = new ConcurrentHashMap<>();
-                final ExecutorService threadPool = Executors.newFixedThreadPool(parallelismStatusThreadCount);
 
-                for (Pair<Integer, Node> numberedNode : nodesConfig.getNodes()) {
+                performPooledOperation(
+                        nodesConfig.getNodes(), parallelismStatusThreadCount, statusOperationTimeout / 1000,
+                        (operation, error) -> {
+                            Node node = operation.getValue();
 
-                    Node node = numberedNode.getValue();
+                            statusMap.put(("node_nbr_" + node.getName()), "" + operation.getKey());
+                            statusMap.put(("node_address_" + node.getName()), node.getAddress());
 
-                    statusMap.put(("node_nbr_" + node.getName()), "" + numberedNode.getKey());
-                    statusMap.put(("node_address_" + node.getName()), node.getAddress());
-
-                    threadPool.execute(() -> {
-                        try {
-                            fetchNodeStatus(nodesConfig, statusMap, numberedNode, servicesInstallationStatus);
-                        } catch (SystemException e) {
-                            logger.error(e, e);
-                            throw new PooledOperationException(e);
-                        }
-                    });
-                }
-
-                threadPool.shutdown();
-                try {
-                    if (!threadPool.awaitTermination(statusOperationTimeout, TimeUnit.MILLISECONDS)) {
-                        logger.warn ("Status operation fetching ended up in timeout.");
-                    }
-                } catch (InterruptedException e) {
-                    logger.error(e, e);
-                }
+                            fetchNodeStatus(nodesConfig, statusMap, operation, servicesInstallationStatus);
+                        });
 
                 // fetch kubernetes services status
                 try {
@@ -369,16 +354,9 @@ public class SystemServiceImpl implements SystemService {
 
             Set<Node> configuredNodesAndOtherLiveNodes = new HashSet<>(systemStatusNodes);
             for (Node node : additionalIpToTests) {
-
                 // find out if SSH connection to host can succeed
-                try {
-                    String ping = sendPing(node);
-
-                    if (ping.startsWith("OK")) {
-                        configuredNodesAndOtherLiveNodes.add(node);
-                    }
-                } catch (SSHCommandException e) {
-                    logger.debug(e, e);
+                if (isNodeUp(node)) {
+                    configuredNodesAndOtherLiveNodes.add(node);
                 }
             }
 
@@ -404,8 +382,13 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public String sendPing(Node node) throws SSHCommandException {
-        return sshCommandService.runSSHScript(node, "echo OK", false);
+    public boolean isNodeUp(Node node) {
+        try {
+            return sshCommandService.runSSHScript(node, "echo OK", false).startsWith("OK");
+        } catch (SSHCommandException e) {
+            logger.debug (e.getMessage());
+            return false;
+        }
     }
 
     @Override
@@ -460,17 +443,7 @@ public class SystemServiceImpl implements SystemService {
 
         // 3.1 Node answers
         try {
-
-            // find out if SSH connection to host can succeeed
-            String ping = null;
-            try {
-                ping = sendPing(node);
-            } catch (SSHCommandException e) {
-                logger.warn(e.getMessage());
-                logger.debug(e, e);
-            }
-
-            if (StringUtils.isBlank(ping) || !ping.startsWith("OK")) {
+            if (!isNodeUp(node)) {
 
                 statusMap.put(("node_alive_" + node.getName()), "KO");
 
@@ -551,6 +524,50 @@ public class SystemServiceImpl implements SystemService {
         } else {
             if (installed) {
                 statusMap.put(SystemStatusWrapper.buildStatusFlag (service, node), "TD"); // To Be Deleted
+            }
+        }
+    }
+
+    @Override
+    public void runPreUninstallHooks(MessageLogger ml, OperationId<?> operation) throws SystemException {
+        ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(operation.getService());
+        if (serviceDef.hasPreUninstallHooks()) {
+            try {
+                NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges(configurationService.loadNodesConfig());
+
+                ml.addInfo(" - Calling Pre-uninstall Hooks");
+
+                Topology topology = servicesDefinition.getTopology(nodesConfig, configurationService.loadKubernetesServicesConfig(), null);
+
+                for (Dependency dep : serviceDef.getDependencies()) {
+                    if (StringUtils.isNotBlank(dep.getPreUninstallHook())) {
+
+                        ml.addInfo(" - Calling Pre-uninstall Hook for dep " + dep.getMasterService().getName());
+
+                        String preUninstallHookCommand = dep.getPreUninstallHook();
+                        if (operation instanceof NodeServiceOperationsCommand.ServiceOperationId) {
+                            preUninstallHookCommand = preUninstallHookCommand.replace(
+                                    "{service.node.address}",
+                                    ((NodeServiceOperationsCommand.ServiceOperationId) operation).getNode().getAddress());
+                        }
+
+                        Node[] masters = topology.getMasters(servicesDefinition.getServiceDefinition(dep.getMasterService()));
+
+                        for (Node master : masters) {
+                            if (isNodeUp(master)) { // best effort basis
+                                try {
+                                    sshCommandService.runSSHCommand(master, preUninstallHookCommand);
+                                } catch (SSHCommandException e) {
+                                    logger.debug (e, e);
+                                    ml.addInfo(e.getMessage());
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (NodesConfigurationException | ServiceDefinitionException | SetupException e) {
+                ml.addInfo(e.getMessage());
+                throw new SystemException(e);
             }
         }
     }
@@ -768,40 +785,25 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
-    public NodesStatus discoverAliveAndDeadNodes(Set<Node> allNodes, NodesConfigWrapper nodesConfig) {
+    public NodesStatus discoverAliveAndDeadNodes(Set<Node> allNodes, NodesConfigWrapper nodesConfig) throws SystemException {
         NodesStatus nodeStatus = new NodesStatus();
 
         // Find out about dead IPs
         Set<Node> nodesToTest = new HashSet<>(allNodes);
         nodesToTest.addAll(nodesConfig.getAllNodes());
-        for (Node node : nodesToTest) {
 
-            // handle potential interruption request
-            if (operationsMonitoringService.isInterrupted()) {
-                return null;
-            }
-
-            // Ping IP to make sure it is available, report problem with IP if it is not ad move to next one
-
-            // find out if SSH connection to host can succeed
-            try {
-                String ping = sendPing(node);
-
-                if (!ping.startsWith("OK")) {
-
-                    handleNodeDead(nodeStatus, node);
-                } else {
-                    nodeStatus.addLiveNode(node);
-                }
-
-                // Ensure sudo is possible
-                ensureSudoPossible(nodeStatus, node);
-
-            } catch (SSHCommandException e) {
-                logger.debug(e, e);
-                handleSSHFails(nodeStatus, node);
-            }
-        }
+        performPooledOperation(new ArrayList<>(nodesToTest), parallelismStatusThreadCount, statusOperationTimeout / 100,
+                (node, error) -> {
+                    // handle potential interruption request
+                    if (!operationsMonitoringService.isInterrupted()) {
+                        if (!isNodeUp(node)) {
+                            handleNodeDead(nodeStatus, node);
+                        } else {
+                            // Ensure sudo is possible
+                            ensureSudoPossible(nodeStatus, node);
+                        }
+                    }
+                });
 
         /* FIXME : wherever buildDeadIps is used, this should be returned to the UI as a warning either at the end of
             the operation or during.
@@ -813,18 +815,24 @@ public class SystemServiceImpl implements SystemService {
         return nodeStatus;
     }
 
-    private void ensureSudoPossible(NodesStatus nodeStatus, Node node) throws SSHCommandException {
+    private void ensureSudoPossible(NodesStatus nodeStatus, Node node) {
 
-        String result = sshCommandService.runSSHScript(node, "sudo ls", false);
-        if (   result.contains("a terminal is required to read the password")
-            || result.contains("a password is required")) {
-            /* FIXME : wherever this  is used, this should be returned to the UI as a warning either at the end of
-            */
-            //messagingService.addLines("\nNode " + node + " doesn't enable the configured user to use sudo without password. Installing cannot continue.");
-            notificationService.addError("Node " + node + " sudo problem");
+        try {
+            String result = sshCommandService.runSSHScript(node, "sudo ls", false);
+            if (result.contains("a terminal is required to read the password")
+                    || result.contains("a password is required")) {
+                /* FIXME : wherever this  is used, this should be returned to the UI as a warning either at the end of
+                 */
+                //messagingService.addLines("\nNode " + node + " doesn't enable the configured user to use sudo without password. Installing cannot continue.");
+                notificationService.addError("Node " + node + " sudo problem");
+                nodeStatus.addDeadNode(node);
+            } else {
+                nodeStatus.addLiveNode(node);
+            }
+        } catch (SSHCommandException e) {
+            logger.debug (e.getMessage());
             nodeStatus.addDeadNode(node);
         }
-
     }
 
     void handleNodeDead(NodesStatus nodeStatus, Node node) {

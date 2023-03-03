@@ -136,14 +136,24 @@ public class KubernetesServiceTest {
     private List<Service> getInstallations() {
 
         return systemServiceTest.getAppliedOperations().stream()
-                .filter(pair -> ((KubernetesOperationsCommand.KubernetesOperationId)pair.getKey()).getOperation().equals(KubernetesOperationsCommand.KuberneteOperation.INSTALLATION))
+                .filter(pair -> {
+                    if (pair.getKey() instanceof KubernetesOperationsCommand.KubernetesOperationId) {
+                        return ((KubernetesOperationsCommand.KubernetesOperationId) pair.getKey()).getOperation().equals(KubernetesOperationsCommand.KuberneteOperation.INSTALLATION);
+                    }
+                    return false;
+                })
                 .map(pair -> ((KubernetesOperationsCommand.KubernetesOperationId)pair.getKey()).getService())
                 .collect(Collectors.toList());
     }
 
     private List<Service> getUninstallations() {
         return systemServiceTest.getAppliedOperations().stream()
-                .filter(pair -> ((KubernetesOperationsCommand.KubernetesOperationId)pair.getKey()).getOperation().equals(KubernetesOperationsCommand.KuberneteOperation.UNINSTALLATION))
+                .filter(pair -> {
+                    if (pair.getKey() instanceof KubernetesOperationsCommand.KubernetesOperationId) {
+                        return ((KubernetesOperationsCommand.KubernetesOperationId) pair.getKey()).getOperation().equals(KubernetesOperationsCommand.KuberneteOperation.UNINSTALLATION);
+                    }
+                    return false;
+                })
                 .map(pair -> ((KubernetesOperationsCommand.KubernetesOperationId)pair.getKey()).getService())
                 .collect(Collectors.toList());
     }
@@ -201,7 +211,7 @@ public class KubernetesServiceTest {
         List<Service> uninstallList = getUninstallations();
 
         assertEquals(4, uninstallList.size());
-        assertEquals("broker,calculator-runtime,cluster-dashboard,database", uninstallList.stream().map(Service::getName).collect(Collectors.joining(",")));
+        assertEquals("cluster-dashboard,database,calculator-runtime,broker", uninstallList.stream().map(Service::getName).collect(Collectors.joining(",")));
     }
 
 
@@ -236,7 +246,6 @@ public class KubernetesServiceTest {
                 "/usr/local/bin/kubectl get service --all-namespaces -o wide 2>/dev/null \n" +
                 "/bin/ls -1 /var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/\n" +
                 "eskimo-kubectl uninstall database-manager 192.168.10.11\n", sshCommandServiceTest.getExecutedCommands());
-
     }
 
     @Test
@@ -348,6 +357,7 @@ public class KubernetesServiceTest {
         configurationServiceTest.setStandard2NodesInstallStatus();
         kubernetesService.showJournal(servicesDefinition.getServiceDefinition(Service.from("database-manager")), Node.fromAddress("192.168.10.11"));
         assertEquals ("Apply service operation  - database-manager - KUBERNETES_NODE - Showing journal", String.join(",", systemServiceTest.getExecutedActions()));
+        assertEquals ("eskimo-kubectl logs database-manager 192.168.10.11\n", sshCommandServiceTest.getExecutedCommands());
     }
 
     @Test
@@ -355,6 +365,7 @@ public class KubernetesServiceTest {
         configurationServiceTest.setStandard2NodesInstallStatus();
         kubernetesService.startService(servicesDefinition.getServiceDefinition(Service.from("database-manager")), Node.fromAddress("192.168.10.11"));
         assertEquals ("Apply service operation  - database-manager - KUBERNETES_NODE - Starting", String.join(",", systemServiceTest.getExecutedActions()));
+        assertEquals ("eskimo-kubectl start database-manager 192.168.10.11\n", sshCommandServiceTest.getExecutedCommands());
     }
 
     @Test
@@ -362,6 +373,7 @@ public class KubernetesServiceTest {
         configurationServiceTest.setStandard2NodesInstallStatus();
         kubernetesService.stopService(servicesDefinition.getServiceDefinition(Service.from("database-manager")), Node.fromAddress("192.168.10.11"));
         assertEquals ("Apply service operation  - database-manager - KUBERNETES_NODE - Stopping", String.join(",", systemServiceTest.getExecutedActions()));
+        assertEquals ("eskimo-kubectl stop database-manager 192.168.10.11\n", sshCommandServiceTest.getExecutedCommands());
     }
 
     @Test
@@ -369,6 +381,7 @@ public class KubernetesServiceTest {
         configurationServiceTest.setStandard2NodesInstallStatus();
         kubernetesService.restartService(servicesDefinition.getServiceDefinition(Service.from("database-manager")), Node.fromAddress("192.168.10.11"));
         assertEquals ("Apply service operation  - database-manager - KUBERNETES_NODE - Restarting", String.join(",", systemServiceTest.getExecutedActions()));
+        assertEquals ("eskimo-kubectl restart database-manager 192.168.10.11\n", sshCommandServiceTest.getExecutedCommands());
     }
 
 }

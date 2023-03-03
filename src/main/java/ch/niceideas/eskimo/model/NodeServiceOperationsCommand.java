@@ -38,12 +38,10 @@ import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.service.Dependency;
 import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
 import ch.niceideas.eskimo.model.service.ServiceDefinition;
-import ch.niceideas.eskimo.services.ServiceDefinitionException;
 import ch.niceideas.eskimo.services.ServicesDefinition;
 import ch.niceideas.eskimo.services.SystemException;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
-import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Operation;
 import ch.niceideas.eskimo.types.Service;
@@ -58,21 +56,23 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperationsCommand.ServiceOperationId> implements Serializable {
+public class NodeServiceOperationsCommand
+        extends AbstractServiceOperationsCommand<NodeServiceOperationsCommand.ServiceOperationId, NodesConfigWrapper>
+        implements Serializable {
 
-    private static final Logger logger = Logger.getLogger(ServiceOperationsCommand.class);
+    private static final Logger logger = Logger.getLogger(NodeServiceOperationsCommand.class);
 
-    private final NodesConfigWrapper rawNodesConfig;
+    private final Set<Node> allNodes = new HashSet<>();
 
-    public static ServiceOperationsCommand create (
+    public static NodeServiceOperationsCommand create (
             ServicesDefinition servicesDefinition,
             NodeRangeResolver nodeRangeResolver,
             ServicesInstallStatusWrapper servicesInstallStatus,
             NodesConfigWrapper rawNodesConfig) throws NodesConfigurationException {
 
-        ServiceOperationsCommand retCommand = new ServiceOperationsCommand(rawNodesConfig);
-
         NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges (rawNodesConfig);
+
+        NodeServiceOperationsCommand retCommand = new NodeServiceOperationsCommand(rawNodesConfig, nodesConfig.getAllNodes());
 
         // 1. Find out about services that need to be installed
         for (Service service : servicesDefinition.listServicesOrderedByDependencies()) {
@@ -176,18 +176,18 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         return retCommand;
     }
 
-    private static boolean isServiceImpactedOnSameNode(ServiceOperationsCommand retCommand, ServiceDefinition masterServiceDef, Node node) {
+    private static boolean isServiceImpactedOnSameNode(NodeServiceOperationsCommand retCommand, ServiceDefinition masterServiceDef, Node node) {
         return retCommand.getInstallations().stream()
                 .anyMatch (operationId -> operationId.getNode().equals(node) && operationId.getService().equals(masterServiceDef.toService()));
     }
 
-    static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, NodesConfigWrapper nodesConfig, Set<Service> restartedServices) {
+    static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, NodeServiceOperationsCommand retCommand, NodesConfigWrapper nodesConfig, Set<Service> restartedServices) {
         restartedServices.stream()
                 .sorted(servicesDefinition::compareServices)
                 .forEach(service -> feedInRestartService(servicesDefinition, servicesInstallStatus, retCommand, nodesConfig, service));
     }
 
-    private static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, Node node, Service restartedService) {
+    private static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, NodeServiceOperationsCommand retCommand, Node node, Service restartedService) {
         if (servicesDefinition.getServiceDefinition(restartedService).isKubernetes()) {
             if (servicesInstallStatus.isServiceInstalledAnywhere(restartedService)) {
                 retCommand.addRestartIfNotInstalled(restartedService, Node.KUBERNETES_FLAG);
@@ -197,7 +197,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         }
     }
 
-    private static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, ServiceOperationsCommand retCommand, NodesConfigWrapper nodesConfig, Service restartedService) {
+    private static void feedInRestartService(ServicesDefinition servicesDefinition, ServicesInstallStatusWrapper servicesInstallStatus, NodeServiceOperationsCommand retCommand, NodesConfigWrapper nodesConfig, Service restartedService) {
         if (servicesDefinition.getServiceDefinition(restartedService).isKubernetes()) {
             if (servicesInstallStatus.isServiceInstalledAnywhere(restartedService)) {
                 retCommand.addRestartIfNotInstalled(restartedService, Node.KUBERNETES_FLAG);
@@ -212,16 +212,16 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         }
     }
 
-    public static ServiceOperationsCommand createForRestartsOnly (
+    public static NodeServiceOperationsCommand createForRestartsOnly (
             ServicesDefinition servicesDefinition,
             NodeRangeResolver nodeRangeResolver,
             Service[] servicesToRestart,
             ServicesInstallStatusWrapper servicesInstallStatus,
             NodesConfigWrapper rawNodesConfig) throws NodesConfigurationException {
 
-        ServiceOperationsCommand retCommand = new ServiceOperationsCommand(rawNodesConfig);
-
         NodesConfigWrapper nodesConfig = nodeRangeResolver.resolveRanges (rawNodesConfig);
+
+        NodeServiceOperationsCommand retCommand = new NodeServiceOperationsCommand(rawNodesConfig, nodesConfig.getAllNodes());
 
         Set<Service> restartedServices = new HashSet<>(Arrays.asList(servicesToRestart));
 
@@ -230,12 +230,9 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         return retCommand;
     }
 
-    ServiceOperationsCommand(NodesConfigWrapper rawNodesConfig) {
-        this.rawNodesConfig = rawNodesConfig;
-    }
-
-    public NodesConfigWrapper getRawConfig() {
-        return rawNodesConfig;
+    NodeServiceOperationsCommand(NodesConfigWrapper rawNodesConfig, List<Node> allNodes) {
+        super (rawNodesConfig);
+        this.allNodes.addAll(allNodes);
     }
 
     void addRestartIfNotInstalled(Service service, Node node) {
@@ -245,6 +242,7 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
         }
     }
 
+    @Override
     public JSONObject toJSON () {
         return new JSONObject(new HashMap<String, Object>() {{
             put("installations", new JSONArray(toJsonList(getInstallations())));
@@ -272,37 +270,14 @@ public class ServiceOperationsCommand extends JSONInstallOpCommand<ServiceOperat
     }
 
     @Override
-    public List<ServiceOperationId> getAllOperationsInOrder
-            (OperationsContext context)
-            throws ServiceDefinitionException, NodesConfigurationException, SystemException {
-
-        List<ServiceOperationId> allOpList = new ArrayList<>(getNodesCheckOperation(context.getNodesConfig()));
-        getOperationsGroupInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
-        return allOpList;
-    }
-
-    public List<ServiceOperationId> getNodesCheckOperation(NodesConfigWrapper nodesConfig) {
+    public List<ServiceOperationId> getNodesCheckOperation() {
         Set<Node> allNodes = new HashSet<>(getAllNodes());
-        allNodes.addAll(nodesConfig.getAllNodes());
+        allNodes.addAll(this.allNodes);
         return allNodes.stream()
                 .map(node -> new ServiceOperationId(ServiceOperation.CHECK_INSTALL, Service.BASE_SYSTEM, node))
                 .sorted()
                 .collect(Collectors.toList());
     }
-
-    public List<List<ServiceOperationId>> getOperationsGroupInOrder
-            (ServicesInstallationSorter sorter, NodesConfigWrapper nodesConfigWrapper)
-            throws ServiceDefinitionException, NodesConfigurationException, SystemException {
-
-        List<ServiceOperationId> allOpList = new ArrayList<>();
-
-        allOpList.addAll(getInstallations());
-        allOpList.addAll(getUninstallations());
-        allOpList.addAll(getRestarts());
-
-        return sorter.orderOperations(allOpList, nodesConfigWrapper);
-    }
-
 
     @EqualsAndHashCode(callSuper = true)
     public static class ServiceOperationId extends AbstractStandardOperationId<ServiceOperation> implements OperationId<ServiceOperation> {

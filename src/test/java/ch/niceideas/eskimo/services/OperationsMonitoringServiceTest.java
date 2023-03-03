@@ -160,7 +160,7 @@ public class OperationsMonitoringServiceTest {
 
         configurationServiceTest.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
 
-        ServiceOperationsCommand command = ServiceOperationsCommand.create(
+        NodeServiceOperationsCommand command = NodeServiceOperationsCommand.create(
                 servicesDefinition,
                 nodeRangeResolver,
                 servicesInstallStatus,
@@ -215,7 +215,7 @@ public class OperationsMonitoringServiceTest {
 
         configurationServiceTest.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
 
-        ServiceOperationsCommand command = ServiceOperationsCommand.create(
+        NodeServiceOperationsCommand command = NodeServiceOperationsCommand.create(
                 servicesDefinition,
                 nodeRangeResolver,
                 servicesInstallStatus,

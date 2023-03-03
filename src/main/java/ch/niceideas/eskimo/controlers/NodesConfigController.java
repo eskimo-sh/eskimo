@@ -36,7 +36,7 @@ package ch.niceideas.eskimo.controlers;
 
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.ServiceOperationsCommand;
+import ch.niceideas.eskimo.model.NodeServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
@@ -132,7 +132,7 @@ public class NodesConfigController extends AbstractOperationController {
             }
 
             // Create OperationsCommand
-            ServiceOperationsCommand command = ServiceOperationsCommand.create(servicesDefinition, nodeRangeResolver, newServicesInstallStatus, nodesConfig);
+            NodeServiceOperationsCommand command = NodeServiceOperationsCommand.create(servicesDefinition, nodeRangeResolver, newServicesInstallStatus, nodesConfig);
 
             // store command and config in HTTP Session
             session.setAttribute(PENDING_OPERATIONS_STATUS_OVERRIDE, newServicesInstallStatus);
@@ -162,7 +162,7 @@ public class NodesConfigController extends AbstractOperationController {
             ServicesInstallStatusWrapper serviceInstallStatus = configurationService.loadServicesInstallationStatus();
 
             // Create OperationsCommand
-            ServiceOperationsCommand command = ServiceOperationsCommand.create(servicesDefinition, nodeRangeResolver, serviceInstallStatus, nodesConfig);
+            NodeServiceOperationsCommand command = NodeServiceOperationsCommand.create(servicesDefinition, nodeRangeResolver, serviceInstallStatus, nodesConfig);
 
             // store command and config in HTTP Session
             session.removeAttribute(PENDING_OPERATIONS_STATUS_OVERRIDE);
@@ -189,7 +189,7 @@ public class NodesConfigController extends AbstractOperationController {
                 return checkObject.toString(2);
             }
 
-            ServiceOperationsCommand command = (ServiceOperationsCommand) session.getAttribute(PENDING_OPERATIONS_COMMAND);
+            NodeServiceOperationsCommand command = (NodeServiceOperationsCommand) session.getAttribute(PENDING_OPERATIONS_COMMAND);
             session.removeAttribute(PENDING_OPERATIONS_COMMAND);
 
             ServicesInstallStatusWrapper newServicesInstallationStatus = (ServicesInstallStatusWrapper) session.getAttribute(PENDING_OPERATIONS_STATUS_OVERRIDE);

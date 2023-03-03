@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.services.SystemServiceTestImpl;
 import ch.niceideas.eskimo.types.Service;
@@ -64,13 +65,16 @@ public class KubernetesOperationsCommandTest {
     @Autowired
     private ServicesDefinition servicesDefinition;
 
+    @Autowired
+    private ServicesInstallationSorter servicesInstallationSorter;
+
     @BeforeEach
     public void setUp() throws Exception {
         systemServiceTest.reset();
     }
 
     @Test
-    public void testNoChanges() {
+    public void testNoChangesExceptRestarts() {
 
         systemServiceTest.setStandard2NodesStatus();
 
@@ -83,6 +87,7 @@ public class KubernetesOperationsCommandTest {
 
         assertEquals(0, koc.getInstallations().size());
         assertEquals(0, koc.getUninstallations().size());
+        assertEquals(7, koc.getRestarts().size());
     }
 
     @Test
@@ -132,7 +137,7 @@ public class KubernetesOperationsCommandTest {
     @Test
     public void toJSON () {
 
-        KubernetesOperationsCommand moc = prepareThreeOps();
+        KubernetesOperationsCommand moc = prepareThreeOpsPlusRestarts();
 
         assertEquals("{\n" +
                 "  \"restarts\": [\n" +
@@ -149,7 +154,7 @@ public class KubernetesOperationsCommandTest {
                 "}", moc.toJSON().toString(2));
     }
 
-    private KubernetesOperationsCommand prepareThreeOps() {
+    private KubernetesOperationsCommand prepareThreeOpsPlusRestarts() {
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         savedServicesInstallStatus.getJSONObject().remove("database-manager_installed_on_IP_KUBERNETES_NODE");
 
@@ -164,24 +169,35 @@ public class KubernetesOperationsCommandTest {
 
         assertEquals(1, koc.getInstallations().size());
         assertEquals(2, koc.getUninstallations().size());
+        assertEquals(4, koc.getRestarts().size());
         return koc;
     }
 
     @Test
-    public void testGetAllOperationsInOrder() {
+    public void testGetAllOperationsInOrder() throws Exception {
 
-        KubernetesOperationsCommand moc = prepareThreeOps();
+        KubernetesOperationsCommand moc = prepareThreeOpsPlusRestarts();
 
-        List<KubernetesOperationsCommand.KubernetesOperationId> opInOrder = moc.getAllOperationsInOrder(null);
+        List<KubernetesOperationsCommand.KubernetesOperationId> opInOrder = moc.getAllOperationsInOrder(new OperationsContext() {
+            @Override
+            public ServicesInstallationSorter getServicesInstallationSorter() {
+                return servicesInstallationSorter;
+            }
+
+            @Override
+            public NodesConfigWrapper getNodesConfig() {
+                return StandardSetupHelpers.getStandard2NodesSetup();
+            }
+        });
 
         assertEquals ("installation_Topology-All-Nodes\n" +
-                        "installation_database-manager\n" +
-                        "uninstallation_broker-manager\n" +
-                        "uninstallation_user-console\n" +
                         "restart_cluster-dashboard\n" +
                         "restart_database\n" +
+                        "installation_database-manager\n" +
                         "restart_calculator-runtime\n" +
-                        "restart_broker",
+                        "restart_broker\n" +
+                        "uninstallation_broker-manager\n" +
+                        "uninstallation_user-console",
                 opInOrder.stream().map(KubernetesOperationsCommand.KubernetesOperationId::toString).collect(Collectors.joining("\n")));
     }
 

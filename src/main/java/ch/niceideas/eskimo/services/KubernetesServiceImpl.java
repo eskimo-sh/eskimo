@@ -44,6 +44,7 @@ import ch.niceideas.eskimo.proxy.ProxyManagerService;
 import ch.niceideas.eskimo.services.satellite.MemoryComputer;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
 import ch.niceideas.eskimo.utils.KubeStatusParser;
@@ -105,6 +106,9 @@ public class KubernetesServiceImpl implements KubernetesService {
 
     @Autowired
     private SSHCommandService sshCommandService;
+
+    @Autowired
+    private ServicesInstallationSorter servicesInstallationSorter;
 
     @Value("${system.parallelismInstallThreadCount}")
     private int parallelismInstallThreadCount = 10;
@@ -212,31 +216,34 @@ public class KubernetesServiceImpl implements KubernetesService {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void installService(KubernetesOperationsCommand.KubernetesOperationId operation, Node kubeMasterNode)
+    public void installService(KubernetesOperationsCommand.KubernetesOperationId operationId, Node kubeMasterNode)
             throws SystemException {
-        systemOperationService.applySystemOperation(operation,
-                logger -> proceedWithKubernetesServiceInstallation(logger, kubeMasterNode, operation.getService()),
-                status -> status.setInstallationFlagOK(operation.getService(), Node.KUBERNETES_NODE) );
+        systemOperationService.applySystemOperation(operationId,
+                ml -> proceedWithKubernetesServiceInstallation(ml, kubeMasterNode, operationId.getService()),
+                status -> status.setInstallationFlagOK(operationId.getService(), Node.KUBERNETES_NODE) );
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void uninstallService(KubernetesOperationsCommand.KubernetesOperationId operation, Node kubeMasterNode) throws SystemException {
+    public void uninstallService(KubernetesOperationsCommand.KubernetesOperationId operationId, Node kubeMasterNode) throws SystemException {
         Node kubeNode = null;
         try {
             Pair<Node, KubeStatusParser.KubernetesServiceStatus> nodeNameAndStatus =
-                    this.getServiceRuntimeNode(servicesDefinition.getServiceDefinition(operation.getService()), kubeMasterNode);
+                    this.getServiceRuntimeNode(servicesDefinition.getServiceDefinition(operationId.getService()), kubeMasterNode);
             kubeNode = nodeNameAndStatus.getKey();
         } catch (KubernetesException e) {
             logger.warn (e.getMessage());
             logger.debug (e, e);
         }
-        systemOperationService.applySystemOperation(operation,
-                builder -> proceedWithKubernetesServiceUninstallation(builder, kubeMasterNode, operation.getService()),
-                status -> status.removeInstallationFlag(operation.getService(), Node.KUBERNETES_NODE));
+        systemOperationService.applySystemOperation(operationId,
+                ml -> {
+                    systemService.runPreUninstallHooks (ml, operationId);
+                    proceedWithKubernetesServiceUninstallation(ml, kubeMasterNode, operationId.getService());
+                },
+                status -> status.removeInstallationFlag(operationId.getService(), Node.KUBERNETES_NODE));
         if (kubeNode != null) {
-            proxyManagerService.removeServerForService(operation.getService(), kubeNode);
+            proxyManagerService.removeServerForService(operationId.getService(), kubeNode);
         } else {
-            logger.warn ("No previous IP could be found for service " + operation.getService());
+            logger.warn ("No previous IP could be found for service " + operationId.getService());
         }
     }
 
@@ -399,7 +406,7 @@ public class KubernetesServiceImpl implements KubernetesService {
                 return;
             }
 
-            if (nodesStatus.getDeadNodes().contains(kubeMasterNode)) {
+            if (nodesStatus.isNodeDead(kubeMasterNode)) {
                 notificationService.addError("The Kube Master node is dead. cannot proceed any further with installation.");
                 String message = "The Kube Master node is dead. cannot proceed any further with installation. Kubernetes services configuration is saved but will need to be re-applied when k8s-master is available.";
                 operationsMonitoringService.addGlobalInfo(message);
@@ -435,18 +442,22 @@ public class KubernetesServiceImpl implements KubernetesService {
                             }), null);
 
 
+            // Installation in batches (groups following dependencies)
+            for (List<KubernetesOperationsCommand.KubernetesOperationId> operationGroup : command.getOperationsGroupInOrder(servicesInstallationSorter, nodesConfig)) {
 
-            // Installation in batches (groups following dependencies) - deploying on kubernetes 1 service at a time for now
-            systemService.performPooledOperation(command.getInstallations(), 1, kubernetesOperationWaitTimoutSeconds,
-                    (operation, error) -> installService(operation, kubeMasterNode));
+                systemService.performPooledOperation(operationGroup, 1, kubernetesOperationWaitTimoutSeconds,
+                        (operation, error) -> {
+                            if (operation.getOperation().equals(KubernetesOperationsCommand.KuberneteOperation.INSTALLATION)) {
+                                installService(operation, kubeMasterNode);
 
-            // uninstallations - deploying on kubernetes 1 service at a time for now
-            systemService.performPooledOperation(command.getUninstallations(), 1, kubernetesOperationWaitTimoutSeconds,
-                    (operation, error) -> uninstallService(operation, kubeMasterNode));
+                            } else if (operation.getOperation().equals(KubernetesOperationsCommand.KuberneteOperation.UNINSTALLATION)) {
+                                uninstallService(operation, kubeMasterNode);
 
-            // restarts
-            systemService.performPooledOperation(command.getRestarts(), 1, kubernetesOperationWaitTimoutSeconds,
-                    (operation, error) -> restartServiceForSystem(operation));
+                            } else { // restart
+                                restartServiceForSystem(operation);
+                            }
+                        });
+            }
 
             success = true;
 

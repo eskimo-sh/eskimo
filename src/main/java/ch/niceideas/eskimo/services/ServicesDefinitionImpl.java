@@ -353,6 +353,13 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
                         dependency.setConditionalDependency(Service.from(conditionalDependency));
                     }
 
+                    if (depObj.has("hooks")) {
+                        JSONObject hookObj = depObj.getJSONObject("hooks");
+                        if (hookObj.has("preUninstallHook")) {
+                            dependency.setPreUninstallHook (hookObj.getString("preUninstallHook"));
+                        }
+                    }
+
                     serviceDef.addDependency(dependency);
                 }
             }

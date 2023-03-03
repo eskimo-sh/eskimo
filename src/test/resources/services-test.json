@@ -246,7 +246,10 @@
         "masterService": "cluster-master",
         "numberOfMasters": 1,
         "mandatory": true,
-        "restart": true
+        "restart": true,
+        "hooks": {
+          "preUninstallHook": " /usr/local/bin/kubectl drain {service.node.address} --force --timeout=300s"
+        }
       },
       {
         "masterElectionStrategy": "SAME_NODE",

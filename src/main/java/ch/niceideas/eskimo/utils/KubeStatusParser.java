@@ -35,7 +35,6 @@
 
 package ch.niceideas.eskimo.utils;
 
-import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.service.ServiceDefinition;
@@ -97,20 +96,7 @@ public class KubeStatusParser {
             SSHCommandService sshCommandService) throws KubernetesException {
 
         try {
-
-            String ping = null;
-            if (kubeMasterNode != null) {
-
-                // find out if SSH connection to host can succeeed
-                try {
-                    ping = systemService.sendPing(kubeMasterNode);
-                } catch (SSHCommandException e) {
-                    logger.warn(e.getMessage());
-                    logger.debug(e, e);
-                }
-            }
-
-            if (StringUtils.isBlank(ping) || !ping.startsWith("OK")) {
+            if (kubeMasterNode  == null || !systemService.isNodeUp(kubeMasterNode)) {
                 return null;
             }
 
@@ -130,7 +116,6 @@ public class KubeStatusParser {
             throw new KubernetesException(e);
         }
     }
-
 
     public KubeStatusParser(String allPodStatus, String allServicesStatus, String allRegistryServices, ServicesDefinition servicesDefinition) {
         this.allPodStatus = allPodStatus;

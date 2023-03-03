@@ -128,7 +128,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void applyNodesConfig(ServiceOperationsCommand command)
+    public void applyNodesConfig(NodeServiceOperationsCommand command)
             throws NodesConfigurationException {
 
         boolean success = false;
@@ -156,7 +156,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             }
 
             // Nodes setup
-            systemService.performPooledOperation(command.getNodesCheckOperation(nodesConfig), parallelismInstallThreadCount, baseInstallWaitTimout,
+            systemService.performPooledOperation(command.getNodesCheckOperation(), parallelismInstallThreadCount, baseInstallWaitTimout,
                     (operation, error) -> {
                         Node node = operation.getNode();
                         if (nodesConfig.getAllNodes().contains(node) && nodesStatus.isNodeAlive(node)) {
@@ -194,10 +194,10 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
                     });
 
             // first thing first, flag services that need to be restarted as "needing to be restarted"
-            for (ServiceOperationsCommand.ServiceOperationId restart :
+            for (NodeServiceOperationsCommand.ServiceOperationId restart :
                     command.getOperationsGroupInOrder(servicesInstallationSorter, nodesConfig).stream()
                             .flatMap(Collection::stream)
-                            .filter(op -> op.getOperation().equals(ServiceOperationsCommand.ServiceOperation.RESTART))
+                            .filter(op -> op.getOperation().equals(NodeServiceOperationsCommand.ServiceOperation.RESTART))
                             .collect(Collectors.toList())) {
                 try {
                     configurationService.updateAndSaveServicesInstallationStatus(servicesInstallationStatus -> {
@@ -214,16 +214,16 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             }
 
             // Installation in batches (groups following dependencies)
-            for (List<ServiceOperationsCommand.ServiceOperationId> operationGroup : command.getOperationsGroupInOrder(servicesInstallationSorter, nodesConfig)) {
+            for (List<NodeServiceOperationsCommand.ServiceOperationId> operationGroup : command.getOperationsGroupInOrder(servicesInstallationSorter, nodesConfig)) {
 
                 systemService.performPooledOperation(operationGroup, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                         (operation, error) -> {
-                            if (operation.getOperation().equals(ServiceOperationsCommand.ServiceOperation.INSTALLATION)) {
+                            if (operation.getOperation().equals(NodeServiceOperationsCommand.ServiceOperation.INSTALLATION)) {
                                 if (nodesStatus.isNodeAlive(operation.getNode())) {
                                     installService(operation);
                                 }
 
-                            } else if (operation.getOperation().equals(ServiceOperationsCommand.ServiceOperation.UNINSTALLATION)) {
+                            } else if (operation.getOperation().equals(NodeServiceOperationsCommand.ServiceOperation.UNINSTALLATION)) {
                                 if (!nodesStatus.isNodeDead (operation.getNode())) {
                                     uninstallService(operation);
                                 } else {
@@ -417,14 +417,20 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
     @Override
     public void uninstallService(AbstractStandardOperationId<?> operationId) throws SystemException {
         systemOperationService.applySystemOperation(operationId,
-                ml -> proceedWithServiceUninstallation(ml, operationId.getNode(), operationId.getService()),
+                ml -> {
+                    systemService.runPreUninstallHooks (ml, operationId);
+                    proceedWithServiceUninstallation(ml, operationId.getNode(), operationId.getService());
+                },
                 status -> status.removeInstallationFlag(operationId.getService(), operationId.getNode()));
         proxyManagerService.removeServerForService(operationId.getService(), operationId.getNode());
     }
 
     void uninstallServiceNoOp(AbstractStandardOperationId<?> operationId) throws SystemException {
         systemOperationService.applySystemOperation(operationId,
-                builder -> {},
+                ml -> {
+                    // this has to be done in anyway, regardless of node status
+                    systemService.runPreUninstallHooks (ml, operationId);
+                },
                 status -> status.removeInstallationFlag(operationId.getService(), operationId.getNode()));
         proxyManagerService.removeServerForService(operationId.getService(), operationId.getNode());
     }

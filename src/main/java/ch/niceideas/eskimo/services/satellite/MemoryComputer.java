@@ -38,10 +38,7 @@ import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
 import ch.niceideas.eskimo.model.service.MemoryModel;
 import ch.niceideas.eskimo.model.service.ServiceDefinition;
-import ch.niceideas.eskimo.services.SSHCommandException;
-import ch.niceideas.eskimo.services.SSHCommandService;
-import ch.niceideas.eskimo.services.ServicesDefinition;
-import ch.niceideas.eskimo.services.SystemException;
+import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
@@ -74,6 +71,9 @@ public class MemoryComputer {
 
     @Autowired
     private SSHCommandService sshCommandService;
+
+    @Autowired
+    private SystemService systemService;
 
     @Value("${system.parallelismInstallThreadCount}")
     private int parallelismInstallThreadCount = 10;
@@ -160,56 +160,38 @@ public class MemoryComputer {
     Map<Node, Long> getMemoryMap(NodesConfigWrapper nodesConfig, Set<Node> deadNodes) throws SystemException {
         // concurrently build map of ipAddress -> full RAM in MB
         Map<Node, Long> memoryMap = new ConcurrentHashMap<>();
-        final ExecutorService threadPool = Executors.newFixedThreadPool(parallelismInstallThreadCount);
-        AtomicReference<Exception> error = new AtomicReference<>();
 
-        // iterator in IP addresses
-        for (Node node : nodesConfig.getAllNodes()) {
-
-            if (!deadNodes.contains(node)) {
-
-                threadPool.execute(() -> {
-                    try {
-                        String nodeMemory = sshCommandService.runSSHScript(node, "cat /proc/meminfo | grep MemTotal", false);
-                        nodeMemory = nodeMemory.trim();
-                        if (!nodeMemory.startsWith("MemTotal")) {
-                            throw new SSHCommandException("Impossible to understand the format of the meminof result. Missing 'MemTotal' in " + nodeMemory);
+        systemService.performPooledOperation(
+                nodesConfig.getAllNodes(), parallelismInstallThreadCount, operationWaitTimout,
+                (node, error) -> {
+                    if (!deadNodes.contains(node)) {
+                        try {
+                            String nodeMemory = sshCommandService.runSSHScript(node, "cat /proc/meminfo | grep MemTotal", false);
+                            nodeMemory = nodeMemory.trim();
+                            if (!nodeMemory.startsWith("MemTotal")) {
+                                throw new SSHCommandException("Impossible to understand the format of the meminof result. Missing 'MemTotal' in " + nodeMemory);
+                            }
+                            BigDecimal divider;
+                            if (nodeMemory.endsWith("B")) {
+                                divider = BigDecimal.valueOf(1024^2);
+                            } else if (nodeMemory.endsWith("kB")) {
+                                divider = BigDecimal.valueOf(1024);
+                            } else if (nodeMemory.endsWith("mB")) {
+                                divider = BigDecimal.valueOf(1);
+                            } else if (nodeMemory.endsWith("gB")) {
+                                divider = BigDecimal.valueOf(1).divide(BigDecimal.valueOf(1024), RoundingMode.CEILING);
+                            } else {
+                                throw new SSHCommandException("Impossible to understand the format of " + nodeMemory);
+                            }
+                            BigDecimal memory = BigDecimal.valueOf(Long.parseLong(nodeMemory.substring(9, nodeMemory.length() - 2).trim()));
+                            memoryMap.put (node, memory.divide(divider, RoundingMode.FLOOR).longValue());
+                        } catch (SSHCommandException e) {
+                            logger.error (e, e);
+                            error.set(e);
                         }
-                        BigDecimal divider;
-                        if (nodeMemory.endsWith("B")) {
-                            divider = BigDecimal.valueOf(1024^2);
-                        } else if (nodeMemory.endsWith("kB")) {
-                            divider = BigDecimal.valueOf(1024);
-                        } else if (nodeMemory.endsWith("mB")) {
-                            divider = BigDecimal.valueOf(1);
-                        } else if (nodeMemory.endsWith("gB")) {
-                            divider = BigDecimal.valueOf(1).divide(BigDecimal.valueOf(1024), RoundingMode.CEILING);
-                        } else {
-                            throw new SSHCommandException("Impossible to understand the format of " + nodeMemory);
-                        }
-                        BigDecimal memory = BigDecimal.valueOf(Long.parseLong(nodeMemory.substring(9, nodeMemory.length() - 2).trim()));
-                        memoryMap.put (node, memory.divide(divider, RoundingMode.FLOOR).longValue());
-                    } catch (SSHCommandException e) {
-                        logger.error (e, e);
-                        error.set(e);
-                        throw new MemoryComputerException(e);
                     }
                 });
-            }
-        }
 
-        threadPool.shutdown();
-        try {
-            if (!threadPool.awaitTermination(operationWaitTimout, TimeUnit.SECONDS)) {
-                logger.warn ("Memor computation shell commandds ended ip in timeout");
-            }
-        } catch (InterruptedException e) {
-            logger.error (e, e);
-        }
-
-        if (error.get() != null) {
-            throw new SystemException(error.get());
-        }
         return memoryMap;
     }
 

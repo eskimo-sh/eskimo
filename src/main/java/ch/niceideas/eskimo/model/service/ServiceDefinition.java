@@ -266,4 +266,13 @@ public class ServiceDefinition {
         }
         return false;
     }
+
+    public boolean hasPreUninstallHooks() {
+        for (Dependency dep : getDependencies()) {
+            if (dep.hasPreUninstallHook()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

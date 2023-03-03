@@ -64,7 +64,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
 @ActiveProfiles({"no-web-stack", "test-conf", "test-setup", "test-services"})
-public class ServiceOperationsCommandTest {
+public class NodeServiceOperationsCommandTest {
 
     @Autowired
     private ServicesDefinition servicesDefinition;
@@ -82,7 +82,7 @@ public class ServiceOperationsCommandTest {
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+        NodeServiceOperationsCommand oc = NodeServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         assertEquals(0, oc.getInstallations().size());
@@ -98,7 +98,7 @@ public class ServiceOperationsCommandTest {
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+        NodeServiceOperationsCommand oc = NodeServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         assertEquals(1, oc.getInstallations().size());
@@ -120,7 +120,7 @@ public class ServiceOperationsCommandTest {
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
         nodesConfig.getJSONObject().remove("cluster-master");
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+        NodeServiceOperationsCommand oc = NodeServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         assertEquals(0, oc.getInstallations().size());
@@ -137,7 +137,7 @@ public class ServiceOperationsCommandTest {
     @Test
     public void testRestartMany() throws Exception {
 
-        ServiceOperationsCommand oc = prepareThreeOps();
+        NodeServiceOperationsCommand oc = prepareThreeOps();
 
         System.err.println (oc.toJSON());
 
@@ -156,7 +156,7 @@ public class ServiceOperationsCommandTest {
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+        NodeServiceOperationsCommand oc = NodeServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         assertEquals(1, oc.getInstallations().size());
@@ -193,7 +193,7 @@ public class ServiceOperationsCommandTest {
             put ("distributed-time2", "on");
         }} );
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+        NodeServiceOperationsCommand oc = NodeServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         System.err.println (oc.toJSON());
@@ -215,7 +215,7 @@ public class ServiceOperationsCommandTest {
         InputStream nodesStatusStream = ResourceUtils.getResourceAsStream("OperationsCommandTest/nodes-status.json");
         ServicesInstallStatusWrapper status = new ServicesInstallStatusWrapper(StreamUtils.getAsString(nodesStatusStream, StandardCharsets.UTF_8));
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+        NodeServiceOperationsCommand oc = NodeServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, status, newNodesConfig);
 
         assertNotNull(oc);
@@ -240,7 +240,7 @@ public class ServiceOperationsCommandTest {
 
         nodesConfig.setValueForPath("cluster-manager", "1");
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+        NodeServiceOperationsCommand oc = NodeServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         System.err.println (oc.toJSON());
@@ -262,7 +262,7 @@ public class ServiceOperationsCommandTest {
         savedServicesInstallStatus.setValueForPath("cluster-master_installed_on_IP_192-168-10-13", "restart");
         savedServicesInstallStatus.setValueForPath("cluster-slave_installed_on_IP_192-168-10-13", "restart");
 
-        ServiceOperationsCommand oc2 = ServiceOperationsCommand.create(
+        NodeServiceOperationsCommand oc2 = NodeServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         System.err.println (oc2.toJSON());
@@ -287,7 +287,7 @@ public class ServiceOperationsCommandTest {
 
         nodesConfig.setValueForPath("cluster-manager", "1");
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+        NodeServiceOperationsCommand oc = NodeServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         System.err.println (oc.toJSON());
@@ -311,7 +311,7 @@ public class ServiceOperationsCommandTest {
         savedServicesInstallStatus.setValueForPath("cluster-master_installed_on_IP_192-168-10-13", "restart");
         savedServicesInstallStatus.setValueForPath("cluster-slave_installed_on_IP_192-168-10-13", "restart");
 
-        ServiceOperationsCommand oc2 = ServiceOperationsCommand.create(
+        NodeServiceOperationsCommand oc2 = NodeServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         System.err.println (oc2.toJSON());
@@ -336,7 +336,7 @@ public class ServiceOperationsCommandTest {
 
         nodesConfig.setValueForPath("cluster-manager", "1");
 
-        ServiceOperationsCommand oc = ServiceOperationsCommand.create(
+        NodeServiceOperationsCommand oc = NodeServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         System.err.println (oc.toJSON());
@@ -365,7 +365,7 @@ public class ServiceOperationsCommandTest {
         savedServicesInstallStatus.setValueForPath("distributed-filesystem_installed_on_IP_192-168-10-13", "OK");
         savedServicesInstallStatus.setValueForPath("cluster-master_installed_on_IP_192-168-10-13", "OK");
 
-        ServiceOperationsCommand oc2 = ServiceOperationsCommand.create(
+        NodeServiceOperationsCommand oc2 = NodeServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
 
         System.err.println (oc2.toJSON());
@@ -380,7 +380,7 @@ public class ServiceOperationsCommandTest {
     @Test
     public void testToJSON () throws Exception {
 
-        ServiceOperationsCommand oc = prepareThreeOps();
+        NodeServiceOperationsCommand oc = prepareThreeOps();
 
         assertEquals ("{\n" +
                 "  \"restarts\": [\n" +
@@ -403,7 +403,7 @@ public class ServiceOperationsCommandTest {
                 "}", oc.toJSON().toString(2));
     }
 
-    private ServiceOperationsCommand prepareThreeOps() throws NodesConfigurationException {
+    private NodeServiceOperationsCommand prepareThreeOps() throws NodesConfigurationException {
         ServicesInstallStatusWrapper savedServicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
         savedServicesInstallStatus.getJSONObject().remove("distributed-time_installed_on_IP_192-168-10-13");
 
@@ -414,16 +414,16 @@ public class ServiceOperationsCommandTest {
 
         nodesConfig.setValueForPath("cluster-manager", "1");
 
-        return ServiceOperationsCommand.create(
+        return NodeServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedServicesInstallStatus, nodesConfig);
     }
 
     @Test
     public void testGetAllOperationsInOrder() throws Exception {
 
-        ServiceOperationsCommand oc = prepareThreeOps();
+        NodeServiceOperationsCommand oc = prepareThreeOps();
 
-        List<ServiceOperationsCommand.ServiceOperationId> opsInOrder =  oc.getAllOperationsInOrder(new OperationsContext() {
+        List<NodeServiceOperationsCommand.ServiceOperationId> opsInOrder =  oc.getAllOperationsInOrder(new OperationsContext() {
             @Override
             public ServicesInstallationSorter getServicesInstallationSorter() {
                 return servicesInstallationSorter;
@@ -453,7 +453,7 @@ public class ServiceOperationsCommandTest {
                         "restart_broker-manager_kubernetes,\n" +
                         "restart_user-console_kubernetes",
                 opsInOrder.stream()
-                        .map(ServiceOperationsCommand.ServiceOperationId::toString)
+                        .map(NodeServiceOperationsCommand.ServiceOperationId::toString)
                         .collect(Collectors.joining(","))
                         .replace(",", ",\n"));
     }

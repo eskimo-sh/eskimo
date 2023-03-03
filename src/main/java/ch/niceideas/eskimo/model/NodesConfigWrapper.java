@@ -37,6 +37,7 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.common.exceptions.CommonRTException;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.SerializablePair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.SystemException;
@@ -164,13 +165,13 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
                 .collect(Collectors.toList());
     }
 
-    public List<Pair<Integer, Node>> getNodes() {
-        List<Pair<Integer, Node>> retList = new ArrayList<>();
+    public List<SerializablePair<Integer, Node>> getNodes() {
+        List<SerializablePair<Integer, Node>> retList = new ArrayList<>();
 
         getNodeAddressKeys()
                 .forEach(key -> {
                     try {
-                        retList.add(new Pair<>(
+                        retList.add(new SerializablePair<>(
                                 Integer.valueOf(key.substring(NODE_ID_FIELD.length())),
                                 Node.fromAddress((String) getValueForPath(key))));
                     } catch (JSONException e) {

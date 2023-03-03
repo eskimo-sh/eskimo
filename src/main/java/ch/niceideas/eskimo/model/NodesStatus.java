@@ -38,14 +38,14 @@ package ch.niceideas.eskimo.model;
 import ch.niceideas.eskimo.types.Node;
 import lombok.Getter;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 @Getter
 public class NodesStatus {
 
-    private final Set<Node> liveNodes = new HashSet<>();
-    private final Set<Node> deadNodes = new HashSet<>();
+    private final Set<Node> liveNodes = new ConcurrentSkipListSet<>();
+    private final Set<Node> deadNodes = new ConcurrentSkipListSet<>();
 
     public void addLiveNode (Node node) {
         liveNodes.add (node);

@@ -36,11 +36,10 @@ package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
-import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.MessageLogger;
 import ch.niceideas.eskimo.model.NodesConfigWrapper;
-import ch.niceideas.eskimo.model.ServiceOperationsCommand;
+import ch.niceideas.eskimo.model.NodeServiceOperationsCommand;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
@@ -61,8 +60,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
@@ -237,14 +235,14 @@ public class NodesConfigurationServiceTest {
         configurationServiceTest.saveServicesInstallationStatus(savedStatus);
         configurationServiceTest.setStandard2NodesSetup();
 
-        ServiceOperationsCommand command = ServiceOperationsCommand.create(
+        NodeServiceOperationsCommand command = NodeServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedStatus, StandardSetupHelpers.getStandard2NodesSetup());
 
         operationsMonitoringServiceTest.startCommand(command);
 
         // testing cluster-manager installation
-        nodesConfigurationService.installService(new ServiceOperationsCommand.ServiceOperationId(
-                ServiceOperationsCommand.ServiceOperation.INSTALLATION,
+        nodesConfigurationService.installService(new NodeServiceOperationsCommand.ServiceOperationId(
+                NodeServiceOperationsCommand.ServiceOperation.INSTALLATION,
                 Service.from("cluster-manager"),
                 Node.fromAddress("192.168.10.13")));
 
@@ -268,7 +266,7 @@ public class NodesConfigurationServiceTest {
 
         configurationServiceTest.setStandardKubernetesConfig();
 
-        ServiceOperationsCommand command = ServiceOperationsCommand.create(
+        NodeServiceOperationsCommand command = NodeServiceOperationsCommand.create(
                 servicesDefinition,
                 nodeRangeResolver,
                 servicesInstallStatus,
@@ -351,14 +349,14 @@ public class NodesConfigurationServiceTest {
         configurationServiceTest.saveServicesInstallationStatus(savedStatus);
         configurationServiceTest.saveNodesConfig(nodesConfig);
 
-        ServiceOperationsCommand command = ServiceOperationsCommand.create(
+        NodeServiceOperationsCommand command = NodeServiceOperationsCommand.create(
                 servicesDefinition, nodeRangeResolver, savedStatus, nodesConfig);
 
         operationsMonitoringServiceTest.startCommand(command);
 
         // testing cluster-manager installation
-        nodesConfigurationService.uninstallService(new ServiceOperationsCommand.ServiceOperationId(
-                ServiceOperationsCommand.ServiceOperation.INSTALLATION,
+        nodesConfigurationService.uninstallService(new NodeServiceOperationsCommand.ServiceOperationId(
+                NodeServiceOperationsCommand.ServiceOperation.INSTALLATION,
                 Service.from("cluster-manager"),
                 Node.fromAddress("192.168.10.11")));
 
@@ -372,6 +370,48 @@ public class NodesConfigurationServiceTest {
                 "sudo bash -c '. /usr/local/sbin/eskimo-utils.sh && docker image rm -f eskimo/cluster-manager:$(get_last_tag cluster-manager)'\n" +
                 "sudo systemctl daemon-reload\n" +
                 "sudo systemctl reset-failed\n"));
+
+        operationsMonitoringServiceTest.endCommand(true);
+    }
+
+    @Test
+    public void testUninstallationWithPreUninstallHook() throws Exception {
+
+        ServicesInstallStatusWrapper savedStatus = new ServicesInstallStatusWrapper(new HashMap<>() {{
+            put("distributed-time_installed_on_IP_192-168-10-11", "OK");
+            put("distributed-time_installed_on_IP_192-168-10-13", "OK");
+            put("cluster-manager_installed_on_IP_192-168-10-11", "OK");
+            put("cluster-master_installed_on_IP_192-168-10-11", "OK");
+            put("cluster-slave_installed_on_IP_192-168-10-11", "OK");
+            put("cluster-slave_installed_on_IP_192-168-10-13", "OK");
+        }});
+
+        NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
+            put("node_id1", "192.168.10.11");
+            put("node_id2", "192.168.10.13");
+            put("distributed-time1", "on");
+            put("distributed-time2", "on");
+            put("cluster-manager", "1");
+            put("cluster-mmaster", "1");
+            put("cluster-slave1", "on");
+        }});
+
+        configurationServiceTest.saveServicesInstallationStatus(savedStatus);
+        configurationServiceTest.saveNodesConfig(nodesConfig);
+
+        NodeServiceOperationsCommand command = NodeServiceOperationsCommand.create(
+                servicesDefinition, nodeRangeResolver, savedStatus, nodesConfig);
+
+        operationsMonitoringServiceTest.startCommand(command);
+
+        // testing cluster-manager installation
+        nodesConfigurationService.uninstallService(new NodeServiceOperationsCommand.ServiceOperationId(
+                NodeServiceOperationsCommand.ServiceOperation.INSTALLATION,
+                Service.from("cluster-slave"),
+                Node.fromAddress("192.168.10.11")));
+
+       assertEquals("Pre-uninstall hook  - cluster-slave\n" +
+               "call Uninstall script  - cluster-slave - 192.168.10.11", String.join("\n", systemServiceTest.getExecutedActions()));
 
         operationsMonitoringServiceTest.endCommand(true);
     }

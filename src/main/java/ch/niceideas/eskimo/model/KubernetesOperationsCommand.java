@@ -40,19 +40,24 @@ import ch.niceideas.eskimo.services.SystemService;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Operation;
 import ch.niceideas.eskimo.types.Service;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static ch.niceideas.eskimo.model.SimpleOperationCommand.standardizeOperationMember;
 
-public class KubernetesOperationsCommand extends JSONInstallOpCommand<KubernetesOperationsCommand.KubernetesOperationId> implements Serializable {
-
-    private final KubernetesServicesConfigWrapper rawKubeServiceConfig;
+public class KubernetesOperationsCommand
+        extends AbstractServiceOperationsCommand<KubernetesOperationsCommand.KubernetesOperationId, KubernetesServicesConfigWrapper>
+        implements Serializable {
 
     @Getter @Setter
     private String warnings = null;
@@ -134,13 +139,10 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
     }
 
     KubernetesOperationsCommand(KubernetesServicesConfigWrapper rawKubeServiceConfig) {
-        this.rawKubeServiceConfig = rawKubeServiceConfig;
+        super (rawKubeServiceConfig);
     }
 
-    public KubernetesServicesConfigWrapper getRawConfig() {
-        return rawKubeServiceConfig;
-    }
-
+    @Override
     public JSONObject toJSON () {
         return new JSONObject(new HashMap<String, Object>() {{
             put("installations", new JSONArray(getInstallations().stream().map(KubernetesOperationId::getService).map(Service::getName).collect(Collectors.toList())));
@@ -150,17 +152,9 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
         }});
     }
 
-    public List<KubernetesOperationId> getAllOperationsInOrder (OperationsContext context) {
-
-        List<KubernetesOperationId> allOpList = new ArrayList<>();
-
-        allOpList.add(new KubernetesOperationId(KuberneteOperation.INSTALLATION, Service.TOPOLOGY_ALL_NODES));
-
-        allOpList.addAll(getInstallations());
-        allOpList.addAll(getUninstallations());
-        allOpList.addAll(getRestarts());
-
-        return allOpList;
+    @Override
+    public List<KubernetesOperationId> getNodesCheckOperation() {
+        return List.of(new KubernetesOperationId(KuberneteOperation.INSTALLATION, Service.TOPOLOGY_ALL_NODES));
     }
 
     @Getter
@@ -201,9 +195,9 @@ public class KubernetesOperationsCommand extends JSONInstallOpCommand<Kubernetes
 
     @RequiredArgsConstructor
     public enum KuberneteOperation implements Operation {
-        INSTALLATION(ServiceOperationsCommand.ServiceOperation.INSTALLATION.getType(), 21),
-        UNINSTALLATION (ServiceOperationsCommand.ServiceOperation.UNINSTALLATION.getType(), 22),
-        RESTART (ServiceOperationsCommand.ServiceOperation.RESTART.getType(), 23);
+        INSTALLATION(NodeServiceOperationsCommand.ServiceOperation.INSTALLATION.getType(), 21),
+        UNINSTALLATION (NodeServiceOperationsCommand.ServiceOperation.UNINSTALLATION.getType(), 22),
+        RESTART (NodeServiceOperationsCommand.ServiceOperation.RESTART.getType(), 23);
 
         @Getter
         private final String type;

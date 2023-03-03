@@ -45,7 +45,7 @@ import java.io.IOException;
 
 public interface NodesConfigurationService {
 
-    void applyNodesConfig(ServiceOperationsCommand command) throws NodesConfigurationException;
+    void applyNodesConfig(NodeServiceOperationsCommand command) throws NodesConfigurationException;
 
     void installTopologyAndSettings(
             MessageLogger ml,

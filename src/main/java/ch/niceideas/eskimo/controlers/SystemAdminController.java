@@ -235,7 +235,7 @@ public class SystemAdminController extends AbstractOperationController {
                     return ReturnStatusHelper.createClearStatus("missing", operationsMonitoringService.isProcessingPending());
                 }
 
-                ServiceOperationsCommand operationsCommand = ServiceOperationsCommand.create(
+                NodeServiceOperationsCommand operationsCommand = NodeServiceOperationsCommand.create(
                         servicesDefinition, nodeRangeResolver, newServicesInstallationStatus, nodesConfig);
 
                 return performSystemOperation(

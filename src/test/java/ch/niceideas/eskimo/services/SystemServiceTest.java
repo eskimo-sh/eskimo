@@ -334,7 +334,7 @@ public class SystemServiceTest {
     }
 
     @Test
-    public void testDiscoverAliveAndDeadNodes() {
+    public void testDiscoverAliveAndDeadNodes() throws Exception {
 
         sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
             if (script.equals("echo OK")) {
@@ -950,6 +950,40 @@ public class SystemServiceTest {
                 "-------------------------------------------------------------------------------, " +
                 "OK" +
                 "]", ""+messages);
+    }
+
+    @Test
+    public void testRunPreUninstallHooks() throws Exception {
+        configurationServiceTest.saveNodesConfig(StandardSetupHelpers.getStandard2NodesSetup());
+        configurationServiceTest.saveKubernetesServicesConfig(StandardSetupHelpers.getStandardKubernetesConfig());
+
+        NodeServiceOperationsCommand.ServiceOperationId serviceOperationId = new NodeServiceOperationsCommand.ServiceOperationId(
+                NodeServiceOperationsCommand.ServiceOperation.UNINSTALLATION,
+                Service.from("cluster-slave"),
+                Node.fromAddress("192.168.10.13"));
+
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
+            if (script.equals("echo OK")) {
+                return "OK";
+            }
+            return "";
+        });
+
+        systemService.runPreUninstallHooks(
+                new TestMessageLogger(new StringBuilder()),
+                serviceOperationId);
+
+        assertEquals("echo OK\n" +
+                " /usr/local/bin/kubectl drain 192.168.10.13 --force --timeout=300s\n", String.join ("\n", sshCommandServiceTest.getExecutedCommands()));
+
+        configurationServiceTest.reset();
+        configurationServiceTest.setNodesConfigError();
+
+        SystemException exp = assertThrows(SystemException.class, () -> systemService.runPreUninstallHooks(
+                new TestMessageLogger(new StringBuilder()),
+                serviceOperationId));
+
+        assertEquals("Test Error", exp.getMessage());
     }
 
 }

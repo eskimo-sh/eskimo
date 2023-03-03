@@ -32,69 +32,60 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.model.service;
+package ch.niceideas.eskimo.model;
 
-import ch.niceideas.common.utils.StringUtils;
-import ch.niceideas.eskimo.model.ConfigurationOwner;
-import ch.niceideas.eskimo.types.Service;
-import lombok.Getter;
-import lombok.Setter;
-import org.json.JSONObject;
+import ch.niceideas.common.json.JsonWrapper;
+import ch.niceideas.eskimo.services.ServiceDefinitionException;
+import ch.niceideas.eskimo.services.SystemException;
+import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
+import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
+import ch.niceideas.eskimo.types.Operation;
+import org.apache.log4j.Logger;
 
-import java.util.HashMap;
-import java.util.Optional;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Dependency {
+public abstract class AbstractServiceOperationsCommand
+        <       T extends OperationId<? extends Operation>,
+                U extends JsonWrapper>
+        extends JSONInstallOpCommand<T> implements Serializable {
 
-    @Getter @Setter
-    private MasterElectionStrategy mes = MasterElectionStrategy.NONE;
+    private static final Logger logger = Logger.getLogger(AbstractServiceOperationsCommand.class);
 
-    @Getter @Setter
-    private Service masterService = null;
+    private final U rawConfig;
 
-    @Getter @Setter
-    private int numberOfMasters = 0;
-
-    @Getter @Setter
-    private boolean mandatory = true; // default is true
-
-    @Getter @Setter
-    private boolean restart = true; // default is true
-
-    @Getter @Setter
-    private String preUninstallHook = null;
-
-    private Service conditionalDependency = null;
-
-    public boolean isMandatory(ConfigurationOwner wrapper) {
-        if (mandatory) {
-            return true;
-        }
-        if (conditionalDependency != null) {
-            return wrapper.hasServiceConfigured(conditionalDependency);
-        }
-        return false;
+    AbstractServiceOperationsCommand(U rawConfig) {
+        this.rawConfig = rawConfig;
     }
 
-    public void setConditionalDependency(Service conditionalDependency) {
-        this.mandatory = false;
-        this.conditionalDependency = conditionalDependency;
+    public U getRawConfig() {
+        return rawConfig;
     }
 
-    public JSONObject toJSON () {
-        return new JSONObject(new HashMap<String, Object>() {{
-            put("mes", Optional.ofNullable(mes).map(Enum::toString).orElse(""));
-            put("masterService", Optional.ofNullable(masterService).map(Service::getName).orElse(""));
-            put("numberOfMasters", numberOfMasters);
-            put("mandatory", mandatory);
-            put("restart", restart);
-            if (conditionalDependency != null) {
-                put("conditional", conditionalDependency.getName());
-            }
-        }});
+    @Override
+    public List<T> getAllOperationsInOrder
+            (OperationsContext context)
+            throws ServiceDefinitionException, NodesConfigurationException, SystemException {
+
+        List<T> allOpList = new ArrayList<>(getNodesCheckOperation());
+        getOperationsGroupInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
+        return allOpList;
     }
 
-    public boolean hasPreUninstallHook() {
-        return StringUtils.isNotBlank(preUninstallHook);
+    public abstract List<T> getNodesCheckOperation();
+
+    public List<List<T>> getOperationsGroupInOrder
+            (ServicesInstallationSorter sorter, NodesConfigWrapper nodesConfigWrapper)
+            throws ServiceDefinitionException, NodesConfigurationException, SystemException {
+
+        List<T> allOpList = new ArrayList<>();
+
+        allOpList.addAll(getInstallations());
+        allOpList.addAll(getUninstallations());
+        allOpList.addAll(getRestarts());
+
+        return sorter.orderOperations(allOpList, nodesConfigWrapper);
     }
+
 }

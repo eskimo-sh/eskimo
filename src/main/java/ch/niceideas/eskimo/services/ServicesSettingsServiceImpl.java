@@ -160,7 +160,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                             });
 
                     // restarts
-                    for (List<ServiceOperationsCommand.ServiceOperationId> restarts :
+                    for (List<NodeServiceOperationsCommand.ServiceOperationId> restarts :
                             restartCommand.getRestartsInOrder(servicesInstallationSorter, nodesConfig)) {
                         systemService.performPooledOperation(restarts, 1, operationWaitTimoutSeconds,
                                 (operation, error) -> {
@@ -330,7 +330,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
         }
     }
 
-    private static class ServiceRestartOperationsCommand extends JSONInstallOpCommand<ServiceOperationsCommand.ServiceOperationId> {
+    private static class ServiceRestartOperationsCommand extends JSONInstallOpCommand<NodeServiceOperationsCommand.ServiceOperationId> {
 
         public static ServiceRestartOperationsCommand create (
                 ServicesDefinition servicesDefinition,
@@ -347,11 +347,11 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                     .map (servicesDefinition::getServiceDefinition)
                     .forEach(serviceDef -> {
                         if (serviceDef.isKubernetes()) {
-                            addRestart(new ServiceOperationsCommand.ServiceOperationId(ServiceOperationsCommand.ServiceOperation.RESTART, serviceDef.toService(), Node.KUBERNETES_FLAG));
+                            addRestart(new NodeServiceOperationsCommand.ServiceOperationId(NodeServiceOperationsCommand.ServiceOperation.RESTART, serviceDef.toService(), Node.KUBERNETES_FLAG));
                         } else {
                             nodesConfig.getNodeNumbers(serviceDef).stream()
                                     .map (nodesConfig::getNode)
-                                    .forEach(node -> addRestart(new ServiceOperationsCommand.ServiceOperationId(ServiceOperationsCommand.ServiceOperation.RESTART, serviceDef.toService(), node)));
+                                    .forEach(node -> addRestart(new NodeServiceOperationsCommand.ServiceOperationId(NodeServiceOperationsCommand.ServiceOperation.RESTART, serviceDef.toService(), node)));
                         }
                     });
             //
@@ -367,7 +367,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
         public Set<Node> getAllNodes() {
             Set<Node> retSet = new HashSet<>();
             getRestarts().stream()
-                    .map(ServiceOperationsCommand.ServiceOperationId::getNode)
+                    .map(NodeServiceOperationsCommand.ServiceOperationId::getNode)
                     .forEach(retSet::add);
 
             // this one can come from restartes flags
@@ -376,21 +376,21 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
             return retSet;
         }
 
-        public List<ServiceOperationsCommand.ServiceOperationId> getNodesCheckOperation(NodesConfigWrapper nodesConfig) {
+        public List<NodeServiceOperationsCommand.ServiceOperationId> getNodesCheckOperation(NodesConfigWrapper nodesConfig) {
             Set<Node> allNodes = new HashSet<>(getAllNodes());
             allNodes.addAll(nodesConfig.getAllNodes());
             return allNodes.stream()
-                    .map(node -> new ServiceOperationsCommand.ServiceOperationId(ServiceOperationsCommand.ServiceOperation.CHECK_INSTALL, Service.SETTINGS, node))
+                    .map(node -> new NodeServiceOperationsCommand.ServiceOperationId(NodeServiceOperationsCommand.ServiceOperation.CHECK_INSTALL, Service.SETTINGS, node))
                     .sorted()
                     .collect(Collectors.toList());
         }
 
         @Override
-        public List<ServiceOperationsCommand.ServiceOperationId> getAllOperationsInOrder
+        public List<NodeServiceOperationsCommand.ServiceOperationId> getAllOperationsInOrder
                 (OperationsContext context)
                 throws ServiceDefinitionException, NodesConfigurationException, SystemException {
 
-            List<ServiceOperationsCommand.ServiceOperationId> allOpList = new ArrayList<>(
+            List<NodeServiceOperationsCommand.ServiceOperationId> allOpList = new ArrayList<>(
                     getNodesCheckOperation (context.getNodesConfig()));
 
             getRestartsInOrder(context.getServicesInstallationSorter(), context.getNodesConfig()).forEach(allOpList::addAll);
@@ -398,7 +398,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
             return allOpList;
         }
 
-        public List<List<ServiceOperationsCommand.ServiceOperationId>> getRestartsInOrder
+        public List<List<NodeServiceOperationsCommand.ServiceOperationId>> getRestartsInOrder
                 (ServicesInstallationSorter servicesInstallationSorter, NodesConfigWrapper nodesConfig)
                 throws ServiceDefinitionException, NodesConfigurationException, SystemException {
             return servicesInstallationSorter.orderOperations (getRestarts(), nodesConfig);

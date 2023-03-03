@@ -50,9 +50,9 @@ import org.springframework.stereotype.Component;
 @Profile("test-nodes-conf")
 public class NodesConfigurationServiceTestImpl implements NodesConfigurationService {
 
-    private ServiceOperationsCommand appliedCommand = null;
+    private NodeServiceOperationsCommand appliedCommand = null;
 
-    public ServiceOperationsCommand getAppliedCommand() {
+    public NodeServiceOperationsCommand getAppliedCommand() {
         return appliedCommand;
     }
 
@@ -61,7 +61,7 @@ public class NodesConfigurationServiceTestImpl implements NodesConfigurationServ
     }
 
     @Override
-    public void applyNodesConfig(ServiceOperationsCommand command) {
+    public void applyNodesConfig(NodeServiceOperationsCommand command) {
         this.appliedCommand = command;
     }
 

@@ -38,13 +38,11 @@ package ch.niceideas.eskimo.test.services;
 import ch.niceideas.common.utils.Pair;
 import ch.niceideas.eskimo.model.*;
 import ch.niceideas.eskimo.model.service.ServiceDefinition;
-import ch.niceideas.eskimo.services.SSHCommandException;
-import ch.niceideas.eskimo.services.SetupException;
-import ch.niceideas.eskimo.services.SystemException;
-import ch.niceideas.eskimo.services.SystemService;
+import ch.niceideas.eskimo.services.*;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
@@ -61,6 +59,9 @@ import java.util.concurrent.atomic.AtomicReference;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Profile("test-system")
 public class SystemServiceTestImpl implements SystemService {
+
+    @Autowired
+    private ServicesDefinition servicesDefinition;
 
     private boolean returnEmptySystemStatus = false;
     private boolean returnOKSystemStatus = false;
@@ -122,7 +123,7 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public void delegateApplyNodesConfig(ServiceOperationsCommand command) {
+    public void delegateApplyNodesConfig(NodeServiceOperationsCommand command) {
 
     }
 
@@ -204,11 +205,11 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public String sendPing(Node node) throws SSHCommandException {
+    public boolean isNodeUp(Node node) {
         if (pingError) {
-            throw new SSHCommandException("Node dead");
+            return false;
         }
-        return "OK";
+        return true;
     }
 
     @Override
@@ -237,8 +238,17 @@ public class SystemServiceTestImpl implements SystemService {
     }
 
     @Override
-    public void applyServiceOperation(Service service, Node node, SimpleOperationCommand.SimpleOperation labelledOp, ServiceOperation<String> operation) {
+    public void applyServiceOperation(
+            Service service, Node node, SimpleOperationCommand.SimpleOperation labelledOp, ServiceOperation<String> operation)
+            throws SystemException{
         executedActions.add ("Apply service operation  - " + service + " - " + node + " - " + labelledOp.getLabel());
+        if (!this.mockCalls) {
+            try {
+                operation.call();
+            } catch (SSHCommandException | KubernetesException  e) {
+                throw new SystemException(e);
+            }
+        }
     }
 
     @Override
@@ -276,6 +286,14 @@ public class SystemServiceTestImpl implements SystemService {
             if (installed) {
                 statusMap.put(SystemStatusWrapper.buildStatusFlag (service, node), "TD"); // To Be Deleted
             }
+        }
+    }
+
+    @Override
+    public void runPreUninstallHooks(MessageLogger ml, OperationId<?> operation) {
+        ServiceDefinition serviceDef = servicesDefinition.getServiceDefinition(operation.getService());
+        if (serviceDef.hasPreUninstallHooks()) {
+            executedActions.add("Pre-uninstall hook  - " + operation.getService());
         }
     }
 
