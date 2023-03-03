@@ -224,7 +224,7 @@ public class KubernetesServiceImpl implements KubernetesService {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void uninstallService(KubernetesOperationsCommand.KubernetesOperationId operationId, Node kubeMasterNode) throws SystemException {
+    public void  uninstallService(KubernetesOperationsCommand.KubernetesOperationId operationId, Node kubeMasterNode) throws SystemException {
         Node kubeNode = null;
         try {
             Pair<Node, KubeStatusParser.KubernetesServiceStatus> nodeNameAndStatus =
@@ -268,8 +268,7 @@ public class KubernetesServiceImpl implements KubernetesService {
     public void fetchKubernetesServicesStatus
             (Map<String, String> statusMap, ServicesInstallStatusWrapper servicesInstallationStatus)
             throws KubernetesException {
-
-        // 3.1 Node answers
+        
         try {
 
             KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
