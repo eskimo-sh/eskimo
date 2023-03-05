@@ -35,14 +35,13 @@
 # requires :
 # apt-get install python-pip
 
-from http.server import BaseHTTPRequestHandler,HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import socketserver
 import logging
 import sys
 import signal
-import os
 import subprocess
-from furl import furl
+import tempfile
 
 PORT = 28999
 
@@ -58,6 +57,7 @@ root.addHandler(handler)
 
 LOG = logging.getLogger(__name__)
 
+
 class RequestHandler(BaseHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         BaseHTTPRequestHandler.__init__(
@@ -68,26 +68,24 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/plain')
         self.end_headers()
 
-
     def do_GET(self):
         LOG.info('- Got GET request: %s (UNSUPPORTED)', self.path)
 
         self._set_error_headers()
-        self.wfile.write("GET requests are not supported by logstash command server")
+        self.wfile.write("GET requests are not supported by logstash command server".encode("UTF-8"))
 
     def do_POST(self):
         LOG.info('- Got POST request: %s', self.path)
 
-        fullArgs = self.rfile.read(int(self.headers['Content-Length']))
+        full_args = self.rfile.read(int(self.headers['Content-Length']))
 
-        LOG.info('- fullArgs raw: %s', fullArgs.decode('utf-8'))
+        LOG.info('- fullArgs raw: %s', full_args.decode('utf-8'))
 
         if 'stdin_file' in self.headers:
-            stdin_file = self.headers['stdin_file']
-            command_line = "/usr/local/sbin/call_logstash.sh --std_in {0} {1} ".format(stdin_file, fullArgs.decode('utf-8'))
+            command_line = "/usr/local/sbin/call_logstash.sh --std_in {0} {1} ".format(self.headers['stdin_file'],
+                                                                                       full_args.decode('utf-8'))
         else:
-            stdin_file = None
-            command_line = "/usr/local/sbin/call_logstash.sh {0} ".format(fullArgs)
+            command_line = "/usr/local/sbin/call_logstash.sh {0} ".format(full_args)
 
         LOG.info('- Command Line : %s', command_line)
 
@@ -95,56 +93,54 @@ class RequestHandler(BaseHTTPRequestHandler):
         try:
             # stdout = subprocess.PIPE lets you redirect the output
             LOG.info('   + Calling process')
-            res = subprocess.Popen(command_line.strip().split(), bufsize=40000000, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            with tempfile.TemporaryFile() as fp:
+                res = subprocess.Popen(command_line.strip().split(), bufsize=40000000, stdout=fp,
+                                       stderr=subprocess.STDOUT)
 
-            LOG.info('   + Waiting for completion')
-            res.wait() # wait for process to finish; this also sets the returncode variable inside 'res'
+                LOG.info('   + Waiting for completion')
+                res.wait()  # wait for process to finish; this also sets the returncode variable inside 'res'
+
+                fp.seek(0)
+                command_log = fp.read()
 
             LOG.info('   + Completed!')
             if res.returncode != 0:
-                LOG.error("os.wait:exit status != 0\n")
+                LOG.error("subprocess.wait:exit status != 0\n")
                 self.send_response(500)
             else:
-                LOG.debug ("os.wait:({},{})".format(res.pid, res.returncode))
+                LOG.debug("subprocess.wait:({},{})".format(res.pid, res.returncode))
                 self.send_response(200)
 
-            self.send_header('Content-type','text/plain')
+            self.send_header('Content-type', 'text/plain')
             self.end_headers()
 
-            # access the output from stdout
-            LOG.info('   + Reading output')
-            result = res.stdout.read()
-
-            LOG.info (" - result is \n : %s", result)
-            #print ("after read: {}".format(result))
+            # LOG.info (" - result is \n : %s", command_log)
+            # print ("after read: {}".format(result))
 
             # Send the html message
-            self.wfile.write(result)
+            self.wfile.write(command_log)
 
         except OSError:
-            LOG.error ("error: popen")
+            LOG.error("error: popen")
 
             self._set_error_headers()
-            self.wfile.write("logstash command failed to execute (got OSError)")
-
-        except IOError:
-            LOG.error("stdin file is not accessible (%s)", stdin_file)
-
-            self._set_error_headers()
-            self.wfile.write("logstash command failed to execute (got IOError) - likely stdin file is not accessible.")
+            self.wfile.write("logstash command failed to execute (got OSError)".encode("UTF-8"))
 
         return
 
+
 socketserver.TCPServer.allow_reuse_address = True
-#httpd = socketserver.TCPServer(("", PORT), RequestHandler)
+# httpd = socketserver.TCPServer(("", PORT), RequestHandler)
 httpd = HTTPServer(('', PORT), RequestHandler)
+
 
 def signal_handler(sig, frame):
     httpd.server_close()
     sys.exit(0)
 
+
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGHUP, signal_handler)
 
-print ("serving at port {0}".format (PORT))
+print("serving at port {0}".format(PORT))
 httpd.serve_forever()
