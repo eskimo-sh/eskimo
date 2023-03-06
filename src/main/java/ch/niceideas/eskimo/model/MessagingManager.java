@@ -56,8 +56,7 @@ public class MessagingManager extends AbstractInformationHolder<String, String> 
     protected String buildFetchedData(int lastLine) {
         StringBuilder ret = new StringBuilder();
         for (String line : new ArrayList<>(getSubList(lastLine))) { // need to copy the list to avoid ConcurrentModifications Exception
-            ret.append (line);
-            ret.append ("\n");
+            ret.append (line).append ("\n");
         }
         return ret.toString();
     }
