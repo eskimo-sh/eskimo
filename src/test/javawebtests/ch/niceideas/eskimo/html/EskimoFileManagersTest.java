@@ -127,7 +127,7 @@ public class EskimoFileManagersTest extends AbstractWebTest {
                 "    <div id=\"file-manager-actions-192-168-10-13\">\n" +
                 "        <nav id=\"file-manager-folder-menu-192-168-10-13\" class=\"btn-toolbar file-manager-folder-menu\">            <div class=\"btn-group\">                <button id=\"file-manager-close-192-168-10-13\" name=\"file-manager-close-192-168-10-13\" class=\"btn btn-primary\">Close</button>\n" +
                 "            </div></nav>        <div id=\"file-manager-folder-content-192-168-10-13\">(connection to backend lost)</div>\n" +
-                "    </div>", "$('#file-managers-file-manager-192-168-10-13').html()");
+                "    </div>\n", "$('#file-managers-file-manager-192-168-10-13').html()");
     }
 
     @Test

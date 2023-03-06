@@ -104,22 +104,26 @@ eskimo.Setup = function() {
     };
 
     function switchDownloadBuild(target, data) {
-        if (    !$('#setup-'+target+'-origin-build').length
-             || !$('#setup-'+target+'-origin-download').length) {
+        const $setupOriginBuild = $('#setup-'+target+'-origin-build');
+        const $setupOriginDownload = $('#setup-'+target+'-origin-download');
+        const $setupOriginDownloadLabel = $('#setup-'+target+'-origin-download-label');
+        const $downloadExplainDisabled = $('#download-'+target+'-explain-disabled');
+        if (    !$setupOriginBuild.length
+             || !$setupOriginDownload.length) {
             console.log ("Couldn't find " + target + " in setup");
             return;
         }
         if (data.isSnapshot) {
-            $('#setup-'+target+'-origin-build').get(0).checked = true;
-            $('#setup-'+target+'-origin-download-label').addClass("disabled");
-            $('#download-'+target+'-explain-disabled').css('display', 'block');
+            $setupOriginBuild.get(0).checked = true;
+            $setupOriginDownloadLabel.addClass("disabled");
+            $downloadExplainDisabled.css('display', 'block');
         } else {
-            $('#setup-'+target+'-origin-download-label').removeClass("disabled");
-            $('#download-'+target+'-explain-disabled').css('display', 'none');
+            $setupOriginDownloadLabel.removeClass("disabled");
+            $downloadExplainDisabled.css('display', 'none');
             if (data['setup-'+target+'-origin'] == "build") {
-                $('#setup-'+target+'-origin-build').get(0).checked = true;
+                $setupOriginBuild.get(0).checked = true;
             } else {
-                $('#setup-'+target+'-origin-download').get(0).checked = true; // default
+                $setupOriginDownload.get(0).checked = true; // default
             }
         }
     }

@@ -75,7 +75,7 @@ eskimo.Alert = function() {
         currentLevel = level;
         if (level >= that.level.CONFIRM) {
             $("#alert-header").attr("class", "modal-header bg-info text-white");
-        } else if (level == that.level.ERROR) {
+        } else if (level === that.level.ERROR) {
             $("#alert-header").attr("class", "modal-header bg-danger text-white");
         } else if (level === that.level.WARNING) {
             $("#alert-header").attr("class", "modal-header bg-warning text-white");

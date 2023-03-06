@@ -102,42 +102,6 @@ eskimo.App = function() {
         }
     }
 
-    // Portlet Widget (Card Reload, Collapse, and Delete)
-    /*
-    function initPortletCard() {
-
-        let portletIdentifier = ".card"
-        let portletCloser = '.card a[data-bs-toggle="remove"]'
-        let portletRefresher = '.card a[data-bs-toggle="reload"]'
-        let self = this
-
-        // Panel closest
-        $(document).on("click", portletCloser, function (ev) {
-            ev.preventDefault();
-            let $portlet = $(this).closest(portletIdentifier);
-            let $portlet_parent = $portlet.parent();
-            $portlet.remove();
-            if ($portlet_parent.children().length == 0) {
-                $portlet_parent.remove();
-            }
-        });
-
-        // Panel Reload
-        $(document).on("click", portletRefresher, function (ev) {
-            ev.preventDefault();
-            let $portlet = $(this).closest(portletIdentifier);
-            // This is just a simulation, nothing is going to be reloaded
-            $portlet.append('<div class="card-disabled"><div class="card-portlets-loader"></div></div>');
-            let $pd = $portlet.find('.card-disabled');
-            setTimeout(function () {
-                $pd.fadeOut('fast', function () {
-                    $pd.remove();
-                });
-            }, 500 + 300 * (Math.random() * 5));
-        });
-    }
-    */
-
     //  Multi Dropdown
     function initMultiDropdown() {
         $('.dropdown-menu a.dropdown-toggle').on('click', function () {
@@ -165,63 +129,6 @@ eskimo.App = function() {
                     $('.side-nav .collapse.show').not(event.target).not(parent).collapse('hide');
                 }
             });
-
-            // activate the menu in left side bar (Vertical Menu) based on url
-            /*
-            $(".side-nav a").each(function () {
-                let pageUrl = window.location.href.split(/[?#]/)[0];
-                if (this.href == pageUrl) {
-                    $(this).addClass("active");
-                    $(this).parent().addClass("menuitem-active");
-                    $(this).parent().parent().parent().addClass("show");
-                    $(this).parent().parent().parent().parent().addClass("menuitem-active"); // add active to li of the current link
-
-                    var firstLevelParent = $(this).parent().parent().parent().parent().parent().parent();
-                    if (firstLevelParent.attr('id') !== 'sidebar-menu') firstLevelParent.addClass("show");
-
-                    $(this).parent().parent().parent().parent().parent().parent().parent().addClass("menuitem-active");
-
-                    let secondLevelParent = $(this).parent().parent().parent().parent().parent().parent().parent().parent().parent();
-                    if (secondLevelParent.attr('id') !== 'wrapper') secondLevelParent.addClass("show");
-
-                    let upperLevelParent = $(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().parent();
-                    if (!upperLevelParent.is('body')) upperLevelParent.addClass("menuitem-active");
-                }
-            });
-            */
-
-            /*
-            setTimeout(function () {
-                let activatedItem = document.querySelector('li.menuitem-active .active');
-                if (activatedItem != null) {
-                    let simplebarContent = document.querySelector('.leftside-menu .simplebar-content-wrapper');
-                    let offset = activatedItem.offsetTop - 300;
-                    if (simplebarContent && offset > 100) {
-                        scrollTo(simplebarContent, offset, 600);
-                    }
-                }
-            }, 200);
-
-            // scrollTo (Left Side Bar Active Menu)
-            function easeInOutQuad(t, b, c, d) {
-                t /= d / 2;
-                if (t < 1) return c / 2 * t * t + b;
-                t--;
-                return -c / 2 * (t * (t - 2) - 1) + b;
-            }
-            function scrollTo(element, to, duration) {
-                let start = element.scrollTop, change = to - start, currentTime = 0, increment = 20;
-                let animateScroll = function () {
-                    currentTime += increment;
-                    let val = easeInOutQuad(currentTime, start, change, duration);
-                    element.scrollTop = val;
-                    if (currentTime < duration) {
-                        setTimeout(animateScroll, increment);
-                    }
-                };
-                animateScroll();
-            }
-                        */
         }
 
     }
@@ -415,7 +322,6 @@ eskimo.App = function() {
 
     this.initialize = function (){
         initComponents();
-        //initPortletCard();
         initMultiDropdown();
         initLeftSidebar()
         initTopbarMenu();

@@ -115,7 +115,7 @@ public class EskimoConsolesTest extends AbstractWebTest {
                 "        <button id=\"console-close-192-168-10-11\" name=\"console-close-1\" class=\"btn btn-secondary\">\n" +
                 "            Close\n" +
                 "        </button>\n" +
-                "    </div>", "$('#consoles-console-192-168-10-11').html()");
+                "    </div>\n", "$('#consoles-console-192-168-10-11').html()");
     }
 
     @Test

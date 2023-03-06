@@ -315,7 +315,7 @@ eskimo.Consoles = function() {
         let consoleFound = false;
         let consoleTabList = $("#consoles-tab-list");
         consoleTabList.find("li").each(function() {
-            if (this.id == "console_"+nodeName) {
+            if (this.id == "console_" + nodeName) {
                 consoleFound = true;
             }
         });
@@ -333,7 +333,8 @@ eskimo.Consoles = function() {
                 '        <button id="console-close-' + nodeName + '" name="console-close-1" class="btn btn-secondary">\n' +
                 '            Close\n' +
                 '        </button>\n' +
-                '    </div>';
+                '    </div>\n' +
+                '</div>';
 
             $("#consoles-console-content").append ($(consoleContent));
 

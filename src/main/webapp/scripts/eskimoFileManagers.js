@@ -706,7 +706,8 @@ eskimo.FileManagers = function() {
                 '            </div>' +
                 '        </nav>'  +
                 '        <div id="file-manager-folder-content-' + nodeName + '"></div>\n' +
-                '    </div>';
+                '    </div>\n' +
+                '</div>';
 
             $("#file-managers-file-manager-content").append ($(fileManagerContent));
 

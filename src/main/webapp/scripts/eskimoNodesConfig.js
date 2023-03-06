@@ -271,9 +271,9 @@ eskimo.NodesConfig = function() {
                     let placeHolder = $("#field" + nbr).find(".configured-multiple-services-placeholder");
                     placeHolder.html(placeHolder.html() +
                         '<div class="nodes-config-entry">' +
-                        '<img alt="nodes config logo" class="nodes-config-logo" src="' + getServiceLogoPath(serviceName) + '" />' +
+                        '     <img alt="nodes config logo" class="' + serviceName + '_logo" src="' + getServiceLogoPath(serviceName) + '" />' +
                         serviceName +
-                        '<br>' +
+                        '     <br>' +
                         '</div>');
 
                 } else {
@@ -283,9 +283,9 @@ eskimo.NodesConfig = function() {
                     let placeHolder = $("#field" + nbr).find(".configured-unique-services-placeholder");
                     placeHolder.html(placeHolder.html() +
                         '<div class="nodes-config-entry">' +
-                        '<img alt="nodes config logo" class="nodes-config-logo" src="' + getServiceLogoPath(serviceName) + '" />' +
+                        '     <img alt="nodes config logo" class="' + serviceName + '_logo" src="' + getServiceLogoPath(serviceName) + '" />' +
                         serviceName +
-                        '<br>' +
+                        '     <br>' +
                         '</div>');
                 }
 
@@ -382,15 +382,15 @@ eskimo.NodesConfig = function() {
             placeHolderUs.html("");
 
             for (let j = 0; j < UNIQUE_SERVICES.length; j++) {
-
                 let effServiceName = UNIQUE_SERVICES[j];
-                if ($('#' + effServiceName + i).length) {
-                    if ($('#' + effServiceName + i).get(0).checked) {
+                const $effService = $('#' + effServiceName + i);
+                if ($effService.length) {
+                    if ($effService.get(0).checked) {
                         placeHolderUs.html(placeHolderUs.html() +
                             '<div class="nodes-config-entry">' +
-                            '<img class="nodes-config-logo" src="' + getServiceLogoPath(effServiceName) + '" />'+
+                            '     <img class="nodes-config-logo"  alt="' + effServiceName + '_logo" src="' + getServiceLogoPath(effServiceName) + '" />'+
                             effServiceName +
-                            '<br>' +
+                            '     <br>' +
                             '</div>');
 
                     }
@@ -399,13 +399,14 @@ eskimo.NodesConfig = function() {
 
             for (let j = 0; j < MULTIPLE_SERVICES.length; j++) {
                 let effServiceName = MULTIPLE_SERVICES[j];
-                if ($('#'+effServiceName+i).length) {
-                    if ($('#'+effServiceName+i).get(0).checked) {
+                const $effService = $('#' + effServiceName + i);
+                if ($effService.length) {
+                    if ($effService.get(0).checked) {
                         placeHolderMs.html(placeHolderMs.html() +
                             '<div class="nodes-config-entry">' +
-                            '<img class="nodes-config-logo" src="' + getServiceLogoPath(effServiceName) + '" />'+
+                            '    <img class="nodes-config-logo" alt="' + effServiceName + '_logo" src="' + getServiceLogoPath(effServiceName) + '" />'+
                             effServiceName +
-                            '<br>' +
+                            '    <br>' +
                             '</div>');
                     }
                 }
@@ -480,13 +481,13 @@ eskimo.NodesConfig = function() {
         if (isRange) {
             return ''+
                 '<div class="server-title-icon">' +
-                '    <img class="server-icon" src="images/range-icon.png" /> ' +
+                '    <img class="server-icon" alt="range-selection-icon"  src="images/range-icon.png" /> ' +
                 '</div>' +
                 '<div class="server-title-text">&nbsp;Range no&nbsp;</div>';
         } else {
             return ''+
                 '<div class="server-title-icon">' +
-                '    <img class="server-icon" src="images/node-icon.png" /> ' +
+                '    <img class="server-icon" alt="single-selection-icon" src="images/node-icon.png" /> ' +
                 '</div>' +
                 '<div class="server-title-text">&nbsp;Node no&nbsp;</div>';
         }
@@ -507,9 +508,10 @@ eskimo.NodesConfig = function() {
 
     function addNewElement (isRange) {
 
-        if (nodes.length == 0) {
+        const $nodesPlaceholder = $("#nodes-placeholder");
+        if (nodes.length === 0) {
             // remove placeholder
-            $("#nodes-placeholder").html('');
+            $nodesPlaceholder.html('');
         }
 
         let next = nodes.length + 1;
@@ -523,7 +525,7 @@ eskimo.NodesConfig = function() {
 
             let uniqueService = UNIQUE_SERVICES[i];
 
-            uniqueServicesDiv +='  <input  type="radio" class="form-check-input" name="' + uniqueService + '" id="' + uniqueService + next + '" value="'+next+'"></input>';
+            uniqueServicesDiv +='  <input  type="radio" class="form-check-input" name="' + uniqueService + '" id="' + uniqueService + next + '" value="'+next+'" />';
         }
 
         uniqueServicesDiv += "</div>";
@@ -536,7 +538,7 @@ eskimo.NodesConfig = function() {
 
             let multipleService = MULTIPLE_SERVICES[i];
 
-            multipleServicesDiv +=' <input  type="checkbox" class="form-check-input" name="' + multipleService + next + '" id="' + multipleService + next + '" ></input>'
+            multipleServicesDiv +=' <input  type="checkbox" class="form-check-input" name="' + multipleService + next + '" id="' + multipleService + next + '" />'
         }
 
         multipleServicesDiv = multipleServicesDiv + "</div>";
@@ -567,7 +569,7 @@ eskimo.NodesConfig = function() {
             '    </div><br><br>'+
             '</div>';
 
-        $("#nodes-placeholder").append(newIn);
+        $nodesPlaceholder.append(newIn);
 
         nodes[next-1] = {};
         nodes[next-1]["type"] = isRange ? "range" : "node";

@@ -110,7 +110,7 @@ eskimo.SettingsOperationsCommand = function() {
 
         commandDescription += "<br>";
 
-        if (command.warnings && command.warnings.trim() != "") {
+        if (command.warnings && command.warnings.trim() !== "") {
 
             commandDescription = commandDescription +
                 '<div class="col-xs-12 col-md-12">' +
