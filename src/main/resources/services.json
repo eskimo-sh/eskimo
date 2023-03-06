@@ -480,7 +480,7 @@
         "mandatory": true,
         "restart": true,
         "hooks": {
-          "preUninstallHook": "/usr/local/bin/kubectl drain {service.node.address} --delete-local-data --force --timeout=300s && /usr/local/bin/kubectl delete node {service.node.address}"
+          "preUninstallHook": "/usr/local/bin/eskimo-kubectl delete_node NULL {service.node.address}"
         }
       },
       {

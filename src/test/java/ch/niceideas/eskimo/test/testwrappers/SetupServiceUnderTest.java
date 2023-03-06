@@ -118,7 +118,7 @@ public class SetupServiceUnderTest extends SetupServiceImpl implements SetupServ
     }
 
     @Override
-    protected void dowloadFile(MessageLogger ml, File destinationFile, URL downloadUrl, String message) throws IOException {
+    protected void downloadFile(MessageLogger ml, File destinationFile, URL downloadUrl, String message) throws IOException {
         destinationFile.createNewFile();
         try {
             FileUtils.writeFile(destinationFile, "TEST DOWNLOADED CONTENT");

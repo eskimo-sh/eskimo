@@ -36,20 +36,38 @@ package ch.niceideas.eskimo.utils;
 
 import ch.niceideas.common.utils.ProcessHelper;
 import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
+import ch.niceideas.eskimo.EskimoApplication;
+import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.test.services.SSHCommandServiceTestImpl;
+import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ContextConfiguration(classes = EskimoApplication.class)
+@SpringBootTest(classes = EskimoApplication.class)
+@TestPropertySource("classpath:application-test.properties")
+@ActiveProfiles({"no-web-stack", "test-setup", "test-ssh"})
 public class SystemStatusParserTest {
+
+    @Autowired
+    private ServicesDefinition servicesDefinition;
+
+    @Autowired
+    private SSHCommandServiceTestImpl sshCommandServiceTest;
 
     @Test
     public void testPattern() {
@@ -62,24 +80,19 @@ public class SystemStatusParserTest {
     @Test
     public void testKubeSlaveCase () throws Exception {
 
-        String testString = loadTestConfig("kube-slave-case.log");
-
-        SystemStatusParser parser = new SystemStatusParser(testString);
+        loadTestConfig("kube-slave-case.log");
+        SystemStatusParser parser = new SystemStatusParser(Node.fromAddress("192.168.56.24"), sshCommandServiceTest, servicesDefinition);
 
         String serviceStatus = parser.getServiceStatus(Service.from("kube-slave"));
 
         assertEquals ("Result: exit-code", serviceStatus);
-
     }
 
     @Test
     public void testParseFileDeb() throws Exception {
 
-        String debConfig = loadTestConfig("systemctl-out-debnode1.log");
-        assertNotNull (debConfig);
-        assertTrue (StringUtils.isNotBlank(debConfig));
-
-        SystemStatusParser parser = new SystemStatusParser(debConfig);
+        loadTestConfig("systemctl-out-debnode1.log");
+        SystemStatusParser parser = new SystemStatusParser(Node.fromAddress("192.168.10.13"), sshCommandServiceTest, servicesDefinition);
 
         assertEquals ("NA", parser.getServiceStatus(Service.from("tada")));
         assertEquals ("running", parser.getServiceStatus(Service.from("elasticsearch")));
@@ -90,11 +103,8 @@ public class SystemStatusParserTest {
     @Test
     public void testParseFileCent() throws Exception {
 
-        String centConfig = loadTestConfig("systemctl-out-centnode1.log");
-        assertNotNull (centConfig);
-        assertTrue (StringUtils.isNotBlank(centConfig));
-
-        SystemStatusParser parser = new SystemStatusParser(centConfig);
+        loadTestConfig("systemctl-out-centnode1.log");
+        SystemStatusParser parser = new SystemStatusParser(Node.fromAddress("192.168.10.1"), sshCommandServiceTest, servicesDefinition);
 
         assertEquals ("NA", parser.getServiceStatus(Service.from("tada")));
         assertEquals ("running", parser.getServiceStatus(Service.from("elasticsearch")));
@@ -105,11 +115,8 @@ public class SystemStatusParserTest {
     @Test
     public void testParseFileOther() throws Exception {
 
-        String centConfig = loadTestConfig("systemctl-out-other.log");
-        assertNotNull (centConfig);
-        assertTrue (StringUtils.isNotBlank(centConfig));
-
-        SystemStatusParser parser = new SystemStatusParser(centConfig);
+        loadTestConfig("systemctl-out-other.log");
+        SystemStatusParser parser = new SystemStatusParser(Node.fromAddress("192.168.10.1"), sshCommandServiceTest, servicesDefinition);
 
         assertEquals ("NA", parser.getServiceStatus(Service.from("tada")));
         assertEquals ("running", parser.getServiceStatus(Service.from("elasticsearch")));
@@ -120,11 +127,8 @@ public class SystemStatusParserTest {
     @Test
     public void testParseFileActual() throws Exception {
 
-        String debConfig = loadTestConfig("systemctl-out-debnode2.log");
-        assertNotNull (debConfig);
-        assertTrue (StringUtils.isNotBlank(debConfig));
-
-        SystemStatusParser parser = new SystemStatusParser(debConfig);
+        loadTestConfig("systemctl-out-debnode2.log");
+        SystemStatusParser parser = new SystemStatusParser(Node.fromAddress("192.168.10.11"), sshCommandServiceTest, servicesDefinition);
 
         assertEquals ("NA", parser.getServiceStatus(Service.from("tada")));
         assertEquals ("running", parser.getServiceStatus(Service.from("zookeeper")));
@@ -135,19 +139,21 @@ public class SystemStatusParserTest {
         assertEquals ("NA", parser.getServiceStatus(Service.from("kibama")));
     }
 
-    private String loadTestConfig (String fileName) throws IOException, ProcessHelper.ProcessHelperException{
+    private void loadTestConfig (String fileName) throws IOException, ProcessHelper.ProcessHelperException{
         InputStream scriptIs = Optional.ofNullable(ResourceUtils.getResourceAsStream("SystemStatusParserTest/" + fileName))
                 .orElseThrow(() -> new ProcessHelper.ProcessHelperException("Impossible to load file " + fileName));
 
-        BufferedReader reader = new BufferedReader( new InputStreamReader(scriptIs, StandardCharsets.UTF_8));
-        String line;
-        StringBuilder sb = new StringBuilder();
-        while ( (line = reader.readLine()) != null) {
-            sb.append (line);
-            sb.append ("\n");
-        }
-        reader.close();
+        String content = StreamUtils.getAsString(scriptIs, StandardCharsets.UTF_8);
+        assertNotNull(content);
+        assertTrue (StringUtils.isNotBlank(content));
 
-        return sb.toString();
+        sshCommandServiceTest.reset();
+
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
+            if (script.startsWith("sudo systemctl status --no-pager --no-block -al")) {
+                return content;
+            }
+            return "";
+        });
     }
 }

@@ -36,7 +36,6 @@ package ch.niceideas.eskimo.model;
 
 import ch.niceideas.common.exceptions.CommonRTException;
 import ch.niceideas.common.json.JsonWrapper;
-import ch.niceideas.common.utils.Pair;
 import ch.niceideas.common.utils.SerializablePair;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.service.ServiceDefinition;
@@ -82,7 +81,7 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
     }
 
     public boolean isServiceOnNode(Service service, int nodeNbr) {
-        return getNodeNumbers(service).contains(nodeNbr);
+        return getAllNodeNumbersWithService(service).contains(nodeNbr);
     }
 
     public boolean hasServiceConfigured(ServiceDefinition serviceDef) {
@@ -137,25 +136,36 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
         return Node.fromAddress(nodeAddress);
     }
 
+    public List<Integer> getAllNodeNumbersWithService(ServiceDefinition serviceDef) {
+        return getAllNodeNumbersWithService(serviceDef.toService());
+    }
+
+    public List<Integer> getAllNodeNumbersWithService(Service service) {
+        return getRootKeys().stream()
+                .map(key -> {
+                    try {
+                        return Topology.parseKeyToServiceConfig(key, this);
+                    } catch (NodesConfigurationException | JSONException e) {
+                        logger.error(e, e);
+                        throw new TopologyException(e);
+                    }
+                })
+                .filter(serviceConfig -> serviceConfig.getService().equals(service))
+                .map(result -> result.getNodeNumber() == null ? -1 : result.getNodeNumber())
+                .filter (value -> value != -1)
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
     public List<Node> getAllNodesWithService(ServiceDefinition serviceDef) {
         return getAllNodesWithService(serviceDef.toService());
     }
 
     public List<Node> getAllNodesWithService(Service service) {
-        return getRootKeys().stream()
-                .map (key -> {
+        return getAllNodeNumbersWithService(service).stream()
+                .map(nodeNumber -> {
                     try {
-                        return Topology.parseKeyToServiceConfig(key, this);
-                    } catch (NodesConfigurationException | JSONException e) {
-                        logger.debug (e, e);
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .filter(serviceConfig -> serviceConfig.getService().equals(service))
-                .map(serviceConfig -> {
-                    try {
-                        return getNode (serviceConfig.getNodeNumber());
+                        return getNode (nodeNumber);
                     } catch (JSONException e) {
                         logger.debug (e, e);
                         return null;
@@ -266,27 +276,6 @@ public class NodesConfigWrapper extends JsonWrapper implements Serializable, Con
                 })
                 .filter(Objects::nonNull)
                 .map(Node::fromAddress)
-                .sorted()
-                .collect(Collectors.toList());
-    }
-
-    public List<Integer> getNodeNumbers(ServiceDefinition serviceDef) {
-        return getNodeNumbers(serviceDef.toService());
-    }
-
-    public List<Integer> getNodeNumbers(Service service) {
-        return getRootKeys().stream()
-                .map(key -> {
-                    try {
-                        return Topology.parseKeyToServiceConfig(key, this);
-                    } catch (NodesConfigurationException | JSONException e) {
-                        logger.error(e, e);
-                        throw new TopologyException(e);
-                    }
-                })
-                .filter(result -> result.getService().equals(service))
-                .map(result -> result.getNodeNumber() == null ? -1 : result.getNodeNumber())
-                .filter (value -> value != -1)
                 .sorted()
                 .collect(Collectors.toList());
     }

@@ -34,11 +34,14 @@
 
 package ch.niceideas.common.utils;
 
+import ch.niceideas.common.exceptions.CommonBusinessException;
+import ch.niceideas.eskimo.utils.PumpThread;
 import org.apache.log4j.Logger;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 
 public class ProcessHelper {
@@ -49,7 +52,7 @@ public class ProcessHelper {
 
     public static String exec(String cmd) {
         try {
-            return exec(cmd, false);
+            return exec(cmd.split(" +"), false);
         } catch (ProcessHelperException e) {
             logger.error (e, e);
         }
@@ -57,48 +60,35 @@ public class ProcessHelper {
     }
 
     public static String exec(String[] cmd, boolean throwExceptions) throws ProcessHelperException {
-        try {
-            Process proc = Runtime.getRuntime().exec(cmd);
-            return execProc (proc, throwExceptions);
-        } catch (IOException e) {
-            logger.error (e, e);
-            throw new ProcessHelperException (e.getMessage(), e);
-        }
+        return execProc (new ProcessBuilder(cmd), throwExceptions);
     }
     
     public static String exec(String cmd, boolean throwExceptions) throws ProcessHelperException {
-        try {
-            Process proc = Runtime.getRuntime().exec(cmd);
-            return execProc (proc, throwExceptions);
-        } catch (IOException e) {
-            logger.error (e, e);
-            throw new ProcessHelperException (e.getMessage(), e);
-        }
+        return execProc (new ProcessBuilder(cmd.split(" +")), throwExceptions);
     }
     
-    private static String execProc(Process proc, boolean throwExceptions) throws ProcessHelperException {
+    private static String execProc(ProcessBuilder pb, boolean throwExceptions) throws ProcessHelperException {
         try {
 
-            String line;
+            Process proc = pb.start();
 
-            /*- standard input -*/
-            BufferedReader input = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+            int returnCode;
             StringBuilder outputBuilder = new StringBuilder();
-            while ((line = input.readLine()) != null) {
 
-                outputBuilder.append (line);
-                outputBuilder.append ("\n");
+            try (ByteArrayOutputStream baosIn = new ByteArrayOutputStream();
+                 ByteArrayOutputStream baosErr = new ByteArrayOutputStream()) {
+
+                try (PumpThread ignoredIn = new PumpThread(proc.getInputStream(), baosIn);
+                     PumpThread ignoredErr = new PumpThread(proc.getErrorStream(), baosErr)) {
+
+                    returnCode = proc.waitFor();
+                }
+
+                outputBuilder.append(baosIn.toString(StandardCharsets.UTF_8));
+                outputBuilder.append(baosErr.toString(StandardCharsets.UTF_8));
             }
 
-            /*- error -*/
-            BufferedReader error = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
-            while ((line = error.readLine()) != null) {
-
-                outputBuilder.append(line);
-                outputBuilder.append("\n");
-            }
-
-            int returnCode = proc.waitFor();
+            proc.destroy();
 
             if (throwExceptions && returnCode != 0) {
                 if (outputBuilder.length() > 0) {
@@ -121,7 +111,7 @@ public class ProcessHelper {
         }
     }
 
-    public static class ProcessHelperException extends Exception {
+    public static class ProcessHelperException extends CommonBusinessException {
 
         private static final long serialVersionUID = 100537626321527736L;
 

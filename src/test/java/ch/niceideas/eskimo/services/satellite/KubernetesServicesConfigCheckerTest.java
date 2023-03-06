@@ -72,7 +72,7 @@ public class KubernetesServicesConfigCheckerTest {
     }
 
     @Test
-    public void testCheckKubernetesSetupCustomDeploymentWong() throws Exception {
+    public void testCheckKubernetesSetupCustomDeploymentWong() {
         KubernetesServicesConfigWrapper kubeConfigStd = StandardSetupHelpers.getStandardKubernetesConfig();
         kubeConfigStd.setValueForPath("database_deployment_strategy", "off");
         KubernetesServicesConfigException exp = assertThrows(KubernetesServicesConfigException.class,
@@ -145,7 +145,7 @@ public class KubernetesServicesConfigCheckerTest {
     }
 
     @Test
-    public void testOneCerebroButNoES() throws Exception {
+    public void testOneCerebroButNoES() {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
@@ -169,7 +169,7 @@ public class KubernetesServicesConfigCheckerTest {
     }
 
     @Test
-    public void testSparkButNoKube() throws Exception {
+    public void testSparkButNoKube() {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
@@ -191,7 +191,7 @@ public class KubernetesServicesConfigCheckerTest {
     }
 
     @Test
-    public void testZeppelinButNoZookeeper() throws Exception {
+    public void testZeppelinButNoZookeeper() {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");
@@ -218,7 +218,7 @@ public class KubernetesServicesConfigCheckerTest {
     }
 
     @Test
-    public void testNonKubernetesServiceCanBeSelected() throws Exception {
+    public void testNonKubernetesServiceCanBeSelected() {
 
         NodesConfigWrapper nodesConfig = new NodesConfigWrapper(new HashMap<>() {{
             put("node_id1", "192.168.10.11");

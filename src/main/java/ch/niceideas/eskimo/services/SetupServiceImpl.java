@@ -461,7 +461,7 @@ public class SetupServiceImpl implements SetupService {
 
             URL downloadUrl = new URL(packagesDownloadUrlRoot + "/" + ESKIMO_PACKAGES_VERSIONS_JSON);
 
-            dowloadFile(new IgnoreMessageLogger(), tempPackagesVersionFile, downloadUrl, "");
+            downloadFile(new IgnoreMessageLogger(), tempPackagesVersionFile, downloadUrl, "");
 
             JsonWrapper packagesVersion = new JsonWrapper(FileUtils.readFile(tempPackagesVersionFile));
             Files.delete(tempPackagesVersionFile.toPath());
@@ -715,7 +715,7 @@ public class SetupServiceImpl implements SetupService {
                                 ml.addInfo(fileName + " is already downloaded");
                             } else {
 
-                                dowloadFile(ml, tempFile, downloadUrl, "Downloading image "+ fileName + " ...");
+                                downloadFile(ml, tempFile, downloadUrl, "Downloading image "+ fileName + " ...");
 
                                 FileUtils.delete(targetFile);
                                 if (!tempFile.renameTo(targetFile)) {
@@ -730,7 +730,7 @@ public class SetupServiceImpl implements SetupService {
         }
     }
 
-    protected void dowloadFile(MessageLogger ml, File destinationFile, URL downloadUrl, String message) throws IOException {
+    protected void downloadFile(MessageLogger ml, File destinationFile, URL downloadUrl, String message) throws IOException {
         // download kube using full java solution, no script (don't want dependency on system script for this)
         try (ReadableByteChannel readableByteChannel = Channels.newChannel(downloadUrl.openStream())) {
             try (FileOutputStream fileOutputStream = new FileOutputStream(destinationFile)) {
@@ -744,9 +744,7 @@ public class SetupServiceImpl implements SetupService {
     }
 
     protected void buildPackage(String image) throws SetupException {
-
         if (!operationsMonitoringService.isInterrupted()) {
-
             try {
                 systemOperationService.applySystemOperation(
                         new SetupCommand.SetupOperationId(SetupCommand.SetupOperation.BUILD, image),

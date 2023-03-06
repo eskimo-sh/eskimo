@@ -349,7 +349,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                         if (serviceDef.isKubernetes()) {
                             addRestart(new NodeServiceOperationsCommand.ServiceOperationId(NodeServiceOperationsCommand.ServiceOperation.RESTART, serviceDef.toService(), Node.KUBERNETES_FLAG));
                         } else {
-                            nodesConfig.getNodeNumbers(serviceDef).stream()
+                            nodesConfig.getAllNodeNumbersWithService(serviceDef).stream()
                                     .map (nodesConfig::getNode)
                                     .forEach(node -> addRestart(new NodeServiceOperationsCommand.ServiceOperationId(NodeServiceOperationsCommand.ServiceOperation.RESTART, serviceDef.toService(), node)));
                         }

@@ -53,6 +53,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNullApi;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.socket.TextMessage;
@@ -90,8 +91,6 @@ public class WebSocketProxyTest {
 
     private TomcatWebSocketTestServer server;
 
-    private AnnotationConfigWebApplicationContext wac;
-
     private static int tomcatServerLocalPort = -1;
 
     @BeforeEach
@@ -99,8 +98,7 @@ public class WebSocketProxyTest {
 
         client = new StandardWebSocketClient();
 
-        wac = new AnnotationConfigWebApplicationContext();
-        //wac.register(TestConfig.class);
+        AnnotationConfigWebApplicationContext wac = new AnnotationConfigWebApplicationContext();
         wac.register(WebSocketConfiguration.class);
         wac.refresh();
 

@@ -271,7 +271,7 @@ eskimo.NodesConfig = function() {
                     let placeHolder = $("#field" + nbr).find(".configured-multiple-services-placeholder");
                     placeHolder.html(placeHolder.html() +
                         '<div class="nodes-config-entry">' +
-                        '     <img alt="nodes config logo" class="' + serviceName + '_logo" src="' + getServiceLogoPath(serviceName) + '" />' +
+                        '     <img class="nodes-config-logo" alt="' + serviceName + '_logo" src="' + getServiceLogoPath(serviceName) + '" />' +
                         serviceName +
                         '     <br>' +
                         '</div>');
@@ -283,7 +283,7 @@ eskimo.NodesConfig = function() {
                     let placeHolder = $("#field" + nbr).find(".configured-unique-services-placeholder");
                     placeHolder.html(placeHolder.html() +
                         '<div class="nodes-config-entry">' +
-                        '     <img alt="nodes config logo" class="' + serviceName + '_logo" src="' + getServiceLogoPath(serviceName) + '" />' +
+                        '     <img class="nodes-config-logo" alt="' + serviceName + '_logo" src="' + getServiceLogoPath(serviceName) + '" />' +
                         serviceName +
                         '     <br>' +
                         '</div>');

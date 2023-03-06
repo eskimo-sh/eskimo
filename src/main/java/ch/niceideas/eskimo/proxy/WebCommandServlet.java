@@ -47,6 +47,8 @@ import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.MimeType;
+import org.springframework.util.MimeTypeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -80,7 +82,7 @@ public class WebCommandServlet extends HttpServlet {
     protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse)
             throws ServletException, IOException {
 
-        servletResponse.setContentType("application/json");
+        servletResponse.setContentType(MimeTypeUtils.APPLICATION_JSON.toString());
 
         try {
 
@@ -116,7 +118,7 @@ public class WebCommandServlet extends HttpServlet {
             String result = sshCommandService.runSSHCommand(serviceNode, webCommand.getCommand());
 
             // 6. Return result or error in expected json format
-            JsonWrapper returnObject = new JsonWrapper("{}");
+            JsonWrapper returnObject = JsonWrapper.empty();
             returnObject.setValueForPath("value", result);
             servletResponse.getOutputStream().write(returnObject.getFormattedValue().getBytes(StandardCharsets.UTF_8));
 

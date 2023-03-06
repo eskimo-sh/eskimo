@@ -33,17 +33,57 @@
  */
 
 
-package ch.niceideas.eskimo.model;
+package ch.niceideas.eskimo.utils;
 
-public class IgnoreMessageLogger implements MessageLogger {
+import org.apache.log4j.Logger;
 
-    @Override
-    public void addInfo(String message) {
-        // ignored
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+public class PumpThread implements Runnable, AutoCloseable {
+
+    private static final Logger logger = Logger.getLogger(PumpThread.class);
+
+    private final InputStream in;
+    private final OutputStream out;
+    private final Thread thread;
+
+    /**
+     * Instantiates a new Pump thread.
+     *
+     * @param in  the in
+     * @param out the out
+     */
+    public  PumpThread(InputStream in, OutputStream out) {
+        thread = new Thread(this, "pump thread");
+        this.in = in;
+        this.out = out;
+        thread.start();
     }
 
     @Override
-    public void addInfo(String[] messages) {
-        // ignored
+    public void run() {
+        byte[] buf = new byte[1024];
+        try {
+            while(true) {
+                int len = in.read(buf);
+                if(len<0) {
+                    in.close();
+                    return;
+                }
+                out.write(buf,0,len);
+            }
+        } catch (IOException e) {
+            logger.warn(e.getMessage());
+            logger.debug(e, e);
+        }
+    }
+
+    @Override
+    public void close() throws InterruptedException {
+        if (thread != null) {
+            thread.join();
+        }
     }
 }

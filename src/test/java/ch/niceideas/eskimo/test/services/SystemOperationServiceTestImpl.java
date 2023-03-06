@@ -65,7 +65,7 @@ public class SystemOperationServiceTestImpl implements SystemOperationService {
 
     private boolean mockCalls = false;
 
-    private final List<Pair<OperationId, SystemOperation>> appliedOperations = new ArrayList<>();
+    private final List<Pair<OperationId<?>, SystemOperation>> appliedOperations = new ArrayList<>();
 
     public void setMockCalls (boolean mockCalls) {
         this.mockCalls = mockCalls;
@@ -76,12 +76,12 @@ public class SystemOperationServiceTestImpl implements SystemOperationService {
         mockCalls = true;
     }
 
-    public List<Pair<OperationId, SystemOperation>> getAppliedOperations() {
+    public List<Pair<OperationId<?>, SystemOperation>> getAppliedOperations() {
         return Collections.unmodifiableList(appliedOperations);
     }
 
     @Override
-    public void applySystemOperation(OperationId operationId, SystemOperation operation, SystemService.StatusUpdater statusUpdater) throws SystemException {
+    public void applySystemOperation(OperationId<?> operationId, SystemOperation operation, SystemService.StatusUpdater statusUpdater) throws SystemException {
         appliedOperations.add(new Pair<>(operationId, operation));
         if (!mockCalls) {
 

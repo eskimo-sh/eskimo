@@ -34,7 +34,6 @@
 
 package ch.niceideas.eskimo.services;
 
-import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.eskimo.EskimoApplication;
@@ -545,9 +544,8 @@ public class ServicesDefinitionTest {
             put("node_id2", "192.168.10.12");
         }});
 
-        NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () -> {
-            nodesConfigurationChecker.checkNodesSetup(nodesConfig2);
-        });
+        NodesConfigurationException exception = assertThrows(NodesConfigurationException.class, () ->
+            nodesConfigurationChecker.checkNodesSetup(nodesConfig2));
 
         assertEquals("Inconsistency found : service distributed-filesystem is mandatory on all nodes but some nodes are lacking it.", exception.getMessage());
 

@@ -451,10 +451,7 @@ public class SystemServiceImpl implements SystemService {
 
                 statusMap.put(("node_alive_" + node.getName()), "OK");
 
-                String allServicesStatus = sshCommandService.runSSHScript(node,
-                        "sudo systemctl status --no-pager --no-block -al " + servicesDefinition.getAllServicesString() + " 2>/dev/null ", false);
-
-                SystemStatusParser parser = new SystemStatusParser(allServicesStatus);
+                SystemStatusParser parser = new SystemStatusParser(node, sshCommandService, servicesDefinition);
 
                 for (Service service : servicesDefinition.listAllNodesServices()) {
 
@@ -841,14 +838,6 @@ public class SystemServiceImpl implements SystemService {
         //messagingService.addLines("\nNode seems dead " + node);
         */
         notificationService.addError("Node " + node + " is dead.");
-        nodeStatus.addDeadNode(node);
-    }
-
-    void handleSSHFails(NodesStatus nodeStatus, Node node) {
-        /* FIXME : wherever this  is used, this should be returned to the UI as a warning either at the end of
-        //messagingService.addLines("\nNode " + node + " couldn't be joined through SSH\nIs the user to be used by eskimo properly created and the public key properly added to SSH authorized keys ? (See User Guide)");
-        */
-        notificationService.addError("Node " + node + " not reachable.");
         nodeStatus.addDeadNode(node);
     }
 

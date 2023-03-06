@@ -116,18 +116,15 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
 
     @Test
     public void testRunSSHCommandStdErr() {
-        try {
-            sshCommandService.runSSHCommand(Node.fromName("localhost"), "/bin/bash -c /bin/tada");
-            fail ("Exception expected");
-        } catch (SSHCommandException e) {
-            assertNotNull(e);
-            assertTrue (
+        SSHCommandException exp = assertThrows(SSHCommandException.class,
+                () -> sshCommandService.runSSHCommand(Node.fromName("localhost"), "/bin/bash -c /bin/tada"));
+        assertNotNull (exp);
+        assertTrue (
+                ("Command exited with return code 127\n" +
+                        "/bin/bash: /bin/tada: No such file or directory\n").equals (exp.getMessage())
+                        ||
                         ("Command exited with return code 127\n" +
-                         "/bin/bash: /bin/tada: No such file or directory\n").equals (e.getMessage())
-                    ||
-                        ("Command exited with return code 127\n" +
-                         "/bin/bash: line 1: /bin/tada: No such file or directory\n").equals (e.getMessage()));
-        }
+                                "/bin/bash: line 1: /bin/tada: No such file or directory\n").equals (exp.getMessage()));
     }
 
     @Test
@@ -146,13 +143,10 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
 
     @Test
     public void testRunSSHScriptErr() {
-        try {
-            sshCommandService.runSSHScript(Node.fromName("localhost"), "/bin/tada");
-            fail ("Exception expected");
-        } catch (SSHCommandException e) {
-            assertNotNull(e);
-            assertEquals ("bash: line 1: /bin/tada: No such file or directory\n", e.getMessage());
-        }
+        SSHCommandException exp = assertThrows(SSHCommandException.class,
+                () -> sshCommandService.runSSHScript(Node.fromName("localhost"), "/bin/tada"));
+        assertNotNull(exp);
+        assertEquals ("bash: line 1: /bin/tada: No such file or directory\n", exp.getMessage());
     }
 
     @Test
@@ -172,7 +166,7 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
             assertTrue (dest.exists());
             assertEquals ("test content", FileUtils.readFile(dest));
         } catch (SSHCommandException e) {
-            // this can happen if we don't have the right to write in /home
+            // this can happen if we don't have the rights to write in /home
             if (!e.getMessage().equals("Error during SCP transfer.")) {
                 fail (e.getMessage() + " is not expected");
             }

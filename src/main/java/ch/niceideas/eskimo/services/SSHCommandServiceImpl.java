@@ -37,9 +37,11 @@ package ch.niceideas.eskimo.services;
 import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileException;
 import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.types.Node;
+import ch.niceideas.eskimo.utils.PumpThread;
 import com.trilead.ssh2.ChannelCondition;
 import com.trilead.ssh2.SCPClient;
 import com.trilead.ssh2.Session;
@@ -50,6 +52,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @Component
@@ -94,32 +97,19 @@ public class SSHCommandServiceImpl implements SSHCommandService {
     }
 
     String getScriptContent(String scriptName) throws SSHCommandException {
-        InputStream scriptIs = Optional.ofNullable(ResourceUtils.getResourceAsStream(scriptName))
-                .orElseThrow(() -> new SSHCommandException("Impossible to load script " + scriptName));
-
-        String scriptContent;
-        try (BufferedReader reader = new BufferedReader (new InputStreamReader(scriptIs))) {
-            String line;
-            StringBuilder scriptBuilder = new StringBuilder();
-
-            while ((line = reader.readLine()) != null) {
-                scriptBuilder.append(line).append("\n");
-            }
-
-            scriptContent = scriptBuilder.toString();
+        try {
+            return StreamUtils.getAsString(Optional.ofNullable(ResourceUtils.getResourceAsStream(scriptName))
+                        .orElseThrow(() -> new SSHCommandException("Impossible to load script " + scriptName)),
+                    StandardCharsets.UTF_8);
         } catch (IOException e) {
-            logger.error(e, e);
-            throw new SSHCommandException(e);
+            throw new SSHCommandException (e);
         }
-        return scriptContent;
     }
 
     @Override
     public String runSSHScript(Node node, String script, boolean throwsException) throws SSHCommandException {
         try {
-            SSHConnection connection = connectionManagerService.getSharedConnection(node);
-            return runSSHScript(connection, script, throwsException);
-
+            return runSSHScript(connectionManagerService.getSharedConnection(node), script, throwsException);
         } catch (ConnectionManagerException e) {
             logger.error(e.getMessage());
             logger.debug(e, e);
@@ -142,14 +132,10 @@ public class SSHCommandServiceImpl implements SSHCommandService {
             out.write(script);
             out.close();
 
-            PumpThread t1 = new PumpThread(session.getStdout(), baosOut);
-            t1.start();
-            PumpThread t2 = new PumpThread(session.getStderr(), baosErr);
-            t2.start();
-
-            session.getStdin().close();
-            t1.join();
-            t2.join();
+            try (PumpThread ignored1 = new PumpThread(session.getStdout(), baosOut);
+                 PumpThread ignored2 = new PumpThread(session.getStderr(), baosErr)) {
+                session.getStdin().close();
+            }
 
             // wait for some time since the delivery of the exit status often gets delayed
             session.waitForCondition(ChannelCondition.EXIT_STATUS, connection.getReadTimeout());
@@ -245,38 +231,4 @@ public class SSHCommandServiceImpl implements SSHCommandService {
         }
     }
 
-    private static final class PumpThread extends Thread {
-        private final InputStream in;
-        private final OutputStream out;
-
-        /**
-         * Instantiates a new Pump thread.
-         *
-         * @param in  the in
-         * @param out the out
-         */
-        PumpThread(InputStream in, OutputStream out) {
-            super("pump thread");
-            this.in = in;
-            this.out = out;
-        }
-
-        @Override
-        public void run() {
-            byte[] buf = new byte[1024];
-            try {
-                while(true) {
-                    int len = in.read(buf);
-                    if(len<0) {
-                        in.close();
-                        return;
-                    }
-                    out.write(buf,0,len);
-                }
-            } catch (IOException e) {
-                logger.warn(e.getMessage());
-                logger.debug(e, e);
-            }
-        }
-    }
 }

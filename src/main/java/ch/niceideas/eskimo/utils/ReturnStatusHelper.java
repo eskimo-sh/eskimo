@@ -67,9 +67,9 @@ public class ReturnStatusHelper {
                 put("status", "KO");
                 put("error", errorMessage);
             }}).toString(2);
-        } catch (JSONException e1) {
+        } catch (JSONException e) {
             // cannot happen
-            throw new ErrorStatusException(e1);
+            throw new ErrorStatusException(e);
         }
     }
 
@@ -101,9 +101,9 @@ public class ReturnStatusHelper {
                 put("clear", flag);
                 additionalAttributesFeeder.feedMap (this);
             }}).toString(2);
-        } catch (JSONException e1) {
+        } catch (JSONException e) {
             // cannot happen
-            throw new ErrorStatusException(e1);
+            throw new ErrorStatusException(e);
         }
     }
 
@@ -130,9 +130,9 @@ public class ReturnStatusHelper {
                 put("processingPending", processingPending);
                 put("clear", flag);
             }}).toString(2);
-        } catch (JSONException e1) {
+        } catch (JSONException e) {
             // cannot happen
-            throw new ErrorStatusException(e1);
+            throw new ErrorStatusException(e);
         }
     }
 
@@ -145,9 +145,9 @@ public class ReturnStatusHelper {
                 put("clear", flag);
                 put("message", message);
             }}).toString(2);
-        } catch (JSONException e1) {
+        } catch (JSONException e) {
             // cannot happen
-            throw new ErrorStatusException(e1);
+            throw new ErrorStatusException(e);
         }
     }
 

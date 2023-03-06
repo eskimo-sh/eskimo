@@ -206,10 +206,7 @@ public class SystemServiceTestImpl implements SystemService {
 
     @Override
     public boolean isNodeUp(Node node) {
-        if (pingError) {
-            return false;
-        }
-        return true;
+        return !pingError;
     }
 
     @Override

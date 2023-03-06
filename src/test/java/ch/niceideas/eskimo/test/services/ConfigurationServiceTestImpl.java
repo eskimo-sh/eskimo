@@ -64,65 +64,48 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
     @Autowired
     private ServicesDefinition servicesDefinition;
 
-    private boolean standardKubernetesConfig = false;
     private boolean kubernetesConfigError = false;
-
-    private boolean standard2NodesInstallStatus = false;
-    private boolean standard2NodesSetup = false;
     private boolean nodesConfigError = false;
-
     private boolean serviceSettingsError = false;
-
     private boolean setupConfigNotCompletedError = false;
-    private boolean setupCompleted = false;
 
     private ServicesSettingsWrapper serviceSettings = null;
-    private String setupConfigAsString;
     private ServicesInstallStatusWrapper installStatus = null;
     private KubernetesServicesConfigWrapper kubeServicesConfig = null;
-
+    private String setupConfigAsString;
     private NodesConfigWrapper nodesConfig = null;
 
     public void reset() {
-        this.standardKubernetesConfig = false;
         this.kubernetesConfigError = false;
-        this.standard2NodesInstallStatus = false;
-        this.standard2NodesSetup = false;
         this.nodesConfigError = false;
         this.serviceSettingsError = false;
         this.setupConfigNotCompletedError = false;
-        this.setupCompleted = false;
 
         this.serviceSettings = null;
-        this.setupConfigAsString = null;
+        this.nodesConfig = null;
         this.installStatus = null;
         this.kubeServicesConfig = null;
-
-        this.nodesConfig = null;
     }
 
     public void setStandardKubernetesConfig() {
-        this.standardKubernetesConfig = true;
+        this.kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
         this.kubernetesConfigError = false;
     }
 
     public void setKubernetesConfigError() {
-        this.standardKubernetesConfig = false;
         this.kubernetesConfigError = true;
     }
 
     public void setStandard2NodesInstallStatus() {
-        this.standard2NodesInstallStatus = true;
-        this.installStatus = null;
+        this.installStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
     }
 
     public void setStandard2NodesSetup() {
-        this.standard2NodesSetup = true;
+        this.nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
         this.nodesConfigError = false;
     }
 
     public void setNodesConfigError() {
-        this.standard2NodesSetup = false;
         this.nodesConfigError = true;
     }
 
@@ -132,12 +115,10 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
 
     public void setSetupConfigNotCompletedError() {
         this.setupConfigNotCompletedError = true;
-        setupCompleted = false;
     }
 
     public void setSetupCompleted() {
         this.setupConfigNotCompletedError = false;
-        setupCompleted = true;
     }
 
     public boolean isSaveServicesInstallationStatusCalled () {
@@ -182,9 +163,6 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
         if (this.installStatus != null) {
             return this.installStatus;
         }
-        if (standard2NodesInstallStatus) {
-            return StandardSetupHelpers.getStandard2NodesInstallStatus();
-        }
         return ServicesInstallStatusWrapper.empty();
     }
 
@@ -195,14 +173,13 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
 
     @Override
     public NodesConfigWrapper loadNodesConfig() throws SystemException {
+        if (nodesConfigError) {
+            throw new SystemException("Test Error");
+        }
         if (nodesConfig != null) {
             return nodesConfig;
         }
-        if (standard2NodesSetup) {
-            return StandardSetupHelpers.getStandard2NodesSetup();
-        } else if (nodesConfigError) {
-            throw new SystemException("Test Error");
-        }
+
         return NodesConfigWrapper.empty();
     }
 
@@ -249,15 +226,13 @@ public class ConfigurationServiceTestImpl implements ConfigurationService {
 
     @Override
     public KubernetesServicesConfigWrapper loadKubernetesServicesConfig() throws SystemException {
-        if (standardKubernetesConfig) {
-            return StandardSetupHelpers.getStandardKubernetesConfig();
-        } else if (kubernetesConfigError) {
+        if (kubernetesConfigError) {
             throw new SystemException("Test Error");
         } else if (this.kubeServicesConfig != null) {
             return this.kubeServicesConfig;
-        } else {
-            return KubernetesServicesConfigWrapper.empty();
         }
+
+        return KubernetesServicesConfigWrapper.empty();
     }
 
     @Override

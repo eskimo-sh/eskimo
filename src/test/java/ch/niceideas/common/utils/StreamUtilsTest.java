@@ -78,14 +78,16 @@ public class StreamUtilsTest {
 
     @Test
     public void testClose() {
+        boolean success = false;
         try {
             StreamUtils.close(new BufferedReader(new InputStreamReader(new ByteArrayInputStream("aaa".getBytes()))));
             StreamUtils.close(new ByteArrayInputStream("aaa".getBytes()));
             StreamUtils.close((InputStream) null);
             StreamUtils.close((OutputStream) null);
             StreamUtils.close(new ByteArrayOutputStream());
-        } catch (Exception e) {
-            fail ("No exception expected");
+            success = true;
+        } finally {
+            assertTrue (success);
         }
     }
 }

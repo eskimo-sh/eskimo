@@ -109,7 +109,7 @@ public class PackageVersionGenerator {
             }
         }
 
-        JsonWrapper resultJSON = new JsonWrapper("{}");
+        JsonWrapper resultJSON = JsonWrapper.empty();
         for (Map.Entry<String, Pair<String, String>> packageEntry : packages.entrySet()) {
             String packageName = packageEntry.getKey();
             Pair<String, String> version = packageEntry.getValue();
@@ -124,6 +124,5 @@ public class PackageVersionGenerator {
             logger.error (e, e);
             throw new CommonRTException(e);
         }
-
     }
 }

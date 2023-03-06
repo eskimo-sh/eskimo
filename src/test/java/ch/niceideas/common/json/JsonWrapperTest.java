@@ -154,6 +154,7 @@ public class JsonWrapperTest {
     @Test
     public void testIsEmpty() {
         assertTrue(new JsonWrapper("{}").isEmpty());
+        assertTrue(JsonWrapper.empty().isEmpty());
         assertFalse(new JsonWrapper("{\"abc\" : \"test\"}").isEmpty());
     }
 

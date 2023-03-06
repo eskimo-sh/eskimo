@@ -81,7 +81,11 @@ public class SimpleOperationCommand implements JSONOpCommand {
         if (StringUtils.isBlank(member)) {
             return "";
         }
-        return member.replace("(", "").replace(")", "").replace("/", "").replace(" ", "-").replace(".", "-");
+        return member.replace("(", "")
+                .replace(")", "")
+                .replace("/", "")
+                .replace(" ", "-")
+                .replace(".", "-");
     }
 
 

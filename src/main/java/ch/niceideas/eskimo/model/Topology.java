@@ -376,7 +376,7 @@ public class Topology {
     private Node findFirstServiceNode(NodesConfigWrapper nodesConfig, Service service) throws NodesConfigurationException {
         int nodeNbr = Integer.MAX_VALUE;
 
-        for (int candidateNbr : nodesConfig.getNodeNumbers(service)) {
+        for (int candidateNbr : nodesConfig.getAllNodeNumbersWithService(service)) {
             if (candidateNbr < nodeNbr) {
                 nodeNbr = candidateNbr;
             }
@@ -394,7 +394,7 @@ public class Topology {
             throws NodesConfigurationException {
         int nodeNbr = Integer.MAX_VALUE;
 
-        for (int candidateNbr : nodesConfig.getNodeNumbers(service)) {
+        for (int candidateNbr : nodesConfig.getAllNodeNumbersWithService(service)) {
             Node otherNode = nodesConfig.getNode(candidateNbr);
             if (!existingMasters.contains(otherNode)
                     && (candidateNbr < nodeNbr)) {
@@ -411,7 +411,7 @@ public class Topology {
     private Node findRandomOtherServiceNode(NodesConfigWrapper nodesConfig, Service service, Set<Node> existingMasters) {
 
         // Try to find any other node running service
-        for (int otherNbr : nodesConfig.getNodeNumbers(service)) {
+        for (int otherNbr : nodesConfig.getAllNodeNumbersWithService(service)) {
             Node otherNode = nodesConfig.getNode (otherNbr);
             if (!existingMasters.contains(otherNode)) {
                 return otherNode;
@@ -425,7 +425,7 @@ public class Topology {
             throws NodesConfigurationException {
         int masterNumber = -1;
 
-        for (int otherNbr : nodesConfig.getNodeNumbers(service)) {
+        for (int otherNbr : nodesConfig.getAllNodeNumbersWithService(service)) {
             if (otherNbr > currentNodeNumber && (masterNumber == -1 || otherNbr < masterNumber) // try to find closest one (next in a chain)
                     ) {
                 masterNumber = otherNbr;

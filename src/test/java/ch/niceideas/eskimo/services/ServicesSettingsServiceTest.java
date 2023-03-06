@@ -42,7 +42,6 @@ import ch.niceideas.eskimo.model.SettingsOperationsCommand;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
 import ch.niceideas.eskimo.test.services.*;
-import ch.niceideas.eskimo.types.Service;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

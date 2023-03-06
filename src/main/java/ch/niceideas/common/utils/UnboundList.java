@@ -50,13 +50,13 @@ public class UnboundList<T> extends AbstractWrappingList<T> implements List<T> {
 
     private final int maxSize;
 
-    private final FixedSizeList<T> buffer;
+    private final List<T> buffer;
 
     private int virtualSize = 0;
 
     public UnboundList(int maxSize) {
         this.maxSize = maxSize;
-        buffer = new FixedSizeList<>(maxSize);
+        buffer = Collections.synchronizedList(new FixedSizeList<>(maxSize));
         setUnderlying (buffer);
     }
 

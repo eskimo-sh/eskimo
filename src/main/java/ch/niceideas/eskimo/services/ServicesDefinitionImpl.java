@@ -158,7 +158,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
             Boolean registryOnly = (Boolean) servicesConfig.getValueForPath(serviceString+".config.registryOnly");
             serviceDef.setRegistryOnly(registryOnly != null && registryOnly); // false by default
 
-            Boolean mandatory = (Boolean)  servicesConfig.getValueForPath(serviceString+".config.mandatory");
+            Boolean mandatory = (Boolean) servicesConfig.getValueForPath(serviceString+".config.mandatory");
             serviceDef.setMandatory(mandatory != null && mandatory);
 
             String conditional = (String) servicesConfig.getValueForPath(serviceString+".config.conditional");
@@ -634,7 +634,7 @@ public class ServicesDefinitionImpl implements ServicesDefinition, InitializingB
         String configStoragePath = setupService.getConfigStoragePath();
         File envFile = new File(configStoragePath + "/persistent-environment.json");
         if (!envFile.exists()) {
-            return new JsonWrapper("{}");
+            return JsonWrapper.empty();
         }
         return new JsonWrapper(FileUtils.readFile(envFile));
     }

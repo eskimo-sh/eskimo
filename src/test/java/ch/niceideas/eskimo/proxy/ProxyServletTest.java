@@ -510,14 +510,10 @@ public class ProxyServletTest {
         sc.getClientProperties().setAutoRedirect(false);//don't want httpunit itself to redirect
 
         GetMethodWebRequest req = makeGetMethodRequest(sourceBaseUri);
-        try {
-            execAssert(req);
-            fail("UnknownHostException expected.");
-        } catch (UnknownHostException e) {
-            // Expected assuming that our proxy host defined above does not exist.
-        } finally {
-            System.clearProperty("http.proxyHost");
-        }
+
+        assertThrows (UnknownHostException.class, () -> execAssert(req));
+
+        System.clearProperty("http.proxyHost");
     }
 
     private WebResponse execAssert(GetMethodWebRequest request, String expectedUri) throws Exception {
@@ -875,7 +871,7 @@ public class ProxyServletTest {
                 } finally {
                     try {
                         servicedSocket.close();
-                    } catch (final IOException ignore) {
+                    } catch (final IOException ignored) {
                     }
                 }
             }
@@ -884,7 +880,7 @@ public class ProxyServletTest {
                 interrupt();
                 try {
                     servicedSocket.close();
-                } catch (final IOException ignore) {
+                } catch (final IOException ignored) {
                 }
             }
 
@@ -919,7 +915,7 @@ public class ProxyServletTest {
                     workers.remove(this);
                     try {
                         this.conn.close();;
-                    } catch (final IOException ignore) {
+                    } catch (final IOException ignored) {
                     }
                 }
             }
@@ -928,7 +924,7 @@ public class ProxyServletTest {
                 interrupt();
                 try {
                     this.conn.close();
-                } catch (final IOException ignore) {
+                } catch (final IOException ignored) {
                 }
             }
 

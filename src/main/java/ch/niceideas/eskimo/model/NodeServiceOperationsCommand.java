@@ -39,7 +39,6 @@ import ch.niceideas.eskimo.model.service.Dependency;
 import ch.niceideas.eskimo.model.service.MasterElectionStrategy;
 import ch.niceideas.eskimo.model.service.ServiceDefinition;
 import ch.niceideas.eskimo.services.ServicesDefinition;
-import ch.niceideas.eskimo.services.SystemException;
 import ch.niceideas.eskimo.services.satellite.NodeRangeResolver;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.types.Node;
@@ -48,7 +47,6 @@ import ch.niceideas.eskimo.types.Service;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -59,8 +57,6 @@ import java.util.stream.Collectors;
 public class NodeServiceOperationsCommand
         extends AbstractServiceOperationsCommand<NodeServiceOperationsCommand.ServiceOperationId, NodesConfigWrapper>
         implements Serializable {
-
-    private static final Logger logger = Logger.getLogger(NodeServiceOperationsCommand.class);
 
     private final Set<Node> allNodes = new HashSet<>();
 
@@ -76,7 +72,7 @@ public class NodeServiceOperationsCommand
 
         // 1. Find out about services that need to be installed
         for (Service service : servicesDefinition.listServicesOrderedByDependencies()) {
-            for (int nodeNumber : nodesConfig.getNodeNumbers(service)) {
+            for (int nodeNumber : nodesConfig.getAllNodeNumbersWithService(service)) {
 
                 Node node = nodesConfig.getNode(nodeNumber);
 
@@ -98,27 +94,13 @@ public class NodeServiceOperationsCommand
                     .orElseThrow(() -> new IllegalStateException("Cann find service " + installedService + " in services definition"));
             if (!serviceDef.isKubernetes()) {
 
-                try {
-                    int nodeNbr = nodesConfig.getNodeNumber(node);
-                    boolean found = false;
-
-                    // search it in config
-                    for (int nodeNumber : nodesConfig.getNodeNumbers(installedService)) {
-
-                        if (nodeNumber == nodeNbr) {
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (!found) {
-                        retCommand.addUninstallation(new ServiceOperationId(ServiceOperation.UNINSTALLATION, installedService, node));
-                    }
-
-                } catch (SystemException e) {
-                    logger.debug(e, e);
-                    retCommand.addUninstallation(new ServiceOperationId(ServiceOperation.UNINSTALLATION, installedService, node));
-                }
+                nodesConfig.getAllNodesWithService(installedService).stream()
+                        .filter(candidate -> candidate.equals(node))
+                        .findAny()
+                        .ifPresentOrElse(
+                                (candidate) -> {},
+                                () -> retCommand.addUninstallation(new ServiceOperationId(ServiceOperation.UNINSTALLATION, installedService, node))
+                        );
             }
         }
 
@@ -144,7 +126,7 @@ public class NodeServiceOperationsCommand
 
                     } else {
 
-                        for (int nodeNumber : nodesConfig.getNodeNumbers(dependent)) {
+                        for (int nodeNumber : nodesConfig.getAllNodeNumbersWithService(dependent)) {
 
                             Node node = nodesConfig.getNode(nodeNumber);
 
@@ -203,7 +185,7 @@ public class NodeServiceOperationsCommand
                 retCommand.addRestartIfNotInstalled(restartedService, Node.KUBERNETES_FLAG);
             }
         } else {
-            for (int nodeNumber : nodesConfig.getNodeNumbers(restartedService)) {
+            for (int nodeNumber : nodesConfig.getAllNodeNumbersWithService(restartedService)) {
 
                 Node node = nodesConfig.getNode(nodeNumber);
 

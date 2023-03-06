@@ -64,6 +64,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ActiveProfiles({"no-web-stack", "test-conf", "test-proxy", "test-web-socket"}) // using test implementation that overrides default implementation
 public class WebSocketProxyServerTest {
 
+    private static final URI TEST_URI = URI.create(ProxyConfiguration.ESKIMO_WEB_SOCKET_URL_PREFIX + "/cerebro/test");
+
     @Autowired
     private WebSocketProxyServerTestImpl server = null;
 
@@ -75,16 +77,12 @@ public class WebSocketProxyServerTest {
 
         wss1 = new StandardWebSocketSession(null, null, null, null) {
             @Override
-            public URI getUri() {
-                return URI.create(ProxyConfiguration.ESKIMO_WEB_SOCKET_URL_PREFIX + "/cerebro/test");
-            }
+            public URI getUri() { return TEST_URI; }
         };
 
         wss2 = new StandardWebSocketSession(null, null, null, null) {
             @Override
-            public URI getUri() {
-                return URI.create(ProxyConfiguration.ESKIMO_WEB_SOCKET_URL_PREFIX + "/cerebro/test");
-            }
+            public URI getUri() { return TEST_URI; }
         };
 
         server.reset();
@@ -104,9 +102,7 @@ public class WebSocketProxyServerTest {
         forwarders = server.getForwarders();
 
         assertEquals(1, forwarders.size());
-
         assertEquals(2, forwarders.get(ServiceWebId.fromService(Service.from("cerebro"))).size());
-
         assertEquals(1, forwarders.get(ServiceWebId.fromService(Service.from("cerebro"))).get(wss2.getId()).size());
 
         assertNotNull(forwarders.get(ServiceWebId.fromService(Service.from("cerebro"))).get(wss2.getId()).get("/test"));
@@ -136,9 +132,7 @@ public class WebSocketProxyServerTest {
         Map<ServiceWebId, Map<String, Map<String, WebSocketProxyForwarder>>>  forwarders = server.getForwarders();
 
         assertEquals(1, forwarders.size());
-
         assertEquals(1, forwarders.get(ServiceWebId.fromService(Service.from("cerebro"))).size());
-
         assertEquals(1, forwarders.get(ServiceWebId.fromService(Service.from("cerebro"))).get(wss1.getId()).size());
 
         assertNotNull(forwarders.get(ServiceWebId.fromService(Service.from("cerebro"))).get(wss1.getId()).get("/test"));

@@ -120,6 +120,7 @@ public class OperationsMonitoringServiceTest {
         try {
             operationsMonitoringService.endCommand(true);
         } catch (Exception e) {
+            // don't bother
             logger.debug (e, e);
         }
     }
@@ -244,6 +245,7 @@ public class OperationsMonitoringServiceTest {
                         monitor.wait();
                     }
                 } catch (InterruptedException e) {
+                    // don't bother
                     logger.error (e, e);
                 }
             }
@@ -256,6 +258,7 @@ public class OperationsMonitoringServiceTest {
                 SecurityContextHelper.loginAdmin();
                 nodesConfigurationService.applyNodesConfig(command);
             } catch (NodesConfigurationException e) {
+                // don't bother
                 logger.error (e, e);
             }
         });
@@ -305,6 +308,5 @@ public class OperationsMonitoringServiceTest {
 
         t.join();
     }
-
 
 }

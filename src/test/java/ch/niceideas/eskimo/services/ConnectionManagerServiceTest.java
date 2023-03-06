@@ -47,6 +47,9 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.appender.ConsoleAppender;
+import org.apache.logging.log4j.core.appender.DefaultErrorHandler;
+import org.apache.logging.log4j.core.layout.MessageLayout;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.shell.ProcessShellCommandFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,6 +62,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.logging.ConsoleHandler;
 
 import static org.apache.logging.log4j.core.config.Configurator.setLevel;
 import static org.junit.jupiter.api.Assertions.*;
@@ -134,9 +138,13 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
                         org.apache.logging.log4j.core.impl.Log4jLogEvent event = (org.apache.logging.log4j.core.impl.Log4jLogEvent) args[0];
                         builder.append(event.getMessage().getFormattedMessage());
                         builder.append("\n");
-                        break;
+                        return null;
+                    case "getHandler":
+                        return new DefaultErrorHandler(ConsoleAppender.createDefaultAppenderForLayout(new MessageLayout()));
+                    case "stop":
+                        return null;
                 }
-                return null;
+                throw new UnsupportedOperationException("Unsupported method : " + method.getName());
             });
 
             ((org.apache.logging.log4j.core.Logger) testLogger).addAppender(testAppender);
@@ -206,9 +214,6 @@ public class ConnectionManagerServiceTest extends AbstractBaseSSHTest {
         connectionManagerServiceTest.recreateTunnels(Node.fromName("localhost"));
 
         assertEquals(3, connectionManagerServiceTest.getCreateCallFor().size());
-
-
         assertEquals(1, connectionManagerServiceTest.getDropCallFor().size());
-
     }
 }

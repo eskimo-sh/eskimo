@@ -171,7 +171,7 @@ public class MessagingManagerTest {
         testNominal();
 
         for (int i = 0; i < 100000; i++) {
-            ms.addLines("Test__" + i);
+            ms.addLine("Test__" + i);
         }
 
         Pair<Integer,String> result2 = ms.fetchElements(2);

@@ -389,7 +389,6 @@ public class ProxyServlet extends HttpServlet {
             proxyResponse = doExecute(servletRequest, proxyRequest);
 
             // Process the response:
-
             int statusCode = proxyResponse.getCode();
 
             // Pass the response code. This method with the "reason phrase" is deprecated but it's the

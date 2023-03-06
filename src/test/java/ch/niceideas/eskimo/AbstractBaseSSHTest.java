@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo;
 
+import ch.niceideas.common.exceptions.CommonRTException;
 import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
@@ -201,16 +202,15 @@ public abstract class AbstractBaseSSHTest {
             write(key.getPublicExponent().toByteArray(), buf);
             write(key.getModulus().toByteArray(), buf);
             return buf.toByteArray();
+        } catch(Exception e) {
+            throw new CommonRTException(e);
         }
-        catch(Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     private static void write(byte[] str, OutputStream os) throws IOException {
-        for (int shift = 24; shift >= 0; shift -= 8)
+        for (int shift = 24; shift >= 0; shift -= 8) {
             os.write((str.length >>> shift) & 0xFF);
+        }
         os.write(str);
     }
 

@@ -316,8 +316,6 @@ public class SetupServiceTest {
 
         List<String> messages = operationsMonitoringServiceTest.getNewMessages(
                 new SetupCommand.SetupOperationId(SetupCommand.SetupOperation.BUILD, "cerebro"), 0);
-        //List<String> messages = messagingService.getSubList(0);
-        //assertEquals (5, messages.size());
 
         assertEquals("--> Done : Build of package cerebro\n" +
                         "-------------------------------------------------------------------------------\n" +

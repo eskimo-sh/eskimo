@@ -34,6 +34,10 @@
 
 package ch.niceideas.eskimo.utils;
 
+import ch.niceideas.eskimo.services.SSHCommandException;
+import ch.niceideas.eskimo.services.SSHCommandService;
+import ch.niceideas.eskimo.services.ServicesDefinition;
+import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
 import org.apache.log4j.Logger;
 
@@ -61,13 +65,17 @@ public class SystemStatusParser {
 
     private final Map<Service, String> serviceStatus = new HashMap<>();
 
-    public SystemStatusParser (String content) {
-        parse(content);
+    public SystemStatusParser (Node node, SSHCommandService sshCommandService, ServicesDefinition servicesDefinition)
+            throws SSHCommandException {
+        parse(sshCommandService, node, servicesDefinition);
     }
 
-    void parse(String content) {
+    void parse(SSHCommandService sshCommandService, Node node, ServicesDefinition servicesDefinition) throws SSHCommandException {
 
-        String[] contentLines = content.split("\n");
+        String allServicesStatus = sshCommandService.runSSHScript(node,
+                "sudo systemctl status --no-pager --no-block -al " + servicesDefinition.getAllServicesString() + " 2>/dev/null ", false);
+
+        String[] contentLines = allServicesStatus.split("\n");
         for (int i = 0; i < contentLines.length; i++) {
 
             if (    (contentLines[i].startsWith("●")

@@ -132,9 +132,9 @@ public class NodesConfigWrapperTest {
 
     @Test
     public void testGetNodeNumbers() {
-        assertEquals ("1,2,3", ncw.getNodeNumbers(Service.from("elasticsearch")).stream().map(nbr -> "" + nbr).collect(Collectors.joining(",")));
-        assertEquals ("1,2,3", ncw.getNodeNumbers(Service.from("k8s-slave")).stream().map(nbr -> "" + nbr).collect(Collectors.joining(",")));
-        assertEquals ("1", ncw.getNodeNumbers(Service.from("zookeeper")).stream().map(nbr -> "" + nbr).collect(Collectors.joining(",")));
+        assertEquals ("1,2,3", ncw.getAllNodeNumbersWithService(Service.from("elasticsearch")).stream().map(nbr -> "" + nbr).collect(Collectors.joining(",")));
+        assertEquals ("1,2,3", ncw.getAllNodeNumbersWithService(Service.from("k8s-slave")).stream().map(nbr -> "" + nbr).collect(Collectors.joining(",")));
+        assertEquals ("1", ncw.getAllNodeNumbersWithService(Service.from("zookeeper")).stream().map(nbr -> "" + nbr).collect(Collectors.joining(",")));
     }
 
     @Test

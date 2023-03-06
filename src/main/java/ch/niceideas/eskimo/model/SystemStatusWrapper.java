@@ -55,7 +55,6 @@ public class SystemStatusWrapper extends JsonWrapper implements Serializable {
     private static final Logger logger = Logger.getLogger(SystemStatusWrapper.class);
 
     public static final String SERVICE_PREFIX = "service_";
-
     public static final String NODE_ALIVE_FLAG = "node_alive_";
 
     public static SystemStatusWrapper empty() {
