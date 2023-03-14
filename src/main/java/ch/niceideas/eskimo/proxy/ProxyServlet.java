@@ -72,11 +72,10 @@ public class ProxyServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(ProxyServlet.class);
 
     public static final String COOKIE            = "Cookie";
-    public static final String COOKIE2           = "Cookie2";
     public static final String SET_COOKIE        = "Set-Cookie";
     public static final String SET_COOKIE2       = "Set-Cookie2";
 
-    private static final int MAX_CONNECTION_PER_ROUTE = 5;
+    private static final int MAX_CONNECTION_PER_ROUTE = 8;
 
     /* INIT PARAMETER NAME CONSTANTS */
 
@@ -383,47 +382,52 @@ public class ProxyServlet extends HttpServlet {
 
         setXForwardedForHeader(servletRequest, proxyRequest);
 
-        ClassicHttpResponse proxyResponse = null;
+        //ClassicHttpResponse proxyResponse = null;
         try {
             // Execute the request
-            proxyResponse = doExecute(servletRequest, proxyRequest);
-
-            // Process the response:
-            int statusCode = proxyResponse.getCode();
-
-            // Pass the response code. This method with the "reason phrase" is deprecated but it's the
-            //  only way to pass the reason along too.
-            servletResponse.setStatus(statusCode, proxyResponse.getReasonPhrase());
-
-            // Copying response headers to make sure SESSIONID or other Cookie which comes from the remote
-            // server will be saved in client when the proxied url was redirected to another one.
-            // See issue [#51](https://github.com/mitre/HTTP-Proxy-Servlet/issues/51)
-            copyResponseHeaders(proxyResponse, servletRequest, servletResponse);
-
-            if (statusCode == HttpServletResponse.SC_NOT_MODIFIED) {
-                // 304 needs special handling.  See:
-                // http://www.ics.uci.edu/pub/ietf/http/rfc1945.html#Code304
-                // Don't send body entity/content!
-                servletResponse.setIntHeader(HttpHeaders.CONTENT_LENGTH, 0);
-            } else {
-                // Send the content to the client
-                copyResponseEntity(proxyResponse, servletResponse, proxyRequest, servletRequest);
+            if (doLog) {
+                log("proxy " + servletRequest.getMethod() + " uri: " + servletRequest.getRequestURI() + " -- " +
+                        proxyRequest.getRequestUri());
             }
+            getHttpClient(servletRequest.getSession())
+                    .execute(getTargetHost(servletRequest), proxyRequest, response -> {
+
+                        // Process the response:
+                        int statusCode = response.getCode();
+
+                        if (statusCode >= 400) {
+                            servletResponse.sendError(statusCode, response.getReasonPhrase());
+
+                        } else {
+                            servletResponse.setStatus(statusCode);
+
+                            // Copying response headers to make sure SESSIONID or other Cookie which comes from the remote
+                            // server will be saved in client when the proxied url was redirected to another one.
+                            // See issue [#51](https://github.com/mitre/HTTP-Proxy-Servlet/issues/51)
+                            copyResponseHeaders(response, servletRequest, servletResponse);
+
+                            if (statusCode == HttpServletResponse.SC_NOT_MODIFIED) {
+                                // 304 needs special handling.  See:
+                                // http://www.ics.uci.edu/pub/ietf/http/rfc1945.html#Code304
+                                // Don't send body entity/content!
+                                servletResponse.setIntHeader(HttpHeaders.CONTENT_LENGTH, 0);
+                            } else {
+                                // Send the content to the client
+                                copyResponseEntity(response, servletResponse, proxyRequest, servletRequest);
+                            }
+
+                            EntityUtils.consumeQuietly(response.getEntity());
+                        }
+
+                        return null;
+                });
 
         } catch (Exception e) {
-            handleRequestException(proxyRequest, e);
-        } finally {
-            // make sure the entire entity was consumed, so the connection is released
-            if (proxyResponse != null) {
-                EntityUtils.consumeQuietly(proxyResponse.getEntity());
-                proxyResponse.close();
-            }
-            //Note: Don't need to close servlet outputStream:
-            // http://stackoverflow.com/questions/1159168/should-one-call-close-on-httpservletresponse-getoutputstream-getwriter
+            handleRequestException(e);
         }
     }
 
-    protected void handleRequestException(HttpRequest proxyRequest, Exception e) throws ServletException, IOException {
+    protected void handleRequestException(Exception e) throws ServletException, IOException {
         if (e instanceof RuntimeException) {
             throw (RuntimeException) e;
         }
@@ -440,14 +444,6 @@ public class ProxyServlet extends HttpServlet {
         public ProxyServletRuntimeException (Exception e) {
             super (e);
         }
-    }
-
-    protected ClassicHttpResponse doExecute(HttpServletRequest servletRequest, ClassicHttpRequest proxyRequest) throws IOException {
-        if (doLog) {
-            log("proxy " + servletRequest.getMethod() + " uri: " + servletRequest.getRequestURI() + " -- " +
-                    proxyRequest.getRequestUri());
-        }
-        return getHttpClient(servletRequest.getSession()).execute(getTargetHost(servletRequest), proxyRequest);
     }
 
     protected ClassicHttpRequest newProxyRequestWithEntity(String method, String proxyRequestUri,
@@ -711,7 +707,7 @@ public class ProxyServlet extends HttpServlet {
         return uri.toString();
     }
 
-    protected String rewriteQueryStringFromRequest(HttpServletRequest servletRequest, String queryString) {
+    protected String rewriteQueryStringFromRequest(HttpServletRequest ignoredServletRequest, String queryString) {
         return queryString;
     }
 

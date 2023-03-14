@@ -212,7 +212,7 @@ Software.
             <scope>test</scope>
         </dependency>
 
-        <!-- for HTML Unit -->
+        <!-- for Web Tests -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
