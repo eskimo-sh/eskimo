@@ -155,12 +155,10 @@ eskimo.SettingsOperationsCommand = function() {
 
                     if (data && data.status) {
                         if (data.status == "KO") {
-                            that.eskimoServicesSettings.showServicesSettingsMessage(data.error, false);
-                        } else {
-                            that.eskimoServicesSettings.showServicesSettingsMessage("Settings applied successfully", true);
+                            that.eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
                         }
                     } else {
-                        that.eskimoServicesSettings.showServicesSettingsMessage("No status received back from backend.", false);
+                        that.eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "No status received back from backend.");
                     }
 
                     if (!data || data.error) {
