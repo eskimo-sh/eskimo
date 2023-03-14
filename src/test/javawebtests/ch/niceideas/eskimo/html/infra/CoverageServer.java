@@ -76,7 +76,7 @@ public class CoverageServer implements TestResourcesServer {
     private Main main = null;
 
     @Override
-    public void startServer(String className) throws Exception {
+    public void startServer(String className) {
         this.className = className;
 
         main = new Main();
@@ -96,7 +96,7 @@ public class CoverageServer implements TestResourcesServer {
     }
 
     @Override
-    public void postTestMethodHook(JsRunner runner) throws Exception {
+    public void postTestMethodHook(JsRunner runner) {
         runner.js("window.jscoverFinished = false;");
         runner.js("jscoverage_report('', function(){window.jscoverFinished=true;});");
 

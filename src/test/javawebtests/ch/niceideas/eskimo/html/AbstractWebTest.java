@@ -349,6 +349,7 @@ public abstract class AbstractWebTest {
 
     Object js (String jsCode) {
         logConsoleLogs();
+        closeAlertIfAny();
         JavascriptExecutor js = (JavascriptExecutor)driver;
         Object result = js.executeScript (jsCode);
 
