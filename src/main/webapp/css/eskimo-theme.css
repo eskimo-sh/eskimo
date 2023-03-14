@@ -1,3 +1,5 @@
+@charset "UTF-8";
+
 /*
 This file is part of the eskimo project referenced at www.eskimo.sh. The licensing information below apply just as
 well to this individual file than to the Eskimo Project as a whole.
@@ -33,7 +35,6 @@ Software.
 */
 
 
-@charset "UTF-8";
 :root{
     --ct-compact-menu-height-min: 1700px;
     --ct-box-shadow:0px 0px 35px 0px rgba(154, 161, 171, 0.15);
