@@ -40,7 +40,6 @@ import ch.niceideas.eskimo.services.SystemException;
 import ch.niceideas.eskimo.services.satellite.NodesConfigurationException;
 import ch.niceideas.eskimo.services.satellite.ServicesInstallationSorter;
 import ch.niceideas.eskimo.types.Operation;
-import org.apache.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -50,8 +49,6 @@ public abstract class AbstractServiceOperationsCommand
         <       T extends OperationId<? extends Operation>,
                 U extends JsonWrapper>
         extends JSONInstallOpCommand<T> implements Serializable {
-
-    private static final Logger logger = Logger.getLogger(AbstractServiceOperationsCommand.class);
 
     private final U rawConfig;
 

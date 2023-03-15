@@ -84,6 +84,7 @@ public class SetupServiceImpl implements SetupService {
 
     private static final Pattern imageFileNamePattern = Pattern.compile("("+DOCKER_TEMPLATE_PREFIX+"|eskimo_)[a-zA-Z0-9\\-]+_([a-zA-Z0-9_\\.]+)_([0-9]+)\\.tar\\.gz");
     public static final String NO_REMOTE_VERSION_ERROR = "Can't find remote version for ";
+    public static final String COULDNT_DOWNLOAD_PACKAGE_FILE_ERROR = "Could not download latest package definition file from ";
 
     @Autowired
     private NotificationService notificationService;
@@ -385,7 +386,7 @@ public class SetupServiceImpl implements SetupService {
             }
 
             if (packagesVersion == null) {
-                throw new SetupException("Could not download latest package definition file from " + packagesDownloadUrlRoot);
+                throw new SetupException(COULDNT_DELETE_PACKAGE_FILE_ERROR() + packagesDownloadUrlRoot);
             }
 
             Set<String> missingServices = new HashSet<>();
@@ -403,7 +404,7 @@ public class SetupServiceImpl implements SetupService {
             }
 
             if (packagesVersion == null) {
-                throw new SetupException("Could not download latest package definition file from " + packagesDownloadUrlRoot);
+                throw new SetupException(COULDNT_DOWNLOAD_PACKAGE_FILE_ERROR + packagesDownloadUrlRoot);
             }
 
             Set<String> missingServices = new HashSet<>();
@@ -444,6 +445,10 @@ public class SetupServiceImpl implements SetupService {
         }
     }
 
+    private String COULDNT_DELETE_PACKAGE_FILE_ERROR() {
+        return COULDNT_DOWNLOAD_PACKAGE_FILE_ERROR;
+    }
+
     protected void fillInPackages(Set<String> downloadPackages, JsonWrapper packagesVersion, Set<String> missingServices) {
         for (String packageName : missingServices) {
 
@@ -475,7 +480,7 @@ public class SetupServiceImpl implements SetupService {
 
     private Pair<String, String> getVersionFromRemote(JsonWrapper packagesVersion, String packageName) {
         if (packagesVersion == null) {
-            logger.warn("Could not download latest package definition file from " + packagesDownloadUrlRoot);
+            logger.warn(COULDNT_DOWNLOAD_PACKAGE_FILE_ERROR + packagesDownloadUrlRoot);
             return null;
         }
 

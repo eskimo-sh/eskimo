@@ -47,7 +47,6 @@ import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 
 import javax.servlet.ServletException;

@@ -427,10 +427,10 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
 
     void uninstallServiceNoOp(AbstractStandardOperationId<?> operationId) throws SystemException {
         systemOperationService.applySystemOperation(operationId,
-                ml -> {
+                ml ->
                     // this has to be done in anyway, regardless of node status
-                    systemService.runPreUninstallHooks (ml, operationId);
-                },
+                    systemService.runPreUninstallHooks (ml, operationId)
+                ,
                 status -> status.removeInstallationFlag(operationId.getService(), operationId.getNode()));
         proxyManagerService.removeServerForService(operationId.getService(), operationId.getNode());
     }

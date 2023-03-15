@@ -229,14 +229,14 @@ eskimo.KubernetesServicesConfig = function() {
             }
 
             let deplStrategy = kubernetesConfig[serviceName + "_deployment_strategy"];
-            const $eploymentStrategy = $('#' + serviceName + '_deployment_strategy');
+            const $deploymentStrategy = $('#' + serviceName + '_deployment_strategy');
             if (deplStrategy && deplStrategy === "on") {
-                $eploymentStrategy.attr("checked", true);
-                $eploymentStrategy.change();
+                $deploymentStrategy.attr("checked", true);
+                $deploymentStrategy.change();
                 deplStrategySet = true;
             } else {
-                $eploymentStrategy.attr("checked", false);
-                $eploymentStrategy.change();
+                $deploymentStrategy.attr("checked", false);
+                $deploymentStrategy.change();
                 let replicas = kubernetesConfig[serviceName + "_replicas"];
                 if (replicas) {
                     $('#' + serviceName + '_replicas').val (replicas);
@@ -266,9 +266,9 @@ eskimo.KubernetesServicesConfig = function() {
 
         // if no previous deploymemnt strategy was set, neither replicas, default is cluster wide
         if (!deplStrategySet && !replicasSet) {
-            $eploymentStrategy = $('#' + serviceName + '_deployment_strategy');
-            $eploymentStrategy.attr("checked", true);
-            $eploymentStrategy.change();
+            const $deploymentStrategy = $('#' + serviceName + '_deployment_strategy');
+            $deploymentStrategy.attr("checked", true);
+            $deploymentStrategy.change();
         }
 
         // if node could be found there either, take hardcoded default values

@@ -98,7 +98,7 @@ public class NodeServiceOperationsCommand
                         .filter(candidate -> candidate.equals(node))
                         .findAny()
                         .ifPresentOrElse(
-                                (candidate) -> {},
+                                candidate -> {},
                                 () -> retCommand.addUninstallation(new ServiceOperationId(ServiceOperation.UNINSTALLATION, installedService, node))
                         );
             }
@@ -253,9 +253,9 @@ public class NodeServiceOperationsCommand
 
     @Override
     public List<ServiceOperationId> getNodesCheckOperation() {
-        Set<Node> allNodes = new HashSet<>(getAllNodes());
-        allNodes.addAll(this.allNodes);
-        return allNodes.stream()
+        Set<Node> nodes = new HashSet<>(getAllNodes());
+        nodes.addAll(this.allNodes);
+        return nodes.stream()
                 .map(node -> new ServiceOperationId(ServiceOperation.CHECK_INSTALL, Service.BASE_SYSTEM, node))
                 .sorted()
                 .collect(Collectors.toList());

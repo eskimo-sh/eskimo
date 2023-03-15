@@ -67,6 +67,8 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
 
     private static final Logger logger = Logger.getLogger(ServicesSettingsServiceImpl.class);
 
+    private static final String VALIDATION_SUFFIX = "_validation";
+
     @Autowired
     private ServicesDefinition servicesDefinition;
 
@@ -217,14 +219,14 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
 
             for (String settingsKey : settingsForm.keySet()) {
 
-                if (settingsKey.startsWith(serviceName) && !settingsKey.endsWith("_validation")) {
+                if (settingsKey.startsWith(serviceName) && !settingsKey.endsWith(VALIDATION_SUFFIX)) {
 
                     String value = settingsForm.getString(settingsKey);
 
                     String propertyKey = settingsKey.substring(serviceName.length() + 1).replace("---", ".");
 
-                    String validationRegex = settingsForm.has(settingsKey + "_validation") ?
-                            settingsForm.getString(settingsKey + "_validation") : null;
+                    String validationRegex = settingsForm.has(settingsKey + VALIDATION_SUFFIX) ?
+                            settingsForm.getString(settingsKey + VALIDATION_SUFFIX) : null;
 
                     if (StringUtils.isNotBlank(value) && StringUtils.isNotBlank(validationRegex)) {
                         Pattern regex = Pattern.compile(validationRegex);
@@ -252,7 +254,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
             // get all properties for service
             for (String settingsKey : settingsForm.keySet()) {
 
-                if (settingsKey.startsWith(service.getName()) && !settingsKey.endsWith("_validation")) {
+                if (settingsKey.startsWith(service.getName()) && !settingsKey.endsWith(VALIDATION_SUFFIX)) {
 
                     String value = settingsForm.getString(settingsKey);
 
