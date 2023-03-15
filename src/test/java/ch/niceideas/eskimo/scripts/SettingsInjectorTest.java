@@ -65,6 +65,7 @@ public class SettingsInjectorTest {
     private File kibanaFile;
     private File cerebroJVMFile;
     private File cerebroJVMOptsFile;
+    private File egmiFile;
 
     /** Run Test on Linux only */
     @BeforeEach
@@ -108,6 +109,7 @@ public class SettingsInjectorTest {
         // Copy configuration files to tempFolder
         sparkFile = copyFile(tempFile, "spark/conf/spark-defaults.conf");
         kafkaFile = copyFile(tempFile, "kafka/config/eskimo-memory.opts");
+        egmiFile = copyFile(tempFile, "egmi/conf/egmi.properties");
         esFile = copyFile (tempFile, "elasticsearch/config/elasticsearch.yml");
         grafanaFile = copyFile (tempFile, "grafana/conf/defaults.ini");
 
@@ -146,26 +148,32 @@ public class SettingsInjectorTest {
     }
 
     @Test
+    public void testEgmiSettings() throws Exception {
+        String result = runSettingsInjectorOnService("gluster");
+        logger.info(result);
+
+        String egmiFileContent = FileUtils.readFile(egmiFile);
+
+        //System.err.println (egmiFileContent);
+
+        assertTrue(egmiFileContent.contains("zookeeper.urls=\n"));
+        assertTrue(egmiFileContent.contains("master=false"));
+        assertTrue(egmiFileContent.contains("\ntarget.predefined-ip-addresses=192.168.56.21,192.168.56.22,192.168.56.23,192.168.56.24"));
+
+        assertFalse(egmiFileContent.contains("#target.predefined-ip-addresses="));
+    }
+
+    @Test
     public void testKafkaJavaOpts() throws Exception {
 
-        String result = ProcessHelper.exec(new String[]{
-                "bash",
-                "-c",
-                "export SETTING_INJECTOR_DEBUG=1 && " +
-                        "export SETTING_ROOT_FOLDER=" + tempFolder + "/usr_local_lib/ && " +
-                        "bash " +
-                        settingsInjectorScriptFile.getCanonicalPath() +
-                        " kafka " +
-                        settingsFile.getCanonicalPath() +
-                        " ; " +
-                        "exit $?"}, true);
+        String result = runSettingsInjectorOnService("kafka");
         logger.info(result);
 
         // ensure properties were found
         assertTrue(result.contains("== adding not found variable"));
 
         String kafkaFileContent = FileUtils.readFile(kafkaFile);
-        System.err.println (kafkaFileContent);
+        //System.err.println (kafkaFileContent);
 
         assertTrue(kafkaFileContent.contains("Xms1234m"));
         assertTrue(kafkaFileContent.contains("Xms1234m"));
@@ -174,42 +182,36 @@ public class SettingsInjectorTest {
     @Test
     public void testKibanaNodeOptions() throws Exception {
 
-        String result = ProcessHelper.exec(new String[]{
-                "bash",
-                "-c",
-                "export SETTING_INJECTOR_DEBUG=1 && " +
-                        "export SETTING_ROOT_FOLDER=" + tempFolder + "/usr_local_lib/ && " +
-                        "bash " +
-                        settingsInjectorScriptFile.getCanonicalPath() +
-                        " kibana " +
-                        settingsFile.getCanonicalPath() +
-                        " ; " +
-                        "exit $?"}, true);
+        String result = runSettingsInjectorOnService("kibana");
         logger.info(result);
 
         // ensure properties were found
         assertTrue(result.contains("== Found property max-old-space-size : 1234"));
 
         String kibanaFileContent = FileUtils.readFile(kibanaFile);
-        System.err.println (kibanaFileContent);
+        //System.err.println (kibanaFileContent);
 
         assertTrue(kibanaFileContent.contains("--max-old-space-size=1234"));
     }
 
-    @Test
-    public void testCerebroSearchJVMOptions() throws Exception {
-
-        String result = ProcessHelper.exec(new String[]{
+    private String runSettingsInjectorOnService(String service) throws ProcessHelper.ProcessHelperException, IOException {
+        return ProcessHelper.exec(new String[]{
                 "bash",
                 "-c",
                 "export SETTING_INJECTOR_DEBUG=1 && " +
                         "export SETTING_ROOT_FOLDER=" + tempFolder + "/usr_local_lib/ && " +
                         "bash " +
                         settingsInjectorScriptFile.getCanonicalPath() +
-                        " cerebro2 " +
+                        " " + service + " " +
                         settingsFile.getCanonicalPath() +
                         " ; " +
                         "exit $?"}, true);
+    }
+
+    @Test
+    public void testCerebroSearchJVMOptions() throws Exception {
+
+        String result = runSettingsInjectorOnService("cerebro2");
         logger.info(result);
 
         // ensure properties were found
@@ -217,7 +219,7 @@ public class SettingsInjectorTest {
         assertTrue(result.contains("== Found property Xmx : 600m"));
 
         String cerebroJVMFileContent = FileUtils.readFile(cerebroJVMOptsFile);
-        System.err.println (cerebroJVMFileContent);
+        //System.err.println (cerebroJVMFileContent);
 
         assertTrue(cerebroJVMFileContent.contains("-Xms600m"));
         assertTrue(cerebroJVMFileContent.contains("-Xmx600m"));
@@ -227,17 +229,7 @@ public class SettingsInjectorTest {
     @Test
     public void testElasticSearchJVMOptions() throws Exception {
 
-        String result = ProcessHelper.exec(new String[]{
-                "bash",
-                "-c",
-                "export SETTING_INJECTOR_DEBUG=1 && " +
-                        "export SETTING_ROOT_FOLDER=" + tempFolder + "/usr_local_lib/ && " +
-                        "bash " +
-                        settingsInjectorScriptFile.getCanonicalPath() +
-                        " cerebro " +
-                        settingsFile.getCanonicalPath() +
-                        " ; " +
-                        "exit $?"}, true);
+        String result = runSettingsInjectorOnService("cerebro");
         logger.info(result);
 
         // ensure properties were found
@@ -254,17 +246,7 @@ public class SettingsInjectorTest {
     @Test
     public void testNominalSparkConfig() throws Exception {
 
-        String result = ProcessHelper.exec(new String [] {
-                "bash",
-                "-c",
-                    "export SETTING_INJECTOR_DEBUG=1 && " +
-                    "export SETTING_ROOT_FOLDER=" + tempFolder + "/usr_local_lib/ && " +
-                    "bash " +
-                    settingsInjectorScriptFile.getCanonicalPath() +
-                    " spark-runtime " +
-                    settingsFile.getCanonicalPath() +
-                    " ; " +
-                    "exit $?"}, true);
+        String result = runSettingsInjectorOnService("spark-runtime");
         logger.info(result);
 
         // ensure properties were found
@@ -272,7 +254,6 @@ public class SettingsInjectorTest {
         assertTrue(result.contains("= Found property spark.dynamicAllocation.executorIdleTimeout : 300s"));
 
         String sparkFileContent = FileUtils.readFile(sparkFile);
-
         //System.err.println (sparkFileContent);
 
         assertTrue (sparkFileContent.contains("spark.locality.wait=40s"));
@@ -290,17 +271,7 @@ public class SettingsInjectorTest {
     @Test
     public void testNominalGrafanaConfig() throws Exception {
 
-        String result = ProcessHelper.exec(new String[]{
-                "bash",
-                "-c",
-                "export SETTING_INJECTOR_DEBUG=1 && " +
-                        "export SETTING_ROOT_FOLDER=" + tempFolder + "/usr_local_lib/ && " +
-                        "bash " +
-                        settingsInjectorScriptFile.getCanonicalPath() +
-                        " grafana " +
-                        settingsFile.getCanonicalPath() +
-                        " ; " +
-                        "exit $?"}, true);
+        String result = runSettingsInjectorOnService("grafana");
         //logger.info(result);
 
         // ensure properties were found
@@ -308,8 +279,7 @@ public class SettingsInjectorTest {
         assertTrue(result.contains("= Found property admin_password : test_password"));
 
         String grafanaFileContent = FileUtils.readFile(grafanaFile);
-
-        //System.err.println (esFileContent);
+        //System.err.println (grafanaFileContent);
 
         assertTrue (grafanaFileContent.contains("admin_user = test_eskimo"));
         assertFalse (grafanaFileContent.contains("admin_user = eskimo"));
@@ -321,17 +291,7 @@ public class SettingsInjectorTest {
     @Test
     public void testNominalESConfig() throws Exception {
 
-        String result = ProcessHelper.exec(new String[]{
-                "bash",
-                "-c",
-                "export SETTING_INJECTOR_DEBUG=1 && " +
-                        "export SETTING_ROOT_FOLDER=" + tempFolder + "/usr_local_lib/ && " +
-                        "bash " +
-                        settingsInjectorScriptFile.getCanonicalPath() +
-                        " elasticsearch " +
-                        settingsFile.getCanonicalPath() +
-                        " ; " +
-                        "exit $?"}, true);
+        String result = runSettingsInjectorOnService("elasticsearch");
         //logger.info(result);
 
         // ensure properties were found
@@ -339,7 +299,6 @@ public class SettingsInjectorTest {
         assertTrue(result.contains("= Found property action.destructive_requires_name : false"));
 
         String esFileContent = FileUtils.readFile(esFile);
-
         //System.err.println (esFileContent);
 
         assertTrue (esFileContent.contains("bootstrap.memory_lock: true"));
@@ -352,21 +311,11 @@ public class SettingsInjectorTest {
     @Test
     public void testServiceWithoutConfig() throws Exception {
 
-        String result = ProcessHelper.exec(new String[]{
-                "bash",
-                "-c",
-                "export SETTING_INJECTOR_DEBUG=1 && " +
-                        "export SETTING_ROOT_FOLDER=" + tempFolder + "/usr_local_lib/ && " +
-                        "bash " +
-                        settingsInjectorScriptFile.getCanonicalPath() +
-                        " ntp " +
-                        settingsFile.getCanonicalPath() +
-                        " ; " +
-                        "exit $?"}, true);
+        String result = runSettingsInjectorOnService("ntp");
         logger.info(result);
 
         // ensure nothing's found
-        assertTrue(result.endsWith("== finding filenames\n"));
+        assertTrue(result.endsWith("== finding filenames for ntp in /data/badtrash/work/eskimo/target/test-classes/settingsInjector/testConfig.json\n"));
     }
 
 

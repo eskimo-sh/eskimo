@@ -288,7 +288,7 @@
       "icon" : "images/gluster-icon.png"
     },
     "ui": {
-      "urlTemplate": "./gluster/{NODE_ADDRESS}/egmi/app.html",
+      "urlTemplate": "./gluster/{NODE_ADDRESS}/egmi/index.html",
       "proxyTargetPort": 28901,
       "waitTime": 10000,
       "role" : "ADMIN",
@@ -352,6 +352,39 @@
             "validationRegex": "^[0-9\\.]+$",
             "defaultValue": "30",
             "value": "20"
+          },
+          {
+            "name": "target.numberOfBricks",
+            "comment": "Define the target minimum number of bricks we want for every volume. It can be a fixed number (like 1, 2, 5, etc.) or a strategy among [ALL_NODES, LOG_DISPATCH].",
+            "defaultValue": "LOG_DISPATCH",
+            "validationRegex": "^([0-9\\.]+)$|^(LOG_DISPATCH)$|^(ALL_NODES)$",
+            "value": ""
+          },
+          {
+            "name": "target.defaultNumberReplica",
+            "comment": "The ideal number of replicas to try to respect.",
+            "defaultValue": "3",
+            "validationRegex": "^[0-9\\.]+$|",
+            "value": ""
+          },
+          {
+            "name": "zookeeper.urls",
+            "comment": "The URL:PORT used to connect to zookeeper (or set of URL:PORTs, coma separated). Use 'ZOOKEEPER_URL:2181' on Eskimo to have it injected automatically by eskimo topology system.",
+            "defaultValue": "",
+            "value": "ZOOKEEPER_URL:2181"
+          },
+          {
+            "name": "target.predefined-ip-addresses",
+            "comment": "Preconfigured set of IP addresses where gluster is to be managed (coma separated).\nIf these are set here, they're used as a fixed pre-defined set of data nodes to manager.\n If none is defined here, zookeeper is used to track data nodes",
+            "defaultValue": "",
+            "value": ""
+          },
+          {
+            "name": "master",
+              "comment": "Force these instances of EGMI being master not master (if EGMI master is running elsewhere), regardless of what happens in zookeeper. Use master=false",
+            "defaultValue": "",
+            "validationRegex": "^(true)$|^(false)$",
+            "value": ""
           }
         ]
       }
@@ -832,7 +865,7 @@
         "masterService": "gluster",
         "numberOfMasters": 1,
         "mandatory": true,
-        "restart": true
+        "restart": false
       }
     ],
     "commands" : [
@@ -1059,7 +1092,7 @@
           {
             "name" :  "spark.scheduler.mode",
             "comment": "The scheduling mode between jobs submitted to the same SparkContext. \nCan be FIFO or FAIR. FAIR Seem not to work well with Kubernetes",
-            "validationRegex": "^(FAIR)$|^(FIFO))$",
+            "validationRegex": "^(FAIR)$|^(FIFO)$",
             "defaultValue" : "FAIR"
           },
           {

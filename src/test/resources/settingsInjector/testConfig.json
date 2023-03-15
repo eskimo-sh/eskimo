@@ -17,7 +17,76 @@
       "name": "ntp"
     },
     {
-      "settings": [],
+      "settings": [
+        {
+          "filename": "egmi.properties",
+          "service": "gluster",
+          "filesystemService": "egmi",
+          "propertyType": "VARIABLE",
+          "propertyFormat": "{name}={value}",
+          "commentPrefix": "#",
+          "properties": [
+            {
+              "name": "target.volumes",
+              "comment": "The volumes to be automagically managed by EGMI.",
+              "defaultValue": "",
+              "value": "spark_eventlog,spark_data,flink_data,kafka_data,flink_completed_jobs,logstash_data,kubernetes_registry,kubernetes_shared"
+            },
+            {
+              "name": "target.volumes.performance.off",
+              "comment": "Volumes for which the performance settings needs to be turned off.",
+              "defaultValue": "",
+              "value": "kafka_data"
+            },
+            {
+              "name": "config.performance.off",
+              "comment": "Performance settings to turn off for volumes defined in 'target.volumes.performance.off'",
+              "defaultValue": "",
+              "value": "performance.quick-read,performance.io-cache,performance.write-behind,performance.stat-prefetch,performance.read-ahead,performance.readdir-ahead,performance.open-behind"
+            },
+            {
+              "name": "system.statusUpdatePeriodSeconds",
+              "comment": "The orchestration loop delay in seconds. EGMI runs its checks and updates its status every X seconds.",
+              "validationRegex": "^[0-9\\.]+$",
+              "defaultValue": "30",
+              "value": "20"
+            },
+            {
+              "name": "target.numberOfBricks",
+              "comment": "Define the target minimum number of bricks we want for every volume. It can be a fixed number (like 1, 2, 5, etc.) or a strategy among [ALL_NODES, LOG_DISPATCH].",
+              "defaultValue": "LOG_DISPATCH",
+              "validationRegex": "^([0-9\\.]+)$|^(LOG_DISPATCH)$|^(ALL_NODES)$",
+              "value": ""
+            },
+            {
+              "name": "target.defaultNumberReplica",
+              "comment": "The ideal number of replicas to try to respect.",
+              "defaultValue": "3",
+              "validationRegex": "^[0-9\\.]+$|",
+              "value": ""
+            },
+            {
+              "name": "zookeeper.urls",
+              "comment": "The URL:PORT used to connect to zookeeper (or set of URL:PORTs, coma separated). Use 'ZOOKEEPER_URL:2181' on Eskimo to have it injected automatically by eskimo topology system.",
+              "defaultValue": "",
+              "value": ""
+            },
+            {
+              "name": "target.predefined-ip-addresses",
+              "comment": "Preconfigured set of IP addresses where gluster is to be managed (coma separated).\nIf these are set here, they're used as a fixed pre-defined set of data nodes to manager.\n If none is defined here, zookeeper is used to track data nodes",
+              "defaultValue": "",
+              "value": "192.168.56.21,192.168.56.22,192.168.56.23,192.168.56.24"
+            },
+            {
+              "name": "master",
+              "comment": "Force these instances of EGMI being master not master (if EGMI master is running elsewhere), regardless of what happens in zookeeper. Use master=false",
+              "defaultValue": "",
+              "validationRegex": "^(true)$|^(false)$",
+              "value": "false"
+            }
+          ]
+        }
+      ],
       "name": "gluster"
     },
     {

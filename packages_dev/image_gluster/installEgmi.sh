@@ -107,6 +107,7 @@ sudo rm -Rf /tmp/test
 echo "   + temporary messing with config file"
 sudo cp /usr/local/lib/egmi/conf/egmi.properties /usr/local/lib/egmi/conf/egmi.properties.bak
 
+sed -i s/"conf.userFilePath=\/var\/lib\/gluster\/egmi-users.json"/"conf.userFilePath=\/tmp\/egmi-users.json"/g /usr/local/lib/egmi/conf/egmi.properties
 sed -i s/"zookeeper.urls=ZOOKEEPER_URL:2181"/"#zookeeper.urls=ZOOKEEPER_URL:2181"/g /usr/local/lib/egmi/conf/egmi.properties
 sed -i s/"master="/"master=true"/g /usr/local/lib/egmi/conf/egmi.properties
 sed -i s/"# target.predefined-ip-addresses"/"target.predefined-ip-addresses=127.0.0.1"/g /usr/local/lib/egmi/conf/egmi.properties

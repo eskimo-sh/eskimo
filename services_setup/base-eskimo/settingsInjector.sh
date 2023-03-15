@@ -243,8 +243,7 @@ function injectVariableProperty () {
     done
 }
 
-echoDebug "finding filenames"
-
+echoDebug "finding filenames for $SERVICE in $SETTINGS_FILE"
 
 IFS=$'\n'
 for settingsFile in $(jq -c  ".settings | .[] | .settings | .[] | select (.service==\"$SERVICE\") | {filename,propertyType,propertyFormat,commentPrefix,filesystemService}" $SETTINGS_FILE); do
