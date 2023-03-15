@@ -406,7 +406,7 @@ Software.
                     </environmentVariables>
                     <!-- Activate the use of TCP to transmit events to the plugin -->
                     <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
-                    <argLine>-Xmx2048m -XX:MaxPermSize=312m</argLine>
+                    <argLine>@{argLine} -Xmx2600m -XX:MaxPermSize=338m</argLine>
                 </configuration>
             </plugin>
 
