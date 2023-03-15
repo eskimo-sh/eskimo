@@ -315,7 +315,8 @@ public class SettingsInjectorTest {
         logger.info(result);
 
         // ensure nothing's found
-        assertTrue(result.endsWith("== finding filenames for ntp in /data/badtrash/work/eskimo/target/test-classes/settingsInjector/testConfig.json\n"));
+        assertTrue(result.contains("== finding filenames for ntp in "));
+        assertTrue(result.endsWith("test-classes/settingsInjector/testConfig.json\n"));
     }
 
 
