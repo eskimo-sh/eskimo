@@ -36,11 +36,11 @@
 
 set -e
 
-echo " - Injecting topology"
-. /usr/local/sbin/inContainerInjectTopology.sh
-
 echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh gluster
+
+echo " - Injecting topology"
+. /usr/local/sbin/inContainerInjectTopology.sh
 
 echo " - Cleaning all volume PID files before starting gluster"
 for i in $(find /var/run/gluster/vols/ -name '*.pid'); do
