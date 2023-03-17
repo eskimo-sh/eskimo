@@ -57,7 +57,7 @@ echo " - Starting logstash remote server"
 export LOGSTASH_SERVICE=$!
 
 echo " - Launching Watch Dog on glusterMountCheckerPeriodic remote server"
-/usr/local/sbin/containerWatchDog.sh $GLUSTER_MOUNT_CHECKER_PID $LOGSTASH_SERVICE /var/log/spark/gluster-mount-checker-periodic-watchdog.log &
+/usr/local/sbin/containerWatchDog.sh $GLUSTER_MOUNT_CHECKER_PID $LOGSTASH_SERVICE /var/log/elasticsearch/logstash/gluster-mount-checker-periodic-watchdog.log &
 
 echo " - Now waiting on main process to exit"
 wait $LOGSTASH_SERVICE
