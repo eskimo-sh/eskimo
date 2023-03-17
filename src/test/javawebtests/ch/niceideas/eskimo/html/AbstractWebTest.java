@@ -94,6 +94,7 @@ public abstract class AbstractWebTest {
         co.addArguments("--no-sandbox");
         co.addArguments("--window-position=0,0");
         co.addArguments("--window-size=1900,1024");
+        co.addArguments("--remote-allow-origins=*");
         co.addArguments("--headless");
         co.addArguments("--disable-gpu");
 

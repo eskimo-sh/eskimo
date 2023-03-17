@@ -155,7 +155,7 @@ eskimo.SettingsOperationsCommand = function() {
 
                     if (data && data.status) {
                         if (data.status == "KO") {
-                            that.eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
+                            that.eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, atob(data.error));
                         }
                     } else {
                         that.eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "No status received back from backend.");

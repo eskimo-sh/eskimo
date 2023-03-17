@@ -164,7 +164,7 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
                     // restarts
                     for (List<NodeServiceOperationsCommand.ServiceOperationId> restarts :
                             restartCommand.getRestartsInOrder(servicesInstallationSorter, nodesConfig)) {
-                        systemService.performPooledOperation(restarts, 1, operationWaitTimoutSeconds,
+                        systemService.performPooledOperation(restarts, parallelismInstallThreadCount, operationWaitTimoutSeconds,
                                 (operation, error) -> {
                                     if (operation.getNode().equals(Node.KUBERNETES_FLAG) || nodesStatus.isNodeAlive(operation.getNode())) {
                                         nodesConfigurationService.restartServiceForSystem(operation);
