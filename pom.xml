@@ -55,6 +55,8 @@ Software.
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
         <argLine>-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8</argLine>
+        <!-- this is required to override spring-boot's stupidly pre-defined version -->
+        <selenium.version>4.7.2</selenium.version>
         <!--
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.projectKey>eskimo-sh-sonarqube-key</sonar.projectKey>
@@ -157,51 +159,13 @@ Software.
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
-            <version>5.3.1</version>
+            <version>5.3.2</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>selenium-java</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.5.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-api</artifactId>
-            <version>4.5.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-chrome-driver</artifactId>
-            <version>4.5.3</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <!-- unfortunately this one is an old one being referenced so I need to force it underneath -->
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>selenium-chromium-driver</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-chromium-driver</artifactId>
-            <version>4.5.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-remote-driver</artifactId>
-            <version>4.5.3</version>
+            <version>${selenium.version}</version>
             <scope>test</scope>
         </dependency>
 
