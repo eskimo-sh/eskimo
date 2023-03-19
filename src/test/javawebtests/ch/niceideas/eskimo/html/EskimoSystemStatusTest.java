@@ -42,25 +42,20 @@ import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.logging.LogEntries;
-import org.openqa.selenium.logging.LogEntry;
-import org.openqa.selenium.logging.LogType;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class EskimoSystemStatusTest extends AbstractWebTest {
 
-    private String jsonFullStatus = null;
     private String jsonNodesStatus = null;
     private String jsonMastersStatus = null;
 
     @BeforeEach
     public void setUp() throws Exception {
 
-        jsonFullStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testFullStatus.json"), StandardCharsets.UTF_8);
+        String jsonFullStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testFullStatus.json"), StandardCharsets.UTF_8);
         jsonNodesStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testNodeStatus.json"), StandardCharsets.UTF_8);
         jsonMastersStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSystemStatusTest/testMastersStatus.json"), StandardCharsets.UTF_8);
 
@@ -104,6 +99,90 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
         js("$('#inner-content-status').css('visibility', 'visible')");
 
         js("window.eskimoFlavour = \"CE\"");
+    }
+
+    @Test
+    public void testShowJournal() {
+        js("$.ajaxGet = function(callback) { " +
+                "    window.actionUrl = callback.url;" +
+                "    callback.success({'message': 'journal OK'});\n" +
+                "    console.log(callback); " +
+                "}");
+
+        js("eskimoSystemStatus.showJournal('kibana', '192.168.56.11')");
+
+        assertJavascriptEquals("show-journal?service=kibana&nodeAddress=192.168.56.11", "window.actionUrl");
+        assertJavascriptEquals("journal OK", "$('#service-status-warning-message').html()");
+    }
+
+    @Test
+    public void testStartService() {
+        js("$.ajaxGet = function(callback) { " +
+                "    window.actionUrl = callback.url;" +
+                "    callback.success({'message': 'start OK'});\n" +
+                "    console.log(callback); " +
+                "}");
+
+        js("eskimoSystemStatus.startService('kibana', '192.168.56.11')");
+
+        assertJavascriptEquals("start-service?service=kibana&nodeAddress=192.168.56.11", "window.actionUrl");
+        assertJavascriptEquals("start OK", "$('#service-status-warning-message').html()");
+    }
+
+    @Test
+    public void testStopService() {
+        js("$.ajaxGet = function(callback) { " +
+                "    window.actionUrl = callback.url;" +
+                "    callback.success({'message': 'stop OK'});\n" +
+                "    console.log(callback); " +
+                "}");
+
+        js("eskimoSystemStatus.stopService('kibana', '192.168.56.11')");
+
+        assertJavascriptEquals("stop-service?service=kibana&nodeAddress=192.168.56.11", "window.actionUrl");
+        assertJavascriptEquals("stop OK", "$('#service-status-warning-message').html()");
+    }
+
+    @Test
+    public void testRestartService() {
+        js("$.ajaxGet = function(callback) { " +
+                "    window.actionUrl = callback.url;" +
+                "    callback.success({'message': 'restart OK'});\n" +
+                "    console.log(callback); " +
+                "}");
+
+        js("eskimoSystemStatus.restartService('kibana', '192.168.56.11')");
+
+        assertJavascriptEquals("restart-service?service=kibana&nodeAddress=192.168.56.11", "window.actionUrl");
+        assertJavascriptEquals("restart OK", "$('#service-status-warning-message').html()");
+    }
+
+    @Test
+    public void testReinstallService() {
+        js("$.ajaxGet = function(callback) { " +
+                "    window.actionUrl = callback.url;" +
+                "    callback.success({'message': 'reinstall OK'});\n" +
+                "    console.log(callback); " +
+                "}");
+
+        js("eskimoSystemStatus.reinstallService('kibana', '192.168.56.11')");
+
+        assertJavascriptEquals("reinstall-service?service=kibana&nodeAddress=192.168.56.11", "window.actionUrl");
+        assertJavascriptEquals("reinstall OK", "$('#service-status-warning-message').html()");
+    }
+
+    @Test
+    public void testPerformServiceAction() {
+        js("$.ajaxGet = function(callback) { " +
+                "    window.actionUrl = callback.url;" +
+                "    callback.success({'message': 'action OK'});\n" +
+                "    console.log(callback); " +
+                "}");
+
+        js("eskimoSystemStatus.performServiceAction('test', 'kibana', '192.168.56.11')");
+
+        assertJavascriptEquals("service-custom-action?action=test&service=kibana&nodeAddress=192.168.56.11", "window.actionUrl");
+        assertJavascriptEquals("action OK", "$('#service-status-warning-message').html()");
     }
 
     @Test
@@ -232,11 +311,47 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         //System.err.println (page.asXml());
 
-        String tableString = js("return $('#status-node-table-body').html()").toString();
+        ActiveWaiter.wait(() -> js("return $('#status-node-table-body').html()").toString().contains("192.168.10.1"));
 
-        assertNotNull (tableString);
+        assertTrue (js("return $('.status-node-cell[data-eskimo-service=zookeeper').html()").toString().contains("status-node-cell-span-ok"));
+        assertTrue (js("return $('.status-node-cell[data-eskimo-service=mesos-master').html()").toString().contains("status-node-cell-span-ok"));
+        assertTrue (js("return $('.status-node-cell[data-eskimo-service=mesos-agent').html()").toString().contains("status-node-cell-span-ok"));
+        assertTrue (js("return $('.status-node-cell[data-eskimo-service=kafka').html()").toString().contains("status-node-cell-span-ok"));
+        assertTrue (js("return $('.status-node-cell[data-eskimo-service=kafka-manager').html()").toString().contains("status-node-cell-span-ok"));
+        assertTrue (js("return $('.status-node-cell[data-eskimo-service=spark-console').html()").toString().contains("status-node-cell-span-ok"));
+        assertTrue (js("return $('.status-node-cell[data-eskimo-service=spark-runtime').html()").toString().contains("status-node-cell-span-ok"));
+        assertTrue (js("return $('.status-node-cell[data-eskimo-service=logstash').html()").toString().contains("status-node-cell-span-ok"));
+        assertTrue (js("return $('.status-node-cell[data-eskimo-service=cerebro').html()").toString().contains("status-node-cell-span-ok"));
+        assertTrue (js("return $('.status-node-cell[data-eskimo-service=elasticsearch').html()").toString().contains("status-node-cell-span-ok"));
+        assertTrue (js("return $('.status-node-cell[data-eskimo-service=kibana').html()").toString().contains("status-node-cell-span-ok"));
+        assertTrue (js("return $('.status-node-cell[data-eskimo-service=zeppelin').html()").toString().contains("status-node-cell-span-ok"));
+    }
 
-        assertTrue (tableString.contains("192.168.10.11"));
+    @Test
+    public void testUpdateStatus_clearSetup() {
+        testShowStatus();
+
+        js("$.ajaxGet = function(callback) {" +
+                "    callback.success({clear: 'setup'});" +
+                "}");
+
+        js("eskimoSystemStatus.updateStatus()");
+
+        assertJavascriptEquals("true", "window.handleSetupNotCompletedCalled");
+    }
+
+    @Test
+    public void testUpdateStatus_clearNodes() {
+        testShowStatus();
+
+        js("$.ajaxGet = function(callback) {" +
+                "    callback.success({clear: 'nodes'});" +
+                "}");
+
+        js("eskimoSystemStatus.updateStatus()");
+
+        assertJavascriptEquals("block", "$(\"#status-node-container-empty\").css('display')");
+        assertJavascriptEquals("visible", "$(\"#status-node-container-empty\").css('visibility')");
     }
 
     @Test

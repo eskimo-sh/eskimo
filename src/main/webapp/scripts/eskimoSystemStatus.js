@@ -444,7 +444,7 @@ eskimo.SystemStatus = function() {
         console.log("performServiceAction ", action, service, node);
         serviceActionCustom(action, service, node);
     }
-    this.reinstallService = reinstallService;
+    this.performServiceAction = performServiceAction;
 
     this.serviceIsUp = function (nodeServicesStatus, service) {
         if (!nodeServicesStatus) {

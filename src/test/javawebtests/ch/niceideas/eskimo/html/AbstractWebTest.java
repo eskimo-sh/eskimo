@@ -58,9 +58,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.time.Duration;
-import java.util.Date;
 import java.util.Optional;
-import java.util.logging.Level;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -290,6 +288,7 @@ public abstract class AbstractWebTest {
         js("window.eskimoSettingsOperationsCommand = {}");
 
         js("window.eskimoMain = {\n"+
+                "    confirm: function (message, callback) { callback() },\n" +
                 "    adaptMenuToUserRole : function (){},\n"+
                 "    handleSetupCompleted : function (){},\n"+
                 "    getServices : function (){ return eskimoServices; },\n"+
@@ -305,13 +304,14 @@ public abstract class AbstractWebTest {
                 "    hideProgressbar : function () { },\n"+
                 "    isCurrentDisplayedScreen : function () { return false; },\n"+
                 "    setSetupLoaded : function () {},\n"+
-                "    startOperationInProgress : function() {},\n"+
-                "    scheduleStopOperationInProgress : function() {},\n"+
+                "    startOperationInProgress : function() { window.startOperationInProgessCalled = true; },\n"+
+                "    scheduleStopOperationInProgress : function() { window.scheduleStopOperationInProgress = true; },\n"+
                 "    handleKubernetesSubsystem : function() {},\n"+
                 "    showProgressbar : function() {},\n"+
                 "    isSetupLoaded : function() { return true; },\n"+
                 "    serviceMenuClear : function() { return true; },\n"+
                 "    windowResize : function() {  },\n"+
+                "    showSetupNotDone : function() {  },\n"+
                 "    hasRole : function(role) { return true; },\n"+
                 "    alert : function(level, message) { alert(level + ' : ' + message); window.lastAlert = level + ' : ' + message; },\n" +
                 "    handleSetupNotCompleted: function() { window.handleSetupNotCompletedCalled = true; }"+
