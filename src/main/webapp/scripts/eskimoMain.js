@@ -317,6 +317,7 @@ eskimo.Main = function() {
         console.log ("eskimoMain - scheduleStopOperationInProgress");
         eskimoOperations.stopOperationInProgress (success, () => {
             setOperationInProgress (false);
+            operationInProgressRecovery = false;
             hideProgressbar();
         });
 
@@ -408,7 +409,7 @@ eskimo.Main = function() {
         eskimoSetup.showSetup();
 
         if (message && message != "") {
-            eskimoSetup.showSetupMessage(message);
+            that.alert(ESKIMO_ALERT_LEVEL.ERROR, message);
         }
     };
 
