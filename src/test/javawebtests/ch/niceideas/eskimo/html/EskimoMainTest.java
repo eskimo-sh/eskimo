@@ -76,6 +76,7 @@ public class EskimoMainTest extends AbstractWebTest {
                 "    };" +
                 "};");
         js("eskimo.Operations = function(){" +
+                "    this.showOperations = function() {};" +
                 "    this.setOperationInProgress = function() {" +
                 "    };" +
                 "    this.startOperationInProgress = function() {" +
@@ -166,14 +167,34 @@ public class EskimoMainTest extends AbstractWebTest {
     public void testStartStopOperationInprogress() {
 
         assertEquals(false, js("return eskimoMain.isOperationInProgress()"));
+        assertEquals(false, js("return eskimoMain.isOperationInProgressRecovery()"));
 
         js("eskimoMain.startOperationInProgress();");
 
         assertEquals(true, js("return eskimoMain.isOperationInProgress()"));
+        assertEquals(false, js("return eskimoMain.isOperationInProgressRecovery()"));
 
         js("eskimoMain.scheduleStopOperationInProgress();");
 
         assertEquals(false, js("return eskimoMain.isOperationInProgress()"));
+        assertEquals(false, js("return eskimoMain.isOperationInProgressRecovery()"));
+    }
+
+    @Test
+    public void testRecoverOperationInprogress() {
+
+        assertEquals(false, js("return eskimoMain.isOperationInProgress()"));
+        assertEquals(false, js("return eskimoMain.isOperationInProgressRecovery()"));
+
+        js("eskimoMain.recoverOperationInProgress();");
+
+        assertEquals(true, js("return eskimoMain.isOperationInProgress()"));
+        assertEquals(true, js("return eskimoMain.isOperationInProgressRecovery()"));
+
+        js("eskimoMain.scheduleStopOperationInProgress();");
+
+        assertEquals(false, js("return eskimoMain.isOperationInProgress()"));
+        assertEquals(false, js("return eskimoMain.isOperationInProgressRecovery()"));
     }
 
     @Test
@@ -190,6 +211,15 @@ public class EskimoMainTest extends AbstractWebTest {
         js("eskimoMain.fetchContext();");
 
         assertJavascriptEquals("0.4-SNAPSHOT", "$('#eskimo-version').html()");
+    }
+
+    @Test
+    public void testHaRole() {
+        testFetchContext();
+
+        assertJavascriptEquals("true", "eskimoMain.hasRole('*')");
+        assertJavascriptEquals("false", "eskimoMain.hasRole('DUMMY')");
+        assertJavascriptEquals("true", "eskimoMain.hasRole('ADMIN')");
     }
 
 }

@@ -40,8 +40,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
 
@@ -78,7 +77,6 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
                 "    } \n" +
                 "}");
 
-
         js("eskimoKubernetesServicesConfig.initialize();");
 
         waitForElementIdInDOM("reset-kubernetes-servicesconfig");
@@ -87,8 +85,51 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
         js("$('#inner-content-kubernetes-services-config').css('visibility', 'visible')");
     }
 
+
     @Test
-    public void testSaveKubernetesServicesButtonClick() throws Exception {
+    public void testReqValueChangeHandler() {
+
+        testRenderKubernetesConfig();
+
+        getElementById("broker_deployment_strategy").click();
+
+        js("$('#broker_replicas').val('2');");
+        js("$('#broker_replicas').change();");
+
+        assertFalse (getElementById("broker_replicas").getDomAttribute("class").contains("invalid"));
+
+        js("$('#broker_replicas').val('aa');");
+        js("$('#broker_replicas').change();");
+
+        assertTrue (getElementById("broker_replicas").getDomAttribute("class").contains("invalid"));
+
+        assertFalse (getElementById("broker_ram").getDomAttribute("class").contains("invalid"));
+
+        js("$('#broker_ram').val('1Gb');");
+        js("$('#broker_ram').change();");
+
+        assertTrue (getElementById("broker_ram").getDomAttribute("class").contains("invalid"));
+
+        js("$('#broker_ram').val('1G');");
+        js("$('#broker_ram').change();");
+
+        assertFalse (getElementById("broker_ram").getDomAttribute("class").contains("invalid"));
+
+        assertFalse (getElementById("broker_cpu").getDomAttribute("class").contains("invalid"));
+
+        js("$('#broker_cpu').val('1a');");
+        js("$('#broker_cpu').change();");
+
+        assertTrue (getElementById("broker_cpu").getDomAttribute("class").contains("invalid"));
+
+        js("$('#broker_cpu').val('0.1');");
+        js("$('#broker_cpu').change();");
+
+        assertFalse (getElementById("broker_cpu").getDomAttribute("class").contains("invalid"));
+    }
+
+    @Test
+    public void testSaveKubernetesServicesButtonClick() {
 
         testRenderKubernetesConfig();
 
@@ -123,7 +164,7 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
                 "}");
 
         JSONObject actualConfig = new JSONObject((String)js("return window.savedKubernetesConfig"));
-        System.err.println (actualConfig.toString(2));
+        //System.err.println (actualConfig.toString(2));
         assertTrue(expectedConfig.similar(actualConfig));
     }
 
