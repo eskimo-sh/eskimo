@@ -36,6 +36,7 @@
 package ch.niceideas.eskimo.proxy;
 
 
+import ch.niceideas.common.exceptions.CommonRTException;
 import ch.niceideas.common.utils.StringUtils;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.config.ConnectionConfig;
@@ -79,7 +80,7 @@ public class ProxyServlet extends HttpServlet {
 
     /* INIT PARAMETER NAME CONSTANTS */
 
-    public static final String SESSION_HTTP_CLIENT = "SESSION_HTTP_CLIENT";
+    static final String SESSION_HTTP_CLIENT = "SESSION_HTTP_CLIENT";
 
     /**
      * A boolean parameter name to enable logging of input and target URLs to the servlet log.
@@ -345,6 +346,7 @@ public class ProxyServlet extends HttpServlet {
                     logger.error("While destroying servlet, shutting down HttpClient: " + e, e);
                 }
             }
+            se.getSession().removeAttribute(SESSION_HTTP_CLIENT);
         }
     }
 
@@ -427,7 +429,7 @@ public class ProxyServlet extends HttpServlet {
         }
     }
 
-    protected void handleRequestException(Exception e) throws ServletException, IOException {
+    protected static void handleRequestException(Exception e) throws ServletException, IOException {
         if (e instanceof RuntimeException) {
             throw (RuntimeException) e;
         }
@@ -440,7 +442,7 @@ public class ProxyServlet extends HttpServlet {
         throw new ProxyServletRuntimeException(e);
     }
 
-    public static class ProxyServletRuntimeException extends RuntimeException {
+    public static class ProxyServletRuntimeException extends CommonRTException {
         public ProxyServletRuntimeException (Exception e) {
             super (e);
         }

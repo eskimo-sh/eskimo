@@ -166,7 +166,7 @@ public class SetupServiceTestImpl extends SetupServiceImpl implements SetupServi
     }
 
     @Override
-    public void prepareSetup(JsonWrapper setupConfig, Set<String> downloadPackages, Set<String> buildPackage, Set<String> downloadKube, Set<String> buildKube, Set<String> packageUpdate) throws SetupException {
+    public void prepareSetup(JsonWrapper setupConfig, Set<String> packagesToDownload, Set<String> buildPackage, Set<String> downloadKube, Set<String> buildKube, Set<String> packageUpdate) throws SetupException {
 
         File packagesDistribFolder;
         try {

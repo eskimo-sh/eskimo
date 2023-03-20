@@ -66,6 +66,8 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         js("window.MANDATORY_SERVICES = [\"ntp\", \"gluster\"];");
         js("window.CONFIGURED_SERVICES = UNIQUE_SERVICES.concat(MULTIPLE_SERVICES);");
 
+        js("window.SERVICES_CONFIGURATION = " + jsonServices + ";");
+
         // instantiate test object
         js("eskimoNodesConfig = new eskimo.NodesConfig()");
         js("eskimoNodesConfig.eskimoMain = eskimoMain");
@@ -73,19 +75,28 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         js("eskimoNodesConfig.eskimoServices = eskimoServices");
         js("eskimoNodesConfig.eskimoOperationsCommand = eskimoOperationsCommand");
 
-        js("$.ajaxGet = function(callback) { console.log(callback); }");
         js("$.ajaxPost = function(callback) { console.log(callback); }");
+
+        js("" +
+                "$.ajaxGet = function (object) {\n" +
+                "    if (object.url === 'list-config-services') {" +
+                "        object.success({" +
+                "            status: 'OK', " +
+                "            uniqueServices: window.UNIQUE_SERVICES, " +
+                "            multipleServices: window.MULTIPLE_SERVICES, " +
+                "            mandatoryServices: window.MANDATORY_SERVICES, " +
+                "            servicesConfigurations: window.SERVICES_CONFIGURATION" +
+                "        });\n" +
+                "    } else if (object.url === 'get-services-dependencies') {" +
+                "        object.success({status: 'OK', servicesDependencies : {}});\n" +
+                "    } else {\n" +
+                "        console.log(object); " +
+                "    } \n" +
+                "}");
 
         js("eskimoNodesConfig.initialize()");
 
         waitForElementIdInDOM("reset-nodes-config");
-
-        js("window.SERVICES_CONFIGURATION = " + jsonServices + ";");
-
-        js("eskimoNodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
-
-        // set services for tests
-        js("eskimoNodesConfig.setServicesSettingsForTest (UNIQUE_SERVICES, MULTIPLE_SERVICES, CONFIGURED_SERVICES, MANDATORY_SERVICES);");
 
         js("$('#inner-content-nodes-config').css('display', 'inherit')");
         js("$('#inner-content-nodes-config').css('visibility', 'visible')");

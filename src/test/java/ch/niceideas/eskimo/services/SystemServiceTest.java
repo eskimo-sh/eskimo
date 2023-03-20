@@ -89,6 +89,7 @@ public class SystemServiceTest {
     protected String systemStatusTest = null;
     protected String expectedFullStatus = null;
     protected String expectedFullStatusNoKubernetes = null;
+    protected String expectedFullStatusKubernetesError = null;
     protected String expectedPrevStatusServicesRemoved = null;
     protected String expectedPrevStatusAllServicesStay = null;
 
@@ -123,6 +124,7 @@ public class SystemServiceTest {
         systemStatusTest = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/systemStatusTest.log"), StandardCharsets.UTF_8);
         expectedFullStatus = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedFullStatus.json"), StandardCharsets.UTF_8);
         expectedFullStatusNoKubernetes = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedFullStatusNoKubernetes.json"), StandardCharsets.UTF_8);
+        expectedFullStatusKubernetesError = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedFullStatusKubernetesError.json"), StandardCharsets.UTF_8);
         expectedPrevStatusServicesRemoved = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedPrevStatusServicesRemoved.json"), StandardCharsets.UTF_8);
         expectedPrevStatusAllServicesStay = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SystemServiceTest/expectedPrevStatusAllServicesStay.json"), StandardCharsets.UTF_8);
     }
@@ -413,14 +415,13 @@ public class SystemServiceTest {
         SystemStatusWrapper systemStatus = systemService.getStatus();
 
         JSONObject actual = systemStatus.getJSONObject();
-
-        System.err.println (actual.toString(2));
+        //System.err.println (actual.toString(2));
 
         assertTrue(new JSONObject(expectedFullStatus).similar(actual), actual.toString(2));
     }
 
     @Test
-    public void testUpdateStatusNoKubernetes() throws Exception {
+    public void testUpdateStatus_NoKubernetes() throws Exception {
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
         configurationServiceTest.saveNodesConfig(nodesConfig);
@@ -448,10 +449,49 @@ public class SystemServiceTest {
         SystemStatusWrapper systemStatus = systemService.getStatus();
 
         JSONObject actual = systemStatus.getJSONObject();
-
-        System.err.println (actual.toString(2));
+        //System.err.println (actual.toString(2));
 
         assertTrue(new JSONObject(expectedFullStatusNoKubernetes).similar(actual), actual.toString(2));
+    }
+
+    @Test
+    public void testUpdateStatus_KubernetesException() throws Exception {
+
+        NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
+        configurationServiceTest.saveNodesConfig(nodesConfig);
+
+        ServicesInstallStatusWrapper servicesInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+        configurationServiceTest.saveServicesInstallationStatus(servicesInstallStatus);
+
+        KubernetesServicesConfigWrapper kubeServicesConfig = StandardSetupHelpers.getStandardKubernetesConfig();
+        configurationServiceTest.saveKubernetesServicesConfig(kubeServicesConfig);
+
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
+            if (script.equals("echo OK")) {
+                return "OK";
+            }
+            if (script.startsWith("sudo systemctl status --no-pager")) {
+                return systemStatusTest;
+            }
+            if (   script.startsWith("/usr/local/bin/kubectl get pod")
+                || script.startsWith("/usr/local/bin/kubectl get service")
+                || script.startsWith("/bin/ls -1")) {
+                throw new SSHCommandException("triggering an error");
+
+            }
+            return "";
+        });
+
+        sshCommandServiceTest.setConnectionResultBuilder((connection, script) -> script);
+
+        systemService.updateStatus();
+
+        SystemStatusWrapper systemStatus = systemService.getStatus();
+
+        JSONObject actual = systemStatus.getJSONObject();
+        System.err.println (actual.toString(2));
+
+        assertTrue(new JSONObject(expectedFullStatusKubernetesError).similar(actual), actual.toString(2));
     }
 
     @Test

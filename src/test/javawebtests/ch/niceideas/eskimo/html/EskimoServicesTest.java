@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +43,7 @@ import org.junit.jupiter.api.Test;
 
 import java.net.URL;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EskimoServicesTest extends AbstractWebTest {
 
@@ -60,15 +61,9 @@ public class EskimoServicesTest extends AbstractWebTest {
         // instantiate test object
         js("eskimoServices = new eskimo.Services()");
         js("eskimoServices.eskimoMain = eskimoMain");
+        js("eskimoServices.eskimoMenu = eskimoMenu");
         js("eskimoServices.eskimoSystemStatus = eskimoSystemStatus");
         js("eskimoServices.eskimoNodesConfig = eskimoNodesConfig");
-        js("eskimoServices.initialize()");
-
-        URL testPage = ResourceUtils.getURL("classpath:emptyPage.html");
-
-        js("eskimoServices.setEmptyFrameTarget (\""+testPage.getPath()+"/\");");
-
-        js("eskimoServices.setUiServices( [\"cerebro\", \"kibana\", \"spark-console\", \"zeppelin\"] );");
 
         js("window.UI_SERVICES_CONFIG = {" +
                 "\"cerebro\" : {'urlTemplate': './cerebro/{NODE_ADDRESS}:9999/cerebro', 'title' : 'cerebro', 'waitTime': 10 }, " +
@@ -77,7 +72,22 @@ public class EskimoServicesTest extends AbstractWebTest {
                 "\"zeppelin\" : {'urlTemplate': './zeppelin/{NODE_ADDRESS}:9999/zeppelin', 'title' : 'zeppelin', 'waitTime': 30 }" +
                 "};");
 
-        js("eskimoServices.setUiServicesConfig(UI_SERVICES_CONFIG);");
+        js("" +
+                "$.ajaxGet = function (object) {\n" +
+                "    if (object.url === 'get-ui-services-config') {" +
+                "        object.success({status: 'OK', uiServicesConfig: window.UI_SERVICES_CONFIG});\n" +
+                "    } else if (object.url === 'list-ui-services') {" +
+                "        object.success({status: 'OK', uiServices : [\"cerebro\", \"kibana\", \"spark-console\", \"zeppelin\"]});\n" +
+                "    } else {\n" +
+                "        console.log(object); " +
+                "    } \n" +
+                "}");
+
+        js("eskimoServices.initialize()");
+
+        URL testPage = ResourceUtils.getURL("classpath:emptyPage.html");
+
+        js("eskimoServices.setEmptyFrameTarget (\""+testPage.getPath()+"/\");");
     }
 
     @Test
@@ -209,6 +219,24 @@ public class EskimoServicesTest extends AbstractWebTest {
         assertJavascriptEquals ("1", "$('#iframe-content-kibana').length");
         assertJavascriptEquals ("1", "$('#iframe-content-spark-console').length");
         assertJavascriptEquals ("1", "$('#iframe-content-zeppelin').length");
+    }
+
+    @Test
+    public void testRefreshIframe() {
+
+        testHandleServiceDisplay();
+
+        String prevUrl = (String) js("return $('#iframe-content-cerebro').attr('src')");
+        assertNotNull (prevUrl);
+        assertTrue (StringUtils.isNotBlank(prevUrl));
+
+        js("eskimoServices.refreshIframe('cerebro')");
+
+        String nextUrl = (String) js("return $('#iframe-content-cerebro').attr('src')");
+        assertNotNull (nextUrl);
+        assertTrue (StringUtils.isNotBlank(nextUrl));
+
+        assertNotEquals(nextUrl, prevUrl);
     }
 
     @Test

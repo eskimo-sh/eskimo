@@ -250,7 +250,7 @@ public abstract class AbstractWebTest {
         js("window.eskimoSetupCommand = {}");
         js("window.eskimoAlert = {}");
         js("window.eskimoApp = {}");
-        js("window.eskimoMenu = { serviceMenuClear: function(){} }");
+        js("window.eskimoMenu = { createServicesMenu: function() {}, serviceMenuClear: function(){} }");
 
         js("window.eskimoFileManagers = {};");
         js("eskimoFileManagers.setAvailableNodes = function() {};");
@@ -276,6 +276,7 @@ public abstract class AbstractWebTest {
         js("window.eskimoSystemStatus = {};");
         js("eskimoSystemStatus.showStatus = function () {};");
         js("eskimoSystemStatus.updateStatus = function () {};");
+        js("eskimoSystemStatus.isDisconnected = function () {return false; };");
 
         js("window.eskimoKubernetesServicesSelection = {" +
                 "showKubernetesServiceSelection: function () {}" +

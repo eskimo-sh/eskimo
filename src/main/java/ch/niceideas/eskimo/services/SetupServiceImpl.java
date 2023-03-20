@@ -349,7 +349,7 @@ public class SetupServiceImpl implements SetupService {
     @PreAuthorize("hasAuthority('ADMIN')")
     public void prepareSetup (
             JsonWrapper setupConfig,
-            Set<String> downloadPackages, Set<String> buildPackage, Set<String> downloadKube, Set<String> buildKube, Set<String> packageUpdate)
+            Set<String> packagesToDownload, Set<String> buildPackage, Set<String> downloadKube, Set<String> buildKube, Set<String> packageUpdate)
             throws SetupException {
 
         File packagesDistribFolder;
@@ -386,13 +386,13 @@ public class SetupServiceImpl implements SetupService {
             }
 
             if (packagesVersion == null) {
-                throw new SetupException(COULDNT_DELETE_PACKAGE_FILE_ERROR() + packagesDownloadUrlRoot);
+                throw new SetupException(COULDNT_DOWNLOAD_PACKAGE_FILE_ERROR + packagesDownloadUrlRoot);
             }
 
             Set<String> missingServices = new HashSet<>();
             findMissingPackages(packagesDistribFolder, missingServices);
 
-            fillInPackages(downloadPackages, packagesVersion, missingServices);
+            fillInPackages(packagesToDownload, packagesVersion, missingServices);
         }
 
         // 2. Find out about missing Kube distrib
@@ -445,17 +445,13 @@ public class SetupServiceImpl implements SetupService {
         }
     }
 
-    private String COULDNT_DELETE_PACKAGE_FILE_ERROR() {
-        return COULDNT_DOWNLOAD_PACKAGE_FILE_ERROR;
-    }
-
-    protected void fillInPackages(Set<String> downloadPackages, JsonWrapper packagesVersion, Set<String> missingServices) {
+    protected void fillInPackages(Set<String> packagesToDownload, JsonWrapper packagesVersion, Set<String> missingServices) {
         for (String packageName : missingServices) {
 
             String softwareVersion = (String) packagesVersion.getValueForPath(packageName+ DOT_SOFTWARE);
             String distributionVersion = (String) packagesVersion.getValueForPath(packageName+ DOT_DISTRIBUTION);
 
-            downloadPackages.add(packageName+"_"+softwareVersion+"_"+distributionVersion);
+            packagesToDownload.add(packageName+"_"+softwareVersion+"_"+distributionVersion);
         }
     }
 
@@ -553,17 +549,7 @@ public class SetupServiceImpl implements SetupService {
 
                     packagesVersion = loadRemotePackagesVersionFile();
 
-                    for (String packageName : sortedServices) {
-
-                        Pair<String, String> remoteVersion = getVersionFromRemote(packagesVersion, packageName);
-                        if (remoteVersion == null) {
-                            continue;
-                        }
-
-                        downloadPackage(
-                                packageName + "_" + remoteVersion.getKey() + "_" + remoteVersion.getValue(),
-                                DOCKER_TEMPLATE_PREFIX + packageName + "_" + remoteVersion.getKey() + "_" + remoteVersion.getValue() + TAR_GZ_EXTENSION);
-                    }
+                    downloadPackages(packagesVersion, sortedServices, DOCKER_TEMPLATE_PREFIX);
                 }
             }
 
@@ -586,17 +572,7 @@ public class SetupServiceImpl implements SetupService {
                         packagesVersion = loadRemotePackagesVersionFile();
                     }
 
-                    for (String kubePackageName : missingKubePackages) {
-
-                        Pair<String, String> remoteVersion = getVersionFromRemote(packagesVersion, kubePackageName);
-                        if (remoteVersion == null) {
-                            continue;
-                        }
-
-                        downloadPackage(
-                                kubePackageName + "_" + remoteVersion.getKey() + "_" + remoteVersion.getValue(),
-                                KUBE_PREFIX + kubePackageName + "_" + remoteVersion.getKey() + "_" + remoteVersion.getValue() + TAR_GZ_EXTENSION);
-                    }
+                    downloadPackages(packagesVersion, missingKubePackages, KUBE_PREFIX);
 
                 } else {
 
@@ -643,6 +619,20 @@ public class SetupServiceImpl implements SetupService {
 
         } finally {
             operationsMonitoringService.endCommand(success);
+        }
+    }
+
+    private void downloadPackages(JsonWrapper packagesVersion, List<String> sortedServices, String dockerTemplatePrefix) throws SetupException {
+        for (String packageName : sortedServices) {
+
+            Pair<String, String> remoteVersion = getVersionFromRemote(packagesVersion, packageName);
+            if (remoteVersion == null) {
+                continue;
+            }
+
+            downloadPackage(
+                    packageName + "_" + remoteVersion.getKey() + "_" + remoteVersion.getValue(),
+                    dockerTemplatePrefix + packageName + "_" + remoteVersion.getKey() + "_" + remoteVersion.getValue() + TAR_GZ_EXTENSION);
         }
     }
 

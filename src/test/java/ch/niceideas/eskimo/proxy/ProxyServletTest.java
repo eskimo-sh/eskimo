@@ -35,6 +35,8 @@
 
 package ch.niceideas.eskimo.proxy;
 
+import ch.niceideas.common.exceptions.CommonBusinessException;
+import ch.niceideas.common.exceptions.CommonRTException;
 import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.PostMethodWebRequest;
@@ -42,6 +44,7 @@ import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.servletunit.ServletRunner;
 import com.meterware.servletunit.ServletUnitClient;
+import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.config.Http1Config;
 import org.apache.hc.core5.http.impl.DefaultConnectionReuseStrategy;
@@ -64,6 +67,7 @@ import org.xml.sax.SAXException;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
+import javax.servlet.ServletException;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
@@ -116,6 +120,12 @@ public class ProxyServletTest {
         servletProps.setProperty("http.protocol.handle-redirects", "false");
         servletProps.setProperty(ProxyServlet.P_LOG, "true");
         servletProps.setProperty(ProxyServlet.P_FORWARDEDFOR, "true");
+
+        servletProps.setProperty(ProxyServlet.P_CONNECTTIMEOUT, "10000");
+        servletProps.setProperty(ProxyServlet.P_READTIMEOUT, "10000");
+        servletProps.setProperty(ProxyServlet.P_CONNECTIONREQUESTTIMEOUT, "10000");
+        servletProps.setProperty(ProxyServlet.P_MAXCONNECTIONS, "50");
+
         setUpServlet(servletProps);
 
         sc = servletRunner.newClient();
@@ -134,6 +144,28 @@ public class ProxyServletTest {
     public void tearDown() throws Exception {
         servletRunner.shutDown();
         localTestServer.stop();
+    }
+
+    @Test
+    public void testHandleRequestException() {
+        assertThrows(RuntimeException.class, () -> ProxyServlet.handleRequestException(new RuntimeException()));
+        assertThrows(ServletException.class, () -> ProxyServlet.handleRequestException(new ServletException()));
+        assertThrows(IOException.class, () -> ProxyServlet.handleRequestException(new IOException()));
+        assertThrows(CommonRTException.class, () -> ProxyServlet.handleRequestException(new CommonBusinessException("test")));
+    }
+
+    @Test
+    public void testInvalidateSession() throws Exception {
+        testRedirectWithBody();
+
+        assertNotNull (sc.getSession(false));
+        HttpClient proxyClient = (HttpClient) sc.getSession(false).getAttribute(ProxyServlet.SESSION_HTTP_CLIENT);
+        assertNotNull(proxyClient);
+
+        sc.getSession(true).invalidate();
+
+        proxyClient = (HttpClient) sc.getSession(true).getAttribute(ProxyServlet.SESSION_HTTP_CLIENT);
+        assertNull(proxyClient);
     }
 
     @Test

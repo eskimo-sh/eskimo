@@ -134,7 +134,10 @@ $.ajaxPut = function (reqObject) {
 };
 
 function defaultSuccess (data, status, jqXHR) {
-    if (!data || data.error) {
+    if (!data) {
+        console.error("no data received");
+        eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "no data received - status is " + status);
+    } else if (data.error) {
         console.error(data.error);
         eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
     }

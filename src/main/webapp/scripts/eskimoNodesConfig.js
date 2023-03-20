@@ -197,22 +197,8 @@ eskimo.NodesConfig = function() {
         return !nodes ? 0 : nodes.length;
     };
 
-    this.setServicesDependenciesForTest = function(testServiceDeps) {
-        SERVICES_DEPENDENCIES = testServiceDeps;
-    };
     this.getServicesDependencies = function() {
         return SERVICES_DEPENDENCIES;
-    };
-
-    this.setServicesSettingsForTest = function (uniqueServices, multiplesServices, configuredServices, mandatoryServices) {
-        UNIQUE_SERVICES = uniqueServices;
-        MULTIPLE_SERVICES = multiplesServices;
-        CONFIGURED_SERVICES = configuredServices;
-        MANDATORY_SERVICES = mandatoryServices;
-    };
-
-    this.setServicesConfig = function (servicesConfig) {
-        SERVICES_CONFIGURATION = servicesConfig;
     };
 
     this.renderNodesConfig = function (data) {

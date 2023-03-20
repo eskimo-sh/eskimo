@@ -107,9 +107,6 @@ eskimo.Services = function () {
     this.setEmptyFrameTarget = function (emptyFrameTarget) {
         EMPTY_FRAMETARGET = emptyFrameTarget;
     };
-    this.setUiServices = function (uiServices) {
-        UI_SERVICES = uiServices;
-    };
     this.setUiServicesConfig = function (uiServicesConfig) {
         UI_SERVICES_CONFIG = uiServicesConfig;
     };

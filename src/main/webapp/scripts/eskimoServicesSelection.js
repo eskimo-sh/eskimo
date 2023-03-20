@@ -91,10 +91,6 @@ eskimo.ServicesSelection = function() {
         });
     }
 
-    this.setServicesSettingsForTest = function (servicesConfig) {
-        SERVICES_CONFIGURATION = servicesConfig;
-    };
-
     this.getCurrentNodesConfig = function() {
         let setupConfig = $("form#nodes-config").serializeObject();
         //console.log (setupConfig);

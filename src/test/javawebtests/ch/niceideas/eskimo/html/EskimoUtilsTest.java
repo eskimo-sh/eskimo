@@ -38,10 +38,14 @@ import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
 
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EskimoUtilsTest extends AbstractWebTest {
 
@@ -53,18 +57,38 @@ public class EskimoUtilsTest extends AbstractWebTest {
     }
 
     @Test
+    public void testErrorHandler() {
+        js("errorHandler({responseJSON : {message : 'test message'}})");
+        assertJavascriptEquals("3 : fail : test message", "window.lastAlert");
+
+        js("errorHandler({responseJSON : {error : 'test error'}})");
+        assertJavascriptEquals("3 : fail : test error", "window.lastAlert");
+
+        js("errorHandler({}, 'test status')");
+        String consoleLogs = driver.manage().logs().get(LogType.BROWSER).getAll().stream()
+                .map(LogEntry::getMessage)
+                .collect(Collectors.joining(","));
+        assertTrue (consoleLogs.contains("test status"));
+    }
+
+    @Test
+    public void testDefaultSuccess() {
+        js("defaultSuccess()");
+        assertJavascriptEquals("3 : no data received - status is undefined", "window.lastAlert");
+
+        js("defaultSuccess({error: 'test error'})");
+        assertJavascriptEquals("3 : test error", "window.lastAlert");
+    }
+
+    @Test
     public void testGetHyphenSeparated() {
-
         assertJavascriptEquals("test-a-string", "getHyphenSeparated('testAString')");
-
         assertJavascriptEquals("test", "getHyphenSeparated('test')");
     }
 
     @Test
     public void testGetCamelCase() {
-
         assertJavascriptEquals("testAString", "getCamelCase('test-a-string')");
-
         assertJavascriptEquals("test", "getCamelCase('test')");
     }
 

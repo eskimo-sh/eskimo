@@ -64,18 +64,20 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         js("$.ajaxGet = function(callback) { console.log(callback); }");
 
+        js("window.SERVICES_CONFIGURATION = " + jsonServices + ";");
+
+        js("" +
+                "$.ajaxGet = function (object) {\n" +
+                "    if (object.url === 'get-services-config') {" +
+                "        object.success({status: 'OK', servicesConfigurations: window.SERVICES_CONFIGURATION});\n" +
+                "    } else {\n" +
+                "        console.log(object); " +
+                "    } \n" +
+                "}");
+
         js("eskimoServicesSelection.initialize()");
 
         waitForElementIdInDOM("services-selection-button-select-all");
-
-        js("window.SERVICES_CONFIGURATION = " + jsonServices + ";");
-
-        js("eskimoServicesSelection.setServicesSettingsForTest(SERVICES_CONFIGURATION);");
-
-        jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"), StandardCharsets.UTF_8);
-
-        js("window.SERVICES_CONFIGURATION = " + jsonServices + ";");
-        //js("eskimoNodesConfig.setServicesConfig(SERVICES_CONFIGURATION);");
 
         js("window.UNIQUE_SERVICES = [\"zookeeper\", \"kube-master\"];");
         js("window.MULTIPLE_SERVICES = [\"ntp\", \"etcd\", \"kube-slave\", \"gluster\", \"prom-node-exporter\"];");
