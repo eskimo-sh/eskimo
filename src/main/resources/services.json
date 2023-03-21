@@ -1781,6 +1781,19 @@
       "title" : "Zeppelin",
       "proxyReplacements" : [
         {
+          "__comment": "zeppelin-0.11",
+          "type" : "PLAIN",
+          "source" : "(\"https:\"===location.protocol?\"wss:\":\"ws:\")+\"//\"+location.hostname+\":\"+this.getPort()+e(location.pathname)+\"/ws\"}",
+          "target" : "(\"https:\"===location.protocol?\"wss:\":\"ws:\")+\"//\"+location.hostname+\":\"+this.getPort()+\"/{CONTEXT_PATH}ws\"+e(location.pathname).replace(\"{CONTEXT_PATH}\" != \"\" ? \"{CONTEXT_PATH}\" : \"dummy_not_matching_anything\", \"\")+\"/ws\"}"
+        },
+        {
+          "__comment": "zeppelin-0.11",
+          "type" : "PLAIN",
+          "source" : "location.protocol+\"//\"+location.hostname+\":\"+this.getPort()+location.pathname",
+          "target" : "location.protocol+\"//\"+location.hostname+\":\"+this.getPort()+location.pathname.replace(\"{CONTEXT_PATH}\" != \"\" ? \"{CONTEXT_PATH}\" : \"dummy_not_matching_anything\", \"\")"
+        },
+        {
+          "__comment": "zeppelin-0.10",
           "type" : "PLAIN",
           "source" : "return t+\"//\"+location.hostname+\":\"+this.getPort()+e(location.pathname)+\"/ws",
           "target" : "return t + \"//\" + location.hostname + \":\" + this.getPort() + \"/{CONTEXT_PATH}ws\" + e(location.pathname).replace(\"{CONTEXT_PATH}\" != \"\" ? \"{CONTEXT_PATH}\" : \"dummy_not_matching_anything\", \"\") + \"/ws"

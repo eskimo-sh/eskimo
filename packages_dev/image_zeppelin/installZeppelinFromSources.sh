@@ -81,27 +81,29 @@ mkdir -p /tmp/zeppelin_build/
 cd /tmp/zeppelin_build/ || (echo "Couldn't change to /tmp/zeppelin_build" && exit 200)
 
 echo " - Install missing dependencies to build zeppelin sources"
-sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install libfontconfig1 r-base-dev r-cran-evaluate apt-transport-https lsb-release > /tmp/zeppelin_install_log 2>&1
+DEBIAN_FRONTEND=noninteractive apt-get -yq install libfontconfig1 r-base-dev r-cran-evaluate apt-transport-https lsb-release git > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -11
 
-echo " - Adding node and NPM source"
-sudo bash -c "curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -" > /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -12
+# Trying to let zeppelin install npm on its own
+#echo " - Adding node and NPM source"
+#sudo bash -c "curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -" > /tmp/zeppelin_install_log 2>&1
+#fail_if_error $? "/tmp/zeppelin_install_log" -12
+#
+#echo " - Installing node JS"
+#sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install nodejs > /tmp/zeppelin_install_log 2>&1
+#fail_if_error $? "/tmp/zeppelin_install_log" -13
 
-echo " - Installing node JS"
-sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install nodejs > /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -13
 
-
-echo " - Creating local build user"
-echo "$USER_TO_USE:x:$UID_TO_USE:$UID_TO_USE:$USER_TO_USE,,,:/home/$USER_TO_USE:/bin/bash" >> /etc/passwd
-
-echo " - Creating home folder for local build user"
-mkdir /home/$USER_TO_USE
-chown -R $USER_TO_USE /home/$USER_TO_USE
-
-echo " - Allowing local build user to use build folder"
-chmod -R 777 .
+# Using root to avoid npm problems
+#echo " - Creating local build user"
+#echo "$USER_TO_USE:x:$UID_TO_USE:$UID_TO_USE:$USER_TO_USE,,,:/home/$USER_TO_USE:/bin/bash" >> /etc/passwd
+#
+#echo " - Creating home folder for local build user"
+#mkdir /home/$USER_TO_USE
+#chown -R $USER_TO_USE /home/$USER_TO_USE
+#
+#echo " - Allowing local build user to use build folder"
+#chmod -R 777 .
 
 echo " - Downloading Zeppelin git repository archive"
 rm -Rf zeppelin
@@ -117,30 +119,33 @@ fail_if_error $? "/tmp/zeppelin_install_log" -2
 mv zeppelin-master zeppelin
 #mv zeppelin-branch-$ZEPPELIN_VERSION zeppelin
 
-echo " - Changing build folder owner"
-chown -R $USER_TO_USE zeppelin
-fail_if_error $? "/tmp/zeppelin_install_log" -1
+#echo " - Changing build folder owner"
+#chown -R $USER_TO_USE zeppelin
+#fail_if_error $? "/tmp/zeppelin_install_log" -1
 
 echo " - update all pom.xml to use scala $SCALA_VERSION"
 cd zeppelin/ || (echo "Couldn't cd to zeppelin/" && exit 1)
-sudo -u $USER_TO_USE bash $PWD/dev/change_scala_version.sh $SCALA_VERSION > /tmp/zeppelin_install_log 2>&1
+bash $PWD/dev/change_scala_version.sh $SCALA_VERSION > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -2
 
 #echo " - HACK - Fixing ElasticSearch interpreter"
 #sed -i s/"hits\/total"/"hits\/total\/value"/g /tmp/zeppelin_build/zeppelin/elasticsearch/src/main/java/org/apache/zeppelin/elasticsearch/client/HttpBasedClient.java
 
-#echo " - Setting JAVA_HOME to java-1.8.0-openjdk-amd64"
-export JAVA_HOME=/usr/local/lib/jvm/openjdk-8/
-export PATH=$JAVA_HOME/bin:$PATH
+  #echo " - Setting JAVA_HOME to java-1.8.0-openjdk-amd64"
+  export JAVA_HOME=/usr/local/lib/jvm/openjdk-8/
+  export PATH=$JAVA_HOME/bin:$PATH
 
 #echo " - Fixing Java interpreter"
 #rm /etc/alternatives/java
 #ln -s /usr/lib/jvm/java-8-openjdk-amd64/bin/java /etc/alternatives/java
 
+echo " - Removing npm lock file"
+mv zeppelin-web/package-lock.json zeppelin-web/package-lock.json.bak
+
 echo " - build zeppelin with all interpreters"
 for i in $(seq 1 2); do  # 2 attempts since sometimes download of packages fails
     echo "   + attempt $i"
-    sudo -u $USER_TO_USE mvn clean package -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr  > /tmp/zeppelin_install_log 2>&1
+    mvn package -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr  > /tmp/zeppelin_install_log 2>&1
     if [[ $? == 0 ]]; then
         echo "   + succeeded !"
         break
@@ -153,7 +158,7 @@ for i in $(seq 1 2); do  # 2 attempts since sometimes download of packages fails
 done
 
 echo " - Installing with maven"
-su -p $USER_TO_USE -c "mvn install -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr"  > /tmp/zeppelin_install_log 2>&1
+mvn install -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr  > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -6
 
 echo " - Creating setup temp directory"

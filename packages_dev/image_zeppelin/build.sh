@@ -113,6 +113,8 @@ check_in_container_install_success /tmp/zeppelin_build_log
 echo " - Installing zeppelin"
 if [[ $ZEPPELIN_IS_SNAPSHOT == "true" ]]; then
 
+    #docker exec -it zeppelin_template bash
+
     docker exec -i zeppelin_template bash /scripts/installZeppelinFromSources.sh $USER $UID | tee /tmp/zeppelin_build_log 2>&1
     check_in_container_install_success /tmp/zeppelin_build_log
 
@@ -131,6 +133,8 @@ else
     docker exec -i zeppelin_template bash /scripts/installZeppelin.sh | tee /tmp/zeppelin_build_log 2>&1
     check_in_container_install_success /tmp/zeppelin_build_log
 fi
+
+docker exec -it zeppelin_template bash
 
 echo " - Installing zeppelin Interpreters Java dependencies"
 docker exec -i zeppelin_template bash /scripts/installZeppelinInterpreterDependencies.sh | tee /tmp/zeppelin_build_log 2>&1

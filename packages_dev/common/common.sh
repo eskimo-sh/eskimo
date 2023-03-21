@@ -95,8 +95,8 @@ export PROMETHEUS_NODE_EXPORTER_VERSION=1.5.0
 export PROMETHEUS_PUSHGATEWAY_VERSION=1.5.1
 
 # Zeppelin
-export ZEPPELIN_VERSION_FULL=0.10.1
-export ZEPPELIN_VERSION=0.10
+export ZEPPELIN_VERSION_FULL=0.11.0-eskimo-1
+export ZEPPELIN_VERSION=0.11
 export ZEPPELIN_VERSION_SNAPSHOT=0.11.0-SNAPSHOT
 export ZEPPELIN_IS_SNAPSHOT="false" # set to "true" to build zeppelin from zeppelin git master (which is rarely working)
 
