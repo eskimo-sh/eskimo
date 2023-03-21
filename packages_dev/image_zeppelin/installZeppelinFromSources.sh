@@ -123,17 +123,18 @@ mv zeppelin-master zeppelin
 #chown -R $USER_TO_USE zeppelin
 #fail_if_error $? "/tmp/zeppelin_install_log" -1
 
-echo " - update all pom.xml to use scala $SCALA_VERSION"
 cd zeppelin/ || (echo "Couldn't cd to zeppelin/" && exit 1)
+
+echo " - update all pom.xml to use scala $SCALA_VERSION"
 bash $PWD/dev/change_scala_version.sh $SCALA_VERSION > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -2
 
 #echo " - HACK - Fixing ElasticSearch interpreter"
 #sed -i s/"hits\/total"/"hits\/total\/value"/g /tmp/zeppelin_build/zeppelin/elasticsearch/src/main/java/org/apache/zeppelin/elasticsearch/client/HttpBasedClient.java
 
-  #echo " - Setting JAVA_HOME to java-1.8.0-openjdk-amd64"
-  export JAVA_HOME=/usr/local/lib/jvm/openjdk-8/
-  export PATH=$JAVA_HOME/bin:$PATH
+#echo " - Setting JAVA_HOME to java-1.8.0-openjdk-amd64"
+export JAVA_HOME=/usr/local/lib/jvm/openjdk-8/
+export PATH=$JAVA_HOME/bin:$PATH
 
 #echo " - Fixing Java interpreter"
 #rm /etc/alternatives/java
@@ -145,7 +146,7 @@ mv zeppelin-web/package-lock.json zeppelin-web/package-lock.json.bak
 echo " - build zeppelin with all interpreters"
 for i in $(seq 1 2); do  # 2 attempts since sometimes download of packages fails
     echo "   + attempt $i"
-    mvn package -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr  > /tmp/zeppelin_install_log 2>&1
+    mvn install -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr  > /tmp/zeppelin_install_log 2>&1
     if [[ $? == 0 ]]; then
         echo "   + succeeded !"
         break
@@ -157,9 +158,9 @@ for i in $(seq 1 2); do  # 2 attempts since sometimes download of packages fails
     fi
 done
 
-echo " - Installing with maven"
-mvn install -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr  > /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -6
+#echo " - Installing with maven"
+#mvn install -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr  > /tmp/zeppelin_install_log 2>&1
+#fail_if_error $? "/tmp/zeppelin_install_log" -6
 
 echo " - Creating setup temp directory"
 mkdir -p /tmp/zeppelin_setup/

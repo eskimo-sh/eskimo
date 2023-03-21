@@ -393,7 +393,7 @@ public class SystemServiceImpl implements SystemService {
 
     @Override
     public <T extends Serializable> void performPooledOperation(
-            List<T> operations, int parallelism, long operationWaitTimout, PooledOperation<T> operation)
+            List<T> operations, int parallelism, long operationWaitTimoutSec, PooledOperation<T> operation)
             throws SystemException {
 
         final ExecutorService threadPool = Executors.newFixedThreadPool(parallelism);
@@ -420,8 +420,8 @@ public class SystemServiceImpl implements SystemService {
 
         threadPool.shutdown();
         try {
-            if (!threadPool.awaitTermination(operationWaitTimout, TimeUnit.SECONDS)) {
-                logger.warn ("Could not complete operation within " + operationWaitTimout + " seconds");
+            if (!threadPool.awaitTermination(operationWaitTimoutSec, TimeUnit.SECONDS)) {
+                logger.warn ("Could not complete operation within " + operationWaitTimoutSec + " seconds");
             }
         } catch (InterruptedException e) {
             logger.debug (e, e);
