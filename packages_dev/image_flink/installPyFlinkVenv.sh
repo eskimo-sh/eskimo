@@ -78,6 +78,17 @@ echo " - Activate the conda python virtual environment"
 source venv/bin/activate ""  > /tmp/pyflink_install_log 2>&1
 fail_if_error $? "/tmp/pyflink_install_log" -24
 
+
+echo " - Installing cargo and rust"
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o rustup.sh > /tmp/pyflink_install_log 2>&1
+fail_if_error $? "/tmp/pyflink_install_log" -33
+
+bash rustup.sh -y > /tmp/pyflink_install_log 2>&1
+fail_if_error $? "/tmp/pyflink_install_log" -34
+
+export PATH=/root/.cargo/bin:$PATH
+
+
 echo " - Installing apache flink python runtime (This takes time)"
 pip install "apache-flink==$FLINK_VERSION"  > /tmp/pyflink_install_log 2>&1
 fail_if_error $? "/tmp/pyflink_install_log" -25

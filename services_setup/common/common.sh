@@ -301,6 +301,7 @@ function deploy_registry() {
             cat $LOG_FILE
             exit 4
         fi
+        sleep 2
 
         docker push kubernetes.registry:5000/$CONTAINER:$NEW_TAG >> $LOG_FILE 2>&1
         if [[ $? != 0 ]]; then
@@ -308,8 +309,9 @@ function deploy_registry() {
             cat $LOG_FILE
             exit 5
         fi
+        sleep 2
 
-        echo " - removing local image"
+        echo " - removing local image 'eskimo/$CONTAINER:$NEW_TAG'"
         docker image rm eskimo/$CONTAINER:$NEW_TAG  >> $LOG_FILE 2>&1
         if [[ $? != 0 ]]; then
             echo "local image removal failed !"
@@ -576,7 +578,7 @@ function build_container() {
         fail_if_error $? "$LOG_FILE" 6
     fi
 
-    echo " - Killing any previous containers"
+    echo " - Killing any previous containers $CONTAINER"
     sudo systemctl stop $CONTAINER > /dev/null 2>&1
     if [[ $(docker ps -a -q -f name=$CONTAINER) != "" ]]; then
 
@@ -585,7 +587,7 @@ function build_container() {
         docker container rm $CONTAINER > /dev/null 2>&1
     fi
 
-    echo " - Finding new tag for container image"
+    echo " - Finding new tag for container image $CONTAINER"
     local LAST_TAG=$(get_last_tag $CONTAINER)
     local NEW_TAG=$(($LAST_TAG+1))
 
@@ -593,8 +595,10 @@ function build_container() {
         delete_tag $CONTAINER $LAST_TAG $LOG_FILE
     fi
 
+    sleep 2
+
     # build
-    echo " - Building docker container from image eskimo/$CONTAINER:$NEW_TAG"
+    echo " - Building docker container with tag eskimo/$CONTAINER:$NEW_TAG"
     docker build --iidfile id_file --tag eskimo/$CONTAINER:$NEW_TAG . >> $LOG_FILE 2>&1
     fail_if_error $? "$LOG_FILE" 7
 

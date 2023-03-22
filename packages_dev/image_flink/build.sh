@@ -62,7 +62,7 @@ fail_if_error $? "/tmp/flink_build_log" -4
 #fail_if_error $? "/tmp/flink_build_log" -5
 
 echo " - Installing python 3.7 build dependencies"
-docker exec -i flink_template apt-get -y install zip libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev > /tmp/flink_build_log 2>&1
+docker exec -i flink_template apt-get -y install zip libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev libjpeg-dev > /tmp/flink_build_log 2>&1
 fail_if_error $? "/tmp/flink_build_log" -5
 
 echo " - Installing python 3.7"

@@ -220,6 +220,9 @@ sudo sed -i -n '1h;1!H;${;g;s/'\
 '          \"value\": \"\/usr\/local\/lib\/flink\/\",'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
+echo " - Fixing flink interpreter"
+mv /usr/local/lib/flink/lib/statefun-flink-distribution* $(ls -1 /usr/local/lib/flink/lib/statefun-flink-distribution* | sed s/distribution/dst/)
+
 
 echo " - Configuring Shell interpreter"
 

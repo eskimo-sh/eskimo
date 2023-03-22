@@ -90,6 +90,12 @@ data:
           allowPrivilegeEscalation: true
           runAsUser: 3305
           runAsGroup: 3305
+        env:
+          - name: POD_IP_ADDRESS
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
         resources:
           requests:
             cpu: "$ESKIMO_KUBE_REQUEST_FLINK_RUNTIME_CPU"
@@ -252,7 +258,7 @@ spec:
               containerPort: 6124
               protocol: TCP
           env:
-            - name: _POD_IP_ADDRESS
+            - name: POD_IP_ADDRESS
               valueFrom:
                 fieldRef:
                   apiVersion: v1

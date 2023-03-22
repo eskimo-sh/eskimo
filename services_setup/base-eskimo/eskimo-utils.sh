@@ -610,7 +610,7 @@ function __delete_registry_repository() {
 
     if [[ -d "/var/lib/kubernetes/docker_registry/docker/registry/v2/repositories/$CONTAINER/" ]]; then
 
-        echo "   + Deleting previous container image tag $LAST_TAG from registry"
+        echo "   + Deleting previous container image tag $CONTAINER:$LAST_TAG from registry"
         docker exec k8s-registry /usr/local/bin/regctl tag delete kubernetes.registry:5000/$CONTAINER:$LAST_TAG >> $LOG_FILE 2>&1
         local result=$?
         # ignoring errors

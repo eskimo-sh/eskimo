@@ -134,37 +134,170 @@ cat > pom.xml <<EOF
         <dependency>
             <groupId>org.apache.flink</groupId>
             <!--<artifactId>flink-connector-kafka</artifactId>-->
-            <artifactId>flink-connector-kafka_$SCALA_VERSION</artifactId>
+            <artifactId>flink-connector-kafka</artifactId>
             <version>$FLINK_VERSION</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                     <groupId>org.apache.flink</groupId>
+                     <artifactId>flink-shaded-force-shading</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-              <!--<artifactId>flink-connector-elasticsearch${ES_VERSION_MAJOR_FOR_FLINK}</artifactId>-->
-              <artifactId>flink-connector-elasticsearch${ES_VERSION_MAJOR_FOR_FLINK}_$SCALA_VERSION</artifactId>
-            <version>$FLINK_VERSION</version>
+            <artifactId>flink-connector-elasticsearch-base</artifactId>
+            <version>$FLINK_CONNECTOR_ELASTICSEARCH_VERSION</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                     <groupId>org.apache.flink</groupId>
+                     <artifactId>flink-shaded-force-shading</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>statefun-flink-harness</artifactId>
             <version>$FLINK_STATEFUN_VERSION</version>
+            <exclusions>
+                <exclusion>
+                     <groupId>org.apache.flink</groupId>
+                     <artifactId>flink-connector-kafka_$SCALA_VERSION</artifactId>
+                </exclusion>
+                <exclusion>
+                     <groupId>org.apache.flink</groupId>
+                     <artifactId>flink-connector-kinesis_$SCALA_VERSION</artifactId>
+                </exclusion>
+                <exclusion>
+                     <groupId>org.apache.flink</groupId>
+                     <artifactId>flink-clients_$SCALA_VERSION</artifactId>
+                </exclusion>
+                <exclusion>
+                     <groupId>org.apache.flink</groupId>
+                     <artifactId>flink-metrics-dropwizard</artifactId>
+                </exclusion>
+                <exclusion>
+                     <groupId>org.apache.flink</groupId>
+                     <artifactId>flink-streaming-java_$SCALA_VERSION</artifactId>
+                </exclusion>
+                <exclusion>
+                     <groupId>org.apache.flink</groupId>
+                     <artifactId>flink-runtime</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-ml-core_$SCALA_VERSION</artifactId>
+            <artifactId>flink-ml-core</artifactId>
+            <version>$FLINK_ML_VERSION</version>
+            <exclusions>
+                <exclusion>
+                     <groupId>org.apache.flink</groupId>
+                     <artifactId>flink-connector-files</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-ml-iteration</artifactId>
+            <version>$FLINK_ML_VERSION</version>
+            <exclusions>
+                <exclusion>
+                     <groupId>org.apache.flink</groupId>
+                     <artifactId>flink-hadoop-fs</artifactId>
+                </exclusion>
+                <exclusion>
+                     <groupId>org.apache.flink</groupId>
+                     <artifactId>flink-table-runtime</artifactId>
+                </exclusion>
+                <exclusion>
+                     <groupId>org.apache.flink</groupId>
+                     <artifactId>flink-core</artifactId>
+                </exclusion>
+                <exclusion>
+                     <groupId>org.apache.flink</groupId>
+                     <artifactId>flink-shaded-netty</artifactId>
+                </exclusion>
+                <exclusion>
+                     <groupId>org.apache.flink</groupId>
+                     <artifactId>flink-annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                     <groupId>org.apache.flink</groupId>
+                     <artifactId>flink-shaded-force-shading</artifactId>
+                </exclusion>
+                <exclusion>
+                     <groupId>org.apache.flink</groupId>
+                     <artifactId>flink-shaded-jackson</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-ml-lib</artifactId>
             <version>$FLINK_ML_VERSION</version>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-ml-iteration_$SCALA_VERSION</artifactId>
-            <version>$FLINK_ML_VERSION</version>
+             <artifactId>flink-core</artifactId>
+             <version>$FLINK_VERSION</version>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-ml-lib_$SCALA_VERSION</artifactId>
-            <version>$FLINK_ML_VERSION</version>
-          </dependency>
+             <artifactId>flink-table-runtime</artifactId>
+             <version>$FLINK_VERSION</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+             <artifactId>flink-annotations</artifactId>
+             <version>$FLINK_VERSION</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+             <artifactId>flink-connector-files</artifactId>
+             <version>$FLINK_VERSION</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+             <artifactId>flink-connector-files</artifactId>
+             <version>$FLINK_VERSION</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+             <artifactId>flink-clients</artifactId>
+             <version>$FLINK_VERSION</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+             <artifactId>flink-runtime</artifactId>
+             <version>$FLINK_VERSION</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+             <artifactId>flink-streaming-java</artifactId>
+             <version>$FLINK_VERSION</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+             <artifactId>flink-streaming-scala_$SCALA_VERSION</artifactId>
+             <version>$FLINK_VERSION</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+             <artifactId>flink-metrics-dropwizard</artifactId>
+             <version>$FLINK_VERSION</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-api-scala_$SCALA_VERSION</artifactId>
+            <version>$FLINK_VERSION</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-api-scala-bridge_$SCALA_VERSION</artifactId>
+            <version>$FLINK_VERSION</version>
+        </dependency>
     </dependencies>
 </project>
 EOF

@@ -70,3 +70,6 @@ fi
 # reached by the TaskManagers and any clients which want to connect
 #sed -i s/"jobmanager.rpc.address: localhost"/"jobmanager.rpc.address: $MASTER_FLINK_APP_MASTER_1"/g /usr/local/lib/flink/conf/flink-conf.yaml
 
+bash -c "sed -i s/\"taskmanager.host: localhost\"/\"taskmanager.host: $POD_IP_ADDRESS\"/g /usr/local/lib/flink/conf/flink-conf.yaml"
+bash -c "sed -i s/\"jobmanager.bind-host: localhost\"/\"jobmanager.bind-host: 0.0.0.0\"/g /usr/local/lib/flink/conf/flink-conf.yaml"
+bash -c "sed -i s/\"taskmanager.bind-host: localhost\"/\"taskmanager.bind-host: 0.0.0.0\"/g /usr/local/lib/flink/conf/flink-conf.yaml"
