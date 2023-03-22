@@ -40,6 +40,7 @@ import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.KubernetesOperationsCommand;
 import ch.niceideas.eskimo.model.KubernetesServicesConfigWrapper;
 import ch.niceideas.eskimo.model.ServicesInstallStatusWrapper;
+import ch.niceideas.eskimo.model.SystemStatusWrapper;
 import ch.niceideas.eskimo.model.service.proxy.ProxyTunnelConfig;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
@@ -159,6 +160,97 @@ public class KubernetesServiceTest {
     }
 
     @Test
+    public void testApplyKubernetesServicesConfig_NoKube() throws Exception {
+
+        ServicesInstallStatusWrapper serviceInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+        serviceInstallStatus.removeInstallationFlag(Service.from("database-manager"), Node.KUBERNETES_NODE);
+        serviceInstallStatus.removeInstallationFlag(Service.from("broker-manager"), Node.KUBERNETES_NODE);
+
+        configurationServiceTest.setStandard2NodesSetup();
+
+        SystemStatusWrapper systemStatus = StandardSetupHelpers.getStandard2NodesSystemStatus();
+        systemStatus.removeRootKey("service_cluster-manager_192-168-10-13");
+        systemServiceTest.setSystemStatus(systemStatus);
+
+        KubernetesOperationsCommand command = KubernetesOperationsCommand.create (
+                servicesDefinition,
+                systemServiceTest,
+                StandardSetupHelpers.getStandardKubernetesConfig(),
+                serviceInstallStatus,
+                new KubernetesServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("KubernetesServiceTest/kubernetes-services-config.json"), StandardCharsets.UTF_8))
+        );
+
+        KubernetesException exception = assertThrows(KubernetesException.class, () -> kubernetesService.applyServicesConfig(command));
+        assertNotNull(exception);
+        assertEquals("Kubernetes doesn't seem to be installed. Kubernetes services configuration is saved but will need to be re-applied when k8s-master is available.", exception.getMessage());
+
+        ServicesInstallStatusWrapper newSserviceInstallStatus = configurationServiceTest.loadServicesInstallationStatus();
+        assertFalse(serviceInstallStatus.getJSONObject().similar(newSserviceInstallStatus.getJSONObject()));
+
+        assertEquals(0, getInstallations().size());
+        assertEquals(0, getUninstallations().size());
+    }
+
+    @Test
+    public void testApplyKubernetesServicesConfig_KubeNodeDown() throws Exception {
+
+        ServicesInstallStatusWrapper serviceInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
+        serviceInstallStatus.removeInstallationFlag(Service.from("database-manager"), Node.KUBERNETES_NODE);
+        serviceInstallStatus.removeInstallationFlag(Service.from("broker-manager"), Node.KUBERNETES_NODE);
+
+        configurationServiceTest.saveServicesInstallationStatus(ServicesInstallStatusWrapper.empty());
+        configurationServiceTest.setStandard2NodesSetup();
+        systemServiceTest.setStandard2NodesStatus();
+
+        KubernetesServicesConfigWrapper previousKubeConfig = StandardSetupHelpers.getStandardKubernetesConfig();
+
+        KubernetesOperationsCommand command = KubernetesOperationsCommand.create (
+                servicesDefinition,
+                systemServiceTest,
+                previousKubeConfig,
+                serviceInstallStatus,
+                new KubernetesServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("KubernetesServiceTest/kubernetes-services-config.json"), StandardCharsets.UTF_8))
+        );
+
+        configurationServiceTest.saveServicesInstallationStatus(serviceInstallStatus);
+
+        configurationServiceTest.saveNodesConfig(StandardSetupHelpers.getStandard2NodesSetup());
+
+        systemServiceTest.setStandard2NodesStatus();
+
+        systemServiceTest.addDeadNode(Node.fromAddress("192.168.10.11"));
+
+        sshCommandServiceTest.setNodeResultBuilder((node, script) -> {
+            switch (node.getAddress()) {
+                case "192.168.10.11":
+                    return "MemTotal:        5969796 kB";
+                case "192.168.10.12":
+                    return "MemTotal:        5799444 kB";
+                default:
+                    return "MemTotal:        3999444 kB";
+            }
+        });
+
+        systemOperationServiceTest.setMockCalls(true);
+
+        KubernetesException kubeEx = assertThrows (KubernetesException.class, () -> kubernetesService.applyServicesConfig(command));
+        assertEquals ("The Kube Master node is dead. cannot proceed any further with installation. " +
+                "Kubernetes services configuration is saved but will need to be re-applied when k8s-master is available.", kubeEx.getMessage());
+
+        List<Service> installList = getInstallations();
+        assertEquals(0, installList.size());
+
+        List<Service> uninstallList = getUninstallations();
+        assertEquals(0, uninstallList.size());
+
+        KubernetesServicesConfigWrapper newKubeConfig = configurationServiceTest.loadKubernetesServicesConfig();
+        assertNotNull (newKubeConfig);
+
+        //changes have been persisted
+        assertFalse (previousKubeConfig.getJSONObject().similar(newKubeConfig.getJSONObject()));
+    }
+
+    @Test
     public void testApplyKubernetesServicesConfig () throws Exception {
 
         ServicesInstallStatusWrapper serviceInstallStatus = StandardSetupHelpers.getStandard2NodesInstallStatus();
@@ -176,10 +268,6 @@ public class KubernetesServiceTest {
                 serviceInstallStatus,
                 new KubernetesServicesConfigWrapper(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("KubernetesServiceTest/kubernetes-services-config.json"), StandardCharsets.UTF_8))
         );
-
-        KubernetesException exception = assertThrows(KubernetesException.class, () -> kubernetesService.applyServicesConfig(command));
-        assertNotNull(exception);
-        assertEquals("Kubernetes doesn't seem to be installed. Kubernetes services configuration is saved but will need to be re-applied when k8s-master is available.", exception.getMessage());
 
         configurationServiceTest.saveServicesInstallationStatus(serviceInstallStatus);
 
@@ -213,7 +301,6 @@ public class KubernetesServiceTest {
         assertEquals(4, uninstallList.size());
         assertEquals("cluster-dashboard,database,calculator-runtime,broker", uninstallList.stream().map(Service::getName).collect(Collectors.joining(",")));
     }
-
 
     @Test
     public void testUninstallKubernetesService () throws Exception {

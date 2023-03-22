@@ -71,6 +71,8 @@ public class SystemServiceTestImpl implements SystemService {
 
     private boolean standard2NodesStatus = false;
 
+    private SystemStatusWrapper systemStatus = null;
+
     private boolean pingError = false;
 
     private boolean mockCalls = false;
@@ -81,6 +83,8 @@ public class SystemServiceTestImpl implements SystemService {
 
     private final List<String> executedActions = new ArrayList<>();
 
+    private final Set<Node> deadNodes = new HashSet<>();
+
     private final List<Pair<? extends Serializable, PooledOperation<? extends Serializable>>> appliedOperations = new ArrayList<>();
 
     public void reset() {
@@ -89,9 +93,15 @@ public class SystemServiceTestImpl implements SystemService {
         this.throwStatusWrapperException = false;
         this.startServiceError = false;
         this.standard2NodesStatus = false;
+        this.systemStatus = null;
         this.pingError = false;
         this.executedActions.clear();
         this.appliedOperations.clear();
+        this.deadNodes.clear();
+    }
+
+    public void addDeadNode (Node deadNode) {
+        deadNodes.add(deadNode);
     }
 
     public List<String> getExecutedActions() {
@@ -165,8 +175,14 @@ public class SystemServiceTestImpl implements SystemService {
             throw new StatusExceptionWrapperException (new SetupException("test"));
         } else if (standard2NodesStatus) {
             return StandardSetupHelpers.getStandard2NodesSystemStatus();
+        } else if (systemStatus != null) {
+            return systemStatus;
         }
         return null;
+    }
+
+    public void setSystemStatus(SystemStatusWrapper systemStatus) {
+        this.systemStatus = systemStatus;
     }
 
     @Override
@@ -186,7 +202,8 @@ public class SystemServiceTestImpl implements SystemService {
     @Override
     public NodesStatus discoverAliveAndDeadNodes(Set<Node> allNodes, NodesConfigWrapper nodesConfig) {
         NodesStatus nodesStatus = new NodesStatus();
-        nodesConfig.getAllNodes().forEach(nodesStatus::addLiveNode);
+        nodesConfig.getAllNodes().forEach(node -> { if (!deadNodes.contains(node)){ nodesStatus.addLiveNode(node); }});
+        nodesConfig.getAllNodes().forEach(node -> { if (deadNodes.contains(node)){ nodesStatus.addDeadNode(node); }});
         return nodesStatus;
     }
 

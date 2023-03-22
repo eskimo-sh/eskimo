@@ -38,6 +38,8 @@ package ch.niceideas.common.utils;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -52,7 +54,36 @@ public class StreamUtilsTest {
         StreamUtils.copy(bais, baos);
         assertEquals(source, baos.toString());
 
-        assertThrows(NullPointerException.class, () -> StreamUtils.copy(null, (OutputStream)null) );
+        assertThrows(NullPointerException.class, () -> StreamUtils.copy(null, (OutputStream) null));
+    }
+
+    @Test
+    public void testCopyThenClose() throws Exception {
+
+        AtomicBoolean baisClosedCall = new AtomicBoolean();
+        AtomicBoolean baosClosedCall = new AtomicBoolean();
+
+        String source = "content";
+        ByteArrayInputStream bais = new ByteArrayInputStream(source.getBytes()){
+            @Override
+            public void close() throws IOException {
+                baisClosedCall.set(true);
+                super.close();
+            }
+        };
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(){
+            @Override
+            public void close() throws IOException {
+                baosClosedCall.set(true);
+                super.close();
+            }
+        };
+        StreamUtils.copyThenClose(bais, baos);
+        assertEquals(source, baos.toString());
+
+        assertTrue (baisClosedCall.get());
+        assertTrue (baosClosedCall.get());
+
         assertThrows(IOException.class, () -> StreamUtils.copyThenClose(null, null) );
     }
 
@@ -80,11 +111,42 @@ public class StreamUtilsTest {
     public void testClose() {
         boolean success = false;
         try {
+            StreamUtils.close((BufferedReader) null);
             StreamUtils.close(new BufferedReader(new InputStreamReader(new ByteArrayInputStream("aaa".getBytes()))));
-            StreamUtils.close(new ByteArrayInputStream("aaa".getBytes()));
+            StreamUtils.close(new BufferedReader(new InputStreamReader(new ByteArrayInputStream("aaa".getBytes()))){
+                @Override
+                public void close() throws IOException {
+                    throw new IOException("test");
+                }
+            });
+
             StreamUtils.close((InputStream) null);
+            StreamUtils.close(new ByteArrayInputStream("aaa".getBytes()));
+            StreamUtils.close(new ByteArrayInputStream("aaa".getBytes()){
+                @Override
+                public void close() throws IOException {
+                    throw new IOException("test");
+                }
+            });
+
             StreamUtils.close((OutputStream) null);
             StreamUtils.close(new ByteArrayOutputStream());
+            StreamUtils.close(new ByteArrayOutputStream(){
+                @Override
+                public void close() throws IOException {
+                    throw new IOException("test");
+                }
+            });
+
+            StreamUtils.close((BufferedWriter) null);
+            StreamUtils.close(new BufferedWriter(new OutputStreamWriter(new ByteArrayOutputStream())));
+            StreamUtils.close(new BufferedWriter(new OutputStreamWriter(new ByteArrayOutputStream())){
+                @Override
+                public void close() throws IOException {
+                    throw new IOException("test");
+                }
+            });
+
             success = true;
         } finally {
             assertTrue (success);

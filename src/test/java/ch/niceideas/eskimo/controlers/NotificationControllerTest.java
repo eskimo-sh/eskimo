@@ -39,6 +39,7 @@ import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.services.NotificationService;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -59,6 +60,28 @@ public class NotificationControllerTest {
 
     @Autowired
     private NotificationService notificationService;
+
+    @BeforeEach
+    public void setUp() {
+        notificationService.clear();
+    }
+
+    @Test
+    public void testNominal() {
+        testFetchNotifications();
+
+        assertEquals ("{\n" +
+                "  \"lastLine\": 3,\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", notificationController.getLastlineMontoring());
+
+        notificationController.clearNotifications();
+
+        assertEquals ("{\n" +
+                "  \"lastLine\": 0,\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", notificationController.getLastlineMontoring());
+    }
 
     @Test
     public void testFetchNotifications() {
