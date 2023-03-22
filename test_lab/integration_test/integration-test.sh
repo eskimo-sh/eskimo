@@ -1542,10 +1542,16 @@ EOF
     for i in $(seq 1 60); do
          sleep 3
          task_manager_id=$(sshpass -p vagrant ssh vagrant@$BOX_IP "sudo su -c '/usr/local/bin/kubectl get pod | grep flink-runtime-taskmanager | cut -d \" \" -f 1' eskimo")
+
          if [[ $task_manager_id != "" ]]; then
+             running=$(sshpass -p vagrant ssh vagrant@$BOX_IP "sudo su -c '/usr/local/bin/kubectl get pod | grep $task_manager_id | grep Running' eskimo")
+             if [[ $running == "" ]]; then
+                 continue
+             fi
+
              sshpass -p vagrant ssh vagrant@$BOX_IP "sudo su -c '/usr/local/bin/kubectl logs $task_manager_id' eskimo" > /tmp/pyflink-tm.log
              if [[ $(grep -F '[consummation, 1]' /tmp/pyflink-tm.log) != "" ]]; then
-                 break;
+                 break
              fi
          fi
 

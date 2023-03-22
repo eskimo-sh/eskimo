@@ -44,6 +44,10 @@ function fail_if_error(){
     fi
 }
 
+if [[ $(echo $PATH | grep "/usr/local/bin") == "" ]]; then
+    export PATH=/usr/local/bin:$PATH
+fi
+
 
 # Take a lock with flock on the file identified as argument.
 # Using this function, the lock is not released automatically and it needs to be released with 'release_lock'.
@@ -479,7 +483,7 @@ function get_last_tag() {
     local last=0
 
     local TAGS
-    TAGS=$(docker image ls -a | grep $IMAGE | grep -v template | sed s/'  *'/' '/g | cut -d ' ' -f 2)
+    TAGS=$(docker image ls -a | grep -E "$IMAGE"'[\t ]+' | grep -v template | sed s/'  *'/' '/g | cut -d ' ' -f 2)
     for tag in $TAGS; do
         if [[ $tag != "latest" ]]; then
             __vercomp $last $tag
@@ -491,7 +495,7 @@ function get_last_tag() {
     done
 
     if [[ $last == 0 ]]; then # try to get it from registry
-        TAGS=$(curl -XGET http://kubernetes.registry:5000/v2/$IMAGE/tags/list 2>/dev/null | jq -r -c  ".tags | .[]" 2>/dev/null)
+        TAGS=$(curl -XGET http://kubernetes.registry:5000/v2/$IMAGE/tags/list 2>/dev/null | /usr/local/bin/jq -r -c  ".tags | .[]" 2>/dev/null)
         if [[ $? == 0 ]]; then
             for tag in $TAGS; do
                 if [[ $tag != "latest" ]]; then
