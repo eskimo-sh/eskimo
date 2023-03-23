@@ -53,8 +53,8 @@ ES_PID=$!
 
 echo " - Waiting for ElasticSearch to be successfuly started"
 sleep 10
-for i in $(seq 1 240); do
-    sleep 1
+for i in $(seq 1 60); do
+    sleep 5
     if [[ $(tail -20 /var/log/elasticsearch/eskimo.log  | grep Node | grep started) != "" ]]; then
         break
     fi
@@ -65,7 +65,7 @@ for i in $(seq 1 240); do
     fi
     if [[ $i == 100 ]]; then
         echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-        echo "Could not start elasticsearch successfully in 240 seconds"
+        echo "Could not start elasticsearch successfully in 300 seconds"
         exit 1
     fi
 done
