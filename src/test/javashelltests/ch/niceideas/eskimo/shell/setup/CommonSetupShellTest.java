@@ -160,7 +160,7 @@ public class CommonSetupShellTest {
 
         // no error reported
         assertEquals (" - Deploying cerebro Service in docker registry for kubernetes\n" +
-                " - removing local image\n" +
+                " - removing local image 'eskimo/cerebro:1'\n" +
                 " - Removing any previously deployed cerebro service from kubernetes\n" +
                 " - Deploying cerebro service in kubernetes\n", result);
 
@@ -284,12 +284,12 @@ public class CommonSetupShellTest {
                 " - Importing latest docker template for cerebro\n" +
                 "   + Decompressing archive\n" +
                 "   + Docker loading archive\n" +
-                " - Killing any previous containers\n" +
-                " - Finding new tag for container image\n" +
+                " - Killing any previous containers cerebro\n" +
+                " - Finding new tag for container image cerebro\n" +
                 " - Deleting previous container image tag 1\n" +
                 " - Attempting to delete it with registry tag as well\n" +
                 " - Searching for previous image tag 1 in registry to delete it (if appliable)\n" +
-                " - Building docker container from image eskimo/cerebro:2\n", result);
+                " - Building docker container with tag eskimo/cerebro:2\n", result);
 
         String dockerLogs = StreamUtils.getAsString(ResourceUtils.getResourceAsStream(jailPath + "/.log_docker"), StandardCharsets.UTF_8);
         if (StringUtils.isNotBlank(dockerLogs)) {

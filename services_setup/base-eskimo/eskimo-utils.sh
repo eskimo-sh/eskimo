@@ -44,7 +44,7 @@ function fail_if_error(){
     fi
 }
 
-if [[ $(echo $PATH | grep "/usr/local/bin") == "" ]]; then
+if [[ -z $TEST_MODE && $(echo $PATH | grep "/usr/local/bin") == "" ]]; then
     export PATH=/usr/local/bin:$PATH
 fi
 
@@ -495,7 +495,7 @@ function get_last_tag() {
     done
 
     if [[ $last == 0 ]]; then # try to get it from registry
-        TAGS=$(curl -XGET http://kubernetes.registry:5000/v2/$IMAGE/tags/list 2>/dev/null | /usr/local/bin/jq -r -c  ".tags | .[]" 2>/dev/null)
+        TAGS=$(curl -XGET http://kubernetes.registry:5000/v2/$IMAGE/tags/list 2>/dev/null | jq -r -c  ".tags | .[]" 2>/dev/null)
         if [[ $? == 0 ]]; then
             for tag in $TAGS; do
                 if [[ $tag != "latest" ]]; then
