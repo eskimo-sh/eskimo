@@ -65,6 +65,7 @@ public class KubeStatusParser {
         __STATUS_ERROR_IMAGE_PULL("ErrImagePull"),
         __STATUS_INVALID_IMAGE_NAME("InvalidImageName"),
         __STATUS_PENDING("Pending"),
+        __STATUS_COMPLETED("Completed"),
         NOT_OK("notOK"),
         NA("NA");
         @Getter
