@@ -38,6 +38,7 @@ package ch.niceideas.eskimo.controlers;
 import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.model.SimpleOperationCommand;
 import ch.niceideas.eskimo.services.OperationsMonitoringService;
+import ch.niceideas.eskimo.services.OperationsMonitoringServiceImpl;
 import ch.niceideas.eskimo.test.StandardSetupHelpers;
 import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
 import ch.niceideas.eskimo.test.infrastructure.SecurityContextHelper;
@@ -273,5 +274,34 @@ public class KubernetesServicesConfigControllerTest {
         assertEquals ("{\"status\": \"OK\"}", kscc.applyKubernetesServicesConfig(session));
 
         assertTrue(sessionContent.isEmpty());
+    }
+
+    @Test
+    public void testNoKubernetes() {
+
+        KubernetesServicesConfigController testController = new KubernetesServicesConfigController() {{
+                this.enableKubernetes = "false";
+                operationsMonitoringService = new OperationsMonitoringServiceImpl() {
+                    @Override
+                    public boolean isProcessingPending() {
+                        return false;
+                    }
+                };
+            }};
+
+        String clearStatus = new JSONObject(new HashMap<>() {{
+            put("status", "OK");
+            put("processingPending", false);
+            put("clear", KubernetesServicesConfigController.NOKUBERNETES);
+        }}).toString(2);
+
+        assertEquals (clearStatus, testController.applyKubernetesServicesConfig(null));
+
+        assertEquals (clearStatus, testController.loadKubernetesServicesConfig());
+
+        assertEquals (clearStatus, testController.reinstallKubernetesServiceConfig(null, null));
+
+        assertEquals (clearStatus, testController.saveKubernetesServicesConfig(null, null));
+
     }
 }
