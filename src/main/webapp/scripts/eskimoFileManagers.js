@@ -639,7 +639,7 @@ eskimo.FileManagers = function() {
 
         // close session on backend
         if (openedFileManager == null) {
-            that.eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "File Manager " + terminalToClose + " not found");
+            that.eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "File Manager " + nodeName + " not found");
         } else {
             $.ajaxGet({
                 url: "file-manager-remove?nodeAddress=" + openedFileManager.nodeAddress,

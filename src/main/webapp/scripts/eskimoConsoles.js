@@ -240,7 +240,7 @@ eskimo.Consoles = function() {
     }
     this.showNextTab = showNextTab;
 
-    function closeConsole (nodeName, terminalToClose) {
+    function closeConsole (nodeName) {
 
         //console.log (terminalToClose);
 
@@ -248,7 +248,7 @@ eskimo.Consoles = function() {
         let openedConsole = null;
         let closedConsoleNbr;
         for (closedConsoleNbr = 0; closedConsoleNbr < openedConsoles.length; closedConsoleNbr++) {
-            if (openedConsoles[closedConsoleNbr].nodeName == terminalToClose) {
+            if (openedConsoles[closedConsoleNbr].nodeName == nodeName) {
                 openedConsole = openedConsoles[closedConsoleNbr];
                 openedConsoles.splice(closedConsoleNbr, 1);
                 break;
@@ -263,7 +263,7 @@ eskimo.Consoles = function() {
 
         // close session on backend
         if (openedConsole == null) {
-            eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "Console " + terminalToClose + " not found");
+            eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "Console " + nodeName + " not found");
         } else {
             //console.log(openedConsole.terminal);
             $.ajaxGet({
@@ -339,8 +339,8 @@ eskimo.Consoles = function() {
             $("#consoles-console-content").append ($(consoleContent));
 
             $("#console-close-" + nodeName).click(function () {
-                let terminalToClose = this.id.substring("console-close-".length);
-                closeConsole (nodeName, terminalToClose);
+                let nodeToClose = this.id.substring("console-close-".length);
+                closeConsole (nodeToClose);
             });
 
             const t = new ajaxterm.Terminal("term_"+nodeName, {
