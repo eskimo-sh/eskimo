@@ -303,6 +303,13 @@ public class ScreenshotGenerator {
 
         wait(driver, 10000).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".note-folder-item a")));
 
+        driver.findElement(By.cssSelector("input[ng-model=\"$parent.query.q\"]")).sendKeys("Spark");
+
+        ActiveWaiter.wait(() -> {
+            Object result = js.executeScript("return $('.note-folder-item a:contains(\" Spark SQL Demo \")').length");
+            return result != null && result.toString().equals("1");
+        });
+
         // get spark SQL notebook ID
         Object notebookId = js.executeScript("return $('.note-folder-item a:contains(\" Spark SQL Demo \")').attr(\"href\").substring(11)");
         if (notebookId == null || StringUtils.isBlank(notebookId.toString())) {

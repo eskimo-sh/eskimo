@@ -70,6 +70,8 @@ public class ConnectionManagerServiceTestImpl extends ConnectionManagerServiceIm
     final List<String> createCalledFor = new ArrayList<>();
     final List<Node> dropCalledFor = new ArrayList<>();
 
+    final List<Node> sharedConnectionCalledFor = new ArrayList<>();
+
     private boolean doConnect = true;
 
     public List<String> getCreateCallFor() {
@@ -99,6 +101,7 @@ public class ConnectionManagerServiceTestImpl extends ConnectionManagerServiceIm
         dropCalledFor.clear();
         openedForwarders.clear();
         closedForwarders.clear();
+        sharedConnectionCalledFor.clear();
     }
 
     public void dontConnect() {
@@ -121,6 +124,10 @@ public class ConnectionManagerServiceTestImpl extends ConnectionManagerServiceIm
         return Collections.unmodifiableList(closedForwarders);
     }
 
+    public List<Node> getSharedConnectionCalledFor() {
+        return Collections.unmodifiableList(sharedConnectionCalledFor);
+    }
+
     @Override
     public SSHConnection getPrivateConnection(Node node) throws ConnectionManagerException {
         return super.getPrivateConnection(node);
@@ -128,6 +135,7 @@ public class ConnectionManagerServiceTestImpl extends ConnectionManagerServiceIm
 
     @Override
     public SSHConnection getSharedConnection(Node node) throws ConnectionManagerException {
+        sharedConnectionCalledFor.add(node);
         return super.getSharedConnection(node);
     }
 

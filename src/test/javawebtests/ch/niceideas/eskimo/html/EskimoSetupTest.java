@@ -70,27 +70,43 @@ public class EskimoSetupTest extends AbstractWebTest {
     }
 
     @Test
-    public void testSaveSetupMessages() {
+    public void testSaveSetupMessagesAndReset() {
+
+        js("$.showElement($('#inner-content-setup'))");
+
+        js("eskimoSetup.showSetup()");
 
         // add services menu
-        js("eskimoSetup.saveSetup()");
+        getElementById("save-setup-btn").click();
 
         //System.out.println (page.asXml());
 
         // should have displayed the error
-        assertJavascriptEquals ("3 : Configuration Storage path should be set", "window.lastAlert");
+        assertJavascriptEquals("3 : Configuration Storage path should be set", "window.lastAlert");
 
         js("$('#setup_storage').val('/tmp/test')");
 
-        js("eskimoSetup.saveSetup()");
+        getElementById("save-setup-btn").click();
 
-        assertJavascriptEquals ("3 : SSH Username to use to reach cluster nodes should be set", "window.lastAlert");
+        assertJavascriptEquals("3 : SSH Username to use to reach cluster nodes should be set", "window.lastAlert");
 
         js("$('#" + SetupService.SSH_USERNAME_FIELD + "').val('eskimo')");
 
-        js("eskimoSetup.saveSetup()");
+        getElementById("save-setup-btn").click();
 
-        assertJavascriptEquals ("3 : SSH Identity Private Key to use to reach cluster nodes should be set", "window.lastAlert");
+        assertJavascriptEquals("3 : SSH Identity Private Key to use to reach cluster nodes should be set", "window.lastAlert");
+    }
+
+    @Test
+    public void testReset() {
+
+        js("$.ajaxGet = function(callback) { window.calledUrl = callback.url; callback.success ({ \"status\" : \"OK\"}); }");
+
+        js("$.showElement($('#inner-content-setup'))");
+
+        getElementById("reset-setup-btn").click();
+
+       assertJavascriptEquals("load-setup", "window.calledUrl");
     }
 
     @Test
