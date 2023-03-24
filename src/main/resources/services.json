@@ -1682,7 +1682,7 @@
     "ui": {
       "urlTemplate": "./kibana/app/home",
       "proxyTargetPort" : 31562,
-      "waitTime": 8000,
+      "waitTime": 10000,
       "role" : "*",
       "title" : "Kibana",
       "applyStandardProxyReplacements": false,

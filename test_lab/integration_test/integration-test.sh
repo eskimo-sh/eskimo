@@ -325,9 +325,12 @@ wait_for_executor_unregistered() {
 __tmp_saved_dir=$(pwd)
 
 __dump_error() {
+  exit_code=$?
   __returned_to_saved_dir
-  echo "Last 20 lines of /tmp/integration-test.log are :"
-  tail -20 /tmp/integration-test.log
+  if [[ $exit_code != 0 ]]; then
+      echo "Last 20 lines of /tmp/integration-test.log are :"
+      tail -20 /tmp/integration-test.log
+  fi
   echo "(Do 'cat /tmp/integration-test.log' to know more)"
 }
 
@@ -1722,20 +1725,26 @@ test_web_apps() {
     echo_date " - Testing web applications"
 
     echo_date "   + testing Kibana answering (on berka dashboard)"
-    if [[ $(query_eskimo "kibana/api/saved_objects/dashboard/df24fd20-a7f9-11ea-956a-630da1c33bca" | grep migrationVersion) == "" ]]; then
+    local berkaDashboardResult=$(query_eskimo "kibana/api/saved_objects/dashboard/df24fd20-a7f9-11ea-956a-630da1c33bca")
+    if [[ $(echo $berkaDashboardResult | grep migrationVersion) == "" ]]; then
         echo_date "Couldn't reach Kibana dashboard"
+        echo $berkaDashboardResult >> /tmp/integration-test.log
         exit 101
     fi
 
     echo_date "   + testing cerebro"
-    if [[ $(query_eskimo "cerebro/api/v1/namespaces/eskimo/services/cerebro:31900/proxy/" | grep 'ng-app="cerebro"') == "" ]]; then
+    local cerebroResult=$(query_eskimo "cerebro/api/v1/namespaces/eskimo/services/cerebro:31900/proxy/")
+    if [[ $(echo $cerebroResult | grep 'ng-app="cerebro"') == "" ]]; then
         echo_date "Couldn't reach Cerebro"
+        echo $cerebroResult >> /tmp/integration-test.log
         exit 102
     fi
 
     echo_date "   + testing grafana (on system dashboard)"
-    if [[ $(query_eskimo "grafana/d/OMwJrHAWk/eskimo-system-wide-monitoring" | grep '<title>Grafana</title>') == "" ]]; then
+    local grafanaResult=$(query_eskimo "grafana/d/OMwJrHAWk/eskimo-system-wide-monitoring")
+    if [[ $(echo $grafanaResult | grep '<title>Grafana</title>') == "" ]]; then
         echo_date "Couldn't reach Grafana system dashboard"
+        echo $grafanaResult >> /tmp/integration-test.log
         exit 103
     fi
 
@@ -1749,8 +1758,10 @@ test_web_apps() {
 #    fi
 
     echo_date "   + testing spark console"
-    if [[ $(query_eskimo "spark-console/" | grep "Show incomplete applications") == "" ]]; then
+    local sparkConsoleResult=$(query_eskimo "spark-console/")
+    if [[ $(echo $sparkConsoleResult | grep "Show incomplete applications") == "" ]]; then
         echo_date "Couldn't reach Spark Console"
+        echo $sparkConsoleResult >> /tmp/integration-test.log
         exit 105
     fi
 
@@ -1762,8 +1773,10 @@ test_web_apps() {
     #fi
 
     echo_date "   + testing kafka-manager"
-    if [[ $(query_eskimo "kafka-manager/api/v1/namespaces/eskimo/services/kafka-manager:31220/proxy/" | grep "clusters/Eskimo") == "" ]]; then
+    local kafkaManagerResult=$(query_eskimo "kafka-manager/api/v1/namespaces/eskimo/services/kafka-manager:31220/proxy/")
+    if [[ $(echo $kafkaManagerResult | grep "clusters/Eskimo") == "" ]]; then
         echo_date "Couldn't reach Kafka-Manager"
+        echo $kafkaManagerResult >> /tmp/integration-test.log
         exit 106
     fi
 
@@ -2178,7 +2191,7 @@ if [[ "$1" != "" ]]; then
 fi
 
 trap __dump_error 15
-#trap __dump_error EXIT # Nope
+trap __dump_error EXIT # Nope
 trap __dump_error ERR
 
 if [[ ! -z $DEMO && ! -z $MULTIPLE_NODE ]]; then
