@@ -217,11 +217,13 @@ public abstract class AbstractWebTest {
         js("eskimoServices.serviceMenuServiceFoundHook = function (){};");
         js("eskimoServices.getServiceIcon = function (service) { return service + '-icon.png'; };");
         js("eskimoServices.isServiceAvailable = function (){ return true; };");
+        js("eskimoServices.initialize = function (){};");
 
         js("window.eskimoConsoles = {}");
         js("eskimoConsoles.setAvailableNodes = function () {};");
 
         js("window.eskimoServicesSelection = {" +
+                "  showServiceSelection: function(nodeNbr, onServicesSelectedForNode, isRange) { window.showServiceSelectionCalled = nodeNbr + '-' + typeof (onServicesSelectedForNode) + '-' + isRange; }" +
                 "}");
 
         js("window.eskimoOperationsCommand = {" +

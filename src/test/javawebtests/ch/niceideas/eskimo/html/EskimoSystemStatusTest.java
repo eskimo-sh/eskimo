@@ -158,6 +158,29 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
     }
 
     @Test
+    public void testFetchOperationResult() {
+        js("$.ajaxGet = function(callback) { " +
+                "    window.actionUrl = callback.url;" +
+                "    callback.success({'status': 'OK', 'success': 'operation OK'});\n" +
+                "    console.log(callback); " +
+                "}");
+
+        js("eskimoSystemStatus.fetchOperationResult()");
+
+        assertJavascriptEquals("true", "window.scheduleStopOperationInProgress");
+
+        js("$.ajaxGet = function(callback) { " +
+                "    window.actionUrl = callback.url;" +
+                "    callback.success({'status': 'KO', 'error': 'operation failed'});\n" +
+                "    console.log(callback); " +
+                "}");
+
+        js("eskimoSystemStatus.fetchOperationResult()");
+
+        assertJavascriptEquals("3 : operation failed", "window.lastAlert");
+    }
+
+    @Test
     public void testReinstallService() {
         js("$.ajaxGet = function(callback) { " +
                 "    window.actionUrl = callback.url;" +

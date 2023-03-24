@@ -115,6 +115,15 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     }
 
     @Test
+    public void testShowServiceSelection() {
+        testRenderNodesConfig();
+
+        getElementById("configure1").click();
+
+        assertJavascriptEquals("1-function-false", "window.showServiceSelectionCalled");
+    }
+
+    @Test
     public void testRenderNodesConfig() {
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetupRealWorld();

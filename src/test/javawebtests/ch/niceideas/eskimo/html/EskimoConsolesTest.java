@@ -57,6 +57,7 @@ public class EskimoConsolesTest extends AbstractWebTest {
         js("ajaxterm.Terminal = function(id, options) {\n" +
                 "this.setShowNextTab = function() {};\n" +
                 "this.setShowPrevTab = function() {};\n" +
+                "this.getSessionId = function() { return 123;};\n" +
                 "this.close = function () {if (!window.terminalCloseCalled) { window.terminalCloseCalled = []; }; window.terminalCloseCalled.push(id); };\n" +
                 "}\n");
 
@@ -116,6 +117,33 @@ public class EskimoConsolesTest extends AbstractWebTest {
                 "            Close\n" +
                 "        </button>\n" +
                 "    </div>\n", "$('#consoles-console-192-168-10-11').html()");
+    }
+
+    @Test
+    public void testCloseConsole() {
+
+        testClickOpenConsle();
+
+        js("$.ajaxGet = function (dataObj) {" +
+                "    window.ajaxGetUrl = dataObj.url;" +
+                "    dataObj.success({" +
+                "        'message' : 'OK'" +
+                "    });" +
+                "}");
+
+        js("eskimoConsoles.closeConsole('192-168-10-13')");
+
+        assertJavascriptEquals ("[\"term_192-168-10-13\"]", "JSON.stringify (window.terminalCloseCalled)");
+
+        assertJavascriptEquals("\n" +
+                "    <div id=\"term_192-168-10-11\" class=\"ajaxterm\" tabindex=\"0\"></div>\n" +
+                "    <div id=\"console-actions-192-168-10-11\">\n" +
+                "        <button id=\"console-close-192-168-10-11\" name=\"console-close-1\" class=\"btn btn-secondary\">\n" +
+                "            Close\n" +
+                "        </button>\n" +
+                "    </div>\n", "$('#consoles-console-192-168-10-11').html()");
+
+        assertJavascriptEquals("terminal-remove?session=123", "window.ajaxGetUrl");
     }
 
     @Test
