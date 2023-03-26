@@ -192,7 +192,7 @@ public class OperationsMonitoringServiceTest {
         OperationsMonitoringStatusWrapper operationsMonitoringStatus = operationsMonitoringService.getOperationsMonitoringStatus(new HashMap<>());
         assertNotNull (operationsMonitoringStatus);
 
-        System.err.println (operationsMonitoringStatus.getFormattedValue());
+        //System.err.println (operationsMonitoringStatus.getFormattedValue());
 
         OperationsMonitoringStatusWrapper expectedStatus = new OperationsMonitoringStatusWrapper (
                 StreamUtils.getAsString(ResourceUtils.getResourceAsStream("OperationsMonitoringServiceTest/expected-status.json"), StandardCharsets.UTF_8));

@@ -112,7 +112,7 @@ public class SystemOperationServiceTest {
                 "In operation\n" +
                 "--> Done : Executing command of test on test\n" +
                 "-------------------------------------------------------------------------------\n" +
-                "--> Completed Successfuly.\n", messages.getValue());
+                "--> Completed Successfully.\n", messages.getValue());
 
         Pair<Integer, List<JSONObject>> notifications = notificationService.fetchElements(0);
         assertNotNull (notifications);

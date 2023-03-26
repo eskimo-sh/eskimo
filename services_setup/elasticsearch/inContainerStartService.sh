@@ -51,7 +51,7 @@ echo " - Starting ElasticSearch"
 /usr/local/lib/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid &
 ES_PID=$!
 
-echo " - Waiting for ElasticSearch to be successfuly started"
+echo " - Waiting for ElasticSearch to be successfully started"
 sleep 10
 for i in $(seq 1 60); do
     sleep 5

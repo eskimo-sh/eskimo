@@ -56,7 +56,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
 @TestPropertySource("classpath:application-test.properties")
-@ActiveProfiles({"no-web-stack", "test-conf", "test-operations", "test-system", "test-services"})
+@ActiveProfiles({"no-web-stack", "test-conf", "test-operations", "test-system", "test-services", "test-kube"})
 public class SystemAdminControllerTest {
 
     @Autowired
@@ -106,13 +106,18 @@ public class SystemAdminControllerTest {
                 "  \"messages\": \"cluster-manager journal display from 192.168.10.11.\",\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", sac.showJournal("cluster-manager", "192.168.10.11"));
+
+        assertEquals ("{\n" +
+                "  \"messages\": \"Successfully shown journal of user-console.\",\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", sac.showJournal("user-console", "192.168.10.11"));
     }
 
     @Test
     public void testStartService() {
 
         assertEquals ("{\n" +
-                "  \"messages\": \"cluster-manager has been started successfuly on 192.168.10.11.\",\n" +
+                "  \"messages\": \"cluster-manager has been started successfully on 192.168.10.11.\",\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", sac.startService("cluster-manager", "192.168.10.11"));
 
@@ -122,33 +127,53 @@ public class SystemAdminControllerTest {
                 "  \"error\": \"Test Error\",\n" +
                 "  \"status\": \"KO\"\n" +
                 "}", sac.startService("cluster-manager", "192.168.10.11"));
+
+        assertEquals ("{\n" +
+                "  \"messages\": \"user-console has been started successfully on kubernetes.\",\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", sac.startService("user-console", "192.168.10.11"));
     }
 
     @Test
     public void testStopService() {
 
         assertEquals ("{\n" +
-                "  \"messages\": \"cluster-manager has been stopped successfuly on 192.168.10.11.\",\n" +
+                "  \"messages\": \"cluster-manager has been stopped successfully on 192.168.10.11.\",\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", sac.stopService("cluster-manager", "192.168.10.11"));
+
+        assertEquals ("{\n" +
+                "  \"messages\": \"user-console has been stopped successfully on kubernetes.\",\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", sac.stopService("user-console", "192.168.10.11"));
     }
 
     @Test
     public void testRestartService() {
 
         assertEquals ("{\n" +
-                "  \"messages\": \"cluster-manager has been restarted successfuly on 192.168.10.11.\",\n" +
+                "  \"messages\": \"cluster-manager has been restarted successfully on 192.168.10.11.\",\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", sac.restartService("cluster-manager", "192.168.10.11"));
+
+        assertEquals ("{\n" +
+                "  \"messages\": \"user-console has been restarted successfully on kubernetes.\",\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", sac.restartService("user-console", "192.168.10.11"));
     }
 
     @Test
     public void testServiceActionCustom() {
 
         assertEquals ("{\n" +
-                "  \"messages\": \"command show_log for cluster-manager has been executed successfuly on 192.168.10.11.\",\n" +
+                "  \"messages\": \"command show_log for cluster-manager has been executed successfully on 192.168.10.11.\",\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", sac.serviceActionCustom("show_log", "cluster-manager", "192.168.10.11"));
+
+        assertEquals ("{\n" +
+                "  \"messages\": \"command show_log for user-console has been executed successfully on 192.168.10.11.\",\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", sac.serviceActionCustom("show_log", "user-console", "192.168.10.11"));
     }
 
     @Test
@@ -179,11 +204,12 @@ public class SystemAdminControllerTest {
 
         configurationServiceTest.setStandard2NodesSetup();
         configurationServiceTest.setStandard2NodesInstallStatus();
+        configurationServiceTest.setStandardKubernetesConfig();
 
         assertEquals ("OK", configurationServiceTest.loadServicesInstallationStatus().getValueForPathAsString("cluster-manager_installed_on_IP_192-168-10-13"));
 
         assertEquals ("{\n" +
-                "  \"messages\": \"cluster-manager has been reinstalled successfuly on 192.168.10.13.\",\n" +
+                "  \"messages\": \"cluster-manager has been reinstalled successfully on 192.168.10.13.\",\n" +
                 "  \"status\": \"OK\"\n" +
                 "}", sac.reinstallService("cluster-manager", "192.168.10.13"));
 
@@ -191,6 +217,13 @@ public class SystemAdminControllerTest {
         assertNull (configurationServiceTest.loadServicesInstallationStatus().getValueForPathAsString("cluster-manager_installed_on_IP_192-168-10-13"));
 
         assertTrue(configurationServiceTest.isSaveServicesInstallationStatusCalled());
+
+        systemServiceTest.setStandard2NodesStatus();
+
+        assertEquals ("{\n" +
+                "  \"messages\": \"user-console has been reinstalled successfully on kubernetes.\",\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", sac.reinstallService("user-console", "192.168.10.13"));
     }
 
 }

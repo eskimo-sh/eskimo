@@ -319,7 +319,7 @@ public class SetupServiceTest {
 
         assertEquals("--> Done : Build of package cerebro\n" +
                         "-------------------------------------------------------------------------------\n" +
-                        "--> Completed Successfuly.",
+                        "--> Completed Successfully.",
                 String.join(",", messages));
 
         FileUtils.delete(packageDevPathTest);

@@ -89,7 +89,7 @@ public class SystemOperationServiceImpl implements SystemOperationService {
                 operationsMonitoringService.addInfo(operationId, "--> Done : "
                             + message
                             + "\n-------------------------------------------------------------------------------\n"
-                            + "--> Completed Successfuly.");
+                            + "--> Completed Successfully.");
 
                 notificationService.addInfo(message + " succeeded");
 

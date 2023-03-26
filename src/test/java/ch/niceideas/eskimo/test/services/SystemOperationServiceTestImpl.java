@@ -108,7 +108,7 @@ public class SystemOperationServiceTestImpl implements SystemOperationService {
                     operationsMonitoringService.addInfo(operationId, "--> Done : "
                             + message
                             + "\n-------------------------------------------------------------------------------\n"
-                            + "--> Completed Successfuly.");
+                            + "--> Completed Successfully.");
 
                 } catch (Exception e) {
                     logger.error(e, e);

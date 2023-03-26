@@ -128,12 +128,12 @@ public class SystemAdminController extends AbstractOperationController {
         if (serviceDef.isKubernetes()) {
             return performKubernetesOperation(
                     kubernetesService -> kubernetesService.startService(serviceDef, Node.fromAddress(nodeAddress)),
-                    serviceName + " has been started successfuly on kubernetes.");
+                    serviceName + " has been started successfully on kubernetes.");
 
         } else {
             return performSystemOperation(
                     sysService -> sysService.startService(serviceDef, Node.fromAddress(nodeAddress)),
-                    serviceName + " has been started successfuly on " + nodeAddress + ".");
+                    serviceName + " has been started successfully on " + nodeAddress + ".");
         }
     }
 
@@ -145,12 +145,12 @@ public class SystemAdminController extends AbstractOperationController {
         if (serviceDef.isKubernetes()) {
             return performKubernetesOperation(
                     kubernetesService -> kubernetesService.stopService(serviceDef, Node.fromAddress(nodeAddress)),
-                    serviceName + " has been stopped successfuly on kubernetes.");
+                    serviceName + " has been stopped successfully on kubernetes.");
 
         } else {
             return performSystemOperation(
                     sysService -> sysService.stopService(serviceDef, Node.fromAddress(nodeAddress)),
-                    serviceName + " has been stopped successfuly on " + nodeAddress + ".");
+                    serviceName + " has been stopped successfully on " + nodeAddress + ".");
         }
     }
 
@@ -162,12 +162,12 @@ public class SystemAdminController extends AbstractOperationController {
         if (serviceDef.isKubernetes()) {
             return performKubernetesOperation(
                     kubernetesService -> kubernetesService.restartService(serviceDef, Node.fromAddress(nodeAddress)),
-                    serviceName + " has been restarted successfuly on kubernetes.");
+                    serviceName + " has been restarted successfully on kubernetes.");
 
         } else {
             return performSystemOperation(
                     sysService -> sysService.restartService(serviceDef, Node.fromAddress(nodeAddress)),
-                    serviceName + " has been restarted successfuly on " + nodeAddress + ".");
+                    serviceName + " has been restarted successfully on " + nodeAddress + ".");
         }
     }
 
@@ -179,7 +179,7 @@ public class SystemAdminController extends AbstractOperationController {
             @RequestParam(name="nodeAddress") String nodeAddress) {
         return performSystemOperation(
                 sysService -> sysService.callCommand(commandId, Service.from(serviceName), Node.fromAddress(nodeAddress)),
-                "command " + commandId + " for " + serviceName + " has been executed successfuly on " + nodeAddress + ".");
+                "command " + commandId + " for " + serviceName + " has been executed successfully on " + nodeAddress + ".");
     }
 
     @GetMapping("/reinstall-service")
@@ -240,7 +240,7 @@ public class SystemAdminController extends AbstractOperationController {
 
                 return performSystemOperation(
                         sysService -> sysService.delegateApplyNodesConfig(operationsCommand),
-                        serviceName + " has been reinstalled successfuly on " + node + ".");
+                        serviceName + " has been reinstalled successfully on " + node + ".");
             }
         } catch (SetupException | SystemException | FileException | JSONException | NodesConfigurationException e) {
             logger.error(e, e);
