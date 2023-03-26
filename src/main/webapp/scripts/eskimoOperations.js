@@ -67,10 +67,10 @@ eskimo.Operations = function() {
                     return false;
                 });
 
-                $("#interupt-operations-btn").click(e => {
+                $("#interrupt-operations-btn").click(e => {
                     $("#operations-title").html("<h3>Operations pending .... <strong>(Interrupting ...)</strong></h3>");
                     $.ajaxGet({
-                        url: "interupt-processing",
+                        url: "interrupt-processing",
                         success: function (data, status, jqXHR2) {
                         },
                         error: errorHandler
@@ -100,9 +100,9 @@ eskimo.Operations = function() {
 
     function setOperationInProgress (pendingOp) {
         if (pendingOp) {
-            $("#interupt-operations-btn").attr("class", "btn btn-danger");
+            $("#interrupt-operations-btn").attr("class", "btn btn-danger");
         } else {
-            $("#interupt-operations-btn").attr("class", "btn btn-danger disabled");
+            $("#interrupt-operations-btn").attr("class", "btn btn-danger disabled");
         }
     }
     this.setOperationInProgress = setOperationInProgress;
@@ -119,6 +119,7 @@ eskimo.Operations = function() {
     function hideLogs () {
         $('#operation-log-modal').modal('hide');
     }
+    this.hideLogs = hideLogs;
 
     function showLogs (operation) {
         if (!messagesStore[operation]) {

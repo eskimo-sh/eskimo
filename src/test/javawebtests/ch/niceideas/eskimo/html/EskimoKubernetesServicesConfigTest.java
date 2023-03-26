@@ -254,6 +254,11 @@ public class EskimoKubernetesServicesConfigTest extends AbstractWebTest {
     @Test
     public void testShowKubernetesServicesConfig() {
 
+        js("eskimoKubernetesServicesConfig.showKubernetesServicesConfig()");
+
+        assertCssValue("#inner-content-kubernetes-services-config", "visibility", "visible");
+        assertCssValue("#inner-content-kubernetes-services-config", "display", "block");
+
         // 1. setup not OK
         js("eskimoMain.isSetupDone = function () { return false; }");
         js("eskimoMain.showSetupNotDone = function () { window.setupNotDoneCalled = true; }");

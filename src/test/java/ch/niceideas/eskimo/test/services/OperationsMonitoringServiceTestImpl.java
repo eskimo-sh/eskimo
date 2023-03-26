@@ -58,7 +58,7 @@ import java.util.Map;
 @Profile("test-operations")
 public class OperationsMonitoringServiceTestImpl implements OperationsMonitoringService {
 
-    private boolean interuptProcessingError = false;
+    private boolean interruptProcessingError = false;
 
     private JSONOpCommand currentOperation = null;
     private boolean lastOperationSuccess = false;
@@ -69,7 +69,7 @@ public class OperationsMonitoringServiceTestImpl implements OperationsMonitoring
     private MessagingManager messagingManager = new MessagingManager();
 
     public void reset() {
-        this.interuptProcessingError = false;
+        this.interruptProcessingError = false;
         this.currentOperation = null;
         this.lastOperationSuccess = false;
         this.lastOperationSuccessError = false;
@@ -85,8 +85,8 @@ public class OperationsMonitoringServiceTestImpl implements OperationsMonitoring
         this.lastOperationSuccessError = true;
     }
 
-    public void setInteruptProcessingError() {
-        this.interuptProcessingError = true;
+    public void setInterruptProcessingError() {
+        this.interruptProcessingError = true;
     }
 
     @Override
@@ -120,7 +120,7 @@ public class OperationsMonitoringServiceTestImpl implements OperationsMonitoring
 
     @Override
     public void interruptProcessing() {
-        if (interuptProcessingError) {
+        if (interruptProcessingError) {
             throw new JSONException("Test Error");
         }
     }

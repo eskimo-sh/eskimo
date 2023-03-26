@@ -111,6 +111,18 @@ public class EskimoFileManagersTest extends AbstractWebTest {
         assertJavascriptEquals("/", "eskimoFileManagers.getOpenedFileManagers()[0].current");
     }
 
+    /*
+    @Test
+    public void testConnectFileManager() {
+        fail ("To Be Implemented");
+    }
+
+    @Test
+    public void testOpenFolder() {
+        fail ("To Be Implemented");
+    }
+    */
+
     @Test
     public void testNodeVanish() {
 

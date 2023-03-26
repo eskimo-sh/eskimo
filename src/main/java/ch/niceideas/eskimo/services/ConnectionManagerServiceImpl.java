@@ -158,6 +158,7 @@ public class ConnectionManagerServiceImpl implements ConnectionManagerService{
             for (LocalPortForwarderWrapper localPortForwarder : getForwarders(connection)) {
                 localPortForwarder.close();
             }
+            portForwardersMap.remove(connection);
 
             connection.close();
         } catch (Exception e) {

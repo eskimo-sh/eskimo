@@ -243,6 +243,10 @@ public class HttpObjectsHelper {
                             return headers.put((String) methodArgs[0], methodArgs[1]);
                         case "setIntHeader":
                             return headers.put((String) methodArgs[0], methodArgs[1]);
+                        case "setHeader":
+                            return headers.put((String) methodArgs[0], methodArgs[1]);
+                        case "flushBuffer" :
+                            return null;
                         default:
                             throw new UnsupportedOperationException(
                                     "Unsupported method: " + method.getName());

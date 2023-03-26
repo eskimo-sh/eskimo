@@ -150,6 +150,9 @@ public class EskimoConsolesTest extends AbstractWebTest {
     public void testShowConsoles() {
         js("eskimoConsoles.showConsoles()");
 
+        assertCssValue("#inner-content-consoles", "visibility", "visible");
+        assertCssValue("#inner-content-consoles", "display", "block");
+
         assertNotNull (getElementById("console_open_192-168-10-11"));
         assertEquals ("192.168.10.11", getElementById("console_open_192-168-10-11").getText());
 

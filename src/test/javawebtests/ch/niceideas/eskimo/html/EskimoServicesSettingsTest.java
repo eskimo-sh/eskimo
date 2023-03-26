@@ -99,11 +99,20 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
     }
 
     @Test
-    public void testSaveServicesSettingsWithButton() {
+    public void testShowServicesSettings() {
 
         js("$.ajaxGet = function(callback) { console.log(callback); }");
 
         js("eskimoServicesSettings.showServicesSettings();");
+
+        assertCssValue("#inner-content-services-settings", "visibility", "visible");
+        assertCssValue("#inner-content-services-settings", "display", "block");
+    }
+
+    @Test
+    public void testSaveServicesSettingsWithButton() {
+
+        testShowServicesSettings();
 
         js("$.ajaxPost = function(object) {" +
                 "    object.success({status: \"OK\", command: true})" +

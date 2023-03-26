@@ -182,6 +182,14 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     }
 
     @Test
+    public void testShowNodesConfig() {
+        js("eskimoNodesConfig.showNodesConfig();");
+
+        assertCssValue("#inner-content-nodes-config", "visibility", "visible");
+        assertCssValue("#inner-content-nodes-config", "display", "block");
+    }
+
+    @Test
     public void testShowNodesConfigWithResetButton() {
 
         js("eskimoMain.isSetupDone = function () { return true; }");

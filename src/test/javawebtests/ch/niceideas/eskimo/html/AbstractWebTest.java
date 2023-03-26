@@ -312,7 +312,7 @@ public abstract class AbstractWebTest {
                 "    setAvailableNodes : function () {},\n"+
                 "    menuResize : function () {},\n"+
                 "    isSetupDone : function () { return true; },\n"+
-                "    hideProgressbar : function () { },\n"+
+                "    hideProgressbar : function () { window.hideProgressbarCalled = true;},\n"+
                 "    isCurrentDisplayedScreen : function () { return false; },\n"+
                 "    setSetupLoaded : function () {},\n"+
                 "    startOperationInProgress : function() { window.startOperationInProgessCalled = true; },\n"+

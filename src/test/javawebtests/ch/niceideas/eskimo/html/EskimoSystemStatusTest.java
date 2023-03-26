@@ -332,6 +332,9 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         js("eskimoSystemStatus.showStatus()");
 
+        assertCssValue("#inner-content-status", "visibility", "visible");
+        assertCssValue("#inner-content-status", "display", "block");
+
         //System.err.println (page.asXml());
 
         ActiveWaiter.wait(() -> js("return $('#status-node-table-body').html()").toString().contains("192.168.10.1"));

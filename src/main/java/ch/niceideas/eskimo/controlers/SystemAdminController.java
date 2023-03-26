@@ -71,7 +71,7 @@ public class SystemAdminController extends AbstractOperationController {
     @Autowired
     private NodeRangeResolver nodeRangeResolver;
 
-    @GetMapping("/interupt-processing")
+    @GetMapping("/interrupt-processing")
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     public String interruptProcessing() {

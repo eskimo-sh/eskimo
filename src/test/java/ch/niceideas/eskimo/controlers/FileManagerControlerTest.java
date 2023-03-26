@@ -35,7 +35,10 @@
 
 package ch.niceideas.eskimo.controlers;
 
+import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.eskimo.EskimoApplication;
+import ch.niceideas.eskimo.test.infrastructure.HttpObjectsHelper;
+import org.apache.catalina.ssi.ByteArrayServletOutputStream;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,10 +47,17 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.lang.reflect.Proxy;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
@@ -168,5 +178,24 @@ public class FileManagerControlerTest {
                 "  \"error\": \"Test Error\",\n" +
                 "  \"status\": \"KO\"\n" +
                 "}", fmc.openFile("192.168.10.16", "/etc/", "passwd"));
+    }
+
+    @Test
+    public void testDownloadFile() throws Exception {
+
+        File tempFile = File.createTempFile("test", "fmc");
+        assertTrue (tempFile.delete());
+
+        FileUtils.writeFile(tempFile, "test content");
+
+        ByteArrayServletOutputStream baos = new ByteArrayServletOutputStream();
+
+        Map<String, Object> headers = new HashMap<>();
+
+        HttpServletResponse response = HttpObjectsHelper.createHttpServletResponse(headers, baos);
+
+        fmc.downloadFile("192.168.56.21", tempFile.getParent(), tempFile.getName(), response);
+
+        assertEquals ("test content", new String (baos.toByteArray(), StandardCharsets.UTF_8));
     }
 }

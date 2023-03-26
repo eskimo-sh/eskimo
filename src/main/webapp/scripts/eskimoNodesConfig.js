@@ -302,7 +302,9 @@ eskimo.NodesConfig = function() {
 
                 console.log (data);
 
-                $("#nodes-placeholder").html("");
+                const $nodesPlaceholder = $("#nodes-placeholder");
+
+                $nodesPlaceholder.html("");
                 nodes = [];
 
                 if (!data.clear) {
@@ -310,7 +312,7 @@ eskimo.NodesConfig = function() {
                     that.renderNodesConfig(data);
 
                 } else if (data.clear == "missing") {
-                    $("#nodes-placeholder").html(''+
+                    $nodesPlaceholder.html(''+
                         '<div class="col-lg-4 col-md-6 col-sm-8 col-xs-12">\n' +
                         '    <address>(No nodes / services configured yet)</address>\n' +
                         '</div>');

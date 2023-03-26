@@ -35,9 +35,15 @@
 
 package ch.niceideas.eskimo.test.services;
 
+import ch.niceideas.common.utils.FileException;
+import ch.niceideas.common.utils.FileUtils;
 import ch.niceideas.common.utils.Pair;
+import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.services.ConnectionManagerException;
 import ch.niceideas.eskimo.services.FileManagerService;
+import ch.niceideas.eskimo.services.SSHCommandException;
 import ch.niceideas.eskimo.types.Node;
+import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -45,15 +51,21 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.stream.Stream;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 @Profile("test-file-manager")
 public class FileManagerServiceTestImpl implements FileManagerService {
+
+    private static final Logger logger = Logger.getLogger(FileManagerServiceTestImpl.class);
 
     @Override
     public void removeFileManager(Node node) {
@@ -120,7 +132,18 @@ public class FileManagerServiceTestImpl implements FileManagerService {
 
     @Override
     public void downloadFile(Node node, String folder, String file, HttpServletResponseAdapter response) {
+        try {
+            // download a local file
+            // get your file as InputStream
+            InputStream is = new ByteArrayInputStream(FileUtils.readFile(new File(new File (folder), file)).getBytes(StandardCharsets.UTF_8));
 
+            // copy it to response's OutputStream
+            StreamUtils.copy(is, response.getOutputStream());
+
+        } catch (IOException | FileException ex) {
+            logger.error("Download error. Filename was " + file, ex);
+            throw new FileDownloadException("Download error. Filename was " + file, ex);
+        }
     }
 
     @Override

@@ -70,11 +70,17 @@ public class EskimoSetupTest extends AbstractWebTest {
     }
 
     @Test
+    public void testShowSetup() {
+        js("eskimoSetup.showSetup()");
+
+        assertCssValue("#inner-content-setup", "visibility", "visible");
+        assertCssValue("#inner-content-setup", "display", "block");
+    }
+
+    @Test
     public void testSaveSetupMessagesAndReset() {
 
-        js("$.showElement($('#inner-content-setup'))");
-
-        js("eskimoSetup.showSetup()");
+        testShowSetup();
 
         // add services menu
         getElementById("save-setup-btn").click();
@@ -102,7 +108,7 @@ public class EskimoSetupTest extends AbstractWebTest {
 
         js("$.ajaxGet = function(callback) { window.calledUrl = callback.url; callback.success ({ \"status\" : \"OK\"}); }");
 
-        js("$.showElement($('#inner-content-setup'))");
+        testShowSetup();
 
         getElementById("reset-setup-btn").click();
 

@@ -91,7 +91,7 @@ public class SystemAdminControllerTest {
 
         assertEquals ("{\"status\": \"OK\"}", sac.interruptProcessing());
 
-        operationsMonitoringServiceTest.setInteruptProcessingError();
+        operationsMonitoringServiceTest.setInterruptProcessingError();
 
         assertEquals ("{\n" +
                 "  \"error\": \"Test Error\",\n" +

@@ -43,6 +43,8 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class EskimoOperationsTest extends AbstractWebTest {
 
     @BeforeEach
@@ -59,19 +61,40 @@ public class EskimoOperationsTest extends AbstractWebTest {
         // instantiate test object
         js("eskimoOperations = new eskimo.Operations()");
 
+        js("eskimoOperations.eskimoMain = eskimoMain");
+
         js("eskimoOperations.initialize();");
 
         waitForElementIdInDOM("operation-log-button-cancel");
     }
 
     @Test
-    public void testInteruptOperations() {
+    public void testShowOperations() {
+        js("eskimoOperations.showOperations();");
+
+        assertJavascriptEquals("true", "window.hideProgressbarCalled");
+
+        assertCssValue("#inner-content-operations", "visibility", "visible");
+        assertCssValue("#inner-content-operations", "display", "block");
+    }
+
+    @Test
+    public void testSetOperationInProgress() {
+        js("eskimoOperations.setOperationInProgress(false);");
+        assertAttrValue("#interrupt-operations-btn", "class", "btn btn-danger disabled");
+
+        js("eskimoOperations.setOperationInProgress(true);");
+        assertAttrValue("#interrupt-operations-btn", "class", "btn btn-danger");
+    }
+
+    @Test
+    public void testInterruptOperations() {
 
         js("$.ajaxGet = function(obj) { window.objUrl = obj.url }");
 
-        getElementById("interupt-operations-btn").click();
+        getElementById("interrupt-operations-btn").click();
 
-        assertJavascriptEquals("interupt-processing", "window.objUrl ");
+        assertJavascriptEquals("interrupt-processing", "window.objUrl ");
     }
 
     @Test
@@ -91,6 +114,28 @@ public class EskimoOperationsTest extends AbstractWebTest {
     public void testUpdateMessagesAndShowLogs() throws Exception {
         testRenderLabels();
 
+        js("eskimoOperations.showLogs('Installation_Topology-All-Nodes');");
+
+        assertJavascriptEquals("(no log received yet for operation)", "$('#log-message-content').html()");
+
+        js("eskimoOperations.updateMessages(" +
+                "[\n" +
+                "  {\n" +
+                "    \"operation\": \"Installation_Topology-All-Nodes\",\n" +
+                "    \"label\": \"Installation of Topology (All Nodes) on kubernetes\"\n" +
+                "  }]" +
+                ", " +
+                " { \"Installation_Topology-All-Nodes\": {\n" +
+                "    \"lines\": \"\",\n" +
+                "    \"lastLine\": 0\n" +
+                "  } " +
+                "}" +
+                ");");
+
+        js("eskimoOperations.showLogs('Installation_Topology-All-Nodes');");
+
+        assertJavascriptEquals("(no log received yet for operation)", "$('#log-message-content').html()");
+
         js("eskimoOperations.updateMessages("
                 + new JSONArray(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsTest/labels.json"), StandardCharsets.UTF_8))
                 + ", "
@@ -105,6 +150,11 @@ public class EskimoOperationsTest extends AbstractWebTest {
                         "--&gt; Completed Successfuly.\n",
                 "$('#log-message-content').html()");
 
+        assertJavascriptEquals("true", "$('#operation-log-modal').is(':visible')");
+
+        js("eskimoOperations.hideLogs();");
+
+        assertJavascriptEquals("false", "$('#operation-log-modal').is(':visible')");
     }
 
     @Test
@@ -137,6 +187,13 @@ public class EskimoOperationsTest extends AbstractWebTest {
                 "$('.progress-operation-wrapper').length");
     }
 
+    /*
+    @Test
+    public void testFetchOperationStatus() {
+        fail ("To Be Implemented");
+    }
+    */
+
     @Test
     public void testStartStopOperationInprogress() {
 
@@ -161,7 +218,6 @@ public class EskimoOperationsTest extends AbstractWebTest {
 
         assertJavascriptEquals("<h3>Operations completed successfully.</h3>",
                 "$('#operations-title').html()");
-
     }
 
 }
