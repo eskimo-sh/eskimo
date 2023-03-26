@@ -54,33 +54,6 @@ public class EskimoMenuTest extends AbstractWebTest {
 
         js("window.eskimoFlavour = \"CE\";");
 
-        // redefine constructor
-        js("eskimo.Setup = function(){ this.initialize = function(){};  };");
-        js("eskimo.NodesConfig = function(){ this.initialize = function(){};  };");
-        js("eskimo.SystemStatus = function(){ " +
-                "   this.initialize = function(){};\n" +
-                "   this.serviceIsUp = function() {return true;} " +
-                "};");
-        js("eskimo.Consoles = function(){ this.initialize = function(){}; };");
-        js("eskimo.Services = function(){" +
-                "   this.handleServiceHiding = function() {};" +
-                "   this.initialize =  function() {}; " +
-                "   this.isServiceAvailable = function() { return true; }" +
-                "};");
-        js("eskimo.ServicesSelection = function(){ this.initialize = function(){}; };");
-        js("eskimo.ServicesSettings = function(){ this.initialize = function(){}; };");
-        js("eskimo.KubernetesServicesConfig = function(){ this.initialize = function(){}; };");
-        js("eskimo.KubernetesServicesSelection = function(){ this.initialize = function(){}; };");
-        js("eskimo.FileManagers = function(){ this.initialize = function(){} ;};");
-        js("eskimo.Setup = function(){ this.initialize = function(){} ;};");
-        js("eskimo.About = function(){ this.initialize = function(){}; };");
-        js("eskimo.EditUser = function(){ this.initialize = function(){}; };");
-        js("eskimo.Alert = function(){ this.showAlert = function (level, message) {window.lastAlert = level + \" : \" + message} };");
-
-        js("window.eskimoSystemStatus = new eskimo.SystemStatus();");
-        js("window.eskimoServices = new eskimo.Services();");
-        js("window.eskimoAlert = new eskimo.Alert();");
-
         // Don0t let jquery load real eskimoMain
         js("$.fn.ready = function () {};");
 
@@ -127,14 +100,104 @@ public class EskimoMenuTest extends AbstractWebTest {
 
         // instantiate test object
         js("eskimoMenu = new eskimo.Menu();");
-        js("eskimoMenu.initialize();");
 
+        js("eskimoMenu.eskimoConsoles = eskimoConsoles;");
         js("eskimoMenu.eskimoNodesConfig = eskimoNodesConfig;");
         js("eskimoMenu.eskimoSystemStatus = eskimoSystemStatus;");
         js("eskimoMenu.eskimoServices = eskimoServices;");
         js("eskimoMenu.eskimoAlert = eskimoAlert;");
+        js("eskimoMenu.eskimoFileManagers = eskimoFileManagers;");
+        js("eskimoMenu.eskimoSetup = eskimoSetup;");
+        js("eskimoMenu.eskimoServicesSettings = eskimoServicesSettings;");
+        js("eskimoMenu.eskimoKubernetesServicesConfig = eskimoKubernetesServicesConfig;");
+        js("eskimoMenu.eskimoOperations = eskimoOperations;");
+
+        js("eskimoMenu.initialize();");
 
         waitForElementIdInDOM("main-menu-show-operations-link");
+    }
+
+    @Test
+    public void testSidebarMouseover() {
+        js("$('body').append($('<div id=\"simplebar-content-wrapper\" class=\"simplebar-content-wrapper\"></div>'))");
+        js("$('body').append($('<div id=\"simplebar-offset\" class=\"simplebar-offset\"></div>'))");
+        js("$('body').append($('<div id=\"side-nav-item\" class=\"side-nav-item\"></div>'))");
+
+        js("eskimoMenu.offsetLeft = 0");
+
+
+        js("document.getElementsByTagName('html')[0].setAttribute('data-sidenav-size', 'full');");
+
+        js("$('.simplebar-offset').css('width', '260px')");
+        js("$('.simplebar-content-wrapper').css('width', '260px')");
+
+        js("eskimoMenu.sidebarMouseover({pageX: 50});");
+
+        assertJavascriptEquals("", "$('.simplebar-offset').get(0).style.width");
+        assertJavascriptEquals("", "$('.simplebar-content-wrapper').get(0).style.width");
+        assertJavascriptEquals("side-nav-title side-nav-item", "$('.side-nav-item').attr('class')");
+
+        js("$('.simplebar-offset').css('width', '260px')");
+        js("$('.simplebar-content-wrapper').css('width', '260px')");
+
+        js("eskimoMenu.sidebarMouseover({pageX: 300});");
+
+        assertJavascriptEquals("", "$('.simplebar-offset').get(0).style.width");
+        assertJavascriptEquals("", "$('.simplebar-content-wrapper').get(0).style.width");
+        assertJavascriptEquals("side-nav-title side-nav-item nohover", "$('.side-nav-item').attr('class')");
+
+
+        js("document.getElementsByTagName('html')[0].setAttribute('data-sidenav-size', 'condensed');");
+
+        js("$('.simplebar-offset').css('width', '260px')");
+        js("$('.simplebar-content-wrapper').css('width', '260px')");
+
+        js("eskimoMenu.sidebarMouseover({pageX: 50});");
+
+        assertJavascriptEquals("260px", "$('.simplebar-offset').get(0).style.width");
+        assertJavascriptEquals("260px", "$('.simplebar-content-wrapper').get(0).style.width");
+        assertJavascriptEquals("side-nav-title side-nav-item", "$('.side-nav-item').attr('class')");
+
+        js("$('.simplebar-offset').css('width', '260px')");
+        js("$('.simplebar-content-wrapper').css('width', '260px')");
+
+        js("eskimoMenu.sidebarMouseover({pageX: 300});");
+
+        assertJavascriptEquals("", "$('.simplebar-offset').get(0).style.width");
+        assertJavascriptEquals("", "$('.simplebar-content-wrapper').get(0).style.width");
+        assertJavascriptEquals("side-nav-title side-nav-item nohover", "$('.side-nav-item').attr('class')");
+
+
+        js("document.getElementsByTagName('html')[0].setAttribute('data-sidenav-size', 'minimized');");
+
+        js("$('.simplebar-offset').css('width', '260px')");
+        js("$('.simplebar-content-wrapper').css('width', '260px')");
+
+        js("eskimoMenu.sidebarMouseover({pageX: 50});");
+
+        assertJavascriptEquals("", "$('.simplebar-offset').get(0).style.width");
+        assertJavascriptEquals("", "$('.simplebar-content-wrapper').get(0).style.width");
+        assertJavascriptEquals("side-nav-title side-nav-item", "$('.side-nav-item').attr('class')");
+
+        js("$('.simplebar-offset').css('width', '260px')");
+        js("$('.simplebar-content-wrapper').css('width', '260px')");
+
+        js("eskimoMenu.sidebarMouseover({pageX: 300});");
+
+        assertJavascriptEquals("", "$('.simplebar-offset').get(0).style.width");
+        assertJavascriptEquals("", "$('.simplebar-content-wrapper').get(0).style.width");
+        assertJavascriptEquals("side-nav-title side-nav-item nohover", "$('.side-nav-item').attr('class')");
+    }
+
+    @Test
+    public void testHandleKubeMenuDisplay() {
+        js("eskimoMenu.handleKubeMenuDisplay(false);");
+
+        assertJavascriptEquals("side-nav-item disabled visually-hidden", "$('#menu-kubernetes-configuration').attr('class')");
+
+        js("eskimoMenu.handleKubeMenuDisplay(true);");
+
+        assertJavascriptEquals("side-nav-item disabled", "$('#menu-kubernetes-configuration').attr('class')");
     }
 
     @Test
@@ -215,6 +278,16 @@ public class EskimoMenuTest extends AbstractWebTest {
         js("eskimoMenu.serviceMenuClear(nodeServiceStatus);");
 
         assertJavascriptEquals ("side-nav-item folder-menu-items menuitem-active", "$('#folderMenuKibana').attr('class')");
+
+        js("eskimoMenu.serviceMenuClear();");
+
+        assertJavascriptEquals ("side-nav-item folder-menu-items disabled", "$('#folderMenuKibana').attr('class')");
+
+        js("eskimoServices.isServiceAvailable = function (){ return false; };");
+
+        js("eskimoMenu.serviceMenuClear(nodeServiceStatus);");
+
+        assertJavascriptEquals ("side-nav-item folder-menu-items disabled", "$('#folderMenuKibana').attr('class')");
     }
 
     @Test

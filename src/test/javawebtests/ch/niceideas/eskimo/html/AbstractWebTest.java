@@ -214,10 +214,13 @@ public abstract class AbstractWebTest {
     private void initDriver() {
         // create mock functions
         js("window.eskimoServices = {};");
+        js("eskimoServices.handleServiceHiding = function (){};");
         js("eskimoServices.serviceMenuServiceFoundHook = function (){};");
         js("eskimoServices.getServiceIcon = function (service) { return service + '-icon.png'; };");
         js("eskimoServices.isServiceAvailable = function (){ return true; };");
         js("eskimoServices.initialize = function (){};");
+
+        js("window.eskimoKubernetesServicesConfig = {}");
 
         js("window.eskimoConsoles = {}");
         js("eskimoConsoles.setAvailableNodes = function () {};");
@@ -250,12 +253,16 @@ public abstract class AbstractWebTest {
 
 
         js("window.eskimoSetupCommand = {}");
-        js("window.eskimoAlert = {}");
+        js("window.eskimoAlert = {" +
+                "showAlert : function (level, message) {window.lastAlert = level + \" : \" + message} }");
         js("window.eskimoApp = {}");
+        js("window.eskimoAbout = {}");
         js("window.eskimoMenu = { createServicesMenu: function() {}, serviceMenuClear: function(){} }");
 
         js("window.eskimoFileManagers = {};");
         js("eskimoFileManagers.setAvailableNodes = function() {};");
+
+        js("window.eskimoKubernetesServicesSelection = function(){ this.initialize = function(){}; };");
 
         js("window.eskimoServicesSettings = {};");
 
@@ -277,6 +284,7 @@ public abstract class AbstractWebTest {
 
         js("window.eskimoSystemStatus = {};");
         js("eskimoSystemStatus.showStatus = function () {};");
+        js("eskimoSystemStatus.serviceIsUp = function() {return true;}");
         js("eskimoSystemStatus.updateStatus = function () {};");
         js("eskimoSystemStatus.isDisconnected = function () {return false; };");
 

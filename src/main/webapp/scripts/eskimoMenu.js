@@ -116,6 +116,7 @@ eskimo.Menu = function() {
             $(".side-nav-item").removeClass("nohover");
         }
     }
+    this.sidebarMouseover = sidebarMouseover;
 
     this.adaptMenuToUserRole = function () {
 
