@@ -515,7 +515,7 @@ initial_setup_eskimo() {
     echo_date " - CALL Fetching status"
     status=$(curl -b $SCRIPT_DIR/cookies http://$ESKIMO_ROOT/get-status 2> /dev/null)
     if [[ $(echo $status | jq -r '.status') != "OK" ]]; then
-        echo "Couldn't successfuly fetch status !"
+        echo "Couldn't successfully fetch status !"
         echo "Got status : $status"
         exit 4
     fi
@@ -552,7 +552,7 @@ setup_eskimo() {
 #    echo_date " - CALL Fetching status"
 #    status=$(curl -b $SCRIPT_DIR/cookies http://$ESKIMO_ROOT/get-status 2> /dev/null)
 #    if [[ $(echo $status | jq -r '.status') != "OK" ]]; then
-#        echo "Couldn't successfuly fetch status !"
+#        echo "Couldn't successfully fetch status !"
 #        echo "Got status : $status"
 #        exit 4
 #    fi
