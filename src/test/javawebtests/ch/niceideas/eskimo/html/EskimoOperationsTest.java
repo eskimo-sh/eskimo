@@ -36,14 +36,13 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
-
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class EskimoOperationsTest extends AbstractWebTest {
 
@@ -153,6 +152,8 @@ public class EskimoOperationsTest extends AbstractWebTest {
         assertJavascriptEquals("true", "$('#operation-log-modal').is(':visible')");
 
         js("eskimoOperations.hideLogs();");
+
+        ActiveWaiter.wait(() -> js("return $('#operation-log-modal').is(':visible')")  == "false");
 
         assertJavascriptEquals("false", "$('#operation-log-modal').is(':visible')");
     }
