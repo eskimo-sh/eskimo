@@ -275,9 +275,23 @@ sudo sed -i -n '1h;1!H;${;g;s/'\
 '      \],'\
 '/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
 
+echo " - Preparing note isolation setting runtime injection"
+sed -i -n '1h;1!H;${;g;s/'\
+'        \"isExistingProcess\": false,\n'\
+'/'\
+'        \"isExistingProcess\": false,\n'\
+'        \"perNote\": \"ESKIMO_PER_NOTE_ISOLATION\",\n'\
+'        \"perUser\": \"ESKIMO_PER_USER_ISOLATION\",\n'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
+echo " - Preparing job manager enablement setting injection"
+
+#FIXME Implement me
+
 
 echo " - Creating default eskimo_settings.conf"
 sudo bash -c "echo 'zeppelin_note_isolation=shared' > /usr/local/lib/zeppelin/conf/eskimo_settings.conf"
+sudo bash -c "echo 'zeppelin_jobmanager_enable=false' > /usr/local/lib/zeppelin/conf/eskimo_settings.conf"
 
 echo " - Enabling spark to change configuration at runtime"
 chown -R spark. "/usr/local/lib/zeppelin/conf/"

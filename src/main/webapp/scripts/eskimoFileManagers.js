@@ -79,9 +79,6 @@ eskimo.FileManagers = function() {
         this.fileEditHook = fileEditHook;
     };
 
-    this.setOpenedFileManagers = function(handles) {
-        openedFileManagers = handles;
-    };
     this.getOpenedFileManagers = function () {
         return openedFileManagers;
     };
@@ -604,7 +601,7 @@ eskimo.FileManagers = function() {
 
                     openedFileManagers.push({"nodeName" : nodeName, "nodeAddress": node, "current": "/"});
 
-                    this.listFolder (node, nodeName, data.folder, data.content);
+                    listFolder (node, nodeName, data.folder, data.content);
 
                 } else {
                     that.eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
@@ -668,7 +665,9 @@ eskimo.FileManagers = function() {
                 fileManagerFound = true;
             }
         });
+console.log ("a");
         if (!fileManagerFound) {
+console.log ("b");
 
             // Add tab entry
             fileManagersTabList.append($('<li id="file-manager_' + nodeName + '" class="nav-item">'+

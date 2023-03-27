@@ -185,8 +185,8 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
     public void testShowNodesConfig() {
         js("eskimoNodesConfig.showNodesConfig();");
 
-        assertCssValue("#inner-content-nodes-config", "visibility", "visible");
-        assertCssValue("#inner-content-nodes-config", "display", "block");
+        assertCssEquals("visible" , "#inner-content-nodes-config", "visibility");
+        assertCssEquals("block", "#inner-content-nodes-config", "display");
     }
 
     @Test
@@ -264,7 +264,7 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
         js("eskimoNodesConfig.removeNode ('remove1')");
 
         // ensure values are found in node 2 now as node 1
-        assertAttrValue("#node_id1", "value", "192.168.10.11");
+        assertAttrEquals("192.168.10.11", "#node_id1", "value");
 
         assertJavascriptEquals("true", "$('#zookeeper1').get(0).checked");
         assertJavascriptEquals("true", "$('#ntp1').get(0).checked");
@@ -279,19 +279,19 @@ public class EskimoNodesConfigTest extends AbstractWebTest {
                 "1"));
 
         assertNotNull (getElementById("node_id1"));
-        assertTagName ("node_id1", "input");
+        assertTagNameEquals("input", "node_id1");
 
         assertNotNull (getElementById("zookeeper1"));
-        assertTagName ("zookeeper1", "input");
+        assertTagNameEquals("input", "zookeeper1");
 
         assertNotNull (getElementById("gluster1"));
-        assertTagName ("gluster1", "input");
+        assertTagNameEquals("input", "gluster1");
 
         assertNotNull (getElementById("kube-master1"));
-        assertTagName ("kube-master1", "input");
+        assertTagNameEquals("input", "kube-master1");
 
         assertNotNull (getElementById("etcd1"));
-        assertTagName ("etcd1", "input");
+        assertTagNameEquals("input", "etcd1");
 
         assertJavascriptEquals ("1", "eskimoNodesConfig.getNodesCount()");
 

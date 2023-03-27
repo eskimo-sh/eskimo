@@ -213,8 +213,8 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         js("eskimoSystemStatus.renderNodesStatusEmpty()");
 
-        assertCssValue("#status-node-container-empty", "visibility", "visible");
-        assertCssValue("#status-node-container-empty", "display", "block");
+        assertCssEquals("visible", "#status-node-container-empty", "visibility");
+        assertCssEquals("block", "#status-node-container-empty", "display");
     }
 
     @Test
@@ -250,18 +250,18 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         js("eskimoSystemStatus.hideGrafanaDashboard()");
 
-        assertCssValue("#status-monitoring-grafana", "display", "none");
-        assertJavascriptEquals("col-xs-12 col-sm-12 col-md-12", "$('#status-monitoring-info-container').attr('class')");
+        assertCssEquals("none", "#status-monitoring-grafana", "display");
+        assertClassEquals("col-xs-12 col-sm-12 col-md-12", "#status-monitoring-info-container");
 
         js("eskimoSystemStatus.showGrafanaDashboard()");
 
-        assertCssValue("#status-monitoring-grafana", "display", "block");
-        assertJavascriptEquals("col-xs-12 col-sm-12 col-md-4", "$('#status-monitoring-info-container').attr('class')");
+        assertCssEquals("block", "#status-monitoring-grafana", "display");
+        assertClassEquals("col-xs-12 col-sm-12 col-md-4", "#status-monitoring-info-container");
 
         js("eskimoSystemStatus.hideGrafanaDashboard()");
 
-        assertCssValue("#status-monitoring-grafana", "display", "none");
-        assertJavascriptEquals("col-xs-12 col-sm-12 col-md-12", "$('#status-monitoring-info-container').attr('class')");
+        assertCssEquals("none", "#status-monitoring-grafana", "display");
+        assertClassEquals("col-xs-12 col-sm-12 col-md-12", "#status-monitoring-info-container");
     }
 
     @Test
@@ -292,7 +292,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
                         "<li class=\"dropdown-divider\"></li><li><a id=\"show_log\" tabindex=\"-1\" href=\"#\" title=\"Show Logs\"><i class=\"fa fa-file\"></i> Show Logs</a></li>\n",
                 "$('#serviceContextMenu').html()");
 
-        assertCssValue("#serviceContextMenu", "position", "absolute");
+        assertCssEquals("absolute", "#serviceContextMenu", "position");
     }
 
     @Test
@@ -311,7 +311,7 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
                         "    <li><a id=\"file_manager\" tabindex=\"-1\" href=\"#\" title=\"Launch SFTP File Manager\"><i class=\"fa fa-folder\"></i> SFTP File Manager</a></li>\n",
                 "$('#nodeContextMenu').html()");
 
-        assertCssValue("#nodeContextMenu", "position", "absolute");
+        assertCssEquals("absolute", "#nodeContextMenu", "position");
     }
 
     @Test
@@ -332,8 +332,8 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         js("eskimoSystemStatus.showStatus()");
 
-        assertCssValue("#inner-content-status", "visibility", "visible");
-        assertCssValue("#inner-content-status", "display", "block");
+        assertCssEquals("visible", "#inner-content-status", "visibility");
+        assertCssEquals("block", "#inner-content-status", "display");
 
         //System.err.println (page.asXml());
 
@@ -376,8 +376,8 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         js("eskimoSystemStatus.updateStatus()");
 
-        assertJavascriptEquals("block", "$(\"#status-node-container-empty\").css('display')");
-        assertJavascriptEquals("visible", "$(\"#status-node-container-empty\").css('visibility')");
+        assertCssEquals("block", "#status-node-container-empty", "display");
+        assertCssEquals("visible", "#status-node-container-empty", "visibility");
     }
 
     @Test
@@ -423,8 +423,8 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         ActiveWaiter.wait(() -> js("return $('#status-monitoring-no-dashboard').css('display')").toString().equals("none"));
 
-        assertCssValue("#status-monitoring-dashboard-frame", "display", "block");
-        assertCssValue("#status-monitoring-no-dashboard", "display", "none");
+        assertCssEquals("block", "#status-monitoring-dashboard-frame", "display");
+        assertCssEquals("none", "#status-monitoring-no-dashboard", "display");
     }
 
     @Test
@@ -474,10 +474,10 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         js("eskimoSystemStatus.handleSystemStatus (jsonFullStatus.nodeServicesStatus, jsonFullStatus.systemStatus, true)");
 
-        assertCssValue("#status-monitoring-no-dashboard", "display", "block");
-        assertCssValue("#status-monitoring-dashboard-frame", "display", "none");
+        assertCssEquals("block", "#status-monitoring-no-dashboard", "display");
+        assertCssEquals("none", "#status-monitoring-dashboard-frame", "display");
 
-        assertAttrValue("#status-monitoring-dashboard-frame", "src", "html/emptyPage.html");
+        assertAttrEquals("html/emptyPage.html", "#status-monitoring-dashboard-frame", "src");
 
         assertJavascriptEquals("CE", "$('#eskimo-flavour').html()");
         assertJavascriptEquals("0.5-SNAPSHOT", "$('#system-information-version').html()");
@@ -529,16 +529,16 @@ public class EskimoSystemStatusTest extends AbstractWebTest {
 
         js("eskimoSystemStatus.showStatusMessage ('test');");
 
-        assertCssValue("#service-status-warning", "display", "block");
-        assertCssValue("#service-status-warning", "visibility", "visible");
+        assertCssEquals("block", "#service-status-warning", "display");
+        assertCssEquals("visible", "#service-status-warning", "visibility");
 
-        assertAttrContains("#service-status-warning-message", "class", "warning");
+        assertClassContains("warning", "#service-status-warning-message");
 
         assertJavascriptEquals("test", "$('#service-status-warning-message').html()");
 
         js("eskimoSystemStatus.showStatusMessage ('test', true);");
 
-        assertAttrContains("#service-status-warning-message", "class", "danger");
+        assertClassContains("danger", "#service-status-warning-message");
     }
 
     @Test

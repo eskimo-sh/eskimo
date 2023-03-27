@@ -58,6 +58,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -82,6 +84,17 @@ public abstract class AbstractWebTest {
         driver = buildSeleniumDriver();
 
         driver.get("http://localhost:" + TestResourcesServer.LOCAL_TEST_SERVER_PORT + "/src/test/resources/GenericTestPage.html");
+    }
+
+    public static String findVendorLib (String libName) {
+        File vendorDir = new File ("./src/main/webapp/scripts/vendor");
+        assertNotNull(vendorDir);
+        assertTrue (vendorDir.exists());
+        String foundLibName = Arrays.stream(Objects.requireNonNull(vendorDir.list()))
+                .filter(fileName -> fileName.contains(libName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No lib found with name " + libName));
+        return "vendor/" + foundLibName;
     }
 
     public static WebDriver buildSeleniumDriver() throws InterruptedException, CommonBusinessException {
@@ -342,7 +355,7 @@ public abstract class AbstractWebTest {
         // 3 attempts
         for (int i = 0; i < 3 ; i++) {
             logger.info ("Loading jquery : attempt " + i);
-            loadScript("vendor/jquery-3.6.0.js");
+            loadScript(findVendorLib("jquery"));
 
             waitForDefinition("window.$");
 
@@ -419,28 +432,35 @@ public abstract class AbstractWebTest {
         }
     }
 
-    protected void assertAttrContains(String selector, String attribute, String value) {
+    protected void assertClassContains(String expectedValue, String selector) {
+        assertAttrContains(expectedValue, selector, "class");
+    }
+
+    protected void assertAttrContains(String expectedValue, String selector, String attribute) {
         logConsoleLogs();
         String cssValue = js("return $('"+selector+"').attr('"+attribute+"')").toString();
-        assertTrue (cssValue.contains(value));
+        assertTrue (cssValue.contains(expectedValue));
     }
 
-    protected void assertAttrValue(String selector, String attribute, String value) {
+    protected void assertClassEquals(String expectedValue, String selector) {
+        assertAttrEquals(expectedValue, selector, "class");
+    }
+
+    protected void assertAttrEquals(String expectedValue, String selector, String attribute) {
         logConsoleLogs();
-        assertEquals (value, js("return $('"+selector+"').attr('"+attribute+"')"));
+        assertEquals (expectedValue, js("return $('"+selector+"').attr('"+attribute+"')"));
     }
 
-    protected void assertCssValue(String selector, String attribute, String value) {
+    protected void assertCssEquals(String expectedValue, String selector, String attribute) {
         logConsoleLogs();
-        assertEquals (value, js("return $('"+selector+"').css('"+attribute+"')"));
+        assertEquals (expectedValue, js("return $('"+selector+"').css('"+attribute+"')"));
     }
 
-    protected void assertJavascriptEquals(String value, String javascript) {
+    protected void assertJavascriptEquals(String expectedValue, String javascript) {
         logConsoleLogs();
         Object jsResult = Optional.ofNullable(js("return " + javascript))
                 .orElseThrow(() -> new NullPointerException("javascript execution returned null value."));
-
-        assertEquals (value, jsResult.toString());
+        assertEquals (expectedValue, jsResult.toString());
     }
 
     protected void assertJavascriptNull(String javascript) {
@@ -448,7 +468,7 @@ public abstract class AbstractWebTest {
         assertNull (js("return " + javascript));
     }
 
-    protected void assertTagName(String elementId, String tagName) {
+    protected void assertTagNameEquals(String tagName, String elementId) {
         logConsoleLogs();
         assertEquals (tagName, getElementById(elementId).getTagName());
     }

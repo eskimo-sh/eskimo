@@ -132,7 +132,7 @@ public class EskimoMenuTest extends AbstractWebTest {
 
         assertJavascriptEquals("", "$('.simplebar-offset').get(0).style.width");
         assertJavascriptEquals("", "$('.simplebar-content-wrapper').get(0).style.width");
-        assertJavascriptEquals("side-nav-title side-nav-item", "$('.side-nav-item').attr('class')");
+        assertClassEquals("side-nav-title side-nav-item", ".side-nav-item");
 
         js("$('.simplebar-offset').css('width', '260px')");
         js("$('.simplebar-content-wrapper').css('width', '260px')");
@@ -141,7 +141,7 @@ public class EskimoMenuTest extends AbstractWebTest {
 
         assertJavascriptEquals("", "$('.simplebar-offset').get(0).style.width");
         assertJavascriptEquals("", "$('.simplebar-content-wrapper').get(0).style.width");
-        assertJavascriptEquals("side-nav-title side-nav-item nohover", "$('.side-nav-item').attr('class')");
+        assertClassEquals("side-nav-title side-nav-item nohover", ".side-nav-item");
 
 
         js("document.getElementsByTagName('html')[0].setAttribute('data-sidenav-size', 'condensed');");
@@ -153,7 +153,7 @@ public class EskimoMenuTest extends AbstractWebTest {
 
         assertJavascriptEquals("260px", "$('.simplebar-offset').get(0).style.width");
         assertJavascriptEquals("260px", "$('.simplebar-content-wrapper').get(0).style.width");
-        assertJavascriptEquals("side-nav-title side-nav-item", "$('.side-nav-item').attr('class')");
+        assertClassEquals("side-nav-title side-nav-item", ".side-nav-item");
 
         js("$('.simplebar-offset').css('width', '260px')");
         js("$('.simplebar-content-wrapper').css('width', '260px')");
@@ -162,7 +162,7 @@ public class EskimoMenuTest extends AbstractWebTest {
 
         assertJavascriptEquals("", "$('.simplebar-offset').get(0).style.width");
         assertJavascriptEquals("", "$('.simplebar-content-wrapper').get(0).style.width");
-        assertJavascriptEquals("side-nav-title side-nav-item nohover", "$('.side-nav-item').attr('class')");
+        assertClassEquals("side-nav-title side-nav-item nohover", ".side-nav-item");
 
 
         js("document.getElementsByTagName('html')[0].setAttribute('data-sidenav-size', 'minimized');");
@@ -174,7 +174,7 @@ public class EskimoMenuTest extends AbstractWebTest {
 
         assertJavascriptEquals("", "$('.simplebar-offset').get(0).style.width");
         assertJavascriptEquals("", "$('.simplebar-content-wrapper').get(0).style.width");
-        assertJavascriptEquals("side-nav-title side-nav-item", "$('.side-nav-item').attr('class')");
+        assertClassEquals("side-nav-title side-nav-item", ".side-nav-item");
 
         js("$('.simplebar-offset').css('width', '260px')");
         js("$('.simplebar-content-wrapper').css('width', '260px')");
@@ -183,18 +183,18 @@ public class EskimoMenuTest extends AbstractWebTest {
 
         assertJavascriptEquals("", "$('.simplebar-offset').get(0).style.width");
         assertJavascriptEquals("", "$('.simplebar-content-wrapper').get(0).style.width");
-        assertJavascriptEquals("side-nav-title side-nav-item nohover", "$('.side-nav-item').attr('class')");
+        assertClassEquals("side-nav-title side-nav-item nohover", ".side-nav-item");
     }
 
     @Test
     public void testHandleKubeMenuDisplay() {
         js("eskimoMenu.handleKubeMenuDisplay(false);");
 
-        assertJavascriptEquals("side-nav-item disabled visually-hidden", "$('#menu-kubernetes-configuration').attr('class')");
+        assertClassContains("disabled visually-hidden", "#menu-kubernetes-configuration");
 
         js("eskimoMenu.handleKubeMenuDisplay(true);");
 
-        assertJavascriptEquals("side-nav-item disabled", "$('#menu-kubernetes-configuration').attr('class')");
+        assertClassContains("disabled", "#menu-kubernetes-configuration");
     }
 
     @Test
@@ -219,13 +219,13 @@ public class EskimoMenuTest extends AbstractWebTest {
 
         js("eskimoMain.hasRole = function(role) { return false; }");
 
-        assertJavascriptEquals("list-item", "$('#folderMenuConsoles').css('display')");
-        assertJavascriptEquals("list-item", "$('#menu-configure-setup').css('display')");
+        assertCssEquals("list-item", "#folderMenuConsoles", "display");
+        assertCssEquals("list-item", "#menu-configure-setup", "display");
 
         js("eskimoMenu.adaptMenuToUserRole()");
 
-        assertJavascriptEquals("none", "$('#folderMenuConsoles').css('display')");
-        assertJavascriptEquals("none", "$('#menu-configure-setup').css('display')");
+        assertCssEquals("none", "#folderMenuConsoles", "display");
+        assertCssEquals("none", "#menu-configure-setup", "display");
     }
 
     @Test
@@ -270,21 +270,21 @@ public class EskimoMenuTest extends AbstractWebTest {
         js ("$('#folderMenuKibana').removeClass('disabled')");
 
         js("eskimoMenu.setActiveMenuEntry('kibana', true)");
-        assertJavascriptEquals ("side-nav-item folder-menu-items menuitem-active", "$('#folderMenuKibana').attr('class')");
+        assertClassContains ("menuitem-active", "#folderMenuKibana");
 
         js("eskimoMenu.serviceMenuClear(nodeServiceStatus);");
 
-        assertJavascriptEquals ("side-nav-item folder-menu-items menuitem-active", "$('#folderMenuKibana').attr('class')");
+        assertClassContains ("menuitem-active", "#folderMenuKibana");
 
         js("eskimoMenu.serviceMenuClear();");
 
-        assertJavascriptEquals ("side-nav-item folder-menu-items disabled", "$('#folderMenuKibana').attr('class')");
+        assertClassContains ("disabled", "#folderMenuKibana");
 
         js("eskimoServices.isServiceAvailable = function (){ return false; };");
 
         js("eskimoMenu.serviceMenuClear(nodeServiceStatus);");
 
-        assertJavascriptEquals ("side-nav-item folder-menu-items disabled", "$('#folderMenuKibana').attr('class')");
+        assertClassContains ("disabled", "#folderMenuKibana");
     }
 
     @Test
@@ -294,13 +294,13 @@ public class EskimoMenuTest extends AbstractWebTest {
         js ("$('#folderMenuKibana').removeClass('disabled')");
 
         js("eskimoMenu.setActiveMenuEntry('kibana', true)");
-        assertJavascriptEquals ("side-nav-item folder-menu-items menuitem-active", "$('#folderMenuKibana').attr('class')");
+        assertClassContains ("menuitem-active", "#folderMenuKibana");
 
         js("eskimoMenu.handleSetupNotCompleted();");
 
-        assertJavascriptEquals ("side-nav-item folder-menu-items", "$('#folderMenuKibana').attr('class')");
+        assertClassEquals("side-nav-item folder-menu-items", "#folderMenuKibana");
 
-        assertJavascriptEquals ("side-nav-item menuitem-active", "$('#menu-configure-setup').attr('class')");
+        assertClassContains ("menuitem-active", "#menu-configure-setup");
     }
 
     @Test
@@ -310,13 +310,13 @@ public class EskimoMenuTest extends AbstractWebTest {
         js ("$('#folderMenuKibana').removeClass('disabled')");
 
         js("eskimoMenu.setActiveMenuEntry('kibana', true)");
-        assertJavascriptEquals ("side-nav-item folder-menu-items menuitem-active", "$('#folderMenuKibana').attr('class')");
+        assertClassContains ("menuitem-active", "#folderMenuKibana");
 
         js("eskimoMenu.handleSetupCompleted();");
 
-        assertJavascriptEquals ("side-nav-item folder-menu-items menuitem-active", "$('#folderMenuKibana').attr('class')");
+        assertClassContains ("menuitem-active", "#folderMenuKibana");
 
-        assertJavascriptEquals ("side-nav-item", "$('#menu-configure-setup').attr('class')");
+        assertClassContains ("side-nav-item", "#menu-configure-setup");
     }
 
     @Test

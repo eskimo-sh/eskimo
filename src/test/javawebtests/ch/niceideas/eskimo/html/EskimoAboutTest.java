@@ -43,7 +43,7 @@ public class EskimoAboutTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript("vendor/bootstrap-5.2.0.js");
+        loadScript(findVendorLib ("bootstrap"));
 
         loadScript("eskimoAbout.js");
 
@@ -62,8 +62,8 @@ public class EskimoAboutTest extends AbstractWebTest {
         js("eskimoAbout.showAbout()");
         ActiveWaiter.wait(() -> js("return $('#about-modal').css('display')").equals("block"));
 
-        assertCssValue("#about-modal", "display", "block");
-        assertCssValue("#about-modal", "visibility", "visible");
+        assertCssEquals("block", "#about-modal", "display");
+        assertCssEquals("visible", "#about-modal", "visibility");
 
         js("eskimoAbout.cancelAbout()");
         ActiveWaiter.wait(() -> {
@@ -72,7 +72,7 @@ public class EskimoAboutTest extends AbstractWebTest {
         });
 
         //assertCssValue("#about-modal", "visibility", "hidden");
-        assertCssValue("#about-modal", "display", "none");
+        assertCssEquals("none", "#about-modal", "display");
     }
 
 }

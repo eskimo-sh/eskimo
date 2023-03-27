@@ -44,12 +44,14 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class EskimoOperationsTest extends AbstractWebTest {
 
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript("vendor/bootstrap-5.2.0.js");
+        loadScript(findVendorLib ("bootstrap"));
         loadScript("eskimoOperations.js");
 
         waitForDefinition("window.eskimo");
@@ -73,17 +75,17 @@ public class EskimoOperationsTest extends AbstractWebTest {
 
         assertJavascriptEquals("true", "window.hideProgressbarCalled");
 
-        assertCssValue("#inner-content-operations", "visibility", "visible");
-        assertCssValue("#inner-content-operations", "display", "block");
+        assertCssEquals("visible", "#inner-content-operations", "visibility");
+        assertCssEquals("block", "#inner-content-operations", "display");
     }
 
     @Test
     public void testSetOperationInProgress() {
         js("eskimoOperations.setOperationInProgress(false);");
-        assertAttrValue("#interrupt-operations-btn", "class", "btn btn-danger disabled");
+        assertClassEquals("btn btn-danger disabled", "#interrupt-operations-btn");
 
         js("eskimoOperations.setOperationInProgress(true);");
-        assertAttrValue("#interrupt-operations-btn", "class", "btn btn-danger");
+        assertClassEquals("btn btn-danger", "#interrupt-operations-btn");
     }
 
     @Test
@@ -153,7 +155,7 @@ public class EskimoOperationsTest extends AbstractWebTest {
 
         js("eskimoOperations.hideLogs();");
 
-        ActiveWaiter.wait(() -> js("return $('#operation-log-modal').is(':visible')")  == "false");
+        ActiveWaiter.wait(() -> js("return $('#operation-log-modal').is(':visible')")  == Boolean.FALSE);
 
         assertJavascriptEquals("false", "$('#operation-log-modal').is(':visible')");
     }
@@ -188,12 +190,59 @@ public class EskimoOperationsTest extends AbstractWebTest {
                 "$('.progress-operation-wrapper').length");
     }
 
-    /*
     @Test
-    public void testFetchOperationStatus() {
-        fail ("To Be Implemented");
+    public void testFetchOperationStatus() throws Exception {
+
+        js("$.ajaxGet = function(obj) { " +
+                "    window.objUrl = obj.url;" +
+                "    if (obj.url.indexOf('fetch-operations-status?last-lines=') > -1) {" +
+                "        obj.success({" +
+                "            result: 'OK'," +
+                "            labels: " + new JSONArray(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsTest/labels.json"), StandardCharsets.UTF_8)) +
+                "                ," +
+                "            globalMessages: " + new JSONObject(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsTest/globalMessages.json"), StandardCharsets.UTF_8)) +
+                "                ," +
+                "            messages: " + new JSONObject(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsTest/messages.json"), StandardCharsets.UTF_8)) +
+                "                ," +
+                "            status: " + new JSONObject(StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoOperationsTest/status.json"), StandardCharsets.UTF_8)) +
+                "        });" +
+                "    } " +
+                "}");
+
+        js("eskimoOperations.fetchOperationStatus()");
+
+        assertJavascriptEquals("100% (Complete)", "$('#Installation_Topology-All-Nodes-progress').html()");
+
+        assertJavascriptEquals(
+                "--&gt; Done : Installation of Topology (All Nodes) on marathon\n" +
+                        "-------------------------------------------------------------------------------\n" +
+                        "--&gt; Completed Successfuly.\n",
+                "$('#operations-global-messages').html()");
+
+        js("eskimoOperations.showLogs('Installation_Topology-All-Nodes');");
+
+        assertJavascriptEquals(
+                "--&gt; Done : Installation of Topology (All Nodes) on marathon\n" +
+                        "-------------------------------------------------------------------------------\n" +
+                        "--&gt; Completed Successfuly.\n",
+                "$('#log-message-content').html()");
     }
-    */
+
+    @Test
+    public void testGetLastLines() throws Exception {
+        testFetchOperationStatus();
+
+        assertJavascriptEquals("{" +
+                "\"Installation_Topology-All-Nodes\":4," +
+                "\"installation_cerebro\":3," +
+                "\"installation_grafana\":0," +
+                "\"installation_kafka-manager\":0," +
+                "\"installation_kibana\":0," +
+                "\"installation_spark-console\":0," +
+                "\"installation_zeppelin\":0," +
+                "\"global\":4" +
+                "}", "JSON.stringify(eskimoOperations.getLastLines())");
+    }
 
     @Test
     public void testStartStopOperationInprogress() {

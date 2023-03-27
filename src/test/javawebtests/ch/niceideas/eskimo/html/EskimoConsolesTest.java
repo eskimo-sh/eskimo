@@ -150,8 +150,8 @@ public class EskimoConsolesTest extends AbstractWebTest {
     public void testShowConsoles() {
         js("eskimoConsoles.showConsoles()");
 
-        assertCssValue("#inner-content-consoles", "visibility", "visible");
-        assertCssValue("#inner-content-consoles", "display", "block");
+        assertCssEquals("visible", "#inner-content-consoles", "visibility");
+        assertCssEquals("block", "#inner-content-consoles", "display");
 
         assertNotNull (getElementById("console_open_192-168-10-11"));
         assertEquals ("192.168.10.11", getElementById("console_open_192-168-10-11").getText());
@@ -168,16 +168,16 @@ public class EskimoConsolesTest extends AbstractWebTest {
         getElementById("console_open_192-168-10-13").click();
 
 
-        assertCssValue ("#consoles-console-192-168-10-13", "visibility", "visible");
-        assertCssValue ("#consoles-console-192-168-10-13", "display", "block");
+        assertCssEquals("visible", "#consoles-console-192-168-10-13", "visibility");
+        assertCssEquals("block", "#consoles-console-192-168-10-13", "display");
 
         getElementById("console_open_192-168-10-11").click();
 
-        assertCssValue ("#consoles-console-192-168-10-11", "visibility", "visible");
-        assertCssValue ("#consoles-console-192-168-10-11", "display", "block");
+        assertCssEquals("visible", "#consoles-console-192-168-10-11", "visibility");
+        assertCssEquals("block", "#consoles-console-192-168-10-11", "display");
 
-        assertCssValue ("#consoles-console-192-168-10-13", "visibility", "hidden");
-        assertCssValue ("#consoles-console-192-168-10-13", "display", "none");
+        assertCssEquals("hidden", "#consoles-console-192-168-10-13", "visibility");
+        assertCssEquals("none", "#consoles-console-192-168-10-13", "display");
     }
 
     @Test
@@ -185,19 +185,19 @@ public class EskimoConsolesTest extends AbstractWebTest {
         js("eskimoConsoles.openConsole('192.168.10.11', '192-168-10-11')");
         js("eskimoConsoles.openConsole('192.168.10.13', '192-168-10-13')");
 
-        assertCssValue ("#consoles-console-192-168-10-11", "visibility", "hidden");
-        assertCssValue ("#consoles-console-192-168-10-11", "display", "none");
+        assertCssEquals("hidden", "#consoles-console-192-168-10-11", "visibility");
+        assertCssEquals("none", "#consoles-console-192-168-10-11", "display");
 
-        assertCssValue ("#consoles-console-192-168-10-13", "visibility", "visible");
-        assertCssValue ("#consoles-console-192-168-10-13", "display", "block");
+        assertCssEquals("visible", "#consoles-console-192-168-10-13", "visibility");
+        assertCssEquals("block", "#consoles-console-192-168-10-13", "display");
 
         js("eskimoConsoles.showPrevTab()");
 
-        assertCssValue ("#consoles-console-192-168-10-11", "visibility", "visible");
-        assertCssValue ("#consoles-console-192-168-10-11", "display", "block");
+        assertCssEquals("visible", "#consoles-console-192-168-10-11", "visibility");
+        assertCssEquals("block", "#consoles-console-192-168-10-11", "display");
 
-        assertCssValue ("#consoles-console-192-168-10-13", "visibility", "hidden");
-        assertCssValue ("#consoles-console-192-168-10-13", "display", "none");
+        assertCssEquals("hidden", "#consoles-console-192-168-10-13", "visibility");
+        assertCssEquals("none", "#consoles-console-192-168-10-13", "display");
     }
 
     @Test
@@ -209,11 +209,11 @@ public class EskimoConsolesTest extends AbstractWebTest {
         js("eskimoConsoles.showNextTab()");
 
         // situation is now inverse
-        assertCssValue ("#consoles-console-192-168-10-11", "visibility", "hidden");
-        assertCssValue ("#consoles-console-192-168-10-11", "display", "none");
+        assertCssEquals("hidden", "#consoles-console-192-168-10-11", "visibility");
+        assertCssEquals("none", "#consoles-console-192-168-10-11", "display");
 
-        assertCssValue ("#consoles-console-192-168-10-13", "visibility", "visible");
-        assertCssValue ("#consoles-console-192-168-10-13", "display", "block");
+        assertCssEquals("visible", "#consoles-console-192-168-10-13", "visibility");
+        assertCssEquals("block", "#consoles-console-192-168-10-13", "display");
     }
 
 }

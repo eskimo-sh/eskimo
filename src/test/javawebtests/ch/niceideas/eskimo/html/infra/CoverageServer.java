@@ -36,6 +36,7 @@
 package ch.niceideas.eskimo.html.infra;
 
 import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.eskimo.html.AbstractWebTest;
 import ch.niceideas.eskimo.utils.ActiveWaiter;
 import ch.niceideas.eskimo.utils.GenerateLCOV;
 import jscover.Main;
@@ -68,7 +69,7 @@ public class CoverageServer implements TestResourcesServer {
             "--port=" + TestResourcesServer.LOCAL_TEST_SERVER_PORT,
             //"--no-branch",
             //"--no-function",
-            "--no-instrument=src/main/webapp/scripts/vendor/bootstrap-5.2.0.js",
+            "--no-instrument=src/main/webapp/scripts/" + AbstractWebTest.findVendorLib("bootstrap"),
             "--log=INFO",
             "--report-dir=" + jsCoverReportDir
     };

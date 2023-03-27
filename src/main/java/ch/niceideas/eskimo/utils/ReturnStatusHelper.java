@@ -34,6 +34,7 @@
 
 package ch.niceideas.eskimo.utils;
 
+import ch.niceideas.common.exceptions.CommonRTException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -151,7 +152,7 @@ public class ReturnStatusHelper {
         }
     }
 
-    public static class ErrorStatusException extends RuntimeException {
+    public static class ErrorStatusException extends CommonRTException {
 
         static final long serialVersionUID = -331151212312431248L;
 

@@ -50,7 +50,7 @@ public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript("vendor/bootstrap-5.2.0.js");
+        loadScript(findVendorLib ("bootstrap"));
         loadScript("eskimoUtils.js");
         loadScript("eskimoKubernetesServicesSelection.js");
 
@@ -86,8 +86,8 @@ public class EskimoKubernetesServicesSelectionTest extends AbstractWebTest {
 
         ActiveWaiter.wait(() -> js("return $('#kubernetes-services-selection-modal').css('display')").toString().equals ("block"));
 
-        assertCssValue("#kubernetes-services-selection-modal", "display", "block");
-        assertCssValue("#kubernetes-services-selection-modal", "visibility", "visible");
+        assertCssEquals("block", "#kubernetes-services-selection-modal", "display");
+        assertCssEquals("visible", "#kubernetes-services-selection-modal", "visibility");
     }
 
     @Test

@@ -115,6 +115,7 @@ eskimo.Operations = function() {
         lastLines["global"] = globalLastLine;
         return lastLines;
     }
+    this.getLastLines = getLastLines;
 
     function hideLogs () {
         $('#operation-log-modal').modal('hide');

@@ -45,7 +45,7 @@ public class EskimoEditUserTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript("vendor/bootstrap-5.2.0.js");
+        loadScript(findVendorLib ("bootstrap"));
 
         loadScript("eskimoUtils.js");
         loadScript("eskimoEditUser.js");
@@ -63,7 +63,7 @@ public class EskimoEditUserTest extends AbstractWebTest {
 
         waitForElementIdInDOM("edit-user-input-button-validate");
 
-        assertCssValue("#edit-user-modal", "display", "block");
+        assertCssEquals("block", "#edit-user-modal", "display");
     }
 
     @Test
@@ -75,7 +75,7 @@ public class EskimoEditUserTest extends AbstractWebTest {
             Object display = js("return $('#edit-user-modal').css('display')");
             return display != null && display.equals("block");
         });
-        assertCssValue("#edit-user-modal", "display", "block");
+        assertCssEquals("block", "#edit-user-modal", "display");
 
         assertJavascriptEquals("testUser", "$('#edit-user-user-id').val()");
 
@@ -89,7 +89,7 @@ public class EskimoEditUserTest extends AbstractWebTest {
             Object display = js("return $('#edit-user-modal').css('display')");
             return display != null && display.equals("none");
         });
-        assertCssValue("#edit-user-modal", "display", "none");
+        assertCssEquals("none", "#edit-user-modal", "display");
     }
 
     @Test
@@ -101,7 +101,7 @@ public class EskimoEditUserTest extends AbstractWebTest {
             Object display = js("return $('#edit-user-modal').css('display')");
             return display != null && display.equals("block");
         });
-        assertCssValue("#edit-user-modal", "display", "block");
+        assertCssEquals("block", "#edit-user-modal", "display");
 
         js("$('#edit-user-current-password').val('testOld')");
         js("$('#edit-user-new-password').val('testNew')");
@@ -129,7 +129,7 @@ public class EskimoEditUserTest extends AbstractWebTest {
             Object display = js("return $('#edit-user-modal').css('display')");
             return display != null && display.equals("none");
         });
-        assertCssValue("#edit-user-modal", "display", "none");
+        assertCssEquals("none", "#edit-user-modal", "display");
     }
 }
 

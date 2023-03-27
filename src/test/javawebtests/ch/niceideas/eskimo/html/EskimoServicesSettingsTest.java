@@ -105,8 +105,8 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
 
         js("eskimoServicesSettings.showServicesSettings();");
 
-        assertCssValue("#inner-content-services-settings", "visibility", "visible");
-        assertCssValue("#inner-content-services-settings", "display", "block");
+        assertCssEquals("visible", "#inner-content-services-settings", "visibility");
+        assertCssEquals("block", "#inner-content-services-settings", "display");
     }
 
     @Test

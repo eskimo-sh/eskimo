@@ -90,64 +90,30 @@ fi
 echo " - creating zeppelin notebook service if it does not exist"
 mkdir -p /var/lib/spark/data/zeppelin/notebooks
 
-#echo " - Checking if samples neeed to be installed"
-#if [[ ! -f /var/lib/spark/data/zeppelin/samples_installed_flag.marker ]]; then
-#
-#    echo " - Installing raw samples "
-#
-#    # XXX Hack required for zeppelin pre-0.9 bug where notebooks imported through APIs are not anymore available after a restart
-#    echo "   + Creating temp dir /tmp/eskimo_samples"
-#    mkdir /tmp/eskimo_samples
-#
-#    echo "   + Copying archive there"
-#    cp /usr/local/lib/zeppelin/eskimo_samples.tgz /tmp/eskimo_samples/
-#
-#    echo "   + changing dir for temp dir"
-#    cd  /tmp/eskimo_samples/
-#
-#    echo "   + Extracting archive"
-#    tar xvfz eskimo_samples.tgz > /tmp/eskimo_samples_extract.log 2>&1;
-#
-#    echo "   + for each of them, see if it needs to be copied"
-#    IFS=$'\n'
-#    for i in `ls -1 *.zpln`; do
-#
-#        echo "      - extracting notebook name"
-#        notebook_name=`echo $i | cut -d '_' -f 1`
-#
-#        echo "      - checking if $notebook_name is already installed"
-#        if [[ `find /var/lib/spark/data/zeppelin/notebooks/ -name "$notebook_name*" 2>/dev/null` == "" ]]; then
-#
-#            echo "      - installing $notebook_name "
-#            cp $i /var/lib/spark/data/zeppelin/notebooks/
-#        fi
-#    done
-
-#fi
 
 echo " - Injecting isolation configuration from settings"
 
 # sourcing custom config
 . /usr/local/lib/zeppelin/conf/eskimo_settings.conf
 
+# FIXME THis is not working, if the user changes his mind, hen we're screwed
+
 if [[ $zeppelin_note_isolation == "per_note" ]]; then
-    sed -i -n '1h;1!H;${;g;s/'\
-'        \"isExistingProcess\": false,\n'\
-'/'\
-'        \"isExistingProcess\": false,\n'\
-'        \"perNote\": \"isolated\",\n'\
-'        \"perUser\": \"\",\n'\
-'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
+   sed -i s/"ESKIMO_PER_NOTE_ISOLATION"/"isolated"/g /usr/local/lib/zeppelin/conf/interpreter.json
+   sed -i s/"ESKIMO_PER_USER_ISOLATION"/""/g /usr/local/lib/zeppelin/conf/interpreter.json
 
 else
-    sed -i -n '1h;1!H;${;g;s/'\
-'        \"isExistingProcess\": false,\n'\
-'/'\
-'        \"isExistingProcess\": false,\n'\
-'        \"perNote\": \"shared\",\n'\
-'        \"perUser\": \"shared\",\n'\
-'/g;p;}' /usr/local/lib/zeppelin/conf/interpreter.json
+
+   sed -i s/"ESKIMO_PER_NOTE_ISOLATION"/"shared"/g /usr/local/lib/zeppelin/conf/interpreter.json
+   sed -i s/"ESKIMO_PER_USER_ISOLATION"/"shared"/g /usr/local/lib/zeppelin/conf/interpreter.json
 fi
+
+
+echo " - Tuning zeppelin-site.xml"
+
+#FIXME Implement me
+
 
 echo " - Start glusterMountCheckerPeriodic.sh script"
 /bin/bash /usr/local/sbin/glusterMountCheckerPeriodic.sh &

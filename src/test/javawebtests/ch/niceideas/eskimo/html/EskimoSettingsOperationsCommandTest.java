@@ -46,7 +46,7 @@ public class EskimoSettingsOperationsCommandTest extends AbstractWebTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript("vendor/bootstrap-5.2.0.js");
+        loadScript(findVendorLib ("bootstrap"));
 
         loadScript("eskimoSettingsOperationsCommand.js");
 

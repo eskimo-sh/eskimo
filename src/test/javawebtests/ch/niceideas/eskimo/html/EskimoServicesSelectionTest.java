@@ -49,7 +49,7 @@ public class EskimoServicesSelectionTest extends AbstractWebTest {
 
         String jsonServices = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSelectionTest/testServices.json"), StandardCharsets.UTF_8);
 
-        loadScript("vendor/bootstrap-5.2.0.js");
+        loadScript(findVendorLib ("bootstrap"));
 
         loadScript("eskimoUtils.js");
         loadScript("eskimoServicesSelection.js");

@@ -55,8 +55,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
@@ -195,5 +194,21 @@ public class FileManagerControlerTest {
         fmc.downloadFile("192.168.56.21", tempFile.getParent(), tempFile.getName(), response);
 
         assertEquals ("test content", new String (baos.toByteArray(), StandardCharsets.UTF_8));
+    }
+
+    @Test
+    public void testConnectFileManager() {
+        assertEquals("{\n" +
+                "  \"content\": {\"test\": {\n" +
+                "    \"count\": \"1\",\n" +
+                "    \"size\": \"1024\",\n" +
+                "    \"user\": \"badtrash\",\n" +
+                "    \"permissions\": \"rwxrwxrwx\",\n" +
+                "    \"group\": \"badtrash\",\n" +
+                "    \"timestamp\": \"2018-01-01 12:00:00\"\n" +
+                "  }},\n" +
+                "  \"folder\": \"/.\",\n" +
+                "  \"status\": \"OK\"\n" +
+                "}", fmc.connectFileManager("192.168.10.15"));
     }
 }

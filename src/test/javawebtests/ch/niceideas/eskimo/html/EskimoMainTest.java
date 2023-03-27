@@ -126,21 +126,21 @@ public class EskimoMainTest extends AbstractWebTest {
 
         js("eskimoMain.showOnlyContent('operations')");
 
-        assertCssValue("#inner-content-status", "visibility", "hidden");
+        assertCssEquals("hidden", "#inner-content-status", "visibility");
 
-        assertCssValue("#inner-content-consoles", "visibility", "hidden");
-        assertCssValue("#inner-content-setup", "visibility", "hidden");
-        assertCssValue("#inner-content-nodes-config", "visibility", "hidden");
-        assertCssValue("#inner-content-services-settings", "visibility", "hidden");
-        assertCssValue("#inner-content-file-managers", "visibility", "hidden");
+        assertCssEquals("hidden", "#inner-content-consoles", "visibility");
+        assertCssEquals("hidden", "#inner-content-setup", "visibility");
+        assertCssEquals("hidden", "#inner-content-nodes-config", "visibility");
+        assertCssEquals("hidden", "#inner-content-services-settings", "visibility");
+        assertCssEquals("hidden", "#inner-content-file-managers", "visibility");
 
-        assertCssValue("#inner-content-operations", "visibility", "visible");
+        assertCssEquals("visible", "#inner-content-operations", "visibility");
 
         assertJavascriptEquals("true", "eskimoMain.isCurrentDisplayedScreen('operations')");
 
         js("eskimoMain.showOnlyContent('kibana', true)");
 
-        assertCssValue("#inner-content-operations", "visibility", "hidden");
+        assertCssEquals("hidden", "#inner-content-operations", "visibility");
 
     }
 

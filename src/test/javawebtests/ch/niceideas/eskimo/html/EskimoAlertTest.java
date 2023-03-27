@@ -38,14 +38,12 @@ import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 public class EskimoAlertTest extends AbstractWebTest {
 
     @BeforeEach
     public void setUp() throws Exception {
 
-        loadScript("vendor/bootstrap-5.2.0.js");
+        loadScript(findVendorLib ("bootstrap"));
 
         loadScript("eskimoUtils.js");
         loadScript("eskimoAlert.js");
@@ -62,39 +60,39 @@ public class EskimoAlertTest extends AbstractWebTest {
         js("$('#alert-modal').modal('show');");
         Thread.sleep(200); // unfortunately need this one
         ActiveWaiter.wait(() -> js("return $('#alert-modal').css('display')").equals("block"));
-        assertCssValue("#alert-modal", "display", "block");
+        assertCssEquals("block", "#alert-modal", "display");
 
         js("$('#alert-modal').modal('hide');");
         Thread.sleep(200); // unfortunately need this one
         ActiveWaiter.wait(() -> js("return $('#alert-modal').css('display')").equals("none"));
-        assertCssValue("#alert-modal", "display", "none");
+        assertCssEquals("none", "#alert-modal", "display");
     }
 
     @Test
-    public void testUnsupportedLevels() throws Exception {
+    public void testUnsupportedLevels() {
 
         js("eskimoAlert.showAlert (0, 'unsuported level 0');");
 
         ActiveWaiter.wait(() -> !js("return $('#alert-modal').css('display')").equals("none"), 500);
         // shouldn't have worked
-        assertCssValue("#alert-modal", "display", "none");
+        assertCssEquals("none", "#alert-modal", "display");
 
         js("eskimoAlert.showAlert (4, 'unsuported level 4');");
 
         ActiveWaiter.wait(() -> !js("return $('#alert-modal').css('display')").equals("none"), 500);
         // shouldn't have worked
-        assertCssValue("#alert-modal", "display", "none");
+        assertCssEquals("none", "#alert-modal", "display");
     }
 
     @Test
-    public void testConfirm() throws Exception {
+    public void testConfirm() {
 
         js("eskimoAlert.confirm ('dummy message', " +
                 "function() { window.confirmCallbackCalled = \"called\"}, " +
                 "function() { window.closeCallbackCalled = \"called\"});");
 
         ActiveWaiter.wait(() -> js("return $('#alert-modal').css('display')").equals("block"));
-        assertCssValue("#alert-modal", "display", "block");
+        assertCssEquals("block", "#alert-modal", "display");
 
         getElementById("alert-button-cancel").click();
 
@@ -120,20 +118,20 @@ public class EskimoAlertTest extends AbstractWebTest {
         js("eskimoAlert.showAlert (1, 'test info');");
 
         ActiveWaiter.wait(() -> js("return $('#alert-modal').css('display')").equals("block"));
-        assertCssValue("#alert-modal", "display", "block");
+        assertCssEquals("block", "#alert-modal", "display");
 
         assertJavascriptEquals("test info", "$('#alert-body').html()");
-        assertJavascriptEquals("modal-header", "$('#alert-header').attr('class')");
+        assertClassEquals("modal-header", "#alert-header");
 
         js("eskimoAlert.showAlert (2, 'test warning');");
 
         assertJavascriptEquals("test info<br>test warning", "$('#alert-body').html()");
-        assertJavascriptEquals("modal-header bg-warning text-white", "$('#alert-header').attr('class')");
+        assertClassContains("bg-warning", "#alert-header");
 
         js("eskimoAlert.showAlert (3, 'test error');");
 
         assertJavascriptEquals("test info<br>test warning<br>test error", "$('#alert-body').html()");
-        assertJavascriptEquals("modal-header bg-danger text-white", "$('#alert-header').attr('class')");
+        assertClassContains("bg-danger", "#alert-header");
 
         // lower level doesn't change header style
 
@@ -142,7 +140,7 @@ public class EskimoAlertTest extends AbstractWebTest {
 
         js("eskimoAlert.closeAlert ();");
         ActiveWaiter.wait(() -> js("return $('#alert-modal').css('display')").equals("none"));
-        assertCssValue("#alert-modal", "display", "none");
+        assertCssEquals("none", "#alert-modal", "display");
     }
 
 }

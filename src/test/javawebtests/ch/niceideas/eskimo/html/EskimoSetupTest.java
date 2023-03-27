@@ -73,8 +73,8 @@ public class EskimoSetupTest extends AbstractWebTest {
     public void testShowSetup() {
         js("eskimoSetup.showSetup()");
 
-        assertCssValue("#inner-content-setup", "visibility", "visible");
-        assertCssValue("#inner-content-setup", "display", "block");
+        assertCssEquals("visible", "#inner-content-setup", "visibility");
+        assertCssEquals("block", "#inner-content-setup", "display");
     }
 
     @Test
@@ -155,16 +155,16 @@ public class EskimoSetupTest extends AbstractWebTest {
 
         js("eskimoSetup.handleSetup("+setupBuild+")");
 
-        assertJavascriptEquals("radio-inline disabled", "$('#setup-kube-origin-download-label').attr('class')");
-        assertJavascriptEquals("radio-inline disabled", "$('#setup-services-origin-download-label').attr('class')");
+        assertClassEquals("radio-inline disabled", "#setup-kube-origin-download-label");
+        assertClassEquals("radio-inline disabled", "#setup-services-origin-download-label");
 
         JsonWrapper setupWrapper = new JsonWrapper(setupBuild);
         setupWrapper.setValueForPath("isSnapshot", false);
 
         js("eskimoSetup.handleSetup("+setupWrapper.getFormattedValue()+")");
 
-        assertJavascriptEquals("radio-inline", "$('#setup-kube-origin-download-label').attr('class')");
-        assertJavascriptEquals("radio-inline", "$('#setup-services-origin-download-label').attr('class')");
+        assertClassEquals("radio-inline", "#setup-kube-origin-download-label");
+        assertClassEquals("radio-inline", "#setup-services-origin-download-label");
     }
 
     @Test
