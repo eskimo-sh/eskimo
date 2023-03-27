@@ -115,13 +115,17 @@ public class EskimoFileManagersTest extends AbstractWebTest {
     public void testDownloadFile() {
         js("eskimoFileManagers.downloadFile('192.168.10.11', '192-168-10-11', '/etc', 'passwd')");
         String originalWindow = driver.getWindowHandle();
-        for (String windowHandle : driver.getWindowHandles()) {
-            if(!originalWindow.contentEquals(windowHandle)) {
-                driver.switchTo().window(windowHandle);
-                break;
+        try {
+            for (String windowHandle : driver.getWindowHandles()) {
+                if (!originalWindow.contentEquals(windowHandle)) {
+                    driver.switchTo().window(windowHandle);
+                    break;
+                }
             }
+            assertEquals("http://localhost:9001/src/test/resources/file-manager-download/passwd?nodeAddress=192.168.10.11&folder=/etc&file=passwd", driver.getCurrentUrl());
+        } finally {
+            driver.switchTo().window(originalWindow);
         }
-        assertEquals ("http://localhost:9001/src/test/resources/file-manager-download/passwd?nodeAddress=192.168.10.11&folder=/etc&file=passwd", driver.getCurrentUrl());
     }
 
     @Test
