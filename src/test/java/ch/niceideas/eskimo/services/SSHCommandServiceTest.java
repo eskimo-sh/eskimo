@@ -110,6 +110,20 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
     }
 
     @Test
+    public void testRunSSHCommandArray() throws Exception {
+        assertEquals ("1\n", sshCommandService.runSSHCommand(
+                connectionManagerServiceTest.getSharedConnection(Node.fromName("localhost")),
+                new String[]{"echo", "1"}));
+    }
+
+    @Test
+    public void testRunSSHCommandWithCon() throws Exception {
+        assertEquals ("1\n", sshCommandService.runSSHCommand(
+                connectionManagerServiceTest.getSharedConnection(Node.fromName("localhost")),
+                "echo 1"));
+    }
+
+    @Test
     public void testRunSSHCommandStdOut() throws Exception {
         assertEquals ("1\n", sshCommandService.runSSHCommand(Node.fromName("localhost"), "echo 1"));
     }

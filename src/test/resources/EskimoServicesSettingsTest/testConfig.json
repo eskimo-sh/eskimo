@@ -72,46 +72,46 @@
             "defaultValue": "3",
             "name": "num.network.threads",
             "comment": "The number of threads that the server uses for receiving requests from the network and sending responses to the network",
-            "validationRegex": "^([0-9\\.]+$"
+            "validationRegex": "^[0-9\\.]+$"
           },
           {
             "defaultValue": "8",
             "name": "num.io.threads",
             "comment": "The number of threads that the server uses for processing requests, which may include disk I/O",
-            "validationRegex": "^([0-9\\.]+$"
+            "validationRegex": "^[0-9\\.]+$"
           },
           {
             "defaultValue": "102400",
             "name": "socket.send.buffer.bytes",
             "comment": "The send buffer (SO_SNDBUF) used by the socket server",
-            "validationRegex": "^([0-9\\.]+$"
+            "validationRegex": "^[0-9\\.]+$"
           },
           {
             "defaultValue": "102400",
             "name": "socket.receive.buffer.bytes",
             "comment": "The receive buffer (SO_RCVBUF) used by the socket server",
-            "validationRegex": "^([0-9\\.]+$",
+            "validationRegex": "^[0-9\\.]+$",
             "value": "204800"
           },
           {
             "defaultValue": "104857600",
             "name": "socket.request.max.bytes",
             "comment": "The maximum size of a request that the socket server will accept (protection against OOM)",
-            "validationRegex": "^([0-9\\.]+$",
+            "validationRegex": "^[0-9\\.]+$",
             "value": "128857600"
           },
           {
             "defaultValue": "1",
             "name": "num.partitions",
             "comment": "The default number of log partitions per topic. More partitions allow greater parallelism for consumption, but this will also result in more files across the brokers.",
-            "validationRegex": "^([0-9\\.]+$",
+            "validationRegex": "^[0-9\\.]+$",
             "value": "3"
           },
           {
             "defaultValue": "168",
             "name": "log.retention.hours",
             "comment": "The minimum age of a log file to be eligible for deletion due to age",
-            "validationRegex": "^([0-9\\.]+$",
+            "validationRegex": "^[0-9\\.]+$",
             "value": "48"
           }
         ]
@@ -128,7 +128,7 @@
               "defaultValue": "3",
               "name": "num.network.test",
               "comment": "Just a test property",
-              "validationRegex": "^([0-9\\.]+$"
+              "validationRegex": "^[0-9\\.]+$"
             }
           ]
         }],
@@ -153,7 +153,7 @@
             "defaultValue": "5",
             "name": "calculator.rpc.numRetries",
             "comment": "Number of times to retry before an RPC task gives up. An RPC task will run at most times of this number.",
-            "validationRegex": "^([0-9\\.]+$"
+            "validationRegex": "^[0-9\\.]+$"
           },
           {
             "defaultValue": "5s",

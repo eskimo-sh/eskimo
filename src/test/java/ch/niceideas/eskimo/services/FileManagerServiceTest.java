@@ -95,7 +95,7 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
     private ConfigurationServiceTestImpl configurationServiceTest;
 
     @Autowired
-    private FileManagerServiceImpl fileManagerService = null;
+    private FileManagerService fileManagerService = null;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -147,15 +147,18 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
     @Test
     public void testIsTextMimeType() {
 
-        assertTrue(fileManagerService.isTextMimeType("text/plain"));
-        assertTrue(fileManagerService.isTextMimeType("text/csv"));
+        assertTrue (fileManagerService instanceof FileManagerServiceImpl);
+        FileManagerServiceImpl impl = (FileManagerServiceImpl) fileManagerService;
 
-        assertTrue(fileManagerService.isTextMimeType("application/resource-lists-diff+xml"));
-        assertTrue(fileManagerService.isTextMimeType("application/xslt+xml"));
+        assertTrue(impl.isTextMimeType("text/plain"));
+        assertTrue(impl.isTextMimeType("text/csv"));
 
-        assertTrue(fileManagerService.isTextMimeType("application/javascript"));
+        assertTrue(impl.isTextMimeType("application/resource-lists-diff+xml"));
+        assertTrue(impl.isTextMimeType("application/xslt+xml"));
 
-        assertFalse(fileManagerService.isTextMimeType("application/x-xpinstall"));
+        assertTrue(impl.isTextMimeType("application/javascript"));
+
+        assertFalse(impl.isTextMimeType("application/x-xpinstall"));
     }
 
     @Test
@@ -247,8 +250,9 @@ public class FileManagerServiceTest extends AbstractBaseSSHTest {
                 }}));
             }
         };
-        fileManagerService.setConnectionManagerService(connectionManagerServiceTest);
-        fileManagerService.setSshCommandService(sshCommandServiceTest);
+        FileManagerServiceImpl impl = (FileManagerServiceImpl) fileManagerService;
+        impl.setConnectionManagerService(connectionManagerServiceTest);
+        impl.setSshCommandService(sshCommandServiceTest);
     }
 
     @Test

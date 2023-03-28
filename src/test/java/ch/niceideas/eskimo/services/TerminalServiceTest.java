@@ -51,7 +51,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
@@ -77,7 +78,7 @@ public class TerminalServiceTest extends AbstractBaseSSHTest {
     private ConfigurationServiceTestImpl configurationServiceTest;
 
     @Autowired
-    private TerminalServiceImpl ts = null;
+    private TerminalService terminalService = null;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -93,39 +94,45 @@ public class TerminalServiceTest extends AbstractBaseSSHTest {
     @Test
     public void testNominal() throws Exception {
 
-        ScreenImage si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=0");
+        ScreenImage si = terminalService.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=0");
 
         assertTrue (si.screen.startsWith("<pre class='term '><span class='"), si.screen);
 
-        si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=2000");
+        si = terminalService.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=2000");
         assertTrue (si.screen.startsWith("<idem/>"), si.screen);
 
-        si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=2000");
+        si = terminalService.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=2000");
         assertTrue (si.screen.startsWith("<idem/>"), si.screen);
 
-        si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=l&t=2001");
+        si = terminalService.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=l&t=2001");
         assertTrue (si.screen.startsWith("<pre class='term '><span class='"), si.screen);
 
-        si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=2002");
+        si = terminalService.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=2002");
         assertTrue (si.screen.startsWith("<pre class='term '><span class='"), si.screen);
 
-        si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=%0D&t=2003");
+        si = terminalService.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=%0D&t=2003");
         assertTrue (si.screen.startsWith("<pre class='term '><span class='"), si.screen);
 
-        ts.removeTerminal("699156997");
+        terminalService.removeTerminal("699156997");
+
+        // make sure removing unknown terminal doesn't cause any error
+        terminalService.removeTerminal("ABCD1234");
     }
 
     @Test
     public void testRemoveExpiredTerminals() throws Exception {
 
-        ScreenImage si = ts.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=0");
+        assertTrue (terminalService instanceof TerminalServiceImpl);
+        TerminalServiceImpl impl = (TerminalServiceImpl) terminalService;
 
-        ts.removeExpiredTerminals (1000);
+        ScreenImage si = terminalService.postUpdate("node=localhost&s=699156997&w=80&h=25&c=1&k=&t=0");
 
-        assertEquals(1, ts.getSessions().size());
+        impl.removeExpiredTerminals (1000);
 
-        ts.removeExpiredTerminals (0);
+        assertEquals(1, impl.getSessions().size());
 
-        assertEquals(0, ts.getSessions().size());
+        impl.removeExpiredTerminals (0);
+
+        assertEquals(0, impl.getSessions().size());
     }
 }

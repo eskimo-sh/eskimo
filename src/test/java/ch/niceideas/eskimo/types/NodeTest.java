@@ -32,65 +32,32 @@
  * Software.
  */
 
-package ch.niceideas.eskimo.utils;
+
+package ch.niceideas.eskimo.types;
 
 import org.junit.jupiter.api.Test;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ReturnStatusHelperTest {
-
-    @Test
-    public void testCreateErrorStatus() {
-        assertEquals("{\n" +
-                "  \"error\": \"test\",\n" +
-                "  \"status\": \"KO\"\n" +
-                "}", ReturnStatusHelper.createErrorStatus("test"));
-    }
+public class NodeTest {
 
     @Test
-    public void testCreateEncodedErrorStatusMultiple() {
+    public void testEdgeCases() {
 
-        Exception root = new Exception("Root Exception",
-                new Exception("inner exception", new Exception("leaf exception")));
+        assertThrows(IllegalArgumentException.class, () -> Node.fromName(null));
+        assertThrows(IllegalArgumentException.class, () -> Node.fromAddress(null));
 
-        assertEquals("{\n" +
-                "  \"error\": \"" + Base64.getEncoder().encodeToString(
-                            ("Root Exception\n" +
-                            "inner exception\n" +
-                            "leaf exception").getBytes(StandardCharsets.UTF_8)) + "\",\n" +
-                "  \"status\": \"KO\"\n" +
-                "}", ReturnStatusHelper.createEncodedErrorStatus(root));
-    }
+        assertThrows(IllegalArgumentException.class, () -> Node.fromName(""));
+        assertThrows(IllegalArgumentException.class, () -> Node.fromAddress(""));
 
+        assertThrows(IllegalArgumentException.class, () -> Node.fromName(Node.KUBE_NA_FLAG.getName()));
+        assertThrows(IllegalArgumentException.class, () -> Node.fromAddress(Node.KUBE_NA_FLAG.getAddress()));
 
-    @Test
-    public void testCreateEncodedErrorStatus() {
-        assertEquals("{\n" +
-                "  \"error\": \"" + Base64.getEncoder().encodeToString("test".getBytes(StandardCharsets.UTF_8)) + "\",\n" +
-                "  \"status\": \"KO\"\n" +
-                "}", ReturnStatusHelper.createEncodedErrorStatus(new RuntimeException("test")));
-    }
+        assertThrows(IllegalArgumentException.class, () -> Node.fromName(Node.KUBERNETES_FLAG.getName()));
+        assertThrows(IllegalArgumentException.class, () -> Node.fromAddress(Node.KUBERNETES_FLAG.getAddress()));
 
-    @Test
-    public void testCreateClearStatus() {
-        assertEquals("{\n" +
-                "  \"clear\": \"test\",\n" +
-                "  \"processingPending\": true,\n" +
-                "  \"status\": \"OK\"\n" +
-                "}", ReturnStatusHelper.createClearStatus("test", true));
-    }
-
-    @Test
-    public void testCreateClearStatusWithMessage() {
-        assertEquals("{\n" +
-                "  \"clear\": \"test\",\n" +
-                "  \"message\": \"test-message\",\n" +
-                "  \"processingPending\": true,\n" +
-                "  \"status\": \"OK\"\n" +
-                "}", ReturnStatusHelper.createClearStatusWithMessage("test", true, "test-message"));
+        assertEquals (Node.KUBERNETES_NODE, Node.fromName(Node.KUBERNETES_NODE.getName()));
+        assertEquals (Node.KUBERNETES_NODE, Node.fromAddress(Node.KUBERNETES_NODE.getAddress()));
     }
 }

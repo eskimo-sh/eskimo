@@ -36,6 +36,7 @@ package ch.niceideas.eskimo.html;
 
 import ch.niceideas.common.utils.ResourceUtils;
 import ch.niceideas.common.utils.StreamUtils;
+import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,22 +63,46 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
         js("eskimoServicesSettings.eskimoMessaging = eskimoMessaging");
         js("eskimoServicesSettings.eskimoSettingsOperationsCommand = eskimoSettingsOperationsCommand");
         js("eskimoServicesSettings.eskimoNodesConfig = eskimoNodesConfig");
-        js("eskimoServicesSettings.initialize()");
-
-        waitForElementIdInDOM("reset-services-settings-btn");
 
         String jsonConfig = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testConfig.json"), StandardCharsets.UTF_8);
 
         js("window.TEST_SERVICE_SETTINGS = " + jsonConfig + ";");
 
-        js("eskimoServicesSettings.setServicesSettingsForTest(TEST_SERVICE_SETTINGS.settings)");
+        js("" +
+                "$.ajaxGet = function (object) {\n" +
+                "    if (object.url === 'load-services-settings') {" +
+                "        object.success({status: 'OK', settings: window.TEST_SERVICE_SETTINGS.settings});\n" +
+                "    } else {\n" +
+                "        console.log(object); " +
+                "    } \n" +
+                "}");
 
-        js("$('#inner-content-services-settings').css('display', 'inherit')");
-        js("$('#inner-content-services-settings').css('visibility', 'visible')");
+        js("eskimoServicesSettings.initialize()");
+
+        waitForElementIdInDOM("reset-services-settings-btn");
+    }
+
+    @Test
+    public void testChangeHandler() throws Exception {
+
+        testShowServicesSettings();
+
+        getElementById("broker-num---network---threads").sendKeys("abc\n");
+
+        ActiveWaiter.wait(() -> js("return $('#broker-num---network---threads').attr('class')").toString().contains("invalid") );
+        assertClassContains("invalid", "#broker-num---network---threads");
+
+        js("$('#broker-num---network---threads').val('');");
+        getElementById("broker-num---network---threads").sendKeys("4\n");
+
+        ActiveWaiter.wait(() -> !js("return $('#broker-num---network---threads').attr('class')").toString().contains("invalid") );
+        assertFalse(js("return $('#broker-num---network---threads').attr('class')").toString().contains("invalid"));
     }
 
     @Test
     public void testCheckServicesSettings() throws Exception {
+
+        testShowServicesSettings();
 
         String testFormWithValidation = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testFormWithValidation.json"), StandardCharsets.UTF_8);
 
@@ -100,8 +125,6 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
 
     @Test
     public void testShowServicesSettings() {
-
-        js("$.ajaxGet = function(callback) { console.log(callback); }");
 
         js("eskimoServicesSettings.showServicesSettings();");
 
@@ -128,9 +151,9 @@ public class EskimoServicesSettingsTest extends AbstractWebTest {
     @Test
     public void testLayoutServicesSettings() {
 
-        js("eskimoServicesSettings.layoutServicesSettings();");
+        testShowServicesSettings();
 
-        //System.out.println (page.asXml());
+        js("eskimoServicesSettings.layoutServicesSettings();");
 
         // test a few input values
 

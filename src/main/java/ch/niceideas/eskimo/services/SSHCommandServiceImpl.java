@@ -223,7 +223,7 @@ public class SSHCommandServiceImpl implements SSHCommandService {
 
             scp.put(filePath, "/home/" + systemConfig.getValueForPath(SetupService.SSH_USERNAME_FIELD), "0755");
 
-            // scp is stateless and doesn't nee to be closed
+            // scp is stateless and doesn't need to be closed
 
         } catch (IOException  | FileException | JSONException | SetupException e) {
             logger.error (e, e);

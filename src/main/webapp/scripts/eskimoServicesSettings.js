@@ -100,9 +100,6 @@ eskimo.ServicesSettings = function () {
             error: errorHandler
         });
     }
-    this.setServicesSettingsForTest = function (servicesConfig) {
-        SERVICES_SETTINGS = servicesConfig;
-    };
 
     function checkServicesSettings(servicesConfigForm) {
 

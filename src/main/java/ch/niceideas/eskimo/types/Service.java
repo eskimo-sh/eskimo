@@ -62,8 +62,6 @@ public class Service implements Comparable<Service>, Serializable {
     @EqualsAndHashCode.Include
     private String name;
 
-    protected Service() {}
-
     protected Service (String name) {
         this.name = name;
     }

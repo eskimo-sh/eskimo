@@ -52,18 +52,8 @@ public class SSHConnection implements Closeable {
 
     private final int readTimeout;
 
-    public SSHConnection(Node node, int readTimeout) {
-        under = new Connection (node.getAddress(), 22);
-        this.readTimeout = readTimeout;
-    }
-
     public SSHConnection(Node node, int port, int readTimeout) {
         under = new Connection (node.getAddress(), port);
-        this.readTimeout = readTimeout;
-    }
-
-    public SSHConnection(Node node, int port, String sourceAddress, int readTimeout) {
-        under = new Connection (node.getAddress(), port, sourceAddress);
         this.readTimeout = readTimeout;
     }
 
@@ -83,16 +73,13 @@ public class SSHConnection implements Closeable {
         return under.authenticateWithPublicKey(user, pemFile, password);
     }
 
+    @Override
     public void close() {
         under.close();
     }
 
     public ConnectionInfo connect() throws IOException {
         return under.connect();
-    }
-
-    public ConnectionInfo connect(ServerHostKeyVerifier verifier) throws IOException {
-        return under.connect(verifier);
     }
 
     public ConnectionInfo connect(ServerHostKeyVerifier verifier, int connectTimeout, int kexTimeout) throws IOException {
@@ -103,20 +90,12 @@ public class SSHConnection implements Closeable {
         return under.createLocalPortForwarder(localPort, hostToConnect, portToConnect);
     }
 
-    public LocalPortForwarder createLocalPortForwarder(InetSocketAddress addr, String hostToConnect, int portToConnect) throws IOException {
-        return under.createLocalPortForwarder(addr, hostToConnect, portToConnect);
-    }
-
     public SCPClient createSCPClient() throws IOException {
         return under.createSCPClient();
     }
 
     public String getHostname() {
         return under.getHostname();
-    }
-
-    public int getPort() {
-        return under.getPort();
     }
 
     public boolean isAuthenticationComplete() {
@@ -135,18 +114,11 @@ public class SSHConnection implements Closeable {
         under.setTCPNoDelay(enable);
     }
 
-    public void ping() throws IOException {
-        under.ping();
-    }
-
-    public Throwable getReasonClosedCause() {
-        return under.getReasonClosedCause();
-    }
-
     public int exec(String command, OutputStream output) throws IOException, InterruptedException {
         return under.exec(command, output);
     }
 
+    @Override
     public String toString() {
         return under.toString();
     }

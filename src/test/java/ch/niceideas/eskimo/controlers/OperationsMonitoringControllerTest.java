@@ -42,6 +42,8 @@ import ch.niceideas.eskimo.services.OperationsMonitoringService;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
 import org.json.JSONObject;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,8 +54,7 @@ import org.springframework.test.context.TestPropertySource;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
@@ -67,19 +68,24 @@ public class OperationsMonitoringControllerTest {
     @Autowired
     private OperationsMonitoringService operationsMonitoringService;
 
-    @Test
-    public void testFetchOperationsStatus() throws Exception {
+    @AfterEach
+    public void tearDown() {
+        operationsMonitoringService.endCommand(true);
+    }
+
+    @BeforeEach
+    public void setup() throws Exception {
 
         operationsMonitoringService.startCommand(new SimpleOperationCommand(
                 SimpleOperationCommand.SimpleOperation.COMMAND, Service.from("test"), Node.fromAddress("192.168.10.15")) {
-              @Override
-              public List<SimpleOperationId> getAllOperationsInOrder(OperationsContext context) {
-                  return new ArrayList<>() {{
-                      add (new SimpleOperationId(SimpleOperation.COMMAND, Service.from("1"), Node.fromAddress("192.168.10.15")));
-                      add (new SimpleOperationId(SimpleOperation.COMMAND, Service.from("2"), Node.fromAddress("192.168.10.15")));
-                      add (new SimpleOperationId(SimpleOperation.COMMAND, Service.from("3"), Node.fromAddress("192.168.10.15")));
-                  }} ;
-              }
+            @Override
+            public List<SimpleOperationId> getAllOperationsInOrder(OperationsContext context) {
+                return new ArrayList<>() {{
+                    add (new SimpleOperationId(SimpleOperation.COMMAND, Service.from("1"), Node.fromAddress("192.168.10.15")));
+                    add (new SimpleOperationId(SimpleOperation.COMMAND, Service.from("2"), Node.fromAddress("192.168.10.15")));
+                    add (new SimpleOperationId(SimpleOperation.COMMAND, Service.from("3"), Node.fromAddress("192.168.10.15")));
+                }} ;
+            }
         });
 
         operationsMonitoringService.addInfo(
@@ -93,51 +99,108 @@ public class OperationsMonitoringControllerTest {
         operationsMonitoringService.addInfo(
                 new SimpleOperationCommand.SimpleOperationId(SimpleOperationCommand.SimpleOperation.COMMAND, Service.from("3"), Node.fromAddress("192.168.10.15")),
                 "TEST-3");
+    }
 
-        assertTrue (new JSONObject("{\n" +
-                        "    \"result\": \"OK\",\n" +
-                        "    \"messages\": {\n" +
-                        "        \"command_2_192-168-10-15\": {\n" +
-                        "            \"lines\": \"VEVTVC0yCg==\",\n" +
-                        "            \"lastLine\": 1\n" +
-                        "        },\n" +
-                        "        \"command_3_192-168-10-15\": {\n" +
-                        "            \"lines\": \"VEVTVC0zCg==\",\n" +
-                        "            \"lastLine\": 1\n" +
-                        "        },\n" +
-                        "        \"command_1_192-168-10-15\": {\n" +
-                        "            \"lines\": \"VEVTVC0xCg==\",\n" +
-                        "            \"lastLine\": 1\n" +
-                        "        }\n" +
-                        "    },\n" +
-                        "    \"globalMessages\": {\n" +
-                        "        \"lines\": \"\",\n" +
-                        "        \"lastLine\": 0\n" +
-                        "    },\n" +
-                        "    \"labels\": [\n" +
-                        "        {\n" +
-                        "            \"operation\": \"command_1_192-168-10-15\",\n" +
-                        "            \"label\": \"Executing command of 1 on 192.168.10.15\"\n" +
-                        "        },\n" +
-                        "        {\n" +
-                        "            \"operation\": \"command_2_192-168-10-15\",\n" +
-                        "            \"label\": \"Executing command of 2 on 192.168.10.15\"\n" +
-                        "        },\n" +
-                        "        {\n" +
-                        "            \"operation\": \"command_3_192-168-10-15\",\n" +
-                        "            \"label\": \"Executing command of 3 on 192.168.10.15\"\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"status\": {\n" +
-                        "        \"command_2_192-168-10-15\": \"INIT\",\n" +
-                        "        \"command_3_192-168-10-15\": \"INIT\",\n" +
-                        "        \"command_1_192-168-10-15\": \"INIT\"\n" +
-                        "    }\n" +
-                        "}").similar(new JSONObject(
-                operationsMonitoringController.fetchOperationsStatus("{" +
-                    "\"test_1_192-168-10-15\" : 0," +
-                    "\"test_2_192-168-10-15\" : 1," +
-                    "\"test_3_192-168-10-15\" : 2," +
-                    "}"))));
+    @Test
+    public void testFetchOperationsStatusInitial() {
+
+        JSONObject expectedResult = new JSONObject("{\n" +
+                "    \"result\": \"OK\",\n" +
+                "    \"messages\": {\n" +
+                "        \"command_2_192-168-10-15\": {\n" +
+                "            \"lines\": \"VEVTVC0yCg==\",\n" +
+                "            \"lastLine\": 1\n" +
+                "        },\n" +
+                "        \"command_3_192-168-10-15\": {\n" +
+                "            \"lines\": \"VEVTVC0zCg==\",\n" +
+                "            \"lastLine\": 1\n" +
+                "        },\n" +
+                "        \"command_1_192-168-10-15\": {\n" +
+                "            \"lines\": \"VEVTVC0xCg==\",\n" +
+                "            \"lastLine\": 1\n" +
+                "        }\n" +
+                "    },\n" +
+                "    \"globalMessages\": {\n" +
+                "        \"lines\": \"\",\n" +
+                "        \"lastLine\": 0\n" +
+                "    },\n" +
+                "    \"labels\": [\n" +
+                "        {\n" +
+                "            \"operation\": \"command_1_192-168-10-15\",\n" +
+                "            \"label\": \"Executing command of 1 on 192.168.10.15\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"operation\": \"command_2_192-168-10-15\",\n" +
+                "            \"label\": \"Executing command of 2 on 192.168.10.15\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"operation\": \"command_3_192-168-10-15\",\n" +
+                "            \"label\": \"Executing command of 3 on 192.168.10.15\"\n" +
+                "        }\n" +
+                "    ],\n" +
+                "    \"status\": {\n" +
+                "        \"command_2_192-168-10-15\": \"INIT\",\n" +
+                "        \"command_3_192-168-10-15\": \"INIT\",\n" +
+                "        \"command_1_192-168-10-15\": \"INIT\"\n" +
+                "    }\n" +
+                "}");
+
+
+        //assertEquals (expectedResult.toString(2), operationsMonitoringController.fetchOperationsStatus("{}"));
+        assertTrue (expectedResult.similar(new JSONObject(operationsMonitoringController.fetchOperationsStatus("{}"))));
+    }
+
+    @Test
+    public void testFetchOperationsStatus() {
+
+        JSONObject expectedResult = new JSONObject("{\n" +
+                "    \"result\": \"OK\",\n" +
+                "    \"messages\": {\n" +
+                "        \"command_2_192-168-10-15\": {\n" +
+                "            \"lines\": \"\",\n" +
+                "            \"lastLine\": 1\n" +
+                "        },\n" +
+                "        \"command_3_192-168-10-15\": {\n" +
+                "            \"lines\": \"VEVTVC0zCg==\",\n" +
+                "            \"lastLine\": 1\n" +
+                "        },\n" +
+                "        \"command_1_192-168-10-15\": {\n" +
+                "            \"lines\": \"VEVTVC0xCg==\",\n" +
+                "            \"lastLine\": 1\n" +
+                "        }\n" +
+                "    },\n" +
+                "    \"globalMessages\": {\n" +
+                "        \"lines\": \"\",\n" +
+                "        \"lastLine\": 0\n" +
+                "    },\n" +
+                "    \"labels\": [\n" +
+                "        {\n" +
+                "            \"operation\": \"command_1_192-168-10-15\",\n" +
+                "            \"label\": \"Executing command of 1 on 192.168.10.15\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"operation\": \"command_2_192-168-10-15\",\n" +
+                "            \"label\": \"Executing command of 2 on 192.168.10.15\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"operation\": \"command_3_192-168-10-15\",\n" +
+                "            \"label\": \"Executing command of 3 on 192.168.10.15\"\n" +
+                "        }\n" +
+                "    ],\n" +
+                "    \"status\": {\n" +
+                "        \"command_2_192-168-10-15\": \"INIT\",\n" +
+                "        \"command_3_192-168-10-15\": \"INIT\",\n" +
+                "        \"command_1_192-168-10-15\": \"INIT\"\n" +
+                "    }\n" +
+                "}");
+
+        String lastLinePerOp = "{" +
+                "\"command_1_192-168-10-15\" : 0," +
+                "\"command_2_192-168-10-15\" : 1," +
+                "\"command_3_192-168-10-15\" : 2," +
+                "}";
+
+        //assertEquals (expectedResult.toString(2), operationsMonitoringController.fetchOperationsStatus(lastLinePerOp));
+        assertTrue (expectedResult.similar(new JSONObject(operationsMonitoringController.fetchOperationsStatus(lastLinePerOp))));
     }
 }

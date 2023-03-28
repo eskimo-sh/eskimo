@@ -49,8 +49,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ContextConfiguration(classes = EskimoApplication.class)
 @SpringBootTest(classes = EskimoApplication.class)
@@ -68,7 +67,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class MasterServiceTest {
 
     @Autowired
-    private MasterServiceImpl masterService;
+    private MasterService masterService;
 
     @Autowired
     private ConfigurationServiceTestImpl configurationServiceTest;
@@ -124,33 +123,39 @@ public class MasterServiceTest {
     @DirtiesContext
     public void testUpdateStatus() {
 
-        assertEquals(0, masterService.getServiceMasterNodes().size());
-        assertEquals(0, masterService.getServiceMasterTimestamps().size());
+        assertTrue (masterService instanceof MasterServiceImpl);
+        MasterServiceImpl impl = (MasterServiceImpl) masterService;
+
+        assertEquals(0, impl.getServiceMasterNodes().size());
+        assertEquals(0, impl.getServiceMasterTimestamps().size());
 
         masterService.updateStatus();
 
-        assertEquals(1, masterService.getServiceMasterNodes().size());
-        assertEquals(1, masterService.getServiceMasterTimestamps().size());
+        assertEquals(1, impl.getServiceMasterNodes().size());
+        assertEquals(1, impl.getServiceMasterTimestamps().size());
 
-        assertEquals(Node.fromAddress("192.168.10.11"), masterService.getServiceMasterNodes().get(Service.from("distributed-filesystem")));
-        assertNotNull(masterService.getServiceMasterTimestamps().get(Service.from("distributed-filesystem")));
+        assertEquals(Node.fromAddress("192.168.10.11"), impl.getServiceMasterNodes().get(Service.from("distributed-filesystem")));
+        assertNotNull(impl.getServiceMasterTimestamps().get(Service.from("distributed-filesystem")));
     }
 
     @Test
     @DirtiesContext
     public void testGetMasterStatus() throws Exception {
 
-        assertEquals(0, masterService.getServiceMasterNodes().size());
-        assertEquals(0, masterService.getServiceMasterTimestamps().size());
+        assertTrue (masterService instanceof MasterServiceImpl);
+        MasterServiceImpl impl = (MasterServiceImpl) masterService;
+
+        assertEquals(0, impl.getServiceMasterNodes().size());
+        assertEquals(0, impl.getServiceMasterTimestamps().size());
 
         // this sets a default master
         masterService.getMasterStatus();
 
-        assertEquals(1, masterService.getServiceMasterNodes().size());
-        assertEquals(1, masterService.getServiceMasterTimestamps().size());
+        assertEquals(1, impl.getServiceMasterNodes().size());
+        assertEquals(1, impl.getServiceMasterTimestamps().size());
 
-        assertEquals(Node.fromAddress("192.168.10.11"), masterService.getServiceMasterNodes().get(Service.from("distributed-filesystem")));
-        assertNotNull(masterService.getServiceMasterTimestamps().get(Service.from("distributed-filesystem")));
+        assertEquals(Node.fromAddress("192.168.10.11"), impl.getServiceMasterNodes().get(Service.from("distributed-filesystem")));
+        assertNotNull(impl.getServiceMasterTimestamps().get(Service.from("distributed-filesystem")));
     }
 
 }
