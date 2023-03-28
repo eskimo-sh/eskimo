@@ -57,7 +57,7 @@ public final class Session extends Thread {
 
     private final SSHConnection connection;
 
-    private final ProcessWithPty childProcess;
+    private final ProcessWithPtyWrapper childProcess;
 
     @Getter
     private final Terminal terminal;
@@ -84,7 +84,7 @@ public final class Session extends Thread {
      *      A child process forked with pty as its stdin/stdout..
      *      Make sure to set the correct terminal name in its environment variable.
      */
-    public Session(SSHConnection connection, int width, int height, ProcessWithPty childProcessWithTty) throws IOException {
+    public Session(SSHConnection connection, int width, int height, ProcessWithPtyWrapper childProcessWithTty) throws IOException {
         this.connection = connection;
         this.terminal = new Terminal(width,height);
         this.childProcess = childProcessWithTty;
@@ -168,7 +168,7 @@ public final class Session extends Thread {
         }
     }
 
-    public Process getChildProcess() {
+    public ProcessWithPtyWrapper getChildProcess() {
         return childProcess;
     }
 

@@ -35,30 +35,33 @@
 package ch.niceideas.eskimo.terminal;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * {@link Process} with additional controls for pseudo-terminal.
  *
  */
-public abstract class ProcessWithPty extends Process {
+public abstract class ProcessWithPtyWrapper { // extends Process {
 
-    protected ProcessWithPty() {
+    protected ProcessWithPtyWrapper() {
     }
 
     public abstract void setWindowSize(int width, int height) throws IOException;
 
     public abstract void kill(int signal) throws IOException;
 
-    /**
-     * Is this process still alive?
-     */
-    @Override
-    public boolean isAlive() {
-        try {
-            exitValue();
-            return true;
-        } catch (IllegalThreadStateException e) {
-            return false;
-        }
-    }
+    public abstract void destroy();
+
+    public abstract OutputStream getOutputStream();
+
+    public abstract InputStream getErrorStream();
+
+    public abstract InputStream getInputStream();
+
+    public abstract int exitValue();
+
+    public abstract boolean isAlive();
+
+    public abstract int waitFor() throws InterruptedException;
 }

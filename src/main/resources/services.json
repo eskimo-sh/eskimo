@@ -1909,6 +1909,12 @@
             "comment": "The setting 'zeppelin_note_isolation' is used to control whether interpreter processes are created and managed globally for the whole zeppelin process or per note.\nPossible values are:\n 'shared' : one single instance of every interpreter is created and shared among users and notes (better for laboratory).\n 'per_note' : one instance of interpreter is created for every note (better for production - but requires a lot of RAM).\n",
             "validationRegex": "^(per_note)$|^(shared)$",
             "defaultValue": "shared"
+          },
+          {
+            "name": "zeppelin_jobmanager_enable",
+            "comment": "The setting 'zeppelin_jobmanager_enable' is used to enable the job manager in Zeppelin. The Job tab in zeppelin page seems not so useful instead it cost lots of memory and affect the performance, so it's disabled by default..\n",
+            "validationRegex": "^(true)$|^(false)$",
+            "defaultValue": "false"
           }
         ]
       }

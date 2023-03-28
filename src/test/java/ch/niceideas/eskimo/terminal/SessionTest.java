@@ -79,7 +79,7 @@ public class SessionTest {
     }
 
 
-    private ProcessWithPty getTestProcessWithPty() throws IOException {
+    private ProcessWithPtyWrapper getTestProcessWithPty() throws IOException {
 
         ProcessBuilder pb = new ProcessBuilder();
         pb.redirectErrorStream(true);
@@ -87,7 +87,7 @@ public class SessionTest {
         pyCmds.add("/bin/bash");
         final Process base = pb.start();
 
-        return new ProcessWithPty() {
+        return new ProcessWithPtyWrapper() {
             final DataOutputStream out = new DataOutputStream(base.getOutputStream());
             @Override
             public void setWindowSize(int width, int height) {
@@ -125,6 +125,11 @@ public class SessionTest {
             @Override
             public int exitValue() {
                 return base.exitValue();
+            }
+
+            @Override
+            public boolean isAlive() {
+                return base.isAlive();
             }
 
             @Override

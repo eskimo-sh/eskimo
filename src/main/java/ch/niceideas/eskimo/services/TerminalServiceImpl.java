@@ -38,7 +38,7 @@ import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.model.SSHConnection;
 import ch.niceideas.eskimo.terminal.ScreenImage;
 import ch.niceideas.eskimo.terminal.Session;
-import ch.niceideas.eskimo.terminal.SshProcessWithPty;
+import ch.niceideas.eskimo.terminal.SshProcess;
 import ch.niceideas.eskimo.types.Node;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -210,7 +210,7 @@ public class TerminalServiceImpl implements TerminalService {
             innerSession.requestPTY(Session.AJAX_TERM_NAME, sessionWidth, sessionHeight, 0, 0, null);
             innerSession.startShell();
 
-            session = new Session(con, sessionWidth, sessionHeight, new SshProcessWithPty(innerSession));
+            session = new Session(con, sessionWidth, sessionHeight, new SshProcess(innerSession));
 
             sessions.put(sessionId, session);
 
@@ -218,7 +218,7 @@ public class TerminalServiceImpl implements TerminalService {
 
             // test it
             try {
-                ((SshProcessWithPty) session.getChildProcess()).getSession().ping();
+                ((SshProcess) session.getChildProcess()).getSession().ping();
             } catch (IOException e) {
                 logger.warn ("Session got into problems. Recreating");
                 logger.warn (e.getMessage());

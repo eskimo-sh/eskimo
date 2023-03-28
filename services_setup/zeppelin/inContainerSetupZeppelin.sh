@@ -286,7 +286,16 @@ sed -i -n '1h;1!H;${;g;s/'\
 
 echo " - Preparing job manager enablement setting injection"
 
-#FIXME Implement me
+sed -i -n '1h;1!H;${;g;s/'\
+'<property>\n'\
+'  <name>zeppelin.jobmanager.enable<\/name>\n'\
+'  <value>false<\/value>\n'\
+'/'\
+'<property>\n'\
+'  <name>zeppelin.jobmanager.enable<\/name>\n'\
+'  <value>ESKIMO_JOBMANAGER_ENABLE<\/value>\n'\
+'/g;p;}' /usr/local/lib/zeppelin/conf/zeppelin-site.xml
+
 
 
 echo " - Creating default eskimo_settings.conf"

@@ -96,8 +96,6 @@ echo " - Injecting isolation configuration from settings"
 # sourcing custom config
 . /usr/local/lib/zeppelin/conf/eskimo_settings.conf
 
-# FIXME THis is not working, if the user changes his mind, hen we're screwed
-
 if [[ $zeppelin_note_isolation == "per_note" ]]; then
 
    sed -i s/"ESKIMO_PER_NOTE_ISOLATION"/"isolated"/g /usr/local/lib/zeppelin/conf/interpreter.json
@@ -112,7 +110,11 @@ fi
 
 echo " - Tuning zeppelin-site.xml"
 
-#FIXME Implement me
+if [[ $zeppelin_jobmanager_enable == "true" ]]; then
+    sed -i s/"ESKIMO_JOBMANAGER_ENABLE"/"true"/g /usr/local/lib/zeppelin/conf/zeppelin-site.xml
+else
+    sed -i s/"ESKIMO_JOBMANAGER_ENABLE"/"false"/g /usr/local/lib/zeppelin/conf/zeppelin-site.xml
+fi
 
 
 echo " - Start glusterMountCheckerPeriodic.sh script"

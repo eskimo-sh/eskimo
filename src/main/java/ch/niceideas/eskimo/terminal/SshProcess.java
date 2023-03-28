@@ -42,13 +42,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Wraps SSH {@link Session} as {@link ProcessWithPty}.
+ * Wraps SSH {@link Session} as {@link ProcessWithPtyWrapper}.
  */
-public class SshProcessWithPty extends ProcessWithPty {
+public class SshProcess extends ProcessWithPtyWrapper {
 
     private final Session ssh;
 
-    public SshProcessWithPty(Session ssh) {
+    public SshProcess(Session ssh) {
         this.ssh = ssh;
     }
 
