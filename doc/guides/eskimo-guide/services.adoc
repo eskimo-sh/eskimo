@@ -596,12 +596,12 @@ be used to program Spark batch jobs, Spark Streaming jobs, Flink jobs, etc.
 
 The different sample note packages with Eskimo and available from within Zeppelin are described hereafter.
 
-//===== ElasticSearch Demo (Queries)
-//
-//This is a very simple demo note showing how to submit queries to ElasticSearch from a Zeppelin note.
-//
-//It uses the elasticsearch interpreter from Zeppelin. +
-//One needs to have loaded the "Sample flight data" from within Kibana in prior to execute the queries from this notebook.
+===== ElasticSearch Demo (Queries)
+
+This is a very simple demo note showing how to submit queries to ElasticSearch from a Zeppelin note.
+
+It uses the elasticsearch interpreter from Zeppelin. +
+One needs to have loaded the "Sample flight data" from within Kibana in prior to execute the queries from this notebook.
 
 ===== Logstash Demo
 
@@ -677,37 +677,6 @@ It does not require any other note executions.
 Multiple paragraphs are provided to read data from / send data to the kafka streams demo program as well as top it
 (since one can't use the _stop_ button to stop java program run by the java interpreter as of Zeppelin 0.9).
 
-//==== Zeppelin 0.10-SNAPSHOT bugs and workarounds
-//
-//In the version 0.4 of Eskimo, we're using a SNAPSHOT version of Zeppelin-0.9 since the 0.9 version is not released yet
-//and the former 0.8 version is incompatible with most software versions packages within Eskimo.
-//
-//Unfortunately this SNAPSHOT version is a development version and suffers from some bugs.
-//
-//These bugs and workarounds are reported hereunder:
-//
-//===== REST API for note export is broken.
-//
-//* *Problem* : after importing a note using the REST API, the note is not properly saved, it only exists in
-//memory. +
-//Restarting zeppelin would loose it.
-//* *Workaround* : Commit it a first time, the commit it again with a little change (like adding a space somewhere) and
-//it is saved for real.
-//
-//WARNING: to avoid the need to do it after provisisioning of the Eskimo sample notes, as of the current version of
-//Eskimo, sample notes provisioning is done py packaging directly the Zeppelin underlying note storage. +
-//One might want to have a look at the zeppelin `inContainerStartService.sh` startup script to find out how
-//this is done.
-//
-//===== Importing a note from the UI is broken
-//
-//* *Problem* : Importing a note from the UI is broken. The UI always reports that the file is exceeding maximum size
-//regardless of actual size.
-//* *Workaround* : Use the REST API to importe note. +
-//For instance if your have a note `test.json` that you want to import, go in its folder and type following command: +
-//`curl -XPOST -H "Content-Type: application/json" http://localhost:38080/api/notebook/import -d @test.json` +
-//(replace localhost by the IP address of the node running zeppelin) +
-//(See above note about REST API import workaround)
 
 === Prometheus
 

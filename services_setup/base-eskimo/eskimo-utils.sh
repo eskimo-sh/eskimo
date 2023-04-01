@@ -537,15 +537,17 @@ function get_replicas() {
     local DEPLOY_STRAT=$(eval "echo \$ESKIMO_KUBE_DEPLOYMENT_${SERVICE_UP}_DEPLOY_STRAT")
     local REPLICAS=$(eval "echo \$ESKIMO_KUBE_REQUEST_${SERVICE_UP}_REPLICAS")
 
+    local NUMBER_OF_KUBE_SLAVES=$(cat /etc/eskimo_topology.sh | grep NODE_NBR_KUBE_SLAVE | wc -l)
+
     # default is CLUSTER_WIDE
     if [[ ($DEPLOY_STRAT == "" || $DEPLOY_STRAT == "CLUSTER_WIDE") && $REPLICAS == "" ]]; then
-        echo $ESKIMO_NODE_COUNT
+        echo $NUMBER_OF_KUBE_SLAVES
     else
 
         if [[ $REPLICAS == "" ]]; then
             echo $ESKIMO_NODE_COUNT
         else
-            echo $REPLICAS
+            echo $NUMBER_OF_KUBE_SLAVES
         fi
     fi
 }

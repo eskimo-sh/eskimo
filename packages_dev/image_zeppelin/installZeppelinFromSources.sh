@@ -39,16 +39,16 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "-- INSTALLING ZEPPELIN ---------------------------------------------------------"
 
-if [ -z "$1" ]; then
-   echo "Expecting local user name to use for build as argument"
-   exit 1
-fi
-export USER_TO_USE=$1
-
-if [ -z "$2" ]; then
-   echo "Expecting local user ID to use for build as argument"
-   exit 2
-fi
+#if [ -z "$1" ]; then
+#   echo "Expecting local user name to use for build as argument"
+#   exit 1
+#fi
+#export USER_TO_USE=$1
+#
+#if [ -z "$2" ]; then
+#   echo "Expecting local user ID to use for build as argument"
+#   exit 2
+#fi
 export UID_TO_USE=$2
 
 if [ -z "$ZEPPELIN_VERSION" ]; then
@@ -84,27 +84,6 @@ echo " - Install missing dependencies to build zeppelin sources"
 DEBIAN_FRONTEND=noninteractive apt-get -yq install libfontconfig1 r-base-dev r-cran-evaluate apt-transport-https lsb-release git > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -11
 
-# Trying to let zeppelin install npm on its own
-#echo " - Adding node and NPM source"
-#sudo bash -c "curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -" > /tmp/zeppelin_install_log 2>&1
-#fail_if_error $? "/tmp/zeppelin_install_log" -12
-#
-#echo " - Installing node JS"
-#sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install nodejs > /tmp/zeppelin_install_log 2>&1
-#fail_if_error $? "/tmp/zeppelin_install_log" -13
-
-
-# Using root to avoid npm problems
-#echo " - Creating local build user"
-#echo "$USER_TO_USE:x:$UID_TO_USE:$UID_TO_USE:$USER_TO_USE,,,:/home/$USER_TO_USE:/bin/bash" >> /etc/passwd
-#
-#echo " - Creating home folder for local build user"
-#mkdir /home/$USER_TO_USE
-#chown -R $USER_TO_USE /home/$USER_TO_USE
-#
-#echo " - Allowing local build user to use build folder"
-#chmod -R 777 .
-
 echo " - Downloading Zeppelin git repository archive"
 rm -Rf zeppelin
 wget https://github.com/apache/zeppelin/archive/refs/heads/master.zip   > /tmp/zeppelin_install_log 2>&1
@@ -113,24 +92,15 @@ fail_if_error $? "/tmp/zeppelin_install_log" -2
 
 echo " - Extracting Zeppelin source code"
 unzip master.zip   > /tmp/zeppelin_install_log 2>&1
-#unzip branch-$ZEPPELIN_VERSION.zip   > /tmp/zeppelin_install_log 2>&1
 fail_if_error $? "/tmp/zeppelin_install_log" -2
 
 mv zeppelin-master zeppelin
-#mv zeppelin-branch-$ZEPPELIN_VERSION zeppelin
-
-#echo " - Changing build folder owner"
-#chown -R $USER_TO_USE zeppelin
-#fail_if_error $? "/tmp/zeppelin_install_log" -1
 
 cd zeppelin/ || (echo "Couldn't cd to zeppelin/" && exit 1)
 
-echo " - update all pom.xml to use scala $SCALA_VERSION"
-bash $PWD/dev/change_scala_version.sh $SCALA_VERSION > /tmp/zeppelin_install_log 2>&1
-fail_if_error $? "/tmp/zeppelin_install_log" -2
-
-#echo " - HACK - Fixing ElasticSearch interpreter"
-#sed -i s/"hits\/total"/"hits\/total\/value"/g /tmp/zeppelin_build/zeppelin/elasticsearch/src/main/java/org/apache/zeppelin/elasticsearch/client/HttpBasedClient.java
+#echo " - update all pom.xml to use scala $SCALA_VERSION"
+#bash $PWD/dev/change_scala_version.sh $SCALA_VERSION > /tmp/zeppelin_install_log 2>&1
+#fail_if_error $? "/tmp/zeppelin_install_log" -2
 
 #echo " - Setting JAVA_HOME to java-1.8.0-openjdk-amd64"
 export JAVA_HOME=/usr/local/lib/jvm/openjdk-8/
@@ -140,27 +110,59 @@ export PATH=$JAVA_HOME/bin:$PATH
 #rm /etc/alternatives/java
 #ln -s /usr/lib/jvm/java-8-openjdk-amd64/bin/java /etc/alternatives/java
 
+echo " - Applying patches"
+
+patch elasticsearch/src/main/java/org/apache/zeppelin/elasticsearch/client/HttpBasedClient.java < /scripts/source_patches/elasticsearch_HttpBasedClient.java.patch
+fail_if_error $? "/tmp/zeppelin_install_log" -21
+
+
 echo " - Removing npm lock file"
 mv zeppelin-web/package-lock.json zeppelin-web/package-lock.json.bak
 
 echo " - build zeppelin with all interpreters"
-for i in $(seq 1 2); do  # 2 attempts since sometimes download of packages fails
+function build_zeppelin(){
     echo "   + attempt $i"
-    mvn install -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr  > /tmp/zeppelin_install_log 2>&1
+    mvn install -DskipTests -Dcheckstyle.skip -Pflink-$FLINK_VERSION_FOR_ZEPPELIN -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr  > /tmp/zeppelin_install_log 2>&1
+    result=$?
+    return $result
+}
+
+export i=1
+while (true); do
+    build_zeppelin
     if [[ $? == 0 ]]; then
         echo "   + succeeded !"
         break
     else
-        if [[ $i == 2 ]]; then
-            echo "Connecto to container and do a 'cat /tmp/zeppelin_install_log' to get logs"
-            exit 10
+
+        if [[ $i -gt 10 ]]; then
+            echo "Couldn't successfully build zeppelin in 10 attempts, quitting ..."
+            exit 160
         fi
+
+        # Analyzing error to find out what went wrong
+
+        # bower install problem
+        if [[ $(tail -400 /tmp/zeppelin_install_log | grep -F "Cannot find where you keep your Bower packages") != "" ]]; then
+
+            echo "- Running bower fix"
+            cd /tmp/zeppelin_build/zeppelin/zeppelin-web || exit 101
+            ./node_modules/.bin/bower install --allow-root > /tmp/zeppelin_install_log 2>&1
+            if [[ $? != 0 ]]; then
+                echo "Failed to run bower fix"
+                exit 151
+            fi
+            cd /tmp/zeppelin_build/zeppelin/ || exit 102
+        fi
+
+        # FIXME remove me
+        #echo " - UNNOWN ERROR HAPPENED !!!!"
+        #bash
     fi
+
+    export i=$((i+1))
 done
 
-#echo " - Installing with maven"
-#mvn install -DskipTests -Pspark-$SPARK_VERSION_MAJOR -Pscala-$SCALA_VERSION -Pbuild-distr  > /tmp/zeppelin_install_log 2>&1
-#fail_if_error $? "/tmp/zeppelin_install_log" -6
 
 echo " - Creating setup temp directory"
 mkdir -p /tmp/zeppelin_setup/
@@ -240,9 +242,15 @@ export ZEPPELIN_PROC_ID=-1
 
 echo " - Cleaning up"
 returned_to_saved_dir
+rm -Rf $HOME/.m2/repository
 #sudo rm -Rf /tmp/zeppelin_setup
 #sudo rm -Rf /tmp/zeppelin_build
-#sudo rm -Rf /home/$USER_TO_USE
+
+echo "  + removing build packages"
+DEBIAN_FRONTEND=noninteractive apt-get -yq remove  r-base-dev r-cran-evaluate > /tmp/zeppelin_install_log 2>&1
+
+echo "  + auto-removing packages not required anymore"
+DEBIAN_FRONTEND=noninteractive apt -y autoremove > /tmp/zeppelin_install_log 2>&1
 
 
 
@@ -254,5 +262,3 @@ fi
 
 # Caution : the in container setup script must mandatorily finish with this log"
 echo "$IN_CONTAINER_INSTALL_SUCESS_MESSAGE"
-
-
