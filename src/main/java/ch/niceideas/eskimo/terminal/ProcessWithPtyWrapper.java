@@ -42,26 +42,23 @@ import java.io.OutputStream;
  * {@link Process} with additional controls for pseudo-terminal.
  *
  */
-public abstract class ProcessWithPtyWrapper { // extends Process {
+public interface ProcessWithPtyWrapper {
 
-    protected ProcessWithPtyWrapper() {
-    }
+    void setWindowSize(int width, int height) throws IOException;
 
-    public abstract void setWindowSize(int width, int height) throws IOException;
+    void kill(int signal) throws IOException;
 
-    public abstract void kill(int signal) throws IOException;
+    void destroy();
 
-    public abstract void destroy();
+    OutputStream getOutputStream();
 
-    public abstract OutputStream getOutputStream();
+    InputStream getErrorStream();
 
-    public abstract InputStream getErrorStream();
+    InputStream getInputStream();
 
-    public abstract InputStream getInputStream();
+    int exitValue();
 
-    public abstract int exitValue();
+    boolean isAlive();
 
-    public abstract boolean isAlive();
-
-    public abstract int waitFor() throws InterruptedException;
+    int waitFor() throws InterruptedException;
 }

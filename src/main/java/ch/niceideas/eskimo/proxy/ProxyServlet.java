@@ -384,7 +384,6 @@ public class ProxyServlet extends HttpServlet {
 
         setXForwardedForHeader(servletRequest, proxyRequest);
 
-        //ClassicHttpResponse proxyResponse = null;
         try {
             // Execute the request
             if (doLog) {

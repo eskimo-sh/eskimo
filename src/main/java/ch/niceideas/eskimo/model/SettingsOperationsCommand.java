@@ -127,8 +127,6 @@ public class SettingsOperationsCommand implements Serializable {
 
         public JSONObject toJSON() {
             return new JSONObject(new HashMap<String, Object>(){{
-                //put ("service", service);
-                //put ("configFile", configFile);
                 put ("key", key);
                 put ("oldValue", StringUtils.isNotBlank(oldValue) ? oldValue : "");
                 put ("value", StringUtils.isNotBlank(value) ? value : "");

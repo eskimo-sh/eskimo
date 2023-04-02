@@ -44,7 +44,7 @@ import java.io.OutputStream;
 /**
  * Wraps SSH {@link Session} as {@link ProcessWithPtyWrapper}.
  */
-public class SshProcess extends ProcessWithPtyWrapper {
+public class SshProcess implements ProcessWithPtyWrapper {
 
     private final Session ssh;
 
