@@ -47,13 +47,16 @@ echo " - Inject settings"
 /usr/local/sbin/settingsInjector.sh kibana
 
 echo " - Starting service"
-# Use file created from inContainerInjectTopology.sh
-/usr/local/lib/kibana/bin/kibana &
-export KIBANA_PID=$!
+/usr/local/lib/kibana/bin/kibana | tee /var/log/elasticsearch/kibana/kibana.log &
 
-echo " - Waiting for Kibana to be up and running"
+echo " - Getting Kibana PID"
+sleep 5
+export KIBANA_PID=$(pgrep node)
+echo " - Kibana process is $KIBANA_PID"
+
+echo " - Waiting for Kibana to be up"
 set +e
-for i in $(seq 1 90); do
+for i in $(seq 1 100); do
 
     sleep 5
 
@@ -70,12 +73,26 @@ for i in $(seq 1 90); do
         fi
     fi
 
-    if [[ $i == 90 ]]; then
-        echo "!!! Couldn't get kibana up and running within 450 seconds. Crashing"
+    if [[ $i == 100 ]]; then
+        echo "!!! Couldn't get kibana up within 500 seconds. Crashing !"
         exit 2
     fi
 done
 
+echo " - Waiting for Kibana to be running"
+for i in $(seq 1 30); do
+
+    sleep 2
+
+    if [[ $(tail -100 /var/log/elasticsearch/kibana/kibana.log | grep -F 'Kibana is now available') != "" ]]; then
+        break;
+    fi
+
+    if [[ $i == 30 ]]; then
+        echo "!!! Couldn't get kibana running within 60 seconds. Crashing !"
+        exit 3
+    fi
+done
 
 echo " - Provisioning sample files"
 # convention: dashboard files have same name as dashboard
@@ -85,16 +102,23 @@ for sample in $(find /usr/local/lib/kibana/samples/); do
     if [[ $(echo $sample | grep ndjson) != "" ]]; then
 
         echo "   + checking $sample"
-        dashboard_name="${sample%.*}"
+        file_name=$(basename $sample)
+        dashboard_name="${file_name%.*}"
+        echo "     - dashboard is $dashboard_name"
         exist=$(curl -XGET "http://localhost:5601/api/saved_objects/_find?type=dashboard&search_fields=title&search=$dashboard_name*" 2>/dev/null | jq -r " .total")
 
-        if [[ $exist == 0 ]]; then
-          echo "   + Provisioning $sample"
-            curl -X POST "http://localhost:5601/api/saved_objects/_import" -H "kbn-xsrf: true" --form file=@"$sample" > /tmp/kibana_provision 2>&1
+        if [[ $exist == "0" ]]; then
+            echo "   + Provisioning $sample"
+            curl -X POST "http://localhost:5601/api/saved_objects/_import" -H "kbn-xsrf: true" --form file=@"$sample" > /tmp/kibana_provision 2>/dev/null
             if [[ $? != 0 ]]; then
                 echo "!!! Failed to import $sample"
                 cat /tmp/kibana_provision
                 exit 3
+            fi
+            if [[ $(grep -F '"success":true' /tmp/kibana_provision) == "" ]]; then
+                echo "!!! Failed to find confirmation of import of $sample"
+                cat /tmp/kibana_provision
+                exit 4
             fi
         fi
     fi
