@@ -134,7 +134,7 @@ public class OperationsMonitoringServiceTestImpl implements OperationsMonitoring
     }
 
     @Override
-    public void addGlobalInfo(String message) {
+    public void addGlobalWarning(String message) {
         messagesCollector.append(message).append("\n");
     }
 

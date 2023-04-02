@@ -244,7 +244,7 @@ public class NodesConfigurationServiceImpl implements NodesConfigurationService 
             }
 
             if (!operationsMonitoringService.isInterrupted() && (!Collections.disjoint(nodesStatus.getDeadNodes(), nodesConfig.getAllNodes()))) {
-                operationsMonitoringService.addGlobalInfo("At least one configured node was found dead");
+                operationsMonitoringService.addGlobalWarning("At least one configured node was found dead");
                 throw new NodesConfigurationException("At least one configured node was found dead");
             }
 

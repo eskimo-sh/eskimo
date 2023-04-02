@@ -408,7 +408,7 @@ public class KubernetesServiceImpl implements KubernetesService {
             if (nodesStatus.isNodeDead(kubeMasterNode)) {
                 notificationService.addError("The Kube Master node is dead. cannot proceed any further with installation.");
                 String message = "The Kube Master node is dead. cannot proceed any further with installation. Kubernetes services configuration is saved but will need to be re-applied when k8s-master is available.";
-                operationsMonitoringService.addGlobalInfo(message);
+                operationsMonitoringService.addGlobalWarning(message);
                 throw new KubernetesException(message);
             }
 
@@ -462,7 +462,7 @@ public class KubernetesServiceImpl implements KubernetesService {
 
         } catch (FileException | SetupException | SystemException | ServiceDefinitionException | NodesConfigurationException e) {
             logger.error (e, e);
-            operationsMonitoringService.addGlobalInfo("Kubernetes Services installation failed ! " + e.getMessage());
+            operationsMonitoringService.addGlobalWarning("Kubernetes Services installation failed ! " + e.getMessage());
             notificationService.addError("Kubernetes Services installation failed !");
             throw new KubernetesException(e);
 

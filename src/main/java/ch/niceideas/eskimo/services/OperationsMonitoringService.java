@@ -55,7 +55,7 @@ public interface OperationsMonitoringService extends OperationsContext {
 
     boolean getLastOperationSuccess();
 
-    void addGlobalInfo (String message);
+    void addGlobalWarning(String message);
 
     void addInfo(OperationId<?> operation, String message);
 

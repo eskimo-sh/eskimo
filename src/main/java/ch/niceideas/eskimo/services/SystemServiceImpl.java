@@ -802,13 +802,6 @@ public class SystemServiceImpl implements SystemService {
                     }
                 });
 
-        /* FIXME : wherever buildDeadIps is used, this should be returned to the UI as a warning either at the end of
-            the operation or during.
-        if (!deadIps.isEmpty()) {
-            messagingService.addLines("\n");
-        }
-        */
-
         return nodeStatus;
     }
 
@@ -818,9 +811,7 @@ public class SystemServiceImpl implements SystemService {
             String result = sshCommandService.runSSHScript(node, "sudo ls", false);
             if (result.contains("a terminal is required to read the password")
                     || result.contains("a password is required")) {
-                /* FIXME : wherever this  is used, this should be returned to the UI as a warning either at the end of
-                 */
-                //messagingService.addLines("\nNode " + node + " doesn't enable the configured user to use sudo without password. Installing cannot continue.");
+                operationsMonitoringService.addGlobalWarning("Node " + node + " doesn't enable the configured user to use sudo without password");
                 notificationService.addError("Node " + node + " sudo problem");
                 nodeStatus.addDeadNode(node);
             } else {
@@ -833,10 +824,7 @@ public class SystemServiceImpl implements SystemService {
     }
 
     void handleNodeDead(NodesStatus nodeStatus, Node node) {
-        /* FIXME : wherever this  is used, this should be returned to the UI as a warning either at the end of
-        the operation or during.
-        //messagingService.addLines("\nNode seems dead " + node);
-        */
+        operationsMonitoringService.addGlobalWarning("Node seems dead " + node);
         notificationService.addError("Node " + node + " is dead.");
         nodeStatus.addDeadNode(node);
     }
