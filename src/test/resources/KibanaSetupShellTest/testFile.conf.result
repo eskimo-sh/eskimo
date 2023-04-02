@@ -4,8 +4,6 @@ server.name: "Eskimo"
 
 pid.file: /var/run/elasticsearch/kibana/kibana.pid
 
-logging.dest: /var/log/elasticsearch/kibana/kibana.log
-
 server.basePath: "/kibana"
 
 elasticsearch.url: "http://elasticsearch.eskimo.svc.cluster.eskimo:9200"
