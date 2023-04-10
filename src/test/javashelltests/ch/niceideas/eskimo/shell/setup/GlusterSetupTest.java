@@ -129,7 +129,7 @@ public class GlusterSetupTest extends AbstractSetupShellTest {
                     "bash -c echo \"    option transport.rdma.bind-address 192.168.10.13\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
                     "bash -c echo \"    option transport.socket.bind-address 192.168.10.13\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
                     "bash -c echo \"    option transport.tcp.bind-address 192.168.10.13\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
-                    "bash -c echo \"#   option transport.address-family inet6\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
+                    "bash -c echo \"    option transport.address-family inet\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
                     "bash -c echo \"#   option base-port 49152\" >> /var/lib/gluster/glusterfs.VOLUME_FILE\n" +
                     "bash -c echo \"end-volume\" >> /var/lib/gluster/glusterfs.VOLUME_FILE"));
 

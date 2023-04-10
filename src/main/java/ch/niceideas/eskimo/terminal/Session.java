@@ -152,6 +152,7 @@ public final class Session extends Thread {
     public ScreenImage handleUpdate(String keys, boolean color, int clientTimestamp) throws IOException, InterruptedException {
         lastAccess = System.currentTimeMillis();
         write(keys);
+        // unfortunately this sleep is required for much smoother interactions
         Thread.sleep(20);   // give a bit of time to let the app respond. poor version of Nagel's algorithm
 
         terminal.setCssClass(isAlive() ? "":"dead");

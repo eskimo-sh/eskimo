@@ -82,19 +82,38 @@ public class TerminalServiceImpl implements TerminalService {
     @Autowired
     private ConnectionManagerService connectionManagerService;
 
-    /* Controlers are singleton */
     private final Map<String, Session> sessions = new ConcurrentHashMap<>();
 
-    private final ScheduledExecutorService scheduler;
+    private transient ScheduledExecutorService scheduler;
 
     public TerminalServiceImpl() {
 
+        initScheduler();
+    }
+
+    private void initScheduler() {
         scheduler = Executors.newSingleThreadScheduledExecutor();
 
         logger.info ("Initializing terminal closer scheduler ...");
         scheduler.scheduleAtFixedRate(
                 () -> removeExpiredTerminals(idleTimeoutSeconds),
                 idleTimeoutSeconds / 10, idleTimeoutSeconds / 10, TimeUnit.SECONDS);
+    }
+
+    /* Handling pre-serialization scheduler close */
+    private void writeObject(java.io.ObjectOutputStream out)
+            throws IOException {
+        out.defaultWriteObject();
+        closeScheduler();
+    }
+
+    /* Handling post-serialization scheduler init */
+    private void readObject(java.io.ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        if (scheduler == null) {
+            initScheduler();
+        }
     }
 
     /* for tests */
@@ -116,8 +135,7 @@ public class TerminalServiceImpl implements TerminalService {
         }
     }
 
-    @PreDestroy
-    public void destroy() {
+    public void closeScheduler() {
         logger.info ("Cancelling terminal closer scheduler");
         if (scheduler != null) {
             scheduler.shutdownNow();

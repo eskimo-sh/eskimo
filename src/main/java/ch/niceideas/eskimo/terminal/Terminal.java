@@ -115,8 +115,9 @@ public class Terminal {
                         CsiSequence seq = CSI_SEQUENCE.get(m.group(2).charAt(0));
                         if (seq != null) {
                             String[] tokens = s.split(";");
-                            if (s.length() == 0)
+                            if (s.length() == 0) {
                                 tokens = EMPTY_STRING_ARRAY;
+                            }
                             int[] n = new int[tokens.length];
                             for (int i = 0; i < n.length; i++)
                                 try {
@@ -135,8 +136,9 @@ public class Terminal {
         CSI_SEQUENCE.put('@', new CsiSequence(1) {
             @Override
             void handle(Terminal t, int[] args) {
-                for (int i = 0; i < args[0]; i++)
+                for (int i = 0; i < args[0]; i++) {
                     t.scrollRight(t.cy, t.cx);
+                }
             }
         });
 
@@ -145,10 +147,11 @@ public class Terminal {
         for (int i = 0; i < 256; i++) {
             if (i < 32) {
                 lat1.append(' ');
-                if (i == 0x0A)
+                if (i == 0x0A) {
                     html.append('\n');
-                else
+                } else {
                     html.append('\u00A0');
+                }
             } else if (i < 127 || 160 < i) {
                 lat1.append((char) i);
                 html.append((char) i);
@@ -165,6 +168,7 @@ public class Terminal {
         return new CsiSequence(1) {
             void handle(Terminal t, int[] args) {
                 try {
+                    //noinspection PrimitiveArrayArgumentToVarargsMethod
                     m.invoke(t, args);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     throw new TerminalException(e);
@@ -321,8 +325,9 @@ public class Terminal {
 
     void zero(int y1, int x1, int y2, int x2) {
         int e = getPosition(y2, x2);
-        for (int i = getPosition(y1, x1); i < e; i++)
+        for (int i = getPosition(y1, x1); i < e; i++) {
             scr[i] = EMPTY_CH;
+        }
     }
 
     void zero(int y1, int y2) {
@@ -362,10 +367,11 @@ public class Terminal {
     }
 
     void cursorRight() {
-        if ((cx + 1) >= width)
+        if ((cx + 1) >= width) {
             cl = true;
-        else
+        } else {
             cx = (cx + 1) % width;
+        }
     }
 
     void echo(char c) {
@@ -432,8 +438,9 @@ public class Terminal {
 
     public String dump() {
         StringBuilder stringBuilder = new StringBuilder(scr.length);
-        for (char ch : scr)
+        for (char ch : scr) {
             stringBuilder.append((char) (ch & 0xFF));
+        }
         return stringBuilder.toString();
     }
 
@@ -442,8 +449,9 @@ public class Terminal {
         int i = 0;
         for (char ch : scr) {
             stringBuilder.append(LATIN1_TABLE.charAt((ch & 0xFF)));
-            if (++i % width == 0)
+            if (++i % width == 0) {
                 stringBuilder.append('\n');
+            }
         }
         return stringBuilder.toString();
     }
@@ -463,8 +471,9 @@ public class Terminal {
 
         StringBuilder r = new StringBuilder(cx * cy * 2);
         r.append("<pre class='term ");
-        if (cssClass != null)
+        if (cssClass != null) {
             r.append(cssClass);
+        }
         r.append("'>");
 
         int currentStatus = -1;
@@ -674,9 +683,11 @@ public class Terminal {
      */
     @SuppressWarnings("unused") /* Actually used through reflection */
     void csiUpperL(int[] args) {
-        for (int i = 0; i < defaultsTo(args, 1); i++)
-            if (cy < sb)
+        for (int i = 0; i < defaultsTo(args, 1); i++) {
+            if (cy < sb) {
                 scrollDown(cy, sb);
+            }
+        }
     }
 
     /**
@@ -684,9 +695,11 @@ public class Terminal {
      */
     @SuppressWarnings("unused") /* Actually used through reflection */
     void csiUpperM(int[] args) {
-        if (cy >= st && cy <= sb)
-            for (int i = 0; i < defaultsTo(args, 1); i++)
+        if (cy >= st && cy <= sb) {
+            for (int i = 0; i < defaultsTo(args, 1); i++) {
                 scrollUp(cy, sb);
+            }
+        }
     }
 
     /**

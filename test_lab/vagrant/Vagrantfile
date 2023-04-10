@@ -60,7 +60,7 @@ nodes = [
   { :hostname => 'deb-node2', :box => 'ubuntu/focal64',  :ip => '192.168.56.12', :ram => 8000, :cpu => 2  },
   { :hostname => 'cent-node1', :box => 'centos/7',  :ip => '192.168.56.13', :ram => 8000, :cpu => 2 },
   { :hostname => 'cent-node2', :box => 'fedora/36-cloud-base', :ip => '192.168.56.14', :ram => 8000, :cpu => 2  },
-  { :hostname => 'suse-node1', :box => 'bento/opensuse-leap-15.2',  :ip => '192.168.56.15', :ram => 10000, :cpu => 2 },
+  { :hostname => 'suse-node1', :box => 'bento/opensuse-leap-15.4',  :ip => '192.168.56.15', :ram => 10000, :cpu => 2 },
   { :hostname => 'test-node1', :box => 'sorabt/centos-stream-8',  :ip => '192.168.56.21', :ram => 8000, :cpu => 2 },
   { :hostname => 'test-node2', :box => 'fedora/36-cloud-base'  ,  :ip => '192.168.56.22', :ram => 8000, :cpu => 2 },
   { :hostname => 'test-node3', :box => 'ubuntu/focal64',  :ip => '192.168.56.23', :ram => 8000, :cpu => 2 },

@@ -110,6 +110,7 @@ public class MasterServiceImpl implements MasterService {
     public MasterServiceImpl() {
         statusRefreshScheduler = SchedulerHelper.scheduleRunnableOneShot(true, statusUpdatePeriodSeconds, this::updateStatus);
     }
+
     @PreDestroy
     public void destroy() {
         logger.info ("Cancelling status updater scheduler");
