@@ -131,9 +131,9 @@ if [[ $(grep $MOUNT_POINT /etc/fstab) == "" ]]; then
     echo " - Enabling gluster share $MOUNT_POINT"
     # XXX I change noauto to auto following issues after recover from suspend
     if [[ "$DEPENDENT_UNIT_DEFINITON" == "" ]]; then
-        bash -c "echo \"$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs auto,rw,_netdev,x-systemd.automount,x-systemd.requires=gluster.service,x-systemd.after=gluster.service,x-systemd.after=local-fs.target 0 0\" >> /etc/fstab"
+        bash -c "echo \"$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs xlator-option=transport.address-family=inet,auto,rw,_netdev,x-systemd.automount,x-systemd.requires=gluster.service,x-systemd.after=gluster.service,x-systemd.after=local-fs.target 0 0\" >> /etc/fstab"
     else
-        bash -c "echo \"$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs noauto,rw,_netdev,$DEPENDENT_UNIT_DEFINITON,x-systemd.requires=gluster.service,x-systemd.after=gluster.service,x-systemd.after=local-fs.target 0 0\" >> /etc/fstab"
+        bash -c "echo \"$SELF_IP_ADDRESS:/$VOLUME $MOUNT_POINT glusterfs xlator-option=transport.address-family=inet,noauto,rw,_netdev,$DEPENDENT_UNIT_DEFINITON,x-systemd.requires=gluster.service,x-systemd.after=gluster.service,x-systemd.after=local-fs.target 0 0\" >> /etc/fstab"
     fi
 
     sleep 1

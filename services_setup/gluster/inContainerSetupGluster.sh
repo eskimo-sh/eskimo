@@ -78,7 +78,7 @@ sudo bash -c "echo \"    option event-threads 2\" >> /var/lib/gluster/glusterfs.
 sudo bash -c "echo \"    option transport.rdma.bind-address $SELF_IP_ADDRESS\" >> /var/lib/gluster/glusterfs.VOLUME_FILE"
 sudo bash -c "echo \"    option transport.socket.bind-address $SELF_IP_ADDRESS\" >> /var/lib/gluster/glusterfs.VOLUME_FILE"
 sudo bash -c "echo \"    option transport.tcp.bind-address $SELF_IP_ADDRESS\" >> /var/lib/gluster/glusterfs.VOLUME_FILE"
-sudo bash -c "echo \"#   option transport.address-family inet6\" >> /var/lib/gluster/glusterfs.VOLUME_FILE"
+sudo bash -c "echo \"    option transport.address-family inet\" >> /var/lib/gluster/glusterfs.VOLUME_FILE"
 sudo bash -c "echo \"#   option base-port 49152\" >> /var/lib/gluster/glusterfs.VOLUME_FILE"
 sudo bash -c "echo \"end-volume\" >> /var/lib/gluster/glusterfs.VOLUME_FILE"
 

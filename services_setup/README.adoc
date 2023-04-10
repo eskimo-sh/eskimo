@@ -61,7 +61,14 @@ This document presents "2. The *Services Installation Framework*"
 
 The whole services development framework can be represented as follows:
 
+ifdef::service-dev-guide-embedded[]
+// suppress inspection "AsciiDocLinkResolve"
+image::pngs/services-development-framework.png[800, 800, align="center"]
+endif::service-dev-guide-embedded[]
+ifndef::service-dev-guide-embedded[]
 image::../doc/guides/service-dev-guide/pngs/services-development-framework.png[800, 800, align="center"]
+endif::service-dev-guide-embedded[]
+
 
 * The *docker_images_development_framework* is used to develop and build Container templates images that are later
 used to build the actual docker containers images that are fine-tuned to Eskimo deployed on Kubernetes or natively on
@@ -115,7 +122,14 @@ after proper injection of Eskimo Topology and configuration.
 
 The principle can be illustrated as follows:
 
+ifdef::service-dev-guide-embedded[]
+// suppress inspection "AsciiDocLinkResolve"
+image::pngs/services-installation-framework.png[800, 800, align="center"]
+endif::service-dev-guide-embedded[]
+ifndef::service-dev-guide-embedded[]
 image::../doc/guides/service-dev-guide/pngs/services-installation-framework.png[800, 800, align="center"]
+endif::service-dev-guide-embedded[]
+
 
 Aside from the above, nothing is enforced and service developers can implement services the way they want.
 
@@ -923,7 +937,13 @@ fashion.
 
 The principle is illustrated as follows:
 
+ifdef::service-dev-guide-embedded[]
+// suppress inspection "AsciiDocLinkResolve"
+image::pngs/services-customization-tool.png[800, 800, align="center"]
+endif::service-dev-guide-embedded[]
+ifndef::service-dev-guide-embedded[]
 image::../doc/guides/service-dev-guide/pngs/services-customization-tool.png[800, 800, align="center"]
+endif::service-dev-guide-embedded[]
 
 
 This tool takes the form of a shell script and is named `eskimo-edit-image.sh`.
@@ -1007,7 +1027,7 @@ deployment.apps/cerebro created
 
 
 
-// marker for exclusion : line 1010
+// marker for exclusion : line 1030
 
 
 

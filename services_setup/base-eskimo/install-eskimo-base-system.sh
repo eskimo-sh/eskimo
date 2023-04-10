@@ -54,6 +54,17 @@ if [[ $? != 0 ]]; then
     exit 1
 fi
 
+# make sure pidof command is available (suse case)
+if ! command -v pidof &> /dev/null; then
+    if [[ -f "/etc/SUSE-brand" ]]; then
+        sudo zypper install -y sysvinit-tools >> /tmp/install_pidof 2>&1
+    else
+        echo "pidof command not found and distribution is not SUSE. This is unexpected. Exiting."
+        exit 51
+    fi
+fi
+
+
 # make sure systemd is installed
 echo " - checking if systemd is running"
 pidof_command=$(which pidof)
@@ -74,7 +85,7 @@ fi
 
 function enable_docker() {
 
-    echo " - Enabling docker service"
+    echo " - Enabling docker service" | tee -a /tmp/install_docker
     sudo systemctl enable docker >>/tmp/install_docker 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to enable docker"
@@ -82,7 +93,7 @@ function enable_docker() {
         exit 71
     fi
 
-    echo " - Starting docker service"
+    echo " - Starting docker service" | tee -a /tmp/install_docker
     sudo systemctl start docker >>/tmp/install_docker 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to start docker"
@@ -90,7 +101,9 @@ function enable_docker() {
         exit 72
     fi
 
-    echo " - Adding current user to docker group"
+    sleep 3
+
+    echo " - Adding current user to docker group" | tee -a /tmp/install_docker
     sudo usermod -a -G docker $USER >>/tmp/install_docker 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to add user $USER to docker"
@@ -98,7 +111,7 @@ function enable_docker() {
         exit 73
     fi
 
-    echo " - Registering kubernetes.registry as insecure registry"
+    echo " - Registering kubernetes.registry as insecure registry" | tee -a /tmp/install_docker
     cat > /tmp/daemon.json <<- "EOF"
 {
   "insecure-registries" : ["kubernetes.registry:5000"]
@@ -110,7 +123,7 @@ EOF
     sudo mv /tmp/daemon.json /etc/docker/daemon.json
     sudo chown root. /etc/docker/daemon.json
 
-    echo " - Restart docker"
+    echo " - Restart docker" | tee -a /tmp/install_docker
     sudo systemctl restart docker >>/tmp/install_docker 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to reload docker"
@@ -118,18 +131,23 @@ EOF
         exit 74
     fi
 
+    sleep 5
 }
 
 function install_docker_suse_based() {
 
     rm -Rf /tmp/install_docker
 
+    echo " - Installing docker through zypper " | tee -a /tmp/install_docker
     sudo zypper install -y docker >>/tmp/install_docker 2>&1
     if [[ $? != 0 ]]; then
         echoerr "Unable to install required packages"
         cat /tmp/install_docker 1>&2
         exit 69
     fi
+
+    echo " - Reloading systemctl " | tee -a /tmp/install_docker
+    sudo systemctl daemon-reload >>/tmp/install_docker 2>&1
 }
 
 function install_docker_redhat_based() {
@@ -238,7 +256,7 @@ function install_docker_debian_based() {
 function install_suse_eskimo_dependencies() {
 
     echo " - Installing other eskimo dependencies"
-    sudo zypper install -y ipset binutils >> /tmp/setup_log 2>&1
+    sudo zypper install -y ipset binutils attr >> /tmp/setup_log 2>&1
      if [[ $? != 0 ]]; then
         echoerr "Unable to install eskimo dependencies"
         cat /tmp/setup_log 1>&2
@@ -377,7 +395,7 @@ else
 fi
 
 
-echo " - installing mesos dependencies"
+echo " - installing eskimo dependencies"
 if [[ -f "/etc/debian_version" ]]; then
     install_debian_eskimo_dependencies
 elif [[ -f "/etc/redhat-release" ]]; then
@@ -443,6 +461,7 @@ enable_docker
 # Docker is likely running on systemd cgroup driver or cgroup2, need to bring it back to using systemd as cgroup driver
 if [[ $(grep native.cgroupdriver=systemd /etc/docker/daemon.json) == "" ]]; then
 
+    echo " - Changing docker cgroup driver to systemd  " | tee -a /tmp/install_docker
     sudo sed -i -n '1h;1!H;${;g;s/'\
 '{\n'\
 '  "insecure-registries"'\
@@ -452,7 +471,11 @@ if [[ $(grep native.cgroupdriver=systemd /etc/docker/daemon.json) == "" ]]; then
 '  "insecure-registries"'\
 '/g;p;}' /etc/docker/daemon.json
 
-    sudo systemctl restart docker containerd
+    echo "   + Restarting containerd" | tee -a /tmp/install_docker
+    sudo systemctl restart containerd >> /tmp/install_docker 2>&1
+
+    echo "   + Restarting docker" | tee -a /tmp/install_docker
+    sudo systemctl restart docker >> /tmp/install_docker 2>&1
 fi
 
 echo " - Disabling IPv6"
