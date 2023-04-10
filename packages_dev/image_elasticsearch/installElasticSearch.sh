@@ -59,7 +59,7 @@ mkdir -p /tmp/es_setup
 cd /tmp/es_setup || (echo "Couldn't change to /tmp/es_setup" && exit 200)
 
 echo " - Downloading elasticsearch-$ES_VERSION"
-# ES 7.x
+# ES 7.x & 8.x
 wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ES_VERSION-linux-x86_64.tar.gz > /tmp/es_install_log 2>&1
 if [[ $? != 0 ]]; then
     # ES 6.x
@@ -67,9 +67,8 @@ if [[ $? != 0 ]]; then
     if [[ $? != 0 ]]; then
 
         echo " -> Failed to downolad elasticsearch-$ES_VERSION from https://artifacts.elastic.co/downloads/. Trying to download from niceideas.ch"
-        exit 1
-        #wget http://niceideas.ch/mes/elasticsearch-$ES_VERSION.tar.gz >> /tmp/es_install_log 2>&1
-        #fail_if_error $? "/tmp/es_install_log" -1
+        wget https://niceideas.ch/mes/elasticsearch-$ES_VERSION-linux-x86_64.tar.gz >> /tmp/es_install_log 2>&1
+        fail_if_error $? "/tmp/es_install_log" -1
     fi
 fi
 

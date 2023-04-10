@@ -62,7 +62,11 @@ cd /tmp/pyflink_setup || (echo "Couldn't change to /tmp/pyflink_setup" && exit 2
 echo " - Downloading miniconda"
 #wget https://repo.anaconda.com/miniconda/Miniconda3-$FLINK_MINICONDA_VERSION-Linux-x86_64.sh -O "miniconda.sh" > /tmp/pyflink_install_log 2>&1
 wget "https://repo.continuum.io/miniconda/Miniconda3-$FLINK_MINICONDA_VERSION-Linux-x86_64.sh" -O "miniconda.sh" > /tmp/pyflink_install_log 2>&1
-fail_if_error $? "/tmp/pyflink_install_log" -21
+if [[ $? != 0 ]]; then
+    echo " -> Failed to downolad Miniconda3-$FLINK_MINICONDA_VERSION from https://repo.continuum.io. Trying to download from niceideas.ch"
+    wget https://niceideas.ch/mes/Miniconda3-$FLINK_MINICONDA_VERSION-Linux-x86_64.sh > /tmp/flink_install_log 2>&1
+    fail_if_error $? "/tmp/flink_install_log" -1
+fi
 
 # fixing shell
 #sed -i s/'#!\/bin\/sh'/'#!\/bin\/bash'/ ./miniconda.sh

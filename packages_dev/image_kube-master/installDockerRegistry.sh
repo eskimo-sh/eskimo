@@ -46,10 +46,9 @@ cd /tmp || (echo "Couldn't change to /tmp" && exit 200)
 
 echo " - Downloading docker-registry_$DOCKER_REGISTRY_VERSION.deb "
 wget http://ftp.debian.org/debian/pool/main/d/docker-registry/docker-registry_$DOCKER_REGISTRY_VERSION.deb > /tmp/docker_registry_install_log 2>&1
-#    http://ftp.debian.org/debian/pool/main/d/docker-registry/docker-registry_2.8.1+ds1-1_amd64.deb
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad docker-registry_$DOCKER_REGISTRY_VERSION.deb from debian. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/docker-registry_$DOCKER_REGISTRY_VERSION.deb  >> /tmp/docker_registry_install_log 2>&1
+    wget https://niceideas.ch/mes/docker-registry_$DOCKER_REGISTRY_VERSION.deb  >> /tmp/docker_registry_install_log 2>&1
     fail_if_error $? "/tmp/docker_registry_install_log" -1
 fi
 
@@ -94,9 +93,11 @@ echo " - Downloading regclient regctl-$REGCLIENT_VERSION "
 wget https://github.com/regclient/regclient/releases/download/v$REGCLIENT_VERSION/regctl-linux-amd64 > /tmp/docker_registry_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad regclient regctl-$REGCLIENT_VERSION from github. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/regclient-v$REGCLIENT_VERSION/regctl-linux-amd64  >> /tmp/docker_registry_install_log 2>&1
+    wget https://niceideas.ch/mes/regctl-linux-amd64-v$REGCLIENT_VERSION  >> /tmp/docker_registry_install_log 2>&1
     fail_if_error $? "/tmp/docker_registry_install_log" -1
 fi
+
+mv regctl-linux-amd64-v$REGCLIENT_VERSION regctl-linux-amd64 || 0
 
 echo " - Installing regclient regctl"
 set -e

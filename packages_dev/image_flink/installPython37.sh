@@ -56,7 +56,11 @@ cd /tmp/python37_setup || (echo "Couldn't change to /tmp/python37_setup" && exit
 
 echo " - Downloading python"
 wget https://www.python.org/ftp/python/$FLINK_PYTHON_VERSION/Python-$FLINK_PYTHON_VERSION.tgz > /tmp/python37_install_log 2>&1
-fail_if_error $? "/tmp/python37_install_log" -22
+if [[ $? != 0 ]]; then
+    echo " -> Failed to downolad Python-$FLINK_PYTHON_VERSION from https://www.python.org/ Trying to download from niceideas.ch"
+    wget https://niceideas.ch/mes/Python-$FLINK_PYTHON_VERSION.tgz > /tmp/flink_install_log 2>&1
+    fail_if_error $? "/tmp/flink_install_log" -1
+fi
 
 echo " - Extracting python"
 tar xvzf Python-$FLINK_PYTHON_VERSION.tgz > /tmp/python37_install_log 2>&1

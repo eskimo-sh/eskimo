@@ -65,11 +65,11 @@ echo " - Downloading kafka-manager-$KAFKA_MANAGER_VERSION"
 wget https://github.com/yahoo/CMAK/archive/$KAFKA_MANAGER_VERSION.zip > /tmp/kafka_manager_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad kafka-manager-$KAFKA_MANAGER_VERSION from github. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/CMAK-$KAFKA_MANAGER_VERSION.zip  >> /tmp/kafka_manager_install_log 2>&1
+    wget https://niceideas.ch/mes/CMAK-$KAFKA_MANAGER_VERSION.zip  >> /tmp/kafka_manager_install_log 2>&1
     fail_if_error $? "/tmp/kafka_manager_install_log" -1
 fi
 
-mv $KAFKA_MANAGER_VERSION.zip CMAK-$KAFKA_MANAGER_VERSION.zip
+mv $KAFKA_MANAGER_VERSION.zip CMAK-$KAFKA_MANAGER_VERSION.zip || 0
 
 echo " - Extracting CMAK-$KAFKA_MANAGER_VERSION"
 unzip CMAK-$KAFKA_MANAGER_VERSION.zip > /tmp/kafka_manager_install_log 2>&1

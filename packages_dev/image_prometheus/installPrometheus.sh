@@ -63,9 +63,8 @@ echo " - Downloading prometheus-$PROMETHEUS_VERSION"
 wget https://github.com/prometheus/prometheus/releases/download/v$PROMETHEUS_VERSION/prometheus-$PROMETHEUS_VERSION.linux-amd64.tar.gz > /tmp/prometheus_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad prometheus-$PROMETHEUS_VERSION from https://www.apache.org/. Trying to download from niceideas.ch"
-    exit 1
-    #wget http://niceideas.ch/mes/prometheus-$PROMETHEUS_VERSION.tar.gz >> /tmp/prometheus_install_log 2>&1
-    #fail_if_error $? "/tmp/prometheus_install_log" -1
+    wget https://niceideas.ch/mes/prometheus-$PROMETHEUS_VERSION.linux-amd64.tar.gz >> /tmp/prometheus_install_log 2>&1
+    fail_if_error $? "/tmp/prometheus_install_log" -1
 fi
 
 

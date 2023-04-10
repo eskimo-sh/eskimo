@@ -68,9 +68,8 @@ wget https://github.com/prometheus/pushgateway/releases/download/v$PROMETHEUS_PU
         > /tmp/prometheus_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad pushgateway-$PROMETHEUS_PUSHGATEWAY_VERSION from github. Trying to download from niceideas.ch"
-    exit 1
-    #wget http://niceideas.ch/mes/prometheus-$PROMETHEUS_VERSION.tar.gz >> /tmp/prometheus_install_log 2>&1
-    #fail_if_error $? "/tmp/prometheus_install_log" -1
+    wget https://niceideas.ch/mes/pushgateway-$PROMETHEUS_PUSHGATEWAY_VERSION.linux-amd64.tar.gz >> /tmp/prometheus_install_log 2>&1
+    fail_if_error $? "/tmp/prometheus_install_log" -1
 fi
 
 

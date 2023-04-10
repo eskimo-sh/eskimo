@@ -61,9 +61,8 @@ echo " - Downloading logstash-$ES_VERSION"
 wget https://artifacts.elastic.co/downloads/logstash/logstash-$ES_VERSION-linux-x86_64.tar.gz > /tmp/ls_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad logstash-$ES_VERSION from https://artifacts.elastic.co/downloads/. Trying to download from niceideas.ch"
-    exit 1
-    #wget http://niceideas.ch/mes/logstash-$ES_VERSION.tar.gz >> /tmp/ls_install_log 2>&1
-    #fail_if_error $? "/tmp/ls_install_log" -1
+    wget https://niceideas.ch/mes/logstash-$ES_VERSION-linux-x86_64.tar.gz >> /tmp/ls_install_log 2>&1
+    fail_if_error $? "/tmp/ls_install_log" -1
 fi
 
 echo " - Extracting logstash-$ES_VERSION"

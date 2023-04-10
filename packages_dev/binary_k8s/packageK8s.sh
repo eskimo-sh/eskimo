@@ -64,7 +64,7 @@ echo " - Downloading cfssl_${CFSSL_VERSION}_linux_amd64"
 wget https://github.com/cloudflare/cfssl/releases/download/v$CFSSL_VERSION/cfssl_${CFSSL_VERSION}_linux_amd64  >> /tmp/k8s_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to download cfssl_${CFSSL_VERSION}_linux_amd64 from https://github.com/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/cfssl_"${CFSSL_VERSION}"_linux_amd64 >> /tmp/k8s_install_log 2>&1
+    wget https://niceideas.ch/mes/cfssl_"${CFSSL_VERSION}"_linux_amd64 >> /tmp/k8s_install_log 2>&1
     fail_if_error $? "/tmp/k8s_install_log" -1
 fi
 
@@ -82,7 +82,7 @@ echo " - Downloading cfssljson_${CFSSL_VERSION}_linux_amd64"
 wget https://github.com/cloudflare/cfssl/releases/download/v$CFSSL_VERSION/cfssljson_${CFSSL_VERSION}_linux_amd64  >> /tmp/k8s_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to download cfssljson_${CFSSL_VERSION}_linux_amd64 from https://github.com/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/cfssljson_${CFSSL_VERSION}_linux_amd64 >> /tmp/k8s_install_log 2>&1
+    wget https://niceideas.ch/mes/cfssljson_${CFSSL_VERSION}_linux_amd64 >> /tmp/k8s_install_log 2>&1
     fail_if_error $? "/tmp/k8s_install_log" -1
 fi
 
@@ -99,7 +99,7 @@ echo " - Downloading etcd-v${ETCD_VERSION}-linux-amd64"
 wget https://github.com/etcd-io/etcd/releases/download/v${ETCD_VERSION}/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to download etcd-v${ETCD_VERSION}-linux-amd64 from https://github.com/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
+    wget https://niceideas.ch/mes/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
     fail_if_error $? "/tmp/k8s_install_log" -1
 fi
 
@@ -118,7 +118,7 @@ echo " - Downloading kubernetes-client-linux-amd64 v$K8S_VERSION"
 wget https://dl.k8s.io/v$K8S_VERSION/kubernetes-client-linux-amd64.tar.gz >> /tmp/k8s_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to download kubernetes-client-linux-amd64 v$K8S_VERSION from https://github.com/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/kubernetes-client-linux-amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
+    wget https://niceideas.ch/mes/kubernetes-client-linux-amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
     fail_if_error $? "/tmp/k8s_install_log" -1
 fi
 
@@ -137,7 +137,7 @@ echo " - Downloading kube-router v$K8S_ROUTER_VERSION"
 wget https://github.com/cloudnativelabs/kube-router/releases/download/v$K8S_ROUTER_VERSION/kube-router_${K8S_ROUTER_VERSION}_linux_amd64.tar.gz >> /tmp/k8s_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to download kube-router v$K8S_ROUTER_VERSION from https://github.com/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/kube-router_${K8S_ROUTER_VERSION}_linux_amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
+    wget https://niceideas.ch/mes/kube-router_${K8S_ROUTER_VERSION}_linux_amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
     fail_if_error $? "/tmp/k8s_install_log" -1
 fi
 
@@ -156,7 +156,7 @@ echo " - Downloading cni-plugins v$K8S_CNI_PLUGINS_VERSION"
 wget https://github.com/containernetworking/plugins/releases/download/v$K8S_CNI_PLUGINS_VERSION/cni-plugins-linux-amd64-v$K8S_CNI_PLUGINS_VERSION.tgz >> /tmp/k8s_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to download cni-plugins v$K8S_ROUTER_VERSION from https://github.com/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/cni-plugins-linux-amd64-v$K8S_CNI_PLUGINS_VERSION.tgz  >> /tmp/k8s_install_log 2>&1
+    wget https://niceideas.ch/mes/cni-plugins-linux-amd64-v$K8S_CNI_PLUGINS_VERSION.tgz >> /tmp/k8s_install_log 2>&1
     fail_if_error $? "/tmp/k8s_install_log" -1
 fi
 
@@ -178,7 +178,7 @@ echo " - Downloading cri-dockerd $CRI_DOCKER_VERSION"
 wget https://github.com/Mirantis/cri-dockerd/releases/download/v$CRI_DOCKER_VERSION/cri-dockerd-$CRI_DOCKER_VERSION.amd64.tgz >> /tmp/k8s_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to download cri-dockerd-$CRI_DOCKER_VERSION from https://github.com/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/cri-dockerd-$CRI_DOCKER_VERSION.amd64.tgz  >> /tmp/k8s_install_log 2>&1
+    wget https://niceideas.ch/mes/cri-dockerd-$CRI_DOCKER_VERSION.amd64.tgz  >> /tmp/k8s_install_log 2>&1
     fail_if_error $? "/tmp/k8s_install_log" -1
 fi
 
@@ -199,7 +199,7 @@ echo " - Downloading kubernetes-server-linux-amd64 v$K8S_VERSION"
 wget https://dl.k8s.io/v$K8S_VERSION/kubernetes-server-linux-amd64.tar.gz >> /tmp/k8s_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to download kubernetes-server-linux-amd64 v$K8S_VERSION from https://github.com/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/kubernetes-server-linux-amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
+    wget https://niceideas.ch/mes/kubernetes-server-linux-amd64.tar.gz  >> /tmp/k8s_install_log 2>&1
     fail_if_error $? "/tmp/k8s_install_log" -1
 fi
 

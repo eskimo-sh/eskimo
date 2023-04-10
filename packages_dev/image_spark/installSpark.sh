@@ -68,10 +68,9 @@ fail_if_error $? "/tmp/spark_install_log" -2
 echo " - Downloading spark-$SPARK_VERSION"
 #wget https://downloads.apache.org/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop$HADOOP_MAJOR_VERSION.tgz > /tmp/spark_install_log 2>&1
 wget https://dlcdn.apache.org/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop$HADOOP_MAJOR_VERSION.tgz > /tmp/spark_install_log 2>&1
-
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad spark-$SPARK_VERSION from http://www.apache.org/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/spark-$SPARK_VERSION-bin-hadoop$HADOOP_MAJOR_VERSION.tgz >> /tmp/spark_install_log 2>&1
+    wget https://niceideas.ch/mes/spark-$SPARK_VERSION-bin-hadoop$HADOOP_MAJOR_VERSION.tgz >> /tmp/spark_install_log 2>&1
     fail_if_error $? "/tmp/spark_install_log" -1
 fi
 

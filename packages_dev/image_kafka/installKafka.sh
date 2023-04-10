@@ -64,12 +64,10 @@ cd /tmp/kafka_setup || (echo "Couldn't change to /tmp/kafka_setup" && exit 11)
 
 echo " - Downloading kafka-$KAFKA_VERSION"
 wget https://archive.apache.org/dist/kafka/$KAFKA_VERSION/kafka_$SCALA_VERSION-$KAFKA_VERSION.tgz > /tmp/kafka_install_log 2>&1
-
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad kafka-$KAFKA_VERSION from https://www.apache.org/. Trying to download from niceideas.ch"
-    exit 3
-    #wget http://niceideas.ch/mes/kafka-$KAFKA_VERSION.tar.gz >> /tmp/kafka_install_log 2>&1
-    #fail_if_error $? "/tmp/kafka_install_log" -1
+    wget https://niceideas.ch/mes/kafka_$SCALA_VERSION-$KAFKA_VERSION.tgz  >> /tmp/kafka_install_log 2>&1
+    fail_if_error $? "/tmp/kafka_install_log" -1
 fi
 
 

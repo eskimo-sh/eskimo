@@ -63,7 +63,7 @@ echo " - Downloading kibana-$ES_VERSION"
 wget https://artifacts.elastic.co/downloads/kibana/kibana-$ES_VERSION-linux-x86_64.tar.gz > /tmp/kb_install_log 2>&1
 if [[ $? != 0 ]]; then
     echo " -> Failed to downolad kibana-$ES_VERSION from https://artifacts.elastic.co/downloads/. Trying to download from niceideas.ch"
-    wget http://niceideas.ch/mes/kibana-$ES_VERSION-linux-x86_64.tar.gz >> /tmp/kb_install_log 2>&1
+    wget https://niceideas.ch/mes/kibana-$ES_VERSION-linux-x86_64.tar.gz >> /tmp/kb_install_log 2>&1
     fail_if_error $? "/tmp/kb_install_log" -1
 fi
 
