@@ -61,7 +61,14 @@ This document presents "1. The *Docker Images Development Framework*"
 
 The whole services development framework can be represented as follows:
 
+ifdef::service-dev-guide-embedded[]
+// suppress inspection "AsciiDocLinkResolve"
+image::pngs/services-development-framework.png[800, 800, align="center"]
+endif::service-dev-guide-embedded[]
+ifndef::service-dev-guide-embedded[]
 image::../doc/guides/service-dev-guide/pngs/services-development-framework.png[800, 800, align="center"]
+endif::service-dev-guide-embedded[]
+
 
 * The <<docker_images_development_framework>> is used to develop and build Container templates images that are later
 used to build the actual docker containers images that are fine-tuned to Eskimo deployed on Kubernetes or natively on
@@ -122,7 +129,13 @@ names `installServiceX` (for a component that would be called "_serviceX_". More
 
 This principle is illustrated as follows:
 
+ifdef::service-dev-guide-embedded[]
+// suppress inspection "AsciiDocLinkResolve"
+image::pngs/images-development-framework.png[800, 800, align="center"]
+endif::service-dev-guide-embedded[]
+ifndef::service-dev-guide-embedded[]
 image::../doc/guides/service-dev-guide/pngs/images-development-framework.png[800, 800, align="center"]
+endif::service-dev-guide-embedded[]
 
 Build files are provided for each and every service pre-packaged within eskimo.
 
@@ -336,8 +349,7 @@ It's content should be aligned with the following properties from the configurat
 
 
 
-
-// marker for exclusion : line 340
+// marker for exclusion : line 350
 
 [appendix]
 == Copyright and License

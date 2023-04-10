@@ -34,8 +34,8 @@ Software.
 
 :sectnums:
 :toc:
-:authors: eskimo.sh - https://www.eskimo.sh - 2019-2022
-:copyright: eskimo.sh - https://www.eskimo.sh - 2019-2022
+:authors: eskimo.sh - https://www.eskimo.sh - 2019-2023
+:copyright: eskimo.sh - https://www.eskimo.sh - 2019-2023
 
 = Eskimo Service Developer Guide
 
@@ -176,17 +176,16 @@ The whole setup process when downloading the images from internet can be represe
 image::pngs/services-download.png[800, 800, align="center"]
 
 
+:service-dev-guide-embedded: OK
 
 
 // included package developer README
-
-include::../../../packages_dev/README.adoc[leveloffset=0,lines=80..340]
+include::../../../packages_dev/README.adoc[leveloffset=0,lines=80..350]
 
 
 
 // included service developer README
-
-include::../../../services_setup/README.adoc[leveloffset=0,lines=80..1010]
+include::../../../services_setup/README.adoc[leveloffset=0,lines=80..1030]
 
 
 

@@ -727,6 +727,10 @@ Software.
                                         <exclude>*.pdf</exclude>
                                     </excludes>
                                 </resource>
+                                <resource>
+                                    <directory>${project.basedir}/doc/fonts</directory>
+                                    <targetPath>docs/fonts</targetPath>
+                                </resource>
                             </webResources>
                         </configuration>
                     </plugin>

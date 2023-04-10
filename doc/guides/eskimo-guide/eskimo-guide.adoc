@@ -34,8 +34,8 @@ Software.
 
 :sectnums:
 :toc:
-:authors: eskimo.sh - https://www.eskimo.sh - 2019-2022
-:copyright: eskimo.sh - https://www.eskimo.sh - 2019-2022
+:authors: eskimo.sh - https://www.eskimo.sh - 2019-2023
+:copyright: eskimo.sh - https://www.eskimo.sh - 2019-2023
 
 = Eskimo User and Administration Guide
 

@@ -724,7 +724,7 @@ https://grafana.com/
 The default _username_ / _password_ to administer grafana within eskimo is `eskimo` / `eskimo.` +
 These credentials can be changed in the Eskimo grafana configuration part on "Eskimo Services Configuration" page.
 
-WARNING: The default _username_ / _password_ can onyl be changed *before* Grafana's first start.
+WARNING: The default _username_ / _password_ can only be changed *before* Grafana's first start.
 
 ===== Grafana dashboards provisionning
 
