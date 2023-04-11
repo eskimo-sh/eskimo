@@ -39,7 +39,7 @@ nodes.
 ** Port 22 for eskimo to be able to reach them - if the eskimo application itself is installed outside of the eskimo
 cluster
 ** Port 80 of the node running eskimo - if the eskimo application itself is installed on one of the eskimo cluster node
-(or the port on which Eskimo is answering).
+(or the port on which Eskimo is configured to listen).
 
 This principle is illustrated by the schema at <<sample_system_archi>>.
 

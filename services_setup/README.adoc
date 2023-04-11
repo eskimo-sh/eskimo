@@ -900,38 +900,155 @@ Page scripters form a third mechanism aimed at customizing the behaviour of prox
 declaring a javascript snippet that is injected at the bottom of the `body` tag in the referenced HTML document.
 
 
-[[docker_images_versioning]]
-== Docker Images Versioning
+[[utility_framework]]
+=== BASH Utilities framework and functions
 
-The different scripts presented above and available with each and every service as part of the _Services Installation
-Framwork_ can be customized at will as ad often as required. +
+Eskimo provides multiple utility features and functions to ease the development of new services within Eskimo.
+Most of these functions and features are implemented in the file `eskimo-utils.sh` installed by the base Eskimo setup
+step on cluster nodes in `/usr/local/sbin`. +
+Some other features are provided as independent scripts. +
+This is noe detailed below.
+
+==== Locking Framework
+
+Whenever a service is starting, it's sometimes required to take a lock to ensure multiple services requiring the same
+resource - such as a gluster mount for instance, or services initializing a common configuration file - avoid spurious
+effects comming from race conditions. +
+This is especially important for native node services starting on multiple nodes at the very same time.
+
+Eskimo provides a locking framework based on filesystem-level locks (`flock` primitive) that can very well work in a
+distributed way to synchronize services cluster-wide by leveraging on Gluster FS.
+
+The BASH functions provided by eskimo for this purpose in  `eskimo-utils.sh` are as follows:
+
+* `take_lock` takes a lock based on the file passed in argument. +
+  e.g. `take_lock test_lock /var/lib/eskimo` would take a lock called test_lock on an ad'hoc file created in the
+  folder `/var/lib/eskimo`. +
+  A call to `take_lock `exports a variable called `LAST_LOCK_HANDLE` where the lock handle identifier to be used in
+  order to release the lock later on is stored. This should be saved in another user-level variable immediately after a
+  call to `take_lock`.
+* `release_lock` releases a lock identified by the handle identifier passed in argument. +
+  e.g. `release_lock 732:/var/lib/eskimo/test_lock.lock` would release the lock taken by the preceding example.
+  A more realistic call would be `release_lock $LAST_LOCK_HANDLE` as explained above, even though that is discouraged
+  and the user should favor storing that variable value in another user-defined variable.
+* `take_global_lock` behaves as `take_lock` except that the user doesn't need to explicitly release the lock. +
+  A lock taken with `take_global_lock` is released automatically when the shell process exits. Global here is meant
+  as _global to the process_.
+
+These locking functions are used extensively in Eskimo pre-packaged services, have a look and get inspired.
+
+==== CLI utilities docker volume mount needs detection
+
+CLI utilities in eskimo pre-packages services - such as logstash, pyspark, flink-shell, etc. - are implemented as
+wrappers that instantiates the real CLI command in a docker container containing the relevant software stack properly
+installed and configured. +
+This causes problems whenever these command line tools takes in argument folder or files from the local filesystem since
+these folders and files wouldn't be available from within the docker container.
+
+For this reason, Eskimo provides an utility function called `parse_cli_docker_volume_mounts` in `eskimo-utils.sh`.
+This function parses the command line tool supported arguments and defines the corresponding mount options to be used
+by `docker run` to make these folders and files available from within the container as well.
+
+The function `parse_cli_docker_volume_mounts` is invoked as follows:
+
+`parse_cli_docker_volume_mounts "arg_flags_to_search_for" _type_ [separator] "$@"`
+
+where type is either `multiple` - whenever multiple files or folders can be passes to the corresponding argument, in
+which case the separator must be indicated as well - or `single` - in which case a single file or folder path is
+expected.
+
+Some examples:
+
+* `parse_cli_docker_volume_mounts "--jars,--py-files,--files" multiple "," "$@"` +
+   seaches for `-jars`, `--py-files` and `--files` arguments in `$@` and supports finding many pathes seperated by a
+   coma.
+* `parse_cli_docker_volume_mounts "-driver-class-path" multiple ":" "$@"` +
+   searches for a typical classpath definition passed as `-driver-class-path` in `$@`
+* `parse_cli_docker_volume_mounts "--properties-file" single "$@"` +
+   searches for a properties file passed as `--properties-file` in `$@`
+
+This function is used everywhere in every command from the Eskimo CLI packages, have a look and get inspired.
+
+==== Getting last tag to use for an Eskimo service docker image
+
+As explained in the next section <<docker_images_versioning>>, Eskimo services docker images follow a versioning scheme
+where a re-installation of a service (following a customization script evolution for instance, or an upgrade of the
+underlying software component, or whatever) causes the version (image tag) to be incremented.
+
+For this reason, whenever a SystemD service startup script or a Kubernetes Deployment descriptor generation script
+wants to start a service, it first needs to find out about the latest version / tag to use.
+
+The function `get_last_tag` in `eskimo-utils.sh` is provided for this purpose. It's invoked by passing the eskimo
+service name (which resolves the docker image name by convention) to the function call and returns on _stdout_ the
+latest tag found either in Docker registry or in local docker image set.
+
+==== Gluster Mount utility script
+
+Gluster shares are mounted at runtime using standard mount command (fuse filesystem).
+
+However eskimo provides _Toolbox script_ that takes care of all the burden of managing shared folders with gluster.
+
+This _Toolbox script_ is the available on cluster nodes at: `/usr/local/sbin/gluster-mount.sh`. +
+This script is called as follows:
+
+.calling /usr/local/sbin/gluster-mount.sh
+----
+/usr/local/sbin/gluster-mount.sh VOLUME_NAME MOUNT_POINT OWNER_USER_ID
+----
+
+where:
+
+* `VOLUME_NAME` is the name of the volume to be created in the gluster cluster
+* `MOUNT_POINT` is the folder where to mount that volume on the local filesystem.
+* `OWNER_USER_ID` the user to which the mount points should belong
+
+The beauty of this script is that it takes care of everything, from manipulating `/etc/fstab` to configuring SystemD
+automount properly, etc.
+
+This script is related to the mount part (the client part) on hosts OSes running on the Eskimo cluster.
+A similar script is provided to run from within container to mount gluster shares from within containers
+(as required for instance for kubernetes operated services) : `inContainerMountGluster.sh`. +
+EGMI takes care of the GlusterFS backend management part.
+
+
+
+[[docker_images_versioning]]
+=== Docker Images Versioning
+
+Eskimo services docker images are versioned by incrementing the tag attribute every time the service gets reinstalled
+by eskimo.
+
+==== Principle
+
+The different scripts presented above in chapter <<services_installation_framework>> and available with each and every service as part of the _Services Installation
+Framwork_ can be customized at will and as often as required. +
 Whenever one of these scripts is updated or customized, one simply needs to _reinstall_ the service using
 
 * either the "_Setup Eskimo Nodes_" platform administration menu entry (for node native services)
 * or the "_Setup Kube Services_" platformadministration menu entry (for node kubernetes services)
 
-This can be done as frequentely as required.
+This can be done as frequently as required.
 
 The system works by incrementing the image tag number at each and every installation and restarting the service (either
 using SystemD for native services, or _kubectl_ for Kubernetes services.
 
 The first time a service is installed, it will get the number "1" as tag, the seond time will make the tag number
 updated to the number "2", and so on. +
-The system automaticically purges and clobbers the previous tags and the docker filesysten layers (overlay) that might
+The system automatically purges and clobbers the previous tags and the docker filesysten layers (overlay) that might
 not be required anymore.
 
 
 [[services_customizatio_tool]]
-== Services Customization Tool
+==== Services Customization Tool
 
 Services can be customized by updating or customizing the different scripts presented in
 <<services_installation_framework>> above and available with each and every service. As explained in
 <<docker_images_versioning>>, this can be done at will and one just needs to reinstall the corresponding service to make
 his changes deployed on the system.
 
-But eskimo also provides a utility tool to perform such customization on the live systen, without requiring to get
+But eskimo also provides an utility tool to perform such customization on the live systen, without requiring to get
 back to the eskimo UI and reinstall a service from the UI. +
-Whenever one is develpping a new service or feature, havigng to get back to Eskimo and the full reinstallation procedure
+Whenever one is developing a new service or feature, having to get back to Eskimo and the full reinstallation procedure
 is cumbersome. This script is intended for this purpose, being able to quickly evolve services in an efficient and easy
 fashion.
 
@@ -1027,7 +1144,10 @@ deployment.apps/cerebro created
 
 
 
-// marker for exclusion : line 1030
+
+
+
+// marker for exclusion : line 1150
 
 
 

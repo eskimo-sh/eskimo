@@ -74,7 +74,7 @@ node in a range is not answering. +
 holes in your range of IPs.* This is fairly important if you want Eskimo to be able to
 successfully manage your cluster.
 
-WARNING: In its current version (0.4 at the time of writing this document), eskimo *requires at all cost nodes to be
+WARNING: In its current version (0.5 at the time of writing this document), eskimo *requires at all cost nodes to be
 defined using IP addresses* and in no way are hostnames or DNS names supported. In this version of eskimo, only IP
 addresses are supported, period. +
 Unfortunately with big data technologies and especially spark and kubernetes, supporting DNS or hostnames is

@@ -176,7 +176,7 @@ where:
 * `MOUNT_POINT` is the folder where to mount that volume on the local filesystem.
 * `OWNER_USER_ID` the user to which the mount points should belong
 
-The beauty of this script is that it takes care of everything, from manioulating /etc/fstab to configuring SystemD
+The beauty of this script is that it takes care of everything, from manipulating `/etc/fstab` to configuring SystemD
 automount properly, etc.
 
 This script is related to the mount part (the client part) on hosts OSes running on the Eskimo cluster.

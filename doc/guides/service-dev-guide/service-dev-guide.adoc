@@ -185,7 +185,7 @@ include::../../../packages_dev/README.adoc[leveloffset=0,lines=80..350]
 
 
 // included service developer README
-include::../../../services_setup/README.adoc[leveloffset=0,lines=80..1030]
+include::../../../services_setup/README.adoc[leveloffset=0,lines=80..1150]
 
 
 

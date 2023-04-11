@@ -86,7 +86,7 @@ can access the clipboard)
 *Various notes related to Eskimo terminal console usage:*
 
 * The initial terminal size is computed automatically from the available window size. Unfortunately in the current
-version, resizing the terminal is not suppported. Whenever the user resizes its Web Browser window, the only way to
+version, resizing the terminal is not supported. Whenever the user resizes its Web Browser window, the only way to
 resize the terminal is by closing it and reopening it.
 * `Shift + PgUp` and `Shift + PgDown` to scroll the terminal is not supported. A sound usage of `| less` is recommended
 when pagination is required.
@@ -174,7 +174,7 @@ In order to do this, one should delete the content of the folder `packages_distr
 sudo rm -RF /usr/local/lib/eskimo-V0.3/packages_distrib/*
 ----
 
-When this is done the Eskimo Web UI will automaticalyl bring the user back to the setup page and enable him to either
+When this is done the Eskimo Web UI will automatically bring the user back to the setup page and enable him to either
 build or download the _Eskimo Service Package Images_. Internet access from the VM is required.
 
 === Docker images versioning
