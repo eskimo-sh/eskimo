@@ -252,11 +252,11 @@ kubernetes services.
 
 ===== Kubernetes services name resolution on host nodes
 
-As of current version of Eskimo (V0.5), no ost-level DNS service is provided to provide service name resolution for
-nodes host level commands and components.
+As of current version of Eskimo (V0.5), no host-level DNS service is setup to provide service name resolution for
+node / host level commands and components.
 
 Eskimo provides in place a command `eskimo-kube-exec` which invokes the passed command line within a container where
-kubernetes services are declared in `/etc/hosts`, thus making them available for command line programs.
+kubernetes services are dynamically declared in `/etc/hosts`, thus making them available for command line programs.
 
 
 === Elastic Logstash
@@ -374,7 +374,7 @@ Eskimo is able to provision Kibana dashboards and referenced objects automatical
 
 * dashboards and all references objects exports need to be put under `services_setup/kibana/samples/` such as
 e.g. `samples/berka-transactions.ndjson`
-* These Kibana export archives need to be self contained : every direct or indirect object referenced by a dashboard
+* These Kibana export archives need to be self-contained : every direct or indirect object referenced by a dashboard
 such as obviously visualizations, saved searches, index patterns, etc. need to be selected when creating the extract.
 
 ==== Pre-packaged Kibana Dashboards

@@ -1999,15 +1999,14 @@ do_overwrite_sc() {
     # overwrite all screenshots
 
     set -e
-    cp $SCRIPT_DIR/../../target/screenshots/console-wide.png                $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
-    cp $SCRIPT_DIR/../../target/screenshots/file-manager-wide.png           $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
-    cp $SCRIPT_DIR/../../target/screenshots/kube-config-medium.png          $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
-    cp $SCRIPT_DIR/../../target/screenshots/nodes-config-wide.png           $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
-    cp $SCRIPT_DIR/../../target/screenshots/services-config-wide.png        $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
-    cp $SCRIPT_DIR/../../target/screenshots/setup-wide.png                  $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
-    cp $SCRIPT_DIR/../../target/screenshots/status-wide-condensed.png       $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
-    cp $SCRIPT_DIR/../../target/screenshots/status-wide.png       $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
-    cp $SCRIPT_DIR/../../target/screenshots/node-services-choice-small.png  $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
+    cp $SCRIPT_DIR/../../target/screenshots/console-wide-condensed.png       $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
+    cp $SCRIPT_DIR/../../target/screenshots/file-manager-wide-condensed.png  $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
+    cp $SCRIPT_DIR/../../target/screenshots/kube-config-medium.png           $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
+    cp $SCRIPT_DIR/../../target/screenshots/nodes-config-wide.png            $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
+    cp $SCRIPT_DIR/../../target/screenshots/services-config-wide.png         $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
+    cp $SCRIPT_DIR/../../target/screenshots/setup-wide.png                   $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
+    cp $SCRIPT_DIR/../../target/screenshots/status-wide-condensed.png        $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
+    cp $SCRIPT_DIR/../../target/screenshots/node-services-choice-small.png   $SCRIPT_DIR/../../doc/guides/eskimo-guide/pngs/
     set +e
 
     if [[ -d $SCRIPT_DIR/../../../eskimo_companion_site ]]; then
@@ -2027,7 +2026,7 @@ do_overwrite_sc() {
         cp $SCRIPT_DIR/../../target/screenshots/nodes-config-medium-condensed.png          $SCRIPT_DIR/../../../eskimo_companion_site/images
         cp $SCRIPT_DIR/../../target/screenshots/services-config-medium-condensed.png       $SCRIPT_DIR/../../../eskimo_companion_site/images
         cp $SCRIPT_DIR/../../target/screenshots/spark-console-medium-condensed.png         $SCRIPT_DIR/../../../eskimo_companion_site/images
-        cp $SCRIPT_DIR/../../target/screenshots/status-wide.png                            $SCRIPT_DIR/../../../eskimo_companion_site/images
+        cp $SCRIPT_DIR/../../target/screenshots/status-wide-condensed.png                  $SCRIPT_DIR/../../../eskimo_companion_site/images
         cp $SCRIPT_DIR/../../target/screenshots/zeppelin-medium-condensed.png              $SCRIPT_DIR/../../../eskimo_companion_site/images
         cp $SCRIPT_DIR/../../target/screenshots/flink-runtime-medium-condensed.png         $SCRIPT_DIR/../../../eskimo_companion_site/images
 
