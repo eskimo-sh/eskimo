@@ -326,6 +326,17 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     ##    eskimo.externalLogoAndIconFolder)
     "icon" : "[images|static_images]/{icon_file_name}"
 
+    ## [optional]  This is used to have eskimo automatically create and maintain
+    ## a system (OS) level user on each and every node of the eskimo cluster
+    "user": {
+
+      # The username of the user to create
+      "name": "{username}",  ## e.g. "kafka"
+
+      # The user ID (/)UID) of the user to create
+      "id": {UID}  ## e.g. 3303
+    }.
+
     # The specific Kubernetes configuration for kubernetes=true services
     "kubeConfig": {
 
@@ -402,8 +413,8 @@ A service declaration in `services.json` for instance for `serviceX` would be de
     ],
 
      ## [optional] List of page scripter
-     ## Page scripts are added to the target resource just aboce the closing 'body'
-     ## tag
+     ## Page scripters are added to the target resource just above the closing
+     ## 'body' tag
     "pageScripters" : [
       {
 
@@ -428,7 +439,30 @@ A service declaration in `services.json` for instance for `serviceX` would be de
                                    ## "{APP_ROOT_URL}/spark-console/history/"
       }
     ]
+  },
 
+  ## [optional] Master detection strategy.
+  ## Whenever the administrator wants to expose a Web UI on a services running
+  ## as multiple instances throughout the Eskimo cluster, then defining this
+  ## is mandatory
+  "masterDetection": {
+
+    ## [mandatory] the strategy to use (only "LOG_FILE" is supported for now)
+    "strategy" : "LOG_FILE",
+
+    ## [mandatory] the log file to search for the marker in the last lines
+    "logFile" : "{log file to search in}", ## e.g. /var/log/gluster/egmi/egmi.log"
+
+    ## [mandatory] the marker to search for
+    "grep": "{marker to search for}",      ## e.g. "I am the new leader"
+
+    ## [mandatory] the REGEX to extract the timestamp from the log line
+    ## containing the marker
+    "timeStampExtractRexp" : "{REGEX to extract the timesamp}", ## e.g.
+                                           ## ([0-9\\-]+ [0-9.:,]+).*"
+
+    ## [mandatory] the SimpleDateFormat pattern to parse the timestamp
+    "timeStampFormat" : "{timesamp format}", ## e.g. "yyyy-MM-dd HH:mm:ss,SSS"
   },
 
   ## [optional] array of dependencies that need to be available and configured
@@ -441,10 +475,10 @@ A service declaration in `services.json` for instance for `serviceX` would be de
       ## essential: it defines how the master service is determined.
       "masterElectionStrategy": "[NONE|FIRST_NODE|SAME_NODE_OR_RANDOM|RANDOM|RANDOM_NODE_AFTER|SAME_NODE|ALl_NODES]"
 
-      ## the service relating to this dependency
+      ## [mandatory] the service relating to this dependency
       "masterService": "{master service name}",
 
-      ## The number of master expected
+      ## [mandatory] The number of master expected
       "numberOfMasters": [1-x],
 
       ## whether that dependency is mandatory or not
@@ -453,6 +487,16 @@ A service declaration in `services.json` for instance for `serviceX` would be de
       ## whether or not the dependent service (parent JSON definition) should be
       ## restarted in case an operation affects this service
       "restart": [true|false],
+
+      ## [optional] Hooks are command to be called on master whenever an action
+      ## is performed on service
+      "hooks": {
+
+        ## [optional] A preinstall hook is a command called on master whenever the
+        ## service is about to be uninstalled
+        "preUninstallHook": "{command}"  #3 e.g.
+           ## "/usr/local/bin/eskimo-kubectl delete_node NULL {service.node.address}"
+      }
     }
   ]
 
@@ -496,13 +540,16 @@ A service declaration in `services.json` for instance for `serviceX` would be de
         {
 
           ## name of the property
-          "name": "{property name}", ## e.g. "num.network.threads"
+          "name": "{property name}",  ## e.g. "num.network.threads"
 
           ## the description to show in the UI
           "comment": "{property description}",
 
           ## the default value to use if undefined by administrators
-          "defaultValue": "{default property value}" ## e.g. "3"
+          "defaultValue": "{default property value}",  ## e.g. "3"
+
+          ## [optional] a REGEX used to validate the user input value
+          "validationRegex": "{REGEX}"  ## e.g. "^[0-9\\.]+$"
         }
       ]
     }
@@ -900,6 +947,50 @@ Page scripters form a third mechanism aimed at customizing the behaviour of prox
 declaring a javascript snippet that is injected at the bottom of the `body` tag in the referenced HTML document.
 
 
+==== Master detection system (for multiple instances services)
+
+Services running as unique service are detected automatically by the proxy redirection system and administrator have
+nothing specific to do for the proxying to work effectively.
+
+Services running as multiple instances services are another story. Eskimo needs a way to understand which of these
+multiple instances is currently the master. +
+Imaging a zookeeper cluster for instance. At any moment in time, only one of the is master. But the master can change at
+any moment and eskimo might need a way to know about this. Now Zookeeper is not a good example since the slave instances
+would still be able to answer requests. +
+A better example is EGMI: Slave EGMI instance User Interfaces redirect the user automatically to the master EGMI User
+Interface (URL). This unfortunately can't work in ESKIMO since this redirection is not compatible with the Eskimo
+proxying system. So Eskimo needs a way to know at any given moment in time which is the EGMI master to direct the user
+to.
+
+This is achieved by using the *Master Detection* sub-system.
+
+This is how this system is used by EGMI in `services.json`:
+
+.master detection for EGMI in `services.json`
+----
+    "masterDetection": {
+      "strategy" : "LOG_FILE",
+      "logFile" : "/var/log/gluster/egmi/egmi.log",
+      "grep": "I am the new leader",
+      "timeStampExtractRexp" : "([0-9\\-]+ [0-9.:,]+).*",
+      "timeStampFormat" : "yyyy-MM-dd HH:mm:ss,SSS"
+    },
+----
+
+And this is how it works:
+
+* `"strategy" : "LOG_FILE"` means that the system will parse the log file of the different instances searching for a
+  specific marker. As of current version of Eskimo (0.5) `LOG_FILE` is the only supported strategy.
+* The `"logFile"` configuration defines the log file to search for the marker in the last lines.
+* `"grep"` gives the marker to be searched for
+* `"timeStampExtractRexp"` and `"timeStampFormat"` are used to be able to get the timestamp if the log entry containing
+  the searched marker. This is crucial to underatand which is the last one, giving us the latest master.
+
+Everytime a service with multiple running instances is deployed (either natively on cluster nodes or through kubernetes,
+this really doesn't matter) and if this service provides a WEB UI that the administrator wants to expose through the
+Eskimo proxy to the Eskimo UI, then such a master detection definition needs to be provided.
+
+
 [[utility_framework]]
 === BASH Utilities framework and functions
 
@@ -1146,8 +1237,7 @@ deployment.apps/cerebro created
 
 
 
-
-// marker for exclusion : line 1150
+// marker for exclusion : line 1240
 
 
 

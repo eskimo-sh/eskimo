@@ -129,10 +129,10 @@
       "memory": "negligible",
       "logo" : "images/prometheus-logo.png",
       "icon" : "images/prometheus-icon.png",
-        "user": {
-          "name": "prometheus",
-          "id": 3307
-        }
+      "user": {
+        "name": "prometheus",
+        "id": 3307
+      }
     },
     "dependencies": [
       {

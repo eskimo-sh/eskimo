@@ -141,14 +141,29 @@ by Kubernetes itself to store its shared configuration.
 Eskimo approaches gluster shares management in a specific way.
 
 First Gluster runs from within a docker container and is isolated from the host operating system. +
-Then Eskimo then leverages on EGMI - https://github.com/eskimo-sh/egmi - Eskimo Gluster Management Interface - to manage
-and operate the gluster cluster.
+Then Eskimo leverages on *EGMI* - Eskimo Gluster Management Interface - https://github.com/eskimo-sh/egmi - to manage
+and operate the cluster of gluster nodes.
 
 The architecture can be depicted as follows:
 
 image::pngs/gluster_infrastructure.png[800, 800, align="center"]
 
-Please refer to the EGMI page on github linked above for further description of EGMI.
+*EGMI* is a daemon running on machines or containers alongside Gluster FS and taking care of managing gluster volumes
+and peers automatically (for most common operations).
+
+The fundamental idea behind EGMI is that Big Data System administrators should not have to do so much manual operations
+to build and maintain a gluster cluster with its volumes and peers.
+
+EGMI inspires from the way most widely used Big Data / NoSQL backends manage their nodes, shards and replicas
+transparently, balancing new replicas to new nodes automatically whenever a node goes down, etc. without an
+administrator needing to really worry about it. +
+EGMI aims eventually at bringing the same level of automation and reliability on top of Gluster FS and at simplifying
+most trivial aspects of gluster volumes management and repairing.
+
+EGMI also includes a web interface for monitoring and to help administrators perform some simple manual operations and
+configuration.
+
+Please refer to the EGMI page on github linked above for further informmation about EGMI.
 
 *Noteworthy details*:
 

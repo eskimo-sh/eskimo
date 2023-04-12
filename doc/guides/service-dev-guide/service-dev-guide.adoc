@@ -179,13 +179,13 @@ image::pngs/services-download.png[800, 800, align="center"]
 :service-dev-guide-embedded: OK
 
 
-// included package developer README
+// include package developer README
 include::../../../packages_dev/README.adoc[leveloffset=0,lines=80..350]
 
 
 
-// included service developer README
-include::../../../services_setup/README.adoc[leveloffset=0,lines=80..1150]
+// include service developer README
+include::../../../services_setup/README.adoc[leveloffset=0,lines=80..1240]
 
 
 
