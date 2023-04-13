@@ -130,15 +130,21 @@ The whole services development framework can be represented as follows:
 
 image::pngs/services-development-framework.png[800, 800, align="center"]
 
-* The <<docker_images_development_framework>> is used to develop and build Container templates images that are later
-  used to build the actual docker containers images that are fine-tuned to Eskimo deployed on Kubernetes or natively on
-  individual Eskimo cluster nodes.
-* The <<services_installation_framework>> which creates the actual container image from the template image and adapts
-  it to the specific situation of the eskimo node or kube cluster on which it is being deployed.
+
+* The <<docker_images_development_framework>> is used to develop and build _Service Container
+template_ images that are later used to build the actual docker containers images that are fine-tuned to Eskimo
+deployed on Kubernetes or natively on individual Eskimo cluster nodes. +
+The _Service Container Template_ Image itself is very generic docker image around the underlying software component
+(e.g. Kafka, Spark, etc.) and might well be used outside of Eskimo.
+* The <<services_installation_framework>> which creates the actual _Eskimo
+Service container_ image from the template image by adapting it to the specific situation of the eskimo node or kube
+cluster on which it is being deployed. +
+The actual _Eskimo Service Container_ Image if very specific to Eskimo; even further, it is very specific to the very
+Eskimo cluster on wich it is being deployed.
 
 The different scripts involved in the different stages are presented on the schema above along with their
 responsibilities and the environment in which they are executed (outside of the container - on the eskimo host machine
-or the eskimo cluster node - or from within the docker container).
+or the eskimo cluster node - or from within the docker container, operated through Kubernetes or not).
 
 
 === Core principles
@@ -180,12 +186,12 @@ image::pngs/services-download.png[800, 800, align="center"]
 
 
 // include package developer README
-include::../../../packages_dev/README.adoc[leveloffset=0,lines=80..350]
+include::../../../packages_dev/README.adoc[leveloffset=0,lines=90..360]
 
 
 
 // include service developer README
-include::../../../services_setup/README.adoc[leveloffset=0,lines=80..1240]
+include::../../../services_setup/README.adoc[leveloffset=0,lines=90..1270]
 
 
 

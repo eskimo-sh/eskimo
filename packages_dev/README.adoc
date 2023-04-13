@@ -70,30 +70,34 @@ image::../doc/guides/service-dev-guide/pngs/services-development-framework.png[8
 endif::service-dev-guide-embedded[]
 
 
-* The <<docker_images_development_framework>> is used to develop and build Container templates images that are later
-used to build the actual docker containers images that are fine-tuned to Eskimo deployed on Kubernetes or natively on
-individual Eskimo cluster nodes.
-* The *services_installation_framework* which creates the actual container image from the template image and adapts
-it to the specific situation of the eskimo node or kube cluster on which it is being deployed.
+* The <<docker_images_development_framework>> (this very guide) is used to develop and build _Service Container
+template_ images that are later used to build the actual docker containers images that are fine-tuned to Eskimo
+deployed on Kubernetes or natively on individual Eskimo cluster nodes. +
+The _Service Container Template_ Image itself is very generic docker image around the underlying software component
+(e.g. Kafka, Spark, etc.) and might well be used outside of Eskimo.
+* The *Services  Installation Framework* (See `README.adoc` in `/services_setup`) which creates the actual _Eskimo
+Service container_ image from the template image by adapting it to the specific situation of the eskimo node or kube
+cluster on which it is being deployed. +
+The actual _Eskimo Service Container_ Image if very specific to Eskimo; even further, it is very specific to the very
+Eskimo cluster on wich it is being deployed.
 
 The different scripts involved in the different stages are presented on the schema above along with their
 responsibilities and the environment in which they are executed (outside of the container - on the eskimo host machine
-or the eskimo cluster node - or from within the docker container).
+or the eskimo cluster node - or from within the docker container, operated through Kubernetes or not).
 
 
 
-
-
-// marker for inclusion : line 80
+// marker for inclusion : line 90
 [[docker_images_development_framework]]
 
 == Docker Images Development Framework
 
 Eskimo manages services (e.g. Flink, Kafka, ElasticSearch, Kibana, etc.) as Docker containers. A docker container is
-the individual and single unit representing a service to be managed by Eskimo. +
+most of the time the individual and single unit representing a service to be managed by Eskimo (exceptions are CLI
+- commad line tools - packages for instance). +
 Docker containers packaging eskimo services should be most of the time downloaded from the Eskimo online package
-archive. But an administrator can very well decide to build his own versions of Eskimo provided service container images
-or event implement his own service packages. +
+repository. But an administrator can very well decide to build his own versions of Eskimo provided service template
+images or even implement his own service packages. +
 This is described in this section.
 
 The _Docker Images Development Framework_ provides tools and defines standards to build the docker images deployed on
@@ -102,7 +106,7 @@ the eskimo cluster nodes.
 Eskimo is leveraging on docker to deploy services either on Kubernetes or natively across the cluster nodes and to
 ensure independence from host OSes and specificities as well as proper isolation between services.
 
-Again, Docker images can be downloaded from internet (or the internal corporation network) or build locally on the
+Again, Docker images can be downloaded from internet (or the internal network of the corporation) or build locally on the
 machine running the Eskimo backend.
 
 === Requirements
@@ -110,8 +114,9 @@ machine running the Eskimo backend.
 In order for one to be able to either build the eskimo software components packages locally (or have eskimo building
 them locally), there are a few requirements:
 
-* Docker must be installed and available on the user local computer or the eskimo host machine in case Eskimo builds
+* Docker must be installed and available on the user local computer or the Eskimo host machine in case Eskimo builds
   them.
+* The Eskimo host machine should have access to Internet
 * At least 10Gb of hard drive space on the partition hosting `/tmp` must be available.
 * At least 15Gb of hard drive space on the partition hosting the eskimo installation folder (Eskimo backend) must be
   available.
@@ -123,7 +128,7 @@ The principle is pretty straightforward:
 * Every docker image (or package) is built by calling `build.sh` from the corresponding package folder, i.e. a
 sub-folder of this very folder `packages_dev`
 * That `build.sh` script is free to perform whatever it wants as long as the result is a docker image with the expected
-name put in the folder `packages_distrib` in the parent folder and packaging the target software component.
+name put in the folder `packages_distrib` in the parent folder and properly packaging the target software component.
 * By convention, the actual software component download and installation from within the container is done by a script
 names `installServiceX` (for a component that would be called "_serviceX_". More on that below.
 
@@ -179,24 +184,28 @@ design his docker container the way he wants.
 However, adhering to some conventions eases a lot the implementation and maintenance of these images. +
 These standard conventions are as follows:
 
-* All docker images are based on the `base-eskimo` image which is itself based on a lightweight debian stretch image.
+* All docker images are based on the `base-eskimo` image which is itself based on a lightweight debian bullseye image
+(as of version 0.5 of esimo)
 * A software component named _X_ with _version Y_ should be installed in `/usr/local/lib/_x_-_y_` (if and only if it is
 not available in apt repositories and installed using standard debian `apt-get install x`).
-** In this case, a simlink preventing the further *Services Installation framework* from the need to mess with version
+** In this case, a symlink preventing the further *Services Installation framework* from the need to mess with version
 numbers should be created : `/usr/local/lib/x` pointing to `/usr/local/lib/x-version`.
-** This simlink is pretty important. In the second stage, when installing services on eskimo cluster nodes, it is
-important that setup and installation scripts can be prevented from knowing about the actual version of the software
-component being installed. Hence the need for that simlink.
+** This symlink is pretty important. In the second stage, when installing services on eskimo cluster nodes, it is
+important that setup and installation scripts can be prevented from having to know about the actual version of the software
+component being installed. Hence the need for that symlink.
 * The presence of a single `build.sh` script is a requirement. That script is called by eskimo to build the package if
 it is not yet available (either built or downloaded)
 * A helper script `../common/common.sh` can be linked in the new package build folder using
 `ln -s ../common/common.sh`. This common script provides various helper functions to build the docker
 container, save it to the proper location after building, etc.
-* The script performing the _in container installation_ of the software component X is usually called `installX.sh`.
-* Software versions to be downloaded and installed within docker images are coded _once and for all_ in the file
+* The script performing the _in container installation_ of the software component _X_ is usually called `installX.sh`.
+* Software versions to be downloaded and installed within docker images are defined _once and for all_ in the file
 `../common/common.sh`. This is actually a requirement since most of the time software version for common components such
 as ElasticSearch or scala are used in several different packages. Defining version numbers of software components to be
 downloaded and installed in a common place helps to enforce consistency.
+* The result image put in `packages_distrib` should follow a strict naming convention:
+`docker_template_{software-name}_{software.version}_{eskimo.version}.tar.gz`, e.g.
+`docker_template_kafka_2.8.2_1.tar.gz`. This is mandatory for Eskimo to be able to manipulate the image later on.
 
 An eskimo component package developer should look at pre-packaged services to get inspired and find out how eskimo
 packaged services are usually implemented.
@@ -230,12 +239,13 @@ The build process thus typically looks this way:
 And that's it.
 
 The package installation is limited to this, all the customizations and fine tuning the image for its use by eskimo is
-done at a later stage, during the *Service Installation* on Kubernetes or directly on eskimo cluster nodes.
+done at a later stage, during the *Service Installation* on Kubernetes or directly on eskimo cluster nodes (for native
+node services).
 
 === Look for examples and get inspired
 
-Look at the eskimo pre-packaged component packages development scripts for examples and the way they are built to get
-inspired for implementing your own packages.
+Look at the packages development scripts of eskimo pre-packaged components for examples and the way they are built to
+get inspired when implementing your own packages.
 
 
 === Building the Kubernetes archive
@@ -271,13 +281,13 @@ succeed.*
 
 It is recommended though to use a binary archive of Zeppelin since the build from the source rarely succeeds out of the
 box (Zeppelin build system is fairly complicated and the eskimo team maintains the "build from source" feature only when
-the last binary release of Zeppelin suffers from impacting bugs).
+the last binary release of Zeppelin suffers from impacting bugs or limitations we want to workaround).
 
 
 === Setting up a remote packages repository
 
-When running eskimo, software packages - either service docker images or the Kube binary archive - can be either built
-or downloaded from a *remote packages repository*.
+When setuping eskimo after initial launch, software packages - either service docker images or the Kube binary archive
+- can be either built or downloaded from a *remote packages repository*.
 
 Setting up a remote packages repository is extremely simple:
 
@@ -298,8 +308,8 @@ For instance the following layout should be available from internet or the local
 
 A software package should be named as follows:
 
-* `docker_template_[software]\_[software_version]_[eskimo_version].tar.gz` for service docker images
-* `eskimo_kube\_[software_version]_[eskimo_version].tar.gz` for kube archive
+* `docker_template_[software-name]\_[software.version]_[eskimo.version].tar.gz` for service docker images
+* `eskimo_kube\_[software.version]_[eskimo.version].tar.gz` for kube archive
 
 The file `eskimo_packages_versions.json` describes the repository of packages and the available packages.
 
@@ -337,7 +347,7 @@ The file `eskimo_packages_versions.json` describes the repository of packages an
 It's content should be aligned with the following properties from the configuration file `eskimo.properties`:
 
 * `system.additionalPackagesToBuild` and images declared on `services.json` giving the set of docker images for packages to be or downloaded
-* `system.kubePackages` giving the name of the kubernetes package to built or downloaded
+* `system.kubePackages` giving the name of the kubernetes package to be built or downloaded
 
 
 
@@ -347,9 +357,7 @@ It's content should be aligned with the following properties from the configurat
 
 
 
-
-
-// marker for exclusion : line 350
+// marker for exclusion : line 360
 
 [appendix]
 == Copyright and License
