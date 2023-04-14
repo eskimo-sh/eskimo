@@ -112,8 +112,6 @@ https://zookeeper.apache.org/
 
 Zookeeper on Eskimo is installed as a native SystemD / docker unit on hosts and doesn't run on Kubernetes.
 
-Zookeeper within Eskimo CE suffers from some limitations related to relocation upon node reinstallation
-*post-initial cluster installation* as described here <<zookeeper-limitations>>.
 
 ==== Zookeeper specificities within Eskimo
 
@@ -226,9 +224,6 @@ administrators but they are not forced to be aware of it. Eskimo automates each 
 as deploying services and PODs, configuring endpoints, creating SSL certificates, etc.
 Eskimo also created roles and users required to operate Kubernetes and sets up host level DNS configuration to enable
 host-native services to call Kubernetes services by their name.
-
-Kubernetes Within Eskimo CE suffers from some limitations related to node removal *post-installation* as
-described here <<kubernetes-limitations>>.
 
 Eskimo also packages and manages _etcd_ automatically as required by Kubernetes. +
 etcd is a strongly consistent, distributed key-value store that provides a reliable way to store data that needs to be
