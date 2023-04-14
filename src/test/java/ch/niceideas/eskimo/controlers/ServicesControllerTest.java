@@ -143,7 +143,9 @@ public class ServicesControllerTest {
 
         String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesControllerTest/expectedUIServicesStatusConfig.json"), StandardCharsets.UTF_8);
 
-        assertEquals (expectedResult, sc.getUIServicesStatusConfig());
+        //System.err.println(sc.getUIServicesStatusConfig());
+
+        assertTrue (new JSONObject(expectedResult).similar(new JSONObject(sc.getUIServicesStatusConfig())));
     }
 
     @Test
@@ -151,7 +153,9 @@ public class ServicesControllerTest {
 
         String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesControllerTest/expectedServicesDependencies.json"), StandardCharsets.UTF_8);
 
-        assertEquals (expectedResult, sc.getServicesDependencies());
+        //System.err.println(sc.getServicesDependencies());
+
+        assertTrue (new JSONObject(expectedResult).similar(new JSONObject(sc.getServicesDependencies())));
     }
 
     @Test

@@ -35,6 +35,7 @@
 package ch.niceideas.eskimo.services;
 
 import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
 import ch.niceideas.eskimo.EskimoApplication;
 import ch.niceideas.eskimo.test.services.ConfigurationServiceTestImpl;
@@ -106,7 +107,9 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
 
     @AfterEach
     public void tearDown() throws Exception {
-        FileUtils.delete(new File (tempPath));
+        if (StringUtils.isNotBlank(tempPath)) {
+            FileUtils.delete(new File(tempPath));
+        }
     }
 
     @Test

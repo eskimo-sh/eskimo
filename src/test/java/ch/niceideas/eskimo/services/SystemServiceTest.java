@@ -51,8 +51,10 @@ import ch.niceideas.eskimo.test.services.SSHCommandServiceTestImpl;
 import ch.niceideas.eskimo.test.testwrappers.SystemServiceUnderTest;
 import ch.niceideas.eskimo.types.Node;
 import ch.niceideas.eskimo.types.Service;
+import ch.niceideas.eskimo.utils.OSDetector;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -185,6 +187,8 @@ public class SystemServiceTest {
 
     @Test
     public void testCallUninstallScript() throws Exception {
+
+        Assumptions.assumeTrue(OSDetector.isPosix());
 
         String tempStorage = createTempStoragePath();
 
