@@ -73,7 +73,12 @@ public class EskimoKubernetesOperationsCommandTest extends AbstractWebTest {
 
         String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoKubernetesOperationsCommandTest/expectedResult.html"), StandardCharsets.UTF_8);
 
-        assertJavascriptEquals(expectedResult.replace("\n", "").replace("\r", "").replace("  ", ""), "$('#kubernetes-operations-command-body').html()");
+        assertJavascriptEquals(
+                expectedResult
+                        .replace("\r\n", "")
+                        .replace("\n", "")
+                        .replace("  ", ""),
+                "$('#kubernetes-operations-command-body').html()");
     }
 
     @Test

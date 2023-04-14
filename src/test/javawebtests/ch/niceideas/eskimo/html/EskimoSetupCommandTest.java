@@ -72,7 +72,12 @@ public class EskimoSetupCommandTest extends AbstractWebTest {
 
         String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSetupCommandTest/expectedResult.html"), StandardCharsets.UTF_8);
 
-        assertJavascriptEquals(expectedResult.replace("\n", "").replace("  ", ""), "$('#setup-command-body').html()");
+        assertJavascriptEquals(
+                expectedResult
+                        .replace("\r\n", "")
+                        .replace("\n", "")
+                        .replace("  ", ""),
+                "$('#setup-command-body').html()");
     }
 
     @Test
@@ -84,7 +89,12 @@ public class EskimoSetupCommandTest extends AbstractWebTest {
 
         String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoSetupCommandTest/expectedResultBuild.html"), StandardCharsets.UTF_8);
 
-        assertJavascriptEquals(expectedResult.replace("\n", "").replace("  ", ""), "$('#setup-command-body').html()");
+        assertJavascriptEquals(
+                expectedResult
+                        .replace("\r\n", "")
+                        .replace("\n", "")
+                        .replace("  ", ""),
+                "$('#setup-command-body').html()");
     }
 
     @Test

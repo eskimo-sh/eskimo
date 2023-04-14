@@ -183,7 +183,11 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         String htmlContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoFileManagersTest/expectedContent.rawhtml"), StandardCharsets.UTF_8);
 
-        assertJavascriptEquals(htmlContent.replaceAll("\r", ""), "$('#file-manager-folder-content-192-168-10-11').html()");
+        assertJavascriptEquals(
+                htmlContent
+                        .replace("\r\n", "")
+                        .replaceAll("\r", ""),
+                "$('#file-manager-folder-content-192-168-10-11').html()");
     }
 
     @Test
@@ -401,6 +405,10 @@ public class EskimoFileManagersTest extends AbstractWebTest {
 
         String htmlContent = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoFileManagersTest/expectedContent.rawhtml"), StandardCharsets.UTF_8);
 
-        assertJavascriptEquals(htmlContent.replaceAll("\r", ""), "$('#file-manager-folder-content-192-168-10-11').html()");
+        assertJavascriptEquals(
+                htmlContent
+                        .replace("\r\n", "")
+                        .replaceAll("\r", ""),
+                "$('#file-manager-folder-content-192-168-10-11').html()");
     }
 }

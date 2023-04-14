@@ -300,6 +300,8 @@ public class SystemServiceTest {
     @Test
     public void testCreateRemotePackageFolder() throws Exception {
 
+        Assumptions.assumeTrue(OSDetector.isPosix());
+
         String tempStorage = createTempStoragePath();
 
         File serviceFolder = new File (tempStorage, "database-manager");
@@ -370,6 +372,8 @@ public class SystemServiceTest {
 
     @Test
     public void testUpdateStatus() throws Exception {
+
+        Assumptions.assumeTrue(OSDetector.isPosix());
 
         NodesConfigWrapper nodesConfig = StandardSetupHelpers.getStandard2NodesSetup();
         configurationServiceTest.saveNodesConfig(nodesConfig);

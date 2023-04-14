@@ -34,8 +34,11 @@
 
 package ch.niceideas.eskimo.utils;
 
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.lang.management.ManagementFactory;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.catchSystemExit;
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,6 +47,11 @@ public class EncodedPasswordGeneratorTest {
 
     @Test
     public void testEdgeCases() throws Exception {
+
+        // SecurityManager is not supported beyond Java 12
+        String javaSpec = System.getProperty("java.specification.version");
+        Assumptions.assumeTrue(javaSpec.startsWith("1.") || Integer.parseInt(javaSpec) <= 12);
+
         assertEquals (-1, catchSystemExit(() -> {
             EncodedPasswordGenerator.main(new String[] {});
         }));

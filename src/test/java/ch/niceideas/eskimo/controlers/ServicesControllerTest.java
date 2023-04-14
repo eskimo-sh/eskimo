@@ -128,7 +128,9 @@ public class ServicesControllerTest {
 
         String expectedResult = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("ServicesControllerTest/expectedUIServicesConfig.json"), StandardCharsets.UTF_8);
 
-        assertEquals (expectedResult, sc.getUIServicesConfig());
+        //System.err.println (sc.getUIServicesConfig());
+
+        assertTrue (new JSONObject(expectedResult).similar(new JSONObject(sc.getUIServicesConfig())));
 
         servicesDefinitionTest.setError();
 
