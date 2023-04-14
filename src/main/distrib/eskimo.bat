@@ -57,7 +57,7 @@ REM overriding serviceDefinitionFile in eskimo.properties
 SET SERVICESDEFINITIONFILE=conf\services.json
 
 REM encoding UTF-8 is required to parse SSH command results properly.
-%JAVA_HOME%\bin\java ^
+java ^
     -Xms1024m ^
     -Xmx1024m ^
     -Dfile.encoding=UTF-8 ^

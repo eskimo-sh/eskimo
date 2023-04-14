@@ -329,7 +329,7 @@ public class FileManagerServiceImpl implements FileManagerService {
         return sshCommandService.runSSHCommand(node, "file --brief --mime-type " + StringEscapeUtils.escapeXSI(newPath));
     }
 
-    boolean isTextMimeType(String fileMimeType) {
+    static boolean isTextMimeType(String fileMimeType) {
         if (fileMimeType.startsWith("text") || fileMimeType.contains("+xml")) {
             return true;
         } else {

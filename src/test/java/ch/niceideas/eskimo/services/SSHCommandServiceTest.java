@@ -34,7 +34,10 @@
 
 package ch.niceideas.eskimo.services;
 
+import ch.niceideas.common.json.JsonWrapper;
 import ch.niceideas.common.utils.FileUtils;
+import ch.niceideas.common.utils.ResourceUtils;
+import ch.niceideas.common.utils.StreamUtils;
 import ch.niceideas.common.utils.StringUtils;
 import ch.niceideas.eskimo.AbstractBaseSSHTest;
 import ch.niceideas.eskimo.EskimoApplication;
@@ -55,7 +58,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -102,7 +109,7 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
         connectionManagerServiceTest.setPrivateSShKeyContent(privateKeyRaw);
         connectionManagerServiceTest.setSShPort(getSShPort());
 
-        configurationServiceTest.saveSetupConfig("{ \"" + SetupService.SSH_USERNAME_FIELD + "\" : \"test\" }");
+        configurationServiceTest.saveSetupConfig("{ \"" + SetupService.SSH_USERNAME_FIELD + "\" : \"" + System.getProperty("user.name") + "\" }");
     }
 
     @AfterEach
@@ -174,19 +181,41 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
     }
 
     @Test
-    public void testScpFile() throws Exception {
+    public void testCopyScpFile() throws Exception {
         File source = File.createTempFile("test_ssh", ".txt");
         FileUtils.writeFile(source, "test content");
-        try {
-            sshCommandService.copySCPFile(Node.fromName("localhost"), source.getAbsolutePath());
-            File dest = new File ("/home/" + source.getName());
-            assertTrue (dest.exists());
-            assertEquals ("test content", FileUtils.readFile(dest));
-        } catch (SSHCommandException e) {
-            // this can happen if we don't have the rights to write in /home
-            if (!e.getMessage().equals("Error during SCP transfer.")) {
-                fail (e.getMessage() + " is not expected");
-            }
+        sshCommandService.copySCPFile(Node.fromName("localhost"), source.getAbsolutePath());
+        File dest = new File ("/home/" + source.getName());
+        assertTrue (dest.exists());
+        assertEquals ("test content", FileUtils.readFile(dest));
+    }
+
+    @Test
+    public void testCopyScpFile_edgeCase() throws Exception {
+
+    }
+
+    @Test
+    public void testCopyScpFile_dos2Unix() throws Exception {
+        File source = File.createTempFile("test_ssh", ".txt");
+        FileUtils.writeFile(source, "test\r\ncontent\r\n");
+        sshCommandService.copySCPFile(Node.fromName("localhost"), source.getAbsolutePath());
+        File dest = new File ("/home/" + source.getName());
+        assertTrue (dest.exists());
+        assertEquals ("test\ncontent\n", FileUtils.readFile(dest));
+    }
+
+    @Test
+    public void testCopyScpFile_binaryFile() throws Exception {
+        File source = File.createTempFile("favicon", ".png");
+        byte[] favicon = StreamUtils.getBytes(ResourceUtils.getResourceAsStream("SSHCommandServiceTest/favicon.png"));
+        assertNotNull(favicon);
+        try (FileOutputStream fos = new FileOutputStream (source)) {
+            StreamUtils.copy(new ByteArrayInputStream(favicon), fos);
         }
+        sshCommandService.copySCPFile(Node.fromName("localhost"), source.getAbsolutePath());
+        File dest = new File ("/home/" + source.getName());
+        assertTrue (dest.exists());
+        assertEquals (favicon, StreamUtils.getBytes(new FileInputStream(dest)));
     }
 }

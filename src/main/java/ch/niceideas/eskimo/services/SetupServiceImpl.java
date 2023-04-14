@@ -506,6 +506,7 @@ public class SetupServiceImpl implements SetupService {
         boolean success = false;
         try {
 
+            logger.info ("Starting Setup Operation.");
             operationsMonitoringService.startCommand(setupCommand);
 
             JsonWrapper setupConfig = setupCommand.getRawSetup();
@@ -619,6 +620,7 @@ public class SetupServiceImpl implements SetupService {
 
         } finally {
             operationsMonitoringService.endCommand(success);
+            logger.info ("Setup Operation Completed.");
         }
     }
 
