@@ -100,14 +100,24 @@ Minimum requirements are as follows:
 * JDK 11 or greater
 * Apache maven 3.5 or greater.
 
-Every other dependency will be downloaded during the maven build process (except `trilead-ssh2`, see <<trilead-ssh2>> below).
+Every other dependency will be downloaded during the maven build process (except `trilead-ssh2`, see <<trilead-ssh2>>
+below).
 
 Theoretically, Eskimo can be built on any Operating System providing a command line and supporting Java 11+
-(Note : previous versions of JDK down to 8 may be supported without any guarantee) and Maven 3+. +
-*However, the eskimo source tree makes an extensive use of symbolic links wich - unfortunately - are not supported on
-Microsoft Windows*. +
-For this reason, building eskimo on windows is absolutely possible but it is highly discouraged to develop eskimo on
-Windows.
+(Note : previous versions of JDK down to 8 may be supported without any guarantee) and Maven 3+.
+
+==== Microsoft Windows
+
+*However, the eskimo source tree makes an extensive use of symbolic links which - unfortunately - are only supported on
+Microsoft Windows 10 and 11 through "Developer Mode*.
+
+In order to checkout and develop Eskimo on Windows, some precautions need to be taken:
+
+* First, *Developer Mode* should be enabled on Windows to support symbolic links. +
+  See https://github.com/MicrosoftDocs/windows-dev-docs/blob/docs/hub/apps/get-started/developer-mode-features-and-debugging.md
+* Second, The `git clone` command should explictely enable symbolic link support. That would mean using following
+  command for instance to checkout Eskimo master branch: +
+  `git clone -c core.symlinks=true https://github.com/eskimo-sh/eskimo.git`
 
 
 === Building using maven
