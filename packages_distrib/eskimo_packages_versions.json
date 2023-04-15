@@ -1,0 +1,82 @@
+{
+    "kube-shell": {
+        "software": "0.5",
+        "distribution": "1"
+    },
+    "prom-node-exporter": {
+        "software": "2.41.0",
+        "distribution": "1"
+    },
+    "zookeeper": {
+        "software": "debian_11_bullseye",
+        "distribution": "1"
+    },
+    "base-eskimo": {
+        "software": "0.5",
+        "distribution": "1"
+    },
+    "zeppelin": {
+        "software": "0.11",
+        "distribution": "1"
+    },
+    "ntp": {
+        "software": "debian_11_bullseye",
+        "distribution": "1"
+    },
+    "gluster": {
+        "software": "debian_11_bullseye",
+        "distribution": "1"
+    },
+    "kubernetes-dashboard": {
+        "software": "2.7.0",
+        "distribution": "1"
+    },
+    "flink": {
+        "software": "1.15.4",
+        "distribution": "1"
+    },
+    "logstash": {
+        "software": "8.5.3",
+        "distribution": "1"
+    },
+    "cerebro": {
+        "software": "0.9.4",
+        "distribution": "1"
+    },
+    "kube-master": {
+        "software": "2.7.1",
+        "distribution": "1"
+    },
+    "elasticsearch": {
+        "software": "8.5.3",
+        "distribution": "1"
+    },
+    "spark": {
+        "software": "3.3.2",
+        "distribution": "1"
+    },
+    "grafana": {
+        "software": "9.3.2",
+        "distribution": "1"
+    },
+    "kafka-manager": {
+        "software": "3.0.0.6",
+        "distribution": "1"
+    },
+    "kafka": {
+        "software": "2.8.2",
+        "distribution": "1"
+    },
+    "prometheus": {
+        "software": "2.41.0",
+        "distribution": "1"
+    },
+    "kibana": {
+        "software": "8.5.3",
+        "distribution": "1"
+    },
+    "kube": {
+        "software": "1.26.3",
+        "distribution": "1"
+    }
+}

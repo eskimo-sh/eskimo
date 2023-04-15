@@ -171,13 +171,12 @@ eskimo.SetupCommand = function() {
                     console.log(data);
                     if (data && data.status) {
                         if (data.status == "KO") {
-                            that.eskimoSetup.showSetupMessage(data.error, false);
+                            that.eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, data.error);
                         } else {
-                            that.eskimoSetup.showSetupMessage("Configuration applied successfully", true);
                             that.eskimoMain.handleSetupCompleted();
                         }
                     } else {
-                        that.eskimoSetup.showSetupMessage("No status received back from backend.", false);
+                        that.eskimoMain.alert(ESKIMO_ALERT_LEVEL.ERROR, "No status received back from backend.");
                     }
 
                     if (data.error) {
