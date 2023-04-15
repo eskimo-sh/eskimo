@@ -41,6 +41,8 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 public class EskimoSetupCommandTest extends AbstractWebTest {
 
     @BeforeEach
@@ -104,11 +106,12 @@ public class EskimoSetupCommandTest extends AbstractWebTest {
 
         js("eskimoMain.scheduleStopOperationInProgress = function (result) { window.stopOperationInProgressResult = result; }");
 
+        js("window.lastAlert = null;");
+
         testShowCommand();
         getElementById("setup-command-button-validate").click();
 
-        assertJavascriptEquals("Configuration applied successfully", "window.setupMessage");
-        assertJavascriptEquals("true", "window.setupStatus");
+        assertNull (js("return window.lastAlert"));
         assertJavascriptEquals("true", "window.stopOperationInProgressResult");
 
         js("$.ajaxPost = function(callback) { callback.success ({ \"status\" : \"KO\",  \"error\": \"test error\"}); }");
@@ -116,8 +119,7 @@ public class EskimoSetupCommandTest extends AbstractWebTest {
         testShowCommand();
         getElementById("setup-command-button-validate").click();
 
-        assertJavascriptEquals("test error", "window.setupMessage");
-        assertJavascriptEquals("false", "window.setupStatus");
+        assertJavascriptEquals("3 : test error", "window.lastAlert");
         assertJavascriptEquals("false", "window.stopOperationInProgressResult");
     }
 

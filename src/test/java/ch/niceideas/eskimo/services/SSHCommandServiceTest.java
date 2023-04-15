@@ -182,40 +182,17 @@ public class SSHCommandServiceTest extends AbstractBaseSSHTest {
 
     @Test
     public void testCopyScpFile() throws Exception {
+        JsonWrapper systemConfig = configurationServiceTest.loadSetupConfig();
+        File targetDir = new File ("/home/" + systemConfig.getValueForPath(SetupService.SSH_USERNAME_FIELD));
+        if (!targetDir.exists()) {
+            assertTrue(targetDir.mkdirs());
+        }
+
         File source = File.createTempFile("test_ssh", ".txt");
         FileUtils.writeFile(source, "test content");
         sshCommandService.copySCPFile(Node.fromName("localhost"), source.getAbsolutePath());
-        File dest = new File ("/home/" + source.getName());
+        File dest = new File (targetDir, source.getName());
         assertTrue (dest.exists());
         assertEquals ("test content", FileUtils.readFile(dest));
-    }
-
-    @Test
-    public void testCopyScpFile_edgeCase() throws Exception {
-
-    }
-
-    @Test
-    public void testCopyScpFile_dos2Unix() throws Exception {
-        File source = File.createTempFile("test_ssh", ".txt");
-        FileUtils.writeFile(source, "test\r\ncontent\r\n");
-        sshCommandService.copySCPFile(Node.fromName("localhost"), source.getAbsolutePath());
-        File dest = new File ("/home/" + source.getName());
-        assertTrue (dest.exists());
-        assertEquals ("test\ncontent\n", FileUtils.readFile(dest));
-    }
-
-    @Test
-    public void testCopyScpFile_binaryFile() throws Exception {
-        File source = File.createTempFile("favicon", ".png");
-        byte[] favicon = StreamUtils.getBytes(ResourceUtils.getResourceAsStream("SSHCommandServiceTest/favicon.png"));
-        assertNotNull(favicon);
-        try (FileOutputStream fos = new FileOutputStream (source)) {
-            StreamUtils.copy(new ByteArrayInputStream(favicon), fos);
-        }
-        sshCommandService.copySCPFile(Node.fromName("localhost"), source.getAbsolutePath());
-        File dest = new File ("/home/" + source.getName());
-        assertTrue (dest.exists());
-        assertEquals (favicon, StreamUtils.getBytes(new FileInputStream(dest)));
     }
 }

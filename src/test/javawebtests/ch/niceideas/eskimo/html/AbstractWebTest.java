@@ -261,7 +261,6 @@ public abstract class AbstractWebTest {
 
         js("window.eskimoSetup = {}");
         js("eskimoSetup.setSnapshot = function () {};");
-        js("eskimoSetup.showSetupMessage = function (message, success) {window.setupMessage = message; window.setupStatus = success;};");
         js("eskimoSetup.loadSetup = function () {};");
 
 
