@@ -1,6 +1,8 @@
 *.sh text eol=lf
 *.service text eol=lf
 *.yaml text eol=lf
+*.py text eol=lf
+*wrappers/** text eol=lf
 Dockerfile text eol=lf
 
 symlinks=true
