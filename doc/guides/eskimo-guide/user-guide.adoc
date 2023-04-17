@@ -52,11 +52,15 @@ This is for instance the action menu when clicking on Zeppelin in the table view
 image::pngs/context-menu.png[300, 300, align="center"]
 
 
-=== Acting on services reporting errors
+=== Acting on services reporting errors upon installation
 
-Most of the time when a service is reporting an error, a first step is to try to reapply the configuration. +
-See <<apply_configuration>>
+Should you encounter an error upon Eskimo's pre-packaged services installation, it most of the time comes fro some edge
+conditions that can happen once in a while (this is very rare). +
+Whenever that happens, a first step is to simply try to reapply the _Nodes Services configuration_ - See
+<<apply_configuration>> - if the error happens again, then look at service installation logs or SystemD logs.
 
+The same applies to Kubernetes Services in which case one should attempt to re-apply the _Kubernetes Services
+Configuration_ - See <<kube_configuration>>,
 
 === SSH and SFTP Client
 

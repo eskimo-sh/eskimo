@@ -140,6 +140,7 @@ latest service docker image available. +
 Dependent services will be properly restarted.
 
 
+[[kube_configuration]]
 === Kubernetes Services Selection
 
 The last step in the Eskimo cluster installation consists in deploying kubernetes services.
