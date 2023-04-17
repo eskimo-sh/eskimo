@@ -1,0 +1,83 @@
+{
+  "settings": {
+    "broker": {
+      "server.properties": [
+        {
+          "value": "5",
+          "key": "num.network.threads",
+          "oldValue": ""
+        },
+        {
+          "value": "",
+          "key": "num.partitions",
+          "oldValue": "3"
+        },
+        {
+          "value": "",
+          "key": "log.retention.hours",
+          "oldValue": "48"
+        },
+        {
+          "value": "",
+          "key": "socket.request.max.bytes",
+          "oldValue": "128857600"
+        },
+        {
+          "value": "10",
+          "key": "num.io.threads",
+          "oldValue": ""
+        },
+        {
+          "value": "",
+          "key": "socket.receive.buffer.bytes",
+          "oldValue": "204800"
+        }
+      ]
+    },
+    "database": {
+      "database.yml": [
+        {
+          "value": "",
+          "key": "bootstrap.memory_lock",
+          "oldValue": "true"
+        }
+      ]
+    },
+    "calculator-runtime": {
+      "calculator-defaults.conf": [
+        {
+          "value": "200s",
+          "key": "calculator.dynamicAllocation.executorIdleTimeout",
+          "oldValue": "300s"
+        },
+        {
+          "value": "",
+          "key": "calculator.locality.wait",
+          "oldValue": "40s"
+        },
+        {
+          "value": "10",
+          "key": "calculator.rpc.numRetries",
+          "oldValue": ""
+        },
+        {
+          "value": "FIFO",
+          "key": "calculator.scheduler.mode",
+          "oldValue": ""
+        },
+        {
+          "value": "500m",
+          "key": "calculator.driver.memory",
+          "oldValue": ""
+        },
+        {
+          "value": "400s",
+          "key": "calculator.dynamicAllocation.cachedExecutorIdleTimeout",
+          "oldValue": ""
+        }
+      ]
+    }
+  },
+  "restarts": [
+  ]
+}

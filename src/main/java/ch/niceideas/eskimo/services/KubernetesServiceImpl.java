@@ -274,8 +274,10 @@ public class KubernetesServiceImpl implements KubernetesService {
             KubernetesServicesConfigWrapper kubeServicesConfig = configurationService.loadKubernetesServicesConfig();
 
             Node kubeMasterNode = servicesInstallationStatus.getFirstNode(servicesDefinition.getKubeMasterServiceDef());
-            if (kubeServicesConfig == null || kubeMasterNode == null && kubeServicesConfig.hasEnabledServices()) {
+            if (kubeMasterNode == null) {
                 logger.warn("Kubernetes is not installed");
+            } else  if (kubeServicesConfig == null || kubeServicesConfig.hasEnabledServices()) {
+                logger.debug("No Kubernetes services are installed");
             }
 
             // get kubectl status all at once and then below get it from Kubectl result

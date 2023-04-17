@@ -70,6 +70,7 @@ public class SettingsOperationsCommandTest {
     private String testForm = null;
 
     private String expectedJson = null;
+    private String expectedNorestartJson = null;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -78,14 +79,32 @@ public class SettingsOperationsCommandTest {
         testForm = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("EskimoServicesSettingsTest/testForm.json"), StandardCharsets.UTF_8);
 
         expectedJson = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SettingsOperationsCommandTest/expected.json"), StandardCharsets.UTF_8);
+        expectedNorestartJson = StreamUtils.getAsString(ResourceUtils.getResourceAsStream("SettingsOperationsCommandTest/expectedNoRestart.json"), StandardCharsets.UTF_8);
 
         SecurityContextHelper.loginAdmin();
+
+        configurationServiceTest.reset();
+    }
+
+    @Test
+    public void toJSONNoRestart () throws Exception {
+
+        configurationServiceTest.setStandard2NodesSetup();
+
+        configurationServiceTest.saveServicesSettings(new ServicesSettingsWrapper(jsonConfig));
+
+        SettingsOperationsCommand command = SettingsOperationsCommand.create(testForm, scs);
+
+        //System.err.println (command.toJSON());
+        assertTrue (new JSONObject(expectedNorestartJson).similar(command.toJSON()));
     }
 
     @Test
     public void toJSON () throws Exception {
 
         configurationServiceTest.setStandard2NodesSetup();
+
+        configurationServiceTest.setStandard2NodesInstallStatus();
 
         configurationServiceTest.saveServicesSettings(new ServicesSettingsWrapper(jsonConfig));
 

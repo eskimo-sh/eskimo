@@ -204,7 +204,13 @@ public class ServicesSettingsServiceImpl implements ServicesSettingsService {
 
         Service[] dirtyServices = fillInEditedConfigs(changedSettings, settingsForm, servicesSettings.getSubJSONArray("settings"));
 
-        restartedServices.addAll(Arrays.asList(dirtyServices));
+        ServicesInstallStatusWrapper serviceInstallStatus = configurationService.loadServicesInstallationStatus();
+
+        List<Service> restartServices = Arrays.stream(dirtyServices)
+                        .filter(serviceInstallStatus::isServiceInstalledAnywhere)
+                                .collect(Collectors.toList());
+
+        restartedServices.addAll(restartServices);
 
         return servicesSettings;
     }
