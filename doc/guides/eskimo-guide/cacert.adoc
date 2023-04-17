@@ -6,17 +6,17 @@ If you encounter an error message on the Setup Page - during initial setup or af
 package definition file from [Configured Remote Repository]`, this means likely that you are suffering from the empty
 `cacert` file problem affecting OpenJDK and Oracle JDK 9 and perhaps further versions as well.
 
-These Java Development Kits do indeed suffer fom a quite annoying issue: the `lib/security/cacert` file referencing the
+These Java Development Kits does indeed suffer fom a quite annoying issue: the `lib/security/cacert` file referencing the
 SSL certifications authorities is empty. +
 This prevents most of the time to download any file from a remote web server using HTTPS, as is the case during initial
 setup of Eskimo.
 
 A first step is to confirm that this is indeed the problem you are suffering from by looking at the eskimo logs, either
-the files in the `logs` sub-folder of the eskimo root folder or simply on the eskimo console.
+the files in the `logs` sub-folder of the eskimo root folder or simply on the eskimo console standard output.
 
 Search for the following error message:
 
-.Impossible to download
+.Impossible to download error message
 ----
 2019-12-24T11:08:55,431 ERROR [http-nio-9191-exec-5] c.n.e.s.SetupService: javax.net.ssl.SSLException: java.lang.RuntimeException:
  Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty
@@ -75,12 +75,12 @@ Caused by: java.security.InvalidAlgorithmParameterException: the trustAnchors pa
 
 If the eskimo logs report the error above, it means that you do indeed suffer from the empty cacert file of the JDK.
 
-*In this case, you need to locate your JDK installation.adoc and overwrite the file `lib/security/cacert` with a valid file
-(non-empty)*.
+*In this case, you need to locate your JDK installation.adoc and overwrite the file `lib/security/cacert` with a valid
+`cacert` file (non-empty)*.
 
 The generation of a valid `cacert` file exceeds the scope of this documentation. Please refer to your Operating System
 manual.
 
-Eskimo provides however  a default `cacert` file in the sub-folder `utils` of its root installation.adoc. This `cacert` file
-is a default Debian `cacert` file as of July 2019 and is guaranteed safe as of July 2019. No guarantee whatsoever are
-ensured by eskimo.sh and one can use it at his own risk.
+Eskimo provides however a default `cacert` file in the sub-folder `utils` of its root installation.adoc. This `cacert`
+file is a default Debian `cacert` file as of July 2019 and is guaranteed safe as of July 2019. No guarantee whatsoever
+are ensured by eskimo.sh and one should use it at his own risk.
