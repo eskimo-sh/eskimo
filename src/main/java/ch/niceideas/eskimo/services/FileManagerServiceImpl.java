@@ -58,6 +58,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -67,7 +68,7 @@ import java.util.regex.Pattern;
 @Component
 @Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Profile("!test-file-manager")
-public class FileManagerServiceImpl implements FileManagerService {
+public class FileManagerServiceImpl implements FileManagerService, Serializable {
 
     private static final Logger logger = Logger.getLogger(FileManagerServiceImpl.class);
 

@@ -34,22 +34,16 @@
 
 package ch.niceideas.eskimo.controlers;
 
-import ch.niceideas.common.utils.Pair;
-import ch.niceideas.eskimo.services.ApplicationStatusService;
 import ch.niceideas.eskimo.services.ApplicationStatusServiceImpl;
-import ch.niceideas.eskimo.services.NotificationService;
 import ch.niceideas.eskimo.utils.ReturnStatusHelper;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 

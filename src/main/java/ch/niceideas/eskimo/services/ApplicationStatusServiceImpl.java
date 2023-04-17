@@ -83,6 +83,9 @@ public class ApplicationStatusServiceImpl implements ApplicationStatusService {
     public static final String ERROR = "(ERROR)";
     public static final String SETUP_INCOMPLETE = "(Setup incomplete)";
 
+    private static final ThreadLocal<SimpleDateFormat> localDateFormatter
+            = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+
     @Autowired
     private ConfigurationService configurationService;
 
@@ -106,9 +109,6 @@ public class ApplicationStatusServiceImpl implements ApplicationStatusService {
 
     @Value("${eskimo.enableKubernetesSubsystem}")
     private String enableKubernetes = "true";
-
-    private final static ThreadLocal<SimpleDateFormat> localDateFormatter
-            = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
     private final ReentrantLock statusUpdateLock = new ReentrantLock();
     private final ScheduledExecutorService scheduler;

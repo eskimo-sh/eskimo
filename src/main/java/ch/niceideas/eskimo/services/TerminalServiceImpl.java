@@ -49,8 +49,8 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
-import javax.annotation.PreDestroy;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -66,7 +66,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Profile("!test-terminal")
-public class TerminalServiceImpl implements TerminalService {
+public class TerminalServiceImpl implements TerminalService, Serializable {
 
     private static final Logger logger = Logger.getLogger(TerminalServiceImpl.class);
 
