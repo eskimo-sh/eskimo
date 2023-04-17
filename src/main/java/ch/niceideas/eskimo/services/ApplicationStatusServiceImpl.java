@@ -107,7 +107,7 @@ public class ApplicationStatusServiceImpl implements ApplicationStatusService {
     @Value("${eskimo.enableKubernetesSubsystem}")
     private String enableKubernetes = "true";
 
-    private final ThreadLocal<SimpleDateFormat> localDateFormatter
+    private final static ThreadLocal<SimpleDateFormat> localDateFormatter
             = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
     private final ReentrantLock statusUpdateLock = new ReentrantLock();
@@ -119,7 +119,7 @@ public class ApplicationStatusServiceImpl implements ApplicationStatusService {
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
 
         logger.info ("Initializing Application Status update scheduler ...");
-        scheduler.scheduleAtFixedRate(this::updateStatus, 15L * 1000L, 15L * 1000L, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this::updateStatus, 15L, 15L, TimeUnit.SECONDS);
     }
 
     @PreDestroy
@@ -177,18 +177,22 @@ public class ApplicationStatusServiceImpl implements ApplicationStatusService {
 
             feedInKubeConfigInfo(systemStatus);
 
-            // Get JVM's thread system bean
-            RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
-            long startTime = runtimeMXBean.getStartTime();
-            Date startDate = new Date(startTime);
-
-            systemStatus.setValueForPath("startTimestamp", localDateFormatter.get().format(startDate));
+            systemStatus.setValueForPath("startTimestamp", getRuntimeStartDate());
 
             lastStatus.set (systemStatus);
 
         } finally {
             statusUpdateLock.unlock();
         }
+    }
+
+    public static String getRuntimeStartDate() {
+        // Get JVM's thread system bean
+        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+        long startTime = runtimeMXBean.getStartTime();
+        Date startDate = new Date(startTime);
+
+        return localDateFormatter.get().format(startDate);
     }
 
     private void feedInKubeConfigInfo(JsonWrapper systemStatus) {

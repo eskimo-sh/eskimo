@@ -38,6 +38,8 @@ import ch.niceideas.eskimo.utils.ActiveWaiter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class EskimoAboutTest extends AbstractWebTest {
 
     @BeforeEach
@@ -59,11 +61,42 @@ public class EskimoAboutTest extends AbstractWebTest {
     @Test
     public void testNominal() throws Exception {
 
+        js("$.ajaxGet = function (dataObj) {" +
+                "    dataObj.success({\n" +
+                "  \"about-eskimo-demo-mode\": false,\n" +
+                "  \"about-eskimo-runtime-timestamp\": \"2023-04-17 16:51:13\",\n" +
+                "  \"about-eskimo-kube-enabled\": true,\n" +
+                "  \"about-eskimo-os-version\": \"6.1.0-5-amd64\",\n" +
+                "  \"about-eskimo-version\": \"0.5-SNAPSHOT\",\n" +
+                "  \"about-eskimo-build-timestamp\": \"2023-04-17T10:17:18Z\",\n" +
+                "  \"about-eskimo-packages-url\": \"https://www.eskimo.sh/eskimo/V0.5/\",\n" +
+                "  \"about-eskimo-java-home\": \"/usr/lib/jvm/java-11-openjdk-amd64\",\n" +
+                "  \"about-eskimo-working-dir\": \"/data/badtrash/work/eskimo\",\n" +
+                "  \"about-eskimo-os-name\": \"Linux\",\n" +
+                "  \"status\": \"OK\",\n" +
+                "  \"about-eskimo-java-version\": \"11.0.17\"\n" +
+                "});" +
+                "}");
+
         js("eskimoAbout.showAbout()");
         ActiveWaiter.wait(() -> js("return $('#about-modal').css('display')").equals("block"));
 
         assertCssEquals("block", "#about-modal", "display");
         assertCssEquals("visible", "#about-modal", "visibility");
+
+        assertJavascriptEquals("0.5-SNAPSHOT", "$('#about-eskimo-version').html()");
+
+        assertJavascriptEquals("false", "$('#about-eskimo-demo-mode').html()");
+        assertJavascriptEquals("2023-04-17 16:51:13", "$('#about-eskimo-runtime-timestamp').html()");
+        assertJavascriptEquals("true", "$('#about-eskimo-kube-enabled').html()");
+        assertJavascriptEquals("2023-04-17T10:17:18Z", "$('#about-eskimo-build-timestamp').html()");
+        assertJavascriptEquals("https://www.eskimo.sh/eskimo/V0.5/", "$('#about-eskimo-packages-url').html()");
+
+        assertJavascriptEquals("6.1.0-5-amd64", "$('#about-eskimo-os-version').html()");
+        assertJavascriptEquals("/usr/lib/jvm/java-11-openjdk-amd64", "$('#about-eskimo-java-home').html()");
+        assertJavascriptEquals("/data/badtrash/work/eskimo", "$('#about-eskimo-working-dir').html()");
+        assertJavascriptEquals("Linux", "$('#about-eskimo-os-name').html()");
+        assertJavascriptEquals("11.0.17", "$('#about-eskimo-java-version').html()");
 
         js("eskimoAbout.cancelAbout()");
         ActiveWaiter.wait(() -> {
@@ -73,6 +106,7 @@ public class EskimoAboutTest extends AbstractWebTest {
 
         //assertCssValue("#about-modal", "visibility", "hidden");
         assertCssEquals("none", "#about-modal", "display");
+
     }
 
 }
