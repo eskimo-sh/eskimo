@@ -44,8 +44,8 @@ If, for instance, the node one wants to remove from the cluster is `node4`, then
 
 ==== Node addition
 
-In the same way, if an etcd node is addedd to the cluster after the initial etcd setup, it needs unfortunately to be
-addedd explictely to the etcd cluster *before* the eskimo cluster node running it is installed (or at least before the
+In the same way, if an etcd node is added to the cluster after the initial etcd setup, it needs unfortunately to be
+added explicitly to the etcd cluster *before* the eskimo cluster node running it is installed (or at least before the
 etcd service is installed on that node).
 
 The command would be as follows:

@@ -5,65 +5,69 @@
 WARNING: Eskimo cluster nodes support only the Linux operating system and have to be running a supported Linux
 distribution (See <<eskimo_nodes_prerequisites>>). +
 The eskimo application itself can very well run on windows though. However, running the Eskimo application on Windows
-prevents the user from building his own containers. When running the eskimo backend on Windows, it's only possible to
-download pre-built service container images from www.eskimo.sh.
+prevents the user from building his own packages / container images. When running the eskimo backend on Windows, it's
+only possible to download pre-built service container images from https://www.eskimo.sh.
 
 
 === Installation target
 
 The eskimo backend itself can either be installed:
 
-* on one of the nodes from the eskimo cluster (for instance one of the node where master services will be installed). +
+* on one of the nodes from the eskimo cluster (anyone of them). +
 Doing so is however not recommended since that node would need to have the HTTP port on which Eskimo is listening opened
-to external accesses (which is against eskimo's philisophy) and in addition Eskimo would eat some of the resources (RAM
+to external accesses (which is against eskimo's philosophy) and in addition Eskimo would eat some of the resources (RAM
 and disk) that would be better left to the business services.
 * or on a dedicated node where only the eskimo backend runs (i.e. separated from the Eskimo cluster nodes). This is the
 recommended approach.
 
 ==== Local Eskimo installation
 
-Eskimo can also be installed on the local computer of the user where that local machine is the single node. +
-This is for instance useful when eskimo is intended to be used as a local _Data Science_ laboratory and not targeted
-towards large scale Big Data Analytics.
+Eskimo can also be used as a local _Data Science_ laboratory, in which case the Eskimo backend is installed on the local
+user machine as well as all eskimo services. This is perfectly possible with Eskimo.
+In such case Eskimo wouldn't be targeted towards large scale Big Data Analytics, but rather local Data Science
+experimentation or prototyping, make the user benefit from the Eskimo pre-packaged services (ElasticSearch, Spark, Flink,
+etc.)
 
 Installing Eskimo on the local user machine is however tricky. +
-Eskimo does require indeed a target IP address for the installation. +
+Eskimo does require indeed an IP address to identify the target node where eskimo services are to be installed. +
 A first idea one might have in this case is to use `127.0.0.1` (localhost) as single node target IP to proceed with
-the installation. Unfortunately, this doesn't work qs 127.0.0.1 resolved to different loopback interfaces in the
+the installation. Unfortunately, this doesn't work as 127.0.0.1 resolves to different loopback interfaces in the
 various docker containers running eskimo services and as a consequence eskimo services are not able to reach each
 others when `127.0.0.1` is used as installation target.
 
 *So something else needs to be found as target IP address.*
 
-The best approach is tu use the external interface IP address since in every possible configuration, this IP address
+The best approach is to use the external interface IP address since in every possible configuration, this IP address
 will be made available from within Kubernetes PODs and native docker containers, just as services running on
 hosts themselves.
 
 ==== Installing eskimo on Windows.
 
 As stated in introduction, the eskimo backend can run on Microsoft Windows but in this case it's only possible to
-download service container images from www.eskimo.sh. Building one's own container images locally is not possible.
+download service container images from https://www.eskimo.sh. Building one's own container images locally is not
+possible.
 
 In addition, a property in the configuration file `eskimo.properties` needs to be adapted to a Windows environment,
-the properly that configures the path of the user definition file:
+the properly that configures the path to the user definition file:
 
 `security.userJsonFile=/var/lib/eskimo/eskimo-users.json`
 
-needs to be changed to a folder existing on windows and where the user running Eskimop has _write rights_, such as e.g.
+needs to be changed to a folder existing on Windows and where the user running Eskimop has _write_access rights, such
+as e.g.
 
 `security.userJsonFile=c:/Windows/Temp/eskimo-users.json`
 
 
 === Prerequisites
 
-Some noteworthy elements need to be beared in mind regarding eskimo prerequisites.
+Some noteworthy elements need to be bore in mind regarding eskimo prerequisites.
 
 ==== Java 11 or greater
 
 Eskimo needs Java 11 or greater to run.
 
 In addition, one needs to have either `java` in the path or the `JAVA_HOME` environment variable properly set in prior
-to starting eskimo.
+to starting eskimo with the provided startup scripts.
 
 Use for instance the following commands on Linux:
 
@@ -73,7 +77,7 @@ export JAVA_HOME=/usr/local/lib/jdk-11 # or wherever it's installed
 export PATH=$JAVA_HOME/bin:$PATH
 ----
 
-(You might want to put the commands above in your `/etc/profile` or `/etc/bash.bashrc`)
+(One might want to put the commands above in ones's `/etc/profile` or `/etc/bash.bashrc`)
 
 Use for instance the following commands on Windows:
 
@@ -83,7 +87,7 @@ set JAVA_HOME=C:\programs\jdk-11 # or wherever it's installed
 set PATH=%JAVA_HOME%\bin;%PATH%
 ----
 
-(On Windows, you might want to define these as _System Variables_: Right-click on "My Computer", choose "Properties",
+(On Windows, one might want to define these as _System Variables_: Right-click on "My Computer", choose "Properties",
 then "Advanced System Settings", then "Environment Variables" and finally add or update the variables above as "System
 Variables")
 
@@ -91,10 +95,10 @@ Variables")
 
 In order to run eskimo, one needs to have
 
-* At least 20Gb of disk storage space on the machine running Eskimo
-* *At least one linux machine* available on the network (can be the same machine than the one running Eskimo) that will
-be put in the eskimo cluster and manipulated by eskimo. See next section regarding requirements for the machines in
-the eskimo cluster.
+* At least 25Gb of disk storage space on the machine running Eskimo
+* *At least one linux machine* available on the network and reachable from the machine running Eskimo (it can actually
+be the same machine than the one running Eskimo) that will be put in the eskimo cluster and manipulated by eskimo. +
+See next section regarding requirements for the machines in the eskimo cluster.
 
 Eskimo is reached using a web browser (see startup logs). Supported web browsers are:
 
@@ -102,19 +106,20 @@ Eskimo is reached using a web browser (see startup logs). Supported web browsers
 * Mozilla FireFox 54 or greater
 * Google Chrome 58 or greater
 
-Note: there may be other browsers / versions supported (Safari, Opera but they are not certified to work with Eskimo)
+Note: there may be other browsers / versions supported (Safari, Opera, etc.) but they are not certified to work with
+Eskimo.
 
 ==== Network requirements
 
 Network requirements with Eskimo are as follows:
 
-* 100MB ethernet between client machines (accessing eskimo cluster services through web browser) and the machine
-running the Eskimo backend.
+* 100MB ethernet minimum between client machines (accessing eskimo cluster services through web browser) and the machine
+running the Eskimo backend (Gigabit ethernet recommended).
 
 In case of cluster deployment:
 
-* gigabit ethernet between the machine running the Eskimo backend and Eskimo cluster nodes
-* gigabit ethernet required in between cluster nodes
+* Gigabit ethernet between the machine running the Eskimo backend and Eskimo cluster nodes
+* Gigabit ethernet required in between cluster nodes
 
 
 [[eskimo_nodes_prerequisites]]
@@ -128,8 +133,8 @@ Linux's distributions successfully tested for usage as Eskimo cluster nodes and 
 * RHEL 8.2 and greater
 * Fedora 35 or greater
 
-Other Debian-based or Red-Hat-based OSes could be supported as well but haven't been tested so far and may require the
-administrator to adapt the setup scripts located in `services_setup`.
+Other Debian-based or Red-Hat-based distributions could be supported as well but haven't been tested so far and may
+require the administrator to adapt the setup scripts located in `services_setup`.
 
 ===== Minimum hardware
 
@@ -165,9 +170,9 @@ Eskimo performs some initial setup operations on every node of the cluster it ne
 operations would require Internet access to download dependencies (either RPM or DEB packages) if these are not properly
 installed in advance by administrators.
 
-In case it is not possible to give access to internet to the nodes in the cluster one wishes to operate using eskimo,
+In case it is not possible to give access to internet to the nodes in the cluster one wants to operate using eskimo,
 one will find below the `yum` and `apt` commands used during nodes setup. +
-*In case internet access from cluster node is not possible, one can reproduce these commands on your environment to
+*In case internet access from cluster node is not possible, one can reproduce these commands on one's environment to
 find out about the packages that need to be installed in prior to have eskimo operating your cluster nodes:*
 
 Following commands are executed on a debian-based node:
@@ -194,7 +199,7 @@ apt-get -yq update
 apt-get -yq install docker-ce docker-ce-cli containerd.io
 
 # other dependencies
-apt-get -y install ipset binutils net-tools attr
+apt-get -y install ipset binutils net-tools attr socat dnsmasq gettext-base iputils-ping
 
 # glusterfs client
 apt-get -y install glusterfs-client
@@ -222,7 +227,7 @@ yum-config-manager --add-repo https://download.docker.com/linux/$LINUX_DISTRIBUT
 yum install -y docker-ce docker-ce-cli containerd.io
 
 # other dependencies
-yum install -y ipset binutils net-tools anacron
+yum install -y ipset binutils net-tools anacron socat dnsmasq gettext iputils
 
 # glusterfs client
 yum -y install glusterfs glusterfs-fuse
@@ -239,7 +244,7 @@ sudo zypper --non-interactive refresh | echo 'a'
 sudo zypper install -y docker
 
 # other dependencies
-sudo zypper install -y ipset binutils net-tools cron
+sudo zypper install -y ipset binutils net-tools cron sysvinit-tools socat dnsmasq iputils
 
 # glusterfs client
 sudo zypper install -y glusterfs
@@ -249,8 +254,8 @@ sudo zypper install -y glusterfs
 packages* (those listed above and their transitive dependencies) *before you can use these machines as
 eskimo cluster nodes.*
 
-After this initial setup is performed (called Eskimo base installation and done by the script
-`install-eskimo-base-system.sh`), eskimo operates entirely without any need to access internet.
+After this initial setup is performed (in a process named _Eskimo base installation_ and implemented by the script
+`install-eskimo-base-system.sh`), the eskimo installation is performed entirely without any need to access internet.
 
 ===== Eskimo system user
 
@@ -265,19 +270,20 @@ This `sudo` ability for the configured user is absolutely key.
 On most systems, this means:
 
 * Add the user configured with eskimo to the `sudoers` groups
-* Add a file in `/etc/sudoers.d/eskimo` containing `eskimo ALL=(ALL) NOPASSWD:ALL +
+* Add a file in `/etc/sudoers.d/eskimo` containing `eskimo ALL=(ALL) NOPASSWD:ALL` +
 (if `eskimo` is the configured user)
 `
 
 
 ===== Protecting eskimo nodes with a firewall
 
-The different sevices operated by Eskimo require different set of ports to communicate with each others. As such,
-internal cluster communications - all IP addresses used by the cluster nodes - have to be whitelisted in the firewall.
+The different services operated by Eskimo require different set of ports to communicate with each others. As such,
+internal cluster communications - all communications (ports) from an eskimo cluster node to all the other eskimo cluster
+nodes - have to be whitelisted (opened) from the firewall.
 
-The cluster nodes can protect from external access - IP addresses not belonging to the eskimo cluster nodes - by
-blocking pretty much every port except port 22, which is the single port used by eskimo to reach eskimo cluster
-services.
+The cluster nodes should however protect themselves against external access - IP addresses not belonging to the eskimo
+cluster nodes - by blocking pretty much every port except port 22, which is the single port used by eskimo to reach
+eskimo cluster services.
 
 *IN ADDITION TO THE STATIC PORTS LISTED BELOW, A WHOLE SET OF PORT RANGES ARE USED BY THE KUBERBNETES INFRASTRUCTURE,
 ELASTICSEARCH, SPARK EXECUTORS AND FLINK WORKERS TO COMMUNICATE WITH EACH OTHER. THESE DYNAMIC PORTS ARE CREATED ON THE
@@ -288,14 +294,14 @@ firewall is filtering out the internal eskimo cluster nodes IP addresses from th
 Every eskimo node should have wide access to every other node in the eskimo cluster. Period.*
 
 Specifically on RHEL, firewalld in its default configuration (coming out of the box) is preventing eskimo services from
-reaching each others and compromises Eskimo's behaviour. It needs to be properly configured and white list all
+reaching each others and compromises Eskimo's behaviour. It needs to be properly configured and whitelist all
 communications (all ports) in between Eskimo cluster nodes. Or just disable firewalld for a non-production critical
 deployment (`sudo disable firewalld` and `sudo stop firewalld`).
 
-On the opposite side, as far as external eskimo clustet communications are concerned,
+On the opposite side, as far as external eskimo cluster communications are concerned,
 it is important to filter out every single access attempt originating from outside the Eskimo cluster. The
-only open port for requests outside of the eskimo cluster should be the port 22 used by SSH since all accesses from the
-Eskimo console to the nodes from the Eskimo cluster happens through SSH tunnels.
+only open port to be opened for requests outside of the eskimo cluster should be the port 22 used by SSH since all
+accesses from the Eskimo console to the cluster nodes happens through SSH tunnels.
 
 For the sake of information, the list of static ports used by the different services are listed here:
 
@@ -330,7 +336,7 @@ Then in the folder `bin` under the newly extracted eskimo binary distribution fo
 
 That's it.
 
-==== SystemD Installation
+==== SystemD Unit file Installation
 
 In case one wants to have Eskimo's backend operated (automatically started, etc.) using SystemD, the script
 `bin/utils/__install-eskimo-systemD-unit-file.sh` can be used to perform all the required setup steps for a successful
@@ -344,13 +350,13 @@ Once extracted on the filesystem, the Eskimo folder contains the following eleme
 * `conf` : contains Eskimo configuration files
 * `lib` : contains eskimo runtime binaries
 * `packages-dev` : contains the Eskimo _docker images (packages) development framework_ which is used to build eskimo
-components / services docker images locally (this is not required if the administrators decides to download packages
-from www.eskimo.sh)
-* `packages_distrib`: contains eventually the eskimo services docker image packages (either build locally or downloaded
+components / services docker images locally (this is not required if the administrator decides to download packages
+from https://www.eskimo.sh)
+* `packages_distrib`: contains eventually the eskimo services docker image packages (either built locally or downloaded
 from internet)
 * `services_setup`: contains the services installation framework. *Each and every customization an administrator wishes
 to apply on eskimo services is done by modifying / extending / customizing the shell scripts in this folder*.
-* `static_images`: is intended to be used to add additional icons or logos for new custom services added by an
+* `static_images`: is intended to be used to add additional icons or logos for new custom managed services added by an
 administrator to Eskimo.
 
 ==== Utility commands
@@ -389,11 +395,11 @@ The structure of this file is as follows;
 
 The password is a `BCrypt` hash (11 rounds) of the actual password.
 
-The administrator can add as many different users to this file as required on the Eskimo platfoirm.
+The administrator can add as many different users as required on the Eskimo platform to this file.
 
 Users can have either the `ADMIN` or `USER` role.
 
-* the `ADMIN` role enables full acces to every single feature of Eskimo
+* the `ADMIN` role enables full access to every single feature of Eskimo
 * the `USER` role limits available functionalities to Data Science tools and prevents the user from making any change
 to the cluster configuration or influence runtime operations.
 
@@ -403,9 +409,8 @@ to the cluster configuration or influence runtime operations.
 Upon first run, eskimo needs to be setup before it can be used.
 
 Right after its first start, one single screen is available : *the setup page*. +
-It is the only accessible page as long as initial setup is not properly completed and service
-docker images (plus kubernetes packages) have not been either downloaded or built.
-
+It is the only accessible page as long as initial setup is not properly completed and service docker images (plus
+kubernetes packages) have not been either downloaded or built.
 
 The setup page is as follows:
 
@@ -415,33 +420,34 @@ On the setup page, the user needs to input following information:
 
 * *Configuration Storage Path* : a folder on the filesystem where the system user running eskimo needs to have write
 access to. The dynamic configuration and state persistence of eskimo will be stored in this location.
-* *SSH Username* : the name of the SSH user eskimo has to use to access the cluster nodes. Every node that need to be
-managed by eskimo needs to have granted access using SSH Public Key authentication to this user.
+* *SSH Username* : the name of the SSH user eskimo has to use to access the cluster nodes. Every node that needs to be
+managed by eskimo should have granted access using SSH Public Key authentication to this user.
 * *SSH private key* : the private key to use for SSH Public Key authentication for the above user. See the next section
-in regards to how to generate this key : <<ssh_key_authentication>>
-* *Kube Origin* : the user needs to choose whether Kubernetes package need to be *built locally* (on eskimo host node) or
-whether pre-built versions shall be *downloaded* from the remote packages repository (by default https://www.eskimo.sd.)
+presenting how to generate this key : <<ssh_key_authentication>>
+* *Kube Origin* : the user needs to choose whether Kubernetes package should be *built locally* (on eskimo host node) or
+whether pre-built versions should be *downloaded* from the remote packages repository (by default https://www.eskimo.sh).
 * *Docker Images Origin* : the user needs to choose whether service package images needs to be *built locally* or whether
-they need to be *downloaded* from the remote packages repository (by default https://www.niceideas.ch.)
+they need to be *downloaded* from the remote packages repository (by default https://www.eskimo.sh).
 
-Once the settings have been chosen by the user, clicking "Save and Apply Setup" will launch the initial setup process
-and the archives will be built locally or downloaded. This can take a few dozen of minutes depending on your internet
-connection and/or the eskimo host machine processing abilities.
+Once the settings have been chosen by the administrator, clicking "_Save and Apply Setup_" will launch the initial setup
+process and the archives will be built locally or downloaded. This can take a few dozen of minutes depending on your
+internet connection and/or the eskimo host machine processing abilities.
 
-Regarding the SSH private key, the next section gives indication with regards to how to build a _public / private key
-pair_ to enable eskimo to reach and manage the cluster nodes.
+Regarding the SSH private key, the next section gives indications on how to build a _public / private key pair_ to
+enable eskimo to reach and manage the cluster nodes.
 
-The document _"Service Development Framework"_ in the section _"Setting up a remote packages repository"_ presents
+The the section _"Setting up a remote packages repository"_ from the document _"Service Development Framework"_ presents
 the nuts and bolts required in setting up a remote packages repository. +
 The remote repository URL is configured in `eskimo.properties` using the configuration property : +
-`system.packagesDownloadUrlRoot` : The Root URL to download the packages from.
+`system.packagesDownloadUrlRoot` : The root URL to download the packages from.
 
 [[build_packages_locally]]
 ==== Building packages locally
 
 Building eskimo packages locally means building the services docker images on your local host machine running eskimo.
 This means that instead of downloading docker images from the eskimo repository, the user wants to build them on his own
-and only download the source package archives from their respective software editor web site (e.g. Apache, Elastic, etc.)
+and only download the source package archives from their respective software editor web site (e.g. Apache, Elastic,
+etc.)
 
 ===== Requirements
 
@@ -618,7 +624,7 @@ this for you.
 ==== Generate an SSH Key Pair
 
 You should generate your key pair on your laptop, not on your server. All Mac and Linux systems include a command called
-ssh-keygen that will generate a new key pair.
+`ssh-keygen` that will generate a new key pair.
 
 If you're using Windows, you can generate the keys on your server. Just remember to copy your keys to your laptop and
 delete your private key from the server after you've generated it.
@@ -695,14 +701,14 @@ ssh-copy-id SYSUSER@x.x.x.x
 If you don't have the `ssh-copy-id` command (for instance, if you are using Windows), you can instead SSH in to your
 server and manually create the `~/.ssh/authorized_keys` file so it contains your public key.
 
-First, run the following commands to make create the file with the correct permissions.
+First, run the following commands to update the file with the correct permissions.
 
 ----
 (umask 077 && test -d ~/.ssh || mkdir ~/.ssh)
 (umask 077 && touch ~/.ssh/authorized_keys)
 ----
 
-Next, edit the file `.ssh/authorized_keys` using your preferred editor. Copy and paste your id_rsa.pub file into the
+Next, edit the file `.ssh/authorized_keys` using your preferred editor. Copy and paste your `id_rsa.pub` file into the
 file.
 
 ==== Log In Using Your Private Key
@@ -731,7 +737,7 @@ If you have multiple keys (for example, one on each of your laptops) or multiple
 to, just follow the same instructions above using ssh-copy-id or manually editing the file to paste in additional
 keys, one on each line.
 
-When you're done, the .ssh/authorized_keys file will look something like this (don't copy this, use your own public
+When you're done, the `.ssh/authorized_keys` file will look something like this (don't copy this, use your own public
 keys):
 
 ----

@@ -45,7 +45,7 @@ Just define where you want to run which services and let eskimo take care of eve
 Move services between nodes or install new services in just a few clicks.
 
 Don’t bother remembering where you installed Web consoles and UI applications, Eskimo wraps them all in a single and
-consistent UI.
+unified UI.
 
 a|image::pngs/console.jpg[60, 60]| *Eskimo Web Console*
 
@@ -113,7 +113,7 @@ In contrary to popular Hadoop-based and other Big Data Platforms, Eskimo is base
 
 * GlusterFS instead of HDFS
 * Spark instead of Hive or Pig
-* Flink instead of Storm
+* Flink and Kafka instead of Storm
 * Kubernetes instead of Yarn
 * Docker instead of native deployment
 * ElasticSearch instead of HBase or Hive
@@ -131,10 +131,10 @@ than on a large production cluster.
 
 a|image::pngs/ring.jpg[80, 80] a| *One ring to Rule them all*
 
-Making docker, gluster, elasticsearch, kafka, spark, Flink, zeppelin, etc. all work perfectly and 100% together is very
+Making docker, gluster, elasticsearch, kafka, spark, flink, zeppelin, etc. all work perfectly and 100% together is very
 tedious and difficult.
 
-Eskimo takes care of everything and fine tunes all these services to make them understand each other and work together.
+Eskimo takes care of everything and fine-tunes all these services to make them understand each other and work together.
 
 Eskimo enables you one-click administration of all of them, moving services, provisioning nodes, etc.
 
@@ -187,12 +187,15 @@ Eskimo is designed for Enterprise deployments, fulfilling enterprise-grade requi
 * State of the art Integration abilities
 * Very broad range of use-cases and possibilities
 
+(N.B. Eskimo comes in two flavours, the _Enterprise Edition_ and the _Community Edition_. Eskimo CE - Community Edition
+- supports only a subset of the features above.)
+
 a|image::pngs/cloud.jpg[80, 80] a| *Cloud Friendly*
 
 Build your own Big Data Cloud
 
 Eskimo is VM friendly. +
-You have a bunch of VMs somewhere on Amazon or google cloud ? +
+You have a bunch of VMs somewhere on Amazon or google cloud? +
 Make it a state of the art big data cluster, your way, not amazon or google's predefined, fixed and constraining way.
 
 Choose your services and let eskimo take care of everything.

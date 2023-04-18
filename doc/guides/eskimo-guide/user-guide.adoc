@@ -54,7 +54,7 @@ image::pngs/context-menu.png[300, 300, align="center"]
 
 === Acting on services reporting errors upon installation
 
-Should you encounter an error upon Eskimo's pre-packaged services installation, it most of the time comes fro some edge
+Should you encounter an error upon Eskimo's pre-packaged services installation, it most of the time comes from some edge
 conditions that can happen once in a while (this is very rare). +
 Whenever that happens, a first step is to simply try to reapply the _Nodes Services configuration_ - See
 <<apply_configuration>> - if the error happens again, then look at service installation logs or SystemD logs.
@@ -133,7 +133,8 @@ In Demo Mode, following actions are blocked:
 * Changing or re-applying kubernetes configuration
 * Changing or re-applying setup configuration
 
-Demo Mode is activated by changing the property `eskimo.demoMode` to `true` in the confguration file `eskimo.properties`:
+Demo Mode is activated by changing the property `eskimo.demoMode` to `true` in the configuration file
+`eskimo.properties`:
 
 .Configuration Property related to _Demo Mode_
 ----
@@ -155,10 +156,10 @@ blocked).
 
 In case a user wants to use the features that are disabled in _Demo Mode_, he needs to disable _Demo Mode_.
 
-*Note*: the "_host only_" interface IP address of the DemoVM needs to be `192.168.56.41`. Eskimo works by targettin cluster
-nodes using their IP addresses. In the case of the Demo VM, the targe cluster node is the very same VM itself. In this
-case, Eskimo is using the IP address of its own VM as installation target. So if the IP address of the DemoVM changes
-from `192.168.56.41` to anything else, Eskimo will interpret it as the target machine having disappeared.
+*Note*: the "_host only_" interface IP address of the DemoVM needs to be `192.168.56.41`. Eskimo works by targetting
+cluster nodes using their IP addresses. In the case of the Demo VM, the targe cluster node is the very same VM itself.
+In this case, Eskimo is using the IP address of its own VM as installation target. So if the IP address of the DemoVM
+changes from `192.168.56.41` to anything else, Eskimo will interpret it as the target machine having disappeared.
 
 ==== Deactivating Demo Mode on the demo VM
 
@@ -184,7 +185,7 @@ build or download the _Eskimo Service Package Images_. Internet access from the 
 === Docker images versioning
 
 Every service deployed on the Eskimo Nods cluster by Eskimo takes a practical form of a docker image instantiated in a
-docker container either through SystemD (for note native services) or Kubernetes.
+docker container either through SystemD (for node native services) or Kubernetes.
 
 These Docker images are installed automatically either in the node local repo (for native services) or in a Docker
 Registry (for kubernetes services).
