@@ -438,7 +438,7 @@ enable eskimo to reach and manage the cluster nodes.
 
 The the section _"Setting up a remote packages repository"_ from the document _"Service Development Framework"_ presents
 the nuts and bolts required in setting up a remote packages repository. +
-The remote repository URL is configured in `eskimo.properties` using the configuration property : +
+The remote repository URL is configured in `eskimo.properties` using the configuration property :
 `system.packagesDownloadUrlRoot` : The root URL to download the packages from.
 
 [[build_packages_locally]]

@@ -97,7 +97,9 @@ if [[ $? != 0 ]]; then
     fail_if_error $? "/tmp/docker_registry_install_log" -1
 fi
 
-mv regctl-linux-amd64-v$REGCLIENT_VERSION regctl-linux-amd64 || 0
+set +e
+mv regctl-linux-amd64-v$REGCLIENT_VERSION regctl-linux-amd64 2>/dev/null
+set -e
 
 echo " - Installing regclient regctl"
 set -e
