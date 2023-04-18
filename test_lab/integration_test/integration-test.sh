@@ -1901,9 +1901,13 @@ prepare_demo() {
     echo_date "   + Extracting dashboard names"
     cat kibana-dashboard-check | jq -r '.saved_objects | .[] | select(.type=="dashboard") | .attributes | .title' > kibana-dashboards
 
+}
+
+prepare_demo2() {
+
     echo_date "   + Ensure all dashboards are found"
 
-    if [[ $(grep -F '\[eCommerce\] Revenue Dashboard' kibana-dashboards) == "" ]]; then
+    if [[ $(grep -F '[eCommerce] Revenue Dashboard' kibana-dashboards) == "" ]]; then
         echo "!! Cannot find [eCommerce] Revenue Dashboard"
         exit 121
     fi
@@ -1913,12 +1917,12 @@ prepare_demo() {
         exit 122
     fi
 
-    if [[ $(grep -F '\[Flights\] Global Flight Dashboard' kibana-dashboards) == "" ]]; then
+    if [[ $(grep -F '[Flights] Global Flight Dashboard' kibana-dashboards) == "" ]]; then
         echo "!! Cannot find [eCommerce] Revenue Dashboard"
         exit 123
     fi
 
-    if [[ $(grep -F '\[Logs\] Web Traffic' kibana-dashboards) == "" ]]; then
+    if [[ $(grep -F '[Logs] Web Traffic' kibana-dashboards) == "" ]]; then
         echo "!! Cannot find [eCommerce] Revenue Dashboard"
         exit 124
     fi
@@ -2238,7 +2242,7 @@ if [[ "$INSTALL_ESKIMO" != "" ]]; then
     install_eskimo
 fi
 
-if [[ "$RUN_DATA_LOAD" != "" || "$RUN_NOTEBOOK_TESTS" != "" || "$RUN_OTHER_TESTS" != "" || "$RUN_CLEANUP" != "" || "$RUN_SCREENSHOTS" != "" ]]; then
+if [[ "$RUN_DATA_LOAD" != "" || "$RUN_NOTEBOOK_TESTS" != "" || "$RUN_OTHER_TESTS" != "" || "$RUN_CLEANUP" != "" || "$RUN_SCREENSHOTS" != "" || $DEMO != "" ]]; then
     login_eskimo
 fi
 
@@ -2300,7 +2304,7 @@ if [[ "$RUN_OVERWRITE_SC" != "" ]]; then
 fi
 
 if [[ $DEMO == "demo" ]]; then
-    prepare_demo
+    prepare_demo2
 fi
 
 # clean log file if we went this far without a problem (since it will be dumped on the console)
