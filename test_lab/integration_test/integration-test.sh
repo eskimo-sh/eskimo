@@ -1901,10 +1901,6 @@ prepare_demo() {
     echo_date "   + Extracting dashboard names"
     cat kibana-dashboard-check | jq -r '.saved_objects | .[] | select(.type=="dashboard") | .attributes | .title' > kibana-dashboards
 
-}
-
-prepare_demo2() {
-
     echo_date "   + Ensure all dashboards are found"
 
     if [[ $(grep -F '[eCommerce] Revenue Dashboard' kibana-dashboards) == "" ]]; then
@@ -2304,7 +2300,7 @@ if [[ "$RUN_OVERWRITE_SC" != "" ]]; then
 fi
 
 if [[ $DEMO == "demo" ]]; then
-    prepare_demo2
+    prepare_demo
 fi
 
 # clean log file if we went this far without a problem (since it will be dumped on the console)
