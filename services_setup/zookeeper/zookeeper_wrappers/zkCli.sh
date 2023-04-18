@@ -34,6 +34,11 @@
 # Software.
 #
 
+if [[ ":$PATH:" != *":/usr/local/sbin/:"* ]]; then
+    PATH=$PATH:/usr/local/sbin/
+fi
+. eskimo-utils.sh
+
 # extract path arguments and create volume mount command part
 export DOCKER_VOLUMES_ARGS=""
 
@@ -49,8 +54,9 @@ fi
 
 #echo $DOCKER_VOLUMES_ARGS
 
-/usr/bin/docker run \
-        -it \
+tty -s && USE_TTY="-t"
+docker run \
+        -i $USE_TTY \
         --rm \
         --network host \
         --user zookeeper \
