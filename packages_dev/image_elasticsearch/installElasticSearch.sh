@@ -133,7 +133,7 @@ echo " - Stopping Elasticsearch"
 kill -15 $ES_PROC_ID
 sleep 5
 killall java 2>/dev/null
-sleep 2
+sleep 5
 
 export ES_PROC_ID=-1
 
