@@ -265,6 +265,15 @@ node / host level commands and components.
 Eskimo provides in place a command `eskimo-kube-exec` which invokes the passed command line within a container where
 kubernetes services are dynamically declared in `/etc/hosts`, thus making them available for command line programs.
 
+===== Kubernetes Dashboard
+
+Eskimo packages and provides the Kubernetes Dashboard to monitor and administer Kubernetes out of the box.
+
+Eskimo takes care of login the user in the Kubernetes Dashboard automatically. +
+However, upon inactivity of the user, the session is lost frequently and fast. In this case, one will see plenty of
+"_401 - unauthorized_" errors. Whenever this happens, the user simply needs to use the upper-right icon to log out of
+the Kubernetes dashboard and Eskimo will take care of login the user back in after a few seconds.
+
 
 === Elastic Logstash
 
