@@ -109,15 +109,19 @@ Theoretically, Eskimo can be built on any Operating System providing a command l
 ==== Microsoft Windows
 
 *However, the eskimo source tree makes an extensive use of symbolic links which - unfortunately - are only supported on
-Microsoft Windows 10 and 11 through "Developer Mode*.
+Microsoft Windows 10 and 11 through "Developer Mode"*.
 
 In order to checkout and develop Eskimo on Windows, some precautions need to be taken:
 
 * First, *Developer Mode* should be enabled on Windows to support symbolic links. +
   See https://github.com/MicrosoftDocs/windows-dev-docs/blob/docs/hub/apps/get-started/developer-mode-features-and-debugging.md
-* Second, The `git clone` command should explictely enable symbolic link support. That would mean using following
+* Second, The `git clone` command should explicitly enable symbolic link support. That would mean using following
   command for instance to checkout Eskimo master branch: +
   `git clone -c core.symlinks=true https://github.com/eskimo-sh/eskimo.git`
+
+If these two precautions are well taken, one should be able to develop Eskimo. +
+A significant portion of the unit tests will however be skipped when executed on Windows since they require a Unix
+Operating System to work properly.
 
 
 === Building using maven
