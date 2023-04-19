@@ -119,7 +119,7 @@ In order to checkout and develop Eskimo on Windows, some precautions need to be 
   command for instance to checkout Eskimo master branch: +
   `git clone -c core.symlinks=true https://github.com/eskimo-sh/eskimo.git`
 
-If these two precautions are well taken, one should be able to develop Eskimo. +
+If these two precautions are well taken, one should be able to develop Eskimo on Windows. +
 A significant portion of the unit tests will however be skipped when executed on Windows since they require a Unix
 Operating System to work properly.
 
